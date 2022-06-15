@@ -19,9 +19,9 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.3.18</spring.version>
-        <spring-boot.version>2.6.6</spring-boot.version>
-        <spring-security.version>5.6.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>5.3.20</spring.version>
+        <spring-boot.version>2.6.8</spring-boot.version>
+        <spring-security.version>5.6.5</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.5.Final</hibernate.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
         <postgresql.driver.version>42.3.3</postgresql.driver.version>
@@ -1358,6 +1358,13 @@
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.0</version>
+		<exclusions>
+                    <!-- A later version is brought in by google-oauth-client -->
+                    <exclusion>
+                        <groupId>com.google.code.gson</groupId>
+                        <artifactId>gson</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Required to run Handle Server -->
             <dependency>
@@ -1680,7 +1687,7 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.32.1</version>
+                <version>1.33.3</version>
             </dependency>
 
             <!-- Findbugs annotations -->

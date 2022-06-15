@@ -8,6 +8,8 @@
 package org.dspace.builder;
 
 import static org.dspace.content.LicenseUtils.getLicenseText;
+import static org.dspace.content.MetadataSchemaEnum.DC;
+import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -76,6 +78,11 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public ItemBuilder withAuthor(final String authorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
+
+    public ItemBuilder withAuthor(final String authorName, final String authority) {
+        return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
+    }
+
     public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
                                 null, authorName, authority, confidence);
@@ -147,6 +154,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, schema, element, qualifier, value);
     }
 
+    public ItemBuilder withDspaceObjectOwner(String value, String authority) {
+        return addMetadataValue(item, "dspace", "object", "owner", null, value, authority, CF_ACCEPTED);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;
@@ -175,7 +186,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     /**
      * Create an admin group for the collection with the specified members
      *
-     * @param members epersons to add to the admin group
+     * @param ePerson epersons to add to the admin group
      * @return this builder
      * @throws SQLException
      * @throws AuthorizeException
@@ -184,6 +195,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setAdminPermission(item, ePerson, null);
     }
 
+    public ItemBuilder withPersonEmail(String email) {
+        return addMetadataValue(item, "person", "email", null, email);
+    }
 
     @Override
     public Item build() {
