@@ -40,11 +40,13 @@ public interface OrcidSynchronizationService {
     /**
      * Configure the given profile with the data present in the given ORCID token.
      * This action is required to synchronize profile and related entities with
-     * ORCID.
+     * ORCID. No security check is done, it is therefore the caller's responsibility
+     * to verify for example that the current user has permission to connect the
+     * profile to ORCID (if necessary).
      *
-     * @param context the relevant DSpace Context.
-     * @param profile the profile to configure
-     * @param token   the ORCID token
+     * @param  context      the relevant DSpace Context.
+     * @param  profile      the profile to configure
+     * @param  token        the ORCID token
      * @throws SQLException if a SQL error occurs during the profile update
      */
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException;
