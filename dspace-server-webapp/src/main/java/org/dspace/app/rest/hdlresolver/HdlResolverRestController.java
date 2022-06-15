@@ -33,18 +33,21 @@ public class HdlResolverRestController {
     private HdlResolverService hdlResolverService;
 
     /**
-     * REST Get Method used to find and retrieve the URL of a target Handle. It
+     * REST GET Method used to find and retrieve the URL of a target Handle. It
      * should return only one item, if found, else a null body value.
      * 
      * Generate an <code>HttpStatus.BAD_REQUEST</code> 400 Error if the handle used
      * in path isn't valid.
+     * 
+     * The response type will be the same that is in the /xmlui/handleresolver/resolve
+     * (<code>application/json;charset=UTF-8</code>)
      * 
      * @param request HttpServletRequest
      * @return One element List or <code>null</code> with status 200
      *         <code>HttpStatus.OK</code> or <code>HttpStatus.BAD_REQUEST</code> 400
      *         error
      */
-    @GetMapping("**")
+    @GetMapping(value = "**", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getHandleUrlResolver(HttpServletRequest request) {
         HdlResolverDTO handleResolver = this.hdlResolverService.resolveBy(request.getRequestURI(),
                 request.getContextPath() + HdlResolverRestController.BASE_PATH);
