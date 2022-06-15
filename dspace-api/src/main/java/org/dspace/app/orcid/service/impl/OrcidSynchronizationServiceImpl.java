@@ -105,10 +105,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
 
-        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, profile);
-        if (orcidToken != null) {
-            orcidToken.setProfileItem(null);
-        }
+        orcidTokenService.deleteByProfileItem(context, profile);
 
         updateItem(context, profile);
 
