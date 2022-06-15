@@ -11,15 +11,20 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.dspace.app.orcid.OrcidOperation;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
+import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.profile.OrcidEntitySyncPreference;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
+import org.dspace.content.Relationship;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +44,9 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private RelationshipService relationshipService;
 
     @Override
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException {
@@ -187,6 +195,43 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     @Override
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException {
         orcidQueueDAO.save(context, orcidQueue);
+    }
+
+    @Override
+    public void recalculateOrcidQueue(Context context, Item owner, OrcidEntityType orcidEntityType,
+        OrcidEntitySyncPreference preference) throws SQLException {
+
+        String entityType = orcidEntityType.getEntityType();
+        if (preference == OrcidEntitySyncPreference.DISABLED) {
+            deleteByOwnerAndRecordType(context, owner, entityType);
+        } else {
+            List<Item> entities = findAllEntitiesLinkableWith(context, owner, entityType);
+            for (Item entity : entities) {
+                create(context, owner, entity);
+            }
+        }
+
+    }
+
+    private List<Item> findAllEntitiesLinkableWith(Context context, Item profile, String entityType) {
+
+        return findRelationshipsByItem(context, profile).stream()
+            .map(relationship -> getRelatedItem(relationship, profile))
+            .filter(item -> entityType.equals(itemService.getEntityType(item)))
+            .collect(Collectors.toList());
+
+    }
+
+    private List<Relationship> findRelationshipsByItem(Context context, Item item) {
+        try {
+            return relationshipService.findByItem(context, item);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Item getRelatedItem(Relationship relationship, Item item) {
+        return relationship.getLeftItem().equals(item) ? relationship.getRightItem() : relationship.getLeftItem();
     }
 
     private String getMetadataValue(Item item, String metadatafield) {

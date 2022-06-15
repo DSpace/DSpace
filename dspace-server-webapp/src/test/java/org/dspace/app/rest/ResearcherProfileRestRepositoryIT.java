@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
+import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
 import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
@@ -18,10 +19,12 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
 import static org.dspace.app.rest.matcher.ResourcePolicyMatcher.matchResourcePolicyProperties;
+import static org.dspace.builder.RelationshipTypeBuilder.createRelationshipTypeBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -41,9 +44,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import com.jayway.jsonpath.JsonPath;
+import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -53,11 +59,15 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidTokenBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -85,6 +95,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private OrcidTokenService orcidTokenService;
+
+    @Autowired
+    private OrcidQueueService orcidQueueService;
 
     private EPerson user;
 
@@ -2100,6 +2113,102 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void testOrcidSynchronizationPreferenceUpdateForceOrcidQueueRecalculation() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        EntityType orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+            "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
+
+        RelationshipType isOrgUnitOfPerson = createRelationshipTypeBuilder(context, personType, orgUnitType,
+            "isOrgUnitOfPerson", "isPersonOfOrgUnit", 0, null, 0, null).build();
+
+        RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
+            "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withOrcidScope("/read")
+            .withOrcidScope("/write")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .build();
+
+        OrcidTokenBuilder.create(context, ePerson, "3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4").build();
+
+        UUID ePersonId = ePerson.getID();
+
+        Item profile = createProfile(ePerson);
+
+        UUID profileItemId = profile.getID();
+
+        Collection publications = createCollection("Publications", "Publication");
+
+        Collection orgUnits = createCollection("OrgUnits", "OrgUnit");
+
+        Item publication = createPublication(publications, "Test publication", profile, isAuthorOfPublication);
+
+        Collection projects = createCollection("Projects", "Project");
+
+        Item firstProject = createProject(projects, "First project", profile, isProjectOfPerson);
+        Item secondProject = createProject(projects, "Second project", profile, isProjectOfPerson);
+
+        createOrgUnit(orgUnits, "OrgUnit", profile, isOrgUnitOfPerson);
+
+        context.restoreAuthSystemState();
+
+        // no preferences configured, so no orcid queue records created
+        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/publications", "ALL"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(1));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "ALL"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(3));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/publications", "DISABLED"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        assertThat(queueRecords, hasSize(2));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
+            .content(getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "DISABLED"))))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk());
+
+        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+
+    }
+
     private Item createProfile(EPerson ePerson) throws Exception {
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
@@ -2137,6 +2246,57 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     private List<MetadataValue> getMetadataValues(Item item, String metadataField) {
         return itemService.getMetadataByMetadataString(item, metadataField);
+    }
+
+    private Collection createCollection(String name, String entityType) throws SQLException {
+        return CollectionBuilder.createCollection(context, context.reloadEntity(parentCommunity))
+            .withName(name)
+            .withEntityType(entityType)
+            .build();
+    }
+
+    private Item createPublication(Collection collection, String title, Item author,
+        RelationshipType isAuthorOfPublication) {
+
+        Item publication = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withAuthor(author.getName())
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, author, publication, isAuthorOfPublication).build();
+
+        return publication;
+
+    }
+
+    private Item createOrgUnit(Collection collection, String title, Item person,
+        RelationshipType isOrgUnitOfPerson) {
+
+        Item orgUnit = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, person, orgUnit, isOrgUnitOfPerson).build();
+
+        return orgUnit;
+
+    }
+
+    private Item createProject(Collection collection, String title, Item person,
+        RelationshipType isProjectOfPerson) {
+
+        Item project = ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, project, person, isProjectOfPerson).build();
+
+        return project;
+
+    }
+
+    private Predicate<OrcidQueue> orcidQueueRecordWithEntity(Item entity) {
+        return orcidQueue -> entity.equals(orcidQueue.getEntity());
     }
 
     private <T> T readAttributeFromResponse(MvcResult result, String attribute) throws UnsupportedEncodingException {
