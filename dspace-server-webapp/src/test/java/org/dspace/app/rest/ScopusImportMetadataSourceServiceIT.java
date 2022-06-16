@@ -61,7 +61,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
             context.restoreAuthSystemState();
             ArrayList<ImportRecord> collection2match = getRecords();
-            Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("test query", 0, 2);
+            Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("roma", 0, 2);
             assertEquals(2, recordsImported.size());
             matchRecords(new ArrayList<ImportRecord>(recordsImported), collection2match);
         } finally {
@@ -87,7 +87,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            int tot = scopusServiceImpl.getRecordsCount("test query");
+            int tot = scopusServiceImpl.getRecordsCount("roma");
             assertEquals(2, tot);
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
@@ -112,7 +112,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
             when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
 
             context.restoreAuthSystemState();
-            Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("test query", 0, 20);
+            Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("roma", 0, 20);
             ImportRecord  importedRecord = recordsImported.iterator().next();
             assertTrue(importedRecord.getValueList().isEmpty());
         } finally {
@@ -144,7 +144,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Orsina L.");
         MetadatumDTO scopusAuthorId3 = createMetadatumDTO("person", "identifier", "scopus-author-id", "6602595438");
         MetadatumDTO orgunit3 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
-        MetadatumDTO rights = createMetadatumDTO("dc", "rights", null, "open access");
+        MetadatumDTO rights = createMetadatumDTO("dc", "rights", null, "true");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
         MetadatumDTO ispartofseries = createMetadatumDTO("dc","relation","ispartofseries","Mathematics In Engineering");
 
@@ -196,7 +196,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Bertini L.");
         MetadatumDTO scopusAuthorId7 = createMetadatumDTO("person", "identifier", "scopus-author-id", "7005555198");
         MetadatumDTO orgunit7 = createMetadatumDTO("person", "affiliation", "name","Sapienza Università di Roma");
-        MetadatumDTO rights2 = createMetadatumDTO("dc", "rights", null, "open access");
+        MetadatumDTO rights2 = createMetadatumDTO("dc", "rights", null, "true");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
         MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries",
                                                           "Mathematics In Engineering");
