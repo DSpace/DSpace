@@ -35,6 +35,7 @@ import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
 
 /**
@@ -137,7 +138,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
         handler.logDebug("building query");
         DiscoverQuery discoverQuery =
             queryBuilder.buildQuery(context, dso, discoveryConfiguration, query, queryBuilderSearchFilters,
-            "Item", 10, Long.getLong("0"), null, "ASC");
+            "Item", 10, Long.getLong("0"), null, SortOption.DESCENDING);
         handler.logDebug("creating iterator");
 
         Iterator<Item> itemIterator = searchService.iteratorSearch(context, dso, discoverQuery);
