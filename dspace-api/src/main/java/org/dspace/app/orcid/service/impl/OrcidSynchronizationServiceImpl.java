@@ -107,17 +107,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public void unlinkProfile(Context context, Item profile) throws SQLException {
 
-        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
-        if (ePerson == null) {
-            throw new IllegalArgumentException(
-                "The given profile item is not related to any eperson. Item id: " + profile.getID());
-        }
-
         itemService.clearMetadata(context, profile, "person", "identifier", "orcid", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
 
-        orcidTokenService.deleteByEPerson(context, ePerson);
+        orcidTokenService.deleteByProfileItem(context, profile);
 
         updateItem(context, profile);
 
@@ -299,12 +293,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     private void updateEPerson(Context context, EPerson ePerson) throws SQLException {
         try {
-            context.turnOffAuthorisationSystem();
             ePersonService.update(context, ePerson);
         } catch (AuthorizeException e) {
             throw new RuntimeException(e);
-        } finally {
-            context.restoreAuthSystemState();
         }
     }
 }

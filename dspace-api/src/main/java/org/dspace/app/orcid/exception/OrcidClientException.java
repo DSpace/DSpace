@@ -16,6 +16,8 @@ package org.dspace.app.orcid.exception;
  */
 public class OrcidClientException extends RuntimeException {
 
+    public static final String INVALID_GRANT_MESSAGE = "invalid_grant";
+
     private static final long serialVersionUID = -7618061110212398216L;
 
     private int status = 0;
@@ -31,6 +33,16 @@ public class OrcidClientException extends RuntimeException {
 
     public int getStatus() {
         return this.status;
+    }
+
+    /**
+     * Returns true if the exception is related to an invalid grant error
+     * (authentication code non valid), false otherwise
+     *
+     * @return the check result
+     */
+    public boolean isInvalidGrantException() {
+        return getMessage() != null && getMessage().contains(INVALID_GRANT_MESSAGE);
     }
 
 }

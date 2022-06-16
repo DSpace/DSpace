@@ -110,6 +110,11 @@ public class ResearcherProfileReplaceOrcidSyncPreferencesOperation extends Patch
         return (String) valueObject;
     }
 
+    /**
+     * Update the ORCID synchronization preference related to the given path.
+     * Returns true if the value has actually been updated, false if the value to be
+     * set is the same as the one already configured.
+     */
     private boolean updatePreferences(Context context, String path, String value, Item profileItem)
         throws SQLException {
         switch (path) {

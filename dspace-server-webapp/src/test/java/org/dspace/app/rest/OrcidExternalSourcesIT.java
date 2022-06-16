@@ -81,7 +81,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                            hasJsonPath("$.externalSource", is("orcid")),
                            hasJsonPath("$.type", is("externalSourceEntry"))
                    )))
-                   .andExpect(jsonPath("$.metadata['dc.identifier.uri'][0].value",is("https://orcid.org/" + entry)))
+                   .andExpect(jsonPath("$.metadata['dc.identifier.uri'][0].value",is("https://sandbox.orcid.org/" + entry)))
                    .andExpect(jsonPath("$.metadata['person.familyName'][0].value",is("Bollini")))
                    .andExpect(jsonPath("$.metadata['person.givenName'][0].value",is("Andrea")))
                    .andExpect(jsonPath("$.metadata['person.identifier.orcid'][0].value",is(entry)));
@@ -103,7 +103,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                            hasJsonPath("$.type", is("externalSourceEntry"))
                    )))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
-                                   is("https://orcid.org/0000-0002-9029-1854")))
+                                   is("https://sandbox.orcid.org/0000-0002-9029-1854")))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
                                    is("Bollini")))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
@@ -129,7 +129,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$.type", is("externalSourceEntry")))
                    )))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
-                                   is("https://orcid.org/0000-0002-9029-1854")))
+                                   is("https://sandbox.orcid.org/0000-0002-9029-1854")))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
                                    is("Bollini")))
                   .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
@@ -211,7 +211,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$.type", is("externalSourceEntry"))
                        )))
                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
-                                       is("https://orcid.org/0000-0002-9029-1854")))
+                                       is("https://sandbox.orcid.org/0000-0002-9029-1854")))
                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
                                        is("Bollini")))
                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
@@ -265,7 +265,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                                    hasJsonPath("$.type", is("externalSourceEntry")))
                        )))
                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0].value",
-                                       is("https://orcid.org/0000-0002-9029-1854")))
+                                       is("https://sandbox.orcid.org/0000-0002-9029-1854")))
                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
                                        is("Bollini")))
                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
