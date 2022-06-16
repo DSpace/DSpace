@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.utils;
+package org.dspace.discovery.utils;
 
 import static java.util.Collections.emptyList;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.COUNT;
@@ -16,10 +16,10 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -35,9 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.InvalidSearchRequestException;
-import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
@@ -45,6 +42,7 @@ import org.dspace.discovery.DiscoverHitHighlightingField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.FacetYearRange;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
@@ -56,6 +54,7 @@ import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
+import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -65,8 +64,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+
 
 /**
  * Unit tests for {@link DiscoverQueryBuilder}
@@ -94,8 +92,14 @@ public class DiscoverQueryBuilderTest {
 
     private DiscoveryConfiguration discoveryConfiguration;
     private String query;
-    private SearchFilter searchFilter;
-    private PageRequest page;
+
+    private int pageSize = 10;
+    private long offset = 10;
+    private String sortProperty = "dc.title";
+    private String sortDirection = "ASC";
+
+    private QueryBuilderSearchFilter searchFilter;
+
 
     @Before
     public void setUp() throws Exception {
@@ -106,33 +110,35 @@ public class DiscoverQueryBuilderTest {
         when(configurationService.getIntProperty(eq("rest.search.max.results"), anyInt())).thenReturn(100);
 
         when(searchService.toSortFieldIndex(any(String.class), any(String.class)))
-            .then(invocation -> invocation.getArguments()[0] + "_sort");
+                .then(invocation -> invocation.getArguments()[0] + "_sort");
 
         when(searchService
-            .getFacetYearRange(eq(context), nullable(IndexableObject.class), any(DiscoverySearchFilterFacet.class),
-                any(), any(DiscoverQuery.class)))
-            .then(invocation -> new FacetYearRange((DiscoverySearchFilterFacet) invocation.getArguments()[2]));
+                     .getFacetYearRange(eq(context), nullable(IndexableObject.class),
+                                        any(DiscoverySearchFilterFacet.class),
+                                        any(), any(DiscoverQuery.class)))
+                .then(invocation -> new FacetYearRange((DiscoverySearchFilterFacet) invocation.getArguments()[2]));
 
         when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class),
-            any(DiscoveryConfiguration.class)))
-            .then(invocation -> new DiscoverFilterQuery((String) invocation.getArguments()[1],
-                invocation.getArguments()[1] + ":\"" + invocation.getArguments()[3] + "\"",
-                (String) invocation.getArguments()[3]));
+                                         any(DiscoveryConfiguration.class)))
+                .then(invocation -> new DiscoverFilterQuery((String) invocation.getArguments()[1],
+                                                            invocation.getArguments()[1] + ":\"" + invocation
+                                                                    .getArguments()[3] + "\"",
+                                                            (String) invocation.getArguments()[3]));
 
         discoveryConfiguration = new DiscoveryConfiguration();
         discoveryConfiguration.setDefaultFilterQueries(Arrays.asList("archived:true"));
 
 
         DiscoveryHitHighlightingConfiguration discoveryHitHighlightingConfiguration =
-            new DiscoveryHitHighlightingConfiguration();
+                new DiscoveryHitHighlightingConfiguration();
         List<DiscoveryHitHighlightFieldConfiguration> discoveryHitHighlightFieldConfigurations = new LinkedList<>();
 
         DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration =
-            new DiscoveryHitHighlightFieldConfiguration();
+                new DiscoveryHitHighlightFieldConfiguration();
         discoveryHitHighlightFieldConfiguration.setField("dc.title");
 
         DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration1 =
-            new DiscoveryHitHighlightFieldConfiguration();
+                new DiscoveryHitHighlightFieldConfiguration();
         discoveryHitHighlightFieldConfiguration1.setField("fulltext");
 
         discoveryHitHighlightFieldConfigurations.add(discoveryHitHighlightFieldConfiguration1);
@@ -177,9 +183,8 @@ public class DiscoverQueryBuilderTest {
         discoveryConfiguration.setSidebarFacets(Arrays.asList(subjectFacet, dateFacet, hierarchyFacet));
         discoveryConfiguration.setSearchFilters(Arrays.asList(subjectFacet, dateFacet, hierarchyFacet));
 
+        searchFilter = new QueryBuilderSearchFilter("subject", "equals", "Java");
         query = "my test case";
-        searchFilter = new SearchFilter("subject", "equals", "Java");
-        page = PageRequest.of(1, 10, Sort.Direction.ASC, "dc.title");
 
         queryBuilder.afterPropertiesSet();
     }
@@ -188,7 +193,8 @@ public class DiscoverQueryBuilderTest {
     public void testBuildQuery() throws Exception {
 
         DiscoverQuery discoverQuery = queryBuilder
-            .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "item", page);
+                .buildQuery(context, scope, discoveryConfiguration, query, Collections.singletonList(searchFilter),
+                            "item", pageSize, offset, sortProperty, sortDirection);
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
@@ -214,10 +220,11 @@ public class DiscoverQueryBuilderTest {
     @Test
     public void testBuildQueryDefaults() throws Exception {
         DiscoverQuery discoverQuery =
-            queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), null);
+                queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), null, null,
+                                        null, null);
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
-        assertThat(discoverQuery.getQuery(), is(emptyOrNullString()));
+        assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
         assertThat(discoverQuery.getDSpaceObjectFilters(), is(empty()));
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
@@ -241,13 +248,12 @@ public class DiscoverQueryBuilderTest {
 
     @Test
     public void testSortByScore() throws Exception {
-        page = PageRequest.of(2, 10, Sort.Direction.ASC, "SCORE");
-
         DiscoverQuery discoverQuery =
-            queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), page);
+                queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), 10, 20L,
+                                        "SCORE", "ASC");
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
-        assertThat(discoverQuery.getQuery(), is(emptyOrNullString()));
+        assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
         assertThat(discoverQuery.getDSpaceObjectFilters(), is(empty()));
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
@@ -269,48 +275,50 @@ public class DiscoverQueryBuilderTest {
         ));
     }
 
-    @Test(expected = DSpaceBadRequestException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidDSOType() throws Exception {
         queryBuilder
-            .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "TEST", page);
+                .buildQuery(context, scope, discoveryConfiguration, query, Collections.singletonList(searchFilter),
+                            "TEST", pageSize, offset, sortProperty, sortDirection);
     }
 
-    @Test(expected = InvalidSearchRequestException.class)
+    @Test(expected = SearchServiceException.class)
     public void testInvalidSortField() throws Exception {
-        page = PageRequest.of(2, 10, Sort.Direction.ASC, "test");
         queryBuilder
-            .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
+                .buildQuery(context, scope, discoveryConfiguration, query, Collections.singletonList(searchFilter),
+                            "ITEM", pageSize, 20L, "test", sortDirection);
     }
 
-    @Test(expected = DSpaceBadRequestException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidSearchFilter1() throws Exception {
-        searchFilter = new SearchFilter("test", "equals", "Smith, Donald");
+        searchFilter = new QueryBuilderSearchFilter("test", "equals", "Smith, Donald");
 
         queryBuilder
-            .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
+                .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM",
+                            pageSize, offset, sortProperty, sortDirection);
     }
 
-    @Test(expected = DSpaceBadRequestException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidSearchFilter2() throws Exception {
         when(searchService.toFilterQuery(any(Context.class), any(String.class), any(String.class), any(String.class),
-            any(DiscoveryConfiguration.class)))
-            .thenThrow(SQLException.class);
+                                         any(DiscoveryConfiguration.class)))
+                .thenThrow(SQLException.class);
 
         queryBuilder
-            .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM", page);
+                .buildQuery(context, scope, discoveryConfiguration, query, Arrays.asList(searchFilter), "ITEM",
+                            pageSize, offset, sortProperty, sortDirection);
     }
 
     @Test
     public void testBuildFacetQuery() throws Exception {
-        DiscoverQuery discoverQuery = queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration,
-                                                            "prefix", query,
-                                                                   Arrays.asList(searchFilter), "item", page,
-                                                                   "subject");
+        DiscoverQuery discoverQuery = queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, "prefix",
+                                                                   query, Collections.singletonList(searchFilter),
+                                                                   "item", pageSize, offset, "subject");
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
         assertThat(discoverQuery.getDSpaceObjectFilters(), contains(IndexableItem.TYPE));
-        assertThat(discoverQuery.getSortField(), is(emptyOrNullString()));
+        assertThat(discoverQuery.getSortField(), isEmptyOrNullString());
         assertThat(discoverQuery.getMaxResults(), is(0));
         assertThat(discoverQuery.getStart(), is(0));
         assertThat(discoverQuery.getFacetMinCount(), is(1));
@@ -321,10 +329,10 @@ public class DiscoverQueryBuilderTest {
         ));
     }
 
-    @Test(expected = DSpaceBadRequestException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidSearchFacet() throws Exception {
         queryBuilder.buildFacetQuery(context, scope, discoveryConfiguration, null, query,
-                Arrays.asList(searchFilter), "item", page, "test");
+                                     Collections.singletonList(searchFilter), "item", pageSize, offset, "test");
     }
 
     public Matcher<DiscoverFacetField> discoverFacetFieldMatcher(DiscoverFacetField expected) {
