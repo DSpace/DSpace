@@ -63,6 +63,11 @@ public class ResearcherProfile {
         return item;
     }
 
+    public Optional<String> getOrcid() {
+        return getMetadataValue(item, "person.identifier.orcid")
+            .map(metadataValue -> metadataValue.getValue());
+    }
+
     private MetadataValue getDspaceObjectOwnerMetadata(Item item) {
         return getMetadataValue(item, "dspace.object.owner")
             .filter(metadata -> UUIDUtils.fromString(metadata.getAuthority()) != null)
