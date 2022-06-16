@@ -20,6 +20,7 @@ import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component(OrcidHistoryRest.CATEGORY  + "." + OrcidHistoryRest.NAME)
+@ConditionalOnProperty("orcid.synchronization-enabled")
 public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistoryRest, Integer> {
 
     @Autowired

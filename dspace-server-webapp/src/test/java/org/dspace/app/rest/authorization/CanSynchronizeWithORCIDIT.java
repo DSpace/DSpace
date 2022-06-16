@@ -27,6 +27,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class CanSynchronizeWithORCIDIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     final String feature = "canSynchronizeWithORCID";
     private Item itemA;
@@ -151,6 +155,25 @@ public class CanSynchronizeWithORCIDIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded").exists())
                         .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+    }
+
+    @Test
+    public void testCanSynchronizeWithORCIDWithSynchronizationDisabled() throws Exception {
+
+        configurationService.setProperty("orcid.synchronization-enabled", false);
+
+        EPerson user = context.getCurrentUser();
+
+        String token = getAuthToken(user.getEmail(), password);
+
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                                     .param("uri", uri(itemA))
+                                     .param("eperson", user.getID().toString())
+                                     .param("feature", canSynchronizeWithORCID.getName()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
     }
 
     private String uri(Item item) {
