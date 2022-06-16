@@ -336,7 +336,6 @@
     </profiles>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -360,6 +359,23 @@
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for sherpa service. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -534,9 +550,16 @@
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
+        <!-- Codebase at https://github.com/OCLC-Research/oaiharvester2/ -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
+        </dependency>
+        <!-- Xalan is REQUIRED by 'oclc-harvester2' listed above (OAI harvesting fails without it).
+             Please do NOT use Xalan in DSpace codebase as it is not well maintained. -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -862,6 +885,13 @@
             <artifactId>mockserver-junit-rule</artifactId>
             <version>5.11.2</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Exclude snakeyaml to avoid conflicts with: spring-boot-starter-cache -->
+            	<exclusion>
+            		<groupId>org.yaml</groupId>
+            		<artifactId>snakeyaml</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

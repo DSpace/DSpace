@@ -131,9 +131,9 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public Integer call() throws Exception {
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             URIBuilder uriBuilder = new URIBuilder(url + URLEncoder.encode(query, StandardCharsets.UTF_8));
-            String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(),
-                          new HashMap<String, String>());
+            String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             Map<Integer, Map<String, List<String>>> records = getRecords(resp);
             return Objects.nonNull(records.size()) ? records.size() : 0;
         }
@@ -161,9 +161,9 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Pattern risPattern = Pattern.compile(ID_PATTERN);
             Matcher risMatcher = risPattern.matcher(scieloId);
             if (risMatcher.matches()) {
+                Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
                 URIBuilder uriBuilder = new URIBuilder(url + URLEncoder.encode(scieloId, StandardCharsets.UTF_8));
-                String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(),
-                              new HashMap<String, String>());
+                String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
                 Map<Integer, Map<String, List<String>>> records = getRecords(resp);
                 if (Objects.nonNull(records) & !records.isEmpty()) {
                     results.add(transformSourceRecords(records.get(1)));
@@ -207,8 +207,8 @@ public class ScieloImportMetadataSourceServiceImpl extends AbstractImportMetadat
             URIBuilder uriBuilder = new URIBuilder(url + URLEncoder.encode(q, StandardCharsets.UTF_8));
             uriBuilder.addParameter("start", start.toString());
             uriBuilder.addParameter("count", count.toString());
-            String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(),
-                    new HashMap<String, String>());
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             Map<Integer, Map<String, List<String>>> records = getRecords(resp);
             for (int record : records.keySet()) {
                 results.add(transformSourceRecords(records.get(record)));

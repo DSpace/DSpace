@@ -8,9 +8,12 @@
 package org.dspace.discovery;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -643,12 +646,77 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
     }
 
+    @Test
+    public void iteratorSearchServiceTest() throws SearchServiceException {
+        String subject1 = "subject1";
+        String subject2 = "subject2";
+        int numberItemsSubject1 = 30;
+        int numberItemsSubject2 = 2;
+        Item[] itemsSubject1 = new Item[numberItemsSubject1];
+        Item[] itemsSubject2 = new Item[numberItemsSubject2];
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItemsSubject1; i++) {
+            itemsSubject1[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 1 number" + i)
+                .withSubject(subject1)
+                .build();
+        }
+
+        for (int i = 0; i < numberItemsSubject2; i++) {
+            itemsSubject2[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 2 number " + i)
+                .withSubject(subject2)
+                .build();
+        }
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community).build();
+        ItemBuilder.createItem(context, collection2)
+            .withTitle("item collection2")
+            .withSubject(subject1)
+            .build();
+        context.restoreAuthSystemState();
+
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject1);
+
+        Iterator<Item> itemIterator =
+            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
+        int counter = 0;
+        List<Item> foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        for (Item item : itemsSubject1) {
+            assertTrue(foundItems.contains(item));
+        }
+        assertEquals(numberItemsSubject1, counter);
+
+        discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject2);
+
+        itemIterator = searchService.iteratorSearch(context, null, discoverQuery);
+        counter = 0;
+        foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        assertEquals(numberItemsSubject2, counter);
+        for (Item item : itemsSubject2) {
+            assertTrue(foundItems.contains(item));
+        }
+    }
+
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
         assertSearchQuery(resourceType, size, size, 0, -1);
     }
 
     private void assertSearchQuery(String resourceType, int size, int totalFound, int start, int limit)
-            throws SearchServiceException {
+        throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
         discoverQuery.setStart(start);

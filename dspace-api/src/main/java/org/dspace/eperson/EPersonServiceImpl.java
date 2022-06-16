@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import static org.dspace.content.Item.ANY;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -30,6 +33,7 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -43,6 +47,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
+import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.dao.VersionDAO;
@@ -96,6 +101,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired
+    protected OrcidTokenService orcidTokenService;
 
     protected EPersonServiceImpl() {
         super();
@@ -379,6 +386,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             group.getMembers().remove(ePerson);
         }
 
+        orcidTokenService.deleteByEPerson(context, ePerson);
+
         // Remove any subscriptions
         subscribeService.deleteByEPerson(context, ePerson);
 
@@ -568,5 +577,19 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public int countTotal(Context context) throws SQLException {
         return ePersonDAO.countRows(context);
+    }
+
+    @Override
+    public EPerson findByProfileItem(Context context, Item profile) throws SQLException {
+        List<MetadataValue> owners = itemService.getMetadata(profile, "dspace", "object", "owner", ANY);
+        if (CollectionUtils.isEmpty(owners)) {
+            return null;
+        }
+        return find(context, UUIDUtils.fromString(owners.get(0).getAuthority()));
+    }
+
+    @Override
+    public String getName(EPerson dso) {
+        return dso.getName();
     }
 }
