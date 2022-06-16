@@ -8,7 +8,6 @@
 
 package org.dspace.app.bulkedit;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,7 +61,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     @Override
     public MetadataExportSearchScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
-            .getServiceByName("metadata-export-search", MetadataExportSearchCliScriptConfiguration.class);
+            .getServiceByName("metadata-export-search", MetadataExportSearchScriptConfiguration.class);
     }
 
     @Override
@@ -156,13 +155,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
     }
 
     protected String getFileNameOrExportFile() {
-        String exportDir = System.getProperty("java.io.tmpdir");
-        File f = new File(exportDir);
-        if (!f.exists()) {
-            f.mkdirs();
-        }
-        String path = String.format("%s%smetadataExportSearch.csv", exportDir, File.separator);
-        return path;
+        return "metadataExportSearch.csv";
     }
 
     public IndexableObject resolveScope(Context context, String id) throws SQLException {
