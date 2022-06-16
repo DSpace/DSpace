@@ -118,8 +118,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     }
 
-
-
     /**
      * If the handle for the "dso" already exists in the index, and the "dso"
      * has a lastModified timestamp that is newer than the document in the index
@@ -710,16 +708,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 discoveryQuery.addFilterQueries("location:l" + dso.getID());
             } else if (dso instanceof IndexableItem) {
                 discoveryQuery.addFilterQueries(SearchUtils.RESOURCE_UNIQUE_ID + ":" + dso.
-                        getUniqueIndexID());
+                    getUniqueIndexID());
             }
         }
         return search(context, discoveryQuery);
 
     }
 
+    @Override
+    public Iterator<Item> iteratorSearch(Context context, IndexableObject dso, DiscoverQuery query)
+        throws SearchServiceException {
+        return new SearchIterator(context, dso, query);
+    }
 
     @Override
-    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery )
+    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery)
         throws SearchServiceException {
         try {
             if (solrSearchCore.getSolr() == null) {
@@ -730,6 +733,72 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         } catch (Exception e) {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * This class implements an iterator over items that is specifically used to iterate over search results
+     */
+    private class SearchIterator implements Iterator<Item> {
+        private Context context;
+        private DiscoverQuery discoverQuery;
+        private DiscoverResult discoverResult;
+        private IndexableObject dso;
+        private int absoluteCursor;
+        private int relativeCursor;
+        private int pagesize;
+
+        SearchIterator(Context context, DiscoverQuery discoverQuery) throws SearchServiceException {
+            this.context = context;
+            this.discoverQuery = discoverQuery;
+            this.absoluteCursor = discoverQuery.getStart();
+            initialise();
+        }
+
+        SearchIterator(Context context, IndexableObject dso, DiscoverQuery discoverQuery)
+            throws SearchServiceException {
+            this.context = context;
+            this.dso = dso;
+            this.discoverQuery = discoverQuery;
+            initialise();
+        }
+
+        private void initialise() throws SearchServiceException {
+            this.relativeCursor = 0;
+            if (discoverQuery.getMaxResults() != -1) {
+                pagesize = discoverQuery.getMaxResults();
+            } else {
+                pagesize = 10;
+            }
+            discoverQuery.setMaxResults(pagesize);
+            this.discoverResult = search(context, dso, discoverQuery);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return absoluteCursor < discoverResult.getTotalSearchResults();
+        }
+
+        @Override
+        public Item next() {
+            //paginate getting results from the discoverquery.
+            if (relativeCursor == pagesize) {
+                //  get a new page of results when the last element of the previous page has been read
+                int offset = absoluteCursor;
+                // reset the position counter for getting element relativecursor on a page
+                relativeCursor = 0;
+                discoverQuery.setStart(offset);
+                try {
+                    discoverResult = search(context, dso, discoverQuery);
+                } catch (SearchServiceException e) {
+                    log.error("error while getting search results", e);
+                }
+            }
+            // get the element at position relativecursor on a page
+            IndexableObject res = discoverResult.getIndexableObjects().get(relativeCursor);
+            relativeCursor++;
+            absoluteCursor++;
+            return (Item) res.getIndexedObject();
         }
     }
 
