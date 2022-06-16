@@ -69,7 +69,7 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
             throw new IllegalArgumentException("Metadata field not supported: " + currentMetadataField);
         }
 
-        return create(context, metadataValues.get(0));
+        return create(context, metadataValue);
     }
 
     @Override
@@ -123,7 +123,8 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
     private Address createAddress(Context context, MetadataValue metadataValue) {
         return orcidCommonObjectFactory.createCountry(context, metadataValue)
             .map(this::createAddress)
-            .orElse(null);
+            .orElseThrow(() -> new IllegalArgumentException("No address creatable "
+                + "from value " + metadataValue.getValue()));
     }
 
     private Address createAddress(Country country) {

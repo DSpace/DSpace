@@ -25,6 +25,10 @@ public class OrcidValidationException extends RuntimeException {
 
     private final List<OrcidValidationError> errors;
 
+    public OrcidValidationException(OrcidValidationError error) {
+        this(List.of(error));
+    }
+
     public OrcidValidationException(List<OrcidValidationError> errors) {
         super("Errors occurs during ORCID object validation");
         this.errors = errors;

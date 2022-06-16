@@ -9,6 +9,7 @@ package org.dspace.app.orcid.model.factory;
 
 import java.util.Optional;
 
+import org.dspace.app.orcid.exception.OrcidValidationException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
@@ -80,10 +81,13 @@ public interface OrcidCommonObjectFactory {
     /**
      * Creates an instance of {@link Country} from the given metadata value.
      *
-     * @param  context       the DSpace context
-     * @param  metadataValue the metadata value
-     * @return               the created Country instance, if any
+     * @param  context                  the DSpace context
+     * @param  metadataValue            the metadata value
+     * @return                          the created Country instance, if any
+     * @throws OrcidValidationException if the given metadata value is not a valid
+     *                                  ISO 3611 country
      */
-    public Optional<Country> createCountry(Context context, MetadataValue metadataValue);
+    public Optional<Country> createCountry(Context context, MetadataValue metadataValue)
+        throws OrcidValidationException;
 
 }

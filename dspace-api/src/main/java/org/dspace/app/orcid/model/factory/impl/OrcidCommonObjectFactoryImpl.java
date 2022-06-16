@@ -26,7 +26,9 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.orcid.client.OrcidConfiguration;
+import org.dspace.app.orcid.exception.OrcidValidationException;
 import org.dspace.app.orcid.model.factory.OrcidCommonObjectFactory;
+import org.dspace.app.orcid.model.validator.OrcidValidationError;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
@@ -159,8 +161,13 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
             return empty();
         }
 
-        return convertToIso3166Country(metadataValue.getValue())
-            .map(isoCountry -> new Country(isoCountry));
+        Optional<Iso3166Country> country = convertToIso3166Country(metadataValue.getValue());
+
+        if (country.isEmpty()) {
+            throw new OrcidValidationException(OrcidValidationError.INVALID_COUNTRY);
+        }
+
+        return country.map(isoCountry -> new Country(isoCountry));
     }
 
     private ContributorAttributes getContributorAttributes(MetadataValue metadataValue, ContributorRole role) {
