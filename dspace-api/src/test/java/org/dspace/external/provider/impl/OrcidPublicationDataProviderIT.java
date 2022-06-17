@@ -12,6 +12,7 @@ import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -189,6 +190,16 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
     }
 
     @Test
+    public void testSearchWithInvalidOrcidId() {
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> dataProvider.searchExternalDataObjects("0000-1111-2222", 0, -1));
+
+        assertThat(exception.getMessage(), is("The given ORCID ID is not valid: 0000-1111-2222"));
+
+    }
+
+    @Test
     public void testSearchWithStoredAccessToken() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -332,9 +343,22 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         verifyNoMoreInteractions(orcidClientMock);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void testGetExternalDataObjectWithInvalidOrcidId() {
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> dataProvider.getExternalDataObject("invalid::277902"));
+
+        assertThat(exception.getMessage(), is("The given ORCID ID is not valid: invalid" ));
+    }
+
+    @Test
     public void testGetExternalDataObjectWithInvalidId() {
-        dataProvider.getExternalDataObject("id");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> dataProvider.getExternalDataObject("id"));
+
+        assertThat(exception.getMessage(), is("Invalid identifier 'id', expected <orcid-id>::<put-code>"));
     }
 
     @Test

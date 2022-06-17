@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -80,6 +81,16 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OrcidPublicationDataProvider.class);
 
+    /**
+     * Examples of valid ORCID IDs:
+     * <ul>
+     * <li>0000-0002-1825-0097</li>
+     * <li>0000-0001-5109-3700</li>
+     * <li>0000-0002-1694-233X</li>
+     * </ul>
+     */
+    private final static Pattern ORCID_ID_PATTERN = Pattern.compile("(\\d{4}-){3}\\d{3}(\\d|X)");
+
     private final static int MAX_PUT_CODES_SIZE = 100;
 
     @Autowired
@@ -114,6 +125,8 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         String orcid = idSections[0];
         String putCode = idSections[1];
 
+        validateOrcidId(orcid);
+
         return getWork(orcid, putCode)
             .filter(work -> hasDifferentSourceClientId(work))
             .filter(work -> work.getPutCode() != null)
@@ -122,6 +135,9 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String orcid, int start, int limit) {
+
+        validateOrcidId(orcid);
+
         return findWorks(orcid, start, limit).stream()
             .map(work -> convertToExternalDataObject(orcid, work))
             .collect(Collectors.toList());
@@ -129,6 +145,12 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     private boolean isInvalidIdentifier(String id) {
         return StringUtils.isBlank(id) || id.split("::").length != 2;
+    }
+
+    private void validateOrcidId(String orcid) {
+        if (!ORCID_ID_PATTERN.matcher(orcid).matches()) {
+            throw new IllegalArgumentException("The given ORCID ID is not valid: " + orcid);
+        }
     }
 
     /**
