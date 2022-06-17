@@ -132,7 +132,7 @@ public class OrcidQueueConsumer implements Consumer {
      */
     private void consumeItem(Context context, Item item) throws SQLException {
 
-        String entityType = itemService.getEntityType(item);
+        String entityType = itemService.getEntityTypeLabel(item);
         if (entityType == null) {
             return;
         }
@@ -322,7 +322,7 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private boolean isNotProfileItem(Item ownerItem) {
-        return !getProfileType().equals(itemService.getEntityType(ownerItem));
+        return !getProfileType().equals(itemService.getEntityTypeLabel(ownerItem));
     }
 
     private String getMetadataValue(Item item, String metadataField) {
