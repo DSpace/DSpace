@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.function.Supplier;
+import javax.validation.constraints.NotNull;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -38,6 +40,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
+import org.dspace.util.FunctionalUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -47,8 +50,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Richard Rodgers, Peter Dietz
  */
-
 public class S3BitStoreService implements BitStoreService {
+    protected static final String EMPTY_BUCKET_PREFIX = "dspace-asset-";
+
     /**
      * log4j log
      */
@@ -84,7 +88,34 @@ public class S3BitStoreService implements BitStoreService {
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    /**
+     * Utility method for generate AmazonS3 builder
+     * 
+     * @param regions wanted regions in client
+     * @param awsCredentials credentials of the client
+     * @return builder with the specified parameters
+     */
+    protected static Supplier<AmazonS3> amazonClientBuilderBy(
+            @NotNull Regions regions,
+            @NotNull AWSCredentials awsCredentials
+    ) {
+        return () -> AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .withRegion(regions)
+                .build();
+    }
+
     public S3BitStoreService() {}
+
+    /**
+     * This constructor is used for test purpose.
+     * In this way is possible to use a mocked instance of AmazonS3
+     * 
+     * @param s3Service mocked AmazonS3 service
+     */
+    protected S3BitStoreService(AmazonS3 s3Service) {
+        this.s3Service = s3Service;
+    }
 
     /**
      * Initialize the asset store
@@ -107,22 +138,27 @@ public class S3BitStoreService implements BitStoreService {
                 }
             }
             // init client
-            AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
-            s3Service = AmazonS3ClientBuilder.standard()
-                    .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                    .withRegion(regions)
-                    .build();
+            s3Service = FunctionalUtils.getDefaultOrBuild(
+                    this.s3Service,
+                    amazonClientBuilderBy(
+                            regions,
+                            new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
+                    )
+            );
             log.warn("S3 Region set to: " + regions.getName());
         } else {
             log.info("Using a IAM role or aws environment credentials");
-            s3Service = AmazonS3ClientBuilder.defaultClient();
+            s3Service = FunctionalUtils.getDefaultOrBuild(
+                    this.s3Service,
+                    AmazonS3ClientBuilder::defaultClient
+            );
         }
 
         // bucket name
         if (StringUtils.isEmpty(bucketName)) {
             // get hostname of DSpace UI to use to name bucket
             String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
-            bucketName = "dspace-asset-" + hostname;
+            bucketName = EMPTY_BUCKET_PREFIX + hostname;
             log.warn("S3 BucketName is not configured, setting default: " + bucketName);
         }
 
@@ -279,7 +315,7 @@ public class S3BitStoreService implements BitStoreService {
         StringBuilder bufFilename = new StringBuilder();
         if (StringUtils.isNotEmpty(subfolder)) {
             bufFilename.append(subfolder);
-            bufFilename.append(File.separator);
+            appendSeparator(bufFilename);
         }
 
         if (this.useRelativePath) {
@@ -296,43 +332,124 @@ public class S3BitStoreService implements BitStoreService {
         return bufFilename.toString();
     }
 
+    /**
+     * Utility that checks string ending with separator
+     * 
+     * @param bufFilename
+     * @return
+     */
+    private boolean endsWithSeparator(StringBuilder bufFilename) {
+        return bufFilename.lastIndexOf(File.separator) == bufFilename.length() - 1;
+    }
+
+    /**
+     * there are 2 cases:
+     * - conventional bitstream, conventional storage
+     * - registered bitstream, conventional storage
+     *  conventional bitstream: dspace ingested, dspace random name/path
+     *  registered bitstream: registered to dspace, any name/path
+     * 
+     * @param sInternalId
+     * @return Computed Relative path
+     */
     private String getRelativePath(String sInternalId) {
         BitstreamStorageService bitstreamStorageService = StorageServiceFactory.getInstance()
                 .getBitstreamStorageService();
-        // there are 2 cases:
-        // -conventional bitstream, conventional storage
-        // -registered bitstream, conventional storage
-        // conventional bitstream - dspace ingested, dspace random name/path
-        // registered bitstream - registered to dspace, any name/path
+
         String sIntermediatePath = StringUtils.EMPTY;
         if (bitstreamStorageService.isRegisteredBitstream(sInternalId)) {
             sInternalId = sInternalId.substring(2);
         } else {
-            // Sanity Check: If the internal ID contains a
-            // pathname separator, it's probably an attempt to
-            // make a path traversal attack, so ignore the path
-            // prefix.  The internal-ID is supposed to be just a
-            // filename, so this will not affect normal operation.
-            if (sInternalId.contains(File.separator)) {
-                sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
-            }
+            sInternalId = sanitizeIdentifier(sInternalId);
             sIntermediatePath = intermediatePath(sInternalId);
         }
 
         return sIntermediatePath + sInternalId;
     }
 
-    public String intermediatePath(String internalId) {
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < directoryLevels; i++) {
-            int digits = i * digitsPerLevel;
-            if (i > 0) {
-                buf.append(File.separator);
-            }
-            buf.append(internalId.substring(digits, digits + digitsPerLevel));
+    /**
+     * Sanity Check: If the internal ID contains a pathname separator, it's probably
+     * an attempt to make a path traversal attack, so ignore the path prefix. The
+     * internal-ID is supposed to be just a filename, so this will not affect normal
+     * operation.
+     * 
+     * @param sInternalId
+     * @return Sanitezed id
+     */
+    protected String sanitizeIdentifier(String sInternalId) {
+        if (sInternalId.contains(File.separator)) {
+            sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
         }
-        buf.append(File.separator);
-        return buf.toString();
+        return sInternalId;
+    }
+
+    /**
+     * @param internalId
+     * @return
+     */
+    protected String intermediatePath(String internalId) {
+        StringBuilder path = new StringBuilder();
+        if (StringUtils.isEmpty(internalId) || internalId.length() <= digitsPerLevel) {
+            return path.append(internalId).append(File.separator).toString();
+        }
+        populatePathSplittingId(internalId, path);
+        appendSeparator(path);
+        return path.toString();
+    }
+
+    /**
+     * Append separator to target {@code StringBuilder}
+     * 
+     * @param path
+     */
+    private void appendSeparator(StringBuilder path) {
+        if (!endsWithSeparator(path)) {
+            path.append(File.separator);
+        }
+    }
+
+    /**
+     * Splits internalId into several subpaths using {@code digitsPerLevel}
+     * that indicates the folder name length, and {@code direcoryLevels} that
+     * indicates the maximum number of subfolders.
+     * 
+     * @param internalId bitStream identifier
+     * @param path
+     */
+    private void populatePathSplittingId(String internalId, StringBuilder path) {
+        int digits = 0;
+        path.append(extractSubstringFrom(internalId, digits, digits + digitsPerLevel));
+        for (int i = 1; i < directoryLevels && !isLonger(internalId, digits + digitsPerLevel); i++) {
+            digits = i * digitsPerLevel;
+            path.append(File.separator);
+            path.append(extractSubstringFrom(internalId, digits, digits + digitsPerLevel));
+        }
+    }
+
+    /**
+     * Extract substring if is in range, otherwise will truncate to length
+     * 
+     * @param internalId
+     * @param startIndex
+     * @param endIndex
+     * @return
+     */
+    private String extractSubstringFrom(String internalId, int startIndex, int endIndex) {
+        if (isLonger(internalId, endIndex)) {
+            endIndex = internalId.length();
+        }
+        return internalId.substring(startIndex, endIndex);
+    }
+
+    /**
+     * Checks if the {@code String} is longer than {@code endIndex}
+     * 
+     * @param internalId
+     * @param endIndex
+     * @return
+     */
+    private boolean isLonger(String internalId, int endIndex) {
+        return endIndex > internalId.length();
     }
 
     public String getAwsAccessKey() {
@@ -428,7 +545,7 @@ public class S3BitStoreService implements BitStoreService {
         // get hostname of DSpace UI to use to name bucket
         String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
         //Bucketname should be lowercase
-        store.bucketName = "dspace-asset-" + hostname + ".s3test";
+        store.bucketName = EMPTY_BUCKET_PREFIX + hostname + ".s3test";
         store.s3Service.createBucket(store.bucketName);
 /* Broken in DSpace 6 TODO Refactor
         // time everything, todo, swtich to caliper
