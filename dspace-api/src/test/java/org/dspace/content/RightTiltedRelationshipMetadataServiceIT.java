@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
@@ -88,18 +89,27 @@ public class RightTiltedRelationshipMetadataServiceIT extends RelationshipMetada
         //request the virtual metadata of the journal volume
         List<RelationshipMetadataValue> volumeRelList =
             relationshipMetadataService.getRelationshipMetadata(rightItem, true);
-        assertThat(volumeRelList.size(), equalTo(2));
-        assertThat(volumeRelList.get(0).getValue(), equalTo("2"));
-        assertThat(volumeRelList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("publicationissue"));
-        assertThat(volumeRelList.get(0).getMetadataField().getElement(), equalTo("issueNumber"));
-        assertThat(volumeRelList.get(0).getMetadataField().getQualifier(), equalTo(null));
+        assertThat(volumeRelList.size(), equalTo(3));
+
+        assertThat(volumeRelList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(volumeRelList.get(0).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(volumeRelList.get(0).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
+        assertThat(volumeRelList.get(0).getMetadataField().getQualifier(), equalTo("latestForDiscovery"));
         assertThat(volumeRelList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        assertThat(volumeRelList.get(1).getValue(), equalTo(String.valueOf(leftItem.getID())));
-        assertThat(volumeRelList.get(1).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(volumeRelList.get(1).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
+        assertThat(volumeRelList.get(1).getValue(), equalTo("2"));
+        assertThat(volumeRelList.get(1).getMetadataField().getMetadataSchema().getName(), equalTo("publicationissue"));
+        assertThat(volumeRelList.get(1).getMetadataField().getElement(), equalTo("issueNumber"));
+        assertThat(volumeRelList.get(1).getMetadataField().getQualifier(), equalTo(null));
         assertThat(volumeRelList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        assertThat(volumeRelList.get(2).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(volumeRelList.get(2).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(volumeRelList.get(2).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
+        assertThat(volumeRelList.get(2).getMetadataField().getQualifier(), nullValue());
+        assertThat(volumeRelList.get(2).getAuthority(), equalTo("virtual::" + relationship.getID()));
     }
 
 }

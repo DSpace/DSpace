@@ -69,22 +69,26 @@
     </bean>
 
     <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
-        <property name="metadataSource" ref="mockPubmedImportService"/>
+        <property name="metadataSource" ref="pubmedImportService"/>
         <property name="sourceIdentifier" value="pubmed"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
     </bean>
 
-    <bean id="mockPubmedImportService"
-          class="org.dspace.external.provider.impl.MockPubmedImportMetadataSourceServiceImpl">
-        <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
-        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
-        <property name="supportedExtensions">
+    <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScopusImportService"/>
+        <property name="sourceIdentifier" value="scopus"/>
+        <property name="recordIdMetadata" value="dc.identifier.scopus"/>
+        <property name="supportedEntityTypes">
             <list>
-                 <value>xml</value>
+                <value>Publication</value>
             </list>
         </property>
     </bean>
 
 </beans>
-
-

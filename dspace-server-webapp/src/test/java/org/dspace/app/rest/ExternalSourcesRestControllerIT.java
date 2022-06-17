@@ -41,6 +41,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                             .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItems(
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
+                                ExternalSourceMatcher.matchExternalSource("scopus", "scopus", false),
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaJournalIssn", "sherpaJournalIssn", false),
                                 ExternalSourceMatcher.matchExternalSource(
