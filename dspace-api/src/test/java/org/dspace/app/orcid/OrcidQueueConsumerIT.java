@@ -47,6 +47,8 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +64,8 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     private OrcidQueueService orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private Collection profileCollection;
 
@@ -86,6 +90,29 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             orcidQueueService.delete(context, record);
         }
         context.setDispatcher(null);
+    }
+
+    @Test
+    public void testWithOrcidSynchronizationDisabled() throws Exception {
+
+        configurationService.setProperty("orcid.synchronization-enabled", false);
+
+        context.turnOffAuthorisationSystem();
+
+        ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withSubject("test")
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
+            .withOrcidSynchronizationProfilePreference(IDENTIFIERS)
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, empty());
     }
 
     @Test

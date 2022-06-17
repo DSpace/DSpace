@@ -115,6 +115,10 @@ public class OrcidQueueConsumer implements Consumer {
             return;
         }
 
+        if (isOrcidSynchronizationDisabled()) {
+            return;
+        }
+
         context.turnOffAuthorisationSystem();
         try {
             consumeItem(context, item);
@@ -331,6 +335,10 @@ public class OrcidQueueConsumer implements Consumer {
 
     private String getProfileType() {
         return configurationService.getProperty("researcher-profile.entity-type", "Person");
+    }
+
+    private boolean isOrcidSynchronizationDisabled() {
+        return !configurationService.getBooleanProperty("orcid.synchronization-enabled", true);
     }
 
     @Override

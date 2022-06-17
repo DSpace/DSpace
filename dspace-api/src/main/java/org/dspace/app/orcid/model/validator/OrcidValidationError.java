@@ -21,6 +21,7 @@ public enum OrcidValidationError {
     TITLE_REQUIRED("title.required"),
     TYPE_REQUIRED("type.required"),
     FUNDER_REQUIRED("funder.required"),
+    INVALID_COUNTRY("country.invalid"),
     ORGANIZATION_NAME_REQUIRED("organization.name-required"),
     ORGANIZATION_ADDRESS_REQUIRED("organization.address-required"),
     ORGANIZATION_CITY_REQUIRED("organization.city-required"),

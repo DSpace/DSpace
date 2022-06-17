@@ -88,4 +88,12 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
         }
     }
 
+    @Override
+    public void deleteByProfileItem(Context context, Item profileItem) {
+        OrcidToken orcidToken = findByProfileItem(context, profileItem);
+        if (orcidToken != null) {
+            delete(context, orcidToken);
+        }
+    }
+
 }

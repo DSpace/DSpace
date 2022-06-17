@@ -18,9 +18,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.OrcidAuthentication;
+import org.dspace.authenticate.OrcidAuthenticationBean;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
+import org.dspace.web.ContextUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.Authentication;
@@ -37,6 +41,9 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
     private static final Logger log = LogManager.getLogger(OrcidLoginFilter.class);
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private OrcidAuthenticationBean orcidAuthentication = new DSpace().getServiceManager()
+        .getServiceByName("orcidAuthentication", OrcidAuthenticationBean.class);
 
     public OrcidLoginFilter(String url, AuthenticationManager authenticationManager,
                                      RestAuthenticationService restAuthenticationService) {
@@ -68,6 +75,22 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, true);
 
         redirectAfterSuccess(req, res);
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+        AuthenticationException failed) throws IOException, ServletException {
+
+        Context context = ContextUtil.obtainContext(request);
+
+        if (orcidAuthentication.isUsed(context, request)) {
+            String baseRediredirectUrl = configurationService.getProperty("dspace.ui.url");
+            String redirectUrl = baseRediredirectUrl + "/error?status=401&code=orcid.generic-error";
+            response.sendRedirect(redirectUrl); // lgtm [java/unvalidated-url-redirection]
+        } else {
+            super.unsuccessfulAuthentication(request, response, failed);
+        }
+
     }
 
     /**

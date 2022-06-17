@@ -115,7 +115,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
             .withIssueDate("2021-04-30")
             .withDescriptionAbstract("Publication description")
             .withLanguage("en_US")
-            .withType("Controlled Vocabulary for Resource Type Genres::text::book")
+            .withType("Book")
             .withIsPartOf("Journal")
             .withDoiIdentifier("doi-id")
             .withScopusIdentifier("scopus-id")

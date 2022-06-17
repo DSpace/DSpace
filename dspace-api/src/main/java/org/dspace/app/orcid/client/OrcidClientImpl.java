@@ -13,7 +13,6 @@ import static org.apache.http.client.methods.RequestBuilder.post;
 import static org.apache.http.client.methods.RequestBuilder.put;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +25,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
@@ -310,10 +311,12 @@ public class OrcidClientImpl implements OrcidClient {
 
     @SuppressWarnings("unchecked")
     private <T> T unmarshall(HttpEntity entity, Class<T> clazz) throws Exception {
-        InputStream content = entity.getContent();
         JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(entity.getContent());
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        return (T) unmarshaller.unmarshal(content);
+        return (T) unmarshaller.unmarshal(xmlStreamReader);
     }
 
     private HttpEntity convertToEntity(Object object) {

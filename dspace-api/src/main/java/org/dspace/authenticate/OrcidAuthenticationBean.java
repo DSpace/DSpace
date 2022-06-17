@@ -221,8 +221,16 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             eperson.setNetid(orcid);
 
             eperson.setEmail(email);
-            eperson.setFirstName(context, getFirstName(person));
-            eperson.setLastName(context, getLastName(person));
+
+            Optional<String> firstName = getFirstName(person);
+            if (firstName.isPresent()) {
+                eperson.setFirstName(context, firstName.get());
+            }
+
+            Optional<String> lastName = getLastName(person);
+            if (lastName.isPresent()) {
+                eperson.setLastName(context, lastName.get());
+            }
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);
 
@@ -282,18 +290,16 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         return Optional.ofNullable(emails.get(0).getEmail());
     }
 
-    private String getFirstName(Person person) {
+    private Optional<String> getFirstName(Person person) {
         return Optional.ofNullable(person.getName())
             .map(name -> name.getGivenNames())
-            .map(givenNames -> givenNames.getContent())
-            .orElseThrow(() -> new IllegalStateException("The found ORCID person has no first name"));
+            .map(givenNames -> givenNames.getContent());
     }
 
-    private String getLastName(Person person) {
+    private Optional<String> getLastName(Person person) {
         return Optional.ofNullable(person.getName())
             .map(name -> name.getFamilyName())
-            .map(givenNames -> givenNames.getContent())
-            .orElseThrow(() -> new IllegalStateException("The found ORCID person has no last name"));
+            .map(givenNames -> givenNames.getContent());
     }
 
     private boolean canSelfRegister() {
