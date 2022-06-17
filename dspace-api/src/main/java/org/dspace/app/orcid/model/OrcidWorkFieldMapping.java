@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.util.SimpleMapConverter;
-import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.common.ContributorRole;
 
 /**
@@ -75,11 +73,6 @@ public class OrcidWorkFieldMapping {
      * The metadata field related to the work sub title.
      */
     private String subTitleField;
-
-    /**
-     * The configured citation type.
-     */
-    private CitationType citationType;
 
     /**
      * The work type converter.
@@ -143,14 +136,6 @@ public class OrcidWorkFieldMapping {
         this.publicationDateField = publicationDateField;
     }
 
-    public CitationType getCitationType() {
-        return citationType;
-    }
-
-    public void setCitationType(String citationType) {
-        this.citationType = parseCitationType(citationType);
-    }
-
     public String getJournalTitleField() {
         return journalTitleField;
     }
@@ -193,20 +178,6 @@ public class OrcidWorkFieldMapping {
             .collect(toMap(identity(), field -> parseContributorRole(contributorsMap.get(field))));
     }
 
-    private CitationType parseCitationType(String citationType) {
-
-        if (StringUtils.isBlank(citationType)) {
-            return null;
-        }
-
-        try {
-            return CitationType.fromValue(citationType);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("The citation type " + citationType + " is invalid, "
-                + "allowed values are " + getAllowedCitationTypes(), ex);
-        }
-    }
-
     private ContributorRole parseContributorRole(String contributorRole) {
         try {
             return ContributorRole.fromValue(contributorRole);
@@ -214,12 +185,6 @@ public class OrcidWorkFieldMapping {
             throw new IllegalArgumentException("The contributor role " + contributorRole +
                 " is invalid, allowed values are " + getAllowedContributorRoles(), ex);
         }
-    }
-
-    private List<String> getAllowedCitationTypes() {
-        return Arrays.asList(CitationType.values()).stream()
-            .map(CitationType::value)
-            .collect(Collectors.toList());
     }
 
     private List<String> getAllowedContributorRoles() {

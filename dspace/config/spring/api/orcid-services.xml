@@ -63,7 +63,6 @@
 		<property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
 		<property name="typeField" value="${orcid.mapping.work.type}" />
 		<property name="typeConverter" ref="${orcid.mapping.work.type.converter}" />
-		<property name="citationType" value="${orcid.mapping.work.citation.type}" />
 	</bean>
 	
 	<bean id="orcidFundingFactoryFieldMapping" class="org.dspace.app.orcid.model.OrcidFundingFieldMapping" >
