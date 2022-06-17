@@ -74,7 +74,8 @@ public class LiveImportClientImpl implements LiveImportClient {
 
             HttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
-                throw new RuntimeException();
+                throw new RuntimeException("The request failed with: " + getStatusCode(httpResponse) + " code, reason= "
+                                           + httpResponse.getStatusLine().getReasonPhrase());
             }
             InputStream inputStream = httpResponse.getEntity().getContent();
             return IOUtils.toString(inputStream, Charset.defaultCharset());

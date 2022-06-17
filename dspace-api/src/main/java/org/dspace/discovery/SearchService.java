@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.content.Item;
@@ -38,6 +39,7 @@ public interface SearchService {
     DiscoverResult search(Context context, DiscoverQuery query)
         throws SearchServiceException;
 
+
     /**
      * Convenient method to call @see #search(Context, DSpaceObject,
      * DiscoverQuery, boolean) with includeWithdrawn=false
@@ -52,9 +54,22 @@ public interface SearchService {
     DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
+    /**
+     * Convenience method to call @see #search(Context, DSpaceObject, DiscoverQuery) and getting an iterator for the
+     * results
+     *
+     * @param context   DSpace context object
+     * @param dso       a DSpace object to use as a scope of the search
+     * @param query     the discovery query object
+     * @return          an iterator iterating over all results from the search
+     * @throws SearchServiceException   if search error
+     */
+    Iterator<Item> iteratorSearch(Context context, IndexableObject dso, DiscoverQuery query)
+        throws SearchServiceException;
+
 
     List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
-            int max, String... filterquery);
+                                 int max, String... filterquery);
 
     /**
      * Transforms the given string field and value into a filter query

@@ -10,6 +10,7 @@ package org.dspace.scripts;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -33,6 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * This class is the DB Entity representation of the Process object to be stored in the Database
@@ -76,6 +78,17 @@ public class Process implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "bitstream_id")}
     )
     private List<Bitstream> bitstreams;
+
+    /*
+     * Special Groups associated with this Process
+     */
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @JoinTable(
+        name = "process2group",
+        joinColumns = {@JoinColumn(name = "process_id")},
+        inverseJoinColumns = {@JoinColumn(name = "group_id")}
+    )
+    private List<Group> groups;
 
     @Column(name = "creation_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -209,6 +222,21 @@ public class Process implements ReloadableEntity<Integer> {
      */
     public Date getCreationTime() {
         return creationTime;
+    }
+
+    /**
+     * This method sets the special groups associated with the Process.
+     */
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    /**
+     * This method will return special groups associated with the Process.
+     * @return The special groups of this process.
+     */
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     /**

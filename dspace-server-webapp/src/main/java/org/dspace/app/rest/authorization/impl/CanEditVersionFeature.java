@@ -9,14 +9,11 @@ package org.dspace.app.rest.authorization.impl;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Item;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
@@ -38,8 +35,6 @@ public class CanEditVersionFeature implements AuthorizationFeature {
     public static final String NAME = "canEditVersion";
 
     @Autowired
-    private ItemService itemService;
-    @Autowired
     private AuthorizeService authorizeService;
     @Autowired
     private VersioningService versioningService;
@@ -56,12 +51,6 @@ public class CanEditVersionFeature implements AuthorizationFeature {
             }
             Version version = versioningService.getVersion(context, (((VersionRest) object).getId()));
             if (Objects.nonNull(version) && Objects.nonNull(version.getItem())) {
-                boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
-                boolean hasEntityType = StringUtils.isNotBlank(
-                        itemService.getMetadataFirstValue(version.getItem(), "dspace", "entity", "type", Item.ANY));
-                if (isBlockEntity && hasEntityType) {
-                    return false;
-                }
                 return authorizeService.isAdmin(context, version.getItem());
             }
         }

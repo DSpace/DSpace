@@ -57,7 +57,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col, false);
+            workspaceItem = workspaceItemService.create(context, col, true);
             item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);

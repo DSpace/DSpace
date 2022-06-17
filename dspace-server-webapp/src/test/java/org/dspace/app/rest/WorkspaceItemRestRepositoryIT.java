@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -7601,6 +7602,54 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void createItemWithoutEntityTypeIfCollectionHasBlankEntityType() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("community")
+            .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, community)
+            .withName("Collection 1")
+            // NOTE: has non-empty entity type
+            .withEntityType("Person")
+            .build();
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community)
+            .withName("Collection 2")
+            // NOTE: has empty entity type, this is by default the case when a collection is created in the GUI
+            .withEntityType("")
+            .build();
+
+        // expect that this item has dspace.entity.type = Person
+        Item item1 = ItemBuilder.createItem(context, collection1)
+            .withTitle("item 1")
+            .build();
+
+        // expect that this item does not have dspace.entity.type at all
+        Item item2 = ItemBuilder.createItem(context, collection2)
+            .withTitle("item 2")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        // test item 1
+        getClient().perform(get("/api/core/items/" + item1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", allOf(
+                matchMetadata("dc.title", "item 1"),
+                matchMetadata("dspace.entity.type", "Person")
+            )));
+
+        // test item 2
+        getClient().perform(get("/api/core/items/" + item2.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", allOf(
+                matchMetadata("dc.title", "item 2"),
+                matchMetadataDoesNotExist("dspace.entity.type")
+            )));
+    }
+
     public void verifyBitstreamPolicyNotDuplicatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
