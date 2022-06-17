@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.exception;
 
-import org.dspace.app.rest.utils.DiscoverQueryBuilder;
+import org.dspace.app.rest.utils.RestDiscoverQueryBuilder;
 
 /**
  * This exception is thrown when the given search configuration
- * passed to {@link DiscoverQueryBuilder} is invalid
+ * passed to {@link RestDiscoverQueryBuilder} is invalid
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */

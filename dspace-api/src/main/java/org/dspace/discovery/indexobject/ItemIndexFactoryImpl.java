@@ -79,6 +79,8 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemIndexFactoryImpl.class);
     public static final String VARIANTS_STORE_SEPARATOR = "###";
     public static final String STORE_SEPARATOR = "\n|||\n";
+    public static final String STATUS_FIELD = "database_status";
+    public static final String STATUS_FIELD_PREDB = "predb";
 
 
     @Autowired
@@ -208,6 +210,14 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         assert latestVersion.getItem().isArchived();
 
         return item.equals(latestVersion.getItem());
+    }
+
+    @Override
+    public SolrInputDocument buildNewDocument(Context context, IndexableItem indexableItem)
+            throws SQLException, IOException {
+        SolrInputDocument doc = buildDocument(context, indexableItem);
+        doc.addField(STATUS_FIELD, STATUS_FIELD_PREDB);
+        return doc;
     }
 
     @Override

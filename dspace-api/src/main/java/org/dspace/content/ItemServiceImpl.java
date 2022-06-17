@@ -26,6 +26,8 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -123,6 +125,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private EntityTypeService entityTypeService;
+
+    @Autowired
+    private OrcidTokenService orcidTokenService;
 
     protected ItemServiceImpl() {
         super();
@@ -750,6 +755,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         if (hi != null) {
             harvestedItemService.delete(context, hi);
+        }
+
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        if (orcidToken != null) {
+            orcidToken.setProfileItem(null);
         }
 
         //Only clear collections after we have removed everything else from the item
