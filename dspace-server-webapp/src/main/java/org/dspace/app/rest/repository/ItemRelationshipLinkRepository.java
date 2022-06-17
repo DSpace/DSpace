@@ -52,10 +52,10 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
             if (item == null) {
                 throw new ResourceNotFoundException("No such item: " + itemId);
             }
-            int total = relationshipService.countByItem(context, item);
+            int total = relationshipService.countByItem(context, item, true, true);
             Pageable pageable = utils.getPageable(optionalPageable);
             List<Relationship> relationships = relationshipService.findByItem(context, item,
-                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()), true);
+                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()), true, true);
             return converter.toRestPage(relationships, pageable, total, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);

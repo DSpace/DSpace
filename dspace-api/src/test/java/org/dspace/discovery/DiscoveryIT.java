@@ -8,13 +8,18 @@
 package org.dspace.discovery;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.launcher.ScriptLauncher;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -85,6 +90,12 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
                                                                                       .getMetadataAuthorityService();
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        configurationService.setProperty("solr-database-resync.time-until-reindex", 1);
+    }
 
     @Test
     public void solrRecordsAfterDepositOrDeletionOfWorkspaceItemTest() throws Exception {
@@ -371,7 +382,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         collectionService.delete(context, col1);
         context.restoreAuthSystemState();
         assertSearchQuery(IndexableCollection.TYPE, 2);
-        assertSearchQuery(IndexableItem.TYPE, 2);
+        // Deleted item contained within totalFound due to predb status (SolrDatabaseResyncCli takes care of this)
+        assertSearchQuery(IndexableItem.TYPE, 2, 3, 0, -1);
     }
 
     @Test
@@ -453,6 +465,10 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
         // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
         assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
+
+        // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
+        performSolrDatabaseResyncScript();
+
         // check Item type with start=2 and limit=4, we expect: indexableObjects=1, totalFound=3
         assertSearchQuery(IndexableItem.TYPE, 1, 3, 2, 4);
         // check Item type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
@@ -639,8 +655,77 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
         assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
-        // as the previous query hit the stale objects running a new query should lead to a clean situation
+
+        // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
+        performSolrDatabaseResyncScript();
+
+        // as SolrDatabaseResyncCli removed the stale objects, running a new query should lead to a clean situation
         assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+    }
+
+    @Test
+    public void iteratorSearchServiceTest() throws SearchServiceException {
+        String subject1 = "subject1";
+        String subject2 = "subject2";
+        int numberItemsSubject1 = 30;
+        int numberItemsSubject2 = 2;
+        Item[] itemsSubject1 = new Item[numberItemsSubject1];
+        Item[] itemsSubject2 = new Item[numberItemsSubject2];
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItemsSubject1; i++) {
+            itemsSubject1[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 1 number" + i)
+                .withSubject(subject1)
+                .build();
+        }
+
+        for (int i = 0; i < numberItemsSubject2; i++) {
+            itemsSubject2[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 2 number " + i)
+                .withSubject(subject2)
+                .build();
+        }
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community).build();
+        ItemBuilder.createItem(context, collection2)
+            .withTitle("item collection2")
+            .withSubject(subject1)
+            .build();
+        context.restoreAuthSystemState();
+
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject1);
+
+        Iterator<Item> itemIterator =
+            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
+        int counter = 0;
+        List<Item> foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        for (Item item : itemsSubject1) {
+            assertTrue(foundItems.contains(item));
+        }
+        assertEquals(numberItemsSubject1, counter);
+
+        discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject2);
+
+        itemIterator = searchService.iteratorSearch(context, null, discoverQuery);
+        counter = 0;
+        foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        assertEquals(numberItemsSubject2, counter);
+        for (Item item : itemsSubject2) {
+            assertTrue(foundItems.contains(item));
+        }
     }
 
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
@@ -648,7 +733,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void assertSearchQuery(String resourceType, int size, int totalFound, int start, int limit)
-            throws SearchServiceException {
+        throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
         discoverQuery.setStart(start);
@@ -737,6 +822,13 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         indexer.commit();
         context.setCurrentUser(previousUser);
+    }
+
+    public void performSolrDatabaseResyncScript() throws Exception {
+        String[] args = new String[] {"solr-database-resync"};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher
+                .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
     }
 
     private void abort(XmlWorkflowItem workflowItem)

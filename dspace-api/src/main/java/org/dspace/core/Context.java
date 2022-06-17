@@ -539,6 +539,36 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Rollback the current transaction with the database, without persisting any
+     * pending changes. The database connection is not closed and can be reused
+     * afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are
+     * "detached" (pending changes are not tracked anymore). You have to reload all
+     * entities you still want to work with manually after this method call (see
+     * {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When rollbacking the transaction in the database fails.
+     */
+    public void rollback() throws SQLException {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if (!isValid()) {
+            log.info("rollback() was called on a closed Context object. No changes to abort.");
+            return;
+        }
+
+        try {
+            // Rollback ONLY if we have a database transaction, and it is NOT Read Only
+            if (!isReadOnly() && isTransactionAlive()) {
+                dbConnection.rollback();
+                reloadContextBoundEntities();
+            }
+        } finally {
+            events = null;
+        }
+    }
+
+    /**
      * Close the context, without committing any of the changes performed using
      * this context. The database connection is freed. No exception is thrown if
      * there is an error freeing the database connection, since this method may
