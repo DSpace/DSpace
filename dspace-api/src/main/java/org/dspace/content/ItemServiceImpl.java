@@ -26,6 +26,8 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -119,6 +121,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
+
+    @Autowired
+    private OrcidTokenService orcidTokenService;
 
     protected ItemServiceImpl() {
         super();
@@ -744,6 +749,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             harvestedItemService.delete(context, hi);
         }
 
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        if (orcidToken != null) {
+            orcidToken.setProfileItem(null);
+        }
+
         //Only clear collections after we have removed everything else from the item
         item.clearCollections();
         item.setOwningCollection(null);
@@ -1129,6 +1139,50 @@ prevent the generation of resource policy entry values with null dspace_object a
                 && Objects.isNull(defaultPolicy.getEndDate());
 
         return !(hasCustomPolicy && isAnonimousGroup && datesAreNull);
+    }
+
+    /**
+     * Returns an iterator of Items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY
+     *
+     * @param context   DSpace context object
+     * @param schema    metadata field schema
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException       if database error
+     *                            An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException if authorization error
+     *                            Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     */
+    @Override
+    public Iterator<Item> findArchivedByMetadataField(Context context,
+                                                      String schema, String element, String qualifier, String value)
+            throws SQLException, AuthorizeException {
+        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        if (mds == null) {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
+        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        if (mdf == null) {
+            throw new IllegalArgumentException(
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
+
+        if (Item.ANY.equals(value)) {
+            return itemDAO.findByMetadataField(context, mdf, null, true);
+        } else {
+            return itemDAO.findByMetadataField(context, mdf, value, true);
+        }
+    }
+
+    @Override
+    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+            throws SQLException, AuthorizeException {
+        String[] mdValueByField = getMDValueByField(metadataField);
+        return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
     }
 
     /**
@@ -1535,5 +1589,9 @@ prevent the generation of resource policy entry values with null dspace_object a
                 .stream().findFirst().orElse(null);
     }
 
+    @Override
+    public String getEntityType(Item item) {
+        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    }
 
 }
