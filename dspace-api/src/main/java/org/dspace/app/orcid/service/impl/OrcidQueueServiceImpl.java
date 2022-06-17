@@ -93,7 +93,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     public OrcidQueue createEntityInsertionRecord(Context context, Item owner, Item entity) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(entity);
-        orcidQueue.setRecordType(itemService.getEntityType(entity));
+        orcidQueue.setRecordType(itemService.getEntityTypeLabel(entity));
         orcidQueue.setOwner(owner);
         orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
         orcidQueue.setOperation(OrcidOperation.INSERT);
@@ -107,7 +107,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setOwner(owner);
         orcidQueue.setEntity(entity);
         orcidQueue.setPutCode(putCode);
-        orcidQueue.setRecordType(itemService.getEntityType(entity));
+        orcidQueue.setRecordType(itemService.getEntityTypeLabel(entity));
         orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
         orcidQueue.setOperation(OrcidOperation.UPDATE);
         return orcidQueueDAO.create(context, orcidQueue);
@@ -217,7 +217,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
         return findRelationshipsByItem(context, profile).stream()
             .map(relationship -> getRelatedItem(relationship, profile))
-            .filter(item -> entityType.equals(itemService.getEntityType(item)))
+            .filter(item -> entityType.equals(itemService.getEntityTypeLabel(item)))
             .collect(Collectors.toList());
 
     }

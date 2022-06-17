@@ -1669,7 +1669,7 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
 
-        String entityType = getEntityType(entity);
+        String entityType = getEntityTypeLabel(entity);
         if (researcherProfileService.getProfileType().equals(entityType)) {
             return;
         }

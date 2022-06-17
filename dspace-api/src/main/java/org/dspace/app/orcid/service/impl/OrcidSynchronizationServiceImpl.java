@@ -161,7 +161,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public boolean isSynchronizationEnabled(Item profile, Item item) {
 
-        String entityType = itemService.getEntityType(item);
+        String entityType = itemService.getEntityTypeLabel(item);
         if (entityType == null) {
             return false;
         }
