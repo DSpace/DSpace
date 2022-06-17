@@ -227,7 +227,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         if (StringUtils.isBlank(profileType)) {
             return false;
         }
-        return profileType.equals(itemService.getEntityType(item));
+        return profileType.equals(itemService.getEntityTypeLabel(item));
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         Iterator<Item> items = itemService.findByAuthorityValue(context, "dspace", "object", "owner", id.toString());
         while (items.hasNext()) {
             Item item = items.next();
-            String entityType = itemService.getEntityType(item);
+            String entityType = itemService.getEntityTypeLabel(item);
             if (profileType.equals(entityType)) {
                 return item;
             }
