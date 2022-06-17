@@ -28,7 +28,6 @@ public interface OrcidClient {
      * Retrieves an /read-public access token using a client-credentials OAuth flow,
      * or 2-step OAuth.
      *
-     * @param  code                 the authorization code
      * @return                      the ORCID token
      * @throws OrcidClientException if some error occurs during the exchange
      */
