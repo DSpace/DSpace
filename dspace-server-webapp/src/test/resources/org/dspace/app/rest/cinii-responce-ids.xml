@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns="http://purl.org/rss/1.0/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:ndl="http://ndl.go.jp/dcndl/terms" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:cir="https://cir.nii.ac.jp/schema/1.0/" xml:lang="ja">
+    <channel rdf:about="https://cir.nii.ac.jp/opensearch/articles?q=science&amp;count=2&amp;lang=ja&amp;start=1&amp;format=rss&amp;sortorder=0">
+        <title>CiNii Research articles - science 2 ja 1 rss 0</title>
+        <description>CiNii Research articles - science 2 ja 1 rss 0</description>
+        <link>https://cir.nii.ac.jp/opensearch/articles?q=science&amp;count=2&amp;lang=ja&amp;start=1&amp;format=rss&amp;sortorder=0</link>
+        <dc:date>2022-06-15T18:37:38.036109+09:00</dc:date>
+        <opensearch:totalResults>32</opensearch:totalResults>
+        <opensearch:startIndex>1</opensearch:startIndex>
+        <opensearch:itemsPerPage>2</opensearch:itemsPerPage>
+        <items>
+            <rdf:Seq>
+                <rdf:li rdf:resource="https://cir.nii.ac.jp/crid/1010572092222310146"/>
+                <rdf:li rdf:resource="https://cir.nii.ac.jp/crid/1050010687833449984"/>
+            </rdf:Seq>
+        </items>
+    </channel>
+    <item rdf:about="https://cir.nii.ac.jp/crid/1010572092222310146">
+        <title>Understanding the impact of mandatory accrual accounting on management practices: Interpretation of Japanese local governments’ behavior</title>
+        <link>https://cir.nii.ac.jp/crid/1010572092222310146</link>
+        <rdfs:seeAlso rdf:resource="https://cir.nii.ac.jp/crid/1010572092222310146.rdf"/>
+        <dc:type>Article</dc:type>
+        <prism:publicationName>International Review of Administration Science</prism:publicationName>
+        <prism:volume>89(2)</prism:volume>
+        <prism:publicationDate>2023</prism:publicationDate>
+    </item>
+    <item rdf:about="https://cir.nii.ac.jp/crid/1050010687833449984">
+        <title>Band structures of passive films on titanium in simulated bioliquids determined by photoelectrochemical response: principle governing the biocompatibility</title>
+        <link>https://cir.nii.ac.jp/crid/1050010687833449984</link>
+        <rdfs:seeAlso rdf:resource="https://cir.nii.ac.jp/crid/1050010687833449984.rdf"/>
+        <dc:type>Article</dc:type>
+        <dc:creator>Kim, Seong-Cheol</dc:creator>
+        <dc:creator>Hanawa, Takao</dc:creator>
+        <dc:creator>Manaka, Tomoyo</dc:creator>
+        <dc:creator>Tsuchiya, Hiroaki</dc:creator>
+        <dc:creator>Fujimoto, Shinji</dc:creator>
+        <dc:publisher>Taylor &amp; Francis</dc:publisher>
+        <prism:publicationName>Science and Technology of Advanced Materials</prism:publicationName>
+        <prism:issn>1468-6996</prism:issn>
+        <prism:volume>23</prism:volume>
+        <prism:number>1</prism:number>
+        <prism:startingPage>322</prism:startingPage>
+        <prism:endingPage>331</prism:endingPage>
+        <prism:publicationDate>2022-12-31</prism:publicationDate>
+        <description>The band structures and band gap energies, E (g), of passive films formed on titanium (Ti) in simulated bioliquids, Hanks&apos; solution (Hanks) and saline, were evaluated. Ti was polarized at 0, −0.1, and −0.2 V-Ag/AgCl, E (f), for 1 h. After polarization, the surfaces were characterized using X-ray photoelectron spectroscopy, and the photoelectrochemical responses were evaluated. The current change during photoirradiation was recorded as a photocurrent transient at each measuring potential, E (m), and by changing the wavelength of the incident light. Passive films consisted of a very thin TiO2 layer containing small amounts of Ti2O3 and TiO, hydroxyl groups, and water. During polarization in Hanks, calcium and phosphate ions were incorporated or formed calcium phosphate but not in saline. Calcium phosphate and hydroxyl groups influenced the band structure. E (g) was graded in Hanks but constant in saline, independent of E (f) and E (m). The passive film on Ti behaved as an n-type semiconductor containing two layers: an inner oxide layer with a large E (g) and an outer hydroxide layer with a small E (g). In Hanks, E (g) was 3.3–3.4 eV in the inner oxide layer and 2.9 eV in the outer hydroxide layer. In saline, E (g) was 3.3 eV in the inner layer and 2.7 eV in the outer layer. Calcium phosphate and hydroxyl groups influenced the band structure of the passive film. The E (g) of the outermost surface was smaller than that of TiO2 ceramics, which is probably one of the principles of the excellent biocompatibility of Ti among metals.</description>
+        <dc:identifier rdf:datatype="cir:URI">http://www.lib.kobe-u.ac.jp/handle_kernel/90009212</dc:identifier>
+        <dc:subject>band gap</dc:subject>
+        <dc:subject>band structure</dc:subject>
+        <dc:subject>biocompatibility</dc:subject>
+        <dc:subject>Hanks&apos; solution</dc:subject>
+        <dc:subject>passive film</dc:subject>
+        <dc:subject>photocurrent</dc:subject>
+        <dc:subject>saline</dc:subject>
+        <dc:subject>Titanium</dc:subject>
+        <dc:subject>XPS</dc:subject>
+        <dc:source rdf:resource="http://www.lib.kobe-u.ac.jp/handle_kernel/90009212" />
+    </item>
+</rdf:RDF>

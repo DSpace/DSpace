@@ -21,6 +21,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipMetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
@@ -55,14 +56,24 @@ public abstract class AbstractVersionProvider {
             MetadataSchema metadataSchema = metadataField.getMetadataSchema();
             String unqualifiedMetadataField = metadataSchema.getName() + "." + metadataField.getElement();
             if (getIgnoredMetadataFields().contains(metadataField.toString('.')) ||
-                getIgnoredMetadataFields().contains(unqualifiedMetadataField + "." + Item.ANY)) {
-                //Skip this metadata field
+                getIgnoredMetadataFields().contains(unqualifiedMetadataField + "." + Item.ANY) ||
+                aMd instanceof RelationshipMetadataValue) {
+                //Skip this metadata field (ignored and/or virtual)
                 continue;
             }
 
-            itemService
-                .addMetadata(context, itemNew, metadataField, aMd.getLanguage(), aMd.getValue(), aMd.getAuthority(),
-                             aMd.getConfidence());
+            itemService.addMetadata(
+                context,
+                itemNew,
+                metadataField.getMetadataSchema().getName(),
+                metadataField.getElement(),
+                metadataField.getQualifier(),
+                aMd.getLanguage(),
+                aMd.getValue(),
+                aMd.getAuthority(),
+                aMd.getConfidence(),
+                aMd.getPlace()
+            );
         }
     }
 

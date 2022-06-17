@@ -18,6 +18,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.launcher.ScriptLauncher;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -88,6 +90,12 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
                                                                                       .getMetadataAuthorityService();
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        configurationService.setProperty("solr-database-resync.time-until-reindex", 1);
+    }
 
     @Test
     public void solrRecordsAfterDepositOrDeletionOfWorkspaceItemTest() throws Exception {
@@ -374,7 +382,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         collectionService.delete(context, col1);
         context.restoreAuthSystemState();
         assertSearchQuery(IndexableCollection.TYPE, 2);
-        assertSearchQuery(IndexableItem.TYPE, 2);
+        // Deleted item contained within totalFound due to predb status (SolrDatabaseResyncCli takes care of this)
+        assertSearchQuery(IndexableItem.TYPE, 2, 3, 0, -1);
     }
 
     @Test
@@ -456,6 +465,10 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
         // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
         assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
+
+        // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
+        performSolrDatabaseResyncScript();
+
         // check Item type with start=2 and limit=4, we expect: indexableObjects=1, totalFound=3
         assertSearchQuery(IndexableItem.TYPE, 1, 3, 2, 4);
         // check Item type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
@@ -642,7 +655,11 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
         assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
-        // as the previous query hit the stale objects running a new query should lead to a clean situation
+
+        // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
+        performSolrDatabaseResyncScript();
+
+        // as SolrDatabaseResyncCli removed the stale objects, running a new query should lead to a clean situation
         assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
     }
 
@@ -805,6 +822,13 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         indexer.commit();
         context.setCurrentUser(previousUser);
+    }
+
+    public void performSolrDatabaseResyncScript() throws Exception {
+        String[] args = new String[] {"solr-database-resync"};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher
+                .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
     }
 
     private void abort(XmlWorkflowItem workflowItem)

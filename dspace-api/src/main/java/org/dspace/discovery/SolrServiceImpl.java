@@ -8,6 +8,8 @@
 package org.dspace.discovery;
 
 import static java.util.stream.Collectors.joining;
+import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD;
+import static org.dspace.discovery.indexobject.ItemIndexFactoryImpl.STATUS_FIELD_PREDB;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -162,6 +164,24 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                           IndexableObject indexableObject) throws IOException, SQLException, SolrServerException {
         final SolrInputDocument solrInputDocument = indexableObjectService.buildDocument(context, indexableObject);
         indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
+    }
+
+    /**
+     * Update the given indexable object using a given service
+     * @param context                   The DSpace Context
+     * @param indexableObjectService    The service to index the object with
+     * @param indexableObject           The object to index
+     * @param preDB                     Add a "preDB" status to the document
+     */
+    protected void update(Context context, IndexFactory indexableObjectService, IndexableObject indexableObject,
+                          boolean preDB) throws IOException, SQLException, SolrServerException {
+        if (preDB) {
+            final SolrInputDocument solrInputDocument =
+                    indexableObjectService.buildNewDocument(context, indexableObject);
+            indexableObjectService.writeDocument(context, indexableObject, solrInputDocument);
+        } else {
+            update(context, indexableObjectService, indexableObject);
+        }
     }
 
     /**
@@ -450,6 +470,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             log.error(e, e);
             throw new SearchServiceException(e);
         }
+    }
+
+    @Override
+    public void atomicUpdate(Context context, String uniqueIndexId, String field, Map<String, Object> fieldModifier)
+            throws SolrServerException, IOException {
+        SolrInputDocument solrInputDocument = new SolrInputDocument();
+        solrInputDocument.addField(SearchUtils.RESOURCE_UNIQUE_ID, uniqueIndexId);
+        solrInputDocument.addField(field, fieldModifier);
+
+        solrSearchCore.getSolr().add(solrInputDocument);
     }
 
     // //////////////////////////////////
@@ -822,6 +852,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.addField(SearchUtils.RESOURCE_TYPE_FIELD);
         solrQuery.addField(SearchUtils.RESOURCE_ID_FIELD);
         solrQuery.addField(SearchUtils.RESOURCE_UNIQUE_ID);
+        solrQuery.addField(STATUS_FIELD);
 
         if (discoveryQuery.isSpellCheck()) {
             solrQuery.setParam(SpellingParams.SPELLCHECK_Q, query);
@@ -972,11 +1003,14 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         // Enables solr to remove documents related to items not on database anymore (Stale)
                         // if maxAttemps is greater than 0 cleanup the index on each step
                         if (maxAttempts >= 0) {
-                            zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
-                            // avoid to process the response except if we are in the last allowed execution.
-                            // When maxAttempts is 0 this will be just the first and last run as the
-                            // executionCount is increased at the start of the loop it will be equals to 1
-                            skipLoadingResponse = maxAttempts + 1 != executionCount;
+                            Object statusObj = doc.getFirstValue(STATUS_FIELD);
+                            if (!(statusObj instanceof String && statusObj.equals(STATUS_FIELD_PREDB))) {
+                                zombieDocs.add((String) doc.getFirstValue(SearchUtils.RESOURCE_UNIQUE_ID));
+                                // avoid to process the response except if we are in the last allowed execution.
+                                // When maxAttempts is 0 this will be just the first and last run as the
+                                // executionCount is increased at the start of the loop it will be equals to 1
+                                skipLoadingResponse = maxAttempts + 1 != executionCount;
+                            }
                         }
                         continue;
                     }
@@ -1453,6 +1487,28 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     public void indexContent(Context context, IndexableObject dso, boolean force,
                              boolean commit) throws SearchServiceException, SQLException {
         indexContent(context, dso, force);
+        if (commit) {
+            commit();
+        }
+    }
+
+    @Override
+    public void indexContent(Context context, IndexableObject indexableObject, boolean force,
+                             boolean commit, boolean preDb) throws SearchServiceException, SQLException {
+        if (preDb) {
+            try {
+                final IndexFactory indexableObjectFactory = indexObjectServiceFactory.
+                        getIndexableObjectFactory(indexableObject);
+                if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
+                    update(context, indexableObjectFactory, indexableObject, true);
+                    log.info(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                }
+            } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
+                log.error(e.getMessage(), e);
+            }
+        } else {
+            indexContent(context, indexableObject, force);
+        }
         if (commit) {
             commit();
         }

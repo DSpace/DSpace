@@ -23,11 +23,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,6 +44,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.RelationshipRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
@@ -166,6 +170,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
+                             .withPersonIdentifierLastName("Smith")
+                             .withPersonIdentifierFirstName("Maria")
+                             .withMetadata("dspace", "entity", "type", "Person")
                              .build();
 
         author3 = ItemBuilder.createItem(context, col1)
@@ -524,6 +531,80 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.rightwardValue", containsString(rightwardValue)));
         } finally {
             RelationshipBuilder.deleteRelationship(idRef.get());
+        }
+    }
+
+    @Test
+    public void createMultipleRelationshipsAppendToEndTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user1);
+        authorizeService.addPolicy(context, author2, Constants.WRITE, user1);
+
+        context.setCurrentUser(user1);
+        context.restoreAuthSystemState();
+
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String token = getAuthToken(user1.getEmail(), password);
+
+            // Add a relationship @ leftPlace 2
+            getClient(token).perform(post("/api/core/relationships")
+                                         .param("relationshipType",
+                                                isAuthorOfPublicationRelationshipType.getID()
+                                                                                     .toString())
+                                         .contentType(MediaType.parseMediaType
+                                                                   (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                        .TEXT_URI_LIST_VALUE))
+                                         .content(
+                                             "https://localhost:8080/server/api/core/items/" + publication1
+                                                 .getID() + "\n" +
+                                                 "https://localhost:8080/server/api/core/items/" + author1
+                                                 .getID()))
+                            .andExpect(status().isCreated())
+                            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient().perform(get("/api/core/relationships/" + idRef))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.id", is(idRef.get())))
+                       .andExpect(jsonPath("$.leftPlace", is(1)));
+
+            getClient(token).perform(post("/api/core/relationships")
+                                         .param("relationshipType",
+                                                isAuthorOfPublicationRelationshipType.getID()
+                                                                                     .toString())
+                                         .contentType(MediaType.parseMediaType
+                                                                   (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                        .TEXT_URI_LIST_VALUE))
+                                         .content(
+                                             "https://localhost:8080/server/api/core/items/" + publication1
+                                                 .getID() + "\n" +
+                                                 "https://localhost:8080/server/api/core/items/" + author2
+                                                 .getID()))
+                            .andExpect(status().isCreated())
+                            .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient().perform(get("/api/core/relationships/" + idRef2))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.id", is(idRef2.get())))
+                       .andExpect(jsonPath("$.leftPlace", is(2)));
+
+            // Check Item author order
+            getClient().perform(get("/api/core/items/" + publication1.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.metadata", allOf(
+                           matchMetadata("dc.contributor.author", "Testy, TEst", 0),
+                           matchMetadata("dc.contributor.author", "Smith, Donald", 1),
+                           matchMetadata("dc.contributor.author", "Smith, Maria", 2)
+                       )));
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+            if (idRef2.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef2.get());
+            }
         }
     }
 
@@ -956,7 +1037,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", Item.ANY, Item.ANY, Item.ANY);
         assertEquals(16, list.size()); //also includes title, 4 date fields, uri
         list = itemService.getMetadata(publication1, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        assertEquals(20, list.size()); //also includes type and 3 relation.isAuthorOfPublication values
+        // also includes type, 3 relation.isAuthorOfPublication and 3 relation.isAuthorOfPublication.latestForDiscovery
+        // values
+        assertEquals(23, list.size());
 
         } finally {
             RelationshipBuilder.deleteRelationship(idRef1.get());
@@ -1526,8 +1609,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("page.totalElements", is(0)));
         } finally {
-            RelationshipBuilder.deleteRelationship(idRef1.get());
-            RelationshipBuilder.deleteRelationship(idRef2.get());
+            if (idRef1.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef2.get());
+            }
         }
     }
 
@@ -2509,6 +2596,104 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         } finally {
             RelationshipBuilder.deleteRelationship(idRef);
+        }
+
+    }
+
+    @Test
+    public void putRelationshipWithJsonMoveInFrontOtherMetadata() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+        Integer idRef = null;
+        Integer idRef2 = null;
+        try {
+            // Add a relationship
+            MvcResult mvcResult = getClient(token)
+                .perform(post("/api/core/relationships")
+                             .param("relationshipType", isAuthorOfPublicationRelationshipType.getID().toString())
+                             .contentType(MediaType.parseMediaType(
+                                 org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content(
+                                 "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                     "https://localhost:8080/server/api/core/items/" + author1.getID()))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+            ObjectMapper mapper = new ObjectMapper();
+            String content = mvcResult.getResponse().getContentAsString();
+            Map<String, Object> map = mapper.readValue(content, Map.class);
+            String id = String.valueOf(map.get("id"));
+            idRef = Integer.parseInt(id);
+
+            // Add some more metadata
+            List<Operation> ops = new ArrayList<Operation>();
+            ops.add(new AddOperation("/metadata/dc.contributor.author/-", "Metadata, First"));
+            ops.add(new AddOperation("/metadata/dc.contributor.author/-", "Metadata, Second"));
+
+            getClient(token).perform(patch("/api/core/items/" + publication1.getID())
+                                         .content(getPatchContent(ops))
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
+
+            // Add another relationship
+            mvcResult = getClient(token)
+                .perform(post("/api/core/relationships")
+                             .param("relationshipType", isAuthorOfPublicationRelationshipType.getID().toString())
+                             .contentType(MediaType.parseMediaType(
+                                 org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content(
+                                 "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                     "https://localhost:8080/server/api/core/items/" + author2.getID()))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+            content = mvcResult.getResponse().getContentAsString();
+            map = mapper.readValue(content, Map.class);
+            id = String.valueOf(map.get("id"));
+            idRef2 = Integer.parseInt(id);
+
+            // Check Item author order
+            getClient().perform(get("/api/core/items/" + publication1.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.metadata", allOf(
+                           matchMetadata("dc.contributor.author", "Testy, TEst", 0),
+                           matchMetadata("dc.contributor.author", "Smith, Donald", 1),      // first relationship
+                           matchMetadata("dc.contributor.author", "Metadata, First", 2),
+                           matchMetadata("dc.contributor.author", "Metadata, Second", 3),
+                           matchMetadata("dc.contributor.author", "Smith, Maria", 4)        // second relationship
+                       )));
+
+            RelationshipRest relationshipRest = new RelationshipRest();
+            relationshipRest.setLeftPlace(0);
+            relationshipRest.setRightPlace(1);
+            relationshipRest.setLeftwardValue(null);
+            relationshipRest.setRightwardValue(null);
+
+            // Modify the place of the second relationship -> put it in front of all other metadata
+            getClient(token).perform(put("/api/core/relationships/" + idRef2)
+                                         .contentType(contentType)
+                                         .content(mapper.writeValueAsBytes(relationshipRest)))
+                            .andExpect(status().isOk());
+
+            // Verify the place has changed to the new value
+            getClient(token).perform(get("/api/core/relationships/" + idRef2))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.leftPlace", is(0)))
+                            .andExpect(jsonPath("$.rightPlace", is(1)));
+
+            // Verify the other metadata have moved back
+            getClient().perform(get("/api/core/items/" + publication1.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.metadata", allOf(
+                           matchMetadata("dc.contributor.author", "Smith, Maria", 0),       // second relationship
+                           matchMetadata("dc.contributor.author", "Testy, TEst", 1),
+                           matchMetadata("dc.contributor.author", "Smith, Donald", 2),      // first relationship
+                           matchMetadata("dc.contributor.author", "Metadata, First", 3),
+                           matchMetadata("dc.contributor.author", "Metadata, Second", 4)
+                       )));
+
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef);
+            RelationshipBuilder.deleteRelationship(idRef2);
         }
 
     }
