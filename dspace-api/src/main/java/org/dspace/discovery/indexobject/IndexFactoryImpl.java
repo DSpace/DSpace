@@ -71,6 +71,11 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
     }
 
     @Override
+    public SolrInputDocument buildNewDocument(Context context, T indexableObject) throws SQLException, IOException {
+        return buildDocument(context, indexableObject);
+    }
+
+    @Override
     public void writeDocument(Context context, T indexableObject, SolrInputDocument solrInputDocument)
             throws SQLException, IOException, SolrServerException {
         try {

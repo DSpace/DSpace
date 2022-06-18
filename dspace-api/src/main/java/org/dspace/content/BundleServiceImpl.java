@@ -158,6 +158,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         }
 
         bundle.addBitstream(bitstream);
+        // If a bitstream is moved from one bundle to another it may be temporarily flagged as deleted
+        // (when removed from the original bundle)
+        if (bitstream.isDeleted()) {
+            bitstream.setDeleted(false);
+        }
         bitstream.getBundles().add(bundle);
 
 

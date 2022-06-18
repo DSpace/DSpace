@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<responseWrapper xmlns:slx="http://www.scholix.org" xmlns:epmc="https://www.europepmc.org/data">
+    <version>6.7</version>
+    <hitCount>3</hitCount>
+    <request>
+        <queryString>chortkiv</queryString>
+        <resultType>core</resultType>
+        <cursorMark>*</cursorMark>
+        <pageSize>25</pageSize>
+        <sort></sort>
+        <synonym>false</synonym>
+    </request>
+    <resultList>
+        <result>
+            <id>21733903</id>
+            <source>MED</source>
+            <pmid>21733903</pmid>
+            <pmcid>PMC3234553</pmcid>
+            <fullTextIdList>
+                <fullTextId>PMC3234553</fullTextId>
+            </fullTextIdList>
+            <doi>10.1098/rspb.2011.0943</doi>
+            <title>First record of preserved soft parts in a Palaeozoic podocopid (Metacopina) ostracod, Cytherellina submagna: phylogenetic implications.</title>
+            <authorString>Olempska E, Horne DJ, Szaniawski H.</authorString>
+            <authorList>
+                <author>
+                    <fullName>Olempska E</fullName>
+                    <firstName>E</firstName>
+                    <lastName>Olempska</lastName>
+                    <initials>E</initials>
+                    <authorId type="ORCID">0000-0003-0310-3876</authorId>
+                    <authorAffiliationDetailsList>
+                        <authorAffiliation>
+                            <affiliation>Institute of Paleobiology, Polish Academy of Sciences, 00-818 Warszawa, Poland. olempska@twarda.pan.pl</affiliation>
+                        </authorAffiliation>
+                    </authorAffiliationDetailsList>
+                </author>
+                <author>
+                    <fullName>Horne DJ</fullName>
+                    <firstName>D J</firstName>
+                    <lastName>Horne</lastName>
+                    <initials>DJ</initials>
+                    <authorId type="ORCID">0000-0002-2148-437X</authorId>
+                </author>
+                <author>
+                    <fullName>Szaniawski H</fullName>
+                    <firstName>H</firstName>
+                    <lastName>Szaniawski</lastName>
+                    <initials>H</initials>
+                </author>
+            </authorList>
+            <authorIdList>
+                <authorId type="ORCID">0000-0002-2148-437X</authorId>
+                <authorId type="ORCID">0000-0003-0310-3876</authorId>
+            </authorIdList>
+            <journalInfo>
+                <issue>1728</issue>
+                <volume>279</volume>
+                <journalIssueId>1890685</journalIssueId>
+                <dateOfPublication>2012 Feb</dateOfPublication>
+                <monthOfPublication>2</monthOfPublication>
+                <yearOfPublication>2012</yearOfPublication>
+                <printPublicationDate>2012-02-01</printPublicationDate>
+                <journal>
+                    <title>Proceedings. Biological sciences</title>
+                    <ISOAbbreviation>Proc Biol Sci</ISOAbbreviation>
+                    <medlineAbbreviation>Proc Biol Sci</medlineAbbreviation>
+                    <NLMid>101245157</NLMid>
+                    <ISSN>0962-8452</ISSN>
+                    <ESSN>1471-2954</ESSN>
+                </journal>
+            </journalInfo>
+            <pubYear>2012</pubYear>
+            <pageInfo>564-570</pageInfo>
+            <abstractText>The metacopines represent one of the oldest and most important extinct groups of ostracods, with a fossil record from the Mid-Ordovician to the Early Jurassic. Herein, we report the discovery of a representative of the group with three-dimensionally preserved soft parts. The specimen--a male of Cytherellina submagna--was found in the Early Devonian (416 Ma) of Podolia, Ukraine. A branchial plate (Bp) of the cephalic maxillula (Mx), a pair of thoracic appendages (walking legs), a presumed furca (Fu) and a copulatory organ are preserved. The material also includes phosphatized steinkerns with exceptionally preserved marginal pore canals and muscle scars. The morphology of the preserved limbs and valves of C. submagna suggests its relationship with extant Podocopida, particularly with the superfamilies Darwinuloidea and Sigillioidea, which have many similar characteristic features, including a large Bp on the Mx, the morphology of walking legs, Fu with two terminal claws, internal stop-teeth in the left valve, adductor muscle scar pattern, and a very narrow fused zone along the anterior and posterior margins. More precise determination of affinities will depend on the soft-part morphology of the cephalic segment, which has not been revealed in the present material.</abstractText>
+            <affiliation>Institute of Paleobiology, Polish Academy of Sciences, 00-818 Warszawa, Poland. olempska@twarda.pan.pl</affiliation>
+            <publicationStatus>ppublish</publicationStatus>
+            <language>eng</language>
+            <pubModel>Print-Electronic</pubModel>
+            <pubTypeList>
+                <pubType>Research Support, Non-U.S. Gov't</pubType>
+                <pubType>research-article</pubType>
+                <pubType>Journal Article</pubType>
+            </pubTypeList>
+            <meshHeadingList>
+                <meshHeading>
+                    <majorTopic_YN>N</majorTopic_YN>
+                    <descriptorName>Animals</descriptorName>
+                </meshHeading>
+                <meshHeading>
+                    <majorTopic_YN>N</majorTopic_YN>
+                    <descriptorName>Crustacea</descriptorName>
+                    <meshQualifierList>
+                        <meshQualifier>
+                            <abbreviation>AH</abbreviation>
+                            <qualifierName>anatomy &amp; histology</qualifierName>
+                            <majorTopic_YN>Y</majorTopic_YN>
+                        </meshQualifier>
+                        <meshQualifier>
+                            <abbreviation>CL</abbreviation>
+                            <qualifierName>classification</qualifierName>
+                            <majorTopic_YN>Y</majorTopic_YN>
+                        </meshQualifier>
+                    </meshQualifierList>
+                </meshHeading>
+                <meshHeading>
+                    <majorTopic_YN>Y</majorTopic_YN>
+                    <descriptorName>Phylogeny</descriptorName>
+                </meshHeading>
+                <meshHeading>
+                    <majorTopic_YN>Y</majorTopic_YN>
+                    <descriptorName>Fossils</descriptorName>
+                </meshHeading>
+                <meshHeading>
+                    <majorTopic_YN>N</majorTopic_YN>
+                    <descriptorName>Ukraine</descriptorName>
+                </meshHeading>
+                <meshHeading>
+                    <majorTopic_YN>N</majorTopic_YN>
+                    <descriptorName>Male</descriptorName>
+                </meshHeading>
+            </meshHeadingList>
+            <subsetList>
+                <subset>
+                    <code>IM</code>
+                    <name>Index Medicus</name>
+                </subset>
+            </subsetList>
+            <fullTextUrlList>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>pdf</documentStyle>
+                    <site>PubMedCentral</site>
+                    <url>https://www.ncbi.nlm.nih.gov/pmc/articles/pmid/21733903/pdf/?tool=EBI</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>html</documentStyle>
+                    <site>PubMedCentral</site>
+                    <url>https://www.ncbi.nlm.nih.gov/pmc/articles/pmid/21733903/?tool=EBI</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Subscription required</availability>
+                    <availabilityCode>S</availabilityCode>
+                    <documentStyle>doi</documentStyle>
+                    <site>DOI</site>
+                    <url>https://doi.org/10.1098/rspb.2011.0943</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>html</documentStyle>
+                    <site>Europe_PMC</site>
+                    <url>https://europepmc.org/articles/PMC3234553</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>pdf</documentStyle>
+                    <site>Europe_PMC</site>
+                    <url>https://europepmc.org/articles/PMC3234553?pdf=render</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>doi</documentStyle>
+                    <site>DOI</site>
+                    <url>https://doi.org/10.1098/rspb.2011.0943</url>
+                </fullTextUrl>
+            </fullTextUrlList>
+            <isOpenAccess>N</isOpenAccess>
+            <inEPMC>Y</inEPMC>
+            <inPMC>Y</inPMC>
+            <hasPDF>Y</hasPDF>
+            <hasBook>N</hasBook>
+            <hasSuppl>N</hasSuppl>
+            <citedByCount>2</citedByCount>
+            <hasData>N</hasData>
+            <hasReferences>Y</hasReferences>
+            <hasTextMinedTerms>Y</hasTextMinedTerms>
+            <hasDbCrossReferences>N</hasDbCrossReferences>
+            <hasLabsLinks>N</hasLabsLinks>
+            <authMan>N</authMan>
+            <epmcAuthMan>N</epmcAuthMan>
+            <nihAuthMan>N</nihAuthMan>
+            <hasTMAccessionNumbers>N</hasTMAccessionNumbers>
+            <dateOfCompletion>2012-04-19</dateOfCompletion>
+            <dateOfCreation>2011-07-08</dateOfCreation>
+            <firstIndexDate>2011-07-08</firstIndexDate>
+            <fullTextReceivedDate>2020-07-11</fullTextReceivedDate>
+            <dateOfRevision>2021-10-20</dateOfRevision>
+            <electronicPublicationDate>2011-07-06</electronicPublicationDate>
+            <firstPublicationDate>2011-07-06</firstPublicationDate>
+        </result>
+        <result>
+            <id>UA37818</id>
+            <source>PAT</source>
+            <title>VODKA SYNEVIR</title>
+            <authorString>BARANOV VALENTYN VOLODYMYROVYC, DANCHAK ROMAN ADAMOVYCH, FEDORCHUK NATALIIA HRYHORIVNA, FEDOREIKO LIUBOV ROMANIVNA.</authorString>
+            <authorList>
+                <author>
+                    <fullName>BARANOV VALENTYN VOLODYMYROVYC</fullName>
+                    <lastName>BARANOV VALENTYN VOLODYMYROVYC</lastName>
+                </author>
+                <author>
+                    <fullName>DANCHAK ROMAN ADAMOVYCH</fullName>
+                    <lastName>DANCHAK ROMAN ADAMOVYCH</lastName>
+                </author>
+                <author>
+                    <fullName>FEDORCHUK NATALIIA HRYHORIVNA</fullName>
+                    <lastName>FEDORCHUK NATALIIA HRYHORIVNA</lastName>
+                </author>
+                <author>
+                    <fullName>FEDOREIKO LIUBOV ROMANIVNA</fullName>
+                    <lastName>FEDOREIKO LIUBOV ROMANIVNA</lastName>
+                </author>
+            </authorList>
+            <pubYear>2004</pubYear>
+            <abstractText>Vodka contains aqueous-alcoholic mixture, 65.8 % sugar syrup and apple vinegar. As a result the vodka has light taste without vodka acid and light apple aroma.</abstractText>
+            <affiliation>CHORTKIV DISTILLARY</affiliation>
+            <language>eng</language>
+            <pubTypeList>
+                <pubType>Patent</pubType>
+            </pubTypeList>
+            <patentDetails>
+                <countryCode>UA</countryCode>
+                <typeCode>C2</typeCode>
+                <classifierList>
+                    <classifier>
+                        <classification>C12G3/06</classification>
+                        <classificationType>IPC</classificationType>
+                        <hyperlink>http://www.cooperativepatentclassification.org/cpc/scheme/C/scheme-C12G.pdf</hyperlink>
+                    </classifier>
+                </classifierList>
+                <application>
+                    <applicationNumber>UA20000042245</applicationNumber>
+                    <applicationDate>2000-04-19</applicationDate>
+                    <orderIn>0</orderIn>
+                </application>
+                <priorityList>
+                    <priority>
+                        <priorityNumber>UA20000042245</priorityNumber>
+                        <priorityDate>2000-04-19</priorityDate>
+                        <orderIn>1</orderIn>
+                    </priority>
+                </priorityList>
+            </patentDetails>
+            <fullTextUrlList>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>html</documentStyle>
+                    <site>SureChembl</site>
+                    <url>https://www.surechembl.org/document/UA-37818-U</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>html</documentStyle>
+                    <site>EPO</site>
+                    <url>http://v3.espacenet.com/textdoc?DB=EPODOC&amp;IDX=UA37818</url>
+                </fullTextUrl>
+            </fullTextUrlList>
+            <isOpenAccess>N</isOpenAccess>
+            <inEPMC>N</inEPMC>
+            <inPMC>N</inPMC>
+            <hasPDF>N</hasPDF>
+            <hasBook>N</hasBook>
+            <hasSuppl>N</hasSuppl>
+            <citedByCount>0</citedByCount>
+            <hasData>N</hasData>
+            <hasReferences>N</hasReferences>
+            <hasTextMinedTerms>Y</hasTextMinedTerms>
+            <hasDbCrossReferences>N</hasDbCrossReferences>
+            <hasLabsLinks>N</hasLabsLinks>
+            <authMan>N</authMan>
+            <epmcAuthMan>N</epmcAuthMan>
+            <nihAuthMan>N</nihAuthMan>
+            <hasTMAccessionNumbers>N</hasTMAccessionNumbers>
+            <dateOfCompletion>2004-12-15</dateOfCompletion>
+            <dateOfCreation>2000-04-19</dateOfCreation>
+            <firstIndexDate>2010-11-01</firstIndexDate>
+            <firstPublicationDate>2000-04-19</firstPublicationDate>
+        </result>
+        <result>
+            <id>UA37954</id>
+            <source>PAT</source>
+            <title>A VODKA CHARKA</title>
+            <authorString>BARANOV VALENTYN VOLODYMYROVYC, DANCHAK ROMAN ADAMOVYCH, FEDORCHUK NATALIIA HRYHORIVNA, FEDOREIKO LIUBOV ROMANIVNA.</authorString>
+            <authorList>
+                <author>
+                    <fullName>BARANOV VALENTYN VOLODYMYROVYC</fullName>
+                    <lastName>BARANOV VALENTYN VOLODYMYROVYC</lastName>
+                </author>
+                <author>
+                    <fullName>DANCHAK ROMAN ADAMOVYCH</fullName>
+                    <lastName>DANCHAK ROMAN ADAMOVYCH</lastName>
+                </author>
+                <author>
+                    <fullName>FEDORCHUK NATALIIA HRYHORIVNA</fullName>
+                    <lastName>FEDORCHUK NATALIIA HRYHORIVNA</lastName>
+                </author>
+                <author>
+                    <fullName>FEDOREIKO LIUBOV ROMANIVNA</fullName>
+                    <lastName>FEDOREIKO LIUBOV ROMANIVNA</lastName>
+                </author>
+            </authorList>
+            <pubYear>2005</pubYear>
+            <abstractText>The invention relates to food industry, and particularly to liqueur and vodka industry, to vodkas compositions. The aim of this invention is producing vodka with high organoleptic indices, and particularly soft taste without vodka bitterness and without vodka aroma, and high biological properties, by selection of necessary ingredients at required quantities. Ingredients ratio at 100 l of finished drink: Carbohydrate module ôAlkosoftö, l 0.07-0.13Citric oil, kg 0,0015-0,0025 Aqueous-alcoholic mixture as calculated per strength of 40% of volume rest. Technical result - preparation of the vodka of given composition with a strength of 40% of volume, which is transparent, colorless, has mild taste without vodka bitterness and without strong vodka aroma which will not cause alcohol withdrawal syndrome and high charge on the body.</abstractText>
+            <affiliation>CHORTKIV DISTILLARY</affiliation>
+            <language>eng</language>
+            <pubTypeList>
+                <pubType>Patent</pubType>
+            </pubTypeList>
+            <patentDetails>
+                <countryCode>UA</countryCode>
+                <typeCode>C2</typeCode>
+                <classifierList>
+                    <classifier>
+                        <classification>C12G3/06</classification>
+                        <classificationType>IPC</classificationType>
+                        <hyperlink>http://www.cooperativepatentclassification.org/cpc/scheme/C/scheme-C12G.pdf</hyperlink>
+                    </classifier>
+                </classifierList>
+                <application>
+                    <applicationNumber>UA20000052634</applicationNumber>
+                    <applicationDate>2000-05-10</applicationDate>
+                    <orderIn>0</orderIn>
+                </application>
+                <priorityList>
+                    <priority>
+                        <priorityNumber>UA20000052634</priorityNumber>
+                        <priorityDate>2000-05-10</priorityDate>
+                        <orderIn>1</orderIn>
+                    </priority>
+                </priorityList>
+            </patentDetails>
+            <fullTextUrlList>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>html</documentStyle>
+                    <site>SureChembl</site>
+                    <url>https://www.surechembl.org/document/UA-37954-U</url>
+                </fullTextUrl>
+                <fullTextUrl>
+                    <availability>Free</availability>
+                    <availabilityCode>F</availabilityCode>
+                    <documentStyle>html</documentStyle>
+                    <site>EPO</site>
+                    <url>http://v3.espacenet.com/textdoc?DB=EPODOC&amp;IDX=UA37954</url>
+                </fullTextUrl>
+            </fullTextUrlList>
+            <isOpenAccess>N</isOpenAccess>
+            <inEPMC>N</inEPMC>
+            <inPMC>N</inPMC>
+            <hasPDF>N</hasPDF>
+            <hasBook>N</hasBook>
+            <hasSuppl>N</hasSuppl>
+            <citedByCount>0</citedByCount>
+            <hasData>N</hasData>
+            <hasReferences>N</hasReferences>
+            <hasTextMinedTerms>Y</hasTextMinedTerms>
+            <hasDbCrossReferences>N</hasDbCrossReferences>
+            <hasLabsLinks>N</hasLabsLinks>
+            <authMan>N</authMan>
+            <epmcAuthMan>N</epmcAuthMan>
+            <nihAuthMan>N</nihAuthMan>
+            <hasTMAccessionNumbers>N</hasTMAccessionNumbers>
+            <dateOfCompletion>2005-02-15</dateOfCompletion>
+            <dateOfCreation>2000-05-10</dateOfCreation>
+            <firstIndexDate>2010-10-18</firstIndexDate>
+            <firstPublicationDate>2000-05-10</firstPublicationDate>
+        </result>
+    </resultList>
+</responseWrapper>

@@ -11,17 +11,22 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.Query;
+import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.Item;
+import org.dspace.content.Item_;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.RelationshipType_;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.AbstractHibernateDAO;
@@ -30,93 +35,150 @@ import org.dspace.core.Context;
 public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> implements RelationshipDAO {
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item, boolean excludeTilted) throws SQLException {
-        return findByItem(context, item, -1, -1, excludeTilted);
+    public List<Relationship> findByItem(
+        Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
+    ) throws SQLException {
+        return findByItem(context, item, -1, -1, excludeTilted, excludeNonLatest);
     }
 
     @Override
-    public List<Relationship> findByItem(Context context, Item item, Integer limit, Integer offset,
-                                         boolean excludeTilted) throws SQLException {
-
+    public List<Relationship> findByItem(
+        Context context, Item item, Integer limit, Integer offset, boolean excludeTilted, boolean excludeNonLatest
+    ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Relationship> criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
-        if (excludeTilted) {
-            // If this item is the left item,
-            //    return relationships for types which are not tilted right (tilted is either left nor null)
-            // If this item is the right item,
-            //    return relationships for types which are not tilted left (tilted is either right nor null)
-            criteriaQuery
-                    .where(criteriaBuilder.or(
-                            criteriaBuilder.and(
-                                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
-                                    criteriaBuilder.or(
-                                            criteriaBuilder.isNull(relationshipRoot.get(Relationship_.relationshipType)
-                                                    .get(RelationshipType_.tilted)),
-                                            criteriaBuilder.notEqual(relationshipRoot
-                                                .get(Relationship_.relationshipType)
-                                                .get(RelationshipType_.tilted), RelationshipType.Tilted.RIGHT))),
-                            criteriaBuilder.and(
-                                    criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item),
-                                    criteriaBuilder.or(
-                                            criteriaBuilder.isNull(relationshipRoot.get(Relationship_.relationshipType)
-                                                    .get(RelationshipType_.tilted)),
-                                            criteriaBuilder.notEqual(relationshipRoot
-                                                    .get(Relationship_.relationshipType)
-                                                    .get(RelationshipType_.tilted), RelationshipType.Tilted.LEFT)))));
-        } else {
-            criteriaQuery
-                    .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
-                            criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
-        }
+
+        criteriaQuery.where(
+            criteriaBuilder.or(
+                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, excludeTilted, excludeNonLatest),
+                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, excludeTilted, excludeNonLatest)
+            )
+        );
+
         return list(context, criteriaQuery, false, Relationship.class, limit, offset);
     }
 
-    @Override
-    public int countByItem(Context context, Item item)
-            throws SQLException {
+    /**
+     * Get the predicate for a criteria query that selects relationships by their left item.
+     * @param criteriaBuilder   the criteria builder.
+     * @param relationshipRoot  the relationship root.
+     * @param item              the item that is being searched for.
+     * @param excludeTilted     if true, exclude tilted relationships.
+     * @param excludeNonLatest  if true, exclude relationships for which the opposite item is not the latest version
+     *                          that is relevant.
+     * @return a predicate that satisfies the given restrictions.
+     */
+    protected Predicate getLeftItemPredicate(
+        CriteriaBuilder criteriaBuilder, Root<Relationship> relationshipRoot, Item item,
+        boolean excludeTilted, boolean excludeNonLatest
+    ) {
+        List<Predicate> predicates = new ArrayList<>();
 
+        // match relationships based on the left item
+        predicates.add(
+            criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item)
+        );
+
+        if (excludeTilted) {
+            // if this item is the left item,
+            // return relationships for types which are NOT tilted right (tilted is either left nor null)
+            predicates.add(
+                criteriaBuilder.or(
+                    criteriaBuilder.isNull(
+                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted)
+                    ),
+                    criteriaBuilder.notEqual(
+                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted),
+                        RelationshipType.Tilted.RIGHT
+                    )
+                )
+            );
+        }
+
+        if (excludeNonLatest) {
+            // if this item is the left item,
+            // return relationships for which the right item is the "latest" version that is relevant.
+            predicates.add(
+                criteriaBuilder.notEqual(
+                    relationshipRoot.get(Relationship_.LATEST_VERSION_STATUS),
+                    Relationship.LatestVersionStatus.LEFT_ONLY
+                )
+            );
+        }
+
+        return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
+    }
+
+    /**
+     * Get the predicate for a criteria query that selects relationships by their right item.
+     * @param criteriaBuilder   the criteria builder.
+     * @param relationshipRoot  the relationship root.
+     * @param item              the item that is being searched for.
+     * @param excludeTilted     if true, exclude tilted relationships.
+     * @param excludeNonLatest  if true, exclude relationships for which the opposite item is not the latest version
+     *                          that is relevant.
+     * @return a predicate that satisfies the given restrictions.
+     */
+    protected Predicate getRightItemPredicate(
+        CriteriaBuilder criteriaBuilder, Root<Relationship> relationshipRoot, Item item,
+        boolean excludeTilted, boolean excludeNonLatest
+    ) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        // match relationships based on the right item
+        predicates.add(
+            criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)
+        );
+
+        if (excludeTilted) {
+            // if this item is the right item,
+            // return relationships for types which are NOT tilted left (tilted is either right nor null)
+            predicates.add(
+                criteriaBuilder.or(
+                    criteriaBuilder.isNull(
+                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted)
+                    ),
+                    criteriaBuilder.notEqual(
+                        relationshipRoot.get(Relationship_.relationshipType).get(RelationshipType_.tilted),
+                        RelationshipType.Tilted.LEFT
+                    )
+                )
+            );
+        }
+
+        if (excludeNonLatest) {
+            // if this item is the right item,
+            // return relationships for which the left item is the "latest" version that is relevant.
+            predicates.add(
+                criteriaBuilder.notEqual(
+                    relationshipRoot.get(Relationship_.LATEST_VERSION_STATUS),
+                    Relationship.LatestVersionStatus.RIGHT_ONLY
+                )
+            );
+        }
+
+        return criteriaBuilder.and(predicates.toArray(new Predicate[]{}));
+    }
+
+    @Override
+    public int countByItem(
+        Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
+    ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
-        criteriaQuery
-                .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
-                        criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+
+        criteriaQuery.where(
+            criteriaBuilder.or(
+                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, excludeTilted, excludeNonLatest),
+                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, excludeTilted, excludeNonLatest)
+            )
+        );
+
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
-    }
-
-    @Override
-    public int findNextLeftPlaceByLeftItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
-        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
-        criteriaQuery.where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item));
-        List<Relationship> list = list(context, criteriaQuery, false, Relationship.class, -1, -1);
-        list.sort((o1, o2) -> o2.getLeftPlace() - o1.getLeftPlace());
-        if (!list.isEmpty()) {
-            return list.get(0).getLeftPlace() + 1;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public int findNextRightPlaceByRightItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
-        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
-        criteriaQuery.where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item));
-        List<Relationship> list = list(context, criteriaQuery, false, Relationship.class, -1, -1);
-        list.sort((o1, o2) -> o2.getRightPlace() - o1.getRightPlace());
-        if (!list.isEmpty()) {
-            return list.get(0).getRightPlace() + 1;
-        } else {
-            return 0;
-        }
     }
 
     @Override
@@ -140,47 +202,130 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
-                                                            RelationshipType relationshipType, Integer limit,
-                                                            Integer offset)
-            throws SQLException {
-
+    public List<Relationship> findByItemAndRelationshipType(
+        Context context, Item item, RelationshipType relationshipType, Integer limit, Integer offset,
+        boolean excludeNonLatest
+    ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
-        criteriaQuery
-                .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType),
-                        relationshipType), criteriaBuilder.or
-                        (criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
-                         criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
+
+        criteriaQuery.where(
+            criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType),
+            criteriaBuilder.or(
+                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest),
+                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest)
+            )
+        );
+
         return list(context, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
     @Override
-    public List<Relationship> findByItemAndRelationshipType(Context context, Item item,
-                                                            RelationshipType relationshipType, boolean isLeft,
-                                                            Integer limit, Integer offset)
-            throws SQLException {
-
+    public List<Relationship> findByItemAndRelationshipType(
+        Context context, Item item, RelationshipType relationshipType, boolean isLeft, Integer limit, Integer offset,
+        boolean excludeNonLatest
+    ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
+
         if (isLeft) {
-            criteriaQuery
-                    .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType),
-                            relationshipType),
-                           criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item));
+            criteriaQuery.where(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType),
+                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest)
+            );
             criteriaQuery.orderBy(criteriaBuilder.asc(relationshipRoot.get(Relationship_.leftPlace)));
         } else {
-            criteriaQuery
-                    .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType),
-                            relationshipType),
-                            criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item));
+            criteriaQuery.where(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType),
+                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest)
+            );
             criteriaQuery.orderBy(criteriaBuilder.asc(relationshipRoot.get(Relationship_.rightPlace)));
         }
+
         return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+    }
+
+    @Override
+    public List<ItemUuidAndRelationshipId> findByLatestItemAndRelationshipType(
+        Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
+    ) throws SQLException {
+        final String relationshipIdAlias = "relationshipId";
+        final String itemUuidAlias = "itemUuid";
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+
+        ArrayList<Predicate> predicates = new ArrayList<>();
+
+        // all relationships should have the specified relationship type
+        predicates.add(
+            criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType)
+        );
+
+        if (isLeft) {
+            // match relationships based on the left item
+            predicates.add(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), latestItem)
+            );
+
+            // the left item has to have "latest status" => accept BOTH and LEFT_ONLY
+            predicates.add(
+                criteriaBuilder.notEqual(
+                    relationshipRoot.get(Relationship_.LATEST_VERSION_STATUS),
+                    Relationship.LatestVersionStatus.RIGHT_ONLY
+                )
+            );
+
+            // return the UUIDs of the right item
+            criteriaQuery.multiselect(
+                relationshipRoot.get(Relationship_.id).alias(relationshipIdAlias),
+                relationshipRoot.get(Relationship_.rightItem).get(Item_.id).alias(itemUuidAlias)
+            );
+        } else {
+            // match relationships based on the right item
+            predicates.add(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), latestItem)
+            );
+
+            // the right item has to have "latest status" => accept BOTH and RIGHT_ONLY
+            predicates.add(
+                criteriaBuilder.notEqual(
+                    relationshipRoot.get(Relationship_.LATEST_VERSION_STATUS),
+                    Relationship.LatestVersionStatus.LEFT_ONLY
+                )
+            );
+
+            // return the UUIDs of the left item
+            criteriaQuery.multiselect(
+                relationshipRoot.get(Relationship_.id).alias(relationshipIdAlias),
+                relationshipRoot.get(Relationship_.leftItem).get(Item_.id).alias(itemUuidAlias)
+            );
+        }
+
+        // all predicates are chained with the AND operator
+        criteriaQuery.where(predicates.toArray(new Predicate[]{}));
+
+        // deduplicate result
+        criteriaQuery.distinct(true);
+
+        // execute query
+        Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
+        query.setHint("org.hibernate.cacheable", true);
+        List<?> resultList = query.getResultList();
+
+        // convert types
+        return resultList.stream()
+            .map(Tuple.class::cast)
+            .map(t -> new ItemUuidAndRelationshipId(
+                (UUID) t.get(itemUuidAlias),
+                (Integer) t.get(relationshipIdAlias)
+            ))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -228,24 +373,26 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
-                                              boolean isLeft) throws SQLException {
-
+    public int countByItemAndRelationshipType(
+        Context context, Item item, RelationshipType relationshipType, boolean isLeft, boolean excludeNonLatest
+    ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
+
         if (isLeft) {
-            criteriaQuery
-                .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType),
-                                             relationshipType),
-                       criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item));
+            criteriaQuery.where(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType),
+                getLeftItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest)
+            );
         } else {
-            criteriaQuery
-                .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType),
-                                             relationshipType),
-                     criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item));
+            criteriaQuery.where(
+                criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType),
+                getRightItemPredicate(criteriaBuilder, relationshipRoot, item, false, excludeNonLatest)
+            );
         }
+
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
