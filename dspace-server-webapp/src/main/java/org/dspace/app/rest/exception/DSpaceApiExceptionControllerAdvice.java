@@ -262,8 +262,20 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                     exceptionMessage, location);
         }
 
+        String adjustedMessage = message;
+        String causeHeader = request.getHeader("X-DSPACE-REST-EXCEPTION-CAUSE");
+        if (causeHeader != null && causeHeader.equals("true")) {
+            Throwable rootCause = ex;
+            while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+                rootCause = rootCause.getCause();
+            }
+            String format = configurationService.getProperty("rest.exceptionCause.format", "%s [CAUSE: %s]");
+            adjustedMessage = String.format(format, message, rootCause.getMessage());
+        }
+
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
-        response.sendError(statusCode, message);
+        response.sendError(statusCode, adjustedMessage);
+        
     }
 
 }
