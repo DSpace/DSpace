@@ -188,6 +188,7 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
         parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-p", ""));
         parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-s", safDir.toString()));
         parameters.add(new DSpaceCommandLineParameter("-m", tempDir.toString() + "/mapfile.out"));
@@ -221,6 +222,7 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
         parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-p", ""));
         parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
         parameters.add(new DSpaceCommandLineParameter("-s", safDir.toString()));
@@ -269,6 +271,7 @@ public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
         parameters.add(new DSpaceCommandLineParameter("-a", ""));
+        parameters.add(new DSpaceCommandLineParameter("-p", ""));
         parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-c", collection.getID().toString()));
         parameters.add(new DSpaceCommandLineParameter("-s", tempDir.toString()));
