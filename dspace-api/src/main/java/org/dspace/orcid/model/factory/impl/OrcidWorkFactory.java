@@ -276,22 +276,6 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
             .findFirst();
     }
 
-    public ItemService getItemService() {
-        return itemService;
-    }
-
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
-    public OrcidCommonObjectFactory getOrcidCommonObjectFactory() {
-        return orcidCommonObjectFactory;
-    }
-
-    public void setOrcidCommonObjectFactory(OrcidCommonObjectFactory orcidCommonObjectFactory) {
-        this.orcidCommonObjectFactory = orcidCommonObjectFactory;
-    }
-
     public void setFieldMapping(OrcidWorkFieldMapping fieldMapping) {
         this.fieldMapping = fieldMapping;
     }

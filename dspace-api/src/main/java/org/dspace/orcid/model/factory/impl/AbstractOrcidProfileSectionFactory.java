@@ -66,22 +66,6 @@ public abstract class AbstractOrcidProfileSectionFactory implements OrcidProfile
         return preference;
     }
 
-    public ItemService getItemService() {
-        return itemService;
-    }
-
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
-    public OrcidCommonObjectFactory getOrcidCommonObjectFactory() {
-        return orcidCommonObjectFactory;
-    }
-
-    public void setOrcidCommonObjectFactory(OrcidCommonObjectFactory orcidCommonObjectFactory) {
-        this.orcidCommonObjectFactory = orcidCommonObjectFactory;
-    }
-
     protected List<MetadataValue> getMetadataValues(Item item, String metadataField) {
         return itemService.getMetadataByMetadataString(item, metadataField);
     }
