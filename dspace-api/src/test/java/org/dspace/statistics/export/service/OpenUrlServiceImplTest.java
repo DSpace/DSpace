@@ -140,9 +140,6 @@ public class OpenUrlServiceImplTest {
         Context context = mock(Context.class);
         String URL = "http://bla.com";
 
-        OpenURLTracker tracker1 = mock(OpenURLTracker.class);
-        when(failedOpenURLTrackerService.create(any(Context.class))).thenReturn(tracker1);
-
         RequestConfig.Builder requestConfig = mock(RequestConfig.Builder.class);
         doReturn(requestConfig).when(openUrlService).getRequestConfigBuilder();
         doReturn(requestConfig).when(requestConfig).setConnectTimeout(10 * 1000);
