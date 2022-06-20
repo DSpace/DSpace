@@ -146,6 +146,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
             .withSubject("test")
+            .withHandle("123456789/200")
             .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
             .withOrcidSynchronizationProfilePreference(IDENTIFIERS)
             .build();
@@ -154,17 +155,23 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
-        assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords.get(0),
-            matches(profile, profile, "KEYWORDS", null, "dc.subject::test", "test", INSERT));
+        assertThat(queueRecords, hasSize(2));
+        assertThat(queueRecords, hasItem(matches(profile, profile, "KEYWORDS", null,
+            "dc.subject::test", "test", INSERT)));
+        assertThat(queueRecords, hasItem(matches(profile, "RESEARCHER_URLS", null,
+            "dc.identifier.uri::http://localhost:4000/handle/123456789/200",
+            "http://localhost:4000/handle/123456789/200", INSERT)));
 
         addMetadata(profile, "person", "name", "variant", "User Test", null);
         context.commit();
 
         queueRecords = orcidQueueService.findAll(context);
-        assertThat(queueRecords, hasSize(2));
+        assertThat(queueRecords, hasSize(3));
         assertThat(queueRecords, hasItem(
             matches(profile, profile, "KEYWORDS", null, "dc.subject::test", "test", INSERT)));
+        assertThat(queueRecords, hasItem(matches(profile, "RESEARCHER_URLS", null,
+            "dc.identifier.uri::http://localhost:4000/handle/123456789/200",
+            "http://localhost:4000/handle/123456789/200", INSERT)));
         assertThat(queueRecords, hasItem(matches(profile, profile, "OTHER_NAMES",
             null, "person.name.variant::User Test", "User Test", INSERT)));
     }
@@ -431,7 +438,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test User")
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
-            .withOrcidSynchronizationProfilePreference(IDENTIFIERS)
+            .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
             .build();
 
         context.restoreAuthSystemState();
@@ -641,6 +648,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
             .withOrcidIdentifier("0000-0000-0012-2345")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
             .withSubject("Math")
+            .withHandle("123456789/200")
             .withOrcidSynchronizationProfilePreference(BIOGRAPHICAL)
             .build();
 
@@ -657,9 +665,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
 
         records = orcidQueueService.findAll(context);
-        assertThat(records, hasSize(2));
+        assertThat(records, hasSize(3));
         assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
         assertThat(records, hasItem(matches(profile, "EXTERNAL_IDS", null, "person.identifier.rid::ID", "ID", INSERT)));
+        assertThat(records, hasItem(matches(profile, "RESEARCHER_URLS", null,
+            "dc.identifier.uri::http://localhost:4000/handle/123456789/200",
+            "http://localhost:4000/handle/123456789/200", INSERT)));
 
         removeMetadata(profile, "dspace", "orcid", "sync-profile");
 
