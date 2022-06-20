@@ -262,10 +262,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "identifier", "rid", rid);
     }
 
-    public ItemBuilder withUrlIdentifier(String urlIdentifier) {
-        return addMetadataValue(item, "oairecerif", "identifier", "url", urlIdentifier);
-    }
-
     public ItemBuilder withVernacularName(String vernacularName) {
         return setMetadataSingleValue(item, "person", "name", "translated", vernacularName);
     }
@@ -304,10 +300,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
-    public ItemBuilder withFundingIdentifier(String identifier) {
-        return addMetadataValue(item, "oairecerif", "funding", "identifier", identifier);
-    }
-
     public ItemBuilder withOrgUnitLegalName(String name) {
         return addMetadataValue(item, "organization", "legalName", null, name);
     }
@@ -324,40 +316,40 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "organization", "identifier", "crossrefid", crossrefid);
     }
 
-    public ItemBuilder withFundingStartDate(String startDate) {
-        return addMetadataValue(item, "oairecerif", "funding", "startDate", startDate);
+    public ItemBuilder withProjectStartDate(String startDate) {
+        return addMetadataValue(item, "project", "startDate", null, startDate);
     }
 
-    public ItemBuilder withFundingEndDate(String endDate) {
-        return addMetadataValue(item, "oairecerif", "funding", "endDate", endDate);
-    }
-
-    public ItemBuilder withFunder(String funder) {
-        return addMetadataValue(item, "oairecerif", "funder", null, funder);
-    }
-
-    public ItemBuilder withFunder(String funder, String authority) {
-        return addMetadataValue(item, "oairecerif", "funder", null, null, funder, authority, 600);
+    public ItemBuilder withProjectEndDate(String endDate) {
+        return addMetadataValue(item, "project", "endDate", null, endDate);
     }
 
     public ItemBuilder withProjectInvestigator(String investigator) {
         return addMetadataValue(item, "project", "investigator", null, investigator);
     }
 
-    public ItemBuilder withInternalId(String internalId) {
-        return addMetadataValue(item, "oairecerif", "internalid", null, internalId);
-    }
-
     public ItemBuilder withDescription(String description) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", null, description);
     }
 
-    public ItemBuilder withAmount(String amount) {
-        return addMetadataValue(item, "oairecerif", "amount", null, amount);
+    public ItemBuilder withProjectAmount(String amount) {
+        return addMetadataValue(item, "project", "amount", null, amount);
     }
 
-    public ItemBuilder withAmountCurrency(String currency) {
-        return addMetadataValue(item, "oairecerif", "amount", "currency", currency);
+    public ItemBuilder withProjectAmountCurrency(String currency) {
+        return addMetadataValue(item, "project", "amount", "currency", currency);
+    }
+
+    public ItemBuilder withUriIdentifier(String uri) {
+        return addMetadataValue(item, "dc", "identifier", "uri", uri);
+    }
+
+    public ItemBuilder withIdentifier(String identifier) {
+        return addMetadataValue(item, "dc", "identifier", null, identifier);
+    }
+
+    public ItemBuilder withOtherIdentifier(String identifier) {
+        return addMetadataValue(item, "dc", "identifier", "other", identifier);
     }
 
     /**
@@ -453,7 +445,4 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
-    public ItemBuilder withAuthorAffiliation(String affiliation) {
-        return addMetadataValue(item, "oairecerif", "author", "affiliation", affiliation);
-    }
 }

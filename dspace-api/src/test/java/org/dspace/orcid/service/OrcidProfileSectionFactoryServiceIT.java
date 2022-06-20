@@ -165,11 +165,11 @@ public class OrcidProfileSectionFactoryServiceIT extends AbstractIntegrationTest
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
             .withTitle("Test profile")
-            .withUrlIdentifier("www.test.com")
+            .withUriIdentifier("www.test.com")
             .build();
         context.restoreAuthSystemState();
 
-        List<MetadataValue> values = List.of(getMetadata(item, "oairecerif.identifier.url", 0));
+        List<MetadataValue> values = List.of(getMetadata(item, "dc.identifier.uri", 0));
 
         Object orcidObject = profileSectionFactoryService.createOrcidObject(context, values, RESEARCHER_URLS);
         assertThat(orcidObject, instanceOf(ResearcherUrl.class));

@@ -743,9 +743,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         EntityType fundingType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
@@ -833,9 +832,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
@@ -915,9 +913,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
@@ -997,9 +994,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
@@ -1117,22 +1113,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withName("Collection 3")
             .build();
 
-        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("OrgUnit")
-            .withName("Collection 4")
-            .build();
-
-        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
-            .withTitle("4Science")
-            .withOrgUnitCountry("IT")
-            .withOrgUnitCrossrefIdentifier("12345")
-            .build();
-
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)

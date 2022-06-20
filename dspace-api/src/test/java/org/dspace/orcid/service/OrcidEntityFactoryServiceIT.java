@@ -200,13 +200,14 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         Item projectItem = ItemBuilder.createItem(context, projects)
             .withTitle("Test funding")
-            .withFundingStartDate("2001-03")
-            .withFundingEndDate("2010-03-25")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2001-03")
+            .withProjectEndDate("2010-03-25")
             .withProjectInvestigator("Walter White")
             .withProjectInvestigator("Jesse Pinkman")
-            .withInternalId("888-666-444")
-            .withFundingIdentifier("000-111-333")
+            .withProjectAmount("123")
+            .withProjectAmountCurrency("EUR")
+            .withOtherIdentifier("888-666-444")
+            .withIdentifier("000-111-333")
             .withDescription("This is a funding to test orcid mapping")
             .build();
 
@@ -231,6 +232,9 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(funding.getEndDate(), matches(date("2010", "03", "25")));
         assertThat(funding.getDescription(), is("This is a funding to test orcid mapping"));
         assertThat(funding.getUrl(), matches(urlEndsWith(projectItem.getHandle())));
+        assertThat(funding.getAmount(), notNullValue());
+        assertThat(funding.getAmount().getContent(), is("123"));
+        assertThat(funding.getAmount().getCurrencyCode(), is("EUR"));
 
         Organization organization = funding.getOrganization();
         assertThat(organization, notNullValue());

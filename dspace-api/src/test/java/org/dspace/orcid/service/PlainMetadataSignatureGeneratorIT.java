@@ -105,7 +105,7 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
             .withTitle("Item title")
             .withDescription("Description")
             .withAuthor("Jesse Pinkman")
-            .withUrlIdentifier("https://www.4science.it/en")
+            .withUriIdentifier("https://www.4science.it/en")
             .build();
 
         context.restoreAuthSystemState();
@@ -119,9 +119,9 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
         assertThat(metadataValues, hasSize(1));
         assertThat(metadataValues, containsInAnyOrder(description));
 
-        MetadataValue url = getMetadata(item, "oairecerif.identifier.url", 0);
+        MetadataValue url = getMetadata(item, "dc.identifier.uri", 0);
         signature = generator.generate(context, List.of(url));
-        assertThat(signature, equalTo("oairecerif.identifier.url::https://www.4science.it/en"));
+        assertThat(signature, equalTo("dc.identifier.uri::https://www.4science.it/en"));
 
         metadataValues = generator.findBySignature(context, item, signature);
         assertThat(metadataValues, hasSize(1));
