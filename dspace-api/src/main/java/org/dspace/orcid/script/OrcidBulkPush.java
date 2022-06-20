@@ -241,6 +241,7 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
                 message += ". An internal server error on ORCID registry side occurs";
                 break;
             default:
+                message += ". Details: " + orcidHistory.getResponseMessage();
                 break;
         }
 
