@@ -102,10 +102,16 @@ public class OrcidQueueConsumer implements Consumer {
 
     @Override
     public void consume(Context context, Event event) throws Exception {
+
+        if (isOrcidSynchronizationDisabled()) {
+            return;
+        }
+
         DSpaceObject dso = event.getSubject(context);
         if (!(dso instanceof Item)) {
             return;
         }
+
         Item item = (Item) dso;
         if (!item.isArchived()) {
             return;
@@ -115,16 +121,13 @@ public class OrcidQueueConsumer implements Consumer {
             return;
         }
 
-        if (isOrcidSynchronizationDisabled()) {
-            return;
-        }
-
         context.turnOffAuthorisationSystem();
         try {
             consumeItem(context, item);
         } finally {
             context.restoreAuthSystemState();
         }
+
     }
 
     /**
@@ -198,7 +201,7 @@ public class OrcidQueueConsumer implements Consumer {
 
             orcidQueueService.deleteByEntityAndRecordType(context, item, sectionType);
 
-            if (isSynchronizationDisabled(context, item, factory)) {
+            if (isProfileSectionSynchronizationDisabled(context, item, factory)) {
                 continue;
             }
 
@@ -212,7 +215,8 @@ public class OrcidQueueConsumer implements Consumer {
 
     }
 
-    private boolean isSynchronizationDisabled(Context context, Item item, OrcidProfileSectionFactory factory) {
+    private boolean isProfileSectionSynchronizationDisabled(Context context,
+        Item item, OrcidProfileSectionFactory factory) {
         List<OrcidProfileSyncPreference> preferences = this.orcidSynchronizationService.getProfilePreferences(item);
         return !preferences.contains(factory.getSynchronizationPreference());
     }
@@ -304,25 +308,25 @@ public class OrcidQueueConsumer implements Consumer {
             .findFirst();
     }
 
-    private boolean isAlreadyQueued(Context context, Item owner, Item entity) throws SQLException {
-        return isNotEmpty(orcidQueueService.findByOwnerAndEntity(context, owner, entity));
+    private boolean isAlreadyQueued(Context context, Item profileItem, Item entity) throws SQLException {
+        return isNotEmpty(orcidQueueService.findByProfileItemAndEntity(context, profileItem, entity));
     }
 
-    private boolean isNotLinkedToOrcid(Context context, Item ownerItem) {
-        return hasNotOrcidAccessToken(context, ownerItem)
-            || getMetadataValue(ownerItem, "person.identifier.orcid") == null;
+    private boolean isNotLinkedToOrcid(Context context, Item profileItemItem) {
+        return hasNotOrcidAccessToken(context, profileItemItem)
+            || getMetadataValue(profileItemItem, "person.identifier.orcid") == null;
     }
 
-    private boolean hasNotOrcidAccessToken(Context context, Item ownerItem) {
-        return orcidTokenService.findByProfileItem(context, ownerItem) == null;
+    private boolean hasNotOrcidAccessToken(Context context, Item profileItemItem) {
+        return orcidTokenService.findByProfileItem(context, profileItemItem) == null;
     }
 
-    private boolean shouldNotBeSynchronized(Item owner, Item entity) {
-        return !orcidSynchronizationService.isSynchronizationEnabled(owner, entity);
+    private boolean shouldNotBeSynchronized(Item profileItem, Item entity) {
+        return !orcidSynchronizationService.isSynchronizationAllowed(profileItem, entity);
     }
 
-    private boolean isNotProfileItem(Item ownerItem) {
-        return !getProfileType().equals(itemService.getEntityTypeLabel(ownerItem));
+    private boolean isNotProfileItem(Item profileItemItem) {
+        return !getProfileType().equals(itemService.getEntityTypeLabel(profileItemItem));
     }
 
     private String getMetadataValue(Item item, String metadataField) {

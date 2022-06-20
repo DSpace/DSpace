@@ -35,12 +35,12 @@ public class OrcidQueueHalLinkFactory extends HalLinkFactory<OrcidQueueResource,
             throws Exception {
 
         OrcidQueueRest orcidQueueRest = halResource.getContent();
-        if (orcidQueueRest.getOwnerId() != null) {
+        if (orcidQueueRest.getProfileItemId() != null) {
             UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(ItemRest.CATEGORY, ItemRest.NAME)
                                        .findRel(null, null, ItemRest.CATEGORY, English.plural(ItemRest.NAME),
-                                        orcidQueueRest.getOwnerId(), "", null, null)).toUriComponentsBuilder();
+                                        orcidQueueRest.getProfileItemId(), "", null, null)).toUriComponentsBuilder();
             String uribuilder = uriComponentsBuilder.build().toString();
-            list.add(buildLink("owner", uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
+            list.add(buildLink("profileItem", uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
         }
 
         if (orcidQueueRest.getEntityId() != null) {

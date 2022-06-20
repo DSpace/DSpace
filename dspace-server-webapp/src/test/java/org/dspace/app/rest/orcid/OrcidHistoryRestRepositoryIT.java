@@ -291,7 +291,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -348,7 +348,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.responseMessage", is("Invalid resource")),
                     hasJsonPath("$.status", is(400)),
@@ -396,7 +396,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.responseMessage", is("GENERIC ERROR")),
                     hasJsonPath("$.status", is(500)),
@@ -445,7 +445,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.status", is(200)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -503,7 +503,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -555,7 +555,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", nullValue()),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -597,7 +597,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", nullValue()),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -644,7 +644,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(profile.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -702,7 +702,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(profile.getID().toString())),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -782,7 +782,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -873,7 +873,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.responseMessage", is("Invalid resource")),
                     hasJsonPath("$.status", is(400)),
@@ -955,7 +955,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.responseMessage", is("GENERIC ERROR")),
                     hasJsonPath("$.status", is(500)),
@@ -1038,7 +1038,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.status", is(200)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -1090,7 +1090,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", nullValue()),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),

@@ -30,8 +30,8 @@ import org.hibernate.annotations.Type;
 
 /**
  * Entity that model a record on the ORCID synchronization queue. Each record in
- * this table is associated with an owner (the profile item) and the entity to
- * be synchronized (which can be the profile itself, a publication or a
+ * this table is associated with an profile item and the entity to be
+ * synchronized (which can be the profile itself, a publication or a
  * project/funding). If the entity is the profile itself then the metadata field
  * contains the signature of the information to be synchronized.
  *
@@ -52,7 +52,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
      */
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    protected Item owner;
+    protected Item profileItem;
 
     /**
      * The entity to be synchronized.
@@ -69,7 +69,8 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
 
     /**
      * The identifier of the resource to be synchronized on ORCID side (in case of
-     * update or deletion).
+     * update or deletion). For more details see
+     * https://info.orcid.org/faq/what-is-a-put-code/
      */
     @Column(name = "put_code")
     private String putCode;
@@ -123,12 +124,12 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
         return this.id;
     }
 
-    public Item getOwner() {
-        return owner;
+    public Item getProfileItem() {
+        return profileItem;
     }
 
-    public void setOwner(Item owner) {
-        this.owner = owner;
+    public void setProfileItem(Item profileItem) {
+        this.profileItem = profileItem;
     }
 
     public Item getEntity() {
@@ -209,7 +210,8 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
 
     @Override
     public String toString() {
-        return "OrcidQueue [id=" + id + ", owner=" + owner + ", entity=" + entity + ", description=" + description
+        return "OrcidQueue [id=" + id + ", profileItem=" + profileItem + ", entity=" + entity + ", description="
+            + description
             + ", putCode=" + putCode + ", recordType=" + recordType + ", metadata=" + metadata + ", operation="
             + operation + "]";
     }

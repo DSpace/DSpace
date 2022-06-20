@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.OrcidToken;
+import org.dspace.app.orcid.model.OrcidEntityType;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.orcid.service.OrcidSynchronizationService;
@@ -1653,9 +1654,13 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     private void removeOrcidSynchronizationStuff(Context context, Item item) throws SQLException, AuthorizeException {
 
-        try {
+        if (isNotProfileOrOrcidEntity(item)) {
+            return;
+        }
 
-            context.turnOffAuthorisationSystem();
+        context.turnOffAuthorisationSystem();
+
+        try {
 
             createOrcidQueueRecordsToDeleteOnOrcid(context, item);
             deleteOrcidHistoryRecords(context, item);
@@ -1667,28 +1672,34 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     }
 
+    private boolean isNotProfileOrOrcidEntity(Item item) {
+        String entityType = getEntityTypeLabel(item);
+        return !OrcidEntityType.isValidEntityType(entityType)
+            && !researcherProfileService.getProfileType().equals(entityType);
+    }
+
     private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
 
         String entityType = getEntityTypeLabel(entity);
-        if (researcherProfileService.getProfileType().equals(entityType)) {
+        if (entityType == null || researcherProfileService.getProfileType().equals(entityType)) {
             return;
         }
 
-        Map<Item, String> ownerAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
-        for (Item owner : ownerAndPutCodeMap.keySet()) {
-            if (orcidSynchronizationService.isSynchronizationEnabled(owner, entity)) {
-                String putCode = ownerAndPutCodeMap.get(owner);
+        Map<Item, String> profileAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        for (Item profile : profileAndPutCodeMap.keySet()) {
+            if (orcidSynchronizationService.isSynchronizationAllowed(profile, entity)) {
+                String putCode = profileAndPutCodeMap.get(profile);
                 String title = getMetadataFirstValue(entity, "dc", "title", null, Item.ANY);
-                orcidQueueService.createEntityDeletionRecord(context, owner, title, entityType, putCode);
+                orcidQueueService.createEntityDeletionRecord(context, profile, title, entityType, putCode);
             }
         }
 
     }
 
     private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
-        List<OrcidHistory> historyRecords = orcidHistoryService.findByOwnerOrEntity(context, item);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByProfileItemOrEntity(context, item);
         for (OrcidHistory historyRecord : historyRecords) {
-            if (historyRecord.getOwner().equals(item)) {
+            if (historyRecord.getProfileItem().equals(item)) {
                 orcidHistoryService.delete(context, historyRecord);
             } else {
                 historyRecord.setEntity(null);
@@ -1698,7 +1709,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private void deleteOrcidQueueRecords(Context context, Item item) throws SQLException {
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByOwnerOrEntity(context, item);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByProfileItemOrEntity(context, item);
         for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
             orcidQueueService.delete(context, orcidQueueRecord);
         }

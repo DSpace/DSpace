@@ -9,7 +9,11 @@ package org.dspace.app.orcid.model.validator;
 
 /**
  * Enum that model all the errors that could occurs during an ORCID object
- * validation.
+ * validation. These codes are used by the {@link OrcidValidator} to returns the
+ * validation error related to a specific ORCID entity. The values of this enum
+ * are returned from the OrcidHistoryRestRepository and can be used to show an
+ * error message to the users when they tries to synchronize some data with
+ * ORCID.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -23,6 +27,7 @@ public enum OrcidValidationError {
     FUNDER_REQUIRED("funder.required"),
     INVALID_COUNTRY("country.invalid"),
     ORGANIZATION_NAME_REQUIRED("organization.name-required"),
+    PUBLICATION_DATE_INVALID("publication.date-invalid"),
     ORGANIZATION_ADDRESS_REQUIRED("organization.address-required"),
     ORGANIZATION_CITY_REQUIRED("organization.city-required"),
     ORGANIZATION_COUNTRY_REQUIRED("organization.country-required"),

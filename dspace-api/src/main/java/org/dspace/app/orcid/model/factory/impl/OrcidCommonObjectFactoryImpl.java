@@ -257,10 +257,6 @@ public class OrcidCommonObjectFactoryImpl implements OrcidCommonObjectFactory {
         return contributorOrcidField;
     }
 
-    public ItemService getItemService() {
-        return itemService;
-    }
-
     public void setItemService(ItemService itemService) {
         this.itemService = itemService;
     }

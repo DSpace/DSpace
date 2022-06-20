@@ -49,29 +49,30 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     private RelationshipService relationshipService;
 
     @Override
-    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException {
-        return orcidQueueDAO.findByOwnerId(context, ownerId, -1, 0);
+    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId) throws SQLException {
+        return orcidQueueDAO.findByProfileItemId(context, profileItemId, -1, 0);
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
+    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId, Integer limit, Integer offset)
         throws SQLException {
-        return orcidQueueDAO.findByOwnerId(context, ownerId, limit, offset);
+        return orcidQueueDAO.findByProfileItemId(context, profileItemId, limit, offset);
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException {
-        return orcidQueueDAO.findByOwnerAndEntity(context, owner, entity);
+    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+        throws SQLException {
+        return orcidQueueDAO.findByProfileItemAndEntity(context, profileItem, entity);
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException {
-        return orcidQueueDAO.findByOwnerOrEntity(context, item);
+    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException {
+        return orcidQueueDAO.findByProfileItemOrEntity(context, item);
     }
 
     @Override
-    public long countByOwnerId(Context context, UUID ownerId) throws SQLException {
-        return orcidQueueDAO.countByOwnerId(context, ownerId);
+    public long countByProfileItemId(Context context, UUID profileItemId) throws SQLException {
+        return orcidQueueDAO.countByProfileItemId(context, profileItemId);
     }
 
     @Override
@@ -80,31 +81,31 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException {
-        Optional<String> putCode = orcidHistoryService.findLastPutCode(context, owner, entity);
+    public OrcidQueue create(Context context, Item profileItem, Item entity) throws SQLException {
+        Optional<String> putCode = orcidHistoryService.findLastPutCode(context, profileItem, entity);
         if (putCode.isPresent()) {
-            return createEntityUpdateRecord(context, owner, entity, putCode.get());
+            return createEntityUpdateRecord(context, profileItem, entity, putCode.get());
         } else {
-            return createEntityInsertionRecord(context, owner, entity);
+            return createEntityInsertionRecord(context, profileItem, entity);
         }
     }
 
     @Override
-    public OrcidQueue createEntityInsertionRecord(Context context, Item owner, Item entity) throws SQLException {
+    public OrcidQueue createEntityInsertionRecord(Context context, Item profileItem, Item entity) throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(entity);
         orcidQueue.setRecordType(itemService.getEntityTypeLabel(entity));
-        orcidQueue.setOwner(owner);
+        orcidQueue.setProfileItem(profileItem);
         orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
         orcidQueue.setOperation(OrcidOperation.INSERT);
         return orcidQueueDAO.create(context, orcidQueue);
     }
 
     @Override
-    public OrcidQueue createEntityUpdateRecord(Context context, Item owner, Item entity, String putCode)
+    public OrcidQueue createEntityUpdateRecord(Context context, Item profileItem, Item entity, String putCode)
         throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
-        orcidQueue.setOwner(owner);
+        orcidQueue.setProfileItem(profileItem);
         orcidQueue.setEntity(entity);
         orcidQueue.setPutCode(putCode);
         orcidQueue.setRecordType(itemService.getEntityTypeLabel(entity));
@@ -114,12 +115,12 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue createEntityDeletionRecord(Context context, Item owner, String description, String type,
+    public OrcidQueue createEntityDeletionRecord(Context context, Item profileItem, String description, String type,
         String putCode)
         throws SQLException {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setRecordType(type);
-        orcidQueue.setOwner(owner);
+        orcidQueue.setProfileItem(profileItem);
         orcidQueue.setPutCode(putCode);
         orcidQueue.setDescription(description);
         orcidQueue.setOperation(OrcidOperation.DELETE);
@@ -132,7 +133,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(profile);
         orcidQueue.setRecordType(recordType);
-        orcidQueue.setOwner(profile);
+        orcidQueue.setProfileItem(profile);
         orcidQueue.setDescription(description);
         orcidQueue.setMetadata(metadata);
         orcidQueue.setOperation(OrcidOperation.INSERT);
@@ -145,7 +146,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         OrcidQueue orcidQueue = new OrcidQueue();
         orcidQueue.setEntity(profile);
         orcidQueue.setRecordType(recordType);
-        orcidQueue.setOwner(profile);
+        orcidQueue.setProfileItem(profile);
         orcidQueue.setDescription(description);
         orcidQueue.setPutCode(putCode);
         orcidQueue.setMetadata(metadata);
@@ -180,8 +181,9 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public void deleteByOwnerAndRecordType(Context context, Item owner, String recordType) throws SQLException {
-        List<OrcidQueue> records = orcidQueueDAO.findByOwnerAndRecordType(context, owner, recordType);
+    public void deleteByProfileItemAndRecordType(Context context, Item profileItem, String recordType)
+        throws SQLException {
+        List<OrcidQueue> records = orcidQueueDAO.findByProfileItemAndRecordType(context, profileItem, recordType);
         for (OrcidQueue record : records) {
             orcidQueueDAO.delete(context, record);
         }
@@ -198,16 +200,16 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public void recalculateOrcidQueue(Context context, Item owner, OrcidEntityType orcidEntityType,
+    public void recalculateOrcidQueue(Context context, Item profileItem, OrcidEntityType orcidEntityType,
         OrcidEntitySyncPreference preference) throws SQLException {
 
         String entityType = orcidEntityType.getEntityType();
         if (preference == OrcidEntitySyncPreference.DISABLED) {
-            deleteByOwnerAndRecordType(context, owner, entityType);
+            deleteByProfileItemAndRecordType(context, profileItem, entityType);
         } else {
-            List<Item> entities = findAllEntitiesLinkableWith(context, owner, entityType);
+            List<Item> entities = findAllEntitiesLinkableWith(context, profileItem, entityType);
             for (Item entity : entities) {
-                create(context, owner, entity);
+                create(context, profileItem, entity);
             }
         }
 

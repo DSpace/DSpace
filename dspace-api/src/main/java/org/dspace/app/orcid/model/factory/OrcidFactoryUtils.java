@@ -13,7 +13,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Utility class for Orcid factory classes.
+ * Utility class for Orcid factory classes. This is used to parse the
+ * configuration of ORCID entities defined in orcid.cfg (for example see
+ * contributors and external ids configuration).
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -26,7 +28,8 @@ public final class OrcidFactoryUtils {
 
     /**
      * Parse the given configurations value and returns a map with metadata fields
-     * as keys and types/sources as values.
+     * as keys and types/sources as values. The expected configuration syntax is a
+     * list of values field::type separated by commas.
      *
      * @param  configurations the configurations to parse
      * @return                the configurations parsing result as map

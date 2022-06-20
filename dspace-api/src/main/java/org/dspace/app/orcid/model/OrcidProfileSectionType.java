@@ -11,6 +11,8 @@ import org.apache.commons.lang3.EnumUtils;
 
 /**
  * Enum that model all the ORCID profile sections that could be synchronized.
+ * These fields come from the ORCID PERSON schema, see
+ * https://info.orcid.org/documentation/integration-guide/orcid-record/#PERSON
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

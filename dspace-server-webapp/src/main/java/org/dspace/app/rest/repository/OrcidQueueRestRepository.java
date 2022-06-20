@@ -78,17 +78,17 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
         }
     }
 
-    @SearchRestMethod(name = "findByOwner")
-    @PreAuthorize("hasPermission(#ownerId, 'ORCID_QUEUE_SEARCH', 'READ')")
-    public Page<OrcidQueueRest> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
-        Pageable pageable) {
+    @SearchRestMethod(name = "findByProfileItem")
+    @PreAuthorize("hasPermission(#profileItemId, 'ORCID_QUEUE_SEARCH', 'READ')")
+    public Page<OrcidQueueRest> findByProfileItemId(
+        @Parameter(value = "profileItemId", required = true) String profileItemId, Pageable pageable) {
 
         Context context = obtainContext();
         try {
-            UUID id = UUID.fromString(ownerId);
-            List<OrcidQueue> result = orcidQueueService.findByOwnerId(context, id, pageable.getPageSize(),
+            UUID id = UUID.fromString(profileItemId);
+            List<OrcidQueue> result = orcidQueueService.findByProfileItemId(context, id, pageable.getPageSize(),
                 toIntExact(pageable.getOffset()));
-            long totalCount = orcidQueueService.countByOwnerId(context, id);
+            long totalCount = orcidQueueService.countByProfileItemId(context, id);
             return converter.toRestPage(result, pageable, totalCount, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

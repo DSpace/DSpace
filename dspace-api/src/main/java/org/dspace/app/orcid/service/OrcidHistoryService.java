@@ -46,14 +46,15 @@ public interface OrcidHistoryService {
     public List<OrcidHistory> findAll(Context context) throws SQLException;
 
     /**
-     * Get the OrcidHistory records where the given item is the owner OR the entity
+     * Get the OrcidHistory records where the given item is the profile item OR the
+     * entity
      *
      * @param  context      DSpace context object
      * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
 
     /**
      * Find the OrcidHistory records related to the given entity item.
@@ -66,16 +67,16 @@ public interface OrcidHistoryService {
     public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException;
 
     /**
-     * Create a new OrcidHistory records related to the given owner and entity
+     * Create a new OrcidHistory records related to the given profileItem and entity
      * items.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the created orcid history record
      * @throws SQLException if database error
      */
-    public OrcidHistory create(Context context, Item owner, Item entity) throws SQLException;
+    public OrcidHistory create(Context context, Item profileItem, Item entity) throws SQLException;
 
     /**
      * Delete an OrcidHistory
@@ -96,23 +97,23 @@ public interface OrcidHistoryService {
     public void update(Context context, OrcidHistory orcidHistory) throws SQLException;
 
     /**
-     * Find the last put code related to the given owner and entity item.
+     * Find the last put code related to the given profileItem and entity item.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the found put code, if any
      * @throws SQLException if database error
      */
-    public Optional<String> findLastPutCode(Context context, Item owner, Item entity) throws SQLException;
+    public Optional<String> findLastPutCode(Context context, Item profileItem, Item entity) throws SQLException;
 
     /**
      * Find all the last put code related to the entity item each associated with
-     * the owner to which it refers.
+     * the profileItem to which it refers.
      *
      * @param  context      DSpace context object
      * @param  entity       the entity item
-     * @return              a map that relates the owners with the identified
+     * @return              a map that relates the profileItems with the identified
      *                      putCode
      * @throws SQLException if database error
      */

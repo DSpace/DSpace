@@ -2300,7 +2300,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.restoreAuthSystemState();
 
         // no preferences configured, so no orcid queue records created
-        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
 
@@ -2309,7 +2309,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        List<OrcidQueue> queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
 
@@ -2318,7 +2318,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(3));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
@@ -2329,7 +2329,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
@@ -2339,7 +2339,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
 
     }
 

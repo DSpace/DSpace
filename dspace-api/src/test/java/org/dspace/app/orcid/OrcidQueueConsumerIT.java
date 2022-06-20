@@ -93,6 +93,28 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testWithNotOrcidSynchronizationEntity() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("OrgUnits")
+            .withEntityType("OrgUnit")
+            .build();
+
+        ItemBuilder.createItem(context, orgUnits)
+            .withTitle("Test OrgUnit")
+            .withSubject("test")
+            .build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        assertThat(queueRecords, empty());
+    }
+
+    @Test
     public void testWithOrcidSynchronizationDisabled() throws Exception {
 
         configurationService.setProperty("orcid.synchronization-enabled", false);

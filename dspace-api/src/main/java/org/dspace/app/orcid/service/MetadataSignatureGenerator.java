@@ -15,7 +15,11 @@ import org.dspace.core.Context;
 
 /**
  * Interface that mark classes that can be used to generate a signature for
- * metadata values.
+ * metadata values. The signature must be a unique identification of a metadata,
+ * based on the attributes that compose it (such as field, value and authority).
+ * It is possible to generate a signature for a single metadata value and also
+ * for a list of values. Given an item, a signature can for example be used to
+ * check if the associated metadata is present in the item.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

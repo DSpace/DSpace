@@ -18,6 +18,7 @@ import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZA
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_CITY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_COUNTRY_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.ORGANIZATION_NAME_REQUIRED;
+import static org.dspace.app.orcid.model.validator.OrcidValidationError.PUBLICATION_DATE_INVALID;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TITLE_REQUIRED;
 import static org.dspace.app.orcid.model.validator.OrcidValidationError.TYPE_REQUIRED;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,7 +44,9 @@ import org.orcid.jaxb.model.v3.release.common.Amount;
 import org.orcid.jaxb.model.v3.release.common.DisambiguatedOrganization;
 import org.orcid.jaxb.model.v3.release.common.Organization;
 import org.orcid.jaxb.model.v3.release.common.OrganizationAddress;
+import org.orcid.jaxb.model.v3.release.common.PublicationDate;
 import org.orcid.jaxb.model.v3.release.common.Title;
+import org.orcid.jaxb.model.v3.release.common.Year;
 import org.orcid.jaxb.model.v3.release.record.ExternalID;
 import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.Funding;
@@ -181,6 +184,64 @@ public class OrcidValidatorTest {
     }
 
     @Test
+    public void testdWorkWithPublicationDateWithoutYear() {
+
+        Work work = new Work();
+        work.setWorkTitle(new WorkTitle());
+        work.setWorkType(WorkType.DATA_SET);
+        work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
+
+        PublicationDate publicationDate = new PublicationDate();
+        work.setPublicationDate(publicationDate);
+
+        List<OrcidValidationError> errors = validator.validateWork(work);
+        assertThat(errors, hasSize(1));
+        assertThat(errors, containsInAnyOrder(PUBLICATION_DATE_INVALID));
+    }
+
+    @Test
+    public void testdWorkWithPublicationDateWithInvalidYear() {
+
+        Work work = new Work();
+        work.setWorkTitle(new WorkTitle());
+        work.setWorkType(WorkType.DATA_SET);
+        work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
+
+        PublicationDate publicationDate = new PublicationDate();
+        Year year = new Year();
+        year.setValue("INVALID");
+        publicationDate.setYear(year);
+        work.setPublicationDate(publicationDate);
+
+        List<OrcidValidationError> errors = validator.validateWork(work);
+        assertThat(errors, hasSize(1));
+        assertThat(errors, containsInAnyOrder(PUBLICATION_DATE_INVALID));
+    }
+
+    @Test
+    public void testdWorkWithPublicationDateWithYearPriorTo1900() {
+
+        Work work = new Work();
+        work.setWorkTitle(new WorkTitle());
+        work.setWorkType(WorkType.DATA_SET);
+        work.getWorkTitle().setTitle(new Title("Work title"));
+        work.setWorkExternalIdentifiers(new ExternalIDs());
+        work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
+
+        PublicationDate publicationDate = new PublicationDate();
+        publicationDate.setYear(new Year(1850));
+        work.setPublicationDate(publicationDate);
+
+        List<OrcidValidationError> errors = validator.validateWork(work);
+        assertThat(errors, hasSize(1));
+        assertThat(errors, containsInAnyOrder(PUBLICATION_DATE_INVALID));
+    }
+
+    @Test
     public void testValidWork() {
 
         Work work = new Work();
@@ -189,6 +250,10 @@ public class OrcidValidatorTest {
         work.getWorkTitle().setTitle(new Title("Work title"));
         work.setWorkExternalIdentifiers(new ExternalIDs());
         work.getExternalIdentifiers().getExternalIdentifier().add(buildValidExternalID());
+
+        PublicationDate publicationDate = new PublicationDate();
+        publicationDate.setYear(new Year(1956));
+        work.setPublicationDate(publicationDate);
 
         List<OrcidValidationError> errors = validator.validateWork(work);
         assertThat(errors, empty());

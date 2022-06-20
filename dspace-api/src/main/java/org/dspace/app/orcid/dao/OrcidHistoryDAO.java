@@ -28,25 +28,27 @@ import org.dspace.core.GenericDAO;
 public interface OrcidHistoryDAO extends GenericDAO<OrcidHistory> {
 
     /**
-     * Find all the ORCID history records by the given owner and entity uuids.
+     * Find all the ORCID history records by the given profileItem and entity uuids.
      *
-     * @param context  the DSpace context
-     * @param ownerId  the owner item uuid
-     * @param entityId the entity item uuid
-     * @return the records list
-     * @throws SQLException if an SQL error occurs
+     * @param  context       the DSpace context
+     * @param  profileItemId the profileItem item uuid
+     * @param  entityId      the entity item uuid
+     * @return               the records list
+     * @throws SQLException  if an SQL error occurs
      */
-    List<OrcidHistory> findByOwnerAndEntity(Context context, UUID ownerId, UUID entityId) throws SQLException;
+    List<OrcidHistory> findByProfileItemAndEntity(Context context, UUID profileItemId, UUID entityId)
+        throws SQLException;
 
     /**
-     * Get the OrcidHistory records where the given item is the owner or the entity
+     * Get the OrcidHistory records where the given item is the profileItem or the
+     * entity
      *
      * @param  context      DSpace context object
      * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
 
     /**
      * Find the OrcidHistory records related to the given entity item.

@@ -71,28 +71,28 @@ public class PlainMetadataSignatureGeneratorIT extends AbstractIntegrationTestWi
             .withTitle("Item title")
             .withIssueDate("2020-01-01")
             .withAuthor("Jesse Pinkman")
-            .withAuthorAffiliation("Affiliation")
+            .withEditor("Editor")
             .build();
 
         context.restoreAuthSystemState();
 
         MetadataValue author = getMetadata(item, "dc.contributor.author", 0);
-        MetadataValue affiliation = getMetadata(item, "oairecerif.author.affiliation", 0);
+        MetadataValue editor = getMetadata(item, "dc.contributor.editor", 0);
 
-        String signature = generator.generate(context, List.of(author, affiliation));
+        String signature = generator.generate(context, List.of(author, editor));
         assertThat(signature, notNullValue());
 
         String expectedSignature = "dc.contributor.author::Jesse Pinkman§§"
-            + "oairecerif.author.affiliation::Affiliation";
+            + "dc.contributor.editor::Editor";
 
         assertThat(signature, equalTo(expectedSignature));
 
-        String anotherSignature = generator.generate(context, List.of(affiliation, author));
+        String anotherSignature = generator.generate(context, List.of(editor, author));
         assertThat(anotherSignature, equalTo(signature));
 
         List<MetadataValue> metadataValues = generator.findBySignature(context, item, signature);
         assertThat(metadataValues, hasSize(2));
-        assertThat(metadataValues, containsInAnyOrder(author, affiliation));
+        assertThat(metadataValues, containsInAnyOrder(author, editor));
 
     }
 

@@ -107,24 +107,38 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return orcidCommonObjectFactory.createContributor(context, metadataValue, role);
     }
 
+    /**
+     * Create an instance of WorkTitle from the given item.
+     */
     private WorkTitle getWorkTitle(Context context, Item item) {
-        return getMetadataValue(context, item, fieldMapping.getTitleField())
-            .map(metadataValue -> getWorkTitle(context, item, metadataValue))
-            .orElse(null);
-    }
+        Optional<String> workTitleValue = getWorkTitleValue(context, item);
+        if (workTitleValue.isEmpty()) {
+            return null;
+        }
 
-    private WorkTitle getWorkTitle(Context context, Item item, MetadataValue metadataValue) {
         WorkTitle workTitle = new WorkTitle();
-        workTitle.setTitle(new Title(metadataValue.getValue()));
-        workTitle.setSubtitle(getSubTitle(context, item));
+        workTitle.setTitle(new Title(workTitleValue.get()));
+        getSubTitle(context, item).ifPresent(workTitle::setSubtitle);
         return workTitle;
     }
 
-    private Subtitle getSubTitle(Context context, Item item) {
+    /**
+     * Take the work title from the configured metadata field of the given item
+     * (orcid.mapping.work.title), if any.
+     */
+    private Optional<String> getWorkTitleValue(Context context, Item item) {
+        return getMetadataValue(context, item, fieldMapping.getTitleField())
+            .map(MetadataValue::getValue);
+    }
+
+    /**
+     * Take the work title from the configured metadata field of the given item
+     * (orcid.mapping.work.sub-title), if any.
+     */
+    private Optional<Subtitle> getSubTitle(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getSubTitleField())
             .map(MetadataValue::getValue)
-            .map(Subtitle::new)
-            .orElse(null);
+            .map(Subtitle::new);
     }
 
     private PublicationDate getPublicationDate(Context context, Item item) {
@@ -134,12 +148,20 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
             .orElse(null);
     }
 
+    /**
+     * Creates an instance of ExternalIDs from the metadata values of the given
+     * item, using the orcid.mapping.funding.external-ids configuration.
+     */
     private ExternalIDs getWorkExternalIds(Context context, Item item) {
         ExternalIDs externalIdentifiers = new ExternalIDs();
         externalIdentifiers.getExternalIdentifier().addAll(getWorkSelfExternalIds(context, item));
         return externalIdentifiers;
     }
 
+    /**
+     * Creates a list of ExternalID, one for orcid.mapping.funding.external-ids
+     * value, taking the values from the given item.
+     */
     private List<ExternalID> getWorkSelfExternalIds(Context context, Item item) {
 
         List<ExternalID> selfExternalIds = new ArrayList<ExternalID>();
@@ -158,12 +180,22 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return selfExternalIds;
     }
 
+    /**
+     * Creates an instance of ExternalID taking the value from the given
+     * metadataValue. The type of the ExternalID is calculated using the
+     * orcid.mapping.funding.external-ids configuration. The relationship of the
+     * ExternalID is SELF.
+     */
     private ExternalID getSelfExternalId(MetadataValue metadataValue) {
         Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
         String metadataField = metadataValue.getMetadataField().toString('.');
         return getExternalId(externalIdentifierFields.get(metadataField), metadataValue.getValue(), SELF);
     }
 
+    /**
+     * Creates an instance of ExternalID with the given type, value and
+     * relationship.
+     */
     private ExternalID getExternalId(String type, String value, Relationship relationship) {
         ExternalID externalID = new ExternalID();
         externalID.setType(type);
@@ -172,6 +204,10 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
         return externalID;
     }
 
+    /**
+     * Creates an instance of WorkType from the given item, taking the value fom the
+     * configured metadata field (orcid.mapping.work.type).
+     */
     private WorkType getWorkType(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getTypeField())
             .map(MetadataValue::getValue)
@@ -180,6 +216,9 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
             .orElse(null);
     }
 
+    /**
+     * Creates an instance of WorkType from the given workType value, if valid.
+     */
     private Optional<WorkType> getWorkType(String workType) {
         try {
             return Optional.ofNullable(WorkType.fromValue(workType));

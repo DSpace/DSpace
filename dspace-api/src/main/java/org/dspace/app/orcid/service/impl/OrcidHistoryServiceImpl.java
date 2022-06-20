@@ -101,15 +101,15 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item owner) throws SQLException {
-        return orcidHistoryDAO.findByOwnerOrEntity(context, owner);
+    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item profileItem) throws SQLException {
+        return orcidHistoryDAO.findByProfileItemOrEntity(context, profileItem);
     }
 
     @Override
-    public OrcidHistory create(Context context, Item owner, Item entity) throws SQLException {
+    public OrcidHistory create(Context context, Item profileItem, Item entity) throws SQLException {
         OrcidHistory orcidHistory = new OrcidHistory();
         orcidHistory.setEntity(entity);
-        orcidHistory.setOwner(owner);
+        orcidHistory.setProfileItem(profileItem);
         return orcidHistoryDAO.create(context, orcidHistory);
     }
 
@@ -126,26 +126,28 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public Optional<String> findLastPutCode(Context context, Item owner, Item entity) throws SQLException {
-        List<OrcidHistory> records = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(), entity.getID());
-        return findLastPutCode(records, owner);
+    public Optional<String> findLastPutCode(Context context, Item profileItem, Item entity) throws SQLException {
+        List<OrcidHistory> records = orcidHistoryDAO.findByProfileItemAndEntity(context, profileItem.getID(),
+            entity.getID());
+        return findLastPutCode(records, profileItem);
     }
 
     @Override
     public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException {
-        Map<Item, String> ownerAndPutCodeMap = new HashMap<Item, String>();
+        Map<Item, String> profileItemAndPutCodeMap = new HashMap<Item, String>();
 
         List<OrcidHistory> orcidHistoryRecords = findByEntity(context, entity);
         for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
-            Item owner = orcidHistoryRecord.getOwner();
-            if (ownerAndPutCodeMap.containsKey(owner)) {
+            Item profileItem = orcidHistoryRecord.getProfileItem();
+            if (profileItemAndPutCodeMap.containsKey(profileItem)) {
                 continue;
             }
 
-            findLastPutCode(orcidHistoryRecords, owner).ifPresent(putCode -> ownerAndPutCodeMap.put(owner, putCode));
+            findLastPutCode(orcidHistoryRecords, profileItem)
+                .ifPresent(putCode -> profileItemAndPutCodeMap.put(profileItem, putCode));
         }
 
-        return ownerAndPutCodeMap;
+        return profileItemAndPutCodeMap;
     }
 
     @Override
@@ -163,15 +165,15 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     public OrcidHistory synchronizeWithOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition)
         throws SQLException {
 
-        Item owner = orcidQueue.getOwner();
+        Item profileItem = orcidQueue.getProfileItem();
 
-        String orcid = getMetadataValue(owner, "person.identifier.orcid")
+        String orcid = getMetadataValue(profileItem, "person.identifier.orcid")
             .orElseThrow(() -> new IllegalArgumentException(
-                format("The related owner item (id = %s) does not have an orcid", owner.getID())));
+                format("The related profileItem item (id = %s) does not have an orcid", profileItem.getID())));
 
-        String token = getAccessToken(context, owner)
+        String token = getAccessToken(context, profileItem)
             .orElseThrow(() -> new IllegalArgumentException(
-                format("The related owner item (id = %s) does not have an access token", owner.getID())));
+                format("The related profileItem item (id = %s) does not have an access token", profileItem.getID())));
 
         OrcidOperation operation = calculateOperation(orcidQueue, forceAddition);
 
@@ -304,7 +306,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         OrcidOperation operation, int status, String putCode) throws SQLException {
         OrcidHistory history = new OrcidHistory();
         history.setEntity(orcidQueue.getEntity());
-        history.setOwner(orcidQueue.getOwner());
+        history.setProfileItem(orcidQueue.getProfileItem());
         history.setResponseMessage(responseMessage);
         history.setStatus(status);
         history.setPutCode(putCode);
@@ -333,9 +335,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         return OrcidEntityType.isValidEntityType(orcidQueue.getRecordType());
     }
 
-    private Optional<String> findLastPutCode(List<OrcidHistory> orcidHistoryRecords, Item owner) {
+    private Optional<String> findLastPutCode(List<OrcidHistory> orcidHistoryRecords, Item profileItem) {
         return orcidHistoryRecords.stream()
-            .filter(orcidHistoryRecord -> owner.equals(orcidHistoryRecord.getOwner()))
+            .filter(orcidHistoryRecord -> profileItem.equals(orcidHistoryRecord.getProfileItem()))
             .sorted(comparing(OrcidHistory::getTimestamp, nullsFirst(naturalOrder())).reversed())
             .map(history -> history.getPutCode())
             .filter(putCode -> isNotBlank(putCode))

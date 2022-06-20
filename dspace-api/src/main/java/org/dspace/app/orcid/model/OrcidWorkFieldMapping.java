@@ -19,10 +19,11 @@ import java.util.stream.Collectors;
 
 import org.dspace.util.SimpleMapConverter;
 import org.orcid.jaxb.model.common.ContributorRole;
+import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
- * Class that contains all the mapping between {@link Work} and DSpaceCris
- * metadata fields.
+ * Class that contains all the mapping between {@link Work} and DSpace metadata
+ * fields.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *

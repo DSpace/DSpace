@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Script that perform the bulk synchronization with ORCID registry of all the
- * ORCID queue records that has an owner that configure the synchronization mode
- * equals to BATCH.
+ * ORCID queue records that has an profileItem that configure the
+ * synchronization mode equals to BATCH.
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
@@ -60,7 +60,10 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
     private Context context;
 
-    private Map<Item, OrcidSynchronizationMode> synchronizationModeByOwner = new HashMap<>();
+    /**
+     * Cache that stores the synchronization mode set for a specific profile item.
+     */
+    private Map<Item, OrcidSynchronizationMode> synchronizationModeByProfileItem = new HashMap<>();
 
     private boolean ignoreMaxAttempts = false;
 
@@ -80,6 +83,12 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
     @Override
     public void internalRun() throws Exception {
+
+        if (isOrcidSynchronizationDisabled()) {
+            handler.logWarning("The ORCID synchronization is disabled. The script cannot proceed");
+            return;
+        }
+
         context = new Context();
         assignCurrentUserInContext();
 
@@ -95,6 +104,10 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
         }
     }
 
+    /**
+     * Find all the Orcid Queue records that need to be synchronized and perfom the
+     * synchronization.
+     */
     private void performBulkSynchronization() throws SQLException {
 
         List<OrcidQueue> queueRecords = findQueueRecordsToSynchronize();
@@ -106,12 +119,22 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
     }
 
+    /**
+     * Returns all the stored Orcid Queue records (ignoring or not the max attempts)
+     * related to a profile that has the synchronization mode set to BATCH.
+     */
     private List<OrcidQueue> findQueueRecordsToSynchronize() throws SQLException {
         return findQueueRecords().stream()
-            .filter(record -> getOwnerSynchronizationMode(record.getOwner()) == BATCH)
+            .filter(record -> getProfileItemSynchronizationMode(record.getProfileItem()) == BATCH)
             .collect(Collectors.toList());
     }
 
+    /**
+     * If the current script execution is configued to ignore the max attemps,
+     * returns all the ORCID Queue records, otherwise returns the ORCID Queue
+     * records that has an attempts value less than the configured max attempts
+     * value.
+     */
     private List<OrcidQueue> findQueueRecords() throws SQLException {
         if (ignoreMaxAttempts) {
             return orcidQueueService.findAll(context);
@@ -121,6 +144,9 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
         }
     }
 
+    /**
+     * Try to synchronize the given queue record with ORCID, handling any errors.
+     */
     private void performSynchronization(OrcidQueue queueRecord) {
 
         try {
@@ -149,38 +175,49 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
     }
 
-    private OrcidSynchronizationMode getOwnerSynchronizationMode(Item owner) {
-        OrcidSynchronizationMode synchronizationMode = synchronizationModeByOwner.get(owner);
+    /**
+     * Returns the Synchronization mode related to the given profile item.
+     */
+    private OrcidSynchronizationMode getProfileItemSynchronizationMode(Item profileItem) {
+        OrcidSynchronizationMode synchronizationMode = synchronizationModeByProfileItem.get(profileItem);
         if (synchronizationMode == null) {
-            synchronizationMode = orcidSynchronizationService.getSynchronizationMode(owner).orElse(MANUAL);
-            synchronizationModeByOwner.put(owner, synchronizationMode);
+            synchronizationMode = orcidSynchronizationService.getSynchronizationMode(profileItem).orElse(MANUAL);
+            synchronizationModeByProfileItem.put(profileItem, synchronizationMode);
         }
         return synchronizationMode;
     }
 
+    /**
+     * Returns an info log message with the details of the given record's operation.
+     * This message is logged before ORCID synchronization.
+     */
     private String getOperationInfoMessage(OrcidQueue record) {
 
-        UUID ownerId = record.getOwner().getID();
+        UUID profileItemId = record.getProfileItem().getID();
         String putCode = record.getPutCode();
         String type = record.getRecordType();
 
         if (record.getOperation() == null) {
-            return "Synchronization of " + type + " data for profile with ID: " + ownerId;
+            return "Synchronization of " + type + " data for profile with ID: " + profileItemId;
         }
 
         switch (record.getOperation()) {
             case INSERT:
-                return "Addition of " + type + " for profile with ID: " + ownerId;
+                return "Addition of " + type + " for profile with ID: " + profileItemId;
             case UPDATE:
-                return "Update of " + type + " for profile with ID: " + ownerId + " by put code " + putCode;
+                return "Update of " + type + " for profile with ID: " + profileItemId + " by put code " + putCode;
             case DELETE:
-                return "Deletion of " + type + " for profile with ID: " + ownerId + " by put code " + putCode;
+                return "Deletion of " + type + " for profile with ID: " + profileItemId + " by put code " + putCode;
             default:
-                return "Synchronization of " + type + " data for profile with ID: " + ownerId;
+                return "Synchronization of " + type + " data for profile with ID: " + profileItemId;
         }
 
     }
 
+    /**
+     * Returns an info log message with the details of the synchronization result.
+     * This message is logged after ORCID synchronization.
+     */
     private String getSynchronizationResultMessage(OrcidHistory orcidHistory) {
 
         String message = "History record created with status " + orcidHistory.getStatus();
@@ -199,6 +236,9 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
                 break;
             case 409:
                 message += ". The resource is already present on the ORCID registry";
+                break;
+            case 500:
+                message += ". An internal server error on ORCID registry side occurs";
                 break;
             default:
                 break;
@@ -232,6 +272,13 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
 
     }
 
+    /**
+     * This method will assign the currentUser to the {@link Context}. The instance
+     * of the method in this class will fetch the EPersonIdentifier from this class,
+     * this identifier was given to this class upon instantiation, it'll then be
+     * used to find the {@link EPerson} associated with it and this {@link EPerson}
+     * will be set as the currentUser of the created {@link Context}
+     */
     private void assignCurrentUserInContext() throws SQLException {
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
@@ -267,6 +314,10 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     private String getRootMessage(Exception ex) {
         String message = ExceptionUtils.getRootCauseMessage(ex);
         return isNotEmpty(message) ? message.substring(message.indexOf(":") + 1).trim() : "Generic error";
+    }
+
+    private boolean isOrcidSynchronizationDisabled() {
+        return !configurationService.getBooleanProperty("orcid.synchronization-enabled", true);
     }
 
     @Override

@@ -27,57 +27,58 @@ import org.dspace.core.Context;
 public interface OrcidQueueService {
 
     /**
-     * Create an OrcidQueue record with the given owner and entity. The type of
-     * operation is calculated based on whether or not the given entity was already
-     * pushed to the ORCID registry.
+     * Create an OrcidQueue record with the given profileItem and entity. The type
+     * of operation is calculated based on whether or not the given entity was
+     * already pushed to the ORCID registry.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException;
+    public OrcidQueue create(Context context, Item profileItem, Item entity) throws SQLException;
 
     /**
-     * Create an OrcidQueue record with the given owner and entity to push new data
-     * to ORCID.
+     * Create an OrcidQueue record with the given profileItem and entity to push new
+     * data to ORCID.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    public OrcidQueue createEntityInsertionRecord(Context context, Item owner, Item entity) throws SQLException;
+    public OrcidQueue createEntityInsertionRecord(Context context, Item profileItem, Item entity) throws SQLException;
 
     /**
-     * Create an OrcidQueue record with the given owner to update a record on ORCID
-     * with the given putCode.
+     * Create an OrcidQueue record with the given profileItem to update a record on
+     * ORCID with the given putCode.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @param  putCode      the putCode related to the given entity item
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    public OrcidQueue createEntityUpdateRecord(Context context, Item owner, Item entity, String putCode)
+    public OrcidQueue createEntityUpdateRecord(Context context, Item profileItem, Item entity, String putCode)
         throws SQLException;
 
     /**
-     * Create an OrcidQueue record with the given owner to delete a record on ORCID
-     * related to the given entity type with the given putCode.
+     * Create an OrcidQueue record with the given profileItem to delete a record on
+     * ORCID related to the given entity type with the given putCode.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  description  the orcid queue record description
      * @param  type         the type of the entity item
      * @param  putCode      the putCode related to the given entity item
      * @return              the stored record
      * @throws SQLException if an SQL error occurs
      */
-    OrcidQueue createEntityDeletionRecord(Context context, Item owner, String description, String type, String putCode)
+    OrcidQueue createEntityDeletionRecord(Context context, Item profileItem, String description, String type,
+        String putCode)
         throws SQLException;
 
     /**
@@ -118,48 +119,50 @@ public interface OrcidQueueService {
     public List<OrcidQueue> findAll(Context context) throws SQLException;
 
     /**
-     * Get the orcid queue records by the owner id.
+     * Get the orcid queue records by the profileItem id.
      *
-     * @param  context      DSpace context object
-     * @param  ownerId      the owner item id
-     * @return              the orcid queue records
-     * @throws SQLException if an SQL error occurs
+     * @param  context       DSpace context object
+     * @param  profileItemId the profileItem item id
+     * @return               the orcid queue records
+     * @throws SQLException  if an SQL error occurs
      */
-    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId) throws SQLException;
+    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId) throws SQLException;
 
     /**
-     * Get the orcid queue records by the owner id.
+     * Get the orcid queue records by the profileItem id.
      *
-     * @param  context      DSpace context object
-     * @param  ownerId      the owner item id
-     * @param  limit        limit
-     * @param  offset       offset
-     * @return              the orcid queue records
-     * @throws SQLException if an SQL error occurs
+     * @param  context       DSpace context object
+     * @param  profileItemId the profileItem item id
+     * @param  limit         limit
+     * @param  offset        offset
+     * @return               the orcid queue records
+     * @throws SQLException  if an SQL error occurs
      */
-    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
+    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId, Integer limit, Integer offset)
         throws SQLException;
 
     /**
-     * Get the orcid queue records by the owner and entity.
+     * Get the orcid queue records by the profileItem and entity.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the found OrcidQueue records
      * @throws SQLException if an SQL error occurs
      */
-    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException;
+    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+        throws SQLException;
 
     /**
-     * Get the OrcidQueue records where the given item is the owner OR the entity
+     * Get the OrcidQueue records where the given item is the profileItem OR the
+     * entity
      *
      * @param  context      DSpace context object
      * @param  item         the item to search for
      * @return              the found OrcidQueue records
      * @throws SQLException if database error
      */
-    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
 
     /**
      * Get all the OrcidQueue records with attempts less than the given attempts.
@@ -173,14 +176,14 @@ public interface OrcidQueueService {
 
     /**
      * Returns the number of records on the OrcidQueue associated with the given
-     * ownerId.
+     * profileItemId.
      *
-     * @param context DSpace context object
-     * @param ownerId the owner item id
-     * @return the record's count
-     * @throws SQLException if an SQL error occurs
+     * @param  context       DSpace context object
+     * @param  profileItemId the profileItem item id
+     * @return               the record's count
+     * @throws SQLException  if an SQL error occurs
      */
-    long countByOwnerId(Context context, UUID ownerId) throws SQLException;
+    long countByProfileItemId(Context context, UUID profileItemId) throws SQLException;
 
     /**
      * Delete the OrcidQueue record with the given id.
@@ -212,14 +215,15 @@ public interface OrcidQueueService {
     public void deleteByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException;
 
     /**
-     * Delete all the OrcidQueue records with the given owner and record type.
+     * Delete all the OrcidQueue records with the given profileItem and record type.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  recordType   the record type
      * @throws SQLException if database error occurs
      */
-    public void deleteByOwnerAndRecordType(Context context, Item owner, String recordType) throws SQLException;
+    public void deleteByProfileItemAndRecordType(Context context, Item profileItem, String recordType)
+        throws SQLException;
 
     /**
      * Get an OrcidQueue from the database.
@@ -241,16 +245,16 @@ public interface OrcidQueueService {
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException;
 
     /**
-     * Recalculates the ORCID queue records linked to the given owner as regards the
-     * entities of the given type. The recalculation is done based on the preference
-     * indicated.
+     * Recalculates the ORCID queue records linked to the given profileItem as
+     * regards the entities of the given type. The recalculation is done based on
+     * the preference indicated.
      *
      * @param  context      context
-     * @param  owner        the owner
+     * @param  profileItem  the profileItem
      * @param  entityType   the entity type related to the records to recalculate
      * @param  preference   the preference value on which to base the recalculation
      * @throws SQLException if database error
      */
-    public void recalculateOrcidQueue(Context context, Item owner, OrcidEntityType entityType,
+    public void recalculateOrcidQueue(Context context, Item profileItem, OrcidEntityType entityType,
         OrcidEntitySyncPreference preference) throws SQLException;
 }

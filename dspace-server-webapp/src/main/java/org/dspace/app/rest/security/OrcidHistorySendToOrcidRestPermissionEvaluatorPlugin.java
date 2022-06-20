@@ -88,7 +88,7 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
 
     private boolean hasAccess(Context context, EPerson currentUser, OrcidQueue orcidQueue) {
         if (orcidQueue != null) {
-            List<MetadataValue> value = itemService.getMetadata(orcidQueue.getOwner(),
+            List<MetadataValue> value = itemService.getMetadata(orcidQueue.getProfileItem(),
                 "dspace", "object", "owner", null);
             if (value.get(0).getAuthority().equals(currentUser.getID().toString())) {
                 return true;

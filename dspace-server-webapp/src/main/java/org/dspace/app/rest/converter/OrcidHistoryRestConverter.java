@@ -25,7 +25,7 @@ public class OrcidHistoryRestConverter implements DSpaceConverter<OrcidHistory, 
     public OrcidHistoryRest convert(OrcidHistory modelObject, Projection projection) {
         OrcidHistoryRest rest = new OrcidHistoryRest();
         rest.setId(modelObject.getID());
-        rest.setOwnerId(modelObject.getOwner().getID());
+        rest.setProfileItemId(modelObject.getProfileItem().getID());
         rest.setEntityId(modelObject.getEntity() != null ? modelObject.getEntity().getID() : null);
         rest.setResponseMessage(modelObject.getResponseMessage());
         rest.setStatus(modelObject.getStatus());

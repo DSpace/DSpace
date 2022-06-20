@@ -28,10 +28,10 @@ import org.dspace.core.Context;
 public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implements OrcidQueueDAO {
 
     @Override
-    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
+    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId, Integer limit, Integer offset)
         throws SQLException {
-        Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :ownerId");
-        query.setParameter("ownerId", ownerId);
+        Query query = createQuery(context, "FROM OrcidQueue WHERE profileItem.id= :profileItemId");
+        query.setParameter("profileItemId", profileItemId);
         if (limit != null && limit.intValue() > 0) {
             query.setMaxResults(limit);
         }
@@ -40,23 +40,25 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidQueue WHERE owner = :owner AND entity = :entity");
-        query.setParameter("owner", owner);
+    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+        throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE profileItem = :profileItem AND entity = :entity");
+        query.setParameter("profileItem", profileItem);
         query.setParameter("entity", entity);
         return query.getResultList();
     }
 
     @Override
-    public long countByOwnerId(Context context, UUID ownerId) throws SQLException {
-        Query query = createQuery(context, "SELECT COUNT(queue) FROM OrcidQueue queue WHERE owner.id= :ownerId");
-        query.setParameter("ownerId", ownerId);
+    public long countByProfileItemId(Context context, UUID profileItemId) throws SQLException {
+        Query query = createQuery(context,
+            "SELECT COUNT(queue) FROM OrcidQueue queue WHERE profileItem.id= :profileItemId");
+        query.setParameter("profileItemId", profileItemId);
         return (long) query.getSingleResult();
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidQueue WHERE owner.id= :itemId OR entity.id = :itemId");
+    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE profileItem.id= :itemId OR entity.id = :itemId");
         query.setParameter("itemId", item.getID());
         return query.getResultList();
     }
@@ -70,9 +72,10 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
-    public List<OrcidQueue> findByOwnerAndRecordType(Context context, Item owner, String type) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidQueue WHERE owner = :owner AND recordType = :type");
-        query.setParameter("owner", owner);
+    public List<OrcidQueue> findByProfileItemAndRecordType(Context context, Item profileItem, String type)
+        throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE profileItem = :profileItem AND recordType = :type");
+        query.setParameter("profileItem", profileItem);
         query.setParameter("type", type);
         return query.getResultList();
     }

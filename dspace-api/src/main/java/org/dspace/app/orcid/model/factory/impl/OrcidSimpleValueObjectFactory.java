@@ -86,6 +86,10 @@ public class OrcidSimpleValueObjectFactory extends AbstractOrcidProfileSectionFa
         return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0).getValue() : null;
     }
 
+    /**
+     * Create an instance of ORCID profile section based on the configured profile
+     * section type, taking the value from the given metadataValue.
+     */
     protected Object create(Context context, MetadataValue metadataValue) {
         switch (getProfileSectionType()) {
             case COUNTRY:

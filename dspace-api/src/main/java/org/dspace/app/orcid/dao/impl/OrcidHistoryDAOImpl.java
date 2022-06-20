@@ -28,16 +28,18 @@ import org.dspace.core.Context;
 public class OrcidHistoryDAOImpl extends AbstractHibernateDAO<OrcidHistory> implements OrcidHistoryDAO {
 
     @Override
-    public List<OrcidHistory> findByOwnerAndEntity(Context context, UUID ownerId, UUID entityId) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidHistory WHERE owner.id = :ownerId AND entity.id = :entityId ");
-        query.setParameter("ownerId", ownerId);
+    public List<OrcidHistory> findByProfileItemAndEntity(Context context, UUID profileItemId, UUID entityId)
+        throws SQLException {
+        Query query = createQuery(context,
+            "FROM OrcidHistory WHERE profileItem.id = :profileItemId AND entity.id = :entityId ");
+        query.setParameter("profileItemId", profileItemId);
         query.setParameter("entityId", entityId);
         return query.getResultList();
     }
 
     @Override
-    public List<OrcidHistory> findByOwnerOrEntity(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM OrcidHistory WHERE owner.id = :itemId OR entity.id = :itemId");
+    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item item) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidHistory WHERE profileItem.id = :itemId OR entity.id = :itemId");
         query.setParameter("itemId", item.getID());
         return query.getResultList();
     }

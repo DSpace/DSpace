@@ -128,8 +128,7 @@ public class OrcidClientImpl implements OrcidClient {
 
     @Override
     public OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path) {
-        String apiUrl = orcidConfiguration.getApiUrl();
-        return execute(buildDeleteUriRequest(accessToken, apiUrl, "/" + orcid + path + "/" + putCode), true);
+        return execute(buildDeleteUriRequest(accessToken, "/" + orcid + path + "/" + putCode), true);
     }
 
     private HttpUriRequest buildGetUriRequest(String accessToken, String relativePath) {
@@ -155,8 +154,8 @@ public class OrcidClientImpl implements OrcidClient {
             .build();
     }
 
-    private HttpUriRequest buildDeleteUriRequest(String accessToken, String baseUrl, String relativePath) {
-        return delete(baseUrl + relativePath.trim())
+    private HttpUriRequest buildDeleteUriRequest(String accessToken, String relativePath) {
+        return delete(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
     }
@@ -179,6 +178,17 @@ public class OrcidClientImpl implements OrcidClient {
 
     }
 
+    /**
+     * Execute the given httpUriRequest, unmarshalling the content with the given
+     * class.
+     * @param  httpUriRequest       the http request to be executed
+     * @param  handleNotFoundAsNull if true this method returns null if the response
+     *                              status is 404, if false throws an
+     *                              OrcidClientException
+     * @param  clazz                the class to be used for the content unmarshall
+     * @return                      the response body
+     * @throws OrcidClientException if the incoming response is not successfull
+     */
     private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
 
         HttpClient client = HttpClientBuilder.create().build();
@@ -291,6 +301,13 @@ public class OrcidClientImpl implements OrcidClient {
         return entity != null ? IOUtils.toString(entity.getContent(), StandardCharsets.UTF_8.name()) : null;
     }
 
+    /**
+     * Returns the put code present in the given http response, if any. For more
+     * details about the put code see For more details see
+     * https://info.orcid.org/faq/what-is-a-put-code/
+     * @param  response the http response coming from ORCID
+     * @return          the put code, if any
+     */
     private String getPutCode(HttpResponse response) {
         Header[] headers = response.getHeaders("Location");
         if (headers.length == 0) {

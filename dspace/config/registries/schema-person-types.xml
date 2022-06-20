@@ -145,12 +145,14 @@
         <schema>person</schema>
         <element>name</element>
         <qualifier>translated</qualifier>
+        <scope_note>Full name translation</scope_note>
     </dc-type>
     
     <dc-type>
         <schema>person</schema>
         <element>name</element>
         <qualifier>variant</qualifier>
+        <scope_note>Full name variant</scope_note>
     </dc-type>
 
 </dspace-dc-types>

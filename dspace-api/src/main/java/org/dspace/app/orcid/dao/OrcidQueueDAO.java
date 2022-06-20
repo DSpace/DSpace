@@ -28,48 +28,51 @@ import org.dspace.core.GenericDAO;
 public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
 
     /**
-     * Get the orcid queue records by the owner id.
+     * Get the orcid queue records by the profileItem id.
      *
-     * @param context DSpace context object
-     * @param ownerId the owner item id
-     * @param limit   limit
-     * @param offset  offset
-     * @return the orcid queue records
-     * @throws SQLException if an SQL error occurs
+     * @param  context       DSpace context object
+     * @param  profileItemId the profileItem item id
+     * @param  limit         limit
+     * @param  offset        offset
+     * @return               the orcid queue records
+     * @throws SQLException  if an SQL error occurs
      */
-    public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
+    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId, Integer limit, Integer offset)
         throws SQLException;
 
     /**
-     * Count the orcid queue records with the same ownerId.
+     * Count the orcid queue records with the same profileItemId.
      *
-     * @param  context      DSpace context object
-     * @param  ownerId      the owner item id
-     * @return              the count result
-     * @throws SQLException if an SQL error occurs
+     * @param  context       DSpace context object
+     * @param  profileItemId the profileItem item id
+     * @return               the count result
+     * @throws SQLException  if an SQL error occurs
      */
-    long countByOwnerId(Context context, UUID ownerId) throws SQLException;
+    long countByProfileItemId(Context context, UUID profileItemId) throws SQLException;
 
     /**
-     * Returns all the orcid queue records with the given owner and entity items.
+     * Returns all the orcid queue records with the given profileItem and entity
+     * items.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the found orcid queue records
      * @throws SQLException
      */
-    public List<OrcidQueue> findByOwnerAndEntity(Context context, Item owner, Item entity) throws SQLException;
+    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+        throws SQLException;
 
     /**
-     * Get the OrcidQueue records where the given item is the owner OR the entity
+     * Get the OrcidQueue records where the given item is the profileItem OR the
+     * entity
      *
      * @param  context      DSpace context object
      * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    public List<OrcidQueue> findByOwnerOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
 
     /**
      * Find all the OrcidQueue records with the given entity and record type.
@@ -82,14 +85,15 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
     public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException;
 
     /**
-     * Find all the OrcidQueue records with the given owner and record type.
+     * Find all the OrcidQueue records with the given profileItem and record type.
      *
      * @param  context      DSpace context object
-     * @param  owner        the owner item
+     * @param  profileItem  the profileItem item
      * @param  type         the record type
      * @throws SQLException if database error occurs
      */
-    public List<OrcidQueue> findByOwnerAndRecordType(Context context, Item owner, String type) throws SQLException;
+    public List<OrcidQueue> findByProfileItemAndRecordType(Context context, Item profileItem, String type)
+        throws SQLException;
 
     /**
      * Get all the OrcidQueue records with attempts less than the given attempts.

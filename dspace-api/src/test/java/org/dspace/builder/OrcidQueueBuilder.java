@@ -39,47 +39,47 @@ public class OrcidQueueBuilder extends  AbstractBuilder<OrcidQueue, OrcidQueueSe
         delete(orcidQueue);
     }
 
-    public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, Item entity) {
+    public static OrcidQueueBuilder createOrcidQueue(Context context, Item profileItem, Item entity) {
         OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
-        return builder.createEntityInsertionRecord(context, owner, entity);
+        return builder.createEntityInsertionRecord(context, profileItem, entity);
     }
 
-    public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, Item entity, String putCode) {
+    public static OrcidQueueBuilder createOrcidQueue(Context context, Item profileItem, Item entity, String putCode) {
         OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
-        return builder.createEntityUpdateRecord(context, owner, entity, putCode);
+        return builder.createEntityUpdateRecord(context, profileItem, entity, putCode);
     }
 
-    public static OrcidQueueBuilder createOrcidQueue(Context context, Item owner, String description,
+    public static OrcidQueueBuilder createOrcidQueue(Context context, Item profileItem, String description,
         String type, String putCode) {
         OrcidQueueBuilder builder = new OrcidQueueBuilder(context);
-        return builder.createEntityDeletionRecord(context, owner, description, type, putCode);
+        return builder.createEntityDeletionRecord(context, profileItem, description, type, putCode);
     }
 
-    private OrcidQueueBuilder createEntityDeletionRecord(Context context, Item owner,
+    private OrcidQueueBuilder createEntityDeletionRecord(Context context, Item profileItem,
         String description, String type, String putCode) {
         try {
             this.context = context;
-            this.orcidQueue = getService().createEntityDeletionRecord(context, owner, description, type, putCode);
+            this.orcidQueue = getService().createEntityDeletionRecord(context, profileItem, description, type, putCode);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return this;
     }
 
-    private OrcidQueueBuilder createEntityUpdateRecord(Context context, Item owner, Item entity, String putCode) {
+    private OrcidQueueBuilder createEntityUpdateRecord(Context context, Item profileItem, Item entity, String putCode) {
         try {
             this.context = context;
-            this.orcidQueue = getService().createEntityUpdateRecord(context, owner, entity, putCode);
+            this.orcidQueue = getService().createEntityUpdateRecord(context, profileItem, entity, putCode);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return this;
     }
 
-    private OrcidQueueBuilder createEntityInsertionRecord(Context context, Item owner, Item entity) {
+    private OrcidQueueBuilder createEntityInsertionRecord(Context context, Item profileItem, Item entity) {
         try {
             this.context = context;
-            this.orcidQueue = getService().createEntityInsertionRecord(context, owner, entity);
+            this.orcidQueue = getService().createEntityInsertionRecord(context, profileItem, entity);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

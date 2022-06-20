@@ -32,11 +32,10 @@ import org.hibernate.annotations.Type;
  * to synchronize the DSpace items and information on ORCID. While the entity
  * {@link OrcidQueue} contains the data to be synchronized with ORCID, this
  * entity instead contains the data synchronized with ORCID, with the result of
- * the synchronization. Each record in this table is associated with an owner
- * (the profile item) and the entity synchronized (which can be the profile
- * itself, a publication or a project/funding). If the entity is the profile
- * itself then the metadata field contains the signature of the information
- * synchronized.
+ * the synchronization. Each record in this table is associated with a profile
+ * item and the entity synchronized (which can be the profile itself, a
+ * publication or a project/funding). If the entity is the profile itself then
+ * the metadata field contains the signature of the information synchronized.
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -55,7 +54,7 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
      */
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    protected Item owner;
+    protected Item profileItem;
 
     /**
      * The synchronized item.
@@ -65,7 +64,8 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     private Item entity;
 
     /**
-     * The identifier of the synchronized resource on ORCID side.
+     * The identifier of the synchronized resource on ORCID side. For more details
+     * see https://info.orcid.org/faq/what-is-a-put-code/
      */
     @Column(name = "put_code")
     private String putCode;
@@ -136,12 +136,12 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
         return id;
     }
 
-    public Item getOwner() {
-        return owner;
+    public Item getProfileItem() {
+        return profileItem;
     }
 
-    public void setOwner(Item owner) {
-        this.owner = owner;
+    public void setProfileItem(Item profileItem) {
+        this.profileItem = profileItem;
     }
 
     public Item getEntity() {

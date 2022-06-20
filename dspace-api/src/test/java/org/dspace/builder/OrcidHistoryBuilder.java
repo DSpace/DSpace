@@ -43,15 +43,15 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
         delete(orcidHistory);
     }
 
-    public static OrcidHistoryBuilder createOrcidHistory(Context context, Item owner, Item entity) {
+    public static OrcidHistoryBuilder createOrcidHistory(Context context, Item profileItem, Item entity) {
         OrcidHistoryBuilder builder = new OrcidHistoryBuilder(context);
-        return builder.create(context, owner, entity);
+        return builder.create(context, profileItem, entity);
     }
 
-    private OrcidHistoryBuilder create(Context context, Item owner, Item entity) {
+    private OrcidHistoryBuilder create(Context context, Item profileItem, Item entity) {
         try {
             this.context = context;
-            this.orcidHistory = getService().create(context, owner, entity);
+            this.orcidHistory = getService().create(context, profileItem, entity);
         } catch (Exception e) {
             log.error("Error in OrcidHistoryBuilder.create(..), error: ", e);
         }

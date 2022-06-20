@@ -146,13 +146,19 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         return externalID;
     }
 
+    /**
+     * Returns an Organization ORCID entity related to the given item. The
+     * relationship type configured with
+     * orcid.mapping.funding.organization-relationship-type is the relationship used
+     * to search the Organization of the given project item.
+     */
     private Organization getOrganization(Context context, Item item) {
 
         try {
 
             return relationshipTypeService.findByLeftwardOrRightwardTypeName(context,
                 fieldMapping.getOrganizationRelationshipType()).stream()
-                .flatMap(relationshipType -> getRelationship(context, item, relationshipType))
+                .flatMap(relationshipType -> getRelationships(context, item, relationshipType))
                 .map(relationship -> getRelatedItem(item, relationship))
                 .flatMap(orgUnit -> orcidCommonObjectFactory.createOrganization(context, orgUnit).stream())
                 .findFirst()
@@ -164,7 +170,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
     }
 
-    private Stream<Relationship> getRelationship(Context context, Item item, RelationshipType relationshipType) {
+    private Stream<Relationship> getRelationships(Context context, Item item, RelationshipType relationshipType) {
         try {
             return relationshipService.findByItemAndRelationshipType(context, item, relationshipType).stream();
         } catch (SQLException e) {
@@ -194,6 +200,11 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         return fundingTitle;
     }
 
+    /**
+     * Returns an instance of FundingType taking the type from the given item. The
+     * metadata field to be used to retrieve the item's type is related to the
+     * configured typeField (orcid.mapping.funding.type).
+     */
     private FundingType getType(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getTypeField())
             .map(type -> fieldMapping.convertType(type.getValue()))
@@ -214,17 +225,40 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         return orcidCommonObjectFactory.createUrl(context, item).orElse(null);
     }
 
+    /**
+     * Returns an Amount instance taking the amount and currency value from the
+     * configured metadata values of the given item, if any.
+     */
     private Amount getAmount(Context context, Item item) {
-        return getMetadataValue(context, item, fieldMapping.getAmountField())
-            .flatMap(amount -> getAmount(context, item, amount.getValue()))
-            .orElse(null);
+
+        Optional<String> amount = getAmountValue(context, item);
+        Optional<String> currency = getCurrencyValue(context, item);
+
+        if (amount.isEmpty() || currency.isEmpty()) {
+            return null;
+        }
+
+        return getAmount(amount.get(), currency.get());
     }
 
-    private Optional<Amount> getAmount(Context context, Item item, String amount) {
+    /**
+     * Returns the amount value of the configured metadata field
+     * orcid.mapping.funding.amount
+     */
+    private Optional<String> getAmountValue(Context context, Item item) {
+        return getMetadataValue(context, item, fieldMapping.getAmountField())
+            .map(MetadataValue::getValue);
+    }
+
+    /**
+     * Returns the amount value of the configured metadata field
+     * orcid.mapping.funding.amount.currency (if configured using the converter
+     * orcid.mapping.funding.amount.currency.converter).
+     */
+    private Optional<String> getCurrencyValue(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getAmountCurrencyField())
             .map(currency -> fieldMapping.convertAmountCurrency(currency.getValue()))
-            .filter(currency -> isValidCurrency(currency))
-            .map(currency -> getAmount(amount, currency));
+            .filter(currency -> isValidCurrency(currency));
     }
 
     private boolean isValidCurrency(String currency) {

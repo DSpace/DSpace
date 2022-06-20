@@ -271,6 +271,7 @@
     <schema>dc</schema>
     <element>identifier</element>
     <qualifier>scopus</qualifier>
+    <scope_note>The scopus identifier</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->

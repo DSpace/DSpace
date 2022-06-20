@@ -159,7 +159,11 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     @Override
-    public boolean isSynchronizationEnabled(Item profile, Item item) {
+    public boolean isSynchronizationAllowed(Item profile, Item item) {
+
+        if (isOrcidSynchronizationDisabled()) {
+            return false;
+        }
 
         String entityType = itemService.getEntityTypeLabel(item);
         if (entityType == null) {
@@ -279,6 +283,10 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
                    .filter(metadata -> metadataField.equals(metadata.getMetadataField().toString('.')));
     }
 
+
+    private boolean isOrcidSynchronizationDisabled() {
+        return !configurationService.getBooleanProperty("orcid.synchronization-enabled", true);
+    }
 
     private void updateItem(Context context, Item item) throws SQLException {
         try {

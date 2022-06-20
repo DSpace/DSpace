@@ -143,9 +143,9 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
-        Item secondOwner = createOwnerItem("1111-2222-3333-4444", admin, MANUAL);
-        Item thirdOwner = createOwnerItem("2222-3333-4444-5555", owner, BATCH);
+        Item firstProfileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondProfileItem = createProfileItemItem("1111-2222-3333-4444", admin, MANUAL);
+        Item thirdProfileItem = createProfileItemItem("2222-3333-4444-5555", owner, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("Second publication");
@@ -165,30 +165,30 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         when(orcidClientMock.push(any(), eq("2222-3333-4444-5555"), any()))
             .thenReturn(createdResponse("11111"));
 
-        createOrcidQueue(context, firstOwner, firstEntity);
-        createOrcidQueue(context, firstOwner, secondEntity, "98765");
-        createOrcidQueue(context, firstOwner, "Description", "Publication", "22222");
-        createOrcidQueue(context, secondOwner, thirdEntity);
-        createOrcidQueue(context, secondOwner, fourthEntity);
-        createOrcidQueue(context, thirdOwner, fifthEntity);
+        createOrcidQueue(context, firstProfileItem, firstEntity);
+        createOrcidQueue(context, firstProfileItem, secondEntity, "98765");
+        createOrcidQueue(context, firstProfileItem, "Description", "Publication", "22222");
+        createOrcidQueue(context, secondProfileItem, thirdEntity);
+        createOrcidQueue(context, secondProfileItem, fourthEntity);
+        createOrcidQueue(context, thirdProfileItem, fifthEntity);
 
         context.commit();
 
         TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
 
-        String firstOwnerId = firstOwner.getID().toString();
-        String thirdOwnerId = thirdOwner.getID().toString();
+        String firstProfileItemId = firstProfileItem.getID().toString();
+        String thirdProfileItemId = thirdProfileItem.getID().toString();
 
         assertThat(handler.getInfoMessages(), hasSize(9));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
             "Found 4 queue records to synchronize with ORCID",
-            "Addition of Publication for profile with ID: " + firstOwnerId,
+            "Addition of Publication for profile with ID: " + firstProfileItemId,
             "History record created with status 201. The operation was completed successfully",
-            "Update of Publication for profile with ID: " + firstOwnerId + " by put code 98765",
+            "Update of Publication for profile with ID: " + firstProfileItemId + " by put code 98765",
             "History record created with status 200. The operation was completed successfully",
-            "Deletion of Publication for profile with ID: " + firstOwnerId + " by put code 22222",
+            "Deletion of Publication for profile with ID: " + firstProfileItemId + " by put code 22222",
             "History record created with status 204. The operation was completed successfully",
-            "Addition of Publication for profile with ID: " + thirdOwnerId,
+            "Addition of Publication for profile with ID: " + thirdProfileItemId,
             "History record created with status 201. The operation was completed successfully"));
 
         assertThat(handler.getErrorMessages(), empty());
@@ -203,23 +203,23 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(2));
-        assertThat(queueRecords, hasItem(matches(secondOwner, thirdEntity, "Publication", INSERT, 0)));
-        assertThat(queueRecords, hasItem(matches(secondOwner, fourthEntity, "Publication", INSERT, 0)));
+        assertThat(queueRecords, hasItem(matches(secondProfileItem, thirdEntity, "Publication", INSERT, 0)));
+        assertThat(queueRecords, hasItem(matches(secondProfileItem, fourthEntity, "Publication", INSERT, 0)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(4));
-        assertThat(historyRecords, hasItem(matches(history(firstOwner, firstEntity, 201, INSERT))));
-        assertThat(historyRecords, hasItem(matches(history(firstOwner, secondEntity, 200, UPDATE))));
-        assertThat(historyRecords, hasItem(matches(history(firstOwner, 204, DELETE))));
-        assertThat(historyRecords, hasItem(matches(history(thirdOwner, fifthEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, secondEntity, 200, UPDATE))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, 204, DELETE))));
+        assertThat(historyRecords, hasItem(matches(history(thirdProfileItem, fifthEntity, 201, INSERT))));
 
     }
 
     @Test
     public void testWithOneValidationError() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
-        Item secondOwner = createOwnerItem("1111-2222-3333-4444", admin, BATCH);
+        Item firstProfileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondProfileItem = createProfileItemItem("1111-2222-3333-4444", admin, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("");
@@ -231,9 +231,9 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         when(orcidClientMock.push(any(), eq("1111-2222-3333-4444"), any()))
             .thenReturn(createdResponse("55555"));
 
-        createOrcidQueue(context, firstOwner, firstEntity);
-        createOrcidQueue(context, firstOwner, secondEntity, "98765");
-        createOrcidQueue(context, secondOwner, thirdEntity);
+        createOrcidQueue(context, firstProfileItem, firstEntity);
+        createOrcidQueue(context, firstProfileItem, secondEntity, "98765");
+        createOrcidQueue(context, secondProfileItem, thirdEntity);
 
         context.commit();
 
@@ -242,10 +242,10 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getInfoMessages(), hasSize(6));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
             "Found 3 queue records to synchronize with ORCID",
-            "Addition of Publication for profile with ID: " + firstOwner.getID().toString(),
+            "Addition of Publication for profile with ID: " + firstProfileItem.getID().toString(),
             "History record created with status 201. The operation was completed successfully",
-            "Update of Publication for profile with ID: " + firstOwner.getID().toString() + " by put code 98765",
-            "Addition of Publication for profile with ID: " + secondOwner.getID().toString(),
+            "Update of Publication for profile with ID: " + firstProfileItem.getID().toString() + " by put code 98765",
+            "Addition of Publication for profile with ID: " + secondProfileItem.getID().toString(),
             "History record created with status 201. The operation was completed successfully"));
 
         assertThat(handler.getErrorMessages(), hasSize(1));
@@ -260,20 +260,20 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(firstOwner, secondEntity, "Publication", UPDATE, 1)));
+        assertThat(queueRecords, hasItem(matches(firstProfileItem, secondEntity, "Publication", UPDATE, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(2));
-        assertThat(historyRecords, hasItem(matches(history(firstOwner, firstEntity, 201, INSERT))));
-        assertThat(historyRecords, hasItem(matches(history(secondOwner, thirdEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(secondProfileItem, thirdEntity, 201, INSERT))));
 
     }
 
     @Test
     public void testWithUnexpectedErrorForMissingOrcid() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
-        Item secondOwner = createOwnerItem("", admin, BATCH);
+        Item firstProfileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondProfileItem = createProfileItemItem("", admin, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("Second publication");
@@ -281,8 +281,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         when(orcidClientMock.push(any(), eq("0000-1111-2222-3333"), any()))
             .thenReturn(createdResponse("12345"));
 
-        createOrcidQueue(context, secondOwner, secondEntity);
-        createOrcidQueue(context, firstOwner, firstEntity);
+        createOrcidQueue(context, secondProfileItem, secondEntity);
+        createOrcidQueue(context, firstProfileItem, firstEntity);
 
         context.commit();
 
@@ -291,13 +291,13 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getInfoMessages(), hasSize(4));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
             "Found 2 queue records to synchronize with ORCID",
-            "Addition of Publication for profile with ID: " + secondOwner.getID().toString(),
-            "Addition of Publication for profile with ID: " + firstOwner.getID().toString(),
+            "Addition of Publication for profile with ID: " + secondProfileItem.getID().toString(),
+            "Addition of Publication for profile with ID: " + firstProfileItem.getID().toString(),
             "History record created with status 201. The operation was completed successfully"));
 
         assertThat(handler.getErrorMessages(), hasSize(1));
         assertThat(handler.getErrorMessages(), contains("An unexpected error occurs during the synchronization: "
-            + "The related owner item (id = " + secondOwner.getID() + ") does not have an orcid"));
+            + "The related profileItem item (id = " + secondProfileItem.getID() + ") does not have an orcid"));
 
         assertThat(handler.getWarningMessages(), empty());
 
@@ -306,19 +306,19 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(secondOwner, secondEntity, "Publication", INSERT, 1)));
+        assertThat(queueRecords, hasItem(matches(secondProfileItem, secondEntity, "Publication", INSERT, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(1));
-        assertThat(historyRecords, hasItem(matches(history(firstOwner, firstEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
 
     }
 
     @Test
     public void testWithOrcidClientException() throws Exception {
 
-        Item firstOwner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
-        Item secondOwner = createOwnerItem("1111-2222-3333-4444", admin, BATCH);
+        Item firstProfileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
+        Item secondProfileItem = createProfileItemItem("1111-2222-3333-4444", admin, BATCH);
 
         Item firstEntity = createPublication("First publication");
         Item secondEntity = createPublication("Second publication");
@@ -329,8 +329,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         when(orcidClientMock.push(any(), eq("1111-2222-3333-4444"), any()))
             .thenReturn(createdResponse("55555"));
 
-        createOrcidQueue(context, firstOwner, firstEntity);
-        createOrcidQueue(context, secondOwner, secondEntity);
+        createOrcidQueue(context, firstProfileItem, firstEntity);
+        createOrcidQueue(context, secondProfileItem, secondEntity);
 
         context.commit();
 
@@ -339,9 +339,9 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getInfoMessages(), hasSize(5));
         assertThat(handler.getInfoMessages(), containsInAnyOrder(
             "Found 2 queue records to synchronize with ORCID",
-            "Addition of Publication for profile with ID: " + firstOwner.getID().toString(),
+            "Addition of Publication for profile with ID: " + firstProfileItem.getID().toString(),
             "History record created with status 400. The resource sent to ORCID registry is not valid",
-            "Addition of Publication for profile with ID: " + secondOwner.getID().toString(),
+            "Addition of Publication for profile with ID: " + secondProfileItem.getID().toString(),
             "History record created with status 201. The operation was completed successfully"));
 
         assertThat(handler.getErrorMessages(), empty());
@@ -353,12 +353,12 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(firstOwner, firstEntity, "Publication", INSERT, 1)));
+        assertThat(queueRecords, hasItem(matches(firstProfileItem, firstEntity, "Publication", INSERT, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(2));
-        assertThat(historyRecords, hasItem(matches(history(firstOwner, firstEntity, 400, INSERT))));
-        assertThat(historyRecords, hasItem(matches(history(secondOwner, secondEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 400, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(secondProfileItem, secondEntity, 201, INSERT))));
 
     }
 
@@ -368,13 +368,13 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         configurationService.setProperty("orcid.bulk-synchronization.max-attempts", 2);
 
-        Item owner = createOwnerItem("0000-1111-2222-3333", eperson, BATCH);
+        Item profileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
         Item entity = createPublication("First publication");
 
         when(orcidClientMock.push(any(), eq("0000-1111-2222-3333"), any()))
             .thenThrow(new OrcidClientException(400, "Bad request"));
 
-        createOrcidQueue(context, owner, entity);
+        createOrcidQueue(context, profileItem, entity);
 
         // First attempt
 
@@ -385,11 +385,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 1)));
+        assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 1)));
 
         List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(1));
-        assertThat(historyRecords, hasItem(matches(history(owner, entity, 400, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(profileItem, entity, 400, INSERT))));
 
         // Second attempt
 
@@ -400,12 +400,12 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 2)));
+        assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 2)));
 
         historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(2));
-        assertThat(historyRecords, contains(matches(history(owner, entity, 400, INSERT)),
-            matches(history(owner, entity, 400, INSERT))));
+        assertThat(historyRecords, contains(matches(history(profileItem, entity, 400, INSERT)),
+            matches(history(profileItem, entity, 400, INSERT))));
 
         // Third attempt
 
@@ -416,12 +416,12 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 2)));
+        assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 2)));
 
         historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(2));
-        assertThat(historyRecords, contains(matches(history(owner, entity, 400, INSERT)),
-            matches(history(owner, entity, 400, INSERT))));
+        assertThat(historyRecords, contains(matches(history(profileItem, entity, 400, INSERT)),
+            matches(history(profileItem, entity, 400, INSERT))));
 
         // Fourth attempt forcing synchronization
 
@@ -432,24 +432,24 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         queueRecords = orcidQueueService.findAll(context);
         assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, hasItem(matches(owner, entity, "Publication", INSERT, 3)));
+        assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 3)));
 
         historyRecords = orcidHistoryService.findAll(context);
         assertThat(historyRecords, hasSize(3));
-        assertThat(historyRecords, contains(matches(history(owner, entity, 400, INSERT)),
-            matches(history(owner, entity, 400, INSERT)),
-            matches(history(owner, entity, 400, INSERT))));
+        assertThat(historyRecords, contains(matches(history(profileItem, entity, 400, INSERT)),
+            matches(history(profileItem, entity, 400, INSERT)),
+            matches(history(profileItem, entity, 400, INSERT))));
     }
 
-    private Predicate<OrcidHistory> history(Item owner, Item entity, int status, OrcidOperation operation) {
-        return history -> owner.equals(history.getOwner())
+    private Predicate<OrcidHistory> history(Item profileItem, Item entity, int status, OrcidOperation operation) {
+        return history -> profileItem.equals(history.getProfileItem())
             && entity.equals(history.getEntity())
             && history.getStatus().equals(status)
             && operation == history.getOperation();
     }
 
-    private Predicate<OrcidHistory> history(Item owner, int status, OrcidOperation operation) {
-        return history -> owner.equals(history.getOwner())
+    private Predicate<OrcidHistory> history(Item profileItem, int status, OrcidOperation operation) {
+        return history -> profileItem.equals(history.getProfileItem())
             && history.getStatus().equals(status)
             && operation == history.getOperation();
     }
@@ -462,7 +462,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         return handler;
     }
 
-    private Item createOwnerItem(String orcid, EPerson owner, OrcidSynchronizationMode mode) throws Exception {
+    private Item createProfileItemItem(String orcid, EPerson owner, OrcidSynchronizationMode mode)
+        throws Exception {
 
         Item item = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test user")

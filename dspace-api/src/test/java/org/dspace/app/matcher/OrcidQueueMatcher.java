@@ -26,7 +26,7 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
 
-    private final Matcher<Item> ownerMatcher;
+    private final Matcher<Item> profileItemMatcher;
 
     private final Matcher<Item> entityMatcher;
 
@@ -42,11 +42,11 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
 
     private final Matcher<Integer> attemptsMatcher;
 
-    private OrcidQueueMatcher(Matcher<Item> ownerMatcher, Matcher<Item> entityMatcher,
+    private OrcidQueueMatcher(Matcher<Item> profileItemMatcher, Matcher<Item> entityMatcher,
         Matcher<String> recordTypeMatcher, Matcher<String> putCodeMatcher, Matcher<String> metadataMatcher,
         Matcher<String> descriptionMatcher, Matcher<OrcidOperation> operationMatcher,
         Matcher<Integer> attemptsMatcher) {
-        this.ownerMatcher = ownerMatcher;
+        this.profileItemMatcher = profileItemMatcher;
         this.entityMatcher = entityMatcher;
         this.recordTypeMatcher = recordTypeMatcher;
         this.putCodeMatcher = putCodeMatcher;
@@ -56,26 +56,27 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
         this.attemptsMatcher = attemptsMatcher;
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType, OrcidOperation operation) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), anything(),
+    public static OrcidQueueMatcher matches(Item profileItem, Item entity, String recordType,
+        OrcidOperation operation) {
+        return new OrcidQueueMatcher(is(profileItem), is(entity), is(recordType), anything(),
             anything(), anything(), is(operation), anything());
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+    public static OrcidQueueMatcher matches(Item profileItem, Item entity, String recordType,
         OrcidOperation operation, int attempts) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), anything(),
+        return new OrcidQueueMatcher(is(profileItem), is(entity), is(recordType), anything(),
             anything(), anything(), is(operation), is(attempts));
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+    public static OrcidQueueMatcher matches(Item profileItem, Item entity, String recordType,
         String putCode, OrcidOperation operation) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType), is(putCode),
+        return new OrcidQueueMatcher(is(profileItem), is(entity), is(recordType), is(putCode),
             anything(), anything(), is(operation), anything());
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+    public static OrcidQueueMatcher matches(Item profileItem, Item entity, String recordType,
         String putCode, String metadata, String description, OrcidOperation operation) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),
+        return new OrcidQueueMatcher(is(profileItem), is(entity), is(recordType),
             is(putCode), is(metadata), is(description), is(operation), anything());
     }
 
@@ -85,16 +86,16 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
             is(putCode), is(metadata), is(description), is(operation), anything());
     }
 
-    public static OrcidQueueMatcher matches(Item owner, Item entity, String recordType,
+    public static OrcidQueueMatcher matches(Item profileItem, Item entity, String recordType,
         String putCode, Matcher<String> metadata, String description, OrcidOperation operation) {
-        return new OrcidQueueMatcher(is(owner), is(entity), is(recordType),
+        return new OrcidQueueMatcher(is(profileItem), is(entity), is(recordType),
             is(putCode), metadata, is(description), is(operation), anything());
     }
 
     @Override
     public void describeTo(Description description) {
         description.appendText("an orcid queue record that with the following attributes:")
-            .appendText(" item owner ").appendDescriptionOf(ownerMatcher)
+            .appendText(" item profileItem ").appendDescriptionOf(profileItemMatcher)
             .appendText(", item entity ").appendDescriptionOf(entityMatcher)
             .appendText(", record type ").appendDescriptionOf(recordTypeMatcher)
             .appendText(", metadata ").appendDescriptionOf(metadataMatcher)
@@ -106,7 +107,7 @@ public class OrcidQueueMatcher extends TypeSafeMatcher<OrcidQueue> {
 
     @Override
     protected boolean matchesSafely(OrcidQueue item) {
-        return ownerMatcher.matches(item.getOwner())
+        return profileItemMatcher.matches(item.getProfileItem())
             && entityMatcher.matches(item.getEntity())
             && recordTypeMatcher.matches(item.getRecordType())
             && metadataMatcher.matches(item.getMetadata())
