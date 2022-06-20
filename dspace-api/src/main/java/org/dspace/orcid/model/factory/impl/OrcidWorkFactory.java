@@ -213,7 +213,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
             .map(MetadataValue::getValue)
             .map(type -> fieldMapping.convertType(type))
             .flatMap(this::getWorkType)
-            .orElse(null);
+            .orElse(WorkType.UNDEFINED);
     }
 
     /**

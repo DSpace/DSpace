@@ -209,7 +209,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
         return getMetadataValue(context, item, fieldMapping.getTypeField())
             .map(type -> fieldMapping.convertType(type.getValue()))
             .flatMap(this::getFundingType)
-            .orElse(null);
+            .orElse(FundingType.CONTRACT);
     }
 
     private Optional<FundingType> getFundingType(String type) {
