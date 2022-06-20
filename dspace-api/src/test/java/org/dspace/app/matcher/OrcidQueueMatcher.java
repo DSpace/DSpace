@@ -9,9 +9,9 @@ package org.dspace.app.matcher;
 
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.app.orcid.OrcidOperation;
-import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.content.Item;
+import org.dspace.orcid.OrcidOperation;
+import org.dspace.orcid.OrcidQueue;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

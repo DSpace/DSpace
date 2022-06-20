@@ -12,12 +12,11 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.orcid.OrcidHistory;
-import org.dspace.app.orcid.OrcidOperation;
-import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-
+import org.dspace.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidOperation;
+import org.dspace.orcid.service.OrcidHistoryService;
 /**
  * Builder to construct OrcidHistory objects
  *

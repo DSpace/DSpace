@@ -13,14 +13,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;

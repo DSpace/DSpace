@@ -11,14 +11,14 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.orcid.OrcidHistory;
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.OrcidHistoryRest;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;

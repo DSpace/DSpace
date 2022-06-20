@@ -11,7 +11,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidHistory;
 import org.hamcrest.Matcher;
 
 /**

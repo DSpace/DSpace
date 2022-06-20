@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;

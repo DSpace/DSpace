@@ -7,9 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.rest.model.OrcidHistoryRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.orcid.OrcidHistory;
 import org.springframework.stereotype.Component;
 
 /**

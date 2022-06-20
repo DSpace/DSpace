@@ -13,10 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

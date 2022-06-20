@@ -12,8 +12,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.content.Item;
+import org.dspace.orcid.OrcidQueue;
 import org.hamcrest.Matcher;
 
 /**

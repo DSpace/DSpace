@@ -9,12 +9,12 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 
-import org.dspace.app.orcid.OrcidOperation;
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.orcid.OrcidOperation;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidQueueService;
 
 /**
  * Builder to construct OrcidQueue objects

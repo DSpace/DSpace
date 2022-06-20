@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
-import static org.dspace.app.orcid.model.OrcidEntityType.FUNDING;
-import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+import static org.dspace.orcid.model.OrcidEntityType.FUNDING;
+import static org.dspace.orcid.model.OrcidEntityType.PUBLICATION;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -16,14 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.orcid.model.OrcidEntityType;
-import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.app.orcid.service.OrcidSynchronizationService;
-import org.dspace.app.profile.OrcidEntitySyncPreference;
-import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
-import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
@@ -31,6 +23,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.orcid.model.OrcidEntityType;
+import org.dspace.orcid.service.OrcidQueueService;
+import org.dspace.orcid.service.OrcidSynchronizationService;
+import org.dspace.profile.OrcidEntitySyncPreference;
+import org.dspace.profile.OrcidProfileSyncPreference;
+import org.dspace.profile.OrcidSynchronizationMode;
+import org.dspace.profile.ResearcherProfile;
+import org.dspace.profile.service.ResearcherProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

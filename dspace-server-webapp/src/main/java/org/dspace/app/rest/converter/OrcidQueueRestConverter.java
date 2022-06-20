@@ -7,10 +7,10 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
+import org.dspace.orcid.OrcidQueue;
 import org.springframework.stereotype.Component;
 
 /**

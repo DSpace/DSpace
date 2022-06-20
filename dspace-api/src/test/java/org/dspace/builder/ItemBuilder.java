@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.dspace.app.profile.OrcidEntitySyncPreference;
-import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -29,6 +26,9 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.profile.OrcidEntitySyncPreference;
+import org.dspace.profile.OrcidProfileSyncPreference;
+import org.dspace.profile.OrcidSynchronizationMode;
 
 /**
  * Builder to construct Item objects
