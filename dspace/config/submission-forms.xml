@@ -582,7 +582,7 @@
                 <field>
                     <dc-schema>project</dc-schema>
                     <dc-element>amount</dc-element>
-                    <dc-qualifier>currency</<dc-qualifier>>
+                    <dc-qualifier>currency</dc-qualifier>
                     <label>Amount currency</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the amount currency of the project</hint>
