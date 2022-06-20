@@ -72,7 +72,6 @@ public class OrcidValidatorTest {
     public void before() {
         when(configurationService.getBooleanProperty("orcid.validation.work.enabled", true)).thenReturn(true);
         when(configurationService.getBooleanProperty("orcid.validation.funding.enabled", true)).thenReturn(true);
-        when(configurationService.getBooleanProperty("orcid.validation.affiliation.enabled", true)).thenReturn(true);
         when(configurationService.getArrayProperty("orcid.validation.organization.identifier-sources"))
             .thenReturn(new String[] { "RINGGOLD", "GRID", "FUNDREF", "LEI" });
     }
