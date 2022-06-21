@@ -50,8 +50,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Richard Rodgers, Peter Dietz
  */
-public class S3BitStoreService implements BitStoreService {
-    protected static final String EMPTY_BUCKET_PREFIX = "dspace-asset-";
+public class S3BitStoreService extends BaseBitStoreService {
+    protected static final String DEFAULT_BUCKET_PREFIX = "dspace-asset-";
 
     /**
      * log4j log
@@ -158,7 +158,7 @@ public class S3BitStoreService implements BitStoreService {
         if (StringUtils.isEmpty(bucketName)) {
             // get hostname of DSpace UI to use to name bucket
             String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
-            bucketName = EMPTY_BUCKET_PREFIX + hostname;
+            bucketName = DEFAULT_BUCKET_PREFIX + hostname;
             log.warn("S3 BucketName is not configured, setting default: " + bucketName);
         }
 
@@ -263,19 +263,8 @@ public class S3BitStoreService implements BitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         try {
             ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
-
             if (objectMetadata != null) {
-                if (attrs.containsKey("size_bytes")) {
-                    attrs.put("size_bytes", objectMetadata.getContentLength());
-                }
-                if (attrs.containsKey("checksum")) {
-                    attrs.put("checksum", objectMetadata.getETag());
-                    attrs.put("checksum_algorithm", CSA);
-                }
-                if (attrs.containsKey("modified")) {
-                    attrs.put("modified", String.valueOf(objectMetadata.getLastModified().getTime()));
-                }
-                return attrs;
+                return this.about(objectMetadata, attrs);
             }
         } catch (AmazonS3Exception e) {
             if (e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -333,16 +322,6 @@ public class S3BitStoreService implements BitStoreService {
     }
 
     /**
-     * Utility that checks string ending with separator
-     * 
-     * @param bufFilename
-     * @return
-     */
-    private boolean endsWithSeparator(StringBuilder bufFilename) {
-        return bufFilename.lastIndexOf(File.separator) == bufFilename.length() - 1;
-    }
-
-    /**
      * there are 2 cases:
      * - conventional bitstream, conventional storage
      * - registered bitstream, conventional storage
@@ -361,95 +340,10 @@ public class S3BitStoreService implements BitStoreService {
             sInternalId = sInternalId.substring(2);
         } else {
             sInternalId = sanitizeIdentifier(sInternalId);
-            sIntermediatePath = intermediatePath(sInternalId);
+            sIntermediatePath = getIntermediatePath(sInternalId);
         }
 
         return sIntermediatePath + sInternalId;
-    }
-
-    /**
-     * Sanity Check: If the internal ID contains a pathname separator, it's probably
-     * an attempt to make a path traversal attack, so ignore the path prefix. The
-     * internal-ID is supposed to be just a filename, so this will not affect normal
-     * operation.
-     * 
-     * @param sInternalId
-     * @return Sanitezed id
-     */
-    protected String sanitizeIdentifier(String sInternalId) {
-        if (sInternalId.contains(File.separator)) {
-            sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
-        }
-        return sInternalId;
-    }
-
-    /**
-     * @param internalId
-     * @return
-     */
-    protected String intermediatePath(String internalId) {
-        StringBuilder path = new StringBuilder();
-        if (StringUtils.isEmpty(internalId) || internalId.length() <= digitsPerLevel) {
-            return path.append(internalId).append(File.separator).toString();
-        }
-        populatePathSplittingId(internalId, path);
-        appendSeparator(path);
-        return path.toString();
-    }
-
-    /**
-     * Append separator to target {@code StringBuilder}
-     * 
-     * @param path
-     */
-    private void appendSeparator(StringBuilder path) {
-        if (!endsWithSeparator(path)) {
-            path.append(File.separator);
-        }
-    }
-
-    /**
-     * Splits internalId into several subpaths using {@code digitsPerLevel}
-     * that indicates the folder name length, and {@code direcoryLevels} that
-     * indicates the maximum number of subfolders.
-     * 
-     * @param internalId bitStream identifier
-     * @param path
-     */
-    private void populatePathSplittingId(String internalId, StringBuilder path) {
-        int digits = 0;
-        path.append(extractSubstringFrom(internalId, digits, digits + digitsPerLevel));
-        for (int i = 1; i < directoryLevels && !isLonger(internalId, digits + digitsPerLevel); i++) {
-            digits = i * digitsPerLevel;
-            path.append(File.separator);
-            path.append(extractSubstringFrom(internalId, digits, digits + digitsPerLevel));
-        }
-    }
-
-    /**
-     * Extract substring if is in range, otherwise will truncate to length
-     * 
-     * @param internalId
-     * @param startIndex
-     * @param endIndex
-     * @return
-     */
-    private String extractSubstringFrom(String internalId, int startIndex, int endIndex) {
-        if (isLonger(internalId, endIndex)) {
-            endIndex = internalId.length();
-        }
-        return internalId.substring(startIndex, endIndex);
-    }
-
-    /**
-     * Checks if the {@code String} is longer than {@code endIndex}
-     * 
-     * @param internalId
-     * @param endIndex
-     * @return
-     */
-    private boolean isLonger(String internalId, int endIndex) {
-        return endIndex > internalId.length();
     }
 
     public String getAwsAccessKey() {
@@ -545,7 +439,7 @@ public class S3BitStoreService implements BitStoreService {
         // get hostname of DSpace UI to use to name bucket
         String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
         //Bucketname should be lowercase
-        store.bucketName = EMPTY_BUCKET_PREFIX + hostname + ".s3test";
+        store.bucketName = DEFAULT_BUCKET_PREFIX + hostname + ".s3test";
         store.s3Service.createBucket(store.bucketName);
 /* Broken in DSpace 6 TODO Refactor
         // time everything, todo, swtich to caliper

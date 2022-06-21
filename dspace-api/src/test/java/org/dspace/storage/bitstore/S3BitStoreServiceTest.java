@@ -84,13 +84,13 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
     @Test
     public void givenEmptyBucketWhenInitThenUsesDefaultBucket() throws IOException {
         assertThat(s3BitStoreService.getBucketName(), isEmptyOrNullString());
-        when(this.s3Service.doesBucketExist(startsWith(S3BitStoreService.EMPTY_BUCKET_PREFIX))).thenReturn(false);
+        when(this.s3Service.doesBucketExist(startsWith(S3BitStoreService.DEFAULT_BUCKET_PREFIX))).thenReturn(false);
         assertThat(s3BitStoreService.getAwsRegionName(), isEmptyOrNullString());
 
         this.s3BitStoreService.init();
 
-        verify(this.s3Service, Mockito.times(1)).createBucket(startsWith(S3BitStoreService.EMPTY_BUCKET_PREFIX));
-        assertThat(s3BitStoreService.getBucketName(), Matchers.startsWith(S3BitStoreService.EMPTY_BUCKET_PREFIX));
+        verify(this.s3Service, Mockito.times(1)).createBucket(startsWith(S3BitStoreService.DEFAULT_BUCKET_PREFIX));
+        assertThat(s3BitStoreService.getBucketName(), Matchers.startsWith(S3BitStoreService.DEFAULT_BUCKET_PREFIX));
         assertThat(s3BitStoreService.getAwsAccessKey(), isEmptyOrNullString());
         assertThat(s3BitStoreService.getAwsSecretKey(), isEmptyOrNullString());
         assertThat(s3BitStoreService.getAwsRegionName(), isEmptyOrNullString());
@@ -102,7 +102,7 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
         assertThat(s3BitStoreService.getAwsSecretKey(), isEmptyOrNullString());
         assertThat(s3BitStoreService.getBucketName(), isEmptyOrNullString());
         assertThat(s3BitStoreService.getAwsRegionName(), isEmptyOrNullString());
-        when(this.s3Service.doesBucketExist(startsWith(S3BitStoreService.EMPTY_BUCKET_PREFIX))).thenReturn(false);
+        when(this.s3Service.doesBucketExist(startsWith(S3BitStoreService.DEFAULT_BUCKET_PREFIX))).thenReturn(false);
 
         final String awsAccessKey = "ACCESS_KEY";
         final String awsSecretKey = "SECRET_KEY";
@@ -140,8 +140,8 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
         }
 
 
-        verify(this.s3Service, Mockito.times(1)).createBucket(startsWith(S3BitStoreService.EMPTY_BUCKET_PREFIX));
-        assertThat(s3BitStoreService.getBucketName(), Matchers.startsWith(S3BitStoreService.EMPTY_BUCKET_PREFIX));
+        verify(this.s3Service, Mockito.times(1)).createBucket(startsWith(S3BitStoreService.DEFAULT_BUCKET_PREFIX));
+        assertThat(s3BitStoreService.getBucketName(), Matchers.startsWith(S3BitStoreService.DEFAULT_BUCKET_PREFIX));
         assertThat(s3BitStoreService.getAwsAccessKey(), Matchers.equalTo(awsAccessKey));
         assertThat(s3BitStoreService.getAwsSecretKey(), Matchers.equalTo(awsSecretKey));
         assertThat(s3BitStoreService.getAwsRegionName(), isEmptyOrNullString());
@@ -229,56 +229,56 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
     @Test
     public void givenBitStreamIdentifierWhenIntermediatePathIsComputedThenNotEndingDoubleSlash() throws IOException {
         StringBuilder path = new StringBuilder("01");
-        String computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        String computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         int slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
         assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
 
         path.append("2");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         assertThat(computedPath, Matchers.not(Matchers.endsWith(File.separator + File.separator)));
 
         path.append("3");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         assertThat(computedPath, Matchers.not(Matchers.endsWith(File.separator + File.separator)));
 
         path.append("4");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         assertThat(computedPath, Matchers.not(Matchers.endsWith(File.separator + File.separator)));
 
         path.append("56789");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         assertThat(computedPath, Matchers.not(Matchers.endsWith(File.separator + File.separator)));
     }
 
     @Test
     public void givenBitStreamIdentidierWhenIntermediatePathIsComputedThenMustBeSplitted() throws IOException {
         StringBuilder path = new StringBuilder("01");
-        String computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        String computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         int slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
         assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
 
         path.append("2");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
         assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
 
         path.append("3");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
         assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
 
         path.append("4");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
         assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
 
         path.append("56789");
-        computedPath = this.s3BitStoreService.intermediatePath(path.toString());
+        computedPath = this.s3BitStoreService.getIntermediatePath(path.toString());
         slashes = computeSlashes(path.toString());
         assertThat(computedPath, Matchers.endsWith(File.separator));
         assertThat(computedPath.split(File.separator).length, Matchers.equalTo(slashes));
