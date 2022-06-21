@@ -11,7 +11,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidHistory;
 import org.hamcrest.Matcher;
 
 /**
@@ -28,7 +28,7 @@ public class OrcidHistoryMatcher {
         String responseMessage) {
         return allOf(
                 hasJsonPath("$.id", is(orcidHistory.getID())),
-                hasJsonPath("$.ownerId", is(orcidHistory.getOwner().getID().toString())),
+                hasJsonPath("$.profileItemId", is(orcidHistory.getProfileItem().getID().toString())),
                 hasJsonPath("$.entityId", is(orcidHistory.getEntity().getID().toString())),
                 hasJsonPath("$.status", is(status)),
                 hasJsonPath("$.putCode", is(putCode)),

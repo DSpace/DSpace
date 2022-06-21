@@ -13,13 +13,13 @@ import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
 import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.dspace.app.matcher.MetadataValueMatcher.with;
-import static org.dspace.app.profile.OrcidEntitySyncPreference.ALL;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
 import static org.dspace.app.rest.matcher.ResourcePolicyMatcher.matchResourcePolicyProperties;
 import static org.dspace.builder.RelationshipTypeBuilder.createRelationshipTypeBuilder;
+import static org.dspace.profile.OrcidEntitySyncPreference.ALL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -51,13 +51,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import com.jayway.jsonpath.JsonPath;
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.OrcidToken;
-import org.dspace.app.orcid.client.OrcidClient;
-import org.dspace.app.orcid.exception.OrcidClientException;
-import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
-import org.dspace.app.orcid.service.OrcidQueueService;
-import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -80,6 +73,13 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.OrcidToken;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.exception.OrcidClientException;
+import org.dspace.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.orcid.service.OrcidQueueService;
+import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.junit.After;
@@ -2300,7 +2300,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.restoreAuthSystemState();
 
         // no preferences configured, so no orcid queue records created
-        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
 
@@ -2309,7 +2309,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        List<OrcidQueue> queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
 
@@ -2318,7 +2318,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(3));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
@@ -2329,7 +2329,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        queueRecords = orcidQueueService.findByOwnerId(context, profileItemId);
+        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
@@ -2339,7 +2339,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        assertThat(orcidQueueService.findByOwnerId(context, profileItemId), empty());
+        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
 
     }
 

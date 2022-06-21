@@ -7,10 +7,10 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
+import org.dspace.orcid.OrcidQueue;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +32,7 @@ public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, Orci
         rest.setDescription(orcidQueue.getDescription());
         rest.setRecordType(orcidQueue.getRecordType());
         rest.setId(orcidQueue.getID());
-        rest.setOwnerId(orcidQueue.getOwner().getID());
+        rest.setProfileItemId(orcidQueue.getProfileItem().getID());
         rest.setOperation(orcidQueue.getOperation() != null ? orcidQueue.getOperation().name() : null);
         rest.setProjection(projection);
 

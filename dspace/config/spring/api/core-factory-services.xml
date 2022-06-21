@@ -51,6 +51,6 @@
 
     <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
     
-    <bean id="orcidServiceFactory" class="org.dspace.app.orcid.factory.OrcidServiceFactoryImpl"/>
+    <bean id="orcidServiceFactory" class="org.dspace.orcid.factory.OrcidServiceFactoryImpl"/>
 
 </beans>

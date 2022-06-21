@@ -32,13 +32,6 @@ import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
-import org.dspace.app.orcid.OrcidHistory;
-import org.dspace.app.orcid.OrcidOperation;
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.client.OrcidClient;
-import org.dspace.app.orcid.client.OrcidResponse;
-import org.dspace.app.orcid.exception.OrcidClientException;
-import org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.dspace.app.rest.matcher.OrcidHistoryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -56,6 +49,13 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.RelationshipType;
 import org.dspace.eperson.EPerson;
+import org.dspace.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidOperation;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.client.OrcidResponse;
+import org.dspace.orcid.exception.OrcidClientException;
+import org.dspace.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
@@ -291,7 +291,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -348,7 +348,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.responseMessage", is("Invalid resource")),
                     hasJsonPath("$.status", is(400)),
@@ -396,7 +396,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.responseMessage", is("GENERIC ERROR")),
                     hasJsonPath("$.status", is(500)),
@@ -445,7 +445,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.status", is(200)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -503,7 +503,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(publication.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -555,7 +555,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", nullValue()),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -597,7 +597,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", nullValue()),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -644,7 +644,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(profile.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -702,7 +702,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(profile.getID().toString())),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -743,9 +743,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         EntityType fundingType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
@@ -782,7 +781,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.status", is(201)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -833,9 +832,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
@@ -873,7 +871,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.responseMessage", is("Invalid resource")),
                     hasJsonPath("$.status", is(400)),
@@ -915,9 +913,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
@@ -955,7 +952,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.responseMessage", is("GENERIC ERROR")),
                     hasJsonPath("$.status", is(500)),
@@ -997,9 +994,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
+            .withIdentifier("888-666-444")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)
@@ -1038,7 +1034,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", is(funding.getID().toString())),
                     hasJsonPath("$.status", is(200)),
                     hasJsonPath("$.putCode", is("12345")),
@@ -1090,7 +1086,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.id", is(idRef.get())),
-                    hasJsonPath("$.ownerId", is(profile.getID().toString())),
+                    hasJsonPath("$.profileItemId", is(profile.getID().toString())),
                     hasJsonPath("$.entityId", nullValue()),
                     hasJsonPath("$.status", is(204)),
                     hasJsonPath("$.putCode", nullValue()),
@@ -1117,22 +1113,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             .withName("Collection 3")
             .build();
 
-        Collection orgUnits = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("OrgUnit")
-            .withName("Collection 4")
-            .build();
-
-        Item orgUnit = ItemBuilder.createItem(context, orgUnits)
-            .withTitle("4Science")
-            .withOrgUnitCountry("IT")
-            .withOrgUnitCrossrefIdentifier("12345")
-            .build();
-
         Item funding = ItemBuilder.createItem(context, fundings)
             .withTitle("Test funding")
-            .withFundingStartDate("2013-08-03")
-            .withInternalId("888-666-444")
-            .withFunder("4Science", orgUnit.getID().toString())
+            .withProjectStartDate("2013-08-03")
             .build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, profile, funding)

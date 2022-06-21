@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.content.Item;
+import org.dspace.orcid.OrcidQueue;
 import org.hamcrest.Matcher;
 
 /**
@@ -30,7 +30,7 @@ public class OrcidQueueMatcher {
         Item entity = orcidQueue.getEntity();
         return allOf(
                 hasJsonPath("$.id", is(orcidQueue.getID())),
-                hasJsonPath("$.ownerId", is(orcidQueue.getOwner().getID().toString())),
+            hasJsonPath("$.profileItemId", is(orcidQueue.getProfileItem().getID().toString())),
                 hasJsonPath("$.entityId", entity != null ? is(entity.getID().toString()) : nullValue()),
                 hasJsonPath("$.description", is(orcidQueue.getDescription())),
                 hasJsonPath("$.recordType", is(orcidQueue.getRecordType())),

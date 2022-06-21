@@ -13,14 +13,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -78,17 +78,17 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
         }
     }
 
-    @SearchRestMethod(name = "findByOwner")
-    @PreAuthorize("hasPermission(#ownerId, 'ORCID_QUEUE_SEARCH', 'READ')")
-    public Page<OrcidQueueRest> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
-        Pageable pageable) {
+    @SearchRestMethod(name = "findByProfileItem")
+    @PreAuthorize("hasPermission(#profileItemId, 'ORCID_QUEUE_SEARCH', 'READ')")
+    public Page<OrcidQueueRest> findByProfileItemId(
+        @Parameter(value = "profileItemId", required = true) String profileItemId, Pageable pageable) {
 
         Context context = obtainContext();
         try {
-            UUID id = UUID.fromString(ownerId);
-            List<OrcidQueue> result = orcidQueueService.findByOwnerId(context, id, pageable.getPageSize(),
+            UUID id = UUID.fromString(profileItemId);
+            List<OrcidQueue> result = orcidQueueService.findByProfileItemId(context, id, pageable.getPageSize(),
                 toIntExact(pageable.getOffset()));
-            long totalCount = orcidQueueService.countByOwnerId(context, id);
+            long totalCount = orcidQueueService.countByProfileItemId(context, id);
             return converter.toRestPage(result, pageable, totalCount, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

@@ -20,7 +20,7 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
     public static final String NAME = "orcidqueue";
     public static final String PLURAL_NAME = "orcidqueues";
 
-    private UUID ownerId;
+    private UUID profileItemId;
 
     private UUID entityId;
 
@@ -45,12 +45,12 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
         return RestResourceController.class;
     }
 
-    public UUID getOwnerId() {
-        return ownerId;
+    public UUID getProfileItemId() {
+        return profileItemId;
     }
 
-    public void setOwnerId(UUID ownerId) {
-        this.ownerId = ownerId;
+    public void setProfileItemId(UUID profileItemId) {
+        this.profileItemId = profileItemId;
     }
 
     public UUID getEntityId() {

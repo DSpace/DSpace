@@ -11,15 +11,15 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.orcid.OrcidHistory;
-import org.dspace.app.orcid.OrcidQueue;
-import org.dspace.app.orcid.service.OrcidHistoryService;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.service.OrcidHistoryService;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
@@ -87,12 +87,12 @@ public class OrcidQueueAndHistoryRestPermissionEvaluatorPlugin extends RestObjec
 
         try {
 
-            Item owner = findOwner(context, orcidObjectId, isOrcidQueueRecord);
-            if (owner == null) {
+            Item profileItem = findProfileItem(context, orcidObjectId, isOrcidQueueRecord);
+            if (profileItem == null) {
                 return true;
             }
 
-            return itemService.getMetadata(owner, "dspace", "object", "owner", Item.ANY).stream()
+            return itemService.getMetadata(profileItem, "dspace", "object", "owner", Item.ANY).stream()
                 .map(metadataValue -> metadataValue.getAuthority())
                 .anyMatch(authority -> currentUser.getID().toString().equals(authority));
 
@@ -103,13 +103,14 @@ public class OrcidQueueAndHistoryRestPermissionEvaluatorPlugin extends RestObjec
         return false;
     }
 
-    private Item findOwner(Context context, Integer orcidObjectId, boolean isOrcidQueueRecord) throws SQLException {
+    private Item findProfileItem(Context context, Integer orcidObjectId, boolean isOrcidQueueRecord)
+        throws SQLException {
         if (isOrcidQueueRecord) {
             OrcidQueue orcidQueue = orcidQueueService.find(context, orcidObjectId);
-            return orcidQueue != null ? orcidQueue.getOwner() : null;
+            return orcidQueue != null ? orcidQueue.getProfileItem() : null;
         } else {
             OrcidHistory orcidHistory = orcidHistoryService.find(context, orcidObjectId);
-            return orcidHistory != null ? orcidHistory.getOwner() : null;
+            return orcidHistory != null ? orcidHistory.getProfileItem() : null;
         }
     }
 

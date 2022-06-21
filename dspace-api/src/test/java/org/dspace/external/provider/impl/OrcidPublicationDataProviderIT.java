@@ -31,9 +31,6 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.app.orcid.client.OrcidClient;
-import org.dspace.app.orcid.client.OrcidConfiguration;
-import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
@@ -43,6 +40,9 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.client.OrcidConfiguration;
+import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
@@ -96,7 +96,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
             .getServiceByName("orcidPublicationDataProvider", OrcidPublicationDataProvider.class);
 
         orcidConfiguration = new DSpace().getServiceManager()
-            .getServiceByName("org.dspace.app.orcid.client.OrcidConfiguration", OrcidConfiguration.class);
+            .getServiceByName("org.dspace.orcid.client.OrcidConfiguration", OrcidConfiguration.class);
 
         orcidClientMock = mock(OrcidClient.class);
         orcidClient = dataProvider.getOrcidClient();
@@ -148,7 +148,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         assertThat(metadata, has(metadata("dc.date.issued", "2011")));
         assertThat(metadata, has(metadata("dc.source", "Test Journal")));
         assertThat(metadata, has(metadata("dc.language.iso", "it")));
-        assertThat(metadata, has(metadata("dc.type", "Controlled Vocabulary for Resource Type Genres::other")));
+        assertThat(metadata, has(metadata("dc.type", "Other")));
         assertThat(metadata, has(metadata("dc.identifier.doi", "10.11234.12")));
         assertThat(metadata, has(metadata("dc.contributor.author", "Walter White")));
         assertThat(metadata, has(metadata("dc.title", "The elements of style and the survey of ophthalmology.")));

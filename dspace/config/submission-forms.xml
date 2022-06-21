@@ -557,6 +557,39 @@
             </row>
             <row>
                 <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>startDate</dc-element>
+                    <label>Start date</label>
+                    <input-type>date</input-type>
+                    <hint>Enter the start date of the project</hint>
+                </field>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>endDate</dc-element>
+                    <label>End date</label>
+                    <input-type>date</input-type>
+                    <hint>Enter the end date of the project</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <label>Amount</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the amount of the project</hint>
+                </field>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <dc-qualifier>currency</dc-qualifier>
+                    <label>Amount currency</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the amount currency of the project</hint>
+                </field>
+            </row>
+            <row>
+                <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>description</dc-element>
                     <label>Description</label>
