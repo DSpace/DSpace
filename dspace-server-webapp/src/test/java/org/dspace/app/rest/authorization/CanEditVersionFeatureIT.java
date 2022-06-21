@@ -202,70 +202,7 @@ public class CanEditVersionFeatureIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void canEditVersionsFeatureByColAndComAdminsAndPropertyBlockEntityEnableTest() throws Exception {
-        configurationService.setProperty("versioning.block.entity", true);
-        context.turnOffAuthorisationSystem();
-        EPerson adminComA = EPersonBuilder.createEPerson(context)
-                                          .withEmail("testComAdminA@test.com")
-                                          .withPassword(password)
-                                          .build();
-
-        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
-                                          .withEmail("testCol1Admin@test.com")
-                                          .withPassword(password)
-                                          .build();
-
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
-
-        Community subCommunityA = CommunityBuilder.createSubCommunity(context, rootCommunity)
-                                                  .withName("Sub Community A")
-                                                  .withAdminGroup(adminComA)
-                                                  .build();
-
-        Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
-                                           .withName("Collection 1")
-                                           .withEntityType("Publication")
-                                           .withSubmitterGroup(eperson)
-                                           .withAdminGroup(adminCol1)
-                                           .build();
-
-        Item item = ItemBuilder.createItem(context, col1)
-                               .withTitle("Public item")
-                               .withIssueDate("2021-04-19")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
-
-        Version version = VersionBuilder.createVersion(context, item, "My test summary").build();
-
-        context.restoreAuthSystemState();
-
-        VersionRest versionRest = versionConverter.convert(version, DefaultProjection.DEFAULT);
-
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
-        String tokenAdminCol1 = getAuthToken(adminCol1.getEmail(), password);
-
-        // define authorization that we know not exists
-        Authorization adminOfComAToVersion = new Authorization(adminComA, canEditVersionFeature, versionRest);
-        Authorization adminOfCol1ToVersion = new Authorization(adminCol1, canEditVersionFeature, versionRest);
-        Authorization adminToVersion = new Authorization(admin, canEditVersionFeature, versionRest);
-
-        getClient(tokenAdminComA).perform(get("/api/authz/authorizations/" + adminOfComAToVersion.getID()))
-                                 .andExpect(status().isNotFound());
-
-        getClient(tokenAdminCol1).perform(get("/api/authz/authorizations/" + adminOfCol1ToVersion.getID()))
-                                 .andExpect(status().isNotFound());
-
-        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + adminToVersion.getID()))
-                             .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void canEditVersionsFeatureByColAndComAdminsAndPropertyBlockEntityDisabledTest() throws Exception {
-        configurationService.setProperty("versioning.block.entity", false);
+    public void canEditVersionsFeatureByColAndComAdminsTest2() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson adminComA = EPersonBuilder.createEPerson(context)
                                           .withEmail("testComAdminA@test.com")
