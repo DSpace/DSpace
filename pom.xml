@@ -32,7 +32,7 @@
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
         <slf4j.version>1.7.14</slf4j.version>
-        <reload4j.version>1.2.18.3</reload4j.version>
+        <reload4j.version>1.2.20</reload4j.version>
         <slf4j-reload4j.version>1.7.36</slf4j-reload4j.version>
         <!--
             Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
