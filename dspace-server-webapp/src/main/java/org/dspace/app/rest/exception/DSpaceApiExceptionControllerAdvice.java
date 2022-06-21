@@ -135,6 +135,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
+    /**
+     * Handle the {@link OrcidValidationException} returning the exception message
+     * in the response, that always contains only the validation error codes (usable
+     * for example to show specific messages to users). No other details are present
+     * in the exception message.
+     */
     @ExceptionHandler({ OrcidValidationException.class })
     protected void handleOrcidValidationException(HttpServletRequest request, HttpServletResponse response,
         OrcidValidationException ex) throws IOException {
