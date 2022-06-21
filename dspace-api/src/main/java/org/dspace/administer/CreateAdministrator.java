@@ -113,7 +113,7 @@ public final class CreateAdministrator {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("dspace create-administrator", header, options, footer, true);
             return;
-		}
+		} else {
 
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -172,6 +172,8 @@ public final class CreateAdministrator {
           Arrays.fill(password1, ' ');
           Arrays.fill(password2, ' ');
 
+        } 
+        
         } else {
             ca.negotiateAdministratorDetails();
         }
