@@ -65,14 +65,14 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
                 .withAuthor("Smith, Donald").withAuthor("Doe, John").withSubject("ExtraEntry")
                 .withHandle("123456789/testHdlResolver").build();
 
+        context.restoreAuthSystemState();
+
         // ** END GIVEN **
 
         getClient()
                 .perform(get(HdlResolverRestController.BASE_PATH + publicItem1.getHandle()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0]", StringContains.containsString("123456789/testHdlResolver")));
-
-        context.restoreAuthSystemState();
 
     }
 

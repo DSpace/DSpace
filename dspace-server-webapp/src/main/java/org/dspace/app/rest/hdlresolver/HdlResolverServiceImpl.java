@@ -42,9 +42,9 @@ public class HdlResolverServiceImpl implements HdlResolverService {
         try {
             return this.handleService.resolveToURL(context, hdlResolver.getHandle());
         } catch (SQLException e) {
-            log.error("Error while resolving Handle: " + hdlResolver.getHandle());
+            log.error("Error while resolving Handle: " + hdlResolver.getHandle(), e);
+            throw new RuntimeException("Error while resolving Handle: " + hdlResolver.getHandle(), e);
         }
-        return null;
     }
 
 }

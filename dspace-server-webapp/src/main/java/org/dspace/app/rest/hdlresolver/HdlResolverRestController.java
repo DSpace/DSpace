@@ -10,8 +10,11 @@ package org.dspace.app.rest.hdlresolver;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * This controller is public and is useful for handler resolving,
+ * wheter a target handle identifier will be resolved into the
+ * corresponding URL (if found), otherwise will respond a null string.
+ * 
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.it)
  *
  */
@@ -28,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(HdlResolverRestController.BASE_PATH)
 public class HdlResolverRestController {
     static final String BASE_PATH = "/hdlResolver/";
+
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private HdlResolverService hdlResolverService;
@@ -66,13 +75,17 @@ public class HdlResolverRestController {
      * @return One element list using String if found, else null String.
      */
     private String resolveToURL(HttpServletRequest request, HdlResolverDTO handleResolver) {
+        String json = "null";
         final String resolvedUrl = this.hdlResolverService.resolveToURL(ContextUtil.obtainContext(request),
                 handleResolver);
         if (StringUtils.isNotEmpty(resolvedUrl)) {
-            return new Gson().toJson(List.of(resolvedUrl));
-        } else {
-            return "null";
+            try {
+                json = new ObjectMapper().writeValueAsString(List.of(resolvedUrl));
+            } catch (JsonProcessingException e) {
+                log.error("Error during conversion of response!", e);
+            }
         }
+        return json;
     }
 
 }
