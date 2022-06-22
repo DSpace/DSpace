@@ -14,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
@@ -24,7 +25,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
-import org.apache.commons.cli.HelpFormatter;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 
