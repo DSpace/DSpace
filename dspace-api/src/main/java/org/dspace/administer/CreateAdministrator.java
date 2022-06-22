@@ -179,8 +179,8 @@ public final class CreateAdministrator {
                         }
                     }
                     ca.createAdministrator(line.getOptionValue("e"),
-                       line.getOptionValue("f"), line.getOptionValue("l"),
-                    language, String.valueOf(password1));
+                        line.getOptionValue("f"), line.getOptionValue("l"),
+                        language, String.valueOf(password1));
                     Arrays.fill(password1, ' ');
                     Arrays.fill(password2, ' ');
 
