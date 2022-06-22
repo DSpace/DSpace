@@ -139,6 +139,7 @@
     <dc-type>
         <schema>person</schema>
         <element>country</element>
+        <scope_note>Country in which person lives</scope_note>
     </dc-type>
     
     <dc-type>
