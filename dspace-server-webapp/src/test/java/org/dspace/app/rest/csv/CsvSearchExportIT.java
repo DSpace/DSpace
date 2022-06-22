@@ -28,6 +28,8 @@ import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessQueryParameterContainer;
+import org.dspace.scripts.Process_;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.junit.Test;
@@ -131,8 +133,12 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isInternalServerError());
 
         // NOTE: While the above call returns 500 (from Discovery), it DOES create a Process.
-        // As we cannot retrieve the process ID, we default to just cleaning up ALL Processes.
-        List<Process> processes = processService.findAll(context);
+        // We must find that process by its name and eperson
+        ProcessQueryParameterContainer processQueryParameterContainer = new ProcessQueryParameterContainer();
+        processQueryParameterContainer.addToQueryParameterMap(Process_.NAME, "metadata-export-search");
+        processQueryParameterContainer.addToQueryParameterMap(Process_.E_PERSON, admin);
+        // Find all processes which match & clean them all up.
+        List<Process> processes = processService.search(context, processQueryParameterContainer, -1, -1);
         for (Process process : processes) {
             ProcessBuilder.deleteProcess(process.getID());
         }
