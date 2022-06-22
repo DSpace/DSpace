@@ -184,11 +184,11 @@ public final class CreateAdministrator {
                     Arrays.fill(password1, ' ');
                     Arrays.fill(password2, ' ');
 
-           } else {
-            ca.negotiateAdministratorDetails();
-           }
-         }
-      }
+                } else {
+                    ca.negotiateAdministratorDetails();
+                }
+            }
+        }
     }
 
     /**
