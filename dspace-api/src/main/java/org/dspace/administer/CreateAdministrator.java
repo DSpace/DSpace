@@ -90,8 +90,8 @@ public final class CreateAdministrator {
 
         } catch (Exception e) {
 
-        System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
-		System.exit(1);
+            System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
+            System.exit(1);
 
         }
 
