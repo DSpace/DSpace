@@ -25,6 +25,8 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.MetadataFieldBuilder;
 import org.dspace.builder.MetadataSchemaBuilder;
+import org.dspace.builder.OrcidHistoryBuilder;
+import org.dspace.builder.OrcidQueueBuilder;
 import org.dspace.builder.OrcidTokenBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.ProcessBuilder;
@@ -57,6 +59,8 @@ public class AbstractBuilderCleanupUtil {
     }
 
     private void initMap() {
+        map.put(OrcidQueueBuilder.class.getName(), new ArrayList<>());
+        map.put(OrcidHistoryBuilder.class.getName(), new ArrayList<>());
         map.put(OrcidTokenBuilder.class.getName(), new ArrayList<>());
         map.put(ResourcePolicyBuilder.class.getName(), new ArrayList<>());
         map.put(RelationshipBuilder.class.getName(), new ArrayList<>());
