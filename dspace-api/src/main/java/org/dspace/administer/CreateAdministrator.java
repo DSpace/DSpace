@@ -114,7 +114,7 @@ public final class CreateAdministrator {
                 formatter.printHelp("dspace create-administrator", header, options, footer, true);
                 return;
             } else if (line.hasOption("h") && (line.hasOption("e") || line.hasOption("f") || line.hasOption("l") ||
-                  line.hasOption("c") || line.hasOption("p"))) { 
+                  line.hasOption("c") || line.hasOption("p"))) {
                 String header = "\nA command-line tool for creating an initial administrator for setting up a" +
                     " DSpace site. Unless all the required parameters are passed it will" +
 					" prompt for an e-mail address, last name, first name and password from" +
