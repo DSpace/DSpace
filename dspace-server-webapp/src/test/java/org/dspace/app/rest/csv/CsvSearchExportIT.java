@@ -9,7 +9,7 @@
 package org.dspace.app.rest.csv;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,7 +51,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
         try {
             String token = getAuthToken(admin.getEmail(), password);
-            getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+            getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
                     .param("properties", new ObjectMapper().writeValueAsString(restparams)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$",
@@ -72,7 +72,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
                 Projection.DEFAULT)).collect(
                 Collectors.toList());
 
-        getClient().perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+        getClient().perform(multipart("/api/system/scripts/metadata-export-search/processes")
                 .param("properties", new ObjectMapper().writeValueAsString(restparams)))
             .andExpect(status().isUnauthorized());
     }
@@ -87,7 +87,7 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
                 Collectors.toList());
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+        getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
                 .param("properties", new ObjectMapper().writeValueAsString(restparams)))
             .andExpect(status().isForbidden());
     }
@@ -104,12 +104,15 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
-                .param("properties", new ObjectMapper().writeValueAsString(restparams)))
-            .andExpect(status().isAccepted())
-            .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
-            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
-        ProcessBuilder.deleteProcess(idRef.get());
+        try {
+            getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
+                                         .param("properties", new ObjectMapper().writeValueAsString(restparams)))
+                            .andExpect(status().isAccepted())
+                            .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+                            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
     }
 
     @Test
@@ -123,11 +126,15 @@ public class CsvSearchExportIT extends AbstractControllerIntegrationTest {
 
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(fileUpload("/api/system/scripts/metadata-export-search/processes")
+        getClient(token).perform(multipart("/api/system/scripts/metadata-export-search/processes")
                 .param("properties", new ObjectMapper().writeValueAsString(restparams)))
             .andExpect(status().isInternalServerError());
 
-        Process process = processService.findAll(context).get(0);
-        ProcessBuilder.deleteProcess(process.getID());
+        // NOTE: While the above call returns 500 (from Discovery), it DOES create a Process.
+        // As we cannot retrieve the process ID, we default to just cleaning up ALL Processes.
+        List<Process> processes = processService.findAll(context);
+        for (Process process : processes) {
+            ProcessBuilder.deleteProcess(process.getID());
+        }
     }
 }
