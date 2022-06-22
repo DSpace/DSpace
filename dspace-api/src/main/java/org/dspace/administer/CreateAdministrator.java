@@ -155,29 +155,29 @@ public final class CreateAdministrator {
 
                            password1 = console.readPassword();
 
-             System.out.print("Again to confirm: ");
-             System.out.flush();
+                           System.out.print("Again to confirm: ");
+                           System.out.flush();
 
-             password2 = console.readPassword();
+                           password2 = console.readPassword();
 
-             //TODO real password validation
-              if (password1.length > 1 && Arrays.equals(password1, password2)) {
-                // password OK
-                System.out.print("Is the above data correct? (y or n): ");
-                System.out.flush();
+                           //TODO real password validation
+                           if (password1.length > 1 && Arrays.equals(password1, password2)) {
+                           // password OK
+                           System.out.print("Is the above data correct? (y or n): ");
+                           System.out.flush();
 
-                String s = console.readLine();
+                           String s = console.readLine();
 
-                if (s != null) {
-                    s = s.trim();
-                    if (s.toLowerCase().startsWith("y")) {
-                        dataOK = true;
+                              if (s != null) {
+                                  s = s.trim();
+                                  if (s.toLowerCase().startsWith("y")) {
+                                      dataOK = true;
+                                  }
+                              }
+                           } else {
+                             System.out.println("Passwords don't match");
+                           }
                     }
-                }
-              } else {
-                System.out.println("Passwords don't match");
-              }
-            }
           ca.createAdministrator(line.getOptionValue("e"),
                                    line.getOptionValue("f"), line.getOptionValue("l"),
                                    language, String.valueOf(password1));
