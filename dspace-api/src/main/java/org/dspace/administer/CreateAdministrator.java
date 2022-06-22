@@ -148,7 +148,7 @@ public final class CreateAdministrator {
                         }
                     }
 
-                        while (!dataOK) {
+                    while (!dataOK) {
                            System.out.println("Password will not display on screen.");
                            System.out.print("Password: ");
                            System.out.flush();
@@ -177,7 +177,7 @@ public final class CreateAdministrator {
                            } else {
                              System.out.println("Passwords don't match");
                            }
-                        }
+                    }
           ca.createAdministrator(line.getOptionValue("e"),
                                    line.getOptionValue("f"), line.getOptionValue("l"),
                                    language, String.valueOf(password1));
