@@ -30,6 +30,10 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidToken;
@@ -61,6 +65,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private SearchService searchService;
 
     @Autowired
     private OrcidTokenService orcidTokenService;
@@ -304,6 +311,21 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             ePersonService.update(context, ePerson);
         } catch (AuthorizeException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Item> findProfilesByOrcid(Context context, String orcid) {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.addFilterQueries("search.entitytype:" + researcherProfileService.getProfileType());
+        discoverQuery.addFilterQueries("person.identifier.orcid:" + orcid);
+        try {
+            return searchService.search(context, discoverQuery).getIndexableObjects().stream()
+                .map(object -> ((IndexableItem) object).getIndexedObject())
+                .collect(Collectors.toList());
+        } catch (SearchServiceException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
