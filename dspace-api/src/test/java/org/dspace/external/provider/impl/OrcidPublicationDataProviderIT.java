@@ -10,6 +10,7 @@ package org.dspace.external.provider.impl;
 import static java.util.Optional.of;
 import static org.dspace.app.matcher.LambdaMatcher.has;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
@@ -243,6 +244,20 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         verify(orcidClientMock).getReadPublicAccessToken();
         verify(orcidClientMock).getWorks(ACCESS_TOKEN, ORCID);
         verify(orcidClientMock).getWorkBulk(ACCESS_TOKEN, ORCID, List.of("277904", "277902", "277871"));
+        verifyNoMoreInteractions(orcidClientMock);
+    }
+
+    @Test
+    public void testSearchWithoutResults() throws Exception {
+
+        String unknownOrcid = "1111-2222-3333-4444";
+        when(orcidClientMock.getWorks(ACCESS_TOKEN, unknownOrcid)).thenReturn(new Works());
+
+        List<ExternalDataObject> externalObjects = dataProvider.searchExternalDataObjects(unknownOrcid, 0, -1);
+        assertThat(externalObjects, empty());
+
+        verify(orcidClientMock).getReadPublicAccessToken();
+        verify(orcidClientMock).getWorks(ACCESS_TOKEN, unknownOrcid);
         verifyNoMoreInteractions(orcidClientMock);
     }
 

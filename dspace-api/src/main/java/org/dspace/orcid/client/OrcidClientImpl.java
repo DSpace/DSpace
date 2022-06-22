@@ -120,27 +120,31 @@ public class OrcidClientImpl implements OrcidClient {
     @Override
     public Works getWorks(String accessToken, String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works");
-        return executeAndUnmarshall(httpUriRequest, false, Works.class);
+        Works works = executeAndUnmarshall(httpUriRequest, true, Works.class);
+        return works != null ? works : new Works();
     }
 
     @Override
     public Works getWorks(String orcid) {
         HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works");
-        return executeAndUnmarshall(httpUriRequest, false, Works.class);
+        Works works = executeAndUnmarshall(httpUriRequest, true, Works.class);
+        return works != null ? works : new Works();
     }
 
     @Override
     public WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes) {
         String putCode = String.join(",", putCodes);
         HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works/" + putCode);
-        return executeAndUnmarshall(httpUriRequest, false, WorkBulk.class);
+        WorkBulk workBulk = executeAndUnmarshall(httpUriRequest, true, WorkBulk.class);
+        return workBulk != null ? workBulk : new WorkBulk();
     }
 
     @Override
     public WorkBulk getWorkBulk(String orcid, List<String> putCodes) {
         String putCode = String.join(",", putCodes);
         HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works/" + putCode);
-        return executeAndUnmarshall(httpUriRequest, false, WorkBulk.class);
+        WorkBulk workBulk = executeAndUnmarshall(httpUriRequest, true, WorkBulk.class);
+        return workBulk != null ? workBulk : new WorkBulk();
     }
 
     @Override
