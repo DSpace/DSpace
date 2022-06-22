@@ -139,7 +139,7 @@ public final class CreateAdministrator {
                             + cfg.getProperty("webui.supported.locales"));
                         System.out.print("Language: ");
                         System.out.flush();
-               
+
                         language = console.readLine();
 
                         if (language != null) {
@@ -148,13 +148,12 @@ public final class CreateAdministrator {
                         }
                     }
 
-            while (!dataOK) {
+                    while (!dataOK) {
+                           System.out.println("Password will not display on screen.");
+                           System.out.print("Password: ");
+                           System.out.flush();
 
-             System.out.println("Password will not display on screen.");
-             System.out.print("Password: ");
-             System.out.flush();
-
-             password1 = console.readPassword();
+                           password1 = console.readPassword();
 
              System.out.print("Again to confirm: ");
              System.out.flush();
