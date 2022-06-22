@@ -102,18 +102,18 @@ public final class CreateAdministrator {
                                    line.getOptionValue("c"), line.getOptionValue("p"));
         } else {
 
-            if(line.hasOption("h") && (!line.hasOption("e") || !line.hasOption("f") || !line.hasOption("l") ||
+            if (line.hasOption("h") && (!line.hasOption("e") || !line.hasOption("f") || !line.hasOption("l") ||
                !line.hasOption("c") || !line.hasOption("p"))) {
-			   String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+                String header = "\nA command-line tool for creating an initial administrator for setting up a" +
 					" DSpace site. Unless all the required parameters are passed it will prompt for an e-mail" +
 					" address, last name, first name and password from standard input. An administrator group is" +
 					" then created and the data passed in used to create an e-person in that group.\n\n";
-			   String footer = "\n";
+			    String footer = "\n";
 
-			   HelpFormatter formatter = new HelpFormatter();
-			   formatter.printHelp("dspace create-administrator", header, options, footer, true);
-               return;
-		} else if(line.hasOption("h") && (line.hasOption("e") || line.hasOption("f") || line.hasOption("l") ||
+			    HelpFormatter formatter = new HelpFormatter();
+			    formatter.printHelp("dspace create-administrator", header, options, footer, true);
+                return;
+		} else if (line.hasOption("h") && (line.hasOption("e") || line.hasOption("f") || line.hasOption("l") ||
                   line.hasOption("c") || line.hasOption("p"))) { 
                 String header = "\nA command-line tool for creating an initial administrator for setting up a" +
 					" DSpace site. Unless all the required parameters are passed it will prompt for an e-mail" +
