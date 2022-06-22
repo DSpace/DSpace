@@ -149,19 +149,19 @@ public final class CreateAdministrator {
                     }
 
                     while (!dataOK) {
-                           System.out.println("Password will not display on screen.");
-                           System.out.print("Password: ");
-                           System.out.flush();
+                        System.out.println("Password will not display on screen.");
+                        System.out.print("Password: ");
+                        System.out.flush();
 
-                           password1 = console.readPassword();
+                        password1 = console.readPassword();
 
-                           System.out.print("Again to confirm: ");
-                           System.out.flush();
+                        System.out.print("Again to confirm: ");
+                        System.out.flush();
 
-                           password2 = console.readPassword();
+                        password2 = console.readPassword();
 
                            //TODO real password validation
-                           if (password1.length > 1 && Arrays.equals(password1, password2)) {
+                        if (password1.length > 1 && Arrays.equals(password1, password2)) {
                            // password OK
                            System.out.print("Is the above data correct? (y or n): ");
                            System.out.flush();
@@ -174,9 +174,9 @@ public final class CreateAdministrator {
                                       dataOK = true;
                                   }
                               }
-                           } else {
-                             System.out.println("Passwords don't match");
-                           }
+                        } else {
+                            System.out.println("Passwords don't match");
+                        }
                     }
           ca.createAdministrator(line.getOptionValue("e"),
                                    line.getOptionValue("f"), line.getOptionValue("l"),
