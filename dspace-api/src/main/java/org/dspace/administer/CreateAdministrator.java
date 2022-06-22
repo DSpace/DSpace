@@ -24,8 +24,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.apache.commons.cli.HelpFormatter;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
@@ -81,15 +81,13 @@ public final class CreateAdministrator {
         options.addOption("l", "last", true, "administrator last name");
         options.addOption("c", "language", true, "administrator language");
         options.addOption("p", "password", true, "administrator password");
-        
+
         CommandLine line = null;
 
-        try
-		{
+        try {
 			line = parser.parse(options, argv);
 		}
-		catch (Exception e)
-		{
+		catch (Exception e) {
 			System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
 			System.exit(1);
 		}
@@ -102,9 +100,7 @@ public final class CreateAdministrator {
         } else {
 
         if(line.hasOption("h") && (!line.hasOption("e") || !line.hasOption("f") || !line.hasOption("l") ||
-            !line.hasOption("c") || !line.hasOption("p")))
-		
-        {
+            !line.hasOption("c") || !line.hasOption("p"))) {
 			String header = "\nA command-line tool for creating an initial administrator for setting up a" +
 					" DSpace site. Unless all the required parameters are passed it will prompt for an e-mail" +
 					" address, last name, first name and password from standard input. An administrator group is" +
@@ -127,13 +123,13 @@ public final class CreateAdministrator {
             return;
         } else {
 
-        ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
+            ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-        if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l") 
-            && (line.hasOption("c") || (!line.hasOption("c") && cfg.getProperty("webui.supported.locales") == null))) {
+            if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l") 
+                && (line.hasOption("c") || (!line.hasOption("c") && cfg.getProperty("webui.supported.locales") == null))) {
 
 
-          if (cfg.getProperty("webui.supported.locales") != null) {
+            if (cfg.getProperty("webui.supported.locales") != null) {
                System.out.println("Select one of the following languages: "
                         + cfg.getProperty("webui.supported.locales"));
                System.out.print("Language: ");
@@ -145,23 +141,23 @@ public final class CreateAdministrator {
                     language = language.trim();
                     language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
                 }
-           } 
+            } 
 
-           while (!dataOK) {
+            while (!dataOK) {
 
-            System.out.println("Password will not display on screen.");
-            System.out.print("Password: ");
-            System.out.flush();
+             System.out.println("Password will not display on screen.");
+             System.out.print("Password: ");
+             System.out.flush();
 
-            password1 = console.readPassword();
+             password1 = console.readPassword();
 
-            System.out.print("Again to confirm: ");
-            System.out.flush();
+             System.out.print("Again to confirm: ");
+             System.out.flush();
 
-            password2 = console.readPassword();
+             password2 = console.readPassword();
 
-            //TODO real password validation
-            if (password1.length > 1 && Arrays.equals(password1, password2)) {
+             //TODO real password validation
+              if (password1.length > 1 && Arrays.equals(password1, password2)) {
                 // password OK
                 System.out.print("Is the above data correct? (y or n): ");
                 System.out.flush();
@@ -174,10 +170,10 @@ public final class CreateAdministrator {
                         dataOK = true;
                     }
                 }
-           } else {
+              } else {
                 System.out.println("Passwords don't match");
-           }
-        }
+              }
+            }
           ca.createAdministrator(line.getOptionValue("e"),
                                    line.getOptionValue("f"), line.getOptionValue("l"),
                                    language, String.valueOf(password1));
