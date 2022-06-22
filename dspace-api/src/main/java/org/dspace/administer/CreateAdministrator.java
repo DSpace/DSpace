@@ -85,11 +85,10 @@ public final class CreateAdministrator {
         CommandLine line = null;
 
         try {
-			line = parser.parse(options, argv);
-		}
-		catch (Exception e) {
-			System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
-			System.exit(1);
+		 line = parser.parse(options, argv);
+        } catch (Exception e) {
+		 System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
+		 System.exit(1);
 		}
 
         if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
