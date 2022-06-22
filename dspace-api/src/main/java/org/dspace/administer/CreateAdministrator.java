@@ -163,17 +163,17 @@ public final class CreateAdministrator {
                            //TODO real password validation
                         if (password1.length > 1 && Arrays.equals(password1, password2)) {
                            // password OK
-                           System.out.print("Is the above data correct? (y or n): ");
-                           System.out.flush();
+                            System.out.print("Is the above data correct? (y or n): ");
+                            System.out.flush();
 
-                           String s = console.readLine();
+                            String s = console.readLine();
 
-                              if (s != null) {
-                                  s = s.trim();
-                                  if (s.toLowerCase().startsWith("y")) {
+                            if (s != null) {
+                                s = s.trim();
+                                if (s.toLowerCase().startsWith("y")) {
                                       dataOK = true;
-                                  }
-                              }
+                                }
+                            }
                         } else {
                             System.out.println("Passwords don't match");
                         }
