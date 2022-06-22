@@ -11,20 +11,20 @@ import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIB
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
@@ -263,13 +263,56 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
 
         String adjustedMessage = message;
-        String causeHeader = request.getHeader("X-DSPACE-REST-EXCEPTION-CAUSE");
-        if (ex.getCause() != null && causeHeader != null && causeHeader.equals("true")) {
-            adjustedMessage = ex.getCause().getMessage();
+
+        if (ex != null && allowCauseAdvice(request)) {
+            Throwable rootCause = ex;
+            while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+                rootCause = rootCause.getCause();
+            }
+            adjustedMessage = rootCause.getMessage();
         }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
         response.sendError(statusCode, adjustedMessage);
+
+    }
+
+    /**
+     * Check whether the current user is allowed to receive the message of
+     * the exception cause.
+     * 
+     * List of allowed users is controlled by rest.causeAdvice.allowedUsers
+     * configuration property.
+     * 
+     * @param request The current request.
+     * @return Whether the user is logged in and allowed to see cause messages.
+     */
+    protected boolean allowCauseAdvice(final HttpServletRequest request) {
+
+        Context context = ContextUtil.obtainContext(request);
+        EPerson currentUser = context.getCurrentUser();
+
+        if (currentUser != null) {
+            
+            ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+            String[] allowedUserIds = configurationService.getArrayProperty(
+                "rest.causeAdvice.allowedUsers"
+            );
+
+            if (ArrayUtils.contains(allowedUserIds, currentUser.getID().toString())) {
+
+                String causeHeader = request.getHeader("X-DSPACE-REST-EXCEPTION-CAUSE");
+                if (causeHeader != null && causeHeader.equals("true")) {
+                    return true;       
+                }
+
+            }
+
+        }
+
+        return false;
 
     }
 
