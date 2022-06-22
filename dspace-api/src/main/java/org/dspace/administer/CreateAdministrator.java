@@ -129,8 +129,9 @@ public final class CreateAdministrator {
 
                 ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-                if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l") 
-                    && (line.hasOption("c") || (!line.hasOption("c") && cfg.getProperty("webui.supported.locales") == null))) {
+                if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l")
+                    && (line.hasOption("c") || (!line.hasOption("c") 
+                    && cfg.getProperty("webui.supported.locales") == null))) {
 
 
                     if (cfg.getProperty("webui.supported.locales") != null) {
