@@ -171,25 +171,25 @@ public final class CreateAdministrator {
                             if (s != null) {
                                 s = s.trim();
                                 if (s.toLowerCase().startsWith("y")) {
-                                      dataOK = true;
+                                    dataOK = true;
                                 }
                             }
                         } else {
                             System.out.println("Passwords don't match");
                         }
                     }
-          ca.createAdministrator(line.getOptionValue("e"),
-                                   line.getOptionValue("f"), line.getOptionValue("l"),
-                                   language, String.valueOf(password1));
-          Arrays.fill(password1, ' ');
-          Arrays.fill(password2, ' ');
+                    ca.createAdministrator(line.getOptionValue("e"),
+                       line.getOptionValue("f"), line.getOptionValue("l"),
+                    language, String.valueOf(password1));
+                    Arrays.fill(password1, ' ');
+                    Arrays.fill(password2, ' ');
 
-        } else {
+           } else {
             ca.negotiateAdministratorDetails();
-        }
+           }
+         }
+      }
     }
-        }
-        }
 
     /**
      * constructor, which just creates and object with a ready context
