@@ -127,25 +127,25 @@ public final class CreateAdministrator {
                 return;
             } else {
 
-            ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
+                ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-            if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l") 
-                && (line.hasOption("c") || (!line.hasOption("c") && cfg.getProperty("webui.supported.locales") == null))) {
+                if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l") 
+                    && (line.hasOption("c") || (!line.hasOption("c") && cfg.getProperty("webui.supported.locales") == null))) {
 
 
-            if (cfg.getProperty("webui.supported.locales") != null) {
-               System.out.println("Select one of the following languages: "
-                        + cfg.getProperty("webui.supported.locales"));
-               System.out.print("Language: ");
-               System.out.flush();
+                    if (cfg.getProperty("webui.supported.locales") != null) {
+                        System.out.println("Select one of the following languages: "
+                         + cfg.getProperty("webui.supported.locales"));
+                        System.out.print("Language: ");
+                        System.out.flush();
                
-               language = console.readLine();
+                        language = console.readLine();
 
-                if (language != null) {
-                    language = language.trim();
-                    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
-                }
-            } 
+                        if (language != null) {
+                            language = language.trim();
+                            language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
+                        }
+                    }
 
             while (!dataOK) {
 
