@@ -136,7 +136,7 @@ public final class CreateAdministrator {
 
                     if (cfg.getProperty("webui.supported.locales") != null) {
                         System.out.println("Select one of the following languages: "
-                         + cfg.getProperty("webui.supported.locales"));
+                            + cfg.getProperty("webui.supported.locales"));
                         System.out.print("Language: ");
                         System.out.flush();
                
