@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -27,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.profile.service.ResearcherProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
