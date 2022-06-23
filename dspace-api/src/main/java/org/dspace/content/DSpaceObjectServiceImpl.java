@@ -621,8 +621,14 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             });
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                if (StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX) &&
-                    ((RelationshipMetadataValue) metadataValue).isUseForPlace()) {
+                if (
+                    // For virtual MDVs with useForPlace=true,
+                    // update both the place of the metadatum and the place of the Relationship.
+                    // E.g. for an Author relationship,
+                    //   the place should be updated using the same principle as dc.contributor.author.
+                    StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
+                        && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
+                ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                     String authority = metadataValue.getAuthority();
@@ -635,8 +641,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                     relationshipService.update(context, relationship);
 
-                } else if (!StringUtils.startsWith(metadataValue.getAuthority(),
-                                                   Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                } else if (
+                    // Otherwise, just set the place of the metadatum
+                    // ...unless the metadatum in question is a relation.* metadatum.
+                    // This case is a leftover from when a Relationship is removed and copied to metadata.
+                    // If we let its place change the order of any remaining Relationships will be affected.
+                    // todo: this makes it so these leftover MDVs can't be reordered later on
+                    !StringUtils.equals(
+                        metadataValue.getMetadataField().getMetadataSchema().getName(), "relation"
+                    )
+                ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                 }

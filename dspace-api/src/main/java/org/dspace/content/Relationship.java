@@ -90,6 +90,15 @@ public class Relationship implements ReloadableEntity<Integer> {
     private String rightwardValue;
 
     /**
+     * Whether the left and/or right side of a given relationship are the "latest".
+     * A side of a relationship is "latest" if the item on that side has either no other versions,
+     * or the item on that side is the most recent version that is relevant to the given relationship.
+     * This column affects what version of an item appears on search pages or the relationship listings of other items.
+     */
+    @Column(name = "latest_version_status")
+    private LatestVersionStatus latestVersionStatus = LatestVersionStatus.BOTH;
+
+    /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipService#create(Context)} }
      */
@@ -214,6 +223,39 @@ public class Relationship implements ReloadableEntity<Integer> {
      */
     public void setRightwardValue(String rightwardValue) {
         this.rightwardValue = rightwardValue;
+    }
+
+    /**
+     * Getter for {@link #latestVersionStatus}.
+     * @return the latest version status of this relationship.
+     */
+    public LatestVersionStatus getLatestVersionStatus() {
+        return latestVersionStatus;
+    }
+
+    /**
+     * Setter for {@link #latestVersionStatus}.
+     * @param latestVersionStatus the new latest version status for this relationship.
+     */
+    public void setLatestVersionStatus(LatestVersionStatus latestVersionStatus) {
+        if (this.latestVersionStatus == latestVersionStatus) {
+            return; // no change or cache reset needed
+        }
+
+        this.latestVersionStatus = latestVersionStatus;
+
+        // on one item, relation.* fields will change
+        // on the other item, relation.*.latestForDiscovery will change
+        leftItem.setMetadataModified();
+        rightItem.setMetadataModified();
+    }
+
+    public enum LatestVersionStatus {
+        // NOTE: SQL migration expects BOTH to be the first constant in this enum!
+        BOTH, // both items in this relationship are the "latest"
+        LEFT_ONLY, // the left-hand item of this relationship is the "latest", but the right-hand item is not
+        RIGHT_ONLY // the right-hand item of this relationship is the "latest", but the left-hand item is not
+        // NOTE: one side of any given relationship should ALWAYS be the "latest"
     }
 
     /**

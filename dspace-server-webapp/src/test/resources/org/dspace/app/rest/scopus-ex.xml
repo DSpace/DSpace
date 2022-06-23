@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search-results xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:atom="http://www.w3.org/2005/Atom">
+    <opensearch:totalResults>2</opensearch:totalResults>
+    <opensearch:startIndex>0</opensearch:startIndex>
+    <opensearch:itemsPerPage>2</opensearch:itemsPerPage>
+    <opensearch:Query role="request" searchTerms="(roma)" startPage="0"/>
+    <link ref="self" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=2&amp;query=%28roma%29&amp;view=COMPLETE" type="application/xml"/>
+    <link ref="first" href="https://api.elsevier.com/content/search/scopus?start=0&amp;count=2&amp;query=%28roma%29&amp;view=COMPLETE" type="application/xml"/>
+    <link ref="next" href="https://api.elsevier.com/content/search/scopus?start=2&amp;count=2&amp;query=%28roma%29&amp;view=COMPLETE" type="application/xml"/>
+    <link ref="last" href="https://api.elsevier.com/content/search/scopus?start=4998&amp;count=2&amp;query=%28roma%29&amp;view=COMPLETE" type="application/xml"/>
+    <entry>
+        <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/85124241875"/>
+        <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/85124241875?field=author,affiliation"/>
+        <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=xxxxxxx&amp;scp=85124241875&amp;origin=inward"/>
+        <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=xxxxxxx&amp;scp=85124241875&amp;origin=inward"/>
+        <prism:url>https://api.elsevier.com/content/abstract/scopus_id/85124241875</prism:url>
+        <dc:identifier>SCOPUS_ID:85124241875</dc:identifier>
+        <eid>2-s2.0-85124241875</eid>
+        <dc:title>Hardy potential versus lower order terms in Dirichlet problems: regularizing effects&lt;sup&gt;†&lt;/sup&gt;</dc:title>
+        <dc:creator>Arcoya D.</dc:creator>
+        <prism:publicationName>Mathematics In Engineering</prism:publicationName>
+        <prism:eIssn>26403501</prism:eIssn>
+        <prism:volume>5</prism:volume>
+        <prism:issueIdentifier>1</prism:issueIdentifier>
+        <prism:pageRange/>
+        <prism:coverDate>2023-01-01</prism:coverDate>
+        <prism:coverDisplayDate>2023</prism:coverDisplayDate>
+        <prism:doi>10.3934/mine.2023004</prism:doi>
+        <citedby-count>0</citedby-count>
+        <affiliation>
+            <affiliation-url>https://api.elsevier.com/content/affiliation/affiliation_id/60032350</affiliation-url>
+            <afid>60032350</afid>
+            <affilname>Sapienza Università di Roma</affilname>
+            <affiliation-city>Rome</affiliation-city>
+            <affiliation-country>Italy</affiliation-country>
+        </affiliation>
+        <affiliation>
+            <affiliation-url>https://api.elsevier.com/content/affiliation/affiliation_id/60027844</affiliation-url>
+            <afid>60027844</afid>
+            <affilname>Universidad de Granada</affilname>
+            <affiliation-city>Granada</affiliation-city>
+            <affiliation-country>Spain</affiliation-country>
+        </affiliation>
+        <prism:aggregationType>Journal</prism:aggregationType>
+        <subtype>ar</subtype>
+        <subtypeDescription>Article</subtypeDescription>
+        <author-count limit="100" total="3">3</author-count>
+        <author seq="1">
+            <author-url>https://api.elsevier.com/content/author/author_id/6602330574</author-url>
+            <authid>6602330574</authid>
+            <authname>Arcoya D.</authname>
+            <surname>Arcoya</surname>
+            <given-name>David</given-name>
+            <initials>D.</initials>
+            <afid>60027844</afid>
+        </author>
+        <author seq="2">
+            <author-url>https://api.elsevier.com/content/author/author_id/7003612261</author-url>
+            <authid>7003612261</authid>
+            <authname>Boccardo L.</authname>
+            <surname>Boccardo</surname>
+            <given-name>Lucio</given-name>
+            <initials>L.</initials>
+            <afid>60032350</afid>
+        </author>
+        <author seq="3">
+            <author-url>https://api.elsevier.com/content/author/author_id/6602595438</author-url>
+            <authid>6602595438</authid>
+            <authname>Orsina L.</authname>
+            <surname>Orsina</surname>
+            <given-name>Luigi</given-name>
+            <initials>L.</initials>
+            <afid>60032350</afid>
+        </author>
+        <authkeywords>Hardy potentials | Laplace equation | Summability of solutions</authkeywords>
+        <source-id>21101039848</source-id>
+        <fund-no>PGC2018-096422-B-I00</fund-no>
+        <fund-sponsor>Junta de Andalucía</fund-sponsor>
+        <openaccess>1</openaccess>
+        <openaccessFlag>true</openaccessFlag>
+        <freetoread>
+            <value>all</value>
+            <value>publisherfullgold</value>
+            <value>repository</value>
+            <value>repositoryvor</value>
+        </freetoread>
+        <freetoreadLabel>
+            <value>All Open Access</value>
+            <value>Gold</value>
+            <value>Green</value>
+        </freetoreadLabel>
+    </entry>
+    <entry>
+        <link ref="self" href="https://api.elsevier.com/content/abstract/scopus_id/85124226483"/>
+        <link ref="author-affiliation" href="https://api.elsevier.com/content/abstract/scopus_id/85124226483?field=author,affiliation"/>
+        <link ref="scopus" href="https://www.scopus.com/inward/record.uri?partnerID=xxxxxxx&amp;scp=85124226483&amp;origin=inward"/>
+        <link ref="scopus-citedby" href="https://www.scopus.com/inward/citedby.uri?partnerID=xxxxxxx&amp;scp=85124226483&amp;origin=inward"/>
+        <prism:url>https://api.elsevier.com/content/abstract/scopus_id/85124226483</prism:url>
+        <dc:identifier>SCOPUS_ID:85124226483</dc:identifier>
+        <eid>2-s2.0-85124226483</eid>
+        <dc:title>Large deviations for a binary collision model: energy evaporation&lt;sup&gt;†&lt;/sup&gt;</dc:title>
+        <dc:creator>Basile G.</dc:creator>
+        <prism:publicationName>Mathematics In Engineering</prism:publicationName>
+        <prism:eIssn>26403501</prism:eIssn>
+        <prism:volume>5</prism:volume>
+        <prism:issueIdentifier>1</prism:issueIdentifier>
+        <prism:pageRange/>
+        <prism:coverDate>2023-01-01</prism:coverDate>
+        <prism:coverDisplayDate>2023</prism:coverDisplayDate>
+        <prism:doi>10.3934/mine.2023001</prism:doi>
+        <citedby-count>0</citedby-count>
+        <affiliation>
+            <affiliation-url>https://api.elsevier.com/content/affiliation/affiliation_id/60032350</affiliation-url>
+            <afid>60032350</afid>
+            <affilname>Sapienza Università di Roma</affilname>
+            <affiliation-city>Rome</affiliation-city>
+            <affiliation-country>Italy</affiliation-country>
+        </affiliation>
+        <prism:aggregationType>Journal</prism:aggregationType>
+        <subtype>ar</subtype>
+        <subtypeDescription>Article</subtypeDescription>
+        <author-count limit="100" total="4">4</author-count>
+        <author seq="1">
+            <author-url>https://api.elsevier.com/content/author/author_id/55613229065</author-url>
+            <authid>55613229065</authid>
+            <authname>Basile G.</authname>
+            <surname>Basile</surname>
+            <given-name>Giada</given-name>
+            <initials>G.</initials>
+            <afid>60032350</afid>
+        </author>
+        <author seq="2">
+            <author-url>https://api.elsevier.com/content/author/author_id/55893665100</author-url>
+            <authid>55893665100</authid>
+            <authname>Benedetto D.</authname>
+            <surname>Benedetto</surname>
+            <given-name>Dario</given-name>
+            <initials>D.</initials>
+            <afid>60032350</afid>
+        </author>
+        <author seq="3">
+            <author-url>https://api.elsevier.com/content/author/author_id/7004588675</author-url>
+            <authid>7004588675</authid>
+            <authname>Caglioti E.</authname>
+            <surname>Caglioti</surname>
+            <given-name>Emanuele</given-name>
+            <initials>E.</initials>
+            <afid>60032350</afid>
+        </author>
+        <author seq="4">
+            <author-url>https://api.elsevier.com/content/author/author_id/7005555198</author-url>
+            <authid>7005555198</authid>
+            <authname>Bertini L.</authname>
+            <surname>Bertini</surname>
+            <given-name>Lorenzo</given-name>
+            <initials>L.</initials>
+            <afid>60032350</afid>
+        </author>
+        <authkeywords>Boltzmann equation | Discrete energy model | Kac model | Large deviations | Violation of energy conservation</authkeywords>
+        <source-id>21101039848</source-id>
+        <fund-no>undefined</fund-no>
+        <openaccess>1</openaccess>
+        <openaccessFlag>true</openaccessFlag>
+        <freetoread>
+            <value>all</value>
+            <value>publisherfullgold</value>
+            <value>repository</value>
+            <value>repositoryam</value>
+        </freetoread>
+        <freetoreadLabel>
+            <value>All Open Access</value>
+            <value>Gold</value>
+            <value>Green</value>
+        </freetoreadLabel>
+    </entry>
+</search-results>

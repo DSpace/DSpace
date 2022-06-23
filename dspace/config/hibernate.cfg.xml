@@ -88,6 +88,10 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
+        
+        <mapping class="org.dspace.orcid.OrcidQueue" />
+        <mapping class="org.dspace.orcid.OrcidHistory" />
+        <mapping class="org.dspace.orcid.OrcidToken"/>
 
     </session-factory>
 </hibernate-configuration>
