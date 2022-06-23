@@ -18,7 +18,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
@@ -26,6 +25,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -292,23 +292,23 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
      */
     protected boolean allowCauseAdvice(final HttpServletRequest request) {
 
-        Context context = ContextUtil.obtainContext(request);
-        EPerson currentUser = context.getCurrentUser();
+        String causeHeader = request.getHeader("X-DSPACE-REST-EXCEPTION-CAUSE");
+        if (causeHeader != null && causeHeader.equals("true")) {
 
-        if (currentUser != null) {
-            
-            ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
+            Context context = ContextUtil.obtainContext(request);
+            EPerson currentUser = context.getCurrentUser();
 
-            String[] allowedUserIds = configurationService.getArrayProperty(
-                "rest.causeAdvice.allowedUsers"
-            );
+            if (currentUser != null) {
 
-            if (ArrayUtils.contains(allowedUserIds, currentUser.getID().toString())) {
+                ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-                String causeHeader = request.getHeader("X-DSPACE-REST-EXCEPTION-CAUSE");
-                if (causeHeader != null && causeHeader.equals("true")) {
-                    return true;       
+                boolean allowCauseAdvice = configurationService.getBooleanProperty(
+                    "rest.admins.allowCauseAdvice", false
+                );
+
+                if (allowCauseAdvice) {
+                    return currentUser.getGroups().stream().anyMatch(g -> g.getName().equals(Group.ADMIN));
                 }
 
             }
