@@ -57,6 +57,8 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.OrcidHistoryRest;
+import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -287,6 +289,12 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
+            return OrcidQueueRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "orcidhistories")) {
+            return OrcidHistoryRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }

@@ -26,6 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.orcid.exception.OrcidValidationException;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -135,6 +136,18 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                 "Invalid search request",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    /**
+     * Handle the {@link OrcidValidationException} returning the exception message
+     * in the response, that always contains only the validation error codes (usable
+     * for example to show specific messages to users). No other details are present
+     * in the exception message.
+     */
+    @ExceptionHandler({ OrcidValidationException.class })
+    protected void handleOrcidValidationException(HttpServletRequest request, HttpServletResponse response,
+        OrcidValidationException ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     /**

@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
-import static org.dspace.app.orcid.model.OrcidEntityType.FUNDING;
-import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+import static org.dspace.orcid.model.OrcidEntityType.FUNDING;
+import static org.dspace.orcid.model.OrcidEntityType.PUBLICATION;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -16,18 +16,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.orcid.service.OrcidSynchronizationService;
-import org.dspace.app.profile.OrcidEntitySyncPreference;
-import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
-import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.orcid.model.OrcidEntityType;
+import org.dspace.orcid.service.OrcidQueueService;
+import org.dspace.orcid.service.OrcidSynchronizationService;
+import org.dspace.profile.OrcidEntitySyncPreference;
+import org.dspace.profile.OrcidProfileSyncPreference;
+import org.dspace.profile.OrcidSynchronizationMode;
+import org.dspace.profile.ResearcherProfile;
+import org.dspace.profile.service.ResearcherProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -63,6 +66,12 @@ public class ResearcherProfileReplaceOrcidSyncPreferencesOperation extends Patch
     @Autowired
     private OrcidSynchronizationService synchronizationService;
 
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private OrcidQueueService orcidQueueService;
+
     @Override
     public ResearcherProfile perform(Context context, ResearcherProfile profile, Operation operation)
         throws SQLException {
@@ -76,7 +85,12 @@ public class ResearcherProfileReplaceOrcidSyncPreferencesOperation extends Patch
         context.turnOffAuthorisationSystem();
 
         try {
-            updatePreferences(context, path, value, profileItem);
+
+            boolean updated = updatePreferences(context, path, value, profileItem);
+
+            if (updated) {
+                reloadOrcidQueue(context, path, value, profileItem);
+            }
 
             return profileService.findById(context, profile.getId());
 
@@ -118,6 +132,18 @@ public class ResearcherProfileReplaceOrcidSyncPreferencesOperation extends Patch
             default:
                 throw new UnprocessableEntityException("Invalid path starting with " + OPERATION_ORCID_SYNCH);
         }
+    }
+
+    private void reloadOrcidQueue(Context context, String path, String value, Item profileItem)
+        throws SQLException, AuthorizeException {
+
+        if (path.equals(PUBLICATIONS_PREFERENCES) || path.equals(FUNDINGS_PREFERENCES)) {
+            OrcidEntitySyncPreference preference = parsePreference(value);
+            OrcidEntityType entityType = path.equals(PUBLICATIONS_PREFERENCES) ? PUBLICATION : FUNDING;
+            orcidQueueService.recalculateOrcidQueue(context, profileItem, entityType, preference);
+        }
+
+        itemService.update(context, profileItem);
     }
 
     @Override

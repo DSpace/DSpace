@@ -7,22 +7,22 @@
  */
 package org.dspace.app.rest.converter;
 
-import static org.dspace.app.orcid.model.OrcidEntityType.FUNDING;
-import static org.dspace.app.orcid.model.OrcidEntityType.PUBLICATION;
+import static org.dspace.orcid.model.OrcidEntityType.FUNDING;
+import static org.dspace.orcid.model.OrcidEntityType.PUBLICATION;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.dspace.app.orcid.service.OrcidSynchronizationService;
-import org.dspace.app.profile.OrcidEntitySyncPreference;
-import org.dspace.app.profile.OrcidProfileSyncPreference;
-import org.dspace.app.profile.OrcidSynchronizationMode;
-import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.model.ResearcherProfileRest.OrcidSynchronizationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.orcid.service.OrcidSynchronizationService;
+import org.dspace.profile.OrcidEntitySyncPreference;
+import org.dspace.profile.OrcidProfileSyncPreference;
+import org.dspace.profile.OrcidSynchronizationMode;
+import org.dspace.profile.ResearcherProfile;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

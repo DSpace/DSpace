@@ -26,6 +26,9 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.profile.OrcidEntitySyncPreference;
+import org.dspace.profile.OrcidProfileSyncPreference;
+import org.dspace.profile.OrcidSynchronizationMode;
 
 /**
  * Builder to construct Item objects
@@ -39,6 +42,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     private WorkspaceItem workspaceItem;
     private Item item;
     private Group readerGroup = null;
+    private String handle = null;
 
     protected ItemBuilder(Context context) {
         super(context);
@@ -79,13 +83,45 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
-    public ItemBuilder withAuthor(final String authorName, final String authority) {
-        return addMetadataValue(item, DC.getName(), "contributor", "author", null, authorName, authority, 600);
-    }
-
     public ItemBuilder withAuthor(final String authorName, final String authority, final int confidence) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "author",
                                 null, authorName, authority, confidence);
+    }
+
+    public ItemBuilder withEditor(final String editorName) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
+    }
+
+    public ItemBuilder withDescriptionAbstract(String description) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "abstract", description);
+    }
+
+    public ItemBuilder withLanguage(String language) {
+        return addMetadataValue(item, "dc", "language", "iso", language);
+    }
+
+    public ItemBuilder withIsPartOf(String isPartOf) {
+        return addMetadataValue(item, "dc", "relation", "ispartof", isPartOf);
+    }
+
+    public ItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue(item, "dc", "identifier", "doi", doi);
+    }
+
+    public ItemBuilder withScopusIdentifier(String scopus) {
+        return addMetadataValue(item, "dc", "identifier", "scopus", scopus);
+    }
+
+    public ItemBuilder withRelationFunding(String funding) {
+        return addMetadataValue(item, "dc", "relation", "funding", funding);
+    }
+
+    public ItemBuilder withRelationFunding(String funding, String authority) {
+        return addMetadataValue(item, DC.getName(), "relation", "funding", null, funding, authority, 600);
+    }
+
+    public ItemBuilder withRelationGrantno(String grantno) {
+        return addMetadataValue(item, "dc", "relation", "grantno", grantno);
     }
 
     public ItemBuilder withPersonIdentifierFirstName(final String personIdentifierFirstName) {
@@ -182,8 +218,65 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dspace", "orcid", "authenticated", authenticated);
     }
 
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationPublicationsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationPublicationsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-publications", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationFundingsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationFundingsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationFundingsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-fundings", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
+        return withOrcidSynchronizationProfilePreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProfilePreference(String value) {
+        return addMetadataValue(item, "dspace", "orcid", "sync-profile", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationMode(OrcidSynchronizationMode mode) {
+        return withOrcidSynchronizationMode(mode.name());
+    }
+
+    private ItemBuilder withOrcidSynchronizationMode(String mode) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-mode", mode);
+    }
+
+    public ItemBuilder withPersonCountry(String country) {
+        return addMetadataValue(item, "person", "country", null, country);
+    }
+
+    public ItemBuilder withScopusAuthorIdentifier(String id) {
+        return addMetadataValue(item, "person", "identifier", "scopus-author-id", id);
+    }
+
+    public ItemBuilder withResearcherIdentifier(String rid) {
+        return addMetadataValue(item, "person", "identifier", "rid", rid);
+    }
+
+    public ItemBuilder withVernacularName(String vernacularName) {
+        return setMetadataSingleValue(item, "person", "name", "translated", vernacularName);
+    }
+
+    public ItemBuilder withVariantName(String variant) {
+        return addMetadataValue(item, "person", "name", "variant", variant);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
+        return this;
+    }
+
+    public ItemBuilder withHandle(String handle) {
+        this.handle = handle;
         return this;
     }
 
@@ -207,6 +300,58 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
+    public ItemBuilder withOrgUnitLegalName(String name) {
+        return addMetadataValue(item, "organization", "legalName", null, name);
+    }
+
+    public ItemBuilder withOrgUnitCountry(String addressCountry) {
+        return addMetadataValue(item, "organization", "address", "addressCountry", addressCountry);
+    }
+
+    public ItemBuilder withOrgUnitLocality(String addressLocality) {
+        return addMetadataValue(item, "organization", "address", "addressLocality", addressLocality);
+    }
+
+    public ItemBuilder withOrgUnitCrossrefIdentifier(String crossrefid) {
+        return addMetadataValue(item, "organization", "identifier", "crossrefid", crossrefid);
+    }
+
+    public ItemBuilder withProjectStartDate(String startDate) {
+        return addMetadataValue(item, "project", "startDate", null, startDate);
+    }
+
+    public ItemBuilder withProjectEndDate(String endDate) {
+        return addMetadataValue(item, "project", "endDate", null, endDate);
+    }
+
+    public ItemBuilder withProjectInvestigator(String investigator) {
+        return addMetadataValue(item, "project", "investigator", null, investigator);
+    }
+
+    public ItemBuilder withDescription(String description) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", null, description);
+    }
+
+    public ItemBuilder withProjectAmount(String amount) {
+        return addMetadataValue(item, "project", "amount", null, amount);
+    }
+
+    public ItemBuilder withProjectAmountCurrency(String currency) {
+        return addMetadataValue(item, "project", "amount", "currency", currency);
+    }
+
+    public ItemBuilder withUriIdentifier(String uri) {
+        return addMetadataValue(item, "dc", "identifier", "uri", uri);
+    }
+
+    public ItemBuilder withIdentifier(String identifier) {
+        return addMetadataValue(item, "dc", "identifier", null, identifier);
+    }
+
+    public ItemBuilder withOtherIdentifier(String identifier) {
+        return addMetadataValue(item, "dc", "identifier", "other", identifier);
+    }
+
     /**
      * Create an admin group for the collection with the specified members
      *
@@ -226,7 +371,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     @Override
     public Item build() {
         try {
-            installItemService.installItem(context, workspaceItem);
+            installItemService.installItem(context, workspaceItem, handle);
             itemService.update(context, item);
 
             //Check if we need to make this item private. This has to be done after item install.
@@ -299,4 +444,5 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         }
         return this;
     }
+
 }
