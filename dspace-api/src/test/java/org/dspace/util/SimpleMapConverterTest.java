@@ -112,8 +112,12 @@ public class SimpleMapConverterTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
             () -> simpleMapConverter.init());
 
+        // Get path separator used for this platform (eg. / for Linux, \ for Windows)
+        String separator = File.separator;
+
         assertThat(exception.getMessage(),
-            is("An error occurs parsing " + dspaceDir.getAbsolutePath() + "/config/crosswalks/test.properties"));
+            is("An error occurs parsing " + dspaceDir.getAbsolutePath() + separator + "config" + separator
+                    + "crosswalks" + separator + "test.properties"));
 
         Throwable cause = exception.getCause();
         assertThat(cause, notNullValue());
