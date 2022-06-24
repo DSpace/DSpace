@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -54,6 +55,8 @@ import org.orcid.jaxb.model.v3.release.record.Person;
 import org.orcid.jaxb.model.v3.release.record.PersonExternalIdentifier;
 import org.orcid.jaxb.model.v3.release.record.ResearcherUrl;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.WorkBulk;
+import org.orcid.jaxb.model.v3.release.record.summary.Works;
 
 /**
  * Implementation of {@link OrcidClient}.
@@ -115,6 +118,50 @@ public class OrcidClientImpl implements OrcidClient {
     }
 
     @Override
+    public Works getWorks(String accessToken, String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works");
+        Works works = executeAndUnmarshall(httpUriRequest, true, Works.class);
+        return works != null ? works : new Works();
+    }
+
+    @Override
+    public Works getWorks(String orcid) {
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works");
+        Works works = executeAndUnmarshall(httpUriRequest, true, Works.class);
+        return works != null ? works : new Works();
+    }
+
+    @Override
+    public WorkBulk getWorkBulk(String accessToken, String orcid, List<String> putCodes) {
+        String putCode = String.join(",", putCodes);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + "/works/" + putCode);
+        WorkBulk workBulk = executeAndUnmarshall(httpUriRequest, true, WorkBulk.class);
+        return workBulk != null ? workBulk : new WorkBulk();
+    }
+
+    @Override
+    public WorkBulk getWorkBulk(String orcid, List<String> putCodes) {
+        String putCode = String.join(",", putCodes);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + "/works/" + putCode);
+        WorkBulk workBulk = executeAndUnmarshall(httpUriRequest, true, WorkBulk.class);
+        return workBulk != null ? workBulk : new WorkBulk();
+    }
+
+    @Override
+    public <T> Optional<T> getObject(String accessToken, String orcid, String putCode, Class<T> clazz) {
+        String path = getOrcidPathFromOrcidObjectType(clazz);
+        HttpUriRequest httpUriRequest = buildGetUriRequest(accessToken, "/" + orcid + path + "/" + putCode);
+        return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
+    }
+
+    @Override
+    public <T> Optional<T> getObject(String orcid, String putCode, Class<T> clazz) {
+        String path = getOrcidPathFromOrcidObjectType(clazz);
+        HttpUriRequest httpUriRequest = buildGetUriRequestToPublicEndpoint("/" + orcid + path + "/" + putCode);
+        return Optional.ofNullable(executeAndUnmarshall(httpUriRequest, true, clazz));
+    }
+
+    @Override
     public OrcidResponse push(String accessToken, String orcid, Object object) {
         String path = getOrcidPathFromOrcidObjectType(object.getClass());
         return execute(buildPostUriRequest(accessToken, "/" + orcid + path, object), false);
@@ -131,10 +178,37 @@ public class OrcidClientImpl implements OrcidClient {
         return execute(buildDeleteUriRequest(accessToken, "/" + orcid + path + "/" + putCode), true);
     }
 
+    @Override
+    public OrcidTokenResponseDTO getReadPublicAccessToken() {
+        return getClientCredentialsAccessToken("/read-public");
+    }
+
+    private OrcidTokenResponseDTO getClientCredentialsAccessToken(String scope) {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("scope", scope));
+        params.add(new BasicNameValuePair("grant_type", "client_credentials"));
+        params.add(new BasicNameValuePair("client_id", orcidConfiguration.getClientId()));
+        params.add(new BasicNameValuePair("client_secret", orcidConfiguration.getClientSecret()));
+
+        HttpUriRequest httpUriRequest = RequestBuilder.post(orcidConfiguration.getTokenEndpointUrl())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .addHeader("Accept", "application/json")
+            .setEntity(new UrlEncodedFormEntity(params, Charset.defaultCharset()))
+            .build();
+
+        return executeAndParseJson(httpUriRequest, OrcidTokenResponseDTO.class);
+    }
+
     private HttpUriRequest buildGetUriRequest(String accessToken, String relativePath) {
         return get(orcidConfiguration.getApiUrl() + relativePath.trim())
             .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .addHeader("Authorization", "Bearer " + accessToken)
+            .build();
+    }
+
+    private HttpUriRequest buildGetUriRequestToPublicEndpoint(String relativePath) {
+        return get(orcidConfiguration.getPublicUrl() + relativePath.trim())
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
             .build();
     }
 

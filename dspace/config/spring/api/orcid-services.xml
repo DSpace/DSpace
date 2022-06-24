@@ -146,11 +146,37 @@
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value=""/>
 	</bean>
+	
+	
+	<bean id="orcidPublicationDataProviderFieldMapping" class="org.dspace.orcid.model.OrcidWorkFieldMapping" >
+		<property name="contributorFields" value="${orcid.external-data.mapping.publication.contributors}" />
+		<property name="externalIdentifierFields" value="${orcid.external-data.mapping.publication.external-ids}" />
+		<property name="publicationDateField" value="${orcid.external-data.mapping.publication.issued-date}" />
+		<property name="titleField" value="${orcid.external-data.mapping.publication.title}" />
+		<property name="journalTitleField" value="${orcid.external-data.mapping.publication.is-part-of}" />
+		<property name="shortDescriptionField" value="${orcid.external-data.mapping.publication.description}" />
+		<property name="languageField" value="${orcid.external-data.mapping.publication.language}" />
+		<property name="languageConverter" ref="${orcid.external-data.mapping.publication.language.converter}" />
+		<property name="typeField" value="${orcid.external-data.mapping.publication.type}" />
+		<property name="typeConverter" ref="${orcid.external-data.mapping.publication.type.converter}" />
+	</bean>
     
     <bean name="mapConverterDSpaceToOrcidAmountCurrency" class="org.dspace.util.SimpleMapConverter" init-method="init">
 		<property name="converterNameFile" value="orcid/mapConverter-dspace-to-orcid-amount-currency.properties" />
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
 		<property name="defaultValue" value=""/>
 	</bean>
+    
+    <bean name="mapConverterOrcidToDSpacePublicationType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="orcid/mapConverter-orcid-to-dspace-publication-type.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="Other"/>
+    </bean>
+    
+    <bean name="mapConverterOrcidToDSpaceLanguageCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="orcid/mapConverter-orcid-to-dspace-language-code.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value=""/>
+    </bean>
 
 </beans>
