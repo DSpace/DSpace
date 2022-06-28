@@ -7963,15 +7963,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(jsonPath("$.sections.upload.files[0].sizeBytes",
                             is(SIZE_IN_BYTES.intValue())));
         } catch (Exception e) {
-            if (!ObjectUtils.isEmpty(file) && file.exists()) {
-                try {
-                    file.delete();
-                } catch (Exception deleteException) {
-                    throw new Exception("Two errors has occurred:\n1. Cannot delete the file in the end of the test:" +
-                            " uploadFileBiggerThanUploadFileSizeLimit!\n2. " + e.getMessage());
-                }
+            throw new Exception("Cannot upload file bigger than upload file size limit, " + e.getMessage());
+        } finally {
+            try {
+                file.delete();
+            } catch (Exception e) {
+                throw new Exception("Cannot delete the file in the end of the test: " + e.getMessage());
             }
-            throw new Exception(e);
         }
     }
 }

@@ -101,7 +101,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler({MaxUploadSizeExceededException.class})
     protected void handleMaxFileSizeExceeded(HttpServletRequest request, HttpServletResponse response,
                                                Exception ex) throws IOException {
-        sendErrorResponse(request, response, ex, "Maximum upload size exceeded", HttpServletResponse.SC_BAD_REQUEST);
+        sendErrorResponse(request, response, ex, "Maximum upload size exceeded",
+                HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
     }
 
     @ExceptionHandler(SQLException.class)
