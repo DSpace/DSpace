@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -26,8 +27,6 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.orcid.OrcidToken;
-import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -42,6 +41,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
@@ -58,6 +58,15 @@ import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.orcid.OrcidHistory;
+import org.dspace.orcid.OrcidQueue;
+import org.dspace.orcid.OrcidToken;
+import org.dspace.orcid.model.OrcidEntityType;
+import org.dspace.orcid.service.OrcidHistoryService;
+import org.dspace.orcid.service.OrcidQueueService;
+import org.dspace.orcid.service.OrcidSynchronizationService;
+import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.profile.service.ResearcherProfileService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
@@ -122,8 +131,23 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
 
+    @Autowired(required = true)
+    private EntityTypeService entityTypeService;
+
     @Autowired
     private OrcidTokenService orcidTokenService;
+
+    @Autowired(required = true)
+    private OrcidHistoryService orcidHistoryService;
+
+    @Autowired(required = true)
+    private OrcidQueueService orcidQueueService;
+
+    @Autowired(required = true)
+    private OrcidSynchronizationService orcidSynchronizationService;
+
+    @Autowired(required = true)
+    private ResearcherProfileService researcherProfileService;
 
     protected ItemServiceImpl() {
         super();
@@ -245,6 +269,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
         return itemDAO.findAll(context, true, true);
     }
+
+    public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
+        return itemDAO.findAllRegularItems(context);
+    };
 
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
@@ -729,7 +757,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             + item.getID()));
 
         // Remove relationships
-        for (Relationship relationship : relationshipService.findByItem(context, item)) {
+        for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
         }
 
@@ -741,6 +769,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // remove version attached to the item
         removeVersion(context, item);
+
+        removeOrcidSynchronizationStuff(context, item);
 
         // Also delete the item if it appears in a harvested collection.
         HarvestedItem hi = harvestedItemService.find(context, item);
@@ -1590,8 +1620,99 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public String getEntityType(Item item) {
-        return getMetadataFirstValue(item, new MetadataFieldName("dspace.entity.type"), Item.ANY);
+    public String getEntityTypeLabel(Item item) {
+        List<MetadataValue> mdvs = getMetadata(item, "dspace", "entity", "type", Item.ANY, false);
+        if (mdvs.isEmpty()) {
+            return null;
+        }
+
+        if (mdvs.size() > 1) {
+            log.warn(
+                "Item with uuid {}, handle {} has {} entity types ({}), expected 1 entity type",
+                item.getID(), item.getHandle(), mdvs.size(),
+                mdvs.stream().map(MetadataValue::getValue).collect(Collectors.toList())
+            );
+        }
+
+        String entityType = mdvs.get(0).getValue();
+        if (StringUtils.isBlank(entityType)) {
+            return null;
+        }
+
+        return entityType;
+    }
+
+    @Override
+    public EntityType getEntityType(Context context, Item item) throws SQLException {
+        String entityTypeString = getEntityTypeLabel(item);
+        if (StringUtils.isBlank(entityTypeString)) {
+            return null;
+        }
+
+        return entityTypeService.findByEntityType(context, entityTypeString);
+    }
+
+    private void removeOrcidSynchronizationStuff(Context context, Item item) throws SQLException, AuthorizeException {
+
+        if (isNotProfileOrOrcidEntity(item)) {
+            return;
+        }
+
+        context.turnOffAuthorisationSystem();
+
+        try {
+
+            createOrcidQueueRecordsToDeleteOnOrcid(context, item);
+            deleteOrcidHistoryRecords(context, item);
+            deleteOrcidQueueRecords(context, item);
+
+        } finally {
+            context.restoreAuthSystemState();
+        }
+
+    }
+
+    private boolean isNotProfileOrOrcidEntity(Item item) {
+        String entityType = getEntityTypeLabel(item);
+        return !OrcidEntityType.isValidEntityType(entityType)
+            && !researcherProfileService.getProfileType().equals(entityType);
+    }
+
+    private void createOrcidQueueRecordsToDeleteOnOrcid(Context context, Item entity) throws SQLException {
+
+        String entityType = getEntityTypeLabel(entity);
+        if (entityType == null || researcherProfileService.getProfileType().equals(entityType)) {
+            return;
+        }
+
+        Map<Item, String> profileAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        for (Item profile : profileAndPutCodeMap.keySet()) {
+            if (orcidSynchronizationService.isSynchronizationAllowed(profile, entity)) {
+                String putCode = profileAndPutCodeMap.get(profile);
+                String title = getMetadataFirstValue(entity, "dc", "title", null, Item.ANY);
+                orcidQueueService.createEntityDeletionRecord(context, profile, title, entityType, putCode);
+            }
+        }
+
+    }
+
+    private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByProfileItemOrEntity(context, item);
+        for (OrcidHistory historyRecord : historyRecords) {
+            if (historyRecord.getProfileItem().equals(item)) {
+                orcidHistoryService.delete(context, historyRecord);
+            } else {
+                historyRecord.setEntity(null);
+                orcidHistoryService.update(context, historyRecord);
+            }
+        }
+    }
+
+    private void deleteOrcidQueueRecords(Context context, Item item) throws SQLException {
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByProfileItemOrEntity(context, item);
+        for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
+            orcidQueueService.delete(context, orcidQueueRecord);
+        }
     }
 
 }

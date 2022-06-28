@@ -9,14 +9,14 @@ package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
 
-import org.dspace.app.orcid.client.OrcidClient;
-import org.dspace.app.orcid.exception.OrcidClientException;
-import org.dspace.app.orcid.model.OrcidTokenResponseDTO;
-import org.dspace.app.orcid.service.OrcidSynchronizationService;
-import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.core.Context;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.exception.OrcidClientException;
+import org.dspace.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.orcid.service.OrcidSynchronizationService;
+import org.dspace.profile.ResearcherProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

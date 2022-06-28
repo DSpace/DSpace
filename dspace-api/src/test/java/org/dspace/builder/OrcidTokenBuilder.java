@@ -9,12 +9,12 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 
-import org.dspace.app.orcid.OrcidToken;
-import org.dspace.app.orcid.service.OrcidTokenService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.orcid.OrcidToken;
+import org.dspace.orcid.service.OrcidTokenService;
 
 /**
  * Builder for {@link OrcidToken} entities.
