@@ -8,6 +8,7 @@
 package org.dspace.xoai.app;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+import static java.util.Objects.nonNull;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 import java.io.ByteArrayOutputStream;
@@ -21,9 +22,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.xml.stream.XMLStreamException;
 
+import com.carrotsearch.hppc.ObjectObjectScatterMap;
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
@@ -223,8 +226,14 @@ public class XOAI {
             for (int i = 0; i < documents.getNumFound(); i++) {
                 Item item = itemService.find(context,
                         UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
-                if (item.getLastModified().before(last)) {
-                    items.add(item);
+                if (nonNull(item)) {
+                    if (nonNull(item.getLastModified())) {
+                        if (item.getLastModified().before(last)) {
+                            items.add(item);
+                        }
+                    } else {
+                        log.warn("Skipping item with id " + item.getID());
+                    }
                 }
             }
             return items.iterator();
