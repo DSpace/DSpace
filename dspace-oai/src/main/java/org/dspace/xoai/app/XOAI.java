@@ -9,6 +9,9 @@ package org.dspace.xoai.app;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_PARAM;
+import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_START;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 import java.io.ByteArrayOutputStream;
@@ -22,11 +25,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.xml.stream.XMLStreamException;
 
-import com.carrotsearch.hppc.ObjectObjectScatterMap;
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
@@ -35,14 +36,18 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -80,6 +85,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class XOAI {
     private static Logger log = LogManager.getLogger(XOAI.class);
 
+    // needed because the solr query only returns 10 rows by default
+    private static final int ROW_NUM = 30000;
+    
     private final Context context;
     private boolean optimize;
     private final boolean verbose;
@@ -220,24 +228,44 @@ public class XOAI {
      */
     private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException, IOException {
         try {
-            SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
-            SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
+            SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id").setRows(100)
+                    .addSort("item.handle", SolrQuery.ORDER.asc);
+            SolrClient solrClient = solrServerResolver.getServer();
+
             List<Item> items = new LinkedList<>();
-            for (int i = 0; i < documents.getNumFound(); i++) {
-                Item item = itemService.find(context,
-                        UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
-                if (nonNull(item)) {
-                    if (nonNull(item.getLastModified())) {
-                        if (item.getLastModified().before(last)) {
-                            items.add(item);
+            boolean done = false;
+            /*
+             * Using solr cursors to paginate and prevent the query from returning 10
+             * SolrDocument objects only.
+             */
+            String cursorMark = CURSOR_MARK_START;
+            String nextCursorMark = EMPTY;
+
+            while (!done) {
+                params.set(CURSOR_MARK_PARAM, cursorMark);
+                QueryResponse response = solrClient.query(params);
+                nextCursorMark = response.getNextCursorMark();
+                
+                for (SolrDocument document : response.getResults()) {
+                    Item item = itemService.find(context, UUID.fromString((String) document.getFieldValue("item.id")));
+                    if (nonNull(item)) {
+                        if (nonNull(item.getLastModified())) {
+                            if (item.getLastModified().before(last)) {
+                                items.add(item);
+                            }
+                        } else {
+                            log.warn("Skipping item with id " + item.getID());
                         }
-                    } else {
-                        log.warn("Skipping item with id " + item.getID());
                     }
                 }
+                
+                if (cursorMark.equals(nextCursorMark)) {
+                    done = true;
+                }
+                cursorMark = nextCursorMark;
             }
             return items.iterator();
-        } catch (SolrServerException | SQLException | DSpaceSolrException ex) {
+        } catch (SolrServerException | SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
