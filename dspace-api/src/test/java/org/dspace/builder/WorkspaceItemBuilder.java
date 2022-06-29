@@ -210,4 +210,17 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         }
         return this;
     }
+
+    /**
+     * Create workspaceItem with any metadata
+     * @param schema metadataSchema name e.g. `dc`
+     * @param element metadataField name e.g. `contributor`
+     * @param qualifier metadataQualifier e.g. `author` or null
+     * @param value which will be added to this metadata as MetadataValue
+     * @return WorkspaceItemBuilder
+     */
+    public WorkspaceItemBuilder withMetadata(final String schema, final String element, final String qualifier,
+                                    final String value) {
+        return addMetadataValue(schema, element, qualifier, value);
+    }
 }

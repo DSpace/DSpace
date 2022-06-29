@@ -8,14 +8,18 @@
 package org.dspace.app.rest.repository;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -31,6 +35,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
+import org.dspace.app.rest.utils.BigMultipartFile;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -216,6 +221,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
         }
         wis.update(context, source);
+
+        try {
+            uploadFileFromURL(context, request, id);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
@@ -387,5 +398,40 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                 }
             }
         }
+    }
+
+    /**
+     * If the admin writes path/filename in the `local.bitstream.redirectToURL` input field, from the tomcat
+     * temp directory will be loaded file which will be converted to the MultipartFile and uploaded as normal bitstream.
+     * The uploaded bitstream will be showed in the UI.
+     *
+     * @param context from the servlet
+     * @param request current patch request
+     * @param id of the workspace item
+     */
+    private void uploadFileFromURL(Context context, HttpServletRequest request, Integer id) throws SQLException,
+            AuthorizeException, IOException, URISyntaxException {
+        WorkspaceItem witem = wis.find(context, id);
+        List<MetadataValue> mdv = itemService.getMetadataByMetadataString(witem.getItem(),
+                "local.bitstream.redirectToURL");
+
+        if (ArrayUtils.isEmpty(mdv.toArray())) {
+            return;
+        }
+
+        String fileName = mdv.get(0).getValue();
+        if (StringUtils.isBlank(fileName)) {
+            return;
+        }
+
+        File file = new File(fileName);
+        String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+
+        BigMultipartFile multipartFile = new BigMultipartFile(file.getName(), file.getName(), mimeType,
+                new FileInputStream(file));
+
+        upload(request, "wokspaceitems", "submission", id, multipartFile);
+
+        wis.update(context, witem);
     }
 }

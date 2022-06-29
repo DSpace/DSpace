@@ -28,7 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -7191,4 +7193,68 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
+    @Test
+    public void uploadFileBiggerThanUploadFileSizeLimit() throws Exception {
+        // Create a big file in the /temp folder
+        String TMP_DIR = System.getProperty("java.io.tmpdir");
+        String FILE_NAME = "test.txt";
+        Long SIZE_IN_BYTES = 2000000000L;
+        File file = null;
+
+        try {
+            file = new File(TMP_DIR, FILE_NAME);
+
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            raf.setLength(SIZE_IN_BYTES);
+            raf.close();
+
+            context.turnOffAuthorisationSystem();
+
+            // A community-collection structure with one parent community and one collection
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                    .withName("Parent Community")
+                    .build();
+            Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withName("Collection").build();
+
+            WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                    .withTitle("Test WorkspaceItem")
+                    .withIssueDate("2017-10-17")
+                    .withMetadata("local", "bitstream", "redirectToURL", file.getAbsolutePath())
+                    .build();
+
+            context.restoreAuthSystemState();
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+            List<Operation> addAccessCondition = new ArrayList<Operation>();
+            List<Map<String, String>> accessConditions = new ArrayList<Map<String, String>>();
+
+            Map<String, String> accessCondition1 = new HashMap<String, String>();
+            accessCondition1.put("name", "administrator");
+            accessConditions.add(accessCondition1);
+
+            addAccessCondition.add(new AddOperation("/sections/defaultAC/accessConditions",
+                    accessConditions));
+
+            String patchBody = getPatchContent(addAccessCondition);
+            // add access conditions
+            getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + wItem.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.sections.upload.files[0]"
+                                    + ".metadata['dc.title'][0].value",
+                            is(FILE_NAME)))
+                    .andExpect(jsonPath("$.sections.upload.files[0].sizeBytes",
+                            is(SIZE_IN_BYTES.intValue())));
+        } catch (Exception e) {
+            throw new Exception("Cannot upload file bigger than upload file size limit, " + e.getMessage());
+        } finally {
+            try {
+                file.delete();
+            } catch (Exception e) {
+                throw new Exception("Cannot delete the file in the end of the test: " + e.getMessage());
+            }
+        }
+    }
 }

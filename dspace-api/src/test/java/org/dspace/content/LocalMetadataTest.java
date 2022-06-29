@@ -35,4 +35,15 @@ public class LocalMetadataTest extends AbstractUnitTest {
         assertThat("existApproximateData 0", field, notNullValue());
     }
 
+    /**
+     * Test of existing custom metadata field `local.bitstream.redirectToURL`
+     */
+    @Test
+    public void existBitstreamRedirectUrl() throws Exception {
+        MetadataField field = metadataFieldService.findByString(context, "local.bitstream.redirectToURL",
+                '.');
+
+        assertThat("existBitstreamRedirectUrl 0", field, notNullValue());
+    }
+
 }
