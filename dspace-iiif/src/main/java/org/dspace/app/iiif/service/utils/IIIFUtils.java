@@ -48,6 +48,8 @@ public class IIIFUtils {
     // The DSpace bundle for other content related to item.
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
 
+    private static final String OMIT_FROM_TOC_BUNDLE = "iiif";
+
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
 
@@ -335,10 +337,17 @@ public class IIIFUtils {
     public String getBundleIIIFToC(Bundle bundle) {
         String label = bundle.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_LABEL))
-                .findFirst().map(m -> m.getValue()).orElse(bundle.getName());
+                .findFirst().map(m -> m.getValue()).orElse(getBundleLabel(bundle));
         return bundle.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_TOC))
                 .findFirst().map(m -> m.getValue() + TOC_SEPARATOR + label).orElse(label);
+    }
+
+    private String getBundleLabel(Bundle bundle) {
+        if (bundle.getName().contentEquals(OMIT_FROM_TOC_BUNDLE)) {
+            return null;
+        }
+        return bundle.getName();
     }
 
     /**
