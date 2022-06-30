@@ -49,4 +49,4 @@ rebel.xml
 
 
 ## local config for build scripts
-/scripts/paths.bat
+/scripts/envs/__basic.bat
