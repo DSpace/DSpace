@@ -177,4 +177,11 @@ public interface AuthenticationService {
      */
     public String getAuthenticationMethod(Context context, HttpServletRequest request);
 
+    /**
+     * @param context The DSpace context
+     * @param challenge The current password of the user
+     * @return true if challenge matches with current password
+     */
+    public boolean canChangePassword(Context context, String challenge);
+
 }

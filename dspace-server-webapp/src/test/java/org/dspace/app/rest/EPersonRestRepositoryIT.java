@@ -1304,7 +1304,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
         ops.add(addOperation);
+        ops.add(addOperation2);
         String patchBody = getPatchContent(ops);
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1401,7 +1403,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
         ops.add(addOperation);
+        ops.add(addOperation2);
         String patchBody = getPatchContent(ops);
 
         String token = getAuthToken(ePerson.getEmail(), password);
@@ -1444,7 +1448,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
         ops.add(addOperation);
+        ops.add(addOperation2);
         String patchBody = getPatchContent(ops);
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1536,7 +1542,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/password", null);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
         ops.add(addOperation);
+        ops.add(addOperation2);
         String patchBody = getPatchContent(ops);
 
         // adding null pw should return bad request
@@ -1581,7 +1589,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
         ops.add(addOperation);
+        ops.add(addOperation2);
         String patchBody = getPatchContent(ops);
 
         // initialize password with add operation, not set during creation
@@ -3126,6 +3136,144 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.page.number", is(3)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+    }
+
+    @Test
+    public void patchChangePassword() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
+        ops.add(addOperation);
+        ops.add(addOperation2);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        // login with new password
+        token = getAuthToken(ePerson.getEmail(), newPassword);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // can't login with old password
+        token = getAuthToken(ePerson.getEmail(), password);
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
+    }
+
+    @Test
+    public void patchChangePasswordWithWrongChallenge() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String newPassword = "newpassword";
+        String wrongPassword = "wrong_password";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", wrongPassword);
+        ops.add(addOperation);
+        ops.add(addOperation2);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patchChangePasswordWithNoChallenge() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patchChangePasswordWithIPAuthenticationMethod() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withPassword(password)
+                                        .build();
+
+        context.restoreAuthSystemState();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/password", newPassword);
+        AddOperation addOperation2 = new AddOperation("/challenge", password);
+        ops.add(addOperation);
+        ops.add(addOperation2);
+        String patchBody = getPatchContent(ops);
+
+        context.setAuthenticationMethod("ip");
+
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                            .with(ip("5.5.5.5")))
+                   .andExpect(status().isUnauthorized());
 
     }
 

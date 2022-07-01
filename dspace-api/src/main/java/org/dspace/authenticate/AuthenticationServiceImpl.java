@@ -207,4 +207,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return null;
     }
+
+    @Override
+    public boolean canChangePassword(Context context, String challenge) {
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
+            if (method.canChangePassword(context, challenge)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -608,4 +608,9 @@ public class X509Authentication implements AuthenticationMethod {
         }
         return false;
     }
+
+    @Override
+    public boolean canChangePassword(Context context, String challenge) {
+        return false;
+    }
 }
