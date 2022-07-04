@@ -15,7 +15,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
-import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
@@ -115,7 +114,7 @@ public class QAEntityOpenaireMetadataAction implements QualityAssuranceAction {
                     throw new IllegalStateException("No collection found by entity type: " + collection);
                 }
 
-                WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+                WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
                 relatedItem = workspaceItem.getItem();
 
                 for (String key : entityMetadata.keySet()) {
@@ -149,11 +148,7 @@ public class QAEntityOpenaireMetadataAction implements QualityAssuranceAction {
                         + " If you don't manage funding in your repository please skip this topic in"
                         + " the qaevents.cfg"));
         // Create the relationship
-        Relationship persistedRelationship = relationshipService.create(context);
-        persistedRelationship.setRelationshipType(relType);
-        persistedRelationship.setLeftItem(item);
-        persistedRelationship.setRightItem(relatedItem);
-        relationshipService.update(context, persistedRelationship);
+        relationshipService.create(context, item, relatedItem, relType, -1, -1);
     }
 
     private String getValue(QAMessageDTO message, String key) {
