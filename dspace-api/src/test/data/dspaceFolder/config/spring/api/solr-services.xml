@@ -48,9 +48,9 @@
           class="org.dspace.statistics.MockSolrStatisticsCore"
           autowire-candidate="true"/>
           
-    <!-- nb events -->
-    <bean class="org.dspace.app.nbevent.MockNBEventService"
-          id="org.dspace.app.nbevent.service.NBEventService" />
+    <!-- qa events -->
+    <bean class="org.dspace.qaevent.MockQAEventService"
+          id="org.dspace.qaevent.service.QAEventService" />
           
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
     

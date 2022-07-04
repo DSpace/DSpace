@@ -8,9 +8,9 @@
 
     <!-- This primary attribute is present so that we can assure that in the REST layer we'll always use this
         bean if it is present-->
-    <bean id="import-openaire-events" class="org.dspace.app.nbevent.OpenaireEventsScriptConfiguration" primary="true">
-        <property name="description" value="Import new openAIRE notification broker events"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.OpenaireEventsRunnable"/>
+    <bean id="import-openaire-events" class="org.dspace.qaevent.OpenaireEventsScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE quality assurance broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.qaevent.OpenaireEventsRunnable"/>
      </bean>
 
     <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportScriptConfiguration" primary="true">

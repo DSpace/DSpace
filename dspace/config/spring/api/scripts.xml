@@ -4,9 +4,9 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-    <bean id="import-openaire-events" class="org.dspace.app.nbevent.OpenaireEventsCliScriptConfiguration" primary="true">
-        <property name="description" value="Import new openAIRE notification broker events"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.nbevent.OpenaireEventsRunnableCli"/>
+    <bean id="import-openaire-events" class="org.dspace.qaevent.OpenaireEventsCliScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE quality assurance broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.qaevent.OpenaireEventsRunnableCli"/>
     </bean>
 
     <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
