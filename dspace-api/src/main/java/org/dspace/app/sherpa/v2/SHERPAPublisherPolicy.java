@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ import java.util.Map;
  * @see SHERPAJournal
  * @see SHERPAPermittedVersion
  */
-public class SHERPAPublisherPolicy {
+public class SHERPAPublisherPolicy implements Serializable {
 
     private int id;
     private boolean openAccessPermitted;

@@ -1,0 +1,109 @@
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <!-- 
+         <entry key="subjects" value="dc.subject" />
+         <entry key="authors" value="dc.contributor.author" />
+         <entry key="publisher" value="dc.publisher" />
+    -->
+    <util:map id="ciniiMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="cinii.title" value-ref="ciniiTitleContrib"/>
+        <entry key-ref="cinii.issn" value-ref="ciniiISSNContrib"/>
+        <entry key-ref="cinii.journal" value-ref="ciniiJournalContrib"/>
+        <entry key-ref="cinii.issued" value-ref="ciniiIssuedContrib"/>
+        <entry key-ref="cinii.language" value-ref="ciniiLanguageContrib"/>
+        <entry key-ref="cinii.description" value-ref="ciniiDescriptionContrib"/>
+    </util:map>
+
+    <bean id="ciniiDescriptionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="cinii.description"/>
+        <property name="query" value="dc:description"/>
+        <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="cinii.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="ciniiLanguageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="cinii.language"/>
+        <property name="query" value="dc:language"/>
+        <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="cinii.language" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.language.iso"/>
+    </bean>
+
+    <bean id="ciniiIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="cinii.issued"/>
+        <property name="query" value="prism:publicationDate"/>
+        <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="cinii.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.date.issued"/>
+    </bean>
+
+    <bean id="ciniiJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="cinii.journal"/>
+        <property name="query" value="prism:publicationName"/>
+        <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="cinii.journal" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.source"/>
+    </bean>
+
+    <bean id="ciniiISSNContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="cinii.issn"/>
+        <property name="query" value="prism:issn"/>
+        <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="cinii.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.issn"/>
+    </bean>
+
+	<!--  alternative authors, titles, etc (based on languages) isn't used at the moment, 
+          org.dspace.importer.external.metadatamapping.contributor.CiniiMetadataContributor
+          could be useful to implements metadata remapping.
+    -->
+    <bean id="ciniiTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="cinii.title"/>
+        <property name="query" value="dc:title"/>
+        <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
+    </bean>
+    <bean id="cinii.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+	<util:map id="ciniiPrefixToNamespaceMapping" map-class="java.util.HashMap">
+		<entry key="http://www.w3.org/1999/02/22-rdf-syntax-ns#" value="rdf" />
+		<entry key="http://purl.org/ontology/bibo/" value="bibo" />
+		<entry key="https://ci.nii.ac.jp/ns/1.0/" value="cinii" />
+		<entry key="http://www.w3.org/2000/10/swap/pim/contact#" value="con" />
+		<entry key="http://purl.org/dc/elements/1.1/" value="dc" />
+		<entry key="http://purl.org/dc/terms/" value="dcterms" />
+		<entry key="http://xmlns.com/foaf/0.1/" value="foaf" />
+		<entry key="http://prismstandard.org/namespaces/basic/2.0/" value="prism" />
+		<entry key="http://www.w3.org/2000/01/rdf-schema#" value="rdfs" />
+	</util:map>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="3"/>
+    </bean>
+
+</beans>

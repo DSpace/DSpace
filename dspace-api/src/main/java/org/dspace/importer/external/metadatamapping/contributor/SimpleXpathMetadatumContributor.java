@@ -33,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class SimpleXpathMetadatumContributor implements MetadataContributor<Element> {
-    private MetadataFieldConfig field;
 
-    private static final Logger log
-        = org.apache.logging.log4j.LogManager.getLogger();
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
+
+    protected MetadataFieldConfig field;
 
     /**
      * Return prefixToNamespaceMapping
@@ -47,7 +47,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         return prefixToNamespaceMapping;
     }
 
-    private MetadataFieldMapping<Element, MetadataContributor<Element>> metadataFieldMapping;
+    protected MetadataFieldMapping<Element, MetadataContributor<Element>> metadataFieldMapping;
 
     /**
      * Return metadataFieldMapping
@@ -79,7 +79,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
     }
 
-    private Map<String, String> prefixToNamespaceMapping;
+    protected Map<String, String> prefixToNamespaceMapping;
 
     /**
      * Initialize SimpleXpathMetadatumContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
@@ -103,7 +103,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
 
     }
 
-    private String query;
+    protected String query;
 
     /**
      * Return the MetadataFieldConfig used while retrieving MetadatumDTO
@@ -154,10 +154,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         for (String ns : prefixToNamespaceMapping.keySet()) {
             namespaces.add(Namespace.getNamespace(prefixToNamespaceMapping.get(ns), ns));
         }
-
-        XPathExpression<Object> xpath =
-            XPathFactory.instance().compile(query, Filters.fpassthrough(), null, namespaces);
-
+        XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,namespaces);
         List<Object> nodes = xpath.evaluate(t);
         for (Object el : nodes) {
             if (el instanceof Element) {
@@ -174,4 +171,5 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<Elem
         }
         return values;
     }
+
 }

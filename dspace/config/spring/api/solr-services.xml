@@ -34,5 +34,8 @@
     
     <!-- notification broker service -->
     <bean id="org.dspace.app.nbevent.service.NBEventService" class="org.dspace.app.nbevent.service.impl.NBEventServiceImpl" />
+    
+    <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
+    
 
 </beans>

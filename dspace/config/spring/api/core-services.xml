@@ -63,6 +63,10 @@
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
+    <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
+
+    <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
+
     <bean class='org.dspace.service.impl.HttpConnectionPoolService'
           id='solrHttpConnectionPoolService'
           scope='singleton'

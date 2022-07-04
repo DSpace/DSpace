@@ -51,5 +51,8 @@
     <!-- nb events -->
     <bean class="org.dspace.app.nbevent.MockNBEventService"
           id="org.dspace.app.nbevent.service.NBEventService" />
+          
+    <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
+    
 
 </beans>
