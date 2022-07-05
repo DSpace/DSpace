@@ -261,7 +261,7 @@ public class SolrDedupServiceImpl implements DedupService {
                 .getServiceByName("item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
 
         // build the dedup reject in the dedup index core
-        buildFromDedupReject(ctx, iu, tmpMapFilter, tmpFilter, searchSignature);
+        buildFromDedupReject(ctx, iu);
 
         // clean FAKE documents related to this identifier
         removeFake(dedupID, iu.getType());
@@ -279,42 +279,47 @@ public class SolrDedupServiceImpl implements DedupService {
 
     private void fillSignature(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
             List<String> tmpFilter) {
+        // Create a copy of the (empty) signature list. We'll use this to store
+        // values that are designed for search filters and might need extra operators
+        // like ~n for fuzzy search, or boosting, or so on
+        Map<String, List<String>> tmpSearchMapFilter = new HashMap<>(tmpMapFilter);
+
         // get all algorithms to build signature
         List<Signature> signAlgo = dspace.getServiceManager().getServicesByType(Signature.class);
         for (Signature algo : signAlgo) {
             if (iu.getType() == algo.getResourceTypeID()) {
+                String key = algo.getSignatureType() + "_signature";
                 List<String> signatures = algo.getSignature(iu, ctx);
+                // This is the list of signatures that could be used for various functions, including indexing
+                // the fake / match / dedup Solr documents
                 for (String signature : signatures) {
-                    if (StringUtils.isNotEmpty(signature)) {
-                        String key = algo.getSignatureType() + "_signature";
-                        if (tmpMapFilter.containsKey(key)) {
-                            List<String> obj = tmpMapFilter.get(key);
-                            obj.add(signature);
-                            tmpMapFilter.put(key, obj);
-                        } else {
-                            List<String> obj = new ArrayList<String>();
-                            obj.add(signature);
-                            tmpMapFilter.put(key, obj);
-                        }
-                    }
+                    populateMapFilter(key, signature, tmpMapFilter);
+                }
+                // This is the list of search values derived from signatures in case we need special Solr or Lucene
+                // operators to use in filter queries, eg ~ fuzzy search, ^ boosts, wildcards, etc.
+                for (String searchFilterValue : algo.getSearchSignature(iu, ctx)) {
+                    populateMapFilter(key, searchFilterValue, tmpSearchMapFilter);
                 }
             }
         }
 
+        // The result strings that are added to the tmpFilter search query filter should come only
+        // from tmpMapSearchFilter, not tmpMapFilter
         String result = "";
         int index = 0;
-        for (String tmpF : tmpMapFilter.keySet()) {
+        for (String tmpF : tmpSearchMapFilter.keySet()) {
             if (index > 0) {
                 result += " OR ";
             }
 
             result += tmpF + ":(";
             int jindex = 0;
-            for (String s : tmpMapFilter.get(tmpF)) {
+            for (String s : tmpSearchMapFilter.get(tmpF)) {
                 if (jindex > 0) {
                     result += " OR ";
                 }
                 result += s;
+
                 jindex++;
             }
             result += ")";
@@ -323,6 +328,28 @@ public class SolrDedupServiceImpl implements DedupService {
 
         if (StringUtils.isNotBlank(result)) {
             tmpFilter.add(result);
+        }
+    }
+
+    /**
+     * Utility function to populate a list of signature filter keys and valuelists
+     * @param key
+     * @param value
+     * @param mapFilter
+     * @return
+     */
+    private static void populateMapFilter(String key, String value, Map<String,
+            List<String>> mapFilter) {
+        if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
+            if (mapFilter.containsKey(key)) {
+                List<String> searchVal = mapFilter.get(key);
+                searchVal.add(value);
+                mapFilter.put(key, searchVal);
+            } else {
+                List<String> searchVal = new ArrayList<String>();
+                searchVal.add(value);
+                mapFilter.put(key, searchVal);
+            }
         }
     }
 
@@ -707,7 +734,7 @@ public class SolrDedupServiceImpl implements DedupService {
                             SearchDeduplication searchSignature = dspace.getServiceManager().getServiceByName(
                                     "item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
                             if (onlyFake) {
-                                buildFromDedupReject(context, item, tmpMapFilter, tmpFilter, searchSignature);
+                                buildFromDedupReject(context, item);
                                 build(context, item.getID(), item.getID(), DeduplicationFlag.FAKE, tmpMapFilter,
                                         searchSignature, null);
                             } else {
@@ -730,8 +757,7 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    private void buildFromDedupReject(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
-            List<String> tmpFilter, SearchDeduplication searchSignature) {
+    private void buildFromDedupReject(Context ctx, DSpaceObject iu) {
 
         try {
             List<Deduplication> tri = deduplicationService.getDeduplicationByFirstAndSecond(ctx, iu.getID(),

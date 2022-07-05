@@ -20,4 +20,6 @@ public interface Signature {
     public String getSignatureType();
 
     public String getMetadata();
+
+    public List<String> getSearchSignature(DSpaceObject item, Context context);
 }

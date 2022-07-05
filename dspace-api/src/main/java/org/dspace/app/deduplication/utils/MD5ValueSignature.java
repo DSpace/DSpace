@@ -64,6 +64,20 @@ public class MD5ValueSignature implements Signature {
 
     protected WorkspaceItemService  wsItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
+    public List<String> getSearchSignature(DSpaceObject item, Context context) {
+        List<String> result = new ArrayList<>();
+        for (String signature: getSignature(item, context)) {
+            if (StringUtils.isNotEmpty(signature)) {
+                // Boost MD5 signature matches above others
+                String searchFilterValue = signature + "^5";
+                if (!result.contains(searchFilterValue)) {
+                    result.add(searchFilterValue);
+                }
+            }
+        }
+        return result;
+    }
+
     public List<String> getSignature(DSpaceObject item, Context context) {
         List<String> result = new ArrayList<String>();
         try {
