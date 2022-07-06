@@ -1,14 +1,14 @@
 [webservers]
-brage3.backupsite.bibsys.no
-brage4.backupsite.bibsys.no
-brage5.backupsite.bibsys.no
+brage3.bibsys.no
+brage4.bibsys.no
+brage5.bibsys.no
 
 [appservers-produksjon]
-brage1.backupsite.bibsys.no
-brage2.backupsite.bibsys.no
-brage3.backupsite.bibsys.no
-brage4.backupsite.bibsys.no
-brage5.backupsite.bibsys.no
+brage1.bibsys.no
+brage2.bibsys.no
+brage3.bibsys.no
+brage4.bibsys.no
+brage5.bibsys.no
 
 [appservers-utvikle]
 brage-utvikle.bibsys.no
