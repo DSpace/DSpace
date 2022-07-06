@@ -46,3 +46,7 @@ rebel.xml
 
 ## Ignore jenv configuration
 .java-version
+
+
+## local config for build scripts
+/scripts/envs/__basic.bat
