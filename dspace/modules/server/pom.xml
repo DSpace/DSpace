@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.3-SNAPSHOT</version>
+        <version>7.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 

@@ -71,9 +71,19 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
     }
 
     @Override
+    public SolrInputDocument buildNewDocument(Context context, T indexableObject) throws SQLException, IOException {
+        return buildDocument(context, indexableObject);
+    }
+
+    @Override
     public void writeDocument(Context context, T indexableObject, SolrInputDocument solrInputDocument)
             throws SQLException, IOException, SolrServerException {
-        writeDocument(solrInputDocument, null);
+        try {
+            writeDocument(solrInputDocument, null);
+        } catch (Exception e) {
+            log.error("Error occurred while writing SOLR document for {} object {}",
+                      indexableObject.getType(), indexableObject.getID(), e);
+        }
     }
 
     /**
@@ -113,9 +123,11 @@ public abstract class IndexFactoryImpl<T extends IndexableObject, S> implements 
                         log.info("Full text is larger than the configured limit (discovery.solr.fulltext.charLimit)."
                                      + " Only the first {} characters were indexed.", charLimit);
                     } else {
+                        log.error("Tika parsing error. Could not index full text.", saxe);
                         throw new IOException("Tika parsing error. Could not index full text.", saxe);
                     }
                 } catch (TikaException ex) {
+                    log.error("Tika parsing error. Could not index full text.", ex);
                     throw new IOException("Tika parsing error. Could not index full text.", ex);
                 }
 

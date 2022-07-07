@@ -42,6 +42,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource("mock", "mock", false),
                                 ExternalSourceMatcher.matchExternalSource("orcid", "orcid", false),
                                 ExternalSourceMatcher.matchExternalSource("suggestion", "suggestion", false),
+                                ExternalSourceMatcher.matchExternalSource("scopus", "scopus", false),
                                 ExternalSourceMatcher.matchExternalSource(
                                     "sherpaJournalIssn", "sherpaJournalIssn", false),
                                 ExternalSourceMatcher.matchExternalSource(
@@ -53,7 +54,7 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                         "openAIREFunding", "openAIREFunding", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(8)));
+                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(9)));
     }
 
     @Test

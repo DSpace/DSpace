@@ -33,4 +33,16 @@
 		</property>	
 	</bean>
 
+    <bean class="org.dspace.app.sherpa.SHERPAService" id="org.dspace.app.sherpa.SHERPAService">
+        <property name="maxNumberOfTries" value="3"/>
+        <!-- the value of this property is in milliseconds -->
+        <property name="sleepBetweenTimeouts" value="2000"/>
+        <!-- the value of this property is in milliseconds -->
+        <property name="timeout" value="5000"/>
+    </bean>
+
+    <bean class="org.dspace.app.sherpa.cache.SherpaCacheEvictService">
+         <property name="sherpaSubmitService"
+                   ref="org.dspace.app.sherpa.submit.SHERPASubmitService"/>
+    </bean>
 </beans>

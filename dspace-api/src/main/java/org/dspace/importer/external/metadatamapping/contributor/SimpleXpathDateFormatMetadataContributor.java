@@ -25,9 +25,15 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
-
+/**
+ * This contributor can be used when parsing an XML file,
+ * particularly to extract a date and convert it to a specific format.
+ * In the variable dateFormatFrom the read format should be configured,
+ * instead in the variable dateFormatTo the format you want to obtain.
+ *
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
+ */
 public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadatumContributor {
-
 
     private DateFormat dateFormatFrom;
     private DateFormat dateFormatTo;
@@ -41,19 +47,15 @@ public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadat
     }
 
     @Override
-    public Collection<MetadatumDTO> contributeMetadata(Element t) {
+    public Collection<MetadatumDTO> contributeMetadata(Element element) {
         List<MetadatumDTO> values = new LinkedList<>();
-
-        List<Namespace> namespaces = new ArrayList<>();
+        List<Namespace> namespaces = new ArrayList<Namespace>();
         for (String ns : prefixToNamespaceMapping.keySet()) {
             namespaces.add(Namespace.getNamespace(prefixToNamespaceMapping.get(ns), ns));
         }
-
-        XPathExpression<Object> xpath = XPathFactory.instance().compile(query, Filters.fpassthrough(), null,
-            namespaces);
-
-        List<Object> nodes = xpath.evaluate(t);
-
+        XPathExpression<Object> xpath = XPathFactory.instance()
+                          .compile(query,Filters.fpassthrough(), null, namespaces);
+        List<Object> nodes = xpath.evaluate(element);
         for (Object el : nodes) {
             if (el instanceof Element) {
                 values.add(getMetadatum(field, ((Element) el).getText()));
@@ -67,7 +69,6 @@ public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadat
                 System.err.println("node of type: " + el.getClass());
             }
         }
-
         return values;
     }
 

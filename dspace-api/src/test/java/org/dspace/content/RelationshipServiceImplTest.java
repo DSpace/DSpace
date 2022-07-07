@@ -24,12 +24,14 @@ import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.versioning.utils.RelationshipVersioningUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -70,6 +72,9 @@ public class RelationshipServiceImplTest {
 
     @Mock
     private ConfigurationService configurationService;
+
+    @Spy
+    private RelationshipVersioningUtils relationshipVersioningUtils;
 
     @Before
     public void init() {
@@ -112,40 +117,11 @@ public class RelationshipServiceImplTest {
         relationshipTest.add(getRelationship(bob, cindy, hasMother,1,0));
         when(relationshipService.findByItem(context, cindy, -1, -1, false)).thenReturn(relationshipTest);
 
-        // Mock the state of objects utilized in findByItem() to meet the success criteria of the invocation
-        when(relationshipDAO.findByItem(context, cindy, -1, -1, false)).thenReturn(relationshipTest);
-
         List<Relationship> results = relationshipService.findByItem(context, cindy);
         assertEquals("TestFindByItem 0", relationshipTest, results);
         for (int i = 0; i < relationshipTest.size(); i++) {
             assertEquals("TestFindByItem sort integrity", relationshipTest.get(i), results.get(i));
         }
-    }
-
-    @Test
-    public void testFindLeftPlaceByLeftItem() throws Exception {
-        // Declare objects utilized in unit test
-        Item item = mock(Item.class);
-
-        // Mock DAO to return mocked left place as 0
-        when(relationshipDAO.findNextLeftPlaceByLeftItem(context, item)).thenReturn(0);
-
-        // The left place reported from out mocked item should match the DAO's report of the left place
-        assertEquals("TestFindLeftPlaceByLeftItem 0", relationshipDAO.findNextLeftPlaceByLeftItem(context, item),
-                relationshipService.findNextLeftPlaceByLeftItem(context, item));
-    }
-
-    @Test
-    public void testFindRightPlaceByRightItem() throws Exception {
-        // Declare objects utilized in unit test
-        Item item = mock(Item.class);
-
-        // Mock lower level DAO to return mocked right place as 0
-        when(relationshipDAO.findNextRightPlaceByRightItem(context, item)).thenReturn(0);
-
-        // The right place reported from out mocked item should match the DAO's report of the right place
-        assertEquals("TestFindRightPlaceByRightItem 0", relationshipDAO.findNextRightPlaceByRightItem(context, item),
-                relationshipService.findNextRightPlaceByRightItem(context, item));
     }
 
     @Test
