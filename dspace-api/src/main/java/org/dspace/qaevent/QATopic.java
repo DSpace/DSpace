@@ -10,7 +10,8 @@ package org.dspace.qaevent;
 import java.util.Date;
 
 /**
- * This model class represent the quality assurance broker topic concept
+ * This model class represent the quality assurance broker topic concept. A
+ * topic represents a type of event and is therefore used to group events.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *

@@ -9,9 +9,13 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
+import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -39,8 +43,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
+import org.dspace.content.QAEventProcessed;
+import org.dspace.qaevent.dao.QAEventsDao;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration tests for {@link QAEventRestRepository}.
@@ -49,6 +56,9 @@ import org.junit.Test;
  *
  */
 public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private QAEventsDao qaEventsDao;
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
@@ -669,7 +679,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
                 .perform(post("/api/integration/qaevents/" + event.getEventId() + "/related").param("item",
                         funding.getID().toString()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
         // check that no related item has been added to our event
         getClient(authToken)
                 .perform(get("/api/integration/qaevents/" + event.getEventId()).param("projection", "full"))
@@ -711,5 +721,52 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         Matchers.containsInAnyOrder(
                                 QAEventMatcher.matchQAEventEntry(event2))))
                 .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void testEventDeletion() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection 1")
+            .build();
+
+        QAEvent event = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/integration/qaevents/" + event.getEventId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchQAEventEntry(event)));
+
+        List<QAEventProcessed> processedEvents = qaEventsDao.findAll(context);
+        assertThat(processedEvents, empty());
+
+        getClient(authToken).perform(delete("/api/integration/qaevents/" + event.getEventId()))
+            .andExpect(status().isNoContent());
+
+        getClient(authToken).perform(get("/api/integration/qaevents/" + event.getEventId()))
+            .andExpect(status().isNotFound());
+
+        processedEvents = qaEventsDao.findAll(context);
+        assertThat(processedEvents, hasSize(1));
+
+        QAEventProcessed processedEvent = processedEvents.get(0);
+        assertThat(processedEvent.getEventId(), is(event.getEventId()));
+        assertThat(processedEvent.getItem(), notNullValue());
+        assertThat(processedEvent.getItem().getID().toString(), is(event.getTarget()));
+        assertThat(processedEvent.getEventTimestamp(), notNullValue());
+        assertThat(processedEvent.getEperson().getID(), is(admin.getID()));
+
     }
 }

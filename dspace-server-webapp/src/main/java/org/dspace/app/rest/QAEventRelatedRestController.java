@@ -12,10 +12,7 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
@@ -37,9 +34,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,7 +48,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + QAEventRest.CATEGORY + "/qaevents" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG
     + "/related")
-public class QAEventRestController {
+public class QAEventRelatedRestController {
+
     @Autowired
     protected Utils utils;
 
@@ -67,42 +66,44 @@ public class QAEventRestController {
      * This method associate an item to a qa event
      * 
      * @param qaeventId       The qa event id
-     * @param response        The current response
-     * @param request         The current request
-     * @param relatedItemUUID The uuid of the related item to associate with the qa
-     *                        event
+     * @param relatedItemUUID The uuid of the related item to associate with the qa event
      * @return The related item
      * @throws SQLException       If something goes wrong
      * @throws AuthorizeException If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RepresentationModel<?>> postRelatedItem(@PathVariable(name = "id") String qaeventId,
-            HttpServletResponse response, HttpServletRequest request,
-            @RequestParam(required = true, name = "item") UUID relatedItemUUID)
-        throws SQLException, AuthorizeException {
-        Context context = ContextUtil.obtainContext(request);
+    public ResponseEntity<RepresentationModel<?>> addRelatedItem(@PathVariable(name = "id") String qaeventId,
+        @RequestParam(name = "item") UUID relatedItemUUID) throws SQLException, AuthorizeException {
+
+        Context context = ContextUtil.obtainCurrentRequestContext();
+
         QAEvent qaevent = qaEventService.findEventByEventId(qaeventId);
         if (qaevent == null) {
             throw new ResourceNotFoundException("No such qa event: " + qaeventId);
         }
+
+        if (!qaEventService.isRelatedItemSupported(qaevent)) {
+            throw new UnprocessableEntityException("The given event does not supports a related item");
+        }
+
         if (qaevent.getRelated() != null) {
-            throw new UnprocessableEntityException("The qa event with ID: " + qaeventId + " already has " +
-                                                       "a related item");
-        } else if (!StringUtils.endsWith(qaevent.getTopic(), "/PROJECT")) {
-            return ControllerUtils.toEmptyResponse(HttpStatus.BAD_REQUEST);
+            throw new UnprocessableEntityException("The given event already has a related item");
         }
 
         Item relatedItem = itemService.find(context, relatedItemUUID);
-        if (relatedItem != null) {
-            qaevent.setRelated(relatedItemUUID.toString());
-            qaEventService.store(context, qaevent);
-        } else {
+        if (relatedItem == null) {
             throw new UnprocessableEntityException("The proposed related item was not found");
         }
+
+        qaevent.setRelated(relatedItemUUID.toString());
+        qaEventService.store(context, qaevent);
+
         ItemRest relatedItemRest = converterService.toRest(relatedItem, utils.obtainProjection());
         ItemResource itemResource = converterService.toResource(relatedItemRest);
+
         context.complete();
+
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), itemResource);
     }
 
@@ -110,22 +111,26 @@ public class QAEventRestController {
      * This method remove the association to a related item from a qa event
      * 
      * @param qaeventId       The qa event id
-     * @param response        The current response
-     * @param request         The current request
      * @return The related item
      * @throws SQLException       If something goes wrong
      * @throws AuthorizeException If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable(name = "id") String qaeventId,
-            HttpServletResponse response, HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> removeRelatedItem(@PathVariable(name = "id") String qaeventId)
         throws SQLException, AuthorizeException, IOException {
-        Context context = ContextUtil.obtainContext(request);
+
+        Context context = ContextUtil.obtainCurrentRequestContext();
         QAEvent qaevent = qaEventService.findEventByEventId(qaeventId);
+
         if (qaevent == null) {
             throw new ResourceNotFoundException("No such qa event: " + qaeventId);
         }
+
+        if (!qaEventService.isRelatedItemSupported(qaevent)) {
+            throw new UnprocessableEntityException("The given event does not supports a related item");
+        }
+
         if (qaevent.getRelated() != null) {
             qaevent.setRelated(null);
             qaEventService.store(context, qaevent);
