@@ -72,7 +72,8 @@ public class QAEventMatcher {
         } else if (StringUtils.endsWith(topic, "/PID")) {
             return allOf(
                     hasJsonPath("$.value", is(message.getValue())),
-                    hasJsonPath("$.type", is(message.getType())));
+                    hasJsonPath("$.type", is(message.getType())),
+                    hasJsonPath("$.pidHref", is(calculateOpenairePidHref(message.getType(), message.getValue()))));
         } else if (StringUtils.endsWith(topic, "/PROJECT")) {
             return allOf(
                     hasJsonPath("$.openaireId", is(message.getOpenaireId())),
@@ -84,5 +85,42 @@ public class QAEventMatcher {
                     hasJsonPath("$.title", is(message.getTitle())));
         }
         return IsAnything.anything();
+    }
+
+    private static String calculateOpenairePidHref(String type, String value) {
+        if (type == null) {
+            return null;
+        }
+
+        String hrefPrefix = null;
+
+        switch (type) {
+            case "arxiv":
+                hrefPrefix = "https://arxiv.org/abs/";
+                break;
+            case "handle":
+                hrefPrefix = "https://arxiv.org/abs/";
+                break;
+            case "urn":
+                hrefPrefix = "";
+                break;
+            case "doi":
+                hrefPrefix = "https://doi.org/";
+                break;
+            case "pmc":
+                hrefPrefix = "https://www.ncbi.nlm.nih.gov/pmc/articles/";
+                break;
+            case "pmid":
+                hrefPrefix = "https://pubmed.ncbi.nlm.nih.gov/";
+                break;
+            case "ncid":
+                hrefPrefix = "https://ci.nii.ac.jp/ncid/";
+                break;
+            default:
+                break;
+        }
+
+        return hrefPrefix != null ? hrefPrefix + value : null;
+
     }
 }

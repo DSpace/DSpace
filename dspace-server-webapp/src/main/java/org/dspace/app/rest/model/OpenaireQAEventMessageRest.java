@@ -16,20 +16,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class OpenaireQAEventMessageRest implements QAEventMessageRest {
+
     // pids
     private String type;
+
     private String value;
+
+    private String pidHref;
+
     // abstract
     @JsonProperty(value = "abstract")
     private String abstractValue;
+
     // project
     private String openaireId;
+
     private String acronym;
+
     private String code;
+
     private String funder;
+
     private String fundingProgram;
+
     private String jurisdiction;
+
     private String title;
+
     public String getType() {
         return type;
     }
@@ -89,6 +102,14 @@ public class OpenaireQAEventMessageRest implements QAEventMessageRest {
     }
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getPidHref() {
+        return pidHref;
+    }
+
+    public void setPidHref(String pidHref) {
+        this.pidHref = pidHref;
     }
 
 }

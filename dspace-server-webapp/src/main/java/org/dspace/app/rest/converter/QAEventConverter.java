@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.text.DecimalFormat;
+import javax.annotation.PostConstruct;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -20,6 +21,8 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.QAEvent;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,10 +35,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
 
+    private static final String OPENAIRE_PID_HREF_PREFIX_PROPERTY = "qaevents.openaire.pid-href-prefix.";
+
+    @Autowired
+    private ConfigurationService configurationService;
+
     private ObjectMapper jsonMapper;
 
-    public QAEventConverter() {
-        super();
+    @PostConstruct
+    public void setup() {
         jsonMapper = new JsonMapper();
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -63,22 +71,40 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
 
     private QAEventMessageRest convertMessage(QAMessageDTO dto) {
         if (dto instanceof OpenaireMessageDTO) {
-            OpenaireMessageDTO openaireDto = (OpenaireMessageDTO) dto;
-            OpenaireQAEventMessageRest message = new OpenaireQAEventMessageRest();
-            message.setAbstractValue(openaireDto.getAbstracts());
-            message.setOpenaireId(openaireDto.getOpenaireId());
-            message.setAcronym(openaireDto.getAcronym());
-            message.setCode(openaireDto.getCode());
-            message.setFunder(openaireDto.getFunder());
-            message.setFundingProgram(openaireDto.getFundingProgram());
-            message.setJurisdiction(openaireDto.getJurisdiction());
-            message.setTitle(openaireDto.getTitle());
-            message.setType(openaireDto.getType());
-            message.setValue(openaireDto.getValue());
-            return message;
+            return convertOpenaireMessage(dto);
+        }
+        throw new IllegalArgumentException("Unknown message type: " + dto.getClass());
+    }
+
+    private QAEventMessageRest convertOpenaireMessage(QAMessageDTO dto) {
+        OpenaireMessageDTO openaireDto = (OpenaireMessageDTO) dto;
+        OpenaireQAEventMessageRest message = new OpenaireQAEventMessageRest();
+        message.setAbstractValue(openaireDto.getAbstracts());
+        message.setOpenaireId(openaireDto.getOpenaireId());
+        message.setAcronym(openaireDto.getAcronym());
+        message.setCode(openaireDto.getCode());
+        message.setFunder(openaireDto.getFunder());
+        message.setFundingProgram(openaireDto.getFundingProgram());
+        message.setJurisdiction(openaireDto.getJurisdiction());
+        message.setTitle(openaireDto.getTitle());
+        message.setType(openaireDto.getType());
+        message.setValue(openaireDto.getValue());
+        message.setPidHref(calculateOpenairePidHref(openaireDto.getType(), openaireDto.getValue()));
+        return message;
+    }
+
+    private String calculateOpenairePidHref(String type, String value) {
+        if (type == null) {
+            return null;
         }
 
-        throw new IllegalArgumentException("Unknown message type: " + dto.getClass());
+        String hrefType = type.toLowerCase();
+        if (!configurationService.hasProperty(OPENAIRE_PID_HREF_PREFIX_PROPERTY + hrefType)) {
+            return null;
+        }
+
+        String hrefPrefix = configurationService.getProperty(OPENAIRE_PID_HREF_PREFIX_PROPERTY + hrefType, "");
+        return hrefPrefix + value;
     }
 
     @Override
