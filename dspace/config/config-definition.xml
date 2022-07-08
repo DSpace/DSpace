@@ -42,6 +42,11 @@
         <properties fileName="local.cfg" throwExceptionOnMissing="false" config-name="local" config-optional="true"
                     encoding="UTF-8" config-reload="true" reloadingRefreshDelay="5000"/>
 
+        <!-- Separate our changes from original dspace source -->
+        <!-- Overrides everything in modules and dspace.cfg, but not local.cfg -->
+        <properties fileName="clarin-dspace.cfg" throwExceptionOnMissing="true" config-name="clarin"
+                    encoding="UTF-8" config-reload="true" reloadingRefreshDelay="5000"/>
+
         <!-- Load our dspace.cfg (which in turn loads all module configs via "include=" statements) -->
         <!-- Check for reload every 5 seconds (5,000ms) -->
         <properties fileName="dspace.cfg" throwExceptionOnMissing="true" encoding="UTF-8" config-reload="true"
