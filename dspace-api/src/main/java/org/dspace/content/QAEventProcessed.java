@@ -13,7 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,11 +40,11 @@ public class QAEventProcessed implements Serializable {
     private Date eventTimestamp;
 
     @JoinColumn(name = "eperson_uuid")
-    @OneToOne
+    @ManyToOne
     private EPerson eperson;
 
     @JoinColumn(name = "item_uuid")
-    @OneToOne
+    @ManyToOne
     private Item item;
 
     public String getEventId() {

@@ -29,6 +29,11 @@ import org.dspace.qaevent.dao.QAEventsDao;
 public class QAEventsDaoImpl extends AbstractHibernateDAO<QAEventProcessed> implements QAEventsDao {
 
     @Override
+    public List<QAEventProcessed> findAll(Context context) throws SQLException {
+        return findAll(context, QAEventProcessed.class);
+    }
+
+    @Override
     public boolean storeEvent(Context context, String checksum, EPerson eperson, Item item) {
         QAEventProcessed qaEvent = new QAEventProcessed();
         qaEvent.setEperson(eperson);
@@ -59,6 +64,26 @@ public class QAEventsDaoImpl extends AbstractHibernateDAO<QAEventProcessed> impl
         query.setFirstResult(start);
         query.setMaxResults(size);
         query.setParameter("event_id", eventId);
+        return findMany(context, query);
+    }
+
+    @Override
+    public List<QAEventProcessed> findByItem(Context context, Item item) throws SQLException {
+        Query query = createQuery(context, ""
+            + " SELECT qaevent "
+            + " FROM QAEventProcessed qaevent "
+            + " WHERE qaevent.item = :item ");
+        query.setParameter("item", item);
+        return findMany(context, query);
+    }
+
+    @Override
+    public List<QAEventProcessed> findByEPerson(Context context, EPerson ePerson) throws SQLException {
+        Query query = createQuery(context, ""
+            + " SELECT qaevent "
+            + " FROM QAEventProcessed qaevent "
+            + " WHERE qaevent.eperson = :eperson ");
+        query.setParameter("eperson", ePerson);
         return findMany(context, query);
     }
 

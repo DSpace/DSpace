@@ -144,4 +144,12 @@ public interface QAEventService {
      */
     public long countSources();
 
+    /**
+     * Check if the given QA event supports a related item.
+     * 
+     * @param  qaevent the event to be verified
+     * @return         true if the event supports a related item, false otherwise.
+     */
+    public boolean isRelatedItemSupported(QAEvent qaevent);
+
 }

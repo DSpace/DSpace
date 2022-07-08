@@ -7,10 +7,6 @@
  */
 package org.dspace.qaevent;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import org.dspace.utils.DSpace;
@@ -41,14 +37,7 @@ public class OpenaireEventsRunnableCli extends OpenaireEventsRunnable {
             formatter.printHelp("Import Notification event json file", getScriptConfiguration().getOptions());
             System.exit(0);
         }
-    }
 
-    /**
-     * Get the events input stream from a local file.
-     */
-    @Override
-    protected InputStream getQAEventsInputStream() throws Exception {
-        return new FileInputStream(new File(fileLocation));
     }
 
 }

@@ -33,6 +33,7 @@ import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.QAEventProcessed;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -47,6 +48,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.qaevent.dao.QAEventsDao;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -103,6 +105,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected ClaimedTaskService claimedTaskService;
     @Autowired
     protected OrcidTokenService orcidTokenService;
+    @Autowired
+    protected QAEventsDao qaEventsDao;
 
     protected EPersonServiceImpl() {
         super();
@@ -390,6 +394,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         // Remove any subscriptions
         subscribeService.deleteByEPerson(context, ePerson);
+
+        List<QAEventProcessed> qaEvents = qaEventsDao.findByEPerson(context, ePerson);
+        for (QAEventProcessed qaEvent : qaEvents) {
+            qaEventsDao.delete(context, qaEvent);
+        }
 
         // Remove ourself
         ePersonDAO.delete(context, ePerson);

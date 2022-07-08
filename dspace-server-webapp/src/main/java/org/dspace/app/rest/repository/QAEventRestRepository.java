@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.Parameter;
@@ -24,10 +23,9 @@ import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.dspace.qaevent.service.QAEventService;
-import org.slf4j.Logger;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,19 +54,14 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     private ItemService itemService;
 
     @Autowired
-    private EPersonService ePersonService;
-
-    @Autowired
     private ResourcePatch<QAEvent> resourcePatch;
-
-    private Logger log = org.slf4j.LoggerFactory.getLogger(QAEventRestRepository.class);
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public QAEventRest findOne(Context context, String id) {
         QAEvent qaEvent = qaEventService.findEventByEventId(id);
         if (qaEvent == null) {
-            // HACK check if this request is part of a patch flow
+            // check if this request is part of a patch flow
             qaEvent = (QAEvent) requestService.getCurrentRequest().getAttribute("patchedNotificationEvent");
             if (qaEvent != null && qaEvent.getEventId().contentEquals(id)) {
                 return converter.toRest(qaEvent, utils.obtainProjection());
@@ -82,7 +75,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @SearchRestMethod(name = "findByTopic")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
-            Pageable pageable) {
+        Pageable pageable) {
         List<QAEvent> qaEvents = null;
         Long count = 0L;
         boolean ascending = false;
@@ -99,16 +92,11 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     }
 
     @Override
-    protected void delete(Context context, String id) throws AuthorizeException {
-        Item item;
-        try {
-            item = itemService.find(context, UUID.fromString(id));
-            EPerson eperson = context.getCurrentUser();
-            qaEventService.deleteEventByEventId(id);
-            qaEventDao.storeEvent(context, id, eperson, item);
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to delete QAEvent " + id, e);
-        }
+    protected void delete(Context context, String eventId) throws AuthorizeException {
+        Item item = findTargetItem(context, eventId);
+        EPerson eperson = context.getCurrentUser();
+        qaEventService.deleteEventByEventId(eventId);
+        qaEventDao.storeEvent(context, eventId, eperson, item);
     }
 
     @Override
@@ -119,9 +107,22 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
-            String id, Patch patch) throws SQLException, AuthorizeException {
+        String id, Patch patch) throws SQLException, AuthorizeException {
         QAEvent qaEvent = qaEventService.findEventByEventId(id);
         resourcePatch.patch(context, qaEvent, patch.getOperations());
+    }
+
+    private Item findTargetItem(Context context, String eventId) {
+        QAEvent qaEvent = qaEventService.findEventByEventId(eventId);
+        if (qaEvent == null) {
+            return null;
+        }
+
+        try {
+            return itemService.find(context, UUIDUtils.fromString(qaEvent.getTarget()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

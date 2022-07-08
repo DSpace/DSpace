@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.content.QAEventProcessed;
 import org.dspace.core.Context;
+import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -21,7 +22,36 @@ import org.dspace.eperson.EPerson;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public interface QAEventsDao {
+public interface QAEventsDao extends GenericDAO<QAEventProcessed> {
+
+    /**
+     * Returns all the stored QAEventProcessed entities.
+     *
+     * @param  context      the DSpace context
+     * @return              the found entities
+     * @throws SQLException if an SQL error occurs
+     */
+    public List<QAEventProcessed> findAll(Context context) throws SQLException;
+
+    /**
+     * Returns the stored QAEventProcessed entities by item.
+     *
+     * @param  context      the DSpace context
+     * @param  item         the item to search for
+     * @return              the found entities
+     * @throws SQLException if an SQL error occurs
+     */
+    public List<QAEventProcessed> findByItem(Context context, Item item) throws SQLException;
+
+    /**
+     * Returns the stored QAEventProcessed entities by eperson.
+     *
+     * @param  context      the DSpace context
+     * @param  ePerson      the ePerson to search for
+     * @return              the found entities
+     * @throws SQLException if an SQL error occurs
+     */
+    public List<QAEventProcessed> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 
     /**
      * Search a page of quality assurance broker events by notification ID.

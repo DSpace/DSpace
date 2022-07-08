@@ -8,6 +8,8 @@
 package org.dspace.qaevent.service.impl;
 
 import static java.util.Comparator.comparing;
+import static org.apache.commons.lang3.StringUtils.endsWith;
+import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -235,40 +238,30 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Override
     public void store(Context context, QAEvent dto) {
-        UpdateRequest updateRequest = new UpdateRequest();
-        String topic = dto.getTopic();
 
         if (isNotSupportedSource(dto.getSource())) {
             throw new IllegalArgumentException("The source of the given event is not supported: " + dto.getSource());
         }
 
-        if (topic != null) {
-            String checksum = dto.getEventId();
-            try {
-                if (!qaEventsDao.isEventStored(context, checksum)) {
-                    SolrInputDocument doc = new SolrInputDocument();
-                    doc.addField(SOURCE, dto.getSource());
-                    doc.addField(EVENT_ID, checksum);
-                    doc.addField(ORIGINAL_ID, dto.getOriginalId());
-                    doc.addField(TITLE, dto.getTitle());
-                    doc.addField(TOPIC, topic);
-                    doc.addField(TRUST, dto.getTrust());
-                    doc.addField(MESSAGE, dto.getMessage());
-                    doc.addField(LAST_UPDATE, new Date());
-                    final String resourceUUID = getResourceUUID(context, dto.getOriginalId());
-                    if (resourceUUID == null) {
-                        throw new IllegalArgumentException("Skipped event " + checksum +
-                            " related to the oai record " + dto.getOriginalId() + " as the record was not found");
-                    }
-                    doc.addField(RESOURCE_UUID, resourceUUID);
-                    doc.addField(RELATED_UUID, dto.getRelated());
-                    updateRequest.add(doc);
-                    updateRequest.process(getSolr());
-                    getSolr().commit();
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        if (StringUtils.isBlank(dto.getTopic())) {
+            throw new IllegalArgumentException("A topic is mandatory for an event");
+        }
+
+        String checksum = dto.getEventId();
+        try {
+            if (!qaEventsDao.isEventStored(context, checksum)) {
+
+                SolrInputDocument doc = createSolrDocument(context, dto, checksum);
+
+                UpdateRequest updateRequest = new UpdateRequest();
+
+                updateRequest.add(doc);
+                updateRequest.process(getSolr());
+
+                getSolr().commit();
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -346,32 +339,6 @@ public class QAEventServiceImpl implements QAEventService {
         }
     }
 
-    private String getResourceUUID(Context context, String originalId) throws Exception {
-        String id = getHandleFromOriginalId(originalId);
-        if (id != null) {
-            Item item = (Item) handleService.resolveToObject(context, id);
-            if (item != null) {
-                final String itemUuid = item.getID().toString();
-                context.uncacheEntity(item);
-                return itemUuid;
-            } else {
-                return null;
-            }
-        } else {
-            throw new IllegalArgumentException("Malformed originalId " + originalId);
-        }
-    }
-
-    // oai:www.openstarts.units.it:10077/21486
-    private String getHandleFromOriginalId(String originalId) {
-        Integer startPosition = originalId.lastIndexOf(':');
-        if (startPosition != -1) {
-            return originalId.substring(startPosition + 1, originalId.length());
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public QASource findSource(String sourceName) {
 
@@ -423,6 +390,58 @@ public class QAEventServiceImpl implements QAEventService {
     @Override
     public long countSources() {
         return getSupportedSources().length;
+    }
+
+    @Override
+    public boolean isRelatedItemSupported(QAEvent qaevent) {
+        // Currently only PROJECT topics related to OPENAIRE supports related items
+        return qaevent.getSource().equals(OPENAIRE_SOURCE) && endsWith(qaevent.getTopic(), "/PROJECT");
+    }
+
+    private SolrInputDocument createSolrDocument(Context context, QAEvent dto, String checksum) throws Exception {
+        SolrInputDocument doc = new SolrInputDocument();
+        doc.addField(SOURCE, dto.getSource());
+        doc.addField(EVENT_ID, checksum);
+        doc.addField(ORIGINAL_ID, dto.getOriginalId());
+        doc.addField(TITLE, dto.getTitle());
+        doc.addField(TOPIC, dto.getTopic());
+        doc.addField(TRUST, dto.getTrust());
+        doc.addField(MESSAGE, dto.getMessage());
+        doc.addField(LAST_UPDATE, new Date());
+        final String resourceUUID = getResourceUUID(context, dto.getOriginalId());
+        if (resourceUUID == null) {
+            throw new IllegalArgumentException("Skipped event " + checksum +
+                " related to the oai record " + dto.getOriginalId() + " as the record was not found");
+        }
+        doc.addField(RESOURCE_UUID, resourceUUID);
+        doc.addField(RELATED_UUID, dto.getRelated());
+        return doc;
+    }
+
+    private String getResourceUUID(Context context, String originalId) throws Exception {
+        String id = getHandleFromOriginalId(originalId);
+        if (id != null) {
+            Item item = (Item) handleService.resolveToObject(context, id);
+            if (item != null) {
+                final String itemUuid = item.getID().toString();
+                context.uncacheEntity(item);
+                return itemUuid;
+            } else {
+                return null;
+            }
+        } else {
+            throw new IllegalArgumentException("Malformed originalId " + originalId);
+        }
+    }
+
+    // oai:www.openstarts.units.it:10077/21486
+    private String getHandleFromOriginalId(String originalId) {
+        Integer startPosition = originalId.lastIndexOf(':');
+        if (startPosition != -1) {
+            return originalId.substring(startPosition + 1, originalId.length());
+        } else {
+            return null;
+        }
     }
 
     private boolean isNotSupportedSource(String source) {
