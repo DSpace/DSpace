@@ -31,6 +31,8 @@ public interface HandleDAO extends GenericDAO<Handle> {
 
     public Handle findByHandle(Context context, String handle) throws SQLException;
 
+    // !NEW we need additional javadoc on the service methods to understand the differences between the findByVersion
+    // and findByPrefix methods as they seem to be duplicate
     public List<Handle> findByPrefix(Context context, String prefix) throws SQLException;
 
     public List<Handle> findByVersion(Context context, String prefix) throws SQLException;

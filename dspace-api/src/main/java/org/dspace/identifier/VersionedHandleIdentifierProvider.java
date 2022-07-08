@@ -385,6 +385,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         }
 
         // Ensure this handle does not exist already.
+        // origin
+        // if (handleService.resolveToObject(context, identifier) == null) {
+        // !NEW
         if (handleService.resolveToObject(context, identifier, false) == null) {
             handleService.createHandle(context, dso, identifier);
         } else {

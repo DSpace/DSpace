@@ -88,6 +88,8 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         return list(context, criteriaQuery, false, Handle.class, -1, -1);
     }
 
+    // !NEW we need additional javadoc on the service methods to understand the differences between the
+    // findByVersion and findByPrefix methods as they seem to be duplicate
     @Override
     public List<Handle> findByVersion(Context context, String prefix) throws SQLException {
         Query query = createQuery(context,
@@ -104,6 +106,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return list(query);
     }
+
     @Override
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException {
 

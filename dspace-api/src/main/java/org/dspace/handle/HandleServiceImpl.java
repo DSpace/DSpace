@@ -50,11 +50,6 @@ public class HandleServiceImpl implements HandleService {
      */
     static final String EXAMPLE_PREFIX = "123456789";
 
-    /**
-     * Initial version suffix
-     */
-    private static String INITIAL_VERSION_SUFFIX = "";
-
     @Autowired(required = true)
     protected HandleDAO handleDAO;
 
@@ -119,6 +114,9 @@ public class HandleServiceImpl implements HandleService {
         while (handle.startsWith("/")) {
             handle = handle.substring(1);
         }
+        // origin
+        //Handle dbhandle = findHandleInternal(context, handle);
+        // !NEW
         Handle dbhandle = findHandleInternal(context, handle, true);
 
         return (null == dbhandle) ? null : handle;
@@ -249,6 +247,7 @@ public class HandleServiceImpl implements HandleService {
         return resolveToObject(context, handle, true);
     }
 
+    // !NEW
     @Override
     public DSpaceObject resolveToObject(Context context, String handle, boolean fallbackResolvingToMostRecentVersion)
             throws IllegalStateException, SQLException {
@@ -372,8 +371,6 @@ public class HandleServiceImpl implements HandleService {
             throw new IllegalArgumentException("Handle is null");
         }
 
-        INITIAL_VERSION_SUFFIX = configurationService.getProperty("dspace.initialVersionSuffix", "");
-
         // search the handle string as is
         Handle tempHandle = handleDAO.findByHandle(context, handle);
 
@@ -386,7 +383,11 @@ public class HandleServiceImpl implements HandleService {
             // if there is no DSO with this handle within the versions ...
             if ( (tempHandleList == null) || (tempHandleList.isEmpty()) ) {
                 // ... then give it a last try appending a version string of ".1"
-                return handleDAO.findByHandle(context, handle + INITIAL_VERSION_SUFFIX);
+                if (configurationService.getBooleanProperty("dspace.initialVersionSuffix", false)) {
+                    return handleDAO.findByHandle(context, handle + ".1");
+                } else {
+                    return tempHandle;
+                }
             } else {
                 // findByVersion returns the DSO list in descending order by version date field
                 return tempHandleList.get(0);
@@ -404,8 +405,6 @@ public class HandleServiceImpl implements HandleService {
      * @throws SQLException If a database error occurs
      */
     protected String createId(Context context, DSpaceObject dso) throws SQLException {
-        INITIAL_VERSION_SUFFIX = configurationService.getProperty("dspace.initialVersionSuffix", "");
-
         // Get configured prefix
         String handlePrefix = getPrefix();
 
@@ -414,8 +413,8 @@ public class HandleServiceImpl implements HandleService {
 
         String strHandle = handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
 
-        if (dso instanceof Item) {
-            strHandle += INITIAL_VERSION_SUFFIX;
+        if (dso instanceof Item && configurationService.getBooleanProperty("dspace.initialVersionSuffix", false)) {
+            strHandle += ".1";
         }
 
         return strHandle;
