@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,31 +99,41 @@ public class IPTable {
                 throw new IPFormatException(ip + " - Range format should be similar to 1.2.3.0-1.2.3.255");
             }
 
-        } else if (ip.contains("/")) {
-            String[] parts = ip.split("/");
-            try {
-                byte[] octets = InetAddress.getByName(parts[0]).getAddress();
-                long result = 0;
-                for (byte octet : octets) {
-                    result <<= 8;
-                    result |= octet & 0xff;
-                }
-                long mask = (long) Math.pow(2, 32 - Integer.parseInt(parts[1]));
-                long ipLo = (result / mask) * mask;
-                long ipHi = (( (result / mask) + 1) * mask) - 1;
-                ipRanges.add(new IPRange(ipLo, ipHi));
-                return;
-            } catch (Exception e) {
-                throw new IPFormatException(ip + " - Range format should be similar to 172.16.0.0/12");
+        } else {
+            // Convert implicit ranges to netmask format
+            //  192       -> 192.0.0.0/8
+            //  192.168   -> 192.168.0.0/16
+            //  192.168.1 -> 192.168.1.0/24
+            int periods = StringUtils.countMatches(ip, '.');
+            if (periods < 3) {
+                ip = StringUtils.join(ip, StringUtils.repeat(".0", 4 - periods - 1), "/", (periods + 1) * 8);
             }
 
-        } else {
-            try {
-                long ipLo = ipToLong(InetAddress.getByName(ip));
-                ipRanges.add(new IPRange(ipLo, ipLo));
-                return;
-            } catch (UnknownHostException e) {
-                throw new IPFormatException(ip + " - IP address format should be similar to 1.2.3.14");
+            if (ip.contains("/")) {
+                String[] parts = ip.split("/");
+                try {
+                    byte[] octets = InetAddress.getByName(parts[0]).getAddress();
+                    long result = 0;
+                    for (byte octet : octets) {
+                        result <<= 8;
+                        result |= octet & 0xff;
+                    }
+                    long mask = (long) Math.pow(2, 32 - Integer.parseInt(parts[1]));
+                    long ipLo = (result / mask) * mask;
+                    long ipHi = (( (result / mask) + 1) * mask) - 1;
+                    ipRanges.add(new IPRange(ipLo, ipHi));
+                    return;
+                } catch (Exception e) {
+                    throw new IPFormatException(ip + " - Range format should be similar to 172.16.0.0/12");
+                }
+            } else {
+                try {
+                    long ipLo = ipToLong(InetAddress.getByName(ip));
+                    ipRanges.add(new IPRange(ipLo, ipLo));
+                    return;
+                } catch (UnknownHostException e) {
+                    throw new IPFormatException(ip + " - IP address format should be similar to 1.2.3.14");
+                }
             }
         }
     }
