@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.qaevent;
+package org.dspace.qaevent.script;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
@@ -22,9 +22,8 @@ public class OpenaireEventsRunnableCli extends OpenaireEventsRunnable {
     @Override
     @SuppressWarnings({ "rawtypes" })
     public OpenaireEventsCliScriptConfiguration getScriptConfiguration() {
-        OpenaireEventsCliScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-openaire-events", OpenaireEventsCliScriptConfiguration.class);
-        return configuration;
+        return new DSpace().getServiceManager()
+            .getServiceByName("import-openaire-events", OpenaireEventsCliScriptConfiguration.class);
     }
 
     @Override

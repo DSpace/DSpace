@@ -11,7 +11,7 @@
 
     <bean id="qaEventsDao" class="org.dspace.qaevent.dao.impl.QAEventsDaoImpl" />
  
-     <bean id="org.dspace.qaevent.QAEventActionService" class="org.dspace.qaevent.QAEventActionServiceImpl">
+     <bean id="org.dspace.qaevent.service.QAEventActionService" class="org.dspace.qaevent.service.impl.QAEventActionServiceImpl">
         <property name="topicsToActions">
             <map>
             	<!--The key are the TOPIC, the value must be a valid implementation of the 
@@ -27,7 +27,7 @@
      
      <!-- This action bind the publication to the project, otherwise if the project has not been specified, 
       create a new project with the available data and then bind it to the publication -->
-     <bean id="ProjectLinkedEntityAction" class="org.dspace.qaevent.QAEntityOpenaireMetadataAction">
+     <bean id="ProjectLinkedEntityAction" class="org.dspace.qaevent.action.QAEntityOpenaireMetadataAction">
         <!-- which metadata will hold the relation between the publication and the project -->
         <property name="relation" value="isPublicationOfProject" />
         <!-- the type of local entity used to store the project details -->
@@ -45,11 +45,11 @@
             </map>
         </property>    
      </bean>
-     <bean id="AbstractMetadataAction" class="org.dspace.qaevent.QAOpenaireSimpleMetadataAction">
+     <bean id="AbstractMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->
-     <bean id="PIDMetadataAction" class="org.dspace.qaevent.QAOpenaireMetadataMapAction">
+     <bean id="PIDMetadataAction" class="org.dspace.qaevent.action.QAOpenaireMetadataMapAction">
 	     <property name="types">
 	         <map>
 	<!--The key are the type of identifier (or subject) reported in the message, the value is the metadata in 

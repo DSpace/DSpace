@@ -121,7 +121,7 @@ public class QAEvent {
             try {
                 computedEventId();
             } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return eventId;

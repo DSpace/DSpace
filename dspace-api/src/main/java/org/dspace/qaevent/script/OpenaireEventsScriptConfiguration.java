@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.qaevent;
+package org.dspace.qaevent.script;
 
 import java.io.InputStream;
 import java.sql.SQLException;

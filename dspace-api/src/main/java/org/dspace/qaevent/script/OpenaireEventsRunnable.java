@@ -5,22 +5,20 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.qaevent;
+package org.dspace.qaevent.script;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -29,8 +27,6 @@ import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DSpaceRunnable} to perfom a QAEvents import from a
@@ -60,19 +56,15 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptConfiguration<OpenaireEventsRunnable>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenaireEventsRunnable.class);
+    private QAEventService qaEventService;
 
-    protected QAEventService qaEventService;
+    private String[] topicsToImport;
 
-    protected String[] topicsToImport;
+    private ConfigurationService configurationService;
 
-    protected ConfigurationService configurationService;
+    private String fileLocation;
 
-    protected String fileLocation;
-
-    protected List<QAEvent> entries;
-
-    protected Context context;
+    private Context context;
 
     @Override
     @SuppressWarnings({ "rawtypes" })
@@ -88,10 +80,7 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
 
         qaEventService =  dspace.getSingletonService(QAEventService.class);
         if (qaEventService == null) {
-            LOGGER.error("qaEventService is NULL. Error in spring configuration");
-            throw new IllegalStateException();
-        } else {
-            LOGGER.debug("qaEventService correctly loaded");
+            throw new IllegalStateException("qaEventService is NULL. Error in spring configuration");
         }
 
         configurationService = dspace.getConfigurationService();
@@ -106,30 +95,33 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
     public void internalRun() throws Exception {
 
         if (StringUtils.isEmpty(fileLocation)) {
-            LOGGER.info("No file location was entered");
-            System.exit(1);
+            throw new IllegalArgumentException("No file location was entered");
         }
 
         context = new Context();
+        assignCurrentUserInContext();
 
-        ObjectMapper jsonMapper = new JsonMapper();
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            this.entries = jsonMapper.readValue(getQAEventsInputStream(), new TypeReference<List<QAEvent>>() {
-            });
-        } catch (IOException e) {
-            LOGGER.error("File is not found or not readable: " + fileLocation, e);
-            System.exit(1);
+            runOpenaireEventsImport();
+        } catch (Exception ex) {
+            handler.logError("A not recoverable error occurs during OPENAIRE events import. "
+                + ExceptionUtils.getRootCauseMessage(ex), ex);
+            throw ex;
         }
 
-        for (QAEvent entry : entries) {
-            entry.setSource(QAEvent.OPENAIRE_SOURCE);
-            if (!StringUtils.equalsAny(entry.getTopic(), topicsToImport)) {
-                LOGGER.info("Skip event for topic " + entry.getTopic() + " is not allowed in the oaire-qaevents.cfg");
-                continue;
-            }
+    }
+
+    /**
+     * Read the OPENAIRE events from the given JSON file and try to store them.
+     */
+    private void runOpenaireEventsImport() {
+
+        QAEvent[] qaEvents = readOpenaireQAEventsFromJsonFile();
+        handler.logInfo("Found " + qaEvents.length + " events to store");
+
+        for (QAEvent event : qaEvents) {
             try {
-                qaEventService.store(context, entry);
+                storeOpenaireQAEvent(event);
             } catch (RuntimeException e) {
                 handler.logWarning(getRootCauseMessage(e));
             }
@@ -138,19 +130,50 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
     }
 
     /**
+     * Read all the QAEvent present in the given file.
+     *
+     * @return           the QA events to be imported
+     * @throws Exception if an oerror occurs during the file reading
+     */
+    private QAEvent[] readOpenaireQAEventsFromJsonFile() {
+        try {
+
+            ObjectMapper jsonMapper = new JsonMapper();
+            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            return jsonMapper.readValue(getQAEventsFileInputStream(), QAEvent[].class);
+
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("An error occurs parsing the OPENAIRE QA events json", ex);
+        }
+    }
+
+    /**
      * Obtain an InputStream from the runnable instance.
      * @return
      * @throws Exception
      */
-    protected InputStream getQAEventsInputStream() throws Exception {
+    private InputStream getQAEventsFileInputStream() throws Exception {
+        return handler.getFileStream(context, fileLocation)
+            .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
+                + "found for filename: " + fileLocation));
+    }
 
-        this.assignCurrentUserInContext();
+    /**
+     * Store the given QAEvent, skipping it if it is not supported.
+     *
+     * @param event the event to be stored
+     */
+    private void storeOpenaireQAEvent(QAEvent event) {
 
-        InputStream inputStream = handler.getFileStream(context, fileLocation)
-                .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
-                    + "found for filename: " + fileLocation));
+        if (!StringUtils.equalsAny(event.getTopic(), topicsToImport)) {
+            handler.logWarning("Event for topic " + event.getTopic() + " is not allowed in the qaevents.cfg");
+            return;
+        }
 
-        return inputStream;
+        event.setSource(QAEvent.OPENAIRE_SOURCE);
+
+        qaEventService.store(context, event);
+
     }
 
     private void assignCurrentUserInContext() throws SQLException {

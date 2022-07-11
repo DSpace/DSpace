@@ -176,7 +176,6 @@ public class QAEventServiceImpl implements QAEventService {
                 if (c.getName().equals(topicId.replace("!", "/"))) {
                     QATopic topic = new QATopic();
                     topic.setKey(c.getName());
-//                    topic.setName(OpenstarSupportedTopic.sorlToRest(c.getName()));
                     topic.setTotalEvents(c.getCount());
                     topic.setLastEvent(new Date());
                     return topic;
@@ -211,7 +210,7 @@ public class QAEventServiceImpl implements QAEventService {
             solrQuery.addFilterQuery(SOURCE + ":" + source);
         }
         QueryResponse response;
-        List<QATopic> topics = null;
+        List<QATopic> topics = new ArrayList<>();
         try {
             response = getSolr().query(solrQuery);
             FacetField facetField = response.getFacetField(TOPIC);
@@ -224,7 +223,6 @@ public class QAEventServiceImpl implements QAEventService {
                 }
                 QATopic topic = new QATopic();
                 topic.setKey(c.getName());
-                // topic.setName(c.getName().replaceAll("/", "!"));
                 topic.setTotalEvents(c.getCount());
                 topic.setLastEvent(new Date());
                 topics.add(topic);
@@ -284,29 +282,18 @@ public class QAEventServiceImpl implements QAEventService {
         return null;
     }
 
-    private QAEvent getQAEventFromSOLR(SolrDocument doc) {
-        QAEvent item = new QAEvent();
-        item.setSource((String) doc.get(SOURCE));
-        item.setEventId((String) doc.get(EVENT_ID));
-        item.setLastUpdate((Date) doc.get(LAST_UPDATE));
-        item.setMessage((String) doc.get(MESSAGE));
-        item.setOriginalId((String) doc.get(ORIGINAL_ID));
-        item.setTarget((String) doc.get(RESOURCE_UUID));
-        item.setTitle((String) doc.get(TITLE));
-        item.setTopic((String) doc.get(TOPIC));
-        item.setTrust((double) doc.get(TRUST));
-        item.setRelated((String) doc.get(RELATED_UUID));
-        return item;
-    }
-
     @Override
     public List<QAEvent> findEventsByTopicAndPage(String topic, long offset,
         int pageSize, String orderField, boolean ascending) {
+
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
-        solrQuery.setRows(pageSize);
+        if (pageSize != -1) {
+            solrQuery.setRows(pageSize);
+        }
         solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
         solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
+
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -322,7 +309,13 @@ public class QAEventServiceImpl implements QAEventService {
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+
+        return List.of();
+    }
+
+    @Override
+    public List<QAEvent> findEventsByTopic(String topic) {
+        return findEventsByTopicAndPage(topic, 0, -1, TRUST, false);
     }
 
     @Override
@@ -442,6 +435,21 @@ public class QAEventServiceImpl implements QAEventService {
         } else {
             return null;
         }
+    }
+
+    private QAEvent getQAEventFromSOLR(SolrDocument doc) {
+        QAEvent item = new QAEvent();
+        item.setSource((String) doc.get(SOURCE));
+        item.setEventId((String) doc.get(EVENT_ID));
+        item.setLastUpdate((Date) doc.get(LAST_UPDATE));
+        item.setMessage((String) doc.get(MESSAGE));
+        item.setOriginalId((String) doc.get(ORIGINAL_ID));
+        item.setTarget((String) doc.get(RESOURCE_UUID));
+        item.setTitle((String) doc.get(TITLE));
+        item.setTopic((String) doc.get(TOPIC));
+        item.setTrust((double) doc.get(TRUST));
+        item.setRelated((String) doc.get(RELATED_UUID));
+        return item;
     }
 
     private boolean isNotSupportedSource(String source) {

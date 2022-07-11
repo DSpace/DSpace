@@ -65,6 +65,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
     
+    <bean id="import-openaire-events" class="org.dspace.qaevent.script.OpenaireEventsCliScriptConfiguration" primary="true">
+        <property name="description" value="Import new openAIRE quality assurance broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.qaevent.script.OpenaireEventsRunnableCli"/>
+    </bean>
+    
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
