@@ -44,10 +44,18 @@ public class IPTable {
             this.ipHi = ipHi;
         }
 
+        /**
+         * Get the lowest address in the range
+         * @return  the lowest address as a long integer
+         */
         public long getIpLo() {
             return ipLo;
         }
 
+        /**
+         * Get the highest address in the range
+         * @return  the highest address as a long integer
+         */
         public long getIpHi() {
             return ipHi;
         }
@@ -91,9 +99,6 @@ public class IPTable {
             }
 
         } else if (ip.contains("/")) {
-            //need to ignore CIDR notation for the moment.
-            //ip = ip.split("\\/")[0];
-
             String[] parts = ip.split("/");
             try {
                 byte[] octets = InetAddress.getByName(parts[0]).getAddress();
@@ -122,6 +127,11 @@ public class IPTable {
         }
     }
 
+    /**
+     * Convert an IP address to a long integer
+     * @param ip    the IP address
+     * @return
+     */
     public static long ipToLong(InetAddress ip) {
         byte[] octets = ip.getAddress();
         long result = 0;
@@ -132,16 +142,21 @@ public class IPTable {
         return result;
     }
 
+    /**
+     * Convert a long integer into an IP address string
+     * @param ip    the IP address as a long integer
+     * @return
+     */
     public static String longToIp(long ip) {
         long part = ip;
         String[] parts = new String[4];
         for (int i = 0; i < 4; i++) {
             long octet = part & 0xff;
-            parts[3-i] = String.valueOf(octet);
+            parts[3 - i] = String.valueOf(octet);
             part = part / 256;
         }
 
-        return parts[0]+"."+parts[1]+"."+parts[2]+"."+parts[3];
+        return parts[0] + "." + parts[1] + "." + parts[2] + "." + parts[3];
     }
 
     /**
@@ -177,7 +192,7 @@ public class IPTable {
             long ipLo = ipRange.getIpLo();
             long ipHi = ipRange.getIpHi();
             for (long ip = ipLo; ip <= ipHi; ip++) {
-                set.add(longToIp(ip).toString());
+                set.add(longToIp(ip));
             }
         }
 
@@ -201,6 +216,10 @@ public class IPTable {
         }
     }
 
+    /**
+     * Represent this IP table as a string
+     * @return  a string containing all IP ranges in this IP table
+     */
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
