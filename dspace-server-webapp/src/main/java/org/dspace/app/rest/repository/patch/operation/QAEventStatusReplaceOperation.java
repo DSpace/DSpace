@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
-import org.dspace.qaevent.QAEventActionService;
+import org.dspace.qaevent.service.QAEventActionService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

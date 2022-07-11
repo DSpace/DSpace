@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.qaevent;
+package org.dspace.qaevent.action;
 
 import java.sql.SQLException;
 
@@ -13,6 +13,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.qaevent.QualityAssuranceAction;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;

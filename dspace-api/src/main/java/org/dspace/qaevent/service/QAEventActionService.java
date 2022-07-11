@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.qaevent;
+package org.dspace.qaevent.service;
 
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;

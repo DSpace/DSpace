@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.qaevent;
+package org.dspace.qaevent.script;
 
 import org.apache.commons.cli.Options;
 

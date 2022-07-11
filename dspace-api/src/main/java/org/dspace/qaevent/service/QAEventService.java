@@ -77,6 +77,14 @@ public interface QAEventService {
     /**
      * Find all the events by topic.
      *
+     * @param  topic the topic to search for
+     * @return       the events
+     */
+    public List<QAEvent> findEventsByTopic(String topic);
+
+    /**
+     * Find all the events by topic.
+     *
      * @param  topic   the topic to search for
      * @return         the events count
      */
