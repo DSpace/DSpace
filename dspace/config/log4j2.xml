@@ -28,17 +28,21 @@
                   fileName='${log.dir}/dspace.log'
 
         >
+            <!-- NOTE: The %equals patterns are providing a default value of "unknown" if "correlationID" or
+                 "requestID" are not currently set in the ThreadContext. -->
             <Layout type='PatternLayout'
-                    pattern='%d %-5p $$$${ctx:correlationID:-unknown} $$$${ctx:requestID:-unknown} %c @ %m%n'/>
+                    pattern='%d %-5p %equals{%X{correlationID}}{}{unknown} %equals{%X{requestID}}{}{unknown} %c @ %m%n'/>
             <policies>
                 <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
-                <!-- Sample deletion policy:  keep last 30 archived files
-                <Delete basePath='${log.dir}'>
-                            <IfFileName glob='dspace.log-*'/>
-                            <IfAccumulatedFileCount exceeds='30'/>
-                </Delete>
-                -->
             </policies>
+            <!-- Sample deletion policy:  keep last 30 archived files
+            <DefaultRolloverStrategy>
+                <Delete basePath='${log.dir}'>
+                    <IfFileName glob='dspace.log-*'/>
+                    <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+            </DefaultRolloverStrategy>
+            -->
         </Appender>
 
         <!-- A2 is for the checksum checker -->
@@ -50,13 +54,15 @@
                     pattern='%m%n'/>
             <policies>
                 <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
-                <!-- Sample deletion policy:  keep last 30 archived files
-                <Delete basePath='${log.dir}'>
-                            <IfFileName glob='dspace.log-*'/>
-                            <IfAccumulatedFileCount exceeds='30'/>
-                </Delete>
-                -->
             </policies>
+            <!-- Sample deletion policy:  keep last 30 archived files
+            <DefaultRolloverStrategy>
+                <Delete basePath='${log.dir}'>
+                    <IfFileName glob='checker.log-*'/>
+                    <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+            </DefaultRolloverStrategy>
+            -->
         </Appender>
     </Appenders>
 
@@ -76,7 +82,7 @@
             <AppenderRef ref='A2'/>
         </Logger>
 
-        # Block services logging except on exceptions
+        <!-- Block services logging except on exceptions -->
         <Logger name='org.dspace.kernel'
                 level='ERROR'/>
         <Logger name='org.dspace.services'
@@ -88,8 +94,7 @@
         <Logger name='org.dspace.utils'
                 level='ERROR'/>
 
-        # Block passwords from being exposed in Axis logs.
-        # (DEBUG exposes passwords in Basic Auth)
+        <!-- Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth) -->
         <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'
                 level='INFO'/>
         <!-- Anything not a part of DSpace -->

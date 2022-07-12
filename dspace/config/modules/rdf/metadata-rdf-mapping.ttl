@@ -196,14 +196,14 @@
 
 :localHandleURI
   dm:metadataName "dc.identifier.uri" ;
-  dm:condition "^http://localhost:8080/jspui/handle/" ;
+  dm:condition "^http://localhost:8080/handle/" ;
   dm:creates [
     dm:subject dm:DSpaceObjectIRI ;
     dm:predicate bibo:handle ;
     dm:object [
       a dm:LiteralGenerator ;
       dm:modifier [
-        dm:matcher "^http://localhost:8080/jspui/handle/(.*)$" ;
+        dm:matcher "^http://localhost:8080/handle/(.*)$" ;
         dm:replacement "hdl:$1";
       ];
       dm:pattern "$DSpaceValue";
@@ -249,7 +249,7 @@
 
 :uri
   dm:metadataName "dc.identifier.uri" ;
-  dm:condition "^((?!http://dx.doi.org/)(?!http://hdl.handle.net/)(?!http://localhost:8080/jspui/handle/)).*" ;
+  dm:condition "^((?!http://dx.doi.org/)(?!http://hdl.handle.net/)(?!http://localhost:8080/handle/)).*" ;
   dm:creates [
     dm:subject dm:DSpaceObjectIRI ;
     dm:predicate bibo:uri ;

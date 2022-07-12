@@ -61,12 +61,17 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = context.getCurrentUser();
         try {
             UUID dsoId = UUID.fromString(targetId.toString());
 
             Group group = groupService.find(context, dsoId);
+
+            // if the group is one of the special groups of the context it is readable
+            if (context.getSpecialGroups().contains(group)) {
+                return true;
+            }
 
             // anonymous user
             if (ePerson == null) {

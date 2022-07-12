@@ -53,6 +53,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -3023,6 +3024,166 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
                 .andExpect(jsonPath("$.page.totalElements", is(5)));
 
+    }
+
+    @Test
+    public void commAdminAndColAdminCannotExploitItemReadGroupTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_ITEM_READ)
+                .withGroup(adminGroup).withDspaceObject(child1).build();
+        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_ITEM_READ)
+                .withGroup(adminGroup).withDspaceObject(col1).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
+        String tokenAdminCol = getAuthToken(adminChild1.getEmail(), password);
+
+        assertFalse(groupService.isMember(context, adminChild1, adminGroup));
+        assertFalse(groupService.isMember(context, adminCol1, adminGroup));
+
+        getClient(tokenAdminCol)
+                .perform(post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + adminCol1.getID()))
+                .andExpect(status().isForbidden());
+
+        assertFalse(groupService.isMember(context, adminCol1, adminGroup));
+
+        getClient(tokenAdminComm)
+                .perform(post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + adminChild1.getID()))
+                .andExpect(status().isForbidden());
+
+        assertFalse(groupService.isMember(context, adminChild1, adminGroup));
+
+    }
+
+    @Test
+    public void commAdminAndColAdminCannotExpoloitBitstreamReadGroupTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_BITSTREAM_READ)
+                .withGroup(adminGroup).withDspaceObject(child1).build();
+        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_BITSTREAM_READ)
+                .withGroup(adminGroup).withDspaceObject(col1).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
+        String tokenAdminCol = getAuthToken(adminChild1.getEmail(), password);
+
+        assertFalse(groupService.isMember(context, adminChild1, adminGroup));
+        assertFalse(groupService.isMember(context, adminCol1, adminGroup));
+
+        getClient(tokenAdminCol)
+                .perform(post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + adminCol1.getID()))
+                .andExpect(status().isForbidden());
+
+        assertFalse(groupService.isMember(context, adminCol1, adminGroup));
+
+        getClient(tokenAdminComm)
+                .perform(post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + adminChild1.getID()))
+                .andExpect(status().isForbidden());
+
+        assertFalse(groupService.isMember(context, adminChild1, adminGroup));
+    }
+
+    @Test
+    /**
+     * Test for bug https://github.com/DSpace/DSpace/issues/7928
+     * @throws Exception
+     */
+    public void anonymousGroupParentObjectTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/eperson/groups/" + anonGroup.getID().toString())
+                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", GroupMatcher.matchFullEmbeds()))
+                   .andExpect(jsonPath("$", GroupMatcher.matchLinks(anonGroup.getID())))
+                   .andExpect(jsonPath("$", Matchers.is(
+                       GroupMatcher.matchGroupEntry(anonGroup.getID(), anonGroup.getName())
+                   )))
+                   .andExpect(jsonPath("$._embedded.object").doesNotExist())
+        ;
     }
 
 }

@@ -23,10 +23,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +57,8 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.OrcidHistoryRest;
+import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -84,6 +88,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -131,6 +136,8 @@ public class Utils {
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
+    // Must be loaded @Lazy, as ConverterService also autowires Utils
+    @Lazy
     @Autowired
     private ConverterService converter;
 
@@ -282,6 +289,12 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
+            return OrcidQueueRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "orcidhistories")) {
+            return OrcidHistoryRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
@@ -467,7 +480,7 @@ public class Utils {
 
                 String line = scanner.nextLine();
                 if (org.springframework.util.StringUtils.hasText(line)) {
-                    list.add(line);
+                    list.add(decodeUrl(line));
                 }
             }
 
@@ -477,6 +490,14 @@ public class Utils {
         return list;
     }
 
+    private String decodeUrl(String url) {
+        try {
+            return URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.warn("The following url could not be decoded: " + url);
+        }
+        return StringUtils.EMPTY;
+    }
 
     /**
      * This method will retrieve a list of DSpaceObjects from the Request by reading in the Request's InputStream
@@ -964,22 +985,53 @@ public class Utils {
             throw new IllegalArgumentException("the supplied uri lacks required path elements: " + uri);
         }
 
+        return findBaseObjectRest(context, uriParts[0], uriParts[1], uriParts[2]);
+    }
+
+    /**
+     * Gets the rest object of of specified type (i.e. "core.item", "core.collection", "workflow.workflowitem",...)
+     * having given uuid.
+     *
+     * @param context the DSpace context
+     * @param type Object type
+     * @param uuid Object uuid
+     * @return the {@link BaseObjectRest} identified by the provided uuid
+     */
+    public BaseObjectRest getBaseObjectRestFromTypeAndUUID(Context context, String type, String uuid) {
+
+        if (StringUtils.isBlank(type)) {
+            throw new IllegalArgumentException("Type is missing");
+        }
+
+        String[] split = type.split("\\.");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("Provided type is not valid: " + type);
+        }
+        return findBaseObjectRest(context, split[0], split[1], uuid);
+    }
+
+    private BaseObjectRest findBaseObjectRest(Context context, String apiCategory, String model, String uuid) {
+
         DSpaceRestRepository repository;
         try {
-            repository = getResourceRepository(uriParts[0], uriParts[1]);
+            repository = getResourceRepository(apiCategory, model);
             if (!(repository instanceof ReloadableEntityObjectRepository)) {
-                throw new IllegalArgumentException("the supplied uri is not for the right type of repository: " + uri);
+                throw new IllegalArgumentException("the supplied category and model are not" +
+                    " for the right type of repository: " +
+                    String.format("%s.%s", apiCategory, model));
             }
         } catch (RepositoryNotFoundException e) {
-            throw new IllegalArgumentException("the repository for the URI '" + uri + "' was not found", e);
+            throw new IllegalArgumentException("the repository for the category '" + apiCategory + "' and model '"
+                + model + "' was not found", e);
         }
 
         Serializable pk;
         try {
             // cast the string id in the uriParts to the real pk class
-            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uriParts[2]);
+            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uuid);
         } catch (Exception e) {
-            throw new IllegalArgumentException("the supplied uri could not be cast to a Primary Key class: " + uri, e);
+            throw new IllegalArgumentException(
+                "the supplied uuid could not be cast to a Primary Key class: " + uuid, e);
         }
         try {
             // disable the security as we only need to retrieve the object to further process the authorization

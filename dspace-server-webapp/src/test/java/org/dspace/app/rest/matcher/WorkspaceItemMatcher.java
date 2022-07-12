@@ -83,6 +83,59 @@ public class WorkspaceItemMatcher {
     }
 
     /**
+     * Check that the workspace item has the expected type and series values
+     * (used in type bind evaluation)
+     * @param witem the workspace item
+     * @param type  the dc.type value eg. Technical Report
+     * @param series the series value eg. 11-23
+     * @return  Matcher result
+     */
+    public static Matcher matchItemWithTypeAndSeries(WorkspaceItem witem, String type, String series) {
+        return allOf(
+                // Check workspaceitem properties
+                matchProperties(witem),
+                // Check type appears or is null
+                type != null ?
+                        hasJsonPath("$.sections.traditionalpageone['dc.type'][0].value", is(type)) :
+                        hasNoJsonPath("$.sections.traditionalpageone['dc.type'][0].value"),
+                // Check series as it appears (for type bind testing)
+                series != null ?
+                hasJsonPath("$.sections.traditionalpageone['dc.relation.ispartofseries'][0].value", is(series)) :
+                        hasNoJsonPath("$.sections.traditionalpageone['dc.relation.ispartofseries'][0].value"),
+                matchLinks(witem)
+        );
+    }
+
+    /**
+     * Check that the workspace item has the expected type and a specific field value
+     * (used in type bind evaluation)
+     * @param witem the workspace item
+     * @param section form section name
+     * @param type  the dc.type value eg. Technical Report
+     * @param field  the field to check eg. dc.identifier.isbn
+     * @param value the value to check
+     * @return  Matcher result
+     */
+    public static Matcher matchItemWithTypeFieldAndValue(WorkspaceItem witem,
+                                                         String section, String type, String field, String value) {
+        String fieldJsonPath = "$.sections." + section + "['" + field + "'][0].value";
+        String dcTypeJsonPath = "$.sections." + section + "['dc.type'][0].value";
+        return allOf(
+                // Check workspaceitem properties
+                matchProperties(witem),
+                // Check type appears or is null
+                type != null ?
+                        hasJsonPath(dcTypeJsonPath, is(type)) :
+                        hasNoJsonPath(dcTypeJsonPath),
+                // Check ISBN as it appears (for type bind testing)
+                value != null ?
+                        hasJsonPath(fieldJsonPath, is(value)) :
+                        hasNoJsonPath(fieldJsonPath),
+                matchLinks(witem)
+        );
+    }
+
+    /**
      * Check that the id and type are exposed
      * 
      * @param witem

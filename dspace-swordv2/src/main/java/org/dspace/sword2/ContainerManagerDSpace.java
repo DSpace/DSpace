@@ -24,7 +24,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -141,7 +141,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "sword_replace", ""));
+                log.debug(LogHelper.getHeader(context, "sword_replace", ""));
             }
 
             // get the deposit target
@@ -164,7 +164,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager.getHeader(
+                log.info(LogHelper.getHeader(
                     context, "replace_failed_authorisation",
                     "user=" + sc.getAuthenticated().getEmail() +
                         ",on_behalf_of=" + oboEmail));
@@ -246,7 +246,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(
+                log.debug(LogHelper.getHeader(
                     context, "sword_create_new", ""));
             }
 
@@ -269,7 +269,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager.getHeader(context,
+                log.info(LogHelper.getHeader(context,
                                               "deposit_failed_authorisation",
                                               "user=" + sc.getAuthenticated().getEmail() +
                                                   ",on_behalf_of=" + oboEmail));
@@ -356,7 +356,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "sword_replace", ""));
+                log.debug(LogHelper.getHeader(context, "sword_replace", ""));
             }
 
             // get the deposit target
@@ -379,7 +379,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager.getHeader(
+                log.info(LogHelper.getHeader(
                     context, "replace_failed_authorisation",
                     "user=" + sc.getAuthenticated().getEmail() +
                         ",on_behalf_of=" + oboEmail));
@@ -463,7 +463,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "sword_delete", ""));
+                log.debug(LogHelper.getHeader(context, "sword_delete", ""));
             }
 
             // get the deposit target
@@ -486,7 +486,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager.getHeader(context,
+                log.info(LogHelper.getHeader(context,
                                               "replace_failed_authorisation",
                                               "user=" + sc.getAuthenticated().getEmail() +
                                                   ",on_behalf_of=" + oboEmail));
@@ -542,7 +542,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(
+                log.debug(LogHelper.getHeader(
                     context, "sword_modify_by_headers", ""));
             }
 
@@ -566,7 +566,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager.getHeader(context,
+                log.info(LogHelper.getHeader(context,
                                               "modify_failed_authorisation",
                                               "user=" + sc.getAuthenticated().getEmail() +
                                                   ",on_behalf_of=" + oboEmail));

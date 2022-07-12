@@ -27,6 +27,7 @@
     <bean id="coreServiceFactory" class="org.dspace.core.factory.CoreServiceFactoryImpl"/>
 
 
+    <bean id="accessStatusServiceFactory" class="org.dspace.access.status.factory.AccessStatusServiceFactoryImpl"/>
     <bean id="disseminateServiceFactory" class="org.dspace.disseminate.factory.DisseminateServiceFactoryImpl"/>
     <bean id="embargoServiceFactory" class="org.dspace.embargo.factory.EmbargoServiceFactoryImpl"/>
     <bean id="ePersonServiceFactory" class="org.dspace.eperson.factory.EPersonServiceFactoryImpl"/>
@@ -49,5 +50,7 @@
     <bean id="indexObjectFactoryFactory" class="org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactoryImpl"/>
 
     <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
+    
+    <bean id="orcidServiceFactory" class="org.dspace.orcid.factory.OrcidServiceFactoryImpl"/>
 
 </beans>

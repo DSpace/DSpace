@@ -100,9 +100,29 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      */
     List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
 
+    /**
+     * Returns a list of relationship types that matches provided EntityType object on any side of relationship
+     * 
+     * @param context            The relevant DSpace context
+     * @param entityType         The EntityType object that will be used to check on
+     * @param limit              Paging limit
+     * @param offset             Paging offset
+     * @return
+     * @throws SQLException      If database error
+     */
     List<RelationshipType> findByEntityType(Context context, EntityType entityType, Integer limit, Integer offset)
             throws SQLException;
 
+    /**
+     * Count all RelationshipType objects for which the given EntityType
+     * is equal to either the leftType or the rightType
+     * 
+     * @param context        DSpace context object
+     * @param entityType     The EntityType object used to check the leftType and rightType properties
+     * @return               Total RelationshipType objects
+     * @throws SQLException  If database error
+     */
+    public int countByEntityType(Context context, EntityType entityType) throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal

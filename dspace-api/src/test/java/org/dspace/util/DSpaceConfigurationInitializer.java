@@ -9,8 +9,6 @@ package org.dspace.util;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.spring.ConfigurationPropertySource;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.context.ApplicationContextInitializer;
@@ -31,8 +29,6 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public class DSpaceConfigurationInitializer
         implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-
-    private static final Logger log = LogManager.getLogger();
 
     @Override
     public void initialize(final ConfigurableApplicationContext applicationContext) {

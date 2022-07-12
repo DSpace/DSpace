@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -50,7 +50,7 @@ public class SolrServicePrivateItemPlugin implements SolrServiceSearchPlugin {
 
             }
         } catch (SQLException ex) {
-            log.error(LogManager.getHeader(context, "Error looking up authorization rights of current user",
+            log.error(LogHelper.getHeader(context, "Error looking up authorization rights of current user",
                 ""), ex);
         }
     }

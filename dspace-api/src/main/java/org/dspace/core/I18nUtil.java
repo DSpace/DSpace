@@ -217,12 +217,11 @@ public class I18nUtil {
      */
     public static String getInputFormsFileName(Locale locale) {
         /** Name of the form definition XML file */
-        String fileName = "";
         final String FORM_DEF_FILE = "submission-forms";
         final String FILE_TYPE = ".xml";
         String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + FORM_DEF_FILE;
-        fileName = getFilename(locale, defsFilename, FILE_TYPE);
+        String fileName = getFilename(locale, defsFilename, FILE_TYPE);
         return fileName;
     }
 
@@ -286,14 +285,13 @@ public class I18nUtil {
      */
     public static String getDefaultLicense(Context context) {
         Locale locale = context.getCurrentLocale();
-        String fileName = "";
         /** Name of the default license */
         final String DEF_LIC_FILE = "default";
         final String FILE_TYPE = ".license";
         String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + DEF_LIC_FILE;
 
-        fileName = getFilename(locale, defsFilename, FILE_TYPE);
+        String fileName = getFilename(locale, defsFilename, FILE_TYPE);
 
         return fileName;
     }
@@ -316,18 +314,17 @@ public class I18nUtil {
         // with Language, Country
         String fileNameLC = null;
         // with Language
-        String fileNameL = null;
-        fileNameL = fileName + "_" + locale.getLanguage();
+        String fileNameL = fileName + "_" + locale.getLanguage();
 
         if (fileType == null) {
             fileType = "";
         }
 
-        if (!("".equals(locale.getCountry()))) {
+        if (!locale.getCountry().isEmpty()) {
             fileNameLC = fileName + "_" + locale.getLanguage() + "_"
                 + locale.getCountry();
 
-            if (!("".equals(locale.getVariant()))) {
+            if (!locale.getVariant().isEmpty()) {
                 fileNameLCV = fileName + "_" + locale.getLanguage() + "_"
                     + locale.getCountry() + "_" + locale.getVariant();
             }
@@ -372,12 +369,11 @@ public class I18nUtil {
      * String - localized filename of an email template
      */
     public static String getEmailFilename(Locale locale, String name) {
-        String templateName = "";
         String templateFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "emails"
             + File.separator + name;
 
-        templateName = getFilename(locale, templateFile, "");
+        String templateName = getFilename(locale, templateFile, "");
         return templateName;
     }
 
@@ -389,7 +385,7 @@ public class I18nUtil {
      * @return array of locale results, possibly empty
      */
     public static Locale[] parseLocales(String[] locales) {
-        List<Locale> resultList = new ArrayList<Locale>();
+        List<Locale> resultList = new ArrayList<>();
         for (String ls : locales) {
             Locale lc = makeLocale(ls);
             if (lc != null) {

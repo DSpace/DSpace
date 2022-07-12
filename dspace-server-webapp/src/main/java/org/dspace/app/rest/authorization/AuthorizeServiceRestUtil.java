@@ -8,6 +8,7 @@
 package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
+import java.util.Objects;
 
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
@@ -15,8 +16,7 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +27,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AuthorizeServiceRestUtil {
+
+    @Autowired
+    private ItemService itemService;
     @Autowired
     private AuthorizeService authorizeService;
     @Autowired
     private Utils utils;
-    @Autowired
-    private ContentServiceFactory contentServiceFactory;
 
     /**
      * Checks that the specified eperson can perform the given action on the rest given object.
@@ -52,16 +53,14 @@ public class AuthorizeServiceRestUtil {
             return false;
         }
 
-        DSpaceObjectService<DSpaceObject> dSpaceObjectService =
-            contentServiceFactory.getDSpaceObjectService(dSpaceObject.getType());
-
         EPerson ePerson = context.getCurrentUser();
 
         // If the item is still inprogress we can process here only the READ permission.
         // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
         if (dSpaceObject instanceof Item) {
+            Item item = (Item) dSpaceObject;
             if (!DSpaceRestPermission.READ.equals(dSpaceRestPermission)
-                && !((Item) dSpaceObject).isArchived() && !((Item) dSpaceObject).isWithdrawn()) {
+                && (itemService.isInProgressSubmission(context, item) || Objects.nonNull(item.getTemplateItemOf()))) {
                 return false;
             }
         }

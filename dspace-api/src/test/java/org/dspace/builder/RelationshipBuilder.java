@@ -39,6 +39,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             relationship = c.reloadEntity(relationship);
@@ -106,18 +107,26 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
     }
 
     public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem,
-                                                                RelationshipType relationshipType) {
+                                                RelationshipType relationshipType, int leftPlace, int rightPlace) {
 
         RelationshipBuilder relationshipBuilder = new RelationshipBuilder(context);
-        return relationshipBuilder.create(context, leftItem, rightItem, relationshipType);
+        return relationshipBuilder.create(context, leftItem, rightItem, relationshipType, leftPlace, rightPlace);
+    }
+
+    public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem,
+                                                                RelationshipType relationshipType) {
+
+        return createRelationshipBuilder(context, leftItem, rightItem, relationshipType, -1, -1);
     }
 
     private RelationshipBuilder create(Context context, Item leftItem, Item rightItem,
-                                       RelationshipType relationshipType) {
+                                       RelationshipType relationshipType, int leftPlace, int rightPlace) {
         this.context = context;
 
         try {
-            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType, 0, 0);
+            //place -1 will add it to the end
+            relationship = relationshipService.create(context, leftItem, rightItem, relationshipType,
+                    leftPlace, rightPlace);
         } catch (SQLException | AuthorizeException e) {
             log.warn("Failed to create relationship", e);
         }
@@ -139,4 +148,10 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         relationship.setLeftPlace(leftPlace);
         return this;
     }
+
+    public RelationshipBuilder withLatestVersionStatus(Relationship.LatestVersionStatus latestVersionStatus) {
+        relationship.setLatestVersionStatus(latestVersionStatus);
+        return this;
+    }
+
 }

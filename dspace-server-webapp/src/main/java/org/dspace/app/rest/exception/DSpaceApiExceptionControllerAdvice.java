@@ -11,16 +11,21 @@ import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIB
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.orcid.exception.OrcidValidationException;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
@@ -51,12 +56,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
-    private static final Logger log = LogManager.getLogger(DSpaceApiExceptionControllerAdvice.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
-     * Set of HTTP error codes to log as ERROR with full stacktrace.
+     * Default collection of HTTP error codes to log as ERROR with full stack trace.
      */
-    private static final Set<Integer> LOG_AS_ERROR = Set.of(422);
+    private static final String[] LOG_AS_ERROR_DEFAULT = { "422" };
+
+    /** Configuration parameter for ERROR treatment. */
+    private static final String P_LOG_AS_ERROR = "logging.server.include-stacktrace-for-httpcode";
+
+    @Inject
+    private ConfigurationService configurationService;
 
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
@@ -106,7 +117,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    @ExceptionHandler( {UnprocessableEntityException.class})
+    @ExceptionHandler({ UnprocessableEntityException.class, ResourceAlreadyExistsException.class })
     protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
@@ -125,14 +136,33 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     }
 
     /**
+     * Handle the {@link OrcidValidationException} returning the exception message
+     * in the response, that always contains only the validation error codes (usable
+     * for example to show specific messages to users). No other details are present
+     * in the exception message.
+     */
+    @ExceptionHandler({ OrcidValidationException.class })
+    protected void handleOrcidValidationException(HttpServletRequest request, HttpServletResponse response,
+        OrcidValidationException ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    /**
      * Add user-friendly error messages to the response body for selected errors.
-     * Since the error messages will be exposed to the API user, the exception classes are expected to implement
-     * {@link TranslatableException} such that the error messages can be translated.
+     * Since the error messages will be exposed to the API user, the
+     * exception classes are expected to implement {@link TranslatableException}
+     * such that the error messages can be translated.
+     *
+     * @param request the client's request
+     * @param response our response
+     * @param ex exception thrown in handling request
+     * @throws java.io.IOException passed through.
      */
     @ExceptionHandler({
         RESTEmptyWorkflowGroupException.class,
         EPersonNameNotProvidedException.class,
         GroupNameNotProvidedException.class,
+        GroupHasPendingWorkflowTasksException.class,
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {
@@ -192,9 +222,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     /**
      * Send the error to the response.
-     * 5xx errors will be logged as ERROR with a full stack trace, 4xx errors will be logged as WARN without a
-     * stacktrace. Specific 4xx errors where an ERROR log with full stacktrace is more appropriate are configured in
-     * {@link #LOG_AS_ERROR}
+     * 5xx errors will be logged as ERROR with a full stack trace.  4xx errors
+     * will be logged as WARN without a stack trace. Specific 4xx errors where
+     * an ERROR log with full stack trace is more appropriate are configured
+     * using property {@code logging.server.include-stacktrace-for-httpcode}
+     * (see {@link P_LOG_AS_ERROR} and {@link LOG_AS_ERROR_DEFAULT}).
+     *
      * @param request current request
      * @param response current response
      * @param ex Exception thrown
@@ -202,10 +235,25 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
      * @param statusCode status code to send in response
      * @throws IOException
      */
-    private void sendErrorResponse(final HttpServletRequest request, final HttpServletResponse response,
-                                   final Exception ex, final String message, final int statusCode) throws IOException {
+    private void sendErrorResponse(final HttpServletRequest request,
+            final HttpServletResponse response,
+            final Exception ex, final String message, final int statusCode)
+            throws IOException {
         //Make sure Spring picks up this exception
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
+
+        // Which status codes should be treated as ERROR?
+        final Set<Integer> LOG_AS_ERROR = new HashSet<>();
+        String[] error_codes = configurationService.getArrayProperty(
+                P_LOG_AS_ERROR, LOG_AS_ERROR_DEFAULT);
+        for (String code : error_codes) {
+            try {
+                LOG_AS_ERROR.add(Integer.valueOf(code));
+            } catch (NumberFormatException e) {
+                log.warn("Non-integer HTTP status code {} in {}", code, P_LOG_AS_ERROR);
+                // And continue
+            }
+        }
 
         // We don't want to fill logs with bad/invalid REST API requests.
         if (HttpStatus.valueOf(statusCode).is5xxServerError() || LOG_AS_ERROR.contains(statusCode)) {
@@ -213,7 +261,18 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
             log.error("{} (status:{})", message, statusCode, ex);
         } else if (HttpStatus.valueOf(statusCode).is4xxClientError()) {
             // Log the error as a single-line WARN
-            log.warn("{} (status:{})", message, statusCode);
+            String location;
+            String exceptionMessage;
+            if (null == ex) {
+                exceptionMessage = "none";
+                location = "unknown";
+            } else {
+                exceptionMessage = ex.getMessage();
+                StackTraceElement[] trace = ex.getStackTrace();
+                location = trace.length <= 0 ? "unknown" : trace[0].toString();
+            }
+            log.warn("{} (status:{} exception: {} at: {})", message, statusCode,
+                    exceptionMessage, location);
         }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter

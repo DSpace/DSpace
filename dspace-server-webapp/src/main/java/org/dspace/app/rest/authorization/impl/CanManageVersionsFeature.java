@@ -18,7 +18,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,30 +36,25 @@ public class CanManageVersionsFeature implements AuthorizationFeature {
     public static final String NAME = "canManageVersions";
 
     @Autowired
-    private ConfigurationService configurationService;
-
+    private ItemService itemService;
     @Autowired
     private AuthorizeService authorizeService;
-
     @Autowired
-    private ItemService itemService;
+    private ConfigurationService configurationService;
+
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof ItemRest) {
-            EPerson currentUser = context.getCurrentUser();
-            if (Objects.isNull(currentUser)) {
+            boolean isEnabled = configurationService.getBooleanProperty("versioning.enabled", true);
+            if (!isEnabled || Objects.isNull(context.getCurrentUser())) {
                 return false;
             }
-            if (authorizeService.isAdmin(context)) {
-                return true;
+            Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
+            if (Objects.nonNull(item)) {
+                return authorizeService.isAdmin(context, item);
             }
-            if (configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion")) {
-                Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
-                EPerson submitter = item.getSubmitter();
-                return Objects.nonNull(submitter) && currentUser.getID().equals(submitter.getID());
-            }
-
         }
         return false;
     }

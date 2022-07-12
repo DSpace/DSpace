@@ -29,7 +29,7 @@ import org.dspace.license.service.CreativeCommonsService;
  * Export the object's Creative Commons license, text form.
  *
  * @author Larry Stone
- * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the
+ * @deprecated the bitstream with the
  * license in the textual format it is no
  * longer stored (see https://jira.duraspace.org/browse/DS-2604)
  */

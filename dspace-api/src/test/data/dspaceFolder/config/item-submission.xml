@@ -20,6 +20,9 @@
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
+        <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
+        <name-map collection-handle="123456789/typebind-test" submission-name="typebindtest"/>
+        <name-map collection-handle="123456789/accessCondition-not-discoverable" submission-name="accessConditionNotDiscoverable"/>
     </submission-map>
 
 
@@ -75,6 +78,28 @@
             <scope visibilityOutside="read-only">submission</scope>
         </step-definition>
 
+        <step-definition id="qualdroptest">
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="typebindtest">
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="defaultAC">
+            <heading>submit.progressbar.accessCondition</heading>
+            <processing-class>org.dspace.app.rest.submit.step.AccessConditionStep</processing-class>
+            <type>accessCondition</type>
+        </step-definition>
+
+        <step-definition id="notDiscoverable">
+            <heading>submit.progressbar.accessCondition</heading>
+            <processing-class>org.dspace.app.rest.submit.step.AccessConditionStep</processing-class>
+            <type>accessCondition</type>
+        </step-definition>
+
         <!-- Step Upload Item with Embargo Features to enable this step, please
             make sure to comment-out the previous step "UploadStep" <step-definition id="upload-with-embargo">
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -112,6 +137,12 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
+
+        <step-definition id="sherpaPolicies" mandatory="true">
+            <heading>submit.progressbar.sherpapolicy</heading>
+            <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
+            <type>sherpaPolicy</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -146,6 +177,8 @@
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
             <!-- <step id="extractionstep"/> -->
+            <step id="defaultAC"/>
+            <step id="sherpaPolicies"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
@@ -165,6 +198,20 @@
             <step id="extractionstep"/>
             <step id="license"/>
             <step id="cclicense"/>
+        </submission-process>
+
+        <submission-process name="qualdroptest">
+            <step id="qualdroptest" />
+        </submission-process>
+
+        <submission-process name="typebindtest">
+            <step id="typebindtest" />
+        </submission-process>
+
+        <submission-process name="accessConditionNotDiscoverable">
+            <step id="collection"/>
+            <step id="traditionalpageone"/>
+            <step id="notDiscoverable"/>
         </submission-process>
 
     </submission-definitions>

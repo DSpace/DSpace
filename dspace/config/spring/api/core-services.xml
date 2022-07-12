@@ -3,7 +3,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true">
 
-
     <!-- ******************** -->
     <!-- Service declarations -->
     <!-- ******************** -->
@@ -56,12 +55,24 @@
     <bean class="org.dspace.content.EntityServiceImpl"/>
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
     <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
+    <bean class="org.dspace.content.FeedbackServiceImpl"/>
 
     <bean class="org.dspace.scripts.ProcessServiceImpl"/>
     <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
+
+    <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
+
+    <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
+
+    <bean class='org.dspace.service.impl.HttpConnectionPoolService'
+          id='solrHttpConnectionPoolService'
+          scope='singleton'
+          autowire-candidate='true'>
+        <constructor-arg name='configPrefix' value='solr'/>
+    </bean>
 
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
@@ -79,8 +90,9 @@
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
 
-    <!-- Ensure EmbargoService is initialized properly via init() method -->
+    <!-- Ensure EmbargoService and AccessStatusService are initialized properly via init() method -->
     <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
+    <bean class="org.dspace.access.status.AccessStatusServiceImpl" init-method="init"/>
 
     <bean class="org.dspace.eperson.AccountServiceImpl"/>
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>
@@ -126,6 +138,10 @@
     <bean class="org.dspace.discovery.indexobject.WorkflowItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
+
+    <!-- OIDC Authentication -->
+    <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
+    <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
 
 </beans>
 

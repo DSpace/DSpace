@@ -26,22 +26,23 @@ public class MetadataFieldNameTest {
     @Test
     public void testConstruct3() {
         MetadataFieldName instance = new MetadataFieldName("one", "two", "three");
-        assertEquals("Incorrect schema", "one", instance.SCHEMA);
-        assertEquals("Incorrect element", "two", instance.ELEMENT);
-        assertEquals("Incorrect qualifier", "three", instance.QUALIFIER);
+        assertEquals("Incorrect schema", "one", instance.schema);
+        assertEquals("Incorrect element", "two", instance.element);
+        assertEquals("Incorrect qualifier", "three", instance.qualifier);
     }
 
     @Test
     public void testConstruct2() {
         MetadataFieldName instance = new MetadataFieldName("one", "two");
-        assertEquals("Incorrect schema", "one", instance.SCHEMA);
-        assertEquals("Incorrect element", "two", instance.ELEMENT);
-        assertNull("Incorrect qualifier", instance.QUALIFIER);
+        assertEquals("Incorrect schema", "one", instance.schema);
+        assertEquals("Incorrect element", "two", instance.element);
+        assertNull("Incorrect qualifier", instance.qualifier);
     }
 
     @Test(expected = NullPointerException.class)
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructNull() {
-        MetadataFieldName instance = new MetadataFieldName("one", null);
+        new MetadataFieldName("one", null);
     }
 
     /**
@@ -71,7 +72,7 @@ public class MetadataFieldNameTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void TestParse1() {
-        String[] results = MetadataFieldName.parse("one");
+        MetadataFieldName.parse("one");
     }
 
     /**
@@ -79,15 +80,16 @@ public class MetadataFieldNameTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void TestParse0() {
-        String[] results = MetadataFieldName.parse("");
+        MetadataFieldName.parse("");
     }
 
     /**
      * Test of parse method using an illegal null name.
      */
     @Test(expected = NullPointerException.class)
+    @SuppressWarnings("null")
     public void TestParseNull() {
-        String[] results = MetadataFieldName.parse(null);
+        MetadataFieldName.parse(null);
     }
 
     /**

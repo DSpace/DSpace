@@ -12,11 +12,13 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.service.ProcessService;
@@ -33,14 +35,22 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
                                                List<DSpaceCommandLineParameter> parameters)
         throws SQLException {
         ProcessBuilder processBuilder = new ProcessBuilder(context);
-        return processBuilder.create(context, ePerson, scriptName, parameters);
+        return processBuilder.create(context, ePerson, scriptName, parameters, null);
+    }
+
+    public static ProcessBuilder createProcess(Context context, EPerson ePerson, String scriptName,
+                                               List<DSpaceCommandLineParameter> parameters,
+                                               Set<Group> specialGroups)
+        throws SQLException {
+        ProcessBuilder processBuilder = new ProcessBuilder(context);
+        return processBuilder.create(context, ePerson, scriptName, parameters, specialGroups);
     }
 
     private ProcessBuilder create(Context context, EPerson ePerson, String scriptName,
-                                  List<DSpaceCommandLineParameter> parameters)
+                                  List<DSpaceCommandLineParameter> parameters, final Set<Group> specialGroups)
         throws SQLException {
         this.context = context;
-        this.process = processService.create(context, ePerson, scriptName, parameters);
+        this.process = processService.create(context, ePerson, scriptName, parameters, specialGroups);
         this.process.setProcessStatus(ProcessStatus.SCHEDULED);
         return this;
     }
@@ -60,6 +70,7 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             process = c.reloadEntity(process);

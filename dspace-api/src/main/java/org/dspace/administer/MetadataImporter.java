@@ -11,13 +11,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -81,7 +84,7 @@ public class MetadataImporter {
      * @throws SQLException                 if database error
      * @throws IOException                  if IO error
      * @throws TransformerException         if transformer error
-     * @throws ParserConfigurationException if config error
+     * @throws ParserConfigurationException if configuration error
      * @throws AuthorizeException           if authorization error
      * @throws SAXException                 if parser error
      * @throws NonUniqueMetadataException   if duplicate metadata
@@ -90,8 +93,7 @@ public class MetadataImporter {
     public static void main(String[] args)
         throws ParseException, SQLException, IOException, TransformerException,
         ParserConfigurationException, AuthorizeException, SAXException,
-        NonUniqueMetadataException, RegistryImportException {
-        boolean forceUpdate = false;
+        NonUniqueMetadataException, RegistryImportException, XPathExpressionException {
 
         // create an options object and populate it
         CommandLineParser parser = new DefaultParser();
@@ -100,16 +102,14 @@ public class MetadataImporter {
         options.addOption("u", "update", false, "update an existing schema");
         CommandLine line = parser.parse(options, args);
 
-        String file = null;
         if (line.hasOption('f')) {
-            file = line.getOptionValue('f');
+            String file = line.getOptionValue('f');
+            boolean forceUpdate = line.hasOption('u');
+            loadRegistry(file, forceUpdate);
         } else {
             usage();
-            System.exit(0);
+            System.exit(1);
         }
-
-        forceUpdate = line.hasOption('u');
-        loadRegistry(file, forceUpdate);
     }
 
     /**
@@ -120,15 +120,15 @@ public class MetadataImporter {
      * @throws SQLException                 if database error
      * @throws IOException                  if IO error
      * @throws TransformerException         if transformer error
-     * @throws ParserConfigurationException if config error
+     * @throws ParserConfigurationException if configuration error
      * @throws AuthorizeException           if authorization error
      * @throws SAXException                 if parser error
      * @throws NonUniqueMetadataException   if duplicate metadata
      * @throws RegistryImportException      if import fails
      */
     public static void loadRegistry(String file, boolean forceUpdate)
-        throws SQLException, IOException, TransformerException, ParserConfigurationException,
-        AuthorizeException, SAXException, NonUniqueMetadataException, RegistryImportException {
+        throws SQLException, IOException, TransformerException, ParserConfigurationException, AuthorizeException,
+        SAXException, NonUniqueMetadataException, RegistryImportException, XPathExpressionException {
         Context context = null;
 
         try {
@@ -140,7 +140,9 @@ public class MetadataImporter {
             Document document = RegistryImporter.loadXML(file);
 
             // Get the nodes corresponding to types
-            NodeList schemaNodes = XPathAPI.selectNodeList(document, "/dspace-dc-types/dc-schema");
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            NodeList schemaNodes = (NodeList) xPath.compile("/dspace-dc-types/dc-schema")
+                                                   .evaluate(document, XPathConstants.NODESET);
 
             // Add each one as a new format to the registry
             for (int i = 0; i < schemaNodes.getLength(); i++) {
@@ -149,7 +151,8 @@ public class MetadataImporter {
             }
 
             // Get the nodes corresponding to types
-            NodeList typeNodes = XPathAPI.selectNodeList(document, "/dspace-dc-types/dc-type");
+            NodeList typeNodes = (NodeList) xPath.compile("/dspace-dc-types/dc-type")
+                                                 .evaluate(document, XPathConstants.NODESET);
 
             // Add each one as a new format to the registry
             for (int i = 0; i < typeNodes.getLength(); i++) {
@@ -181,8 +184,8 @@ public class MetadataImporter {
      * @throws RegistryImportException    if import fails
      */
     private static void loadSchema(Context context, Node node, boolean updateExisting)
-        throws SQLException, IOException, TransformerException,
-        AuthorizeException, NonUniqueMetadataException, RegistryImportException {
+        throws SQLException, AuthorizeException, NonUniqueMetadataException, RegistryImportException,
+        XPathExpressionException {
         // Get the values
         String name = RegistryImporter.getElementData(node, "name");
         String namespace = RegistryImporter.getElementData(node, "namespace");
@@ -227,7 +230,7 @@ public class MetadataImporter {
     /**
      * Process a node in the metadata registry XML file. The node must
      * be a "dc-type" node.  If the type already exists, then it
-     * will not be reimported
+     * will not be re-imported.
      *
      * @param context DSpace context object
      * @param node    the node in the DOM tree
@@ -239,8 +242,8 @@ public class MetadataImporter {
      * @throws RegistryImportException    if import fails
      */
     private static void loadType(Context context, Node node)
-        throws SQLException, IOException, TransformerException,
-        AuthorizeException, NonUniqueMetadataException, RegistryImportException {
+        throws SQLException, IOException, AuthorizeException, NonUniqueMetadataException, RegistryImportException,
+        XPathExpressionException {
         // Get the values
         String schema = RegistryImporter.getElementData(node, "schema");
         String element = RegistryImporter.getElementData(node, "element");

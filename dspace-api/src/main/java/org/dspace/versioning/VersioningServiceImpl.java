@@ -10,6 +10,7 @@ package org.dspace.versioning;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -96,7 +97,7 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     @Override
-    public void removeVersion(Context c, Version version) throws SQLException {
+    public void delete(Context c, Version version) throws SQLException {
         try {
             // we will first delete the version and then the item
             // after deletion of the version we cannot find the item anymore
@@ -158,7 +159,7 @@ public class VersioningServiceImpl implements VersioningService {
     public void removeVersion(Context c, Item item) throws SQLException {
         Version version = versionDAO.findByItem(c, item);
         if (version != null) {
-            removeVersion(c, version);
+            delete(c, version);
         }
     }
 
@@ -196,8 +197,11 @@ public class VersioningServiceImpl implements VersioningService {
                                     int versionNumber) {
         try {
             Version version = versionDAO.create(context, new Version());
-
-            version.setVersionNumber(getNextVersionNumer(context, history));
+            if (versionNumber > 0 && !isVersionExist(context, item, versionNumber)) {
+                version.setVersionNumber(versionNumber);
+            } else {
+                version.setVersionNumber(getNextVersionNumer(context, history));
+            }
             version.setVersionDate(date);
             version.setePerson(item.getSubmitter());
             version.setItem(item);
@@ -211,12 +215,27 @@ public class VersioningServiceImpl implements VersioningService {
         }
     }
 
+    private boolean isVersionExist(Context context, Item item, int versionNumber) throws SQLException {
+        VersionHistory history = versionHistoryService.findByItem(context, item);
+        if (Objects.isNull(history)) {
+            return false;
+        }
+        return history.getVersions().stream().filter(v -> v.getVersionNumber() == versionNumber)
+                                    .findFirst()
+                                    .isPresent();
+    }
+
     @Override
     public List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException {
-        List<Version> versions = versionDAO.findVersionsWithItems(c, vh);
+        List<Version> versions = versionDAO.findVersionsWithItems(c, vh, -1, -1);
         return versions;
     }
 
+    @Override
+    public List<Version> getVersionsByHistoryWithItems(Context c, VersionHistory vh, int offset, int limit)
+           throws SQLException {
+        return versionDAO.findVersionsWithItems(c, vh, offset, limit);
+    }
 
 // **** PROTECTED METHODS!!
 
@@ -236,4 +255,15 @@ public class VersioningServiceImpl implements VersioningService {
 
         return next;
     }
+
+    @Override
+    public void update(Context context, Version version) throws SQLException {
+        versionDAO.save(context, version);
+    }
+
+    @Override
+    public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException {
+        return versionDAO.countVersionsByHistoryWithItem(context, versionHistory);
+    }
+
 }

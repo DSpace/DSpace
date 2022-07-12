@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import static org.dspace.content.Item.ANY;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,19 +32,22 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
+import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.dao.VersionDAO;
@@ -96,6 +101,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired
+    protected OrcidTokenService orcidTokenService;
 
     protected EPersonServiceImpl() {
         super();
@@ -220,7 +227,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Create a table row
         EPerson e = ePersonDAO.create(context, new EPerson());
 
-        log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
+        log.info(LogHelper.getHeader(context, "create_eperson", "eperson_id="
                 + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
@@ -379,13 +386,15 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             group.getMembers().remove(ePerson);
         }
 
+        orcidTokenService.deleteByEPerson(context, ePerson);
+
         // Remove any subscriptions
         subscribeService.deleteByEPerson(context, ePerson);
 
         // Remove ourself
         ePersonDAO.delete(context, ePerson);
 
-        log.info(LogManager.getHeader(context, "delete_eperson",
+        log.info(LogHelper.getHeader(context, "delete_eperson",
                 "eperson_id=" + ePerson.getID()));
     }
 
@@ -486,7 +495,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         ePersonDAO.save(context, ePerson);
 
-        log.info(LogManager.getHeader(context, "update_eperson",
+        log.info(LogHelper.getHeader(context, "update_eperson",
                 "eperson_id=" + ePerson.getID()));
 
         if (ePerson.isModified()) {
@@ -568,5 +577,19 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public int countTotal(Context context) throws SQLException {
         return ePersonDAO.countRows(context);
+    }
+
+    @Override
+    public EPerson findByProfileItem(Context context, Item profile) throws SQLException {
+        List<MetadataValue> owners = itemService.getMetadata(profile, "dspace", "object", "owner", ANY);
+        if (CollectionUtils.isEmpty(owners)) {
+            return null;
+        }
+        return find(context, UUIDUtils.fromString(owners.get(0).getAuthority()));
+    }
+
+    @Override
+    public String getName(EPerson dso) {
+        return dso.getName();
     }
 }

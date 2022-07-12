@@ -18,6 +18,9 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,17 +32,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
+import org.dspace.app.rest.authorization.Authorization;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
+import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
+import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.utils.Utils;
+import org.dspace.authenticate.OrcidAuthenticationBean;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -53,6 +71,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.orcid.client.OrcidClient;
+import org.dspace.orcid.client.OrcidConfiguration;
+import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -74,8 +95,24 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Autowired
     ConfigurationService configurationService;
 
+    @Autowired
+    private EPersonConverter ePersonConverter;
+
+    @Autowired
+    private AuthorizationFeatureService authorizationFeatureService;
+
+    @Autowired
+    private OrcidConfiguration orcidConfiguration;
+
+    @Autowired
+    private OrcidAuthenticationBean orcidAuthentication;
+
+    @Autowired
+    private Utils utils;
+
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
+    public static final String[] ORCID_ONLY = { "org.dspace.authenticate.OrcidAuthentication" };
     public static final String[] SHIB_AND_PASS = {
         "org.dspace.authenticate.ShibAuthentication",
         "org.dspace.authenticate.PasswordAuthentication"
@@ -84,14 +121,28 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         "org.dspace.authenticate.IPAuthentication",
         "org.dspace.authenticate.ShibAuthentication"
     };
+    public static final String[] PASS_AND_IP = {
+            "org.dspace.authenticate.PasswordAuthentication",
+            "org.dspace.authenticate.IPAuthentication"
+        };
 
     // see proxies.trusted.ipranges in local.cfg
     public static final String TRUSTED_IP = "7.7.7.7";
     public static final String UNTRUSTED_IP = "8.8.8.8";
 
+    private Authorization authorization;
+    private EPersonRest ePersonRest;
+    private final String feature = CanChangePasswordFeature.NAME;
+
+
     @Before
     public void setup() throws Exception {
         super.setUp();
+
+        AuthorizationFeature canChangePasswordFeature = authorizationFeatureService.find(CanChangePasswordFeature.NAME);
+        ePersonRest = ePersonConverter.convert(eperson, DefaultProjection.DEFAULT);
+        authorization = new Authorization(eperson, canChangePasswordFeature, ePersonRest);
+
         // Default all tests to Password Authentication only
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
     }
@@ -107,11 +158,17 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")))
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                         .andExpect(jsonPath("$._embedded.eperson",
                                 EPersonMatcher.matchEPersonWithGroups(admin.getEmail(), "Administrator")));
+
+        getClient(token).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
@@ -120,6 +177,101 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+    }
+
+    /**
+     * This test verifies:
+     * - that a logged in via password user finds the expected specialGroupPwd in _embedded.specialGroups;
+     * - that a logged in via password and specific IP user finds the expected specialGroupPwd and specialGroupIP
+     *   in _embedded.specialGroups;
+     * - that a not logged in user with a specific IP finds the expected specialGroupIP in _embedded.specialGroups;
+     * @throws Exception
+     */
+    @Test
+    public void testStatusGetSpecialGroups() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group specialGroupPwd = GroupBuilder.createGroup(context)
+                .withName("specialGroupPwd")
+                .build();
+        Group specialGroupIP = GroupBuilder.createGroup(context)
+               .withName("specialGroupIP")
+               .build();
+
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_AND_IP);
+        configurationService.setProperty("authentication-password.login.specialgroup","specialGroupPwd");
+        configurationService.setProperty("authentication-ip.specialGroupIP", "123.123.123.123");
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("password")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupPwd"))));
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient(token).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupPwd"))));
+
+        getClient(token).perform(get("/api/authn/status").param("projection", "full")
+                .with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("password")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                    Matchers.containsInAnyOrder(
+                            GroupMatcher.matchGroupWithName("specialGroupPwd"),
+                            GroupMatcher.matchGroupWithName("specialGroupIP"))));
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient(token).perform(get("/api/authn/status/specialGroups").param("projection", "full")
+                .with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupPwd"),
+                        GroupMatcher.matchGroupWithName("specialGroupIP"))));
+
+        getClient().perform(get("/api/authn/status").param("projection", "full").with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            // fails due to bug https://github.com/DSpace/DSpace/issues/8274
+            //.andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(false)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                    Matchers.containsInAnyOrder(GroupMatcher.matchGroupWithName("specialGroupIP"))));
+
+        // try the special groups link endpoint in the same scenario than above
+        getClient().perform(get("/api/authn/status/specialGroups").param("projection", "full")
+                .with(ip("123.123.123.123")))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(
+                        GroupMatcher.matchGroupWithName("specialGroupIP"))));
     }
 
     @Test
@@ -136,6 +288,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")))
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
@@ -145,6 +298,11 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+
+        getClient(token).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
 
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
@@ -159,9 +317,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(false)))
+                   .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                    .andExpect(jsonPath("$.type", is("status")))
                    .andExpect(header().string("WWW-Authenticate",
                            "password realm=\"DSpace REST API\""));
+
+        getClient().perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
@@ -173,7 +341,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // In order to fully simulate a Shibboleth authentication, we'll call
         // /api/authn/shibboleth?redirectUrl=[UI-URL] , with valid Shibboleth request attributes.
-        // In this situation, we are mocking how Shibboleth works from our UI (see also ShibbolethRestController):
+        // In this situation, we are mocking how Shibboleth works from our UI (see also ShibbolethLoginFilter):
         // (1) The UI sends the user to Shibboleth to login
         // (2) After a successful login, Shibboleth redirects user to /api/authn/shibboleth?redirectUrl=[url]
         // (3) That triggers generation of the auth token (JWT), and redirects the user to 'redirectUrl', sending along
@@ -181,7 +349,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // In below call, we're sending a GET request (as that's what a redirect is), with a Referer of a "fake"
         // Shibboleth server to simulate this request coming back from Shibboleth (after a successful login).
         // We are then verifying the user will be redirected to the 'redirectUrl' with a single-use auth cookie
-        // (NOTE: Additional tests of this /api/authn/shibboleth endpoint can be found in ShibbolethRestControllerIT)
+        // (NOTE: Additional tests of this /api/authn/shibboleth endpoint can be found in ShibbolethLoginFilterIT)
         Cookie authCookie = getClient().perform(get("/api/authn/shibboleth")
                 .header("Referer", "https://myshib.example.com")
                 .param("redirectUrl", uiURL)
@@ -213,41 +381,69 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 // Verify that the CSRF token has NOT been changed... status checks won't change the token
                 // (only login/logout will)
                 .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
                 .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
         // To complete the authentication process, we pass our auth cookie to the "/login" endpoint.
         // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
         // only use the 'Authorization' header for all future requests.
         // (NOTE that this call has an "Origin" matching the UI, to better mock that the request came from there &
         // to verify the temporary auth cookie is valid for the UI's origin.)
-        getClient().perform(post("/api/authn/login").header("Origin", uiURL)
-                                                              .secure(true)
-                                                              .cookie(authCookie))
+        String headerToken = getClient().perform(post("/api/authn/login").header("Origin", uiURL)
+                                                                                   .secure(true)
+                                                                                   .cookie(authCookie))
                 .andExpect(status().isOk())
                 // Verify the Auth cookie has been destroyed
                 .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
-                // Verify token is now sent back in the Authorization header as the Bearer token
-                .andExpect(header().string(AUTHORIZATION_HEADER, "Bearer " + token))
+                // Verify Authorization header is returned
+                .andExpect(header().exists(AUTHORIZATION_HEADER))
                 // Verify that the CSRF token has been changed
                 // (as both cookie and header should be sent back)
                 .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
-                .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+                .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                .andReturn().getResponse()
+                .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        // Verify that the token in the returned header has the *same claims* as the auth Cookie token
+        // NOTE: We test claim equality because the token's expiration date may change during this request. If it does
+        // change, then the tokens will look different even though the claims are the same.
+        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
+                   tokenClaimsEqual(token, headerToken));
 
         // Now that the auth cookie is cleared, all future requests (from UI)
         // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
-        getClient(token).perform(get("/api/authn/status").header("Origin", uiURL))
+        getClient(headerToken).perform(get("/api/authn/status").header("Origin", uiURL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+
         //Logout, invalidating the token
-        getClient(token).perform(post("/api/authn/logout").header("Origin", uiURL))
+        getClient(headerToken).perform(post("/api/authn/logout").header("Origin", uiURL))
                         .andExpect(status().isNoContent());
     }
 
@@ -260,12 +456,27 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Verify /api/authn/shibboleth endpoint does not work
         // NOTE: this is the same call as in testStatusShibAuthenticatedWithCookie())
-        getClient().perform(get("/api/authn/shibboleth")
+        String token = getClient().perform(get("/api/authn/shibboleth")
                 .header("Referer", "https://myshib.example.com")
                 .param("redirectUrl", uiURL)
                 .requestAttr("SHIB-MAIL", eperson.getEmail())
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getHeader("Authorization");
+
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist());
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     // NOTE: This test is similar to testStatusShibAuthenticatedWithCookie(), but proves the same process works
@@ -275,9 +486,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testStatusPasswordAuthenticatedWithCookie() throws Exception {
         // Login via password to retrieve a valid token
         String token = getAuthToken(eperson.getEmail(), password);
-
-        // Remove "Bearer " from that token, so that we are left with the token itself
-        token = token.replace("Bearer ", "");
 
         // Fake the creation of an auth cookie, just for testing. (Currently, it's not possible to create an auth cookie
         // via Password auth, but this test proves it would work if enabled)
@@ -301,20 +509,28 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         // To complete the authentication process, we pass our auth cookie to the "/login" endpoint.
         // This is where the temporary cookie will be read, verified & destroyed. After this point, the UI will
         // only use the Authorization header for all future requests.
-        getClient().perform(post("/api/authn/login").secure(true).cookie(authCookie))
+        String headerToken = getClient().perform(post("/api/authn/login").secure(true).cookie(authCookie))
                     .andExpect(status().isOk())
                     // Verify the Auth cookie has been destroyed
                     .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
-                    // Verify token is now sent back in the Authorization header
-                    .andExpect(header().string(AUTHORIZATION_HEADER, "Bearer " + token))
+                    // Verify Authorization header is returned
+                    .andExpect(header().exists(AUTHORIZATION_HEADER))
                     // Verify that the CSRF token has been changed
                     // (as both cookie and header should be sent back)
                     .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
-                    .andExpect(header().exists("DSPACE-XSRF-TOKEN"));
+                    .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+                    .andReturn().getResponse()
+                    .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        // Verify that the token in the returned header has the *same claims* as the auth Cookie token
+        // NOTE: We test claim equality because the token's expiration date may change during this request. If it does
+        // change, then the tokens will look different even though the claims are the same.
+        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
+                   tokenClaimsEqual(token, headerToken));
 
         // Now that the auth cookie is cleared, all future requests (from UI)
         // should be made via the Authorization header. So, this tests the token is still valid if sent via header.
-        getClient(token).perform(get("/api/authn/status"))
+        getClient(headerToken).perform(get("/api/authn/status"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$.okay", is(true)))
@@ -322,7 +538,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                     .andExpect(jsonPath("$.type", is("status")));
 
         // Logout, invalidating the token
-        getClient(token).perform(post("/api/authn/logout"))
+        getClient(headerToken).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
 
@@ -330,13 +546,20 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testTwoAuthenticationTokens() throws Exception {
         String token1 = getAuthToken(eperson.getEmail(), password);
 
-        //Sleep so tokens are different
+        // Sleep for >1sec ensures the tokens are different. Because expiration date in the token includes a timestamp,
+        // waiting for >1sec will result in a different expiration, and therefore a slightly different token.
         sleep(1200);
 
         String token2 = getAuthToken(eperson.getEmail(), password);
 
+        // Tokens should be different
         assertNotEquals(token1, token2);
 
+        // However, tokens should contain the same claims
+        assertTrue("Check tokens " + token1 + " and " + token2 + " have same claims",
+                   tokenClaimsEqual(token1, token2));
+
+        // BOTH tokens should be valid, as they represent the same authenticated user's "session".
         getClient(token1).perform(get("/api/authn/status").param("projection", "full"))
 
                          .andExpect(status().isOk())
@@ -367,6 +590,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                 EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
         // Logout, this will invalidate both tokens
+        // NOTE: invalidation of both tokens is tested in testLogoutInvalidatesAllTokens()
         getClient(token1).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
 
@@ -453,14 +677,25 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
     public void testLogoutInvalidatesAllTokens() throws Exception {
         String token1 = getAuthToken(eperson.getEmail(), password);
 
-        //Sleep so tokens are different
+        // Sleep for >1sec ensures the tokens are different. Because expiration date in the token includes a timestamp,
+        // waiting for >1sec will result in a different expiration, and therefore a slightly different token.
         sleep(1200);
 
         String token2 = getAuthToken(eperson.getEmail(), password);
@@ -489,7 +724,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testRefreshToken() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        //Sleep so tokens are different
+        // Sleep for >1sec ensures the tokens are different. Because expiration date in the token includes a timestamp,
+        // waiting for >1sec will result in a different expiration, and therefore a slightly different token.
         sleep(1200);
 
         String newToken = getClient(token).perform(post("/api/authn/login"))
@@ -506,19 +742,33 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                           .andExpect(cookie().value("DSPACE-XSRF-COOKIE", ""))
                                           // CSRF Tokens generated by Spring Security are UUIDs
                                           .andExpect(header().string("DSPACE-XSRF-TOKEN", matchesPattern(REGEX_UUID)))
-                                          .andReturn().getResponse().getHeader("Authorization");
+                                          .andReturn().getResponse()
+                                          .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
+        // Tokens should be different
         assertNotEquals(token, newToken);
 
+        // However, tokens should contain the same claims
+        assertTrue("Check tokens " + token + " and " + newToken + " have same claims",
+                   tokenClaimsEqual(token, newToken));
+
+        // Verify new token is valid
         getClient(newToken).perform(get("/api/authn/status"))
                            .andExpect(status().isOk())
 
                            .andExpect(jsonPath("$.okay", is(true)))
                            .andExpect(jsonPath("$.authenticated", is(true)))
+                           .andExpect(jsonPath("$.authenticationMethod", is("password")))
                            .andExpect(jsonPath("$.type", is("status")));
 
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
+        getClient(newToken).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
+
+        // Logout, this will invalidate both tokens
+        // NOTE: invalidation of both tokens is tested in testLogoutInvalidatesAllTokens()
+        getClient(newToken).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
     }
 
@@ -528,9 +778,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testRefreshTokenWithInvalidCSRF() throws Exception {
         // Login via password to retrieve a valid token
         String token = getAuthToken(eperson.getEmail(), password);
-
-        // Remove "Bearer " from that token, so that we are left with the token itself
-        token = token.replace("Bearer ", "");
 
         // Save token to an Authorization cookie
         Cookie[] cookies = new Cookie[1];
@@ -565,7 +812,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                                       // (as both cookie and header should be sent back)
                                       .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
                                       .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
-                                      .andReturn().getResponse().getHeader("Authorization");
+                                      .andReturn().getResponse()
+                                      .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
@@ -850,7 +1098,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                     .requestAttr("SHIB-MAIL", eperson.getEmail())
                     .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
                 .andExpect(status().isOk())
@@ -858,11 +1106,20 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson",
                         EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous", "Reviewers")));
 
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
         // Logout, invalidating token
         getClient(token).perform(post("/api/authn/logout"))
                 .andExpect(status().isNoContent());
@@ -891,7 +1148,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                     .with(ip("123.123.123.123"))
                     .header("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full")
                                     .with(ip("123.123.123.123")))
@@ -901,6 +1158,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson",
@@ -911,7 +1169,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .with(ip("234.234.234.234"))
                 .header("SHIB-MAIL", eperson.getEmail()))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+                .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full")
                 .with(ip("234.234.234.234")))
@@ -921,10 +1179,20 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                 .andExpect(jsonPath("$.type", is("status")))
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson",
                         EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
+
+        getClient(token).perform(
+                get("/api/authz/authorizations/search/object")
+                        .param("embed", "feature")
+                        .param("feature", feature)
+                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
 
         // Logout, invalidating token
         getClient(token).perform(post("/api/authn/logout"))
@@ -954,8 +1222,13 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("password")))
                         .andExpect(jsonPath("$.type", is("status")));
 
+        getClient(token).perform(get("/api/authz/authorizations/" + authorization.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.is(
+                                AuthorizationMatcher.matchAuthorization(authorization))));
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
@@ -965,6 +1238,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Simulate that a shibboleth authentication has happened
@@ -972,13 +1246,14 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .requestAttr("SHIB-MAIL", eperson.getEmail())
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
             .andExpect(status().isOk())
-            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace("Bearer ", "");
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
         //Check if we have a valid token
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
@@ -990,6 +1265,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist())
                         .andExpect(jsonPath("$.type", is("status")));
 
     }
@@ -1064,7 +1340,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .requestAttr("SHIB-MAIL", eperson.getEmail())
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
             .andExpect(status().isOk())
-            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
 
         //Logout
         getClient(token).perform(post("/api/authn/logout"))
@@ -1333,6 +1609,116 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void testStatusOrcidAuthenticatedWithCookie() throws Exception {
+
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", ORCID_ONLY);
+
+        String uiURL = configurationService.getProperty("dspace.ui.url");
+
+        context.turnOffAuthorisationSystem();
+
+        String orcid = "0000-1111-2222-3333";
+        String code = "123456";
+        String orcidAccessToken = "c41e37e5-c2de-4177-91d6-ed9e9d1f31bf";
+
+        EPersonBuilder.createEPerson(context)
+            .withEmail("test@email.it")
+            .withNetId(orcid)
+            .withNameInMetadata("Test", "User")
+            .withCanLogin(true)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        OrcidClient orcidClientMock = mock(OrcidClient.class);
+        when(orcidClientMock.getAccessToken(code)).thenReturn(buildOrcidTokenResponse(orcid, orcidAccessToken));
+
+        OrcidClient originalOrcidClient = orcidAuthentication.getOrcidClient();
+        orcidAuthentication.setOrcidClient(orcidClientMock);
+
+        Cookie authCookie = null;
+
+        try {
+
+            authCookie = getClient().perform(get("/api/" + AuthnRest.CATEGORY + "/orcid")
+                .param("redirectUrl", uiURL)
+                .param("code", code))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(uiURL))
+                .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+                .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"))
+                .andExpect(cookie().exists(AUTHORIZATION_COOKIE))
+                .andReturn().getResponse().getCookie(AUTHORIZATION_COOKIE);
+
+        } finally {
+            orcidAuthentication.setOrcidClient(originalOrcidClient);
+        }
+
+        assertNotNull(authCookie);
+        String token = authCookie.getValue();
+
+        getClient().perform(get("/api/authn/status").header("Origin", uiURL)
+            .secure(true)
+            .cookie(authCookie))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("orcid")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
+
+        String headerToken = getClient().perform(post("/api/authn/login").header("Origin", uiURL)
+            .secure(true)
+            .cookie(authCookie))
+            .andExpect(status().isOk())
+            .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""))
+            .andExpect(header().exists(AUTHORIZATION_HEADER))
+            .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
+            .andExpect(header().exists("DSPACE-XSRF-TOKEN"))
+            .andReturn().getResponse()
+            .getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        assertTrue("Check tokens " + token + " and " + headerToken + " have same claims",
+            tokenClaimsEqual(token, headerToken));
+
+        getClient(headerToken).perform(get("/api/authn/status").header("Origin", uiURL))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("orcid")))
+            .andExpect(jsonPath("$.type", is("status")));
+
+        getClient(headerToken).perform(post("/api/authn/logout").header("Origin", uiURL))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testOrcidLoginURL() throws Exception {
+
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", ORCID_ONLY);
+
+        String originalClientId = orcidConfiguration.getClientId();
+        orcidConfiguration.setClientId("CLIENT-ID");
+
+        try {
+
+            getClient().perform(post("/api/authn/login"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                    "orcid realm=\"DSpace REST API\", " +
+                        "location=\"https://sandbox.orcid.org/oauth/authorize?client_id=CLIENT-ID&response_type=code"
+                        + "&scope=/authenticate+/read-limited+/activities/update+/person/update&redirect_uri"
+                        + "=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Forcid\""));
+
+        } finally {
+            orcidConfiguration.setClientId(originalClientId);
+        }
+    }
+
     // Get a short-lived token based on an active login token
     private String getShortLivedToken(String loginToken) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -1388,6 +1774,56 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         return bitstream;
+    }
+
+    /**
+     * Check if the claims (except for expiration date) are equal between two JWTs.
+     * Expiration date (exp) claim is ignored as it includes a timestamp and therefore changes every second.
+     * So, this method checks to ensure token equality by comparing all other claims.
+     *
+     * @param token1 first token
+     * @param token2 second token
+     * @return True if tokens are identical or have the same claims (ignoring "exp"). False otherwise.
+     */
+    private boolean tokenClaimsEqual(String token1, String token2) {
+        // First check for exact match tokens. These are guaranteed to have equal claims.
+        if (token1.equals(token2)) {
+            return true;
+        }
+
+        // Now parse the two tokens and compare the claims in each
+        try {
+            SignedJWT jwt1 = SignedJWT.parse(token1);
+            SignedJWT jwt2 = SignedJWT.parse(token2);
+            JWTClaimsSet jwt1ClaimsSet = jwt1.getJWTClaimsSet();
+            JWTClaimsSet jwt2ClaimsSet = jwt2.getJWTClaimsSet();
+
+            Map<String,Object> jwt1Claims = jwt1ClaimsSet.getClaims();
+            for (String claim: jwt1Claims.keySet()) {
+                // Ignore the "exp" (expiration date) claim, as it includes a timestamp and changes every second
+                if (claim.equals("exp")) {
+                    continue;
+                }
+                // If one other claim is not equal, return false
+                if (!jwt1ClaimsSet.getClaim(claim).equals(jwt2ClaimsSet.getClaim(claim))) {
+                    return false;
+                }
+            }
+            // all claims (except "exp") are equal!
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    private OrcidTokenResponseDTO buildOrcidTokenResponse(String orcid, String accessToken) {
+        OrcidTokenResponseDTO token = new OrcidTokenResponseDTO();
+        token.setAccessToken(accessToken);
+        token.setOrcid(orcid);
+        token.setTokenType("Bearer");
+        token.setName("Test User");
+        token.setScope(String.join(" ", new String[] { "FirstScope", "SecondScope" }));
+        return token;
     }
 }
 
