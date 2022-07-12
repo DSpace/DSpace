@@ -14,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
@@ -25,6 +26,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+
 
 /**
  * A command-line tool for creating an initial administrator for setting up a
@@ -64,16 +66,34 @@ public final class CreateAdministrator {
         throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
+        Console console = System.console();
 
         CreateAdministrator ca = new CreateAdministrator();
 
+        char[] password1 = null;
+        char[] password2 = null;
+        boolean dataOK = false;
+        String language = I18nUtil.getDefaultLocale().getLanguage();
+
         options.addOption("e", "email", true, "administrator email address");
         options.addOption("f", "first", true, "administrator first name");
+        options.addOption("h", "help", false, "explain create-administrator options");
         options.addOption("l", "last", true, "administrator last name");
         options.addOption("c", "language", true, "administrator language");
         options.addOption("p", "password", true, "administrator password");
 
-        CommandLine line = parser.parse(options, argv);
+        CommandLine line = null;
+
+        try {
+
+            line = parser.parse(options, argv);
+
+        } catch (Exception e) {
+
+            System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
+            System.exit(1);
+
+        }
 
         if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
             line.hasOption("c") && line.hasOption("p")) {
@@ -81,7 +101,80 @@ public final class CreateAdministrator {
                                    line.getOptionValue("f"), line.getOptionValue("l"),
                                    line.getOptionValue("c"), line.getOptionValue("p"));
         } else {
-            ca.negotiateAdministratorDetails();
+
+            if (line.hasOption("h")) {
+                String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+                    " DSpace site. Unless all the required parameters are passed it will" +
+                    " prompt for an e-mail address, last name, first name and password from" +
+                    " standard input.. An administrator group is then created and the data passed" +
+                    "  in used to create an e-person in that group.\n\n";
+                String footer = "\n";
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("dspace create-administrator", header, options, footer, true);
+                return;
+            } else {
+
+                ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+                if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l")
+                    && (line.hasOption("c") || (!line.hasOption("c")
+                    && cfg.getProperty("webui.supported.locales") == null))) {
+
+
+                    if (cfg.getProperty("webui.supported.locales") != null) {
+                        System.out.println("Select one of the following languages: "
+                            + cfg.getProperty("webui.supported.locales"));
+                        System.out.print("Language: ");
+                        System.out.flush();
+
+                        language = console.readLine();
+
+                        if (language != null) {
+                            language = language.trim();
+                            language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
+                        }
+                    }
+
+                    while (!dataOK) {
+                        System.out.println("Password will not display on screen.");
+                        System.out.print("Password: ");
+                        System.out.flush();
+
+                        password1 = console.readPassword();
+
+                        System.out.print("Again to confirm: ");
+                        System.out.flush();
+
+                        password2 = console.readPassword();
+
+                           //TODO real password validation
+                        if (password1.length > 1 && Arrays.equals(password1, password2)) {
+                           // password OK
+                            System.out.print("Is the above data correct? (y or n): ");
+                            System.out.flush();
+
+                            String s = console.readLine();
+
+                            if (s != null) {
+                                s = s.trim();
+                                if (s.toLowerCase().startsWith("y")) {
+                                    dataOK = true;
+                                }
+                            }
+                        } else {
+                            System.out.println("Passwords don't match");
+                        }
+                    }
+                    ca.createAdministrator(line.getOptionValue("e"),
+                        line.getOptionValue("f"), line.getOptionValue("l"),
+                        language, String.valueOf(password1));
+                    Arrays.fill(password1, ' ');
+                    Arrays.fill(password2, ' ');
+
+                } else {
+                    ca.negotiateAdministratorDetails();
+                }
+            }
         }
     }
 
