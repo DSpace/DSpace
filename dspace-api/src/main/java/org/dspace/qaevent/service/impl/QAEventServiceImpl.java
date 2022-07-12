@@ -429,7 +429,7 @@ public class QAEventServiceImpl implements QAEventService {
 
     // oai:www.openstarts.units.it:10077/21486
     private String getHandleFromOriginalId(String originalId) {
-        Integer startPosition = originalId.lastIndexOf(':');
+        int startPosition = originalId.lastIndexOf(':');
         if (startPosition != -1) {
             return originalId.substring(startPosition + 1, originalId.length());
         } else {
