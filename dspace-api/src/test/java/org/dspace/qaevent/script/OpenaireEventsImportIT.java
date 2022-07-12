@@ -38,12 +38,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Integration tests for {@link OpenaireEventsRunnable}.
+ * Integration tests for {@link OpenaireEventsImport}.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class OpenaireEventsRunnableIT extends AbstractIntegrationTestWithDatabase {
+public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String BASE_JSON_DIR_PATH = "org/dspace/app/openaire-events/";
 

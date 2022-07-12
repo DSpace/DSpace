@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsScriptConfiguration<T extends OpenaireEventsRunnable> extends ScriptConfiguration<T> {
+public class OpenaireEventsImportScriptConfiguration<T extends OpenaireEventsImport> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -37,7 +37,7 @@ public class OpenaireEventsScriptConfiguration<T extends OpenaireEventsRunnable>
 
     /**
      * Generic setter for the dspaceRunnableClass
-     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this OpenaireEventsScriptConfiguration
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this OpenaireEventsImportScriptConfiguration
      */
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {

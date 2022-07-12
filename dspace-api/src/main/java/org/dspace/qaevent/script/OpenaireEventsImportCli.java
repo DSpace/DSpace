@@ -12,18 +12,18 @@ import org.apache.commons.cli.ParseException;
 import org.dspace.utils.DSpace;
 
 /**
- * Extensions of {@link OpenaireEventsRunnable} to run the script on console.
+ * Extensions of {@link OpenaireEventsImport} to run the script on console.
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsRunnableCli extends OpenaireEventsRunnable {
+public class OpenaireEventsImportCli extends OpenaireEventsImport {
 
     @Override
     @SuppressWarnings({ "rawtypes" })
-    public OpenaireEventsCliScriptConfiguration getScriptConfiguration() {
+    public OpenaireEventsImportCliScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
-            .getServiceByName("import-openaire-events", OpenaireEventsCliScriptConfiguration.class);
+            .getServiceByName("import-openaire-events", OpenaireEventsImportCliScriptConfiguration.class);
     }
 
     @Override

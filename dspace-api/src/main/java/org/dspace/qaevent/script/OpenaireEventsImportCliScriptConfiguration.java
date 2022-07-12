@@ -10,14 +10,14 @@ package org.dspace.qaevent.script;
 import org.apache.commons.cli.Options;
 
 /**
- * Extension of {@link OpenaireEventsScriptConfiguration} to run the script on
+ * Extension of {@link OpenaireEventsImportScriptConfiguration} to run the script on
  * console.
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsCliScriptConfiguration<T extends OpenaireEventsRunnable>
-    extends OpenaireEventsScriptConfiguration<T> {
+public class OpenaireEventsImportCliScriptConfiguration<T extends OpenaireEventsImport>
+    extends OpenaireEventsImportScriptConfiguration<T> {
 
     @Override
     public Options getOptions() {

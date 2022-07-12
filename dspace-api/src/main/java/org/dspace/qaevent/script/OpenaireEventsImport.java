@@ -54,7 +54,8 @@ import org.dspace.utils.DSpace;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptConfiguration<OpenaireEventsRunnable>> {
+public class OpenaireEventsImport
+    extends DSpaceRunnable<OpenaireEventsImportScriptConfiguration<OpenaireEventsImport>> {
 
     private QAEventService qaEventService;
 
@@ -68,9 +69,9 @@ public class OpenaireEventsRunnable extends DSpaceRunnable<OpenaireEventsScriptC
 
     @Override
     @SuppressWarnings({ "rawtypes" })
-    public OpenaireEventsScriptConfiguration getScriptConfiguration() {
-        OpenaireEventsScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-openaire-events", OpenaireEventsScriptConfiguration.class);
+    public OpenaireEventsImportScriptConfiguration getScriptConfiguration() {
+        OpenaireEventsImportScriptConfiguration configuration = new DSpace().getServiceManager()
+                .getServiceByName("import-openaire-events", OpenaireEventsImportScriptConfiguration.class);
         return configuration;
     }
 
