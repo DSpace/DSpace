@@ -35,10 +35,10 @@ public interface QAEventService {
     /**
      * Find all the event's topics related to the given source.
      *
-     * @param  source   the source to search for
-     * @param  offset   the offset to apply
-     * @param  pageSize the page size
-     * @return          the topics list
+     * @param  source the source to search for
+     * @param  offset the offset to apply
+     * @param  count  the page size
+     * @return        the topics list
      */
     public List<QATopic> findAllTopicsBySource(String source, long offset, long count);
 

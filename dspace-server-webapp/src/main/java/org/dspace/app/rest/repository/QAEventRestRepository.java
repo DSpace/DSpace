@@ -77,7 +77,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
         Pageable pageable) {
         List<QAEvent> qaEvents = null;
-        Long count = 0L;
+        long count = 0L;
         boolean ascending = false;
         if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
             ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
