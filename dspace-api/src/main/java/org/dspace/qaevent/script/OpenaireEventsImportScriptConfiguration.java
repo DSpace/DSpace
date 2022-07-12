@@ -58,9 +58,15 @@ public class OpenaireEventsImportScriptConfiguration<T extends OpenaireEventsImp
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("f", "file", true, "Import data from OpenAIRE quality assurance broker files");
+            options.addOption("f", "file", true, "Import data from OpenAIRE quality assurance broker JSON file."
+                + " This parameter is mutually exclusive to the email parameter.");
             options.getOption("f").setType(InputStream.class);
-            options.getOption("f").setRequired(true);
+            options.getOption("f").setRequired(false);
+
+            options.addOption("e", "email", true, "Email related to the subscriptions to import data from OpenAIRE "
+                + "broker. This parameter is mutually exclusive to the file parameter.");
+            options.getOption("e").setType(String.class);
+            options.getOption("e").setRequired(false);
 
             super.options = options;
         }

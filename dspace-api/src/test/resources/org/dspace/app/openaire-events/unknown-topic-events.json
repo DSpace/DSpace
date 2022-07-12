@@ -8,8 +8,8 @@
 	},
 	
 	{
-		"originalId": "oai:www.openstarts.units.it:123456789/99999",
-		"title": "Test Publication",
+		"originalId": "oai:www.openstarts.units.it:123456789/999991",
+		"title": "Test Publication 2",
 		"topic": "ENRICH/MISSING/ABSTRACT",
 		"trust": 1.0,
 		"message": {

@@ -7,15 +7,24 @@
  */
 package org.dspace.qaevent.script;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import eu.dnetlib.broker.BrokerClient;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -23,9 +32,11 @@ import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.qaevent.service.BrokerClientFactory;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
@@ -52,6 +63,7 @@ import org.dspace.utils.DSpace;
  * </code>
  * 
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
+ * @author Luca Giamminonni (luca.giamminonni at 4Science.it)
  *
  */
 public class OpenaireEventsImport
@@ -63,7 +75,15 @@ public class OpenaireEventsImport
 
     private ConfigurationService configurationService;
 
+    private BrokerClient brokerClient;
+
+    private ObjectMapper jsonMapper;
+
+    private URL openaireBrokerURL;
+
     private String fileLocation;
+
+    private String email;
 
     private Context context;
 
@@ -77,86 +97,149 @@ public class OpenaireEventsImport
 
     @Override
     public void setup() throws ParseException {
-        DSpace dspace = new DSpace();
 
-        qaEventService =  dspace.getSingletonService(QAEventService.class);
-        if (qaEventService == null) {
-            throw new IllegalStateException("qaEventService is NULL. Error in spring configuration");
-        }
+        jsonMapper = new JsonMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        configurationService = dspace.getConfigurationService();
+        qaEventService = new DSpace().getSingletonService(QAEventService.class);
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        brokerClient = BrokerClientFactory.getInstance().getBrokerClient();
 
         topicsToImport = configurationService.getArrayProperty("qaevents.openaire.import.topic");
+        openaireBrokerURL = getOpenaireBrokerUri();
 
         fileLocation = commandLine.getOptionValue("f");
+        email = commandLine.getOptionValue("e");
 
     }
 
     @Override
     public void internalRun() throws Exception {
 
-        if (StringUtils.isEmpty(fileLocation)) {
-            throw new IllegalArgumentException("No file location was entered");
+        if (StringUtils.isAllBlank(fileLocation, email)) {
+            throw new IllegalArgumentException("One parameter between the location of the file and the email "
+                + "must be entered to proceed with the import.");
+        }
+
+        if (StringUtils.isNoneBlank(fileLocation, email)) {
+            throw new IllegalArgumentException("Only one parameter between the location of the file and the email "
+                + "must be entered to proceed with the import.");
         }
 
         context = new Context();
         assignCurrentUserInContext();
 
         try {
-            runOpenaireEventsImport();
+            importOpenaireEvents();
         } catch (Exception ex) {
-            handler.logError("A not recoverable error occurs during OPENAIRE events import. "
-                + ExceptionUtils.getRootCauseMessage(ex), ex);
+            handler.logError("A not recoverable error occurs during OPENAIRE events import: " + getMessage(ex), ex);
             throw ex;
         }
 
     }
 
     /**
-     * Read the OPENAIRE events from the given JSON file and try to store them.
+     * Read the OPENAIRE events from the given JSON file or directly from the
+     * OPENAIRE broker and try to store them.
      */
-    private void runOpenaireEventsImport() {
+    private void importOpenaireEvents() throws Exception {
 
-        QAEvent[] qaEvents = readOpenaireQAEventsFromJsonFile();
-        handler.logInfo("Found " + qaEvents.length + " events to store");
-
-        for (QAEvent event : qaEvents) {
-            try {
-                storeOpenaireQAEvent(event);
-            } catch (RuntimeException e) {
-                handler.logWarning(getRootCauseMessage(e));
-            }
+        if (StringUtils.isNotBlank(fileLocation)) {
+            handler.logInfo("Trying to read the QA events from the provided file");
+            importOpenaireEventsFromFile();
+        } else {
+            handler.logInfo("Trying to read the QA events from the OPENAIRE broker");
+            importOpenaireEventsFromBroker();
         }
 
     }
 
     /**
-     * Read all the QAEvent present in the given file.
-     *
-     * @return           the QA events to be imported
-     * @throws Exception if an oerror occurs during the file reading
+     * Read the OPENAIRE events from the given file location and try to store them.
      */
-    private QAEvent[] readOpenaireQAEventsFromJsonFile() {
-        try {
+    private void importOpenaireEventsFromFile() throws Exception {
 
-            ObjectMapper jsonMapper = new JsonMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return jsonMapper.readValue(getQAEventsFileInputStream(), QAEvent[].class);
+        InputStream eventsFileInputStream = getQAEventsFileInputStream();
+        List<QAEvent> qaEvents = readOpenaireQAEventsFromJson(eventsFileInputStream);
 
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("An error occurs parsing the OPENAIRE QA events json", ex);
+        handler.logInfo("Found " + qaEvents.size() + " events in the given file");
+
+        storeOpenaireQAEvents(qaEvents);
+
+    }
+
+    /**
+     * Import the OPENAIRE events from the Broker using the subscription related to
+     * the given email and try to store them.
+     */
+    private void importOpenaireEventsFromBroker() {
+
+        List<String> subscriptionIds = listEmailSubscriptions();
+
+        handler.logInfo("Found " + subscriptionIds.size() + " subscriptions related to the given email");
+
+        for (String subscriptionId : subscriptionIds) {
+
+            List<QAEvent> events = readOpenaireQAEventsFromBroker(subscriptionId);
+
+            handler.logInfo("Found " + events.size() + " events from the subscription " + subscriptionId);
+
+            storeOpenaireQAEvents(events);
+
         }
     }
 
     /**
      * Obtain an InputStream from the runnable instance.
-     * @return
-     * @throws Exception
      */
     private InputStream getQAEventsFileInputStream() throws Exception {
         return handler.getFileStream(context, fileLocation)
             .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
                 + "found for filename: " + fileLocation));
+    }
+
+    /**
+     * Read all the QAEvent from the OPENAIRE Broker related to the subscription
+     * with the given id.
+     */
+    private List<QAEvent> readOpenaireQAEventsFromBroker(String subscriptionId) {
+
+        try {
+            InputStream eventsInputStream = getEventsBySubscriptions(subscriptionId);
+            return readOpenaireQAEventsFromJson(eventsInputStream);
+        } catch (Exception ex) {
+            handler.logError("An error occurs downloading the events related to the subscription "
+                + subscriptionId + ": " + getMessage(ex), ex);
+        }
+
+        return List.of();
+
+    }
+
+    /**
+     * Read all the QAEvent present in the given input stream.
+     *
+     * @return the QA events to be imported
+     */
+    private List<QAEvent> readOpenaireQAEventsFromJson(InputStream inputStream) throws Exception {
+        return jsonMapper.readValue(inputStream, new TypeReference<List<QAEvent>>() {
+        });
+    }
+
+    /**
+     * Store the given QAEvents.
+     *
+     * @param events the event to be stored
+     */
+    private void storeOpenaireQAEvents(List<QAEvent> events) {
+        for (QAEvent event : events) {
+            try {
+                storeOpenaireQAEvent(event);
+            } catch (RuntimeException e) {
+                handler.logWarning("An error occurs storing the event with id "
+                    + event.getEventId() + ": " + getMessage(e));
+            }
+        }
     }
 
     /**
@@ -175,6 +258,48 @@ public class OpenaireEventsImport
 
         qaEventService.store(context, event);
 
+    }
+
+    /**
+     * Download the events related to the given subscription from the OPENAIRE broker.
+     *
+     * @param subscriptionId the subscription id
+     * @return an input stream from which to read the events in json format
+     */
+    private InputStream getEventsBySubscriptions(String subscriptionId) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        brokerClient.downloadEvents(openaireBrokerURL, subscriptionId, outputStream);
+        return new ByteArrayInputStream(outputStream.toByteArray());
+    }
+
+    /**
+     * Takes all the subscription related to the given email from the OPENAIRE
+     * broker.
+     */
+    private List<String> listEmailSubscriptions() {
+        try {
+            return brokerClient.listSubscriptions(openaireBrokerURL, email);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("An error occurs retriving the subscriptions "
+                + "from the OPENAIRE broker: " + getMessage(ex), ex);
+        }
+    }
+
+    private URL getOpenaireBrokerUri() {
+        try {
+            return new URL(configurationService.getProperty("qaevents.openaire.broker-url", "http://api.openaire.eu/broker"));
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("The configured OPENAIRE broker URL is not valid.", e);
+        }
+    }
+
+    /**
+     * Get the root exception message from the given exception.
+     */
+    private String getMessage(Exception ex) {
+        String message = ExceptionUtils.getRootCauseMessage(ex);
+        // Remove the Exception name from the message
+        return isNotBlank(message) ? substringAfter(message, ":").trim() : "";
     }
 
     private void assignCurrentUserInContext() throws SQLException {

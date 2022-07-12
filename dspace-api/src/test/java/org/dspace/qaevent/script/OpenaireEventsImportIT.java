@@ -7,7 +7,7 @@
  */
 package org.dspace.qaevent.script;
 
-import static org.dspace.app.matcher.LambdaMatcher.matches;
+import static java.util.List.of;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.matcher.QAEventMatcher.pendingOpenaireEventWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,12 +16,25 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.List;
 
+import eu.dnetlib.broker.BrokerClient;
+import org.apache.commons.io.IOUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -30,10 +43,13 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.qaevent.QASource;
-import org.dspace.qaevent.QATopic;
+import org.dspace.matcher.QASourceMatcher;
+import org.dspace.matcher.QATopicMatcher;
+import org.dspace.qaevent.service.BrokerClientFactory;
 import org.dspace.qaevent.service.QAEventService;
+import org.dspace.qaevent.service.impl.BrokerClientFactoryImpl;
 import org.dspace.utils.DSpace;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,6 +67,10 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
     private Collection collection;
 
+    private BrokerClient brokerClient = BrokerClientFactory.getInstance().getBrokerClient();
+
+    private BrokerClient mockBrokerClient = mock(BrokerClient.class);
+
     @Before
     public void setup() {
 
@@ -65,23 +85,62 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             .build();
 
         context.restoreAuthSystemState();
+
+        ((BrokerClientFactoryImpl) BrokerClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
+    }
+
+    @After
+    public void after() {
+        ((BrokerClientFactoryImpl) BrokerClientFactory.getInstance()).setBrokerClient(brokerClient);
+    }
+
+    @Test
+    public void testWithoutParameters() throws Exception {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        String[] args = new String[] { "import-openaire-events" };
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+        assertThat(handler.getInfoMessages(), empty());
+
+        Exception exception = handler.getException();
+        assertThat(exception, instanceOf(IllegalArgumentException.class));
+        assertThat(exception.getMessage(), is("One parameter between the location of the file and the email "
+            + "must be entered to proceed with the import."));
+
+        verifyNoInteractions(mockBrokerClient);
+    }
+
+    @Test
+    public void testWithBothFileAndEmailParameters() throws Exception {
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("events.json"),
+            "-e", "test@user.com" };
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+        assertThat(handler.getInfoMessages(), empty());
+
+        Exception exception = handler.getException();
+        assertThat(exception, instanceOf(IllegalArgumentException.class));
+        assertThat(exception.getMessage(), is("Only one parameter between the location of the file and the email "
+            + "must be entered to proceed with the import."));
+
+        verifyNoInteractions(mockBrokerClient);
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testManyEventsImport() throws Exception {
+    public void testManyEventsImportFromFile() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Item firstItem = ItemBuilder.createItem(context, collection)
-            .withTitle("Egypt, crossroad of translations and literary interweavings")
-            .withHandle("123456789/99998")
-            .build();
-
-        Item secondItem = ItemBuilder.createItem(context, collection)
-            .withTitle("Test item")
-            .withHandle("123456789/99999")
-            .build();
+        Item firstItem = createItem("Test item", "123456789/99998");
+        Item secondItem = createItem("Test item 2", "123456789/99999");
 
         context.restoreAuthSystemState();
 
@@ -92,19 +151,15 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(), empty());
-        assertThat(handler.getInfoMessages(), contains("Found 2 events to store"));
+        assertThat(handler.getInfoMessages(), contains(
+            "Trying to read the QA events from the provided file",
+            "Found 2 events in the given file"));
 
-        List<QASource> sources = qaEventService.findAllSources(0, 20);
-        assertThat(sources, hasSize(1));
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 2L)));
 
-        assertThat(sources.get(0).getName(), is(OPENAIRE_SOURCE));
-        assertThat(sources.get(0).getTotalEvents(), is(2L));
-
-        List<QATopic> topics = qaEventService.findAllTopics(0, 20);
-        assertThat(topics, hasSize(2));
-        assertThat(topics, containsInAnyOrder(
-            matches(topic -> topic.getKey().equals("ENRICH/MORE/PROJECT") && topic.getTotalEvents() == 1L),
-            matches(topic -> topic.getKey().equals("ENRICH/MISSING/ABSTRACT") && topic.getTotalEvents() == 1L)));
+        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+            QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
+            QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L)));
 
         String projectMessage = "{\"projects[0].acronym\":\"PAThs\",\"projects[0].code\":\"687567\","
             + "\"projects[0].funder\":\"EC\",\"projects[0].fundingProgram\":\"H2020\","
@@ -123,17 +178,16 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", secondItem, "Test Publication",
                 abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d)));
 
+        verifyNoInteractions(mockBrokerClient);
+
     }
 
     @Test
-    public void testManyEventsImportWithUnknownHandle() throws Exception {
+    public void testManyEventsImportFromFileWithUnknownHandle() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Item item = ItemBuilder.createItem(context, collection)
-            .withTitle("Test item")
-            .withHandle("123456789/99999")
-            .build();
+        Item item = createItem("Test item", "123456789/99999");
 
         context.restoreAuthSystemState();
 
@@ -144,21 +198,16 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(),
-            contains("IllegalArgumentException: Skipped event b4e09c71312cd7c397969f56c900823f" +
-                " related to the oai record oai:www.openstarts.units.it:123456789/99998 as the record was not found"));
-        assertThat(handler.getInfoMessages(), contains("Found 2 events to store"));
+            contains("An error occurs storing the event with id b4e09c71312cd7c397969f56c900823f: "
+                + "Skipped event b4e09c71312cd7c397969f56c900823f related to the oai record "
+                + "oai:www.openstarts.units.it:123456789/99998 as the record was not found"));
+        assertThat(handler.getInfoMessages(), contains(
+            "Trying to read the QA events from the provided file",
+            "Found 2 events in the given file"));
 
-        List<QASource> sources = qaEventService.findAllSources(0, 20);
-        assertThat(sources, hasSize(1));
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
 
-        assertThat(sources.get(0).getName(), is(OPENAIRE_SOURCE));
-        assertThat(sources.get(0).getTotalEvents(), is(1L));
-
-        List<QATopic> topics = qaEventService.findAllTopics(0, 20);
-        assertThat(topics, hasSize(1));
-        QATopic topic = topics.get(0);
-        assertThat(topic.getKey(), is("ENRICH/MISSING/ABSTRACT"));
-        assertThat(topic.getTotalEvents(), is(1L));
+        assertThat(qaEventService.findAllTopics(0, 20), contains(QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
@@ -166,22 +215,17 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", item, "Test Publication",
                 abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d)));
 
+        verifyNoInteractions(mockBrokerClient);
+
     }
 
     @Test
-    public void testManyEventsImportWithUnknownTopic() throws Exception {
+    public void testManyEventsImportFromFileWithUnknownTopic() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        ItemBuilder.createItem(context, collection)
-            .withTitle("Egypt, crossroad of translations and literary interweavings")
-            .withHandle("123456789/99998")
-            .build();
-
-        Item secondItem = ItemBuilder.createItem(context, collection)
-            .withTitle("Test item")
-            .withHandle("123456789/99999")
-            .build();
+        createItem("Test item", "123456789/99999");
+        Item secondItem = createItem("Test item 2", "123456789/999991");
 
         context.restoreAuthSystemState();
 
@@ -193,48 +237,226 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(),
             contains("Event for topic ENRICH/MORE/UNKNOWN is not allowed in the qaevents.cfg"));
-        assertThat(handler.getInfoMessages(), contains("Found 2 events to store"));
+        assertThat(handler.getInfoMessages(), contains(
+            "Trying to read the QA events from the provided file",
+            "Found 2 events in the given file"));
 
-        List<QASource> sources = qaEventService.findAllSources(0, 20);
-        assertThat(sources, hasSize(1));
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
 
-        assertThat(sources.get(0).getName(), is(OPENAIRE_SOURCE));
-        assertThat(sources.get(0).getTotalEvents(), is(1L));
-
-        List<QATopic> topics = qaEventService.findAllTopics(0, 20);
-        assertThat(topics, hasSize(1));
-        QATopic topic = topics.get(0);
-        assertThat(topic.getKey(), is("ENRICH/MISSING/ABSTRACT"));
-        assertThat(topic.getTotalEvents(), is(1L));
+        assertThat(qaEventService.findAllTopics(0, 20), contains(QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
         assertThat(qaEventService.findEventsByTopic("ENRICH/MISSING/ABSTRACT"), contains(
-            pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", secondItem, "Test Publication",
+            pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/999991", secondItem, "Test Publication 2",
                 abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d)));
+
+        verifyNoInteractions(mockBrokerClient);
 
     }
 
     @Test
-    public void testWithoutEvents() throws Exception {
+    public void testImportFromFileWithoutEvents() throws Exception {
 
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
 
-        String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("empty-events.json") };
+        String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("empty-file.json") };
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
 
         assertThat(handler.getErrorMessages(),
-            contains(containsString("A not recoverable error occurs during OPENAIRE events import.")));
+            contains(containsString("A not recoverable error occurs during OPENAIRE events import")));
         assertThat(handler.getWarningMessages(),empty());
-        assertThat(handler.getInfoMessages(), empty());
+        assertThat(handler.getInfoMessages(), contains("Trying to read the QA events from the provided file"));
 
-        List<QASource> sources = qaEventService.findAllSources(0, 20);
-        assertThat(sources, hasSize(1));
-
-        assertThat(sources.get(0).getName(), is(OPENAIRE_SOURCE));
-        assertThat(sources.get(0).getTotalEvents(), is(0L));
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), empty());
+
+        verifyNoInteractions(mockBrokerClient);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testImportFromOpenaireBroker() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = createItem("Test item", "123456789/99998");
+        Item secondItem = createItem("Test item 2", "123456789/99999");
+        Item thirdItem = createItem("Test item 3", "123456789/999991");
+
+        context.restoreAuthSystemState();
+
+        URL openaireURL = new URL("http://api.openaire.eu/broker");
+
+        when(mockBrokerClient.listSubscriptions(openaireURL, "user@test.com")).thenReturn(of("sub1", "sub2", "sub3"));
+
+        doAnswer(i -> writeToOutputStream(i.getArgument(2, OutputStream.class), "events.json"))
+            .when(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub1"), any());
+
+        doAnswer(i -> writeToOutputStream(i.getArgument(2, OutputStream.class), "empty-events-list.json"))
+            .when(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub2"), any());
+
+        doAnswer(i -> writeToOutputStream(i.getArgument(2, OutputStream.class), "unknown-topic-events.json"))
+            .when(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub3"), any());
+
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        String[] args = new String[] { "import-openaire-events", "-e", "user@test.com" };
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(),
+            contains("Event for topic ENRICH/MORE/UNKNOWN is not allowed in the qaevents.cfg"));
+        assertThat(handler.getInfoMessages(), contains(
+            "Trying to read the QA events from the OPENAIRE broker",
+            "Found 3 subscriptions related to the given email",
+            "Found 2 events from the subscription sub1",
+            "Found 0 events from the subscription sub2",
+            "Found 2 events from the subscription sub3"));
+
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 3L)));
+
+        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+            QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
+            QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 2L)));
+
+        String projectMessage = "{\"projects[0].acronym\":\"PAThs\",\"projects[0].code\":\"687567\","
+            + "\"projects[0].funder\":\"EC\",\"projects[0].fundingProgram\":\"H2020\","
+            + "\"projects[0].jurisdiction\":\"EU\","
+            + "\"projects[0].openaireId\":\"40|corda__h2020::6e32f5eb912688f2424c68b851483ea4\","
+            + "\"projects[0].title\":\"Tracking Papyrus and Parchment Paths\"}";
+
+        assertThat(qaEventService.findEventsByTopic("ENRICH/MORE/PROJECT"), contains(
+            pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99998", firstItem,
+                "Egypt, crossroad of translations and literary interweavings", projectMessage,
+                "ENRICH/MORE/PROJECT", 1.00d)));
+
+        String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
+
+        assertThat(qaEventService.findEventsByTopic("ENRICH/MISSING/ABSTRACT"), containsInAnyOrder(
+            pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", secondItem, "Test Publication",
+                abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d),
+            pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/999991", thirdItem, "Test Publication 2",
+                abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d)));
+
+        verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
+        verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub1"), any());
+        verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub2"), any());
+        verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub3"), any());
+
+        verifyNoMoreInteractions(mockBrokerClient);
+    }
+
+    @Test
+    public void testImportFromOpenaireBrokerWithErrorDuringListSubscription() throws Exception {
+
+        URL openaireURL = new URL("http://api.openaire.eu/broker");
+
+        when(mockBrokerClient.listSubscriptions(openaireURL, "user@test.com"))
+            .thenThrow(new RuntimeException("Connection refused"));
+
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        String[] args = new String[] { "import-openaire-events", "-e", "user@test.com" };
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
+
+        assertThat(handler.getErrorMessages(),
+            contains("A not recoverable error occurs during OPENAIRE events import: Connection refused"));
+        assertThat(handler.getWarningMessages(), empty());
+        assertThat(handler.getInfoMessages(), contains("Trying to read the QA events from the OPENAIRE broker"));
+
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
+
+        assertThat(qaEventService.findAllTopics(0, 20), empty());
+
+        verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
+
+        verifyNoMoreInteractions(mockBrokerClient);
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testImportFromOpenaireBrokerWithErrorDuringEventsDownload() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        createItem("Test item", "123456789/99998");
+        createItem("Test item 2", "123456789/99999");
+        createItem("Test item 3", "123456789/999991");
+
+        context.restoreAuthSystemState();
+
+        URL openaireURL = new URL("http://api.openaire.eu/broker");
+
+        when(mockBrokerClient.listSubscriptions(openaireURL, "user@test.com")).thenReturn(of("sub1", "sub2", "sub3"));
+
+        doAnswer(i -> writeToOutputStream(i.getArgument(2, OutputStream.class), "events.json"))
+            .when(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub1"), any());
+
+        doThrow(new RuntimeException("Invalid subscription id"))
+            .when(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub2"), any());
+
+        doAnswer(i -> writeToOutputStream(i.getArgument(2, OutputStream.class), "unknown-topic-events.json"))
+            .when(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub3"), any());
+
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        String[] args = new String[] { "import-openaire-events", "-e", "user@test.com" };
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
+
+        assertThat(handler.getErrorMessages(), contains("An error occurs downloading the events "
+            + "related to the subscription sub2: Invalid subscription id"));
+        assertThat(handler.getWarningMessages(),
+            contains("Event for topic ENRICH/MORE/UNKNOWN is not allowed in the qaevents.cfg"));
+        assertThat(handler.getInfoMessages(), contains(
+            "Trying to read the QA events from the OPENAIRE broker",
+            "Found 3 subscriptions related to the given email",
+            "Found 2 events from the subscription sub1",
+            "Found 0 events from the subscription sub2",
+            "Found 2 events from the subscription sub3"));
+
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 3L)));
+
+        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+            QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
+            QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 2L)));
+
+        assertThat(qaEventService.findEventsByTopic("ENRICH/MORE/PROJECT"), hasSize(1));
+        assertThat(qaEventService.findEventsByTopic("ENRICH/MISSING/ABSTRACT"), hasSize(2));
+
+        verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
+        verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub1"), any());
+        verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub2"), any());
+        verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub3"), any());
+
+        verifyNoMoreInteractions(mockBrokerClient);
+
+    }
+
+    private Item createItem(String title, String handle) {
+        return ItemBuilder.createItem(context, collection)
+            .withTitle(title)
+            .withHandle(handle)
+            .build();
+    }
+
+    private Void writeToOutputStream(OutputStream outputStream, String fileName) {
+        try {
+            byte[] fileContent = getFileContent(fileName);
+            IOUtils.write(fileContent, outputStream);
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private byte[] getFileContent(String fileName) throws Exception {
+        String fileLocation = getFileLocation(fileName);
+        try (FileInputStream fis = new FileInputStream(new File(fileLocation))) {
+            return IOUtils.toByteArray(fis);
+        }
     }
 
     private String getFileLocation(String fileName) throws Exception {

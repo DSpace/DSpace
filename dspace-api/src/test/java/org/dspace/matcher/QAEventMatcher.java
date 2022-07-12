@@ -63,6 +63,19 @@ public class QAEventMatcher extends TypeSafeMatcher<QAEvent> {
         this.trustMatcher = trustMatcher;
     }
 
+    /**
+     * Creates an instance of {@link QAEventMatcher} that matches an OPENAIRE
+     * QAEvent with PENDING status, with an event id, without a related item and
+     * with the given attributes.
+     * 
+     * @param  originalId the original id to match
+     * @param  target     the target to match
+     * @param  title      the title to match
+     * @param  message    the message to match
+     * @param  topic      the topic to match
+     * @param  trust      the trust to match
+     * @return            the matcher istance
+     */
     public static QAEventMatcher pendingOpenaireEventWith(String originalId, Item target,
         String title, String message, String topic, Double trust) {
 
