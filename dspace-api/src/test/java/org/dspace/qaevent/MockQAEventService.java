@@ -7,6 +7,9 @@
  */
 package org.dspace.qaevent;
 
+import java.io.IOException;
+
+import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.qaevent.service.impl.QAEventServiceImpl;
 import org.dspace.solr.MockSolrServer;
 import org.springframework.beans.factory.DisposableBean;
@@ -29,6 +32,11 @@ public class MockQAEventService extends QAEventServiceImpl implements Initializi
     /** Clear all records from the search core. */
     public void reset() {
         mockSolrServer.reset();
+        try {
+            mockSolrServer.getSolrServer().commit();
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
