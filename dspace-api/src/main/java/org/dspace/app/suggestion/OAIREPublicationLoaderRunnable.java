@@ -85,9 +85,9 @@ public class OAIREPublicationLoaderRunnable
      * researcher, the method returns an empty array list. If uuid is null, all
      * research will be return.
      * 
-     * @param profile uuid of the researcher. If null, all researcher will be
-     *                returned.
-     * @return the researcher with specified UUID or all researchers
+     * @param  profileUUID uuid of the researcher. If null, all researcher will be
+     *                     returned.
+     * @return             the researcher with specified UUID or all researchers
      */
     @SuppressWarnings("rawtypes")
     private List<Item> getResearchers(String profileUUID) {

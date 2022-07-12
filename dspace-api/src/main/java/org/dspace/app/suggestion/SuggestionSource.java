@@ -24,7 +24,7 @@ public class SuggestionSource {
     /**
      * Summarize the available suggestions from a source.
      * 
-     * @param the name must be not null
+     * @param name the name must be not null
      */
     public SuggestionSource(String name) {
         super();

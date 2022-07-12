@@ -32,6 +32,6 @@ public interface EvidenceScorer {
      * @return the generated suggestion evidence or null if the record should be
      *         discarded
      */
-    public SuggestionEvidence computeEvidence(Item researcher, ExternalDataObject importRecords);
+    public SuggestionEvidence computeEvidence(Item researcher, ExternalDataObject importRecord);
 
 }
