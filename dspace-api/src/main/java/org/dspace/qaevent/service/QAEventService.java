@@ -26,7 +26,6 @@ public interface QAEventService {
     /**
      * Find all the event's topics.
      *
-     * @param  context  the DSpace context
      * @param  offset   the offset to apply
      * @param  pageSize the page size
      * @return          the topics list
@@ -36,7 +35,6 @@ public interface QAEventService {
     /**
      * Find all the event's topics related to the given source.
      *
-     * @param  context  the DSpace context
      * @param  source   the source to search for
      * @param  offset   the offset to apply
      * @param  pageSize the page size
@@ -47,7 +45,6 @@ public interface QAEventService {
     /**
      * Count all the event's topics.
      *
-     * @param  context the DSpace context
      * @return         the count result
      */
     public long countTopics();
@@ -55,7 +52,6 @@ public interface QAEventService {
     /**
      * Count all the event's topics related to the given source.
      *
-     * @param  context the DSpace context
      * @param  source  the source to search for
      * @return         the count result
      */
@@ -116,7 +112,7 @@ public interface QAEventService {
     /**
      * Delete events by the given target id.
      *
-     * @param id      the id of the target id
+     * @param targetId the id of the target id
      */
     public void deleteEventsByTargetId(UUID targetId);
 
