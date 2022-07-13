@@ -4668,34 +4668,33 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findAccessStatusForItemBadRequestTest() throws Exception {
-        getClient().perform(get("/api/core/items/{uuid}/accessStatus", "1"))
-                   .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void findAccessStatusForItemNotFoundTest() throws Exception {
-        UUID fakeUUID = UUID.randomUUID();
-        getClient().perform(get("/api/core/items/{uuid}/accessStatus", fakeUUID))
-                   .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void findAccessStatusForItemTest() throws Exception {
+    public void findItemWithUnknownIssuedDate() throws Exception {
         context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collection
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Collection owningCollection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                       .withName("Owning Collection")
-                                                       .build();
-        Item item = ItemBuilder.createItem(context, owningCollection)
-                               .withTitle("Test item")
-                               .build();
+                .withName("Parent Community")
+                .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem = ItemBuilder.createItem(context, col)
+                .withTitle("Public item")
+                .withIssueDate("2021-04-27")
+                .withMetadata("local", "approximateDate", "issued", "unknown")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
         context.restoreAuthSystemState();
-        getClient().perform(get("/api/core/items/{uuid}/accessStatus", item.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.status", notNullValue()));
+        Matcher<? super Object> publicItemMatcher = ItemMatcher.matchItemWithTitleAndApproximateDateIssued(publicItem,
+                "Public item", "unknown");
+
+        getClient().perform(get("/api/core/items/" + publicItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", publicItemMatcher));
     }
 
 }

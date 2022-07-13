@@ -46,6 +46,15 @@ public class ItemConverter
 
     @Override
     public ItemRest convert(Item obj, Projection projection) {
+        List<MetadataValue> approximatedDates =
+                itemService.getMetadata(obj, "local", "approximateDate", "issued", Item.ANY, false);
+        if (CollectionUtils.isNotEmpty(approximatedDates) &&
+                StringUtils.isNotBlank(approximatedDates.get(0).getValue())) {
+            List<MetadataValue> issuedDates =
+                    itemService.getMetadata(obj, "dc", "date", "issued", Item.ANY, false);
+            issuedDates.forEach(metadataValue -> metadataValue.setValue(approximatedDates.get(0).getValue()));
+        }
+
         ItemRest item = super.convert(obj, projection);
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
