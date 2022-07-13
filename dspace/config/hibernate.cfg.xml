@@ -93,5 +93,8 @@
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
+        <!-- Dedeuplication -->
+        <mapping class="org.dspace.deduplication.Deduplication"/>
+
     </session-factory>
 </hibernate-configuration>
