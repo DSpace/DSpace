@@ -78,29 +78,39 @@ public class CanvasService extends AbstractResourceService {
     }
 
     /**
-     * Checks for bitstream iiif.image.width metadata in the first
-     * bitstream in first IIIF bundle. If bitstream metadata is not
-     * found, use the IIIF image service to update the default canvas
-     * dimensions for this request. Called once for each manifest.
+     * Checks for "iiif.image.width" metadata in the first
+     * bitstream of IIIF bundles. If bitstream metadata is not
+     * found, sets the default canvas dimensions for this request,
+     * using the IIIF image service to get the dimensions. Called
+     * once for each manifest.
      * @param bundles IIIF bundles for this item
      */
     protected void guessCanvasDimensions(List<Bundle> bundles) {
-        Bitstream firstBistream = bundles.get(0).getBitstreams().get(0);
-        if (!utils.hasWidthMetadata(firstBistream)) {
-            int[] imageDims = utils.getImageDimensions(firstBistream);
-            if (imageDims != null && imageDims.length == 2) {
-                // update the fallback dimensions
-                defaultCanvasWidthFallback = imageDims[0];
-                defaultCanvasHeightFallback = imageDims[1];
+        // prevent redundant updates.
+        boolean dimensionUpdated = false;
+        for (Bundle bundle : bundles) {
+            if(bundle.getBitstreams().size() > 0 && !dimensionUpdated) {
+                Bitstream firstBitstream = bundle.getBitstreams().get(0);
+                if (!utils.hasWidthMetadata(firstBitstream)) {
+                    // get the dimensions of the first image.
+                    int[] imageDims = utils.getImageDimensions(firstBitstream);
+                    if (imageDims != null && imageDims.length == 2) {
+                        // update the fallback dimensions
+                        defaultCanvasWidthFallback = imageDims[0];
+                        defaultCanvasHeightFallback = imageDims[1];
+                    }
+                    setDefaultCanvasDimensions();
+                    // the default dimension for this request has been updated.
+                    dimensionUpdated = true;
+                }
             }
-            setDefaultCanvasDimensions();
         }
     }
 
     /**
-     * Used to set the height and width dimensions for all images when iiif.image.default-width and
-     * iiif.image.default-height are set to -1 in DSpace configuration.
-     * The values are updated only if the bitstream does not have its own iiif.image.width metadata.
+     * Sets the height and width dimensions for all images when "iiif.image.default-width"
+     * and "iiif.image.default-height" are set to -1 in DSpace configuration. The values
+     * are updated only when the bitstream does not have its own image dimension metadata.
      * @param bitstream
      */
     private void setCanvasDimensions(Bitstream bitstream) {
