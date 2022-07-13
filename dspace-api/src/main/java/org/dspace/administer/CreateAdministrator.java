@@ -66,14 +66,8 @@ public final class CreateAdministrator {
         throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
-        // Console console = System.console();
 
         CreateAdministrator ca = new CreateAdministrator();
-
-        // char[] password1 = null;
-        // char[] password2 = null;
-        // boolean dataOK = false;
-        // String language = I18nUtil.getDefaultLocale().getLanguage();
 
         options.addOption("e", "email", true, "administrator email address");
         options.addOption("f", "first", true, "administrator first name");
@@ -158,7 +152,7 @@ public final class CreateAdministrator {
         }
 
         while (!dataOK) {
-            if (flag == false) {
+            if (!flag) {
                 System.out.print("E-mail address: ");
                 System.out.flush();
 
