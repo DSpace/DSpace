@@ -9,6 +9,7 @@ package org.dspace.app.iiif.service;
 
 import static org.dspace.app.iiif.service.utils.IIIFUtils.METADATA_IMAGE_WIDTH;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -78,30 +79,42 @@ public class CanvasService extends AbstractResourceService {
     }
 
     /**
-     * Checks for "iiif.image.width" metadata in the first
-     * bitstream of IIIF bundles. If bitstream metadata is not
-     * found, sets the default canvas dimensions for this request,
-     * using the IIIF image service to get the dimensions. Called
-     * once for each manifest.
+     * Checks for "iiif.image.width" metadata in IIIF bundles. When bitstream
+     * metadata is not found for the first image in the bundle this method updates the
+     * default canvas dimensions for the request based on the actual image dimensions,
+     * using the IIIF image service. Called once for each manifest.
      * @param bundles IIIF bundles for this item
      */
-    protected void guessCanvasDimensions(List<Bundle> bundles) {
+    protected void guessCanvasDimensions(List<Bundle> bundles, Context context) {
         // prevent redundant updates.
         boolean dimensionUpdated = false;
+
         for (Bundle bundle : bundles) {
-            if(bundle.getBitstreams().size() > 0 && !dimensionUpdated) {
-                Bitstream firstBitstream = bundle.getBitstreams().get(0);
-                if (!utils.hasWidthMetadata(firstBitstream)) {
-                    // get the dimensions of the first image.
-                    int[] imageDims = utils.getImageDimensions(firstBitstream);
-                    if (imageDims != null && imageDims.length == 2) {
-                        // update the fallback dimensions
-                        defaultCanvasWidthFallback = imageDims[0];
-                        defaultCanvasHeightFallback = imageDims[1];
+            if (!dimensionUpdated) {
+                for (Bitstream bitstream : bundle.getBitstreams()) {
+                    boolean isImage = false;
+                    try {
+                        isImage = bitstream.getFormat(context).getMIMEType().contains("image/");
+                    } catch (SQLException e) {
+                        log.warn("Error reading the bitstream format: " + e.getMessage());
                     }
-                    setDefaultCanvasDimensions();
-                    // the default dimension for this request has been updated.
-                    dimensionUpdated = true;
+                    if (isImage) {
+                        // check for width dimension
+                        if (!utils.hasWidthMetadata(bitstream)) {
+                            // get the dimensions of the image.
+                            int[] imageDims = utils.getImageDimensions(bitstream);
+                            if (imageDims != null && imageDims.length == 2) {
+                                // update the fallback dimensions
+                                defaultCanvasWidthFallback = imageDims[0];
+                                defaultCanvasHeightFallback = imageDims[1];
+                            }
+                            setDefaultCanvasDimensions();
+                            // stop processing the bundles
+                            dimensionUpdated = true;
+                        }
+                        // check only the first image
+                        break;
+                    }
                 }
             }
         }
