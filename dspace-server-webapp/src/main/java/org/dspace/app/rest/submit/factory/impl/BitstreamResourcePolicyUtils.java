@@ -39,9 +39,10 @@ public class BitstreamResourcePolicyUtils {
      * @param context               The relevant DSpace Context.
      * @param uploadConfigs         The configured UploadConfigurations
      * @param obj                   The applicable DSpace object whose policies should be determined
-     * @param newAccessCondition    The access condition containing the details for the desired policies
+     * @param newAccessConditions   The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+     * @throws ParseException       Passed through.
      */
     public static void findApplyResourcePolicy(Context context, Iterator<UploadConfiguration> uploadConfigs,
             DSpaceObject obj, List<AccessConditionDTO> newAccessConditions)
@@ -62,11 +63,10 @@ public class BitstreamResourcePolicyUtils {
 
     /**
      * Based on the given name, find the resource policy to apply on the given DSpace object
-     * This function applies the resource policies.
-     * The description, start date and end date are applied as well
+     * This function applies the resource policies.The description, start date and end date are applied as well
      *
      * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
+     * @param uploadConfiguration   The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
      * @param name                  The name of the access condition matching the desired policies
      * @param description           An optional description for the policies
@@ -74,6 +74,7 @@ public class BitstreamResourcePolicyUtils {
      * @param endDate               An optional end date for the policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+     * @throws ParseException       Passed through.
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, String name, String description,
