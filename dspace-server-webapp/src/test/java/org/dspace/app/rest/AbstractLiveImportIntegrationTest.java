@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -34,9 +34,9 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
     protected void matchRecords(ArrayList<ImportRecord> recordsImported, ArrayList<ImportRecord> records2match) {
         assertEquals(records2match.size(), recordsImported.size());
         for (int i = 0; i < recordsImported.size(); i++) {
-            ImportRecord firstImported = recordsImported.get(i);
-            ImportRecord first2match = records2match.get(i);
-            checkMetadataValue(firstImported.getValueList(), first2match.getValueList());
+            ImportRecord imported = recordsImported.get(i);
+            ImportRecord toMatch = records2match.get(i);
+            checkMetadataValue(imported.getValueList(), toMatch.getValueList());
         }
     }
 

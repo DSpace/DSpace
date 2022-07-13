@@ -23,10 +23,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +57,8 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.OrcidHistoryRest;
+import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -286,6 +290,12 @@ public class Utils {
         if (StringUtils.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
         }
+        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
+            return OrcidQueueRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "orcidhistories")) {
+            return OrcidHistoryRest.NAME;
+        }
         return modelPlural.replaceAll("s$", "");
     }
 
@@ -470,7 +480,7 @@ public class Utils {
 
                 String line = scanner.nextLine();
                 if (org.springframework.util.StringUtils.hasText(line)) {
-                    list.add(line);
+                    list.add(decodeUrl(line));
                 }
             }
 
@@ -480,6 +490,14 @@ public class Utils {
         return list;
     }
 
+    private String decodeUrl(String url) {
+        try {
+            return URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.warn("The following url could not be decoded: " + url);
+        }
+        return StringUtils.EMPTY;
+    }
 
     /**
      * This method will retrieve a list of DSpaceObjects from the Request by reading in the Request's InputStream
