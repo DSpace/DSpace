@@ -630,11 +630,9 @@ public class ItemExportServiceImpl implements ItemExportService {
             Thread go = new Thread() {
                 @Override
                 public void run() {
-                    Context context = null;
+                    Context context = new Context();
                     Iterator<Item> iitems = null;
                     try {
-                        // create a new dspace context
-                        context = new Context();
                         // ignore auths
                         context.turnOffAuthorisationSystem();
 

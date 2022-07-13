@@ -1665,26 +1665,27 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                               .trim();
             }
 
+            if (isTest) {
+                continue;
+            }
+
             Bitstream bs = null;
-            boolean notfound = true;
             boolean updateRequired = false;
 
-            if (!isTest) {
-                // find bitstream
-                List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(c, myItem);
-                for (int j = 0; j < bitstreams.size() && notfound; j++) {
-                    if (bitstreams.get(j).getName().equals(bitstreamName)) {
-                        bs = bitstreams.get(j);
-                        notfound = false;
-                    }
+            // find bitstream
+            List<Bitstream> bitstreams = itemService.getNonInternalBitstreams(c, myItem);
+            for (Bitstream bitstream : bitstreams) {
+                if (bitstream.getName().equals(bitstreamName)) {
+                    bs = bitstream;
+                    break;
                 }
             }
 
-            if (notfound && !isTest) {
+            if (null == bs) {
                 // this should never happen
-                System.out.println("\tdefault permissions set for "
-                    + bitstreamName);
-            } else if (!isTest) {
+                System.out.printf("\tdefault permissions set for %s%n",
+                    bitstreamName);
+            } else {
                 if (permissionsExist) {
                     if (myGroup == null) {
                         System.out.println("\t" + groupName
@@ -2025,15 +2026,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         Thread go = new Thread() {
             @Override
             public void run() {
-                Context context = null;
-
+                Context context = new Context();
                 String importDir = null;
                 EPerson eperson = null;
 
                 try {
-
-                    // create a new dspace context
-                    context = new Context();
                     eperson = ePersonService.find(context, oldEPerson.getID());
                     context.setCurrentUser(eperson);
                     context.turnOffAuthorisationSystem();
@@ -2044,7 +2041,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     if (theOtherCollections != null) {
                         for (String colID : theOtherCollections) {
                             UUID colId = UUID.fromString(colID);
-                            if (!theOwningCollection.getID().equals(colId)) {
+                            if (theOwningCollection != null
+                                    && !theOwningCollection.getID().equals(colId)) {
                                 Collection col = collectionService.find(context, colId);
                                 if (col != null) {
                                     collectionList.add(col);

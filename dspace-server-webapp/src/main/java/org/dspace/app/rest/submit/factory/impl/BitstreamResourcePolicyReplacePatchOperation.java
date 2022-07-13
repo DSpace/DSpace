@@ -56,7 +56,7 @@ public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOp
         Item item = source.getItem();
 
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-        ;
+
         Collection<UploadConfiguration> uploadConfigsCollection = uploadConfigurationService.getMap().values();
         Iterator<UploadConfiguration> uploadConfigs = uploadConfigsCollection.iterator();
         for (Bundle bb : bundle) {
@@ -70,7 +70,7 @@ public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOp
 
                     int index = 0;
                     for (ResourcePolicy policy : policies) {
-                        Integer toReplace = Integer.parseInt(rpIdx);
+                        int toReplace = Integer.parseInt(rpIdx);
                         if (index == toReplace) {
                             b.getResourcePolicies().remove(policy);
                             break;

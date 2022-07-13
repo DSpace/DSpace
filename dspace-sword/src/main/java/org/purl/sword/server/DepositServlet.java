@@ -358,17 +358,14 @@ public class DepositServlet extends HttpServlet {
                                    request,
                                    response);
             return;
-        } catch (SWORDException se) {
+        } catch (SWORDException | NoSuchAlgorithmException se) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             log.error(se.toString());
-        } catch (NoSuchAlgorithmException nsae) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            log.error(nsae.toString());
         } finally {
             // Try deleting the temp file
             if (filename != null) {
                 File f = new File(filename);
-                if (f != null && !f.delete()) {
+                if (!f.delete()) {
                     log.error("Unable to delete file: " + filename);
                 }
             }

@@ -136,7 +136,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         }
 
         // For second level browses on metadata indexes, we need to adjust the default sorting
-        if (bi != null && bi.isMetadataIndex() && bs.isSecondLevel() && bs.getSortBy() <= 0) {
+        if (bi.isMetadataIndex() && bs.isSecondLevel() && bs.getSortBy() <= 0) {
             bs.setSortBy(1);
         }
 
@@ -144,7 +144,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
         Pageable pageResultInfo =
                 PageRequest.of((binfo.getStart() - 1) / binfo.getResultsPerPage(), binfo.getResultsPerPage());
-        List<Item> tmpResult = new ArrayList<Item>();
+        List<Item> tmpResult = new ArrayList<>();
         for (Item bb : binfo.getBrowseItemResults()) {
             tmpResult.add(bb);
         }

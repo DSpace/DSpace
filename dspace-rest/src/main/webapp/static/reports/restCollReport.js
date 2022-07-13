@@ -75,7 +75,7 @@ var CollReport = function() {
 
     this.createCollectionTable = function() {
         var self = this;
-         var tbl = $("<table/>");
+        var tbl = $("<table/>");
         tbl.attr("id","table");
         $("#report").replaceWith(tbl);
 
@@ -144,8 +144,6 @@ var CollReport = function() {
         
         self.myHtmlUtil.addTd(tr, parval).addClass("title comm");
         self.myHtmlUtil.addTdAnchor(tr, coll.name, self.ROOTPATH + coll.handle).addClass("title");
-        var td = self.myHtmlUtil.addTd(tr, "").addClass("num").addClass("link").addClass("numCount");
-        td = self.myHtmlUtil.addTd(tr, "").addClass("num").addClass("numFiltered");
     };
     
     

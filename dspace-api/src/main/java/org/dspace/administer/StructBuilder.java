@@ -138,6 +138,7 @@ public class StructBuilder {
      * @throws SQLException passed through.
      * @throws FileNotFoundException if input or output could not be opened.
      * @throws TransformerException if the input document is invalid.
+     * @throws XPathExpressionException passed through.
      */
     public static void main(String[] argv)
         throws ParserConfigurationException, SQLException,
@@ -209,6 +210,7 @@ public class StructBuilder {
         // Export? Import?
         if (line.hasOption('x')) { // export
             exportStructure(context, outputStream);
+            outputStream.close();
         } else { // Must be import
             String input = line.getOptionValue('f');
             if (null == input) {
@@ -224,6 +226,10 @@ public class StructBuilder {
             }
 
             importStructure(context, inputStream, outputStream);
+
+            inputStream.close();
+            outputStream.close();
+
             // save changes from import
             context.complete();
         }
