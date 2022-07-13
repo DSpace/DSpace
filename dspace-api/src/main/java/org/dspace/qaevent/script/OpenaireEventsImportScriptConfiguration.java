@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  *
  */
-public class OpenaireEventsScriptConfiguration<T extends OpenaireEventsRunnable> extends ScriptConfiguration<T> {
+public class OpenaireEventsImportScriptConfiguration<T extends OpenaireEventsImport> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -37,7 +37,7 @@ public class OpenaireEventsScriptConfiguration<T extends OpenaireEventsRunnable>
 
     /**
      * Generic setter for the dspaceRunnableClass
-     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this OpenaireEventsScriptConfiguration
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this OpenaireEventsImportScriptConfiguration
      */
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
@@ -58,9 +58,15 @@ public class OpenaireEventsScriptConfiguration<T extends OpenaireEventsRunnable>
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("f", "file", true, "Import data from OpenAIRE quality assurance broker files");
+            options.addOption("f", "file", true, "Import data from OpenAIRE quality assurance broker JSON file."
+                + " This parameter is mutually exclusive to the email parameter.");
             options.getOption("f").setType(InputStream.class);
-            options.getOption("f").setRequired(true);
+            options.getOption("f").setRequired(false);
+
+            options.addOption("e", "email", true, "Email related to the subscriptions to import data from OpenAIRE "
+                + "broker. This parameter is mutually exclusive to the file parameter.");
+            options.getOption("e").setType(String.class);
+            options.getOption("e").setRequired(false);
 
             super.options = options;
         }
