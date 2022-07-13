@@ -27,7 +27,6 @@
 	       <field>
 	         <dc-schema>dc</dc-schema>
 	         <dc-element>title</dc-element>
-	         <dc-qualifier></dc-qualifier>
 	         <repeatable>false</repeatable>
 	         <label>Title</label>
 	         <input-type>onebox</input-type>
@@ -73,7 +72,6 @@
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Title</label>
          <input-type>onebox</input-type>
@@ -112,7 +110,6 @@
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>publisher</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Publisher</label>
          <style>col-sm-8</style>
@@ -150,7 +147,6 @@
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
-         <dc-qualifier></dc-qualifier>
          <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Identifiers</label>
@@ -164,7 +160,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>true</repeatable>
          <label>Type</label>
          <input-type value-pairs-name="common_types">dropdown</input-type>
@@ -191,7 +186,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>subject</dc-element>
-         <dc-qualifier></dc-qualifier>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
@@ -229,7 +223,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Description</label>
          <input-type>textarea</input-type>
@@ -292,7 +285,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>identifier</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>true</repeatable>
          <label>Identifiers</label>
          <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
@@ -308,7 +300,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>title</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>false</repeatable>
          <label>Title</label>
          <input-type>onebox</input-type>
@@ -336,7 +327,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
-         <dc-qualifier></dc-qualifier>
          <repeatable>true</repeatable>
          <label>Type</label>
          <input-type value-pairs-name="common_types">dropdown</input-type>
