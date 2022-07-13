@@ -119,6 +119,15 @@
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
 	       <type>cclicense</type> </step-definition>
 
+        <!-- This optional step will present the submitter or workflow editor with a list of
+     potential duplicate items. The user may then chose to mark each potential match as
+     *not* duplicate, or mark one as duplicate and discard their current submission -->
+        <step-definition id="detect-duplicate">
+            <heading>submit.progressbar.detect-duplicate</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
+            <type>detect-duplicate</type>
+        </step-definition>
+
         <!--Step will be to Check for potential duplicate -->
         <!-- <step-definition id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
             <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class> 
@@ -201,7 +210,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <!-- <step id="detect-duplicate"/> -->
+            <step id="detect-duplicate"/>
 
             <step id="cclicense"/>
 

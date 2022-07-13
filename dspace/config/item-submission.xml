@@ -142,6 +142,15 @@
             <scope visibilityOutside="read-only">submission</scope>
         </step-definition>
 
+        <!-- This optional step will present the submitter or workflow editor with a list of
+             potential duplicate items. The user may then chose to mark each potential match as
+             *not* duplicate, or mark one as duplicate and discard their current submission -->
+        <step-definition id="detect-duplicate" mandatory="true">
+            <heading>submit.progressbar.detect-duplicate</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
+            <type>detect-duplicate</type>
+        </step-definition>
+
         <!-- This optional step may allow the user to select a Creative Commons license -->
         <step-definition id="cclicense" mandatory="false">
             <heading>submit.progressbar.CClicense</heading>
