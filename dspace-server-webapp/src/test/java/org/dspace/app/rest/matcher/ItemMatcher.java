@@ -45,6 +45,23 @@ public class ItemMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchItemWithTitleAndApproximateDateIssued(Item item, String title,
+                                                                                     String approximateDateIssued) {
+        return allOf(
+                //Check item properties
+                matchItemProperties(item),
+
+                //Check core metadata (the JSON Path expression evaluates to a collection so we have to use contains)
+                hasJsonPath("$.metadata", allOf(
+                        matchMetadata("dc.title", title),
+                        matchMetadata("local.approximateDate.issued", approximateDateIssued),
+                        matchMetadata("dc.date.issued", approximateDateIssued))),
+
+                //Check links
+                matchLinks(item.getID())
+        );
+    }
+
     /**
      * Gets a matcher for all expected embeds when the full projection is requested.
      */
