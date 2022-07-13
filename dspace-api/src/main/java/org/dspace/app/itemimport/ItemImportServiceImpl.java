@@ -264,16 +264,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 // sneaky isResume == true means open file in append mode
                 outFile = new File(mapFile);
                 mapOut = new PrintWriter(new FileWriter(outFile, isResume));
-
-                if (mapOut == null) {
-                    throw new Exception("can't open mapfile: " + mapFile);
-                }
             }
 
             // open and process the source directory
             File d = new java.io.File(sourceDir);
 
-            if (d == null || !d.isDirectory()) {
+            if (!d.isDirectory()) {
                 throw new Exception("Error, cannot open source directory " + sourceDir);
             }
 
@@ -433,12 +429,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     /**
      * Read the relationship manifest file.
      * 
-     * Each line in the file contains a relationship type id and an item identifier in the following format:
-     * 
-     * relation.<relation_key> <handle|uuid|folderName:import_item_folder|schema.element[.qualifier]:value>
-     * 
-     * The input_item_folder should refer the folder name of another item in this import batch.
-     * 
+     * Each line in the file contains a relationship type id and an item
+     * identifier in the following format:
+     *
+     * <p>
+     * {@code relation.<relation_key> <handle|uuid|folderName:import_item_folder|schema.element[.qualifier]:value>}
+     *
+     * <p>
+     * The {@code input_item_folder} should refer the folder name of another
+     * item in this import batch.
+     *
      * @param path The main import folder path.
      * @param filename The name of the manifest file to check ('relationships')
      * @return Map of found relationships
@@ -558,9 +558,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     /**
      * Lookup an item by a (unique) meta value.
      * 
-     * @param metaKey
-     * @param metaValue
-     * @return Item
+     * @param c current DSpace session.
+     * @param metaKey name of the metadata field to match.
+     * @param metaValue value to be matched.
+     * @return the matching Item.
      * @throws Exception if single item not found.
      */
     protected Item findItemByMetaValue(Context c, String metaKey, String metaValue) throws Exception {
@@ -604,7 +605,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // verify the source directory
         File d = new java.io.File(sourceDir);
 
-        if (d == null || !d.isDirectory()) {
+        if (!d.isDirectory()) {
             throw new Exception("Error, cannot open source directory "
                                     + sourceDir);
         }
@@ -642,10 +643,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
              * the original item */
             File handleFile = new File(sourceDir + File.separatorChar + newItemName + File.separatorChar + "handle");
             PrintWriter handleOut = new PrintWriter(new FileWriter(handleFile, true));
-
-            if (handleOut == null) {
-                throw new Exception("can't open handle file: " + handleFile.getCanonicalPath());
-            }
 
             handleOut.println(oldHandle);
             handleOut.close();

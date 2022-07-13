@@ -48,6 +48,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * files.  Most input can be configured; use the -help flag for a full list
  * of usage information.
  *
+ * <p>
  * The output of this file is plain text and forms an "aggregation" file which
  * can then be used for display purposes using the related ReportGenerator
  * class.
@@ -171,7 +172,7 @@ public class LogAnalyser {
     /**
      * the average number of views per item
      */
-    private static int views = 0;
+    private static long views = 0;
 
     ///////////////////////
     // regular expressions
@@ -627,10 +628,10 @@ public class LogAnalyser {
         if ((archiveStats.get("All Items")) != 0) {
             // FIXME: this is dependent on their being a query on the db, which
             // there might not always be if it becomes configurable
-            Double avg = Math.ceil(
+            double avg = Math.ceil(
                 (actionAggregator.get("view_item")).doubleValue() /
                     (archiveStats.get("All Items")).doubleValue());
-            views = avg.intValue();
+            views = Math.round(avg);
         }
 
         // finally, write the output
