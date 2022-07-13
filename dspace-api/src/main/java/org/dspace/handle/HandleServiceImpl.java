@@ -415,4 +415,9 @@ public class HandleServiceImpl implements HandleService {
 
         return null;
     }
+
+    @Override
+    public List<Handle> getDeletedItemHandles(Context context) throws SQLException {
+        return handleDAO.getDeletedItemHandles(context);
+    }
 }

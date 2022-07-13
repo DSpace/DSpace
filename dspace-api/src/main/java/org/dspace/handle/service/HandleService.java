@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.handle.Handle;
 
 /**
  * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
@@ -190,4 +191,13 @@ public interface HandleService {
      * @return
      */
     String parseHandle(String identifier);
+
+    /**
+     * Returns a list of handles of items that have been deleted.
+     *
+     * @param context DSpace context
+     * @return a List of handles of items that have been deleted.
+     * @exception SQLException If a database error occurs
+     */
+    List<Handle> getDeletedItemHandles(Context context) throws SQLException;
 }

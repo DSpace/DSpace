@@ -38,6 +38,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
@@ -54,6 +55,9 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.Handle;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SolrUtils;
@@ -67,6 +71,7 @@ import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
+import org.dspace.xoai.solr.exceptions.SolrSearchEmptyException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -93,6 +98,8 @@ public class XOAI {
 
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
+    private final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+
 
     private final static ConfigurationService configurationService = DSpaceServicesFactory
             .getInstance().getConfigurationService();
@@ -165,8 +172,8 @@ public class XOAI {
                 }
 
             }
-            solrServerResolver.getServer().commit();
-
+            SolrClient server = solrServerResolver.getServer();
+            server.commit();
 
             if (optimize) {
                 println("Optimizing Index");
@@ -176,8 +183,12 @@ public class XOAI {
 
             // Set last compilation date
             xoaiLastCompilationCacheService.put(new Date());
+            List<Handle> deletedItemHandles = handleService.getDeletedItemHandles(context);
+            for (Handle handle : deletedItemHandles) {
+                updateDocsWithDeletes(server, handle.getHandle());
+            }
             return result;
-        } catch (DSpaceSolrException | SolrServerException | IOException ex) {
+        } catch (DSpaceSolrException | SolrServerException | IOException | SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
@@ -711,6 +722,56 @@ public class XOAI {
             System.out.println("> Parameters:");
             System.out.println("     -v Verbose output");
             System.out.println("     -h Shows this text");
+        }
+    }
+
+    /**
+     * Method to cross references handles of items that have been deleted with OAI core docs of said handle.
+     * If a match is found update that document.
+     * If no match is found create a document for persistence sake
+     *
+     * @param solrServer
+     *            The configured solr server to commit to
+     * @param handle
+     *            The handle to cross reference
+     *
+     */
+    private void updateDocsWithDeletes(SolrClient solrServer, String handle) {
+        try {
+            SolrQuery params = new SolrQuery("item.handle:" + handle);
+            SolrDocument result = SolrSearchQuerySingleSupportNull(solrServer, params);
+            if (result != null) {
+                solrServer.deleteByQuery(params.getQuery());
+            }
+            SolrInputDocument document = new SolrInputDocument();
+            document.setField("item.handle", handle);
+            document.setField("item.deleted", true);
+            document.setField("item.public", true);
+            document.setField("item.lastmodified", new Date());
+            solrServer.add(document);
+            solrServer.commit();
+        } catch (SolrServerException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Method to return a null SolrDocument instead of throwing a SolrSearchEmptyException
+     *
+     * @param solrServer
+     *            The configured solr server to commit to
+     * @param queryParams
+     *            Params for solr search query
+     *
+     */
+    private SolrDocument SolrSearchQuerySingleSupportNull(SolrClient solrServer, SolrQuery queryParams) {
+        try {
+            SolrDocument result = DSpaceSolrSearch.querySingle(solrServer, queryParams);
+            return result;
+        } catch (SolrSearchEmptyException | IOException ex) {
+            return null;
         }
     }
 
