@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.exception.PasswordNotValidException;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -188,6 +189,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                           "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler({ PasswordNotValidException.class})
+    protected void handlePasswordNotValidException(HttpServletRequest request, HttpServletResponse resp, Exception ex)
+        throws IOException {
+        sendErrorResponse(request, resp, null, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     @Override

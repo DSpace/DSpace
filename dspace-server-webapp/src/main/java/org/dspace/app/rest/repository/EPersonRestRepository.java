@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
 import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
@@ -34,7 +33,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.service.SiteService;
+import org.dspace.authorize.service.ValidatePasswordService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EmptyWorkflowGroupException;
@@ -74,10 +73,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     private AccountService accountService;
 
     @Autowired
-    private AuthorizationFeatureService authorizationFeatureService;
-
-    @Autowired
-    private SiteService siteService;
+    private ValidatePasswordService validatePasswordService;
 
     @Autowired
     private RegistrationDataService registrationDataService;
@@ -120,21 +116,22 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     private EPerson createEPersonFromRestObject(Context context, EPersonRest epersonRest) throws AuthorizeException {
         EPerson eperson = null;
-        try {
-            eperson = es.create(context);
-
-            // this should be probably moved to the converter (a merge method?)
-            eperson.setCanLogIn(epersonRest.isCanLogIn());
-            eperson.setRequireCertificate(epersonRest.isRequireCertificate());
-            eperson.setEmail(epersonRest.getEmail());
-            eperson.setNetid(epersonRest.getNetid());
-            if (epersonRest.getPassword() != null) {
-                es.setPassword(eperson, epersonRest.getPassword());
+        if (validatePasswordService.validatePasswordRobustness(epersonRest.getPassword())) {
+            try {
+                eperson = es.create(context);
+                // this should be probably moved to the converter (a merge method?)
+                eperson.setCanLogIn(epersonRest.isCanLogIn());
+                eperson.setRequireCertificate(epersonRest.isRequireCertificate());
+                eperson.setEmail(epersonRest.getEmail());
+                eperson.setNetid(epersonRest.getNetid());
+                if (epersonRest.getPassword() != null) {
+                    es.setPassword(eperson, epersonRest.getPassword());
+                }
+                es.update(context, eperson);
+                metadataConverter.setMetadata(context, eperson, epersonRest.getMetadata());
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage(), e);
             }
-            es.update(context, eperson);
-            metadataConverter.setMetadata(context, eperson, epersonRest.getMetadata());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
         }
         return eperson;
     }
@@ -295,7 +292,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                          Patch patch) throws AuthorizeException, SQLException {
         boolean passwordChangeFound = false;
         for (Operation operation : patch.getOperations()) {
-            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
+            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")
+                && validatePasswordService.validatePasswordRobustness((String) operation.getValue())) {
                 passwordChangeFound = true;
             }
         }
