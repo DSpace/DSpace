@@ -66,14 +66,14 @@ public final class CreateAdministrator {
         throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
-        Console console = System.console();
+        // Console console = System.console();
 
         CreateAdministrator ca = new CreateAdministrator();
 
-        char[] password1 = null;
-        char[] password2 = null;
-        boolean dataOK = false;
-        String language = I18nUtil.getDefaultLocale().getLanguage();
+        // char[] password1 = null;
+        // char[] password2 = null;
+        // boolean dataOK = false;
+        // String language = I18nUtil.getDefaultLocale().getLanguage();
 
         options.addOption("e", "email", true, "administrator email address");
         options.addOption("f", "first", true, "administrator first name");
@@ -100,81 +100,18 @@ public final class CreateAdministrator {
             ca.createAdministrator(line.getOptionValue("e"),
                                    line.getOptionValue("f"), line.getOptionValue("l"),
                                    line.getOptionValue("c"), line.getOptionValue("p"));
-        } else {
-
-            if (line.hasOption("h")) {
-                String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+        } else if (line.hasOption("h")) {
+            String header = "\nA command-line tool for creating an initial administrator for setting up a" +
                     " DSpace site. Unless all the required parameters are passed it will" +
                     " prompt for an e-mail address, last name, first name and password from" +
                     " standard input.. An administrator group is then created and the data passed" +
                     "  in used to create an e-person in that group.\n\n";
-                String footer = "\n";
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("dspace create-administrator", header, options, footer, true);
-                return;
-            } else {
-
-                ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
-
-                if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l")
-                    && (line.hasOption("c") || (!line.hasOption("c")
-                    && cfg.getProperty("webui.supported.locales") == null))) {
-
-
-                    if (cfg.getProperty("webui.supported.locales") != null) {
-                        System.out.println("Select one of the following languages: "
-                            + cfg.getProperty("webui.supported.locales"));
-                        System.out.print("Language: ");
-                        System.out.flush();
-
-                        language = console.readLine();
-
-                        if (language != null) {
-                            language = language.trim();
-                            language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
-                        }
-                    }
-
-                    while (!dataOK) {
-                        System.out.println("Password will not display on screen.");
-                        System.out.print("Password: ");
-                        System.out.flush();
-
-                        password1 = console.readPassword();
-
-                        System.out.print("Again to confirm: ");
-                        System.out.flush();
-
-                        password2 = console.readPassword();
-
-                           //TODO real password validation
-                        if (password1.length > 1 && Arrays.equals(password1, password2)) {
-                           // password OK
-                            System.out.print("Is the above data correct? (y or n): ");
-                            System.out.flush();
-
-                            String s = console.readLine();
-
-                            if (s != null) {
-                                s = s.trim();
-                                if (s.toLowerCase().startsWith("y")) {
-                                    dataOK = true;
-                                }
-                            }
-                        } else {
-                            System.out.println("Passwords don't match");
-                        }
-                    }
-                    ca.createAdministrator(line.getOptionValue("e"),
-                        line.getOptionValue("f"), line.getOptionValue("l"),
-                        language, String.valueOf(password1));
-                    Arrays.fill(password1, ' ');
-                    Arrays.fill(password2, ' ');
-
-                } else {
-                    ca.negotiateAdministratorDetails();
-                }
-            }
+            String footer = "\n";
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("dspace create-administrator", header, options, footer, true);
+            return;
+        } else {
+            ca.negotiateAdministratorDetails(line);
         }
     }
 
@@ -196,7 +133,7 @@ public final class CreateAdministrator {
      *
      * @throws Exception if error
      */
-    protected void negotiateAdministratorDetails()
+    protected void negotiateAdministratorDetails(CommandLine line)
         throws Exception {
         Console console = System.console();
 
@@ -210,79 +147,90 @@ public final class CreateAdministrator {
         char[] password1 = null;
         char[] password2 = null;
         String language = I18nUtil.getDefaultLocale().getLanguage();
+        ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean flag = false;
+
+
+        if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l")
+                    && (line.hasOption("c") || (!line.hasOption("c"))
+                    && cfg.getProperty("webui.supported.locales") == null)) {
+            flag = true;
+        }
 
         while (!dataOK) {
-            System.out.print("E-mail address: ");
-            System.out.flush();
-
-            email = console.readLine();
-            if (!StringUtils.isBlank(email)) {
-                email = email.trim();
-            } else {
-                System.out.println("Please provide an email address.");
-                continue;
-            }
-
-            System.out.print("First name: ");
-            System.out.flush();
-
-            firstName = console.readLine();
-
-            if (firstName != null) {
-                firstName = firstName.trim();
-            }
-
-            System.out.print("Last name: ");
-            System.out.flush();
-
-            lastName = console.readLine();
-
-            if (lastName != null) {
-                lastName = lastName.trim();
-            }
-
-            ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
-            if (cfg.hasProperty("webui.supported.locales")) {
-                System.out.println("Select one of the following languages: "
-                        + cfg.getProperty("webui.supported.locales"));
-                System.out.print("Language: ");
+            if (flag == false) {
+                System.out.print("E-mail address: ");
                 System.out.flush();
 
-                language = console.readLine();
-
-                if (language != null) {
-                    language = language.trim();
-                    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
+                email = console.readLine();
+                if (!StringUtils.isBlank(email)) {
+                    email = email.trim();
+                } else {
+                    System.out.println("Please provide an email address.");
+                    continue;
                 }
-            }
 
-            System.out.println("Password will not display on screen.");
-            System.out.print("Password: ");
-            System.out.flush();
-
-            password1 = console.readPassword();
-
-            System.out.print("Again to confirm: ");
-            System.out.flush();
-
-            password2 = console.readPassword();
-
-            //TODO real password validation
-            if (password1.length > 1 && Arrays.equals(password1, password2)) {
-                // password OK
-                System.out.print("Is the above data correct? (y or n): ");
+                System.out.print("First name: ");
                 System.out.flush();
 
-                String s = console.readLine();
+                firstName = console.readLine();
 
-                if (s != null) {
-                    s = s.trim();
-                    if (s.toLowerCase().startsWith("y")) {
-                        dataOK = true;
+                if (firstName != null) {
+                    firstName = firstName.trim();
+                }
+
+                System.out.print("Last name: ");
+                System.out.flush();
+
+                lastName = console.readLine();
+
+                if (lastName != null) {
+                    lastName = lastName.trim();
+                }
+            } else {
+
+                if (cfg.hasProperty("webui.supported.locales")) {
+                    System.out.println("Select one of the following languages: "
+                        + cfg.getProperty("webui.supported.locales"));
+                    System.out.print("Language: ");
+                    System.out.flush();
+
+                    language = console.readLine();
+
+                    if (language != null) {
+                        language = language.trim();
+                        language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
                     }
                 }
-            } else {
-                System.out.println("Passwords don't match");
+
+                System.out.println("Password will not display on screen.");
+                System.out.print("Password: ");
+                System.out.flush();
+
+                password1 = console.readPassword();
+
+                System.out.print("Again to confirm: ");
+                System.out.flush();
+
+                password2 = console.readPassword();
+
+                //TODO real password validation
+                if (password1.length > 1 && Arrays.equals(password1, password2)) {
+                    // password OK
+                    System.out.print("Is the above data correct? (y or n): ");
+                    System.out.flush();
+
+                    String s = console.readLine();
+
+                    if (s != null) {
+                        s = s.trim();
+                        if (s.toLowerCase().startsWith("y")) {
+                            dataOK = true;
+                        }
+                    }
+                } else {
+                    System.out.println("Passwords don't match");
+                }
             }
         }
 
