@@ -35,6 +35,7 @@ import org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl;
 import org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl.DeduplicationFlag;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -64,6 +65,9 @@ public class DedupUtils {
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
 
     public DuplicateInfoList findSignatureWithDuplicate(Context context, String signatureType, int resourceType,
             int limit, int offset, int rule) throws SearchServiceException, SQLException {
@@ -197,9 +201,20 @@ public class DedupUtils {
                         Item duplicateItem = itemService.find(context, itemID);
 
                         if (duplicateItem == null) {
-                            // found a zombie reference in solr, ignore it
+                            // Found a zombie reference in solr, ignore it
                             continue;
                         }
+
+                        if (!authorizeService.authorizeActionBoolean(context, duplicateItem, Constants.READ)) {
+                            // The current user doesn't have READ authorisation to the duplicate item, ignore it
+                            // This could be because:
+                            // 1. the user is not an admin and the item is withdrawn
+                            // 2. the item is archived but missing a READ policy or user doesn't apply to READ policy
+                            // 3. the item is in workspace or workflow and the current user isn't submitter or reviewer
+                            // ... and so on
+                            continue;
+                        }
+
 
                         info.setDuplicateItem(duplicateItem);
                         info.setDuplicateItemType(ItemUtils.getItemStatus(context, duplicateItem));
