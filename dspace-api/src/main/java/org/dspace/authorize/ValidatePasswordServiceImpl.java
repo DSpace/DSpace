@@ -17,6 +17,8 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Basic implementation for validation password robustness
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class ValidatePasswordServiceImpl implements ValidatePasswordService {
