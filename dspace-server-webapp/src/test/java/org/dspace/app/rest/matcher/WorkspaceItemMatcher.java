@@ -82,6 +82,17 @@ public class WorkspaceItemMatcher {
                 matchLinks(witem));
     }
 
+    public static Matcher matchItemWithSponsorRelation(WorkspaceItem witem, String sponsor, String relation) {
+        return allOf(
+                // Check workspaceitem properties
+                matchProperties(witem),
+                hasJsonPath("$.sections.traditionalpageone['local.sponsor'][0].value", is(sponsor)),
+                relation != null ?
+                hasJsonPath("$._embedded.item.metadata['dc.relation'][0].value", is(relation)) :
+                hasNoJsonPath("$._embedded.item.metadata['dc.relation'][0].value"),
+                matchLinks(witem));
+    }
+
     /**
      * Check that the workspace item has the expected type and series values
      * (used in type bind evaluation)

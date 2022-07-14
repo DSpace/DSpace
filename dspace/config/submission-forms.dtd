@@ -1,14 +1,20 @@
 <!-- DSpace Custom Submit input form definition language -->
 
 
- <!ELEMENT input-forms (form-definitions, form-value-pairs) >
+ <!ELEMENT input-forms (form-definitions, form-value-pairs, form-complex-definitions) >
 
  <!ELEMENT form-definitions (form)+ >
  <!ELEMENT form (row)+ >
+ <!ELEMENT form-complex-definitions (definition)+ >
  <!ELEMENT row (field|relation-field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
 
  <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?, acl?) >
+ <!ELEMENT definition (input*) >
+ <!ATTLIST definition
+        name CDATA #REQUIRED
+        >
+        
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -19,6 +25,22 @@
  <!ELEMENT label (#PCDATA) >
  <!ELEMENT style (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
+
+ <!ELEMENT input (#PCDATA) >
+ <!ATTLIST input input-type CDATA #REQUIRED >
+ <!ATTLIST input name CDATA #REQUIRED >
+ <!ATTLIST input label CDATA #IMPLIED >
+ <!ATTLIST input regex CDATA #IMPLIED >
+ <!ATTLIST input value-pairs-name CDATA #IMPLIED >
+ <!ATTLIST input hint CDATA #IMPLIED >
+ <!ATTLIST input autocomplete CDATA #IMPLIED >
+ <!ATTLIST input placeholder CDATA #IMPLIED >
+ <!ATTLIST input id CDATA #IMPLIED >
+ <!ATTLIST input class CDATA #IMPLIED >
+ <!ATTLIST input readonly CDATA #IMPLIED >
+ <!ATTLIST input mapped-to-if-not-default CDATA #IMPLIED >
+ <!ATTLIST input value CDATA #IMPLIED >
+ <!ATTLIST input required CDATA #IMPLIED >
 
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
@@ -53,6 +75,7 @@
  <!ELEMENT stored-value (#PCDATA)>
 
  <!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
+ <!ATTLIST input-type complex-definition-ref CDATA  #IMPLIED>
 
  <!ELEMENT vocabulary (#PCDATA) >
 

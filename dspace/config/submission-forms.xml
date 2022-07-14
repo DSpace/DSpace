@@ -51,6 +51,33 @@
         <!-- Form which defines the first page/section of the "traditional" DSpace submission process,
              often used when depositing normal Items (i.e. Items which are not Entities). -->
         <form name="traditionalpageone">
+            <!-- Example row for the complex input type definition.
+                 Uncomment it and the complex input will be showed in the submission UI. -->
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>contact</dc-element>
+                    <dc-qualifier>person</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Contact person</label>
+                    <style>col-sm-5</style>
+                    <input-type complex-definition-ref="contact_person">complex</input-type>
+                    <hint>This is contact person</hint>
+                    <required>Enter the contact person data.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>sponsor</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Funding</label>
+                    <style>col-sm-5</style>
+                    <input-type complex-definition-ref="funding">complex</input-type>
+                    <hint>This is funding</hint>
+                    <required>Enter the funding.</required>
+                </field>
+            </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -58,7 +85,7 @@
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Author</label>
-                    <input-type>onebox</input-type>
+                    <input-type>autocomplete</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
                     <required></required>
                     <!-- Example ACL field definition.
@@ -1415,6 +1442,30 @@
             </pair>
         </value-pairs>
 
+        <!-- taken from the metashare standard -->
+        <value-pairs value-pairs-name="metashare_funding" dc-term="">
+            <pair>
+                <displayed-value>N/A</displayed-value>
+                <stored-value>N/A</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>EU</displayed-value>
+                <stored-value>euFunds</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Own funds</displayed-value>
+                <stored-value>ownFunds</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>National</displayed-value>
+                <stored-value>nationalFunds</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+        </value-pairs>
+
         <value-pairs value-pairs-name="common_types" dc-term="type">
             <pair>
                 <displayed-value>Animation</displayed-value>
@@ -2011,4 +2062,22 @@
 
     </form-value-pairs>
 
+    <!-- Example of the complex input type definition.
+         Uncomment the example row of the complex input type definition to see this input in the submission UI. -->
+    <form-complex-definitions>
+        <definition name="contact_person">
+            <input name="givenname" input-type="text" label="Given name" required="true"/>
+            <input name="surname" input-type="text" label="Surname" required="true"/>
+            <input name="email" input-type="text" label="Email" regex="[^@]+@[^\.@]+\.[^@]+" required="true"/>
+            <input name="affiliation" input-type="text" label="Affiliation"/>
+        </definition>
+
+        <definition name="funding">
+            <input name="type" input-type="dropdown" label="Funding type" required="true" value-pairs-name="metashare_funding"/>
+            <input name="code"  input-type="autocomplete" label="Grant no. or funding project code" required="true"/>
+            <input name="orgname" input-type="text" label="Funding organization" required="true"/>
+            <input name="projname" input-type="autocomplete" label="Funding project name" required="true"/>
+            <input name="openaire_id" input-type="text" label="EU Project Identifier (OpenAIRE)" readonly="true" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation"/>
+        </definition>
+    </form-complex-definitions>
 </input-forms>

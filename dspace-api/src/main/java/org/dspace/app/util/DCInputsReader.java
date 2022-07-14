@@ -70,6 +70,11 @@ public class DCInputsReader {
      */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
+    /**
+     * Keyname for storing the name of the complex input type
+     */
+    static final String COMPLEX_DEFINITION_REF = "complex-definition-ref";
+
 
     /**
      * Reference to the forms definitions map, computed from the forms
@@ -87,6 +92,11 @@ public class DCInputsReader {
      * form-interleaved, there will be a modest win.
      */
     private DCInputSet lastInputSet = null;
+
+    /**
+     * Processed ComplexDefinition objects from the form definition file
+     */
+    private DCInput.ComplexDefinitions complexDefinitions = null;
 
     /**
      * Parse an XML encoded submission forms template file, and create a hashmap
@@ -118,6 +128,7 @@ public class DCInputsReader {
         throws DCInputsReaderException {
         formDefns = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
+        complexDefinitions = new DCInput.ComplexDefinitions(valuePairs);
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -220,7 +231,7 @@ public class DCInputsReader {
             throw new DCInputsReaderException("Missing the " + formName + " form");
         }
         lastInputSet = new DCInputSet(formName,
-                                      pages, valuePairs);
+                                      pages, valuePairs, complexDefinitions);
         return lastInputSet;
     }
 
@@ -285,6 +296,8 @@ public class DCInputsReader {
                 foundDefs = true;
             } else if (tagName.equals("form-value-pairs")) {
                 processValuePairs(nd);
+            } else if (tagName.equals("form-complex-definitions")) {
+                processComplexDefinitions(nd);
             }
             // Ignore unknown nodes
         }
@@ -340,6 +353,59 @@ public class DCInputsReader {
         }
     }
 
+    /**
+     * Process the form-complex-definitions section of the form definition file.
+     * Based on the form definition file create a new ComplexDefinition objects
+     * which are added to the ComplexDefinitions object.
+     */
+    private void processComplexDefinitions(Node e) throws SAXException {
+        NodeList nl = e.getChildNodes();
+        int len = nl.getLength();
+        for (int i = 0; i < len; i++) {
+            Node nd = nl.item(i);
+            String tagName = nd.getNodeName();
+
+            if (!tagName.equals("definition")) {
+                return;
+            }
+
+            // process each value-pairs set
+            String definitionName = getAttribute(nd, "name");
+            if (StringUtils.isBlank(definitionName)) {
+                String errString =
+                        "Missing attribute name for complex definition ";
+                throw new SAXException(errString);
+            }
+
+            DCInput.ComplexDefinition definition = new DCInput.ComplexDefinition(definitionName);
+            complexDefinitions.addDefinition(definition);
+            NodeList cl = nd.getChildNodes();
+            int lench = cl.getLength();
+            for (int j = 0; j < lench; j++) {
+                Node nch = cl.item(j);
+                if (nch.getNodeName().equals("input")) {
+                    definition.addInput(attributes2Map(nch.getAttributes()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Convert Node attributes to the input definition of the ComplexDefinition
+     * @param attributes representing raw data from the XML file
+     * @return input definition (map) of the ComplexDefinition e.g., ["name","surname"]
+     */
+    private Map<String, String> attributes2Map(NamedNodeMap attributes) {
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        int attrCount = attributes.getLength();
+        for (int i = 0; i < attrCount; i++) {
+            Node node = attributes.item(i);
+            map.put(node.getNodeName(), node.getNodeValue());
+        }
+
+        return map;
+    }
     /**
      * Process parts of a row
      */
@@ -474,6 +540,16 @@ public class DCInputsReader {
                                            " has no name attribute");
             } else {
                 field.put(PAIR_TYPE_NAME, pairTypeName);
+            }
+        } else if (value.equals("complex")) {
+            String definitionName = getAttribute(nd, COMPLEX_DEFINITION_REF);
+            if (definitionName == null) {
+                throw new SAXException("Form " + formName
+                        + ", field " + field.get("dc-element")
+                        + "." + field.get("dc-qualifier")
+                        + " has no linked definition");
+            } else {
+                field.put(COMPLEX_DEFINITION_REF, definitionName);
             }
         }
     }

@@ -9,8 +9,11 @@ package org.dspace.app.rest.submit.step.validation;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
@@ -117,34 +120,14 @@ public class MetadataValidation extends AbstractValidation {
                 for (String fieldName : fieldsName) {
                     boolean valuesRemoved = false;
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
-                    if (!input.isAllowedFor(documentTypeValue)) {
-                        // Check the lookup list. If no other inputs of the same field name allow this type,
-                        // then remove. Otherwise, do not
-                        if (!(allowedFieldNames.contains(fieldName))) {
-                            itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                    obj.getItem(), mdv);
-                            valuesRemoved = true;
-                            log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
-                                    + documentTypeValue + " as it is allowed by another input of the same field " +
-                                    "name");
-                        } else {
-                            log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
-                                    + documentTypeValue + " as it is allowed by another input of the same field " +
-                                    "name");
-                        }
-                    }
-                    validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
-                    if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                                                                && !valuesRemoved) {
-                        // Is the input required for *this* type? In other words, are we looking at a required
-                        // input that is also allowed for this document type
-                        if (input.isAllowedFor(documentTypeValue)) {
-                            // since this field is missing add to list of error
-                            // fields
-                            addError(errors, ERROR_VALIDATION_REQUIRED, "/"
-                                    + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                            input.getFieldName());
-                        }
+                    validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey);
+                    if (input.isRequired() && input.isVisible(DCInput.SUBMISSION_SCOPE) &&
+                            (mdv.size() == 0 || !isValidComplexDefinitionMetadata(input, mdv))) {
+                        // since this field is missing add to list of error
+                        // fields
+                        addError(ERROR_VALIDATION_REQUIRED,
+                            "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
+                                input.getFieldName());
                     }
                 }
             }
@@ -152,6 +135,29 @@ public class MetadataValidation extends AbstractValidation {
         return errors;
     }
 
+    private boolean isValidComplexDefinitionMetadata(DCInput input, List<MetadataValue> mdv) {
+        if (input.getInputType().equals("complex")) {
+            int complexDefinitionIndex = 0;
+            Map<String, Map<String, String>> complexDefinitionInputs = input.getComplexDefinition().getInputs();
+            for (String complexDefinitionInputName : complexDefinitionInputs.keySet()) {
+                Map<String, String> complexDefinitionInputValues =
+                        complexDefinitionInputs.get(complexDefinitionInputName);
+
+                List<String> filledInputValues = null;
+                String isRequired = complexDefinitionInputValues.get("required");
+                if (StringUtils.equals(BooleanUtils.toStringTrueFalse(true), isRequired)) {
+                    filledInputValues = new ArrayList<>(Arrays.asList(
+                            mdv.get(0).getValue().split(DCInput.ComplexDefinitions.getSeparator(),-1)));
+
+                    if (StringUtils.isBlank(filledInputValues.get(complexDefinitionIndex))) {
+                        return false;
+                    }
+                }
+                complexDefinitionIndex++;
+            }
+        }
+        return true;
+    }
 
     private void validateMetadataValues(List<MetadataValue> mdv, DCInput input, SubmissionStepConfig config,
                                         boolean isAuthorityControlled, String fieldKey,
