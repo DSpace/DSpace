@@ -881,7 +881,7 @@
         <dependency>
           <groupId>eu.openaire</groupId>
           <artifactId>broker-client</artifactId>
-          <version>1.1.1</version>
+          <version>1.1.2</version>
         </dependency>
 
         <dependency>
