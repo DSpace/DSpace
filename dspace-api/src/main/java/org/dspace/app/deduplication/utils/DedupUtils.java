@@ -31,7 +31,6 @@ import org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl.Deduplicat
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -246,102 +245,6 @@ public class DedupUtils {
 
     }
 
-    /**
-     * Reject a duplicate based on an administrative decision
-     *
-     * @param context   DSpace context
-     * @param firstId   source item ID
-     * @param secondId  target item ID
-     * @param type      item resource type
-     * @return  true if duplicate was rejected, false if inapplicable
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public boolean rejectAdminDups(Context context, UUID firstId, UUID secondId, Integer type)
-            throws SQLException, AuthorizeException {
-        // If source and target are the same item, do not apply the rejection
-        if (firstId == secondId) {
-            return false;
-        }
-        // If current user is not an administrator, throw an exception
-        if (!AuthorizeServiceFactory.getInstance().getAuthorizeService().isAdmin(context)) {
-            throw new AuthorizeException(
-                    "Only the administrator can reject the duplicate in the administrative section");
-        }
-        // Sort item IDs
-        UUID[] sortedIds = new UUID[] { firstId, secondId };
-        Arrays.sort(sortedIds);
-
-        Deduplication row;
-        try {
-            // Get duplicate database row
-            row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
-            if (row != null) {
-                // Set information about this admin decision to reject and update the row
-                row.setAdminId(context.getCurrentUser().getID());
-                row.setAdminTime(new Date());
-                row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
-                deduplicationService.update(context, row);
-            } else {
-                // Create a new row with information about this admin decision and insert to database
-                row = new Deduplication();
-                row.setAdminId(context.getCurrentUser().getID());
-                row.setFirstItemId(sortedIds[0]);
-                row.setSecondItemId(sortedIds[1]);
-                row.setAdminTime(new Date());
-                row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
-                deduplicationService.create(context, row);
-            }
-            // Update the solr index
-            dedupService.buildDecision(context, firstId, secondId, DeduplicationFlag.REJECTADMIN, null);
-            // Return true to indicate this rejection was processed
-            return true;
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-        }
-        // If we reached this statement, the rejection wasn't processed, return false
-        return false;
-    }
-
-    /**
-     * Mark all the potential duplicates for the specified signature and item as
-     * fake.
-     *
-     * @param context
-     * @param itemID
-     * @param signatureType
-     * @return false if no potential duplicates are found
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws SearchServiceException
-     */
-    public boolean rejectAdminDups(Context context, UUID itemID, String signatureType, int resourceType)
-            throws SQLException, AuthorizeException, SearchServiceException {
-
-        DuplicateSignatureInfo dsi = findPotentialMatchByID(context, signatureType, resourceType, itemID);
-
-        boolean found = false;
-        for (DSpaceObject item : dsi.getItems()) {
-            if (item != null) {
-                if (item.getID() == itemID) {
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if (found && dsi.getNumItems() > 1) {
-            for (DSpaceObject item : dsi.getItems()) {
-                if (item != null) {
-                    if (item.getID() != itemID) {
-                        rejectAdminDups(context, itemID, item.getID(), resourceType);
-                    }
-                }
-            }
-        }
-        return true;
-
-    }
-
     public void verify(Context context, int dedupId, UUID firstId, UUID secondId, int type, boolean toFix, String note,
             boolean check) throws SQLException, AuthorizeException {
         UUID[] sortedIds = new UUID[] { firstId, secondId };
@@ -497,46 +400,6 @@ public class DedupUtils {
         }
 
         return valid;
-    }
-
-    private DuplicateSignatureInfo findPotentialMatchByID(Context context, String signatureType, int resourceType,
-            UUID itemID) throws SearchServiceException, SQLException {
-        if (StringUtils.isNotEmpty(signatureType)) {
-            if (!StringUtils.contains(signatureType, "_signature")) {
-                signatureType += "_signature";
-            }
-        }
-        SolrQuery solrQuery = new SolrQuery();
-
-        solrQuery.setQuery(SolrDedupServiceImpl.RESOURCE_IDS_FIELD + ":" + itemID);
-
-        solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_SIGNATURETYPE_FIELD + ":" + signatureType);
-        solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
-        solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
-                + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription());
-
-        QueryResponse response = getDedupService().search(solrQuery);
-
-        SolrDocumentList solrDocumentList = response.getResults();
-
-        DuplicateSignatureInfo dsi = new DuplicateSignatureInfo(signatureType);
-        for (SolrDocument solrDocument : solrDocumentList) {
-
-            String signatureTypeString = (String) ((List) (solrDocument.getFieldValue(signatureType))).get(0);
-
-            dsi.setSignature(signatureTypeString);
-
-            List<String> ids = (List<String>) solrDocument.getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
-
-            for (String obj : ids) {
-                Item item = ContentServiceFactory.getInstance().getItemService().find(context, UUID.fromString(obj));
-                if (!(dsi.getItems().contains(item))) {
-                    dsi.getItems().add(item);
-                }
-            }
-        }
-
-        return dsi;
     }
 
     public DedupService getDedupService() {
