@@ -47,7 +47,7 @@ public class ItemWithdrawnDedupServiceIndexPlugin implements SolrDedupServiceInd
                 return;
             }
 
-            Integer status = ItemUtils.getItemStatus(context, item);
+            int status = ItemUtils.getItemStatus(context, item);
             if (status == 3) {
                 document.addField(SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD, true);
             }

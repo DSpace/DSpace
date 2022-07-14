@@ -27,24 +27,12 @@ public class DuplicateItemInfo {
     private Map<DuplicateDecisionType, DuplicateDecisionValue> decisions =
             new HashMap<DuplicateDecisionType, DuplicateDecisionValue>();
 
-    public int getDedupID() {
-        return dedupID;
-    }
-
-    public void setDedupID(int dedupID) {
-        this.dedupID = dedupID;
-    }
-
     public DSpaceObject getDuplicateItem() {
         return duplicateItem;
     }
 
     public void setDuplicateItem(DSpaceObject duplicateItem) {
         this.duplicateItem = duplicateItem;
-    }
-
-    public int getDuplicateItemType() {
-        return duplicateItemType;
     }
 
     public void setDuplicateItemType(int duplicateItemType) {

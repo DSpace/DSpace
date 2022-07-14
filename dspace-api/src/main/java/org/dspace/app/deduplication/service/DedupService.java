@@ -25,35 +25,35 @@ import org.dspace.discovery.SearchServiceException;
  * Service used to handle indexing related to the dedup solr core.
  */
 public interface DedupService {
-    public void indexContent(Context ctx, Item item, boolean force) throws SearchServiceException;
+    void indexContent(Context ctx, Item item, boolean force) throws SearchServiceException;
 
-    public void unIndexContent(Context context, Item item);
+    void unIndexContent(Context context, Item item);
 
-    public QueryResponse find(String query, String... filters) throws SearchServiceException;
+    QueryResponse find(String query, String... filters) throws SearchServiceException;
 
-    public UpdateResponse delete(String query) throws SearchServiceException;
+    UpdateResponse delete(String query) throws SearchServiceException;
 
-    public void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException;
+    void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException;
 
-    public void indexContent(Context context, List<UUID> ids, boolean force);
+    void indexContent(Context context, List<UUID> ids, boolean force);
 
-    public void updateIndex(Context context, boolean b);
+    void updateIndex(Context context, boolean b);
 
-    public void optimize();
+    void optimize();
 
-    public void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException;
+    void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException;
 
-    public void unIndexContent(Context context, UUID id) throws IllegalStateException, SQLException;
+    void unIndexContent(Context context, UUID id) throws IllegalStateException, SQLException;
 
-    public QueryResponse search(SolrQuery solrQuery) throws SearchServiceException;
+    QueryResponse search(SolrQuery solrQuery) throws SearchServiceException;
 
-    public void buildDecision(Context context, UUID firstId, UUID secondId, DeduplicationFlag flag, String note);
+    void buildDecision(Context context, UUID firstId, UUID secondId, DeduplicationFlag flag, String note);
 
-    public void commit();
+    void commit();
 
-    public void removeStoredDecision(UUID firstId, UUID secondId, DuplicateDecisionType type)
+    void removeStoredDecision(UUID firstId, UUID secondId, DuplicateDecisionType type)
             throws SearchServiceException;
 
-    public QueryResponse findDecisions(UUID firstItemID, UUID secondItemID, DuplicateDecisionType t)
+    QueryResponse findDecisions(UUID firstItemID, UUID secondItemID, DuplicateDecisionType t)
             throws SearchServiceException;
 }

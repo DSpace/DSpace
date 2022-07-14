@@ -50,8 +50,6 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     private String normalizationRegexp;
 
-    private boolean caseSensitive;
-
     private boolean useCollection;
 
     private boolean useEntityType = true;
@@ -60,8 +58,6 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     protected WorkflowItemService<?> workflowItemService = WorkflowServiceFactory.getInstance()
                                                                                  .getWorkflowItemService();
-
-    protected WorkspaceItemService  wsItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
      * This list of signatures is specifically intended for search filter values, NOT for inclusion
@@ -108,10 +104,6 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     }
 
-    protected String getSingleValue(DSpaceObject item, String metadata) {
-        return ContentServiceFactory.getInstance().getDSpaceObjectService(item).getMetadata(item, metadata);
-    }
-
     protected List<String> getMultiValue(DSpaceObject item, String metadata) {
         List<MetadataValue> values = ContentServiceFactory.getInstance().getDSpaceObjectService(item)
                 .getMetadataByMetadataString(item, metadata);
@@ -139,14 +131,6 @@ public class FuzzyMetadataValueSignature implements Signature {
         this.resourceTypeID = resourceTypeID;
     }
 
-    public List<String> getIgnorePrefix() {
-        return ignorePrefix;
-    }
-
-    public void setIgnorePrefix(List<String> ignorePrefix) {
-        this.ignorePrefix = ignorePrefix;
-    }
-
     public String getSignatureType() {
         return signatureType;
     }
@@ -170,10 +154,6 @@ public class FuzzyMetadataValueSignature implements Signature {
         this.prefix = prefix;
     }
 
-    public String getNormalizationRegexp() {
-        return normalizationRegexp;
-    }
-
     public void setNormalizationRegexp(String normalizationRegexp) {
         this.normalizationRegexp = normalizationRegexp;
     }
@@ -184,18 +164,6 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     public void setUseCollection(boolean useCollection) {
         this.useCollection = useCollection;
-    }
-
-    public boolean isUseEntityType() {
-        return useEntityType;
-    }
-
-    public void setUseEntityType(boolean useEntityType) {
-        this.useEntityType = useEntityType;
-    }
-
-    public int getMaxDistance() {
-        return maxDistance;
     }
 
     public void setMaxDistance(int maxDistance) {

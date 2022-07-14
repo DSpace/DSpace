@@ -13,9 +13,4 @@ public class DuplicateSignatureInfo extends DuplicateInfo {
         setSignatureId(type);
     }
 
-    public DuplicateSignatureInfo(String type, String signature) {
-        setSignatureId(type);
-        setSignature(signature);
-    }
-
 }

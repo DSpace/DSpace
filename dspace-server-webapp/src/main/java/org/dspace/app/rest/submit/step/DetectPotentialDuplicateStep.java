@@ -47,8 +47,6 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep {
 
     public static final String DETECT_DUPLICATE_STEP_ADD_OPERATION_ENTRY = "detectduplicateadd";
 
-    // TODO - TLC-277 - it feels like we should be able to configure this in a bean somewhere... if not
-    // the factory->factoryimpl->service, then to some way we can do @Autowired simply here, as controllers do
     private final ConverterService converter = ConverterServiceFactoryImpl.getInstance().getConverterService();
 
     @Override
@@ -76,8 +74,6 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep {
     private Map<UUID, DuplicateMatch> processPotentialDuplicates(UUID itemID, boolean check,
             List<DuplicateItemInfo> potentialDuplicates) {
         Map<UUID, DuplicateMatch> matches = new HashMap<UUID, DuplicateMatch>();
-        //FIXME we need to find a more strict rule about when potential duplicate can be seen
-        // TODO TLC-277 as above, check visibility rules here
         Context context = org.dspace.web.ContextUtil.obtainCurrentRequestContext();
         context.turnOffAuthorisationSystem();
         for (DuplicateItemInfo itemInfo : potentialDuplicates) {
@@ -92,7 +88,7 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep {
 
             // avoid a clash with data with a valid decision
             if (!matches.containsKey(duplicateItem.getID()) || match.anyDecisionMade()) {
-                matches.put((UUID) duplicateItem.getID(), match);
+                matches.put(duplicateItem.getID(), match);
             }
         }
         context.restoreAuthSystemState();

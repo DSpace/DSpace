@@ -16,7 +16,6 @@ public abstract class DuplicateInfo {
     private String signatureId;
     private List<Item> items;
     private String signature;
-    private List<String> otherSignature;
 
     public int getNumItems() {
         return items.size();
@@ -33,10 +32,6 @@ public abstract class DuplicateInfo {
         return signature;
     }
 
-    public String getSignatureId() {
-        return signatureId;
-    }
-
     public void setSignatureId(String signatureId) {
         this.signatureId = signatureId;
     }
@@ -49,14 +44,4 @@ public abstract class DuplicateInfo {
         this.signature = signature;
     }
 
-    public List<String> getOtherSignature() {
-        if (this.otherSignature == null) {
-            this.otherSignature = new ArrayList<String>();
-        }
-        return otherSignature;
-    }
-
-    public void setOtherSignature(List<String> otherSignature) {
-        this.otherSignature = otherSignature;
-    }
 }

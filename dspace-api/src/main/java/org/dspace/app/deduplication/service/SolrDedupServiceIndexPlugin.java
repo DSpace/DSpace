@@ -18,6 +18,6 @@ import org.dspace.core.Context;
  */
 public interface SolrDedupServiceIndexPlugin {
 
-    public void additionalIndex(Context context, UUID itemFirst, UUID itemSecond, SolrInputDocument document);
+    void additionalIndex(Context context, UUID itemFirst, UUID itemSecond, SolrInputDocument document);
 
 }
