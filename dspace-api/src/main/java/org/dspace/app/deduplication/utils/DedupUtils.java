@@ -44,8 +44,9 @@ import org.dspace.util.ItemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Utility class used to search for and manage duplicates inside the dedup solr core.
+ * Utility class used to search for and manage duplicates inside the dedup solr core and database table.
  *
+ * @author 4Science
  */
 public class DedupUtils {
 
