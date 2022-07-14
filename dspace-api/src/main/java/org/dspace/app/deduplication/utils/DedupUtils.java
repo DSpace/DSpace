@@ -45,7 +45,7 @@ import org.dspace.util.ItemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Utility class used to search for duplicates inside the dedup solr core.
+ * Utility class used to search for and manage duplicates inside the dedup solr core.
  *
  */
 public class DedupUtils {
@@ -65,11 +65,14 @@ public class DedupUtils {
     protected AuthorizeService authorizeService;
 
     /**
-     * @param context
-     * @param targetItemID
-     * @param resourceType
+     *
+     * Find potential duplicates of any signature type, given an item UUID and workflow state
+     *
+     * @param context       DSpace context
+     * @param targetItemID  current item to match for duplicate detection
+     * @param resourceType  item resource type
      * @param isInWorkflow  set null to retrieve all (ADMIN)
-     * @return
+     * @return  List of potential duplicates
      * @throws SQLException
      * @throws SearchServiceException
      */
@@ -79,11 +82,14 @@ public class DedupUtils {
     }
 
     /**
-     * @param context
-     * @param targetItemID
-     * @param resourceType
-     * @param signatureType
+     *
+     * Find potential duplicates of a specific signature type, given an item UUID and workflow state
+     *
+     * @param context       DSpace context
+     * @param targetItemID  current item to match for duplicate detection
+     * @param resourceType  item resource type
      * @param isInWorkflow  set null to retrieve all (ADMIN)
+     * @param signatureType type of signature to filter on
      * @return
      * @throws SQLException
      * @throws SearchServiceException
@@ -91,12 +97,19 @@ public class DedupUtils {
     private List<DuplicateItemInfo> findDuplicate(Context context, UUID targetItemID, Integer resourceType,
             String signatureType, Boolean isInWorkflow) throws SQLException, SearchServiceException {
 
+        // Set up base Solr query filters:
+        // Potential duplicate not in workflow and not rejected, OR match unconfirmed and item in workflow or workspace
         SolrQuery findDuplicateBySignature = new SolrQuery();
         findDuplicateBySignature.setQuery((isInWorkflow == null ? SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED
                 : (isInWorkflow ? SolrDedupServiceImpl.SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY
                         : SolrDedupServiceImpl.SUBQUERY_WS_MATCH_OR_REJECTED_OR_VERIFY)));
+        // Potential duplicate matches current in-progress item ID
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_IDS_FIELD + ":" + targetItemID);
+        // Potential duplicate matches current in-progress item resource type
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
+
+        // If the item is in workspace or workflow, allow reject or verify flags for the potential duplicate
+        // Otherwise require a strict match flag
         String filter = "";
         if (isInWorkflow == null) {
             filter = SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
@@ -112,34 +125,39 @@ public class DedupUtils {
                     + SolrDedupServiceImpl.DeduplicationFlag.VERIFYWS.getDescription() + " OR "
                     + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription() + ")";
         }
-
         findDuplicateBySignature.addFilterQuery(filter);
 
+        // Set fields
         findDuplicateBySignature.setFields("dedup.ids", "dedup.note", "dedup.flag");
 
-        if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
+        // If configured, ignore withdrawn items (default: true)
+        if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn", true)) {
             findDuplicateBySignature.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
         }
 
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-        List<DuplicateItemInfo> dupsInfo = new ArrayList<DuplicateItemInfo>();
+        List<DuplicateItemInfo> dupsInfo = new ArrayList<>();
+
+        // Perform actual search
         QueryResponse response = dedupService.search(findDuplicateBySignature);
         SolrDocumentList solrDocumentList = response.getResults();
         for (SolrDocument solrDocument : solrDocumentList) {
             Collection<Object> match = solrDocument.getFieldValues("dedup.ids");
-
+            // Iterate IDs from this potential match
             if (match != null && !match.isEmpty()) {
                 for (Object matchItem : match) {
                     UUID itemID = UUID.fromString((String) matchItem);
+                    // If the match is not this exact item, it might be a duplicate. Get the underlying item
+                    // and construct a new DuplicateItemInfo to add to the list of results
                     if (!itemID.equals(targetItemID)) {
                         DuplicateItemInfo info = new DuplicateItemInfo();
-                        Item duplicateItem = itemService.find(context, itemID);
 
+                        // Find and validate item
+                        Item duplicateItem = itemService.find(context, itemID);
                         if (duplicateItem == null) {
                             // Found a zombie reference in solr, ignore it
                             continue;
                         }
-
                         if (!authorizeService.authorizeActionBoolean(context, duplicateItem, Constants.READ)) {
                             // The current user doesn't have READ authorisation to the duplicate item, ignore it
                             // This could be because:
@@ -150,10 +168,11 @@ public class DedupUtils {
                             continue;
                         }
 
-
+                        // Set item and type
                         info.setDuplicateItem(duplicateItem);
                         info.setDuplicateItemType(ItemUtils.getItemStatus(context, duplicateItem));
 
+                        // Set flag and decision notes on the DuplicateItemInfo
                         String flag = (String) solrDocument.getFieldValue("dedup.flag");
                         if (SolrDedupServiceImpl.DeduplicationFlag.VERIFYWS.getDescription().equals(flag)) {
                             info.setNote(DuplicateDecisionType.WORKSPACE,
@@ -168,6 +187,8 @@ public class DedupUtils {
                         } else if (SolrDedupServiceImpl.DeduplicationFlag.REJECTWF.getDescription().equals(flag)) {
                             info.setDecision(DuplicateDecisionType.WORKFLOW, DuplicateDecisionValue.REJECT);
                         }
+
+                        // Finally, add to the list and break from the 'each ID' loop, process the next Solr doc
                         dupsInfo.add(info);
                         break;
                     }
@@ -175,20 +196,43 @@ public class DedupUtils {
             }
         }
 
+        // Return list of potential duplicates
         return dupsInfo;
 
     }
 
+    /**
+     * Does this match have a decision (of a particular type) already stored?
+     *
+     * @param firstItemID       source item
+     * @param secondItemID      target item
+     * @param decisionType      decision type
+     * @return
+     * @throws SearchServiceException
+     */
     private boolean hasStoredDecision(UUID firstItemID, UUID secondItemID, DuplicateDecisionType decisionType)
             throws SearchServiceException {
-
+        // Search solr for matching decisions and return true if results is not empty
         QueryResponse response = dedupService.findDecisions(firstItemID, secondItemID, decisionType);
-
         return !response.getResults().isEmpty();
     }
 
+    /**
+     * Does a potential duplicate match exist in Solr given exact criteria? This is used to validate
+     * decisions which need to refer to a valid match
+     * @param context
+     * @param itemID
+     * @param targetItemID
+     * @param resourceType
+     * @param isInWorkflow
+     * @return
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
     public boolean matchExist(Context context, UUID itemID, UUID targetItemID, Integer resourceType,
                               Boolean isInWorkflow) throws SQLException, SearchServiceException {
+        // Return true if there is a potential duplicate matching the passed ID, type and workflow state parameters
+        // Otherwise, return false
         boolean exist = false;
         List<DuplicateItemInfo> potentialDuplicates = findDuplicate(context, itemID, resourceType, isInWorkflow);
         for (DuplicateItemInfo match : potentialDuplicates) {
