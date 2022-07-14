@@ -220,12 +220,12 @@ public class DedupUtils {
     /**
      * Does a potential duplicate match exist in Solr given exact criteria? This is used to validate
      * decisions which need to refer to a valid match
-     * @param context
-     * @param itemID
-     * @param targetItemID
-     * @param resourceType
-     * @param isInWorkflow
-     * @return
+     * @param context       DSpace context
+     * @param itemID        source item ID
+     * @param targetItemID  target item ID
+     * @param resourceType  item resource type
+     * @param isInWorkflow  is this item in workflow?
+     * @return  true if the match exists, false if it does not
      * @throws SQLException
      * @throws SearchServiceException
      */
@@ -246,50 +246,67 @@ public class DedupUtils {
 
     }
 
+    /**
+     * Reject a duplicate based on an administrative decision
+     *
+     * @param context   DSpace context
+     * @param firstId   source item ID
+     * @param secondId  target item ID
+     * @param type      item resource type
+     * @return  true if duplicate was rejected, false if inapplicable
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     public boolean rejectAdminDups(Context context, UUID firstId, UUID secondId, Integer type)
             throws SQLException, AuthorizeException {
+        // If source and target are the same item, do not apply the rejection
         if (firstId == secondId) {
             return false;
         }
+        // If current user is not an administrator, throw an exception
         if (!AuthorizeServiceFactory.getInstance().getAuthorizeService().isAdmin(context)) {
             throw new AuthorizeException(
                     "Only the administrator can reject the duplicate in the administrative section");
         }
+        // Sort item IDs
         UUID[] sortedIds = new UUID[] { firstId, secondId };
         Arrays.sort(sortedIds);
 
-        Deduplication row = null;
+        Deduplication row;
         try {
-
+            // Get duplicate database row
             row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
             if (row != null) {
+                // Set information about this admin decision to reject and update the row
                 row.setAdminId(context.getCurrentUser().getID());
                 row.setAdminTime(new Date());
                 row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
-
                 deduplicationService.update(context, row);
             } else {
+                // Create a new row with information about this admin decision and insert to database
                 row = new Deduplication();
                 row.setAdminId(context.getCurrentUser().getID());
                 row.setFirstItemId(sortedIds[0]);
                 row.setSecondItemId(sortedIds[1]);
                 row.setAdminTime(new Date());
                 row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
-
-                row = deduplicationService.create(context, row);
+                deduplicationService.create(context, row);
             }
+            // Update the solr index
             dedupService.buildDecision(context, firstId, secondId, DeduplicationFlag.REJECTADMIN, null);
+            // Return true to indicate this rejection was processed
             return true;
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
+        // If we reached this statement, the rejection wasn't processed, return false
         return false;
     }
 
     /**
      * Mark all the potential duplicates for the specified signature and item as
      * fake.
-     * 
+     *
      * @param context
      * @param itemID
      * @param signatureType
