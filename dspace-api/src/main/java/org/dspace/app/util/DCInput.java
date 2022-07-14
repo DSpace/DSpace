@@ -8,6 +8,8 @@
 package org.dspace.app.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -18,8 +20,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
+import org.xml.sax.SAXException;
 
 /**
  * Class representing a line in an input form.
@@ -146,6 +152,11 @@ public class DCInput {
      */
     private List<String> typeBind = null;
 
+    /**
+     * for this input type the complex definition is loaded from the all complex definitions
+     */
+    private ComplexDefinition complexDefinition = null;
+
     private boolean isRelationshipField = false;
     private boolean isMetadataField = false;
     private String relationshipType = null;
@@ -171,8 +182,10 @@ public class DCInput {
      *
      * @param fieldMap named field values.
      * @param listMap  value-pairs map, computed from the forms definition XML file
+     * @param complexDefinitions  definition of the complex input - more inputs in one row
      */
-    public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap) {
+    public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap,
+                   ComplexDefinitions complexDefinitions) {
         dcElement = fieldMap.get("dc-element");
         dcQualifier = fieldMap.get("dc-qualifier");
 
@@ -206,6 +219,9 @@ public class DCInput {
             || "list".equals(inputType)) {
             valueListName = fieldMap.get("value-pairs-name");
             valueList = listMap.get(valueListName);
+        }
+        if ("complex".equals(inputType)) {
+            complexDefinition = complexDefinitions.getByName((fieldMap.get(DCInputsReader.COMPLEX_DEFINITION_REF)));
         }
         hint = fieldMap.get("hint");
         warning = fieldMap.get("required");
@@ -561,6 +577,33 @@ public class DCInput {
         return false;
     }
 
+    public ComplexDefinition getComplexDefinition() {
+        return this.complexDefinition;
+    }
+
+    /**
+     * Convert complex definition HashMap to the ordered JSON string
+     * @return complex definition in the JSON string which will be parsed in the FE
+     */
+    public String getComplexDefinitionJSONString() {
+        String resultJson = "";
+        JSONArray complexDefinitionListJSON = null;
+
+        if (!ObjectUtils.isEmpty(this.complexDefinition)) {
+            List<JSONObject> complexDefinitionJsonList = new ArrayList<>();
+            for (String CDInputName : this.complexDefinition.getInputs().keySet()) {
+                JSONObject inputFieldJson = new JSONObject();
+                Map<String, String> inputField = this.complexDefinition.getInputs().get(CDInputName);
+                inputFieldJson.put(CDInputName, new JSONObject(inputField));
+                complexDefinitionJsonList.add(inputFieldJson);
+            }
+            complexDefinitionListJSON = new JSONArray(complexDefinitionJsonList);
+            resultJson = complexDefinitionListJSON.toString();
+        }
+
+        return resultJson;
+    }
+
     public boolean validate(String value) {
         if (StringUtils.isNotBlank(value)) {
             try {
@@ -604,5 +647,91 @@ public class DCInput {
      */
     public boolean isMetadataField() {
         return isMetadataField;
+    }
+
+    /**
+     * Class representing a Map of the ComplexDefinition object
+     * Class is copied from UFAL/CLARIN-DSPACE (https://github.com/ufal/clarin-dspace) and modified by
+     * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+     */
+    public static class ComplexDefinitions {
+        /**
+         * Map of the ComplexDefiniton object
+         */
+        private Map<String, ComplexDefinition> definitions = null;
+        private Map<String, List<String>> valuePairs = null;
+        private static final String separator = ";";
+
+        public ComplexDefinitions(Map<String, List<String>> valuePairs) {
+            definitions = new HashMap<>();
+            this.valuePairs = valuePairs;
+        }
+
+        public ComplexDefinition getByName(String name) {
+            return definitions.get(name);
+        }
+
+        public void addDefinition(ComplexDefinition definition) {
+            definitions.put(definition.getName(), definition);
+            definition.setValuePairs(valuePairs);
+        }
+
+        public static String getSeparator() {
+            return separator;
+        }
+    }
+
+    /**
+     * Class representing a complex input field - multiple lines in input form
+     * Class is copied from UFAL/CLARIN-DSPACE (https://github.com/ufal/clarin-dspace) and modified by
+     * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+     */
+    public static class ComplexDefinition {
+        /**
+         * Input fields in the input form
+         */
+        private Map<String, Map<String, String>> inputs;
+        private String name;
+        private Map<String, List<String>> valuePairs = null;
+
+        /**
+         * Class constructor for creating a ComplexDefinition object
+         *
+         * @param definitionName the name of the complex input type
+         */
+        public ComplexDefinition(String definitionName) {
+            name = definitionName;
+            inputs = new LinkedHashMap<>();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * Add input field definition to the complex input field definition
+         * @param attributes of the input field definition e.g., ["name","surname"]
+         * @throws SAXException
+         */
+        public void addInput(Map<String, String> attributes) throws SAXException {
+            // these two are a must, check if present
+            String iName = attributes.get("name");
+            String iType = attributes.get("input-type");
+
+            if (iName == null || iType == null) {
+                throw new SAXException(
+                        "Missing attributes (name or input-type) on complex definition input");
+            }
+
+            inputs.put(iName,attributes);
+        }
+
+        public Map<String, Map<String, String>> getInputs() {
+            return this.inputs;
+        }
+
+        void setValuePairs(Map<String, List<String>> valuePairs) {
+            this.valuePairs = valuePairs;
+        }
     }
 }

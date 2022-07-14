@@ -32,9 +32,23 @@
 
   <dc-type>
     <schema>local</schema>
+    <element>contact</element>
+    <qualifier>person</qualifier>
+    <scope_note>Contact person</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>sponsor</element>
+    <scope_note>Sponsor</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
     <element>bitstream</element>
     <qualifier>redirectToURL</qualifier>
     <scope_note>Get the bitstream from this URL.</scope_note>
   </dc-type>
+
 
 </dspace-dc-types>

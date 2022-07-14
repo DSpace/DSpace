@@ -89,6 +89,10 @@ public class SubmissionFormFieldRest {
     private List<String> typeBind;
 
     /**
+     * ComplexDefinition transformed to the JSON string
+     */
+    private String complexDefinition;
+    /**
      * Getter for {@link #selectableMetadata}
      * 
      * @return {@link #selectableMetadata}
@@ -285,5 +289,13 @@ public class SubmissionFormFieldRest {
 
     public void setSelectableRelationship(SelectableRelationship selectableRelationship) {
         this.selectableRelationship = selectableRelationship;
+    }
+
+    public void setComplexDefinition(String complexDefinition) {
+        this.complexDefinition = complexDefinition;
+    }
+
+    public String getComplexDefinition() {
+        return this.complexDefinition;
     }
 }
