@@ -178,7 +178,6 @@ public class StructBuilderIT
                         IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
         Diff myDiff = DiffBuilder.compare(reference).withTest(output)
                 .normalizeWhitespace()
-//                .withNodeFilter(new MyNodeFilter())
                 .withAttributeFilter((Attr attr) ->
                         !attr.getName().equals("identifier"))
                 .checkForIdentical()
@@ -243,7 +242,6 @@ public class StructBuilderIT
                         IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
         Diff myDiff = DiffBuilder.compare(reference).withTest(output)
                 .normalizeWhitespace()
-//                .withNodeFilter(new MyNodeFilter())
                 .withAttributeFilter((Attr attr) ->
                         !attr.getName().equals("identifier"))
                 .checkForIdentical()
@@ -299,7 +297,6 @@ public class StructBuilderIT
                         EXPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8)));
         Diff myDiff = DiffBuilder.compare(reference).withTest(output)
                 .normalizeWhitespace()
-//                .withNodeFilter(new MyNodeFilter())
                 .withAttributeFilter((Attr attr) ->
                         !attr.getName().equals("identifier"))
                 .checkForIdentical()
@@ -373,23 +370,4 @@ public class StructBuilderIT
         // There must be at most one difference.
         return diffIterator.hasNext();
     }
-
-    /**
-     * Reject uninteresting nodes. (currently commented out of tests above)
-     */
-    /*private static class MyNodeFilter implements Predicate<Node> {
-        private static final List<String> dontCare = Arrays.asList(
-            "description",
-            "intro",
-            "copyright",
-            "sidebar",
-            "license",
-            "provenance");
-
-        @Override
-        public boolean test(Node node) {
-            String type = node.getLocalName();
-            return ! dontCare.contains(type);
-        }
-    }*/
 }
