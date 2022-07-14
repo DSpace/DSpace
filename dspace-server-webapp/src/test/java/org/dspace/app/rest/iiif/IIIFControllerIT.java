@@ -750,7 +750,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        // Expected a rendering element and no structures (because all images are inside the IIIF exclusive bundle)
+        // Expected a rendering element and no structures (because all images are inside the toc excluded bundle)
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
