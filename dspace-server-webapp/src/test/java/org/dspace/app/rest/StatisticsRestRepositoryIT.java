@@ -561,7 +561,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         UsageReportPointDsoTotalVisitsRest expectedPoint = new UsageReportPointDsoTotalVisitsRest();
         expectedPoint.addValue("views", 1);
-        expectedPoint.setId("BitstreamVisitedName");
+        expectedPoint.setId(bitstreamVisited.getID().toString());
+        expectedPoint.setLabel("BitstreamVisitedName");
         expectedPoint.setType("bitstream");
 
         // And request that item's TotalDownloads stat report
@@ -1123,11 +1124,13 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         List<UsageReportPointRest> totalDownloadsPoints = new ArrayList<>();
         UsageReportPointDsoTotalVisitsRest expectedPointTotalVisitsBit1 = new UsageReportPointDsoTotalVisitsRest();
         expectedPointTotalVisitsBit1.addValue("views", 1);
-        expectedPointTotalVisitsBit1.setId("bitstream1");
+        expectedPointTotalVisitsBit1.setId(bitstream1.getID().toString());
+        expectedPointTotalVisitsBit1.setLabel("bitstream1");
         expectedPointTotalVisitsBit1.setType("bitstream");
         UsageReportPointDsoTotalVisitsRest expectedPointTotalVisitsBit2 = new UsageReportPointDsoTotalVisitsRest();
         expectedPointTotalVisitsBit2.addValue("views", 2);
-        expectedPointTotalVisitsBit2.setId("bitstream2");
+        expectedPointTotalVisitsBit2.setId(bitstream2.getID().toString());
+        expectedPointTotalVisitsBit2.setLabel("bitstream2");
         expectedPointTotalVisitsBit2.setType("bitstream");
         totalDownloadsPoints.add(expectedPointTotalVisitsBit1);
         totalDownloadsPoints.add(expectedPointTotalVisitsBit2);
