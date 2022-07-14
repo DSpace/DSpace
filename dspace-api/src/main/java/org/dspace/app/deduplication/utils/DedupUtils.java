@@ -245,29 +245,45 @@ public class DedupUtils {
 
     }
 
+    /**
+     * Verify a duplication entry
+     * @param context       DSpace comment
+     * @param dedupId       deduplication database ID
+     * @param firstId       first item ID
+     * @param secondId      second item ID
+     * @param type          item resource type
+     * @param toFix         "to fix" indicator
+     * @param note          decision note
+     * @param isWorkflow    is this item in workflow?
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     public void verify(Context context, int dedupId, UUID firstId, UUID secondId, int type, boolean toFix, String note,
-            boolean check) throws SQLException, AuthorizeException {
+            boolean isWorkflow) throws SQLException, AuthorizeException {
+        // Sort item IDs
         UUID[] sortedIds = new UUID[] { firstId, secondId };
         Arrays.sort(sortedIds);
         firstId = sortedIds[0];
         secondId = sortedIds[1];
+        // Get DSpace items
         Item firstItem = ContentServiceFactory.getInstance().getItemService().find(context, firstId);
         Item secondItem = ContentServiceFactory.getInstance().getItemService().find(context, secondId);
-        if (AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context, firstItem,
-                Constants.WRITE)
-                || AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context,
-                        secondItem, Constants.WRITE)) {
+        // Check that the current user has WRITE permission for at least one of the matching items
+        if (hasAuthorization(context, firstId, secondId)) {
+            // Try to get an existing database row for this duplication entry
             Deduplication row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, firstId, secondId);
-
             if (row != null) {
+                // Duplication entry already exists. Not sure why the existing submitter decision gets set again here?
                 String submitterDecision = row.getSubmitterDecision();
-                if (check && StringUtils.isNotBlank(submitterDecision)) {
+                if (isWorkflow && StringUtils.isNotBlank(submitterDecision)) {
                     row.setSubmitterDecision(submitterDecision);
                 }
             } else {
+                // Create a new row
                 row = deduplicationService.create(context, new Deduplication());
             }
 
+            // Set row data from method parameters
             row.setFirstItemId(firstId);
             row.setSecondItemId(secondId);
             row.setTofix(toFix);
@@ -275,20 +291,29 @@ public class DedupUtils {
             row.setReaderNote(note);
             row.setReaderId(context.getCurrentUser().getID());
             row.setReaderTime(new Date());
-            if (check) {
+            // Set either workflow or workspace decision description
+            if (isWorkflow) {
                 row.setWorkflowDecision(DeduplicationFlag.VERIFYWF.getDescription());
             } else {
                 row.setSubmitterDecision(DeduplicationFlag.VERIFYWS.getDescription());
             }
 
+            // Update database and solr index
             deduplicationService.update(context, row);
             dedupService.buildDecision(context, firstId, secondId,
-                    check ? DeduplicationFlag.VERIFYWF : DeduplicationFlag.VERIFYWS, note);
+                    isWorkflow ? DeduplicationFlag.VERIFYWF : DeduplicationFlag.VERIFYWS, note);
         } else {
             throw new AuthorizeException("Only authorize users can access to the deduplication");
         }
     }
 
+    /**
+     * Check if the current user has write permission for either the first or second item
+     * @param context   DSpace context
+     * @param firstId   First item ID
+     * @param secondId  Second item ID
+     * @return  boolean indicating whether the user has authorization to create/update duplication entry
+     */
     private Boolean hasAuthorization(Context context, UUID firstId, UUID secondId) {
         Item firstItem;
         Item secondItem;
@@ -306,11 +331,20 @@ public class DedupUtils {
         }
     }
 
+    /**
+     * Retrieve a duplication row from the database
+     * @param context   DSpace context
+     * @param firstId   First item ID
+     * @param secondId  Second item ID
+     * @return  Duplication entry
+     * @throws SQLException
+     */
     private Deduplication retrieveDuplicationRow(Context context, UUID firstId, UUID secondId) throws SQLException {
-
+        // Sort item IDs
         UUID[] sortedIds = new UUID[] { firstId, secondId };
         Arrays.sort(sortedIds);
-        Deduplication row = null;
+        Deduplication row;
+        // Fetch row for this duplication entry or create and return new row
         row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
         if (row == null) {
             row = deduplicationService.create(context, new Deduplication());
@@ -319,17 +353,33 @@ public class DedupUtils {
         return row;
     }
 
+    /**
+     * Set the decision made for a potential duplicate
+     * @param context           DSpace context
+     * @param firstId           First item ID
+     * @param secondId          Second item ID
+     * @param type              Item resource type
+     * @param decisionObject    Decision object from patch add operation
+     * @throws AuthorizeException
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
     public void setDuplicateDecision(Context context, UUID firstId, UUID secondId, Integer type,
             DuplicateDecisionObjectRest decisionObject)
             throws AuthorizeException, SQLException, SearchServiceException {
 
+        // Check if the current user has WRITE permission to either item
         if (hasAuthorization(context, firstId, secondId)) {
             Deduplication row = retrieveDuplicationRow(context, firstId, secondId);
+            // Set "to fix" and "fake" indicators to false
             boolean toFix = false;
             boolean fake = false;
+            // Is this a workflow decision?
             boolean isWorkflow = decisionObject.getType() == DuplicateDecisionType.WORKFLOW;
+            // Get the decision flag and description
             DeduplicationFlag decisionFlag = decisionObject.getDecisionFlag();
             String decisionDesc = decisionFlag.getDescription();
+            // Set safe nulls for other decision information
             String readerNote = null;
             String epersonNote = null;
             UUID readerId = null;
@@ -337,8 +387,10 @@ public class DedupUtils {
             Date readerTime = null;
             Date epersonTime = null;
 
+            // Set notes and indicators about decision-maker and decision
+            // depending on whether it was made by a reviewer in workflow or a submitter in workspace
             if (decisionObject.getValue() == DuplicateDecisionValue.REJECT) {
-                fake = isWorkflow ? false : true;
+                fake = !isWorkflow;
                 epersonNote = decisionObject.getNote();
                 epersonId = context.getCurrentUser().getID();
                 epersonTime = new Date();
@@ -351,6 +403,7 @@ public class DedupUtils {
                 decisionDesc = null;
             }
 
+            // Set row values
             row.setFirstItemId(firstId);
             row.setSecondItemId(secondId);
             row.setTofix(toFix);
@@ -367,12 +420,13 @@ public class DedupUtils {
                 row.setSubmitterDecision(decisionDesc);
             }
 
+            // Update database entry
             deduplicationService.update(context, row);
 
+            // Update solr index, removing existing stored decision if present
             if (hasStoredDecision(firstId, secondId, decisionObject.getType())) {
                 dedupService.removeStoredDecision(firstId, secondId, decisionObject.getType());
             }
-
             dedupService.buildDecision(context, firstId, secondId, decisionFlag, decisionObject.getNote());
             dedupService.commit();
         } else {
@@ -380,17 +434,24 @@ public class DedupUtils {
         }
     }
 
+    /**
+     * Validate a decision object parsed by patch add operation
+     * @param decisionObject    Duplication decision object
+     * @return boolean indicating decision validity
+     */
     public boolean validateDecision(DuplicateDecisionObjectRest decisionObject) {
         boolean valid = false;
 
         switch (decisionObject.getType()) {
             case WORKSPACE:
             case WORKFLOW:
+                // If the decision type is workspace or workflow then the decision must be reject or verify
                 valid = (decisionObject.getValue() == DuplicateDecisionValue.REJECT
                         || decisionObject.getValue() == DuplicateDecisionValue.VERIFY
                         || decisionObject.getValue() == null);
                 break;
             case ADMIN:
+                // If the decision type is admin then the decision must be reject
                 valid = decisionObject.getValue() == DuplicateDecisionValue.REJECT;
                 break;
 
@@ -402,23 +463,55 @@ public class DedupUtils {
         return valid;
     }
 
+    /**
+     * Get deduplication service. Required by Spring.
+     * @return deduplication service
+     */
     public DedupService getDedupService() {
         return dedupService;
     }
 
+    /**
+     * Set deduplication service. Required by Spring.
+     * @param dedupService  deduplication service instance
+     */
     public void setDedupService(DedupService dedupService) {
         this.dedupService = dedupService;
     }
 
+    /**
+     * Send a commit to the deduplication service
+     */
     public void commit() {
         dedupService.commit();
     }
 
+    /**
+     * Get potential duplicates for a given item, item resource type and workflow state
+     * @param context           DSpace context
+     * @param itemID            Item ID
+     * @param typeID            Item resource type
+     * @param isInWorkflow      Workflow state
+     * @return list of potential duplicates
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
     public List<DuplicateItemInfo> getDuplicateByIDandType(Context context, UUID itemID, int typeID,
             boolean isInWorkflow) throws SQLException, SearchServiceException {
         return getDuplicateByIdAndTypeAndSignatureType(context, itemID, typeID, null, isInWorkflow);
     }
 
+    /**
+     * Get potential duplicates for a given item, item resource type, signature type and workflow state
+     * @param context           DSpace context
+     * @param itemID            Item ID
+     * @param typeID            Item resource type
+     * @param signatureType     Duplicate signature type
+     * @param isInWorkflow      Workflow state
+     * @return list of potential duplicates
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
     public List<DuplicateItemInfo> getDuplicateByIdAndTypeAndSignatureType(Context context, UUID itemID, int typeID,
             String signatureType, boolean isInWorkflow) throws SQLException, SearchServiceException {
         return findDuplicate(context, itemID, typeID, signatureType, isInWorkflow);
