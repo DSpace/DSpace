@@ -66,8 +66,14 @@ public final class CreateAdministrator {
         throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
+        // Console console = System.console();
 
         CreateAdministrator ca = new CreateAdministrator();
+
+        // char[] password1 = null;
+        // char[] password2 = null;
+        // boolean dataOK = false;
+        // String language = I18nUtil.getDefaultLocale().getLanguage();
 
         options.addOption("e", "email", true, "administrator email address");
         options.addOption("f", "first", true, "administrator first name");
@@ -138,21 +144,34 @@ public final class CreateAdministrator {
         String email = null;
         String firstName = null;
         String lastName = null;
-        char[] password1 = null;
-        char[] password2 = null;
         String language = I18nUtil.getDefaultLocale().getLanguage();
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         boolean flag = false;
+        char[] password = null;
 
 
         if (!line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l")
-                    && (line.hasOption("c") || (!line.hasOption("c"))
-                    && cfg.getProperty("webui.supported.locales") == null)) {
+            && (line.hasOption("c") || (!line.hasOption("c")
+            && cfg.getProperty("webui.supported.locales") == null))) {
             flag = true;
+            dataOK = false;
+        } else if (!line.hasOption('p') && !line.hasOption("e")  && !line.hasOption("f") && !line.hasOption("l")) {
+            flag = false;
+            dataOK = false;
+        } else if (line.hasOption('p') && line.hasOption("e")  && line.hasOption("f") && line.hasOption("l")
+                   && (line.hasOption("c") || (!line.hasOption("c")
+                   && cfg.getProperty("webui.supported.locales") == null))) {
+            dataOK = true;
+            password = line.getOptionValue("p").toCharArray();
         }
 
         while (!dataOK) {
-            if (!flag) {
+            if (flag) {
+                password = getPassword(console);
+                if (password != null) {
+                    dataOK = true;
+                }
+            } else if (!flag) {
                 System.out.print("E-mail address: ");
                 System.out.flush();
 
@@ -181,7 +200,6 @@ public final class CreateAdministrator {
                 if (lastName != null) {
                     lastName = lastName.trim();
                 }
-            } else {
 
                 if (cfg.hasProperty("webui.supported.locales")) {
                     System.out.println("Select one of the following languages: "
@@ -197,19 +215,8 @@ public final class CreateAdministrator {
                     }
                 }
 
-                System.out.println("Password will not display on screen.");
-                System.out.print("Password: ");
-                System.out.flush();
-
-                password1 = console.readPassword();
-
-                System.out.print("Again to confirm: ");
-                System.out.flush();
-
-                password2 = console.readPassword();
-
-                //TODO real password validation
-                if (password1.length > 1 && Arrays.equals(password1, password2)) {
+                password = getPassword(console);
+                if (password != null) {
                     // password OK
                     System.out.print("Is the above data correct? (y or n): ");
                     System.out.flush();
@@ -218,22 +225,43 @@ public final class CreateAdministrator {
 
                     if (s != null) {
                         s = s.trim();
-                        if (s.toLowerCase().startsWith("y")) {
+                        if (s.toLowerCase().startsWith("y") && password != null) {
                             dataOK = true;
                         }
                     }
-                } else {
-                    System.out.println("Passwords don't match");
                 }
             }
         }
-
         // if we make it to here, we are ready to create an administrator
-        createAdministrator(email, firstName, lastName, language, String.valueOf(password1));
+        createAdministrator(email, firstName, lastName, language, String.valueOf(password));
 
-        //Cleaning arrays that held password
-        Arrays.fill(password1, ' ');
-        Arrays.fill(password2, ' ');
+    }
+
+
+    private char[] getPassword(Console console) {
+        char[] password1 = null;
+        char[] password2 = null;
+        System.out.println("Password will not display on screen.");
+        System.out.print("Password: ");
+        System.out.flush();
+
+
+        password1 = console.readPassword();
+
+        System.out.print("Again to confirm: ");
+        System.out.flush();
+
+        password2 = console.readPassword();
+
+        //TODO real password validation
+        if (password1.length > 1 && Arrays.equals(password1, password2)) {
+            // password OK
+            Arrays.fill(password2, ' ');
+            return password1;
+        } else {
+            System.out.println("Passwords don't match");
+            return null;
+        }
     }
 
     /**
