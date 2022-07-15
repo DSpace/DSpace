@@ -1,0 +1,31 @@
+# copy this file and name it tests.yaml
+
+# If you want more test .bats generated, add another entry. 
+# Each entry generates its own .bat file
+
+# parameters description:
+# mandatory
+# source folder - part of dspace where tests should be run - required
+# class name - required, without .java
+
+# optional
+# debug: true - optional, use for debug
+# comment - optional
+# methondName - optional -use if want to run only one method
+
+# when ready, click regenerate.bat
+
+# WARNING - all .bats not specified in this file will be removed
+# (when you no longer need )
+
+tests:
+# example entry #1 - with debug, whole class and with comment
+  - sourceFolder: "dspace-server-webapp"
+    className: "org.dspace.app.oai.OpenSearchControllerIT"
+    debug: true
+    comment: This is sample commentary
+
+# example entry #2 - testing one method
+  - sourceFolder: "dspace-server-webapp"
+    className: "org.dspace.app.oai.OAIpmhIT"
+    methodName: "listSetsWithMoreSetsThenMaxSetsPerPage"

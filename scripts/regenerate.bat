@@ -1,0 +1,1 @@
+java -jar regenerate.jar
