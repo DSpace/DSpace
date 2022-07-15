@@ -35,6 +35,14 @@
           class="org.dspace.discovery.MockSolrSearchCore"
           autowire-candidate="true"/>
 
+    <!-- Mock Deduplication core / solr service -->
+    <bean id="org.dspace.app.deduplication.service.DedupService"
+          class="org.dspace.deduplication.MockSolrDedupCore"
+          autowire-candidate="true"/>
+
+
+
+
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin"
           id="solrServiceIndexOutputPlugin"/>-->
 

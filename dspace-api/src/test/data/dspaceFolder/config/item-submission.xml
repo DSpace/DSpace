@@ -18,6 +18,9 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/deduplication-test" submission-name="deduplicationtest"/>
+        <name-map collection-handle="123456789/deduplication-test-1" submission-name="deduplicationtest"/>
+        <name-map collection-handle="123456789/deduplication-test-2" submission-name="deduplicationtest"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/extraction-test" submission-name="extractiontestprocess"/>
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
@@ -185,10 +188,12 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <step id="detect-duplicate"/>
             <!-- <step id="extractionstep"/> -->
             <step id="defaultAC"/>
             <step id="sherpaPolicies"/>
+
+            <!-- Detect Duplicates -->
+            <step id="detect-duplicate"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
@@ -216,6 +221,10 @@
 
         <submission-process name="typebindtest">
             <step id="typebindtest" />
+        </submission-process>
+
+        <submission-process name="deduplicationtest">
+            <step id="detect-duplicate"/>
         </submission-process>
 
         <submission-process name="accessConditionNotDiscoverable">
