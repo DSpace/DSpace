@@ -74,7 +74,7 @@
                             <warSourceExcludes>WEB-INF/classes/**</warSourceExcludes>
                             <packagingExcludes>
                                 WEB-INF/classes/**,
-                                WEB-INF/lib/slf4j-jdk14-*.jar,
+                                WEB-INF/lib/slf4j-reload4j-*.jar,
                                 WEB-INF/lib/log4j-over-slf4j-*.jar
                             </packagingExcludes>
                         </configuration>
@@ -234,13 +234,8 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-reload4j</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <artifactId>log4j</artifactId>
-            <groupId>log4j</groupId>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

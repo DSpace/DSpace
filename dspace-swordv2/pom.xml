@@ -94,6 +94,14 @@
                     <groupId>org.apache.abdera</groupId>
                     <artifactId>abdera-client</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -107,8 +115,8 @@
             <artifactId>dspace-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
             <exclusions>
                 <exclusion>
                     <artifactId>jmxtools</artifactId>

@@ -32,6 +32,8 @@
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
         <slf4j.version>1.7.14</slf4j.version>
+        <reload4j.version>1.2.20</reload4j.version>
+        <slf4j-reload4j.version>1.7.36</slf4j-reload4j.version>
         <!--
             Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
             Upgrading the spring version will make the XMLUI crash
@@ -1080,6 +1082,16 @@
                 <artifactId>apache-jena-libs</artifactId>
                 <type>pom</type>
                 <version>${jena.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1187,9 +1199,14 @@
                 <version>1.1.3</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
+                <groupId>ch.qos.reload4j</groupId>
+                <artifactId>reload4j</artifactId>
+                <version>${reload4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-reload4j</artifactId>
+                <version>${slf4j-reload4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>oro</groupId>
@@ -1339,10 +1356,11 @@
                 <artifactId>slf4j-jdk14</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <artifactId>slf4j-reload4j</artifactId>
+                <version>${slf4j-reload4j.version}</version>
             </dependency>
             <!-- JMockit, JUnit and Hamcrest are used for Unit/Integration tests -->
             <dependency> <!-- Keep jmockit before junit -->
