@@ -31,6 +31,10 @@ Please be aware that, as a Java web application, DSpace requires a database (Pos
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
+## SOURCES 
+
+[maven](https://archive.apache.org/dist/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.zip)
+
 ## Running DSpace 7 in Docker
 
 NOTE: At this time, we do not have production-ready Docker images for DSpace.

@@ -50,3 +50,5 @@ rebel.xml
 
 ## local config for build scripts
 /scripts/envs/__basic.bat
+/scripts/TEST_*
+/scripts/tests.yaml
