@@ -453,14 +453,13 @@ public class SimpleDSORelationsConverterPlugin
     }
 
     /**
-     * This methods generataes a link to the provieded Bitstream.
+     * This methods generates a link to the provided Bitstream.
      * As bitstreams currently don't get Persistent Identifier in DSpace, we have
-     * to link them using a link to the repository. This link should work with
-     * JSPUI and XMLUI (at least it does in DSpace 4.x).
+     * to link them using a link to the repository.
      *
      * @param context   The relevant DSpace Context.
      * @param bitstream Bitstream for which a URL should be generated.
-     * @return The link to the URL or null if the Bistream is is a Community or
+     * @return The link to the URL or null if the Bitstream is a Community or
      * Collection logo.
      * @throws SQLException if database error
      */
@@ -476,7 +475,7 @@ public class SimpleDSORelationsConverterPlugin
         String dspaceURL = configurationService.getProperty("dspace.ui.url");
         String link = "";
         try {
-            // this currently (DSpace 4.1) works with xmlui and jspui.
+            // the link to the bitstream in the UI
             link = dspaceURL + "/bitstream/" + parent.getHandle() + "/"
                 + bitstream.getSequenceID() + "/"
                 + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);

@@ -235,7 +235,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Step 4: Log the user in.
             context.setCurrentUser(eperson);
-            request.getSession().setAttribute("shib.authenticated", true);
+            request.setAttribute("shib.authenticated", true);
             AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
             log.info(eperson.getEmail() + " has been authenticated via shibboleth.");
@@ -403,7 +403,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             // Cache the special groups, so we don't have to recalculate them again
             // for this session.
-            request.getSession().setAttribute("shib.specialgroup", groupIds);
+            request.setAttribute("shib.specialgroup", groupIds);
 
             return new ArrayList<>(groups);
         } catch (Throwable t) {
@@ -515,7 +515,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             }
 
             // Determine the server return URL, where shib will send the user after authenticating.
-            // We need it to go back to DSpace's ShibbolethRestController so we will extract the user's information,
+            // We need it to trigger DSpace's ShibbolethLoginFilter so we will extract the user's information,
             // locally authenticate them & then redirect back to the UI.
             String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/shibboleth"
                     + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
@@ -1283,5 +1283,14 @@ public class ShibAuthentication implements AuthenticationMethod {
 
     }
 
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute("shib.authenticated") != null) {
+            return true;
+        }
+        return false;
+    }
 }
 

@@ -10,6 +10,7 @@ package org.dspace.app.mediafilter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
@@ -66,6 +67,6 @@ public class PoiWordFilter
         }
 
         // return the extracted text as a stream.
-        return new ByteArrayInputStream(text.getBytes());
+        return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
     }
 }

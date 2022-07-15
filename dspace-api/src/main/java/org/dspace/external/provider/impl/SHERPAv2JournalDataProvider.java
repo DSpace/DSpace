@@ -15,14 +15,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAJournal;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaJournal External
@@ -31,9 +30,7 @@ import org.dspace.external.provider.ExternalDataProvider;
  *
  * @author Kim Shepherd
  */
-public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SHERPAv2JournalDataProvider.class);
+public class SHERPAv2JournalDataProvider extends AbstractExternalDataProvider {
 
     // Source identifier (configured in spring configuration)
     private String sourceIdentifier;

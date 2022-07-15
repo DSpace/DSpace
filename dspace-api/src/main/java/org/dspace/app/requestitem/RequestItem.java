@@ -33,7 +33,6 @@ import org.dspace.core.ReloadableEntity;
 @Table(name = "requestitem")
 public class RequestItem implements ReloadableEntity<Integer> {
 
-
     @Id
     @Column(name = "requestitem_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "requestitem_seq")
@@ -54,8 +53,6 @@ public class RequestItem implements ReloadableEntity<Integer> {
     @Column(name = "request_name", length = 64)
     private String reqName;
 
-    //    @Column(name = "request_message")
-//    @Lob
     @Column(name = "request_message", columnDefinition = "text")
     private String reqMessage;
 
@@ -82,8 +79,8 @@ public class RequestItem implements ReloadableEntity<Integer> {
 
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(Context, Bitstream, Item,
-     * boolean, String, String, String)}
+     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(
+     * Context, Bitstream, Item, boolean, String, String, String)}
      */
     protected RequestItem() {
     }

@@ -665,7 +665,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
             throws SQLException, AuthorizeException, IOException, WorkflowException, SearchServiceException {
         context.turnOffAuthorisationSystem();
         workspaceItem = context.reloadEntity(workspaceItem);
-        XmlWorkflowItem workflowItem = workflowService.startWithoutNotify(context, workspaceItem);
+        XmlWorkflowItem unusedWorkflowItem = workflowService.startWithoutNotify(context, workspaceItem);
         context.commit();
         indexer.commit();
         context.restoreAuthSystemState();

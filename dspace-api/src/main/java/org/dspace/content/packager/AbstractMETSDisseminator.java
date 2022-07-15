@@ -75,7 +75,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
@@ -265,7 +265,7 @@ public abstract class AbstractMETSDisseminator
             } //end if/else
 
             // Assuming no errors, log this dissemination
-            log.info(LogManager.getHeader(context, "package_disseminate",
+            log.info(LogHelper.getHeader(context, "package_disseminate",
                                           "Disseminated package file=" + pkgFile.getName() +
                                               " for Object, type="
                                               + Constants.typeText[dso.getType()] + ", handle="
@@ -777,9 +777,6 @@ public abstract class AbstractMETSDisseminator
         Mets mets = new Mets();
 
         String identifier = "DB-ID-" + dso.getID();
-        if (dso.getHandle() != null) {
-            identifier = dso.getHandle().replace('/', '-');
-        }
 
         // this ID should be globally unique (format: DSpace_[objType]_[handle with slash replaced with a dash])
         mets.setID("DSpace_" + Constants.typeText[dso.getType()] + "_" + identifier);

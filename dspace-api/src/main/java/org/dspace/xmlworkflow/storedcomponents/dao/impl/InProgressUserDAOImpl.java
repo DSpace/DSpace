@@ -23,7 +23,7 @@ import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the InProgressUser object.
- * This class is responsible for all database calls for the InProgressUser object and is autowired by spring
+ * This class is responsible for all database calls for the InProgressUser object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -46,7 +46,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
             criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.ePerson), ePerson)
                             )
         );
-        return uniqueResult(context, criteriaQuery, false, InProgressUser.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, InProgressUser.class);
 
     }
 

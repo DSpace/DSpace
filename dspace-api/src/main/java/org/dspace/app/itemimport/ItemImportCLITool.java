@@ -76,7 +76,6 @@ public class ItemImportCLITool {
             options.addOption("r", "replace", false, "replace items in mapfile");
             options.addOption("d", "delete", false,
                               "delete items listed in mapfile");
-            options.addOption("i", "inputtype", true, "input type in case of BTE import");
             options.addOption("s", "source", true, "source of items (directory)");
             options.addOption("z", "zip", true, "name of zip file");
             options.addOption("c", "collection", true,
@@ -100,7 +99,6 @@ public class ItemImportCLITool {
             CommandLine line = parser.parse(options, argv);
 
             String command = null; // add replace remove, etc
-            String bteInputType = null; //ris, endnote, tsv, csv, bibtex
             String sourcedir = null;
             String mapfile = null;
             String eperson = null; // db ID or email
@@ -142,14 +140,6 @@ public class ItemImportCLITool {
 
             if (line.hasOption('d')) {
                 command = "delete";
-            }
-
-            if (line.hasOption('b')) {
-                command = "add-bte";
-            }
-
-            if (line.hasOption('i')) {
-                bteInputType = line.getOptionValue('i');
             }
 
             if (line.hasOption('w')) {
@@ -235,37 +225,6 @@ public class ItemImportCLITool {
                     System.out.println("No collections given. Assuming 'collections' file inside item directory");
                     commandLineCollections = false;
                 }
-            } else if ("add-bte".equals(command)) {
-                //Source dir can be null, the user can specify the parameters for his loader in the Spring XML
-                // configuration file
-
-                if (mapfile == null) {
-                    System.out
-                        .println("Error - a map file to hold importing results must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (eperson == null) {
-                    System.out
-                        .println("Error - an eperson to do the importing must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
-
-                if (collections == null) {
-                    System.out.println("No collections given. Assuming 'collections' file inside item directory");
-                    commandLineCollections = false;
-                }
-
-                if (bteInputType == null) {
-                    System.out
-                        .println(
-                            "Error - an input type (tsv, csv, ris, endnote, bibtex or any other type you have " +
-                                "specified in BTE Spring XML configuration file) must be specified");
-                    System.out.println(" (run with -h flag for details)");
-                    System.exit(1);
-                }
             } else if ("delete".equals(command)) {
                 if (eperson == null) {
                     System.out
@@ -280,9 +239,9 @@ public class ItemImportCLITool {
             }
 
             // can only resume for adds
-            if (isResume && !"add".equals(command) && !"add-bte".equals(command)) {
+            if (isResume && !"add".equals(command)) {
                 System.out
-                    .println("Error - resume option only works with the --add or the --add-bte commands");
+                    .println("Error - resume option only works with the --add command");
                 System.exit(1);
             }
 
@@ -337,28 +296,35 @@ public class ItemImportCLITool {
 
                 // validate each collection arg to see if it's a real collection
                 for (int i = 0; i < collections.length; i++) {
-                    // is the ID a handle?
-                    if (collections[i].indexOf('/') != -1) {
-                        // string has a / so it must be a handle - try and resolve
-                        // it
-                        mycollections.add((Collection) handleService
-                            .resolveToObject(c, collections[i]));
 
-                        // resolved, now make sure it's a collection
-                        if ((mycollections.get(i) == null)
-                            || (mycollections.get(i).getType() != Constants.COLLECTION)) {
-                            mycollections.set(i, null);
+                    Collection resolved = null;
+
+                    if (collections[i] != null) {
+
+                        // is the ID a handle?
+                        if (collections[i].indexOf('/') != -1) {
+                            // string has a / so it must be a handle - try and resolve
+                            // it
+                            resolved = ((Collection) handleService
+                                .resolveToObject(c, collections[i]));
+
+                        } else {
+                            // not a handle, try and treat it as an integer collection database ID
+                            resolved = collectionService.find(c, UUID.fromString(collections[i]));
+
                         }
-                    } else if (collections[i] != null) {
-                        // not a handle, try and treat it as an integer collection database ID
-                        mycollections.set(i, collectionService.find(c, UUID.fromString(collections[i])));
+
                     }
 
                     // was the collection valid?
-                    if (mycollections.get(i) == null) {
+                    if ((resolved == null)
+                            || (resolved.getType() != Constants.COLLECTION)) {
                         throw new IllegalArgumentException("Cannot resolve "
                                                                + collections[i] + " to collection");
                     }
+
+                    // add resolved collection to list
+                    mycollections.add(resolved);
 
                     // print progress info
                     String owningPrefix = "";
@@ -368,7 +334,7 @@ public class ItemImportCLITool {
                     }
 
                     System.out.println(owningPrefix + " Collection: "
-                                           + mycollections.get(i).getName());
+                                           + resolved.getName());
                 }
             } // end of validating collections
 

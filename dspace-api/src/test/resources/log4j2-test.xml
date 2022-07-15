@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration strict='true'
+               xmlns='http://logging.apache.org/log4j/2.0/config'>
+
+    <Properties>
+        <!-- Log level for all DSpace-specific code (org.dspace.*)
+             Possible values (from most to least info):
+             DEBUG, INFO, WARN, ERROR, FATAL -->
+        <Property name='loglevel.dspace'>DEBUG</Property>
+
+        <!-- Log level for other third-party tools/APIs used by DSpace
+             Possible values (from most to least info):
+             DEBUG, INFO, WARN, ERROR, FATAL -->
+        <Property name='loglevel.other'>INFO</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- A1 is for most DSpace activity -->
+        <Appender name='A1'
+                  type='Console'>
+            <Layout type='PatternLayout'
+                    pattern='%d %-5p %c @ %m%n'/>
+        </Appender>
+    </Appenders>
+
+    <Loggers>
+        <!-- Most parts of DSpace -->
+        <Logger name='org.dspace'
+                level='${loglevel.dspace}'
+                additivity='false'>
+            <AppenderRef ref='A1'/>
+        </Logger>
+
+        <!-- Block services logging except on exceptions -->
+        <Logger name='org.dspace.kernel'
+                level='ERROR'/>
+        <Logger name='org.dspace.services'
+                level='ERROR'/>
+        <Logger name='org.dspace.servicemanager'
+                level='WARN'/>
+        <Logger name='org.dspace.providers'
+                level='ERROR'/>
+        <Logger name='org.dspace.utils'
+                level='ERROR'/>
+
+        <!-- Block passwords from being exposed in Axis logs.
+             (DEBUG exposes passwords in Basic Auth) -->
+        <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'
+                level='INFO'/>
+
+                <!-- Anything not a part of DSpace -->
+        <Root level='${loglevel.other}'>
+            <AppenderRef ref='A1'/>
+        </Root>
+    </Loggers>
+</Configuration>

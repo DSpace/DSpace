@@ -103,6 +103,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // Explicitly use solr commit in SolrLoggerServiceImpl#postView
         configurationService.setProperty("solr-statistics.autoCommit", false);
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", true);
 
         context.turnOffAuthorisationSystem();
 
@@ -133,26 +134,42 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void usagereports_notProperUUIDAndReportId_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/notProperUUIDAndReportId"))
+        getClient(adminToken).perform(get("/api/statistics/usagereports/notProperUUIDAndReportId"))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
     public void usagereports_nonValidUUIDpart_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/notAnUUID" + "_" + TOTAL_VISITS_REPORT_ID))
+        getClient(adminToken).perform(get("/api/statistics/usagereports/notAnUUID" + "_" + TOTAL_VISITS_REPORT_ID))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
     public void usagereports_nonValidReportIDpart_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+        getClient(adminToken).perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
                                 "_NotValidReport"))
                    .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
+    public void usagereports_nonValidReportIDpart_Exception_By_Anonymous_Unauthorized_Test() throws Exception {
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                "_NotValidReport"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void usagereports_nonValidReportIDpart_Exception_By_Anonymous_Test() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                "_NotValidReport"))
+                   .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void usagereports_NonExistentUUID_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/" + UUID.randomUUID() + "_" + TOTAL_VISITS_REPORT_ID))
+        getClient(adminToken).perform(
+                  get("/api/statistics/usagereports/" + UUID.randomUUID() + "_" + TOTAL_VISITS_REPORT_ID))
                    .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -208,12 +225,45 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(loggedInToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                                 // ** THEN **
-                                .andExpect(status().isOk());
+                                .andExpect(status().isForbidden());
         // We request a dso's TotalVisits usage stat report as another logged in eperson and has no read policy for
         // this user
         getClient(anotherLoggedInUserToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                                            // ** THEN **
+                                           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void usagereport_loggedInUserReadRights_and_usage_statistics_admin_is_false_Test() throws Exception {
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+        context.turnOffAuthorisationSystem();
+        authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(itemNotVisitedWithBitstreams)
+                             .withAction(Constants.READ)
+                             .withUser(eperson).build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson1@mail.com")
+                                         .withPassword(password)
+                                         .build();
+        context.restoreAuthSystemState();
+        String anotherLoggedInUserToken = getAuthToken(eperson1.getEmail(), password);
+        // We request a dso's TotalVisits usage stat report as anon but dso has no read policy for anon
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
+                                TOTAL_VISITS_REPORT_ID))
+                   .andExpect(status().isUnauthorized());
+
+        // We request a dso's TotalVisits usage stat report as logged in eperson and has read policy for this user
+        getClient(loggedInToken).perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                             "_" + TOTAL_VISITS_REPORT_ID))
+                                .andExpect(status().isOk());
+
+        // We request a dso's TotalVisits usage stat report as another logged
+        // in eperson and has no read policy for this user
+        getClient(anotherLoggedInUserToken).perform(
+             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                                            .andExpect(status().isForbidden());
     }
 
@@ -233,7 +283,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that community's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + communityVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -253,7 +303,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // Community is never visited
         // And request that community's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + communityNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -289,7 +339,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that collection's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -309,7 +359,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // Collection is never visited
         // And request that collection's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + collectionNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -340,7 +390,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that collection's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -359,20 +409,58 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     public void totalVisitsReport_Item_NotVisited() throws Exception {
         // ** WHEN **
         //Item is never visited
+        List<UsageReportPointRest> expectedPoints = List.of(
+            getExpectedDsoViews(itemNotVisitedWithBitstreams, 0)
+        );
+
         // And request that item's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", Matchers.is(
-                       UsageReportMatcher.matchUsageReport(
-                           itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID,
-                           TOTAL_VISITS_REPORT_ID,
-                           List.of(
-                               getExpectedDsoViews(itemNotVisitedWithBitstreams, 0)
-                           )
-                       )
-                   )));
+                             .andExpect(jsonPath("$", Matchers.is(
+                                 UsageReportMatcher.matchUsageReport(
+                                     itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                                     TOTAL_VISITS_REPORT_ID,
+                                     expectedPoints
+                                 )
+                             )));
+
+        // only admin access visits report
+        getClient(loggedInToken).perform(
+             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+            .andExpect(status().isForbidden());
+
+        getClient().perform(
+             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+            .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(loggedInToken).perform(
+                get("/api/statistics/usagereports/"
+                        + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                        TOTAL_VISITS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
+
+       getClient().perform(
+                get("/api/statistics/usagereports/"
+                        + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                        TOTAL_VISITS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     @Test
@@ -390,8 +478,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
+        List<UsageReportPointRest> expectedPoints = List.of(
+            getExpectedDsoViews(bitstreamVisited, 1)
+        );
+
         // And request that bitstream's TotalVisits stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -399,19 +491,57 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                        UsageReportMatcher.matchUsageReport(
                            bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
                            TOTAL_VISITS_REPORT_ID,
-                           List.of(
-                               getExpectedDsoViews(bitstreamVisited, 1)
-                           )
+                           expectedPoints
                        )
                    )));
+
+        // only admin access visits report
+        getClient(loggedInToken).perform(
+                  get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                 .andExpect(status().isForbidden());
+
+        getClient().perform(
+                  get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                 .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(loggedInToken).perform(
+                get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                        TOTAL_VISITS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
+
+        getClient().perform(
+                get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        bitstreamVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                        TOTAL_VISITS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     @Test
     public void totalVisitsReport_Bitstream_NotVisited() throws Exception {
         // ** WHEN **
         // Bitstream is never visited
+
+        List<UsageReportPointRest> expectedPoints = List.of(
+            getExpectedDsoViews(bitstreamNotVisited, 0)
+        );
+
+        String authToken = getAuthToken(admin.getEmail(), password);
         // And request that bitstream's TotalVisits stat report
-        getClient().perform(
+        getClient(authToken).perform(
             get("/api/statistics/usagereports/" + bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -419,11 +549,43 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                        UsageReportMatcher.matchUsageReport(
                            bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
                            TOTAL_VISITS_REPORT_ID,
-                           List.of(
-                               getExpectedDsoViews(bitstreamNotVisited, 0)
-                           )
+                           expectedPoints
                        )
                    )));
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(
+                  get("/api/statistics/usagereports/" + bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                 .andExpect(status().isForbidden());
+
+        getClient().perform(
+                    get("/api/statistics/usagereports/" + bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                   .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(tokenEPerson).perform(
+                get("/api/statistics/usagereports/" + bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                        TOTAL_VISITS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
+
+      getClient().perform(
+                get("/api/statistics/usagereports/" + bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        bitstreamNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                        TOTAL_VISITS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     @Test
@@ -441,8 +603,10 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
+        List<UsageReportPointRest> expectedPoints = this.getListOfVisitsPerMonthsPoints(1);
+
         // And request that item's TotalVisitsPerMonth stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -450,9 +614,43 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                        UsageReportMatcher.matchUsageReport(
                            itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
                            TOTAL_VISITS_PER_MONTH_REPORT_ID,
-                           this.getListOfVisitsPerMonthsPoints(1)
+                           expectedPoints
                        )
                    )));
+
+        // only admin has access
+        getClient(loggedInToken).perform(
+                 get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
+                .andExpect(status().isForbidden());
+
+        getClient().perform(
+                 get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
+                .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(loggedInToken).perform(
+                get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                        TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                        expectedPoints
+                        )
+                )));
+
+       getClient().perform(
+                get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                        TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     @Test
@@ -460,7 +658,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // Item is not visited
         // And request that item's TotalVisitsPerMonth stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
                 TOTAL_VISITS_PER_MONTH_REPORT_ID))
                    // ** THEN **
@@ -495,7 +693,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that collection's TotalVisitsPerMonth stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -523,8 +721,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
+        List<UsageReportPointRest> expectedPoints = List.of(
+            getExpectedDsoViews(bitstreamVisited, 1)
+        );
+
         // And request that bitstreams's TotalDownloads stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -532,11 +734,43 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                        UsageReportMatcher.matchUsageReport(
                            bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
                            TOTAL_DOWNLOADS_REPORT_ID,
-                           List.of(
-                               getExpectedDsoViews(bitstreamVisited, 1)
-                           )
+                           expectedPoints
                        )
                    )));
+
+        // only admin has access to downloads report
+        getClient(loggedInToken).perform(
+                  get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+                 .andExpect(status().isForbidden());
+
+        getClient().perform(
+                  get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+                 .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(loggedInToken).perform(
+                get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                        TOTAL_DOWNLOADS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
+
+        getClient().perform(
+                get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                        TOTAL_DOWNLOADS_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     @Test
@@ -555,7 +789,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that item's TotalDownloads stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
                 TOTAL_DOWNLOADS_REPORT_ID))
                    // ** THEN **
@@ -576,7 +810,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // You don't visit an item's bitstreams
         // And request that item's TotalDownloads stat report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
                 TOTAL_DOWNLOADS_REPORT_ID))
                    // ** THEN **
@@ -592,7 +826,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void TotalDownloadsReport_NotSupportedDSO_Collection() throws Exception {
-        getClient()
+        getClient(adminToken)
             .perform(get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
             .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
@@ -615,8 +849,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
+        List<UsageReportPointRest> expectedPoints = List.of(
+            getExpectedCountryViews("US", "United States", 1)
+        );
+
         // And request that collection's TopCountries report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -624,11 +862,43 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                        UsageReportMatcher.matchUsageReport(
                            collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                            TOP_COUNTRIES_REPORT_ID,
-                           List.of(
-                               getExpectedCountryViews("US", "United States", 1)
-                           )
+                           expectedPoints
                        )
                    )));
+
+        // only admin has access to countries report
+        getClient(loggedInToken).perform(
+                  get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
+                 .andExpect(status().isForbidden());
+
+        getClient().perform(
+                  get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
+                 .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(loggedInToken).perform(
+                get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
+                        TOP_COUNTRIES_REPORT_ID,
+                        expectedPoints
+                        )
+                )));
+
+      getClient().perform(
+                get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        collectionVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
+                        TOP_COUNTRIES_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     /**
@@ -655,7 +925,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that collection's TopCountries report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + communityVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -678,7 +948,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // Item is not visited
         // And request that item's TopCountries report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOP_COUNTRIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -709,8 +979,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
+        List<UsageReportPointRest> expectedPoints = List.of(
+            getExpectedCityViews("New York", 1)
+        );
+
         // And request that item's TopCities report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -718,11 +992,43 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                        UsageReportMatcher.matchUsageReport(
                            itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                            TOP_CITIES_REPORT_ID,
-                           List.of(
-                               getExpectedCityViews("New York", 1)
-                           )
+                           expectedPoints
                        )
                    )));
+
+        // only admin has access to cities report
+        getClient(loggedInToken).perform(
+                  get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
+                 .andExpect(status().isForbidden());
+
+        getClient().perform(
+                  get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
+                 .andExpect(status().isUnauthorized());
+
+        // make statistics visible to all
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        getClient(loggedInToken).perform(
+                get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
+                        TOP_CITIES_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
+
+        getClient().perform(
+                get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                    UsageReportMatcher.matchUsageReport(
+                        itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
+                        TOP_CITIES_REPORT_ID,
+                        expectedPoints
+                    )
+                )));
     }
 
     /**
@@ -754,7 +1060,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         // And request that community's TopCities report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + communityVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -777,7 +1083,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // Collection is not visited
         // And request that collection's TopCountries report
-        getClient().perform(
+        getClient(adminToken).perform(
             get("/api/statistics/usagereports/" + collectionNotVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
@@ -792,7 +1098,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void usagereportsSearch_notProperURI_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/search/object?uri=BadUri"))
+        getClient(adminToken).perform(get("/api/statistics/usagereports/search/object?uri=BadUri"))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -804,7 +1110,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void usagereportsSearch_NonExistentUUID_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
+        getClient(adminToken).perform(
+                  get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                                 "/items/" + UUID.randomUUID()))
                    .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
@@ -865,7 +1172,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemNotVisitedWithBitstreams.getID()))
             // ** THEN **
-            .andExpect(status().isOk());
+            .andExpect(status().isForbidden());
         // We request a dso's TotalVisits usage stat report as another logged in eperson and has no read policy for
         // this user
         getClient(anotherLoggedInUserToken)
@@ -946,7 +1253,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isCreated());
 
         // And request the community usage reports
-        getClient()
+        getClient(adminToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/communities/" + communityVisited.getID()))
             // ** THEN **
@@ -987,7 +1294,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         // Collection is not visited
         // And request the collection's usage reports
-        getClient()
+        getClient(adminToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/collections/" + collectionNotVisited.getID()))
             // ** THEN **
@@ -1035,7 +1342,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isCreated());
 
         // And request the community usage reports
-        getClient()
+        getClient(adminToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemVisited.getID()))
             // ** THEN **
@@ -1122,7 +1429,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isCreated());
 
         // And request the community usage reports
-        getClient()
+        getClient(adminToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + itemVisited.getID()))
             // ** THEN **
@@ -1186,7 +1493,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         );
 
         // And request the community usage reports
-        getClient()
+        getClient(adminToken)
             .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
                          "/items/" + bitstreamVisited.getID()))
             // ** THEN **
@@ -1237,7 +1544,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             } else {
                 expectedPoint.addValue("views", viewsLastMonth);
             }
-            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"));
             expectedPoint.setId(month + " " + cal.get(Calendar.YEAR));
 
             expectedPoints.add(expectedPoint);

@@ -24,9 +24,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class ItemEventProcessor extends ExportEventProcessor {
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private Item item;
+    private final Item item;
 
     /**
      * Creates a new ItemEventProcessor that will set the params
@@ -48,6 +49,7 @@ public class ItemEventProcessor extends ExportEventProcessor {
      * @throws SQLException
      * @throws IOException
      */
+    @Override
     public void processEvent() throws SQLException, IOException {
         if (shouldProcessItem(item)) {
             String baseParam = getBaseParameters(item);

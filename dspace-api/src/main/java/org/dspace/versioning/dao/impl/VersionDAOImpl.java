@@ -61,7 +61,7 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
     }
 
     @Override
-    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
+    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory, int offset, int limit)
         throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
@@ -78,6 +78,16 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
         orderList.add(criteriaBuilder.desc(versionRoot.get(Version_.versionNumber)));
         criteriaQuery.orderBy(orderList);
 
-        return list(context, criteriaQuery, false, Version.class, -1, -1);
+        return list(context, criteriaQuery, false, Version.class, limit, offset);
     }
+
+    @Override
+    public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException {
+        Query query = createQuery(context, "SELECT count(*) FROM " + Version.class.getSimpleName()
+                + " WHERE versionhistory_id = (:versionhistoryId)"
+                + " AND  item_id IS NOT NULL");
+        query.setParameter("versionhistoryId", versionHistory);
+        return count(query);
+    }
+
 }

@@ -61,13 +61,14 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             indexer.unIndexContent(context, commandLine.getOptionValue("r"));
         } else if (indexClientOptions == IndexClientOptions.CLEAN) {
             handler.logInfo("Cleaning Index");
-            indexer.cleanIndex(false);
-        } else if (indexClientOptions == IndexClientOptions.FORCECLEAN) {
-            handler.logInfo("Cleaning Index");
-            indexer.cleanIndex(true);
+            indexer.cleanIndex();
+        } else if (indexClientOptions == IndexClientOptions.DELETE) {
+            handler.logInfo("Deleting Index");
+            indexer.deleteIndex();
         } else if (indexClientOptions == IndexClientOptions.BUILD ||
             indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
             handler.logInfo("(Re)building index from scratch.");
+            indexer.deleteIndex();
             indexer.createIndex(context);
             if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
@@ -125,16 +126,14 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else if (indexClientOptions == IndexClientOptions.UPDATE ||
             indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
-            handler.logInfo("Updating and Cleaning Index");
-            indexer.cleanIndex(false);
+            handler.logInfo("Updating Index");
             indexer.updateIndex(context, false);
             if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
             }
         } else if (indexClientOptions == IndexClientOptions.FORCEUPDATE ||
             indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
-            handler.logInfo("Updating and Cleaning Index");
-            indexer.cleanIndex(true);
+            handler.logInfo("Updating Index");
             indexer.updateIndex(context, true);
             if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);

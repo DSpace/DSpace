@@ -828,6 +828,158 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     };
 
     @Test
+    public void testBrowseByEntriesStartsWithAndDiacritics() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 4 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item1")
+                                .withAuthor("Álvarez, Nombre")
+                                .withIssueDate("1912-06-23")
+                                .withSubject("Teléfono")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item2")
+                                .withAuthor("Ögren, Name")
+                                .withIssueDate("1982-06-25")
+                                .withSubject("Televisor")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Item3")
+                                .withAuthor("Azuaga, Nombre")
+                                .withIssueDate("1990")
+                                .withSubject("Telecomunicaciones")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Item4")
+                                .withAuthor("Alonso, Nombre")
+                                .withAuthor("Ortiz, Nombre")
+                                .withIssueDate("1995-05-23")
+                                .withSubject("Guion")
+                                .build();
+
+
+        // ---- BROWSES BY ENTRIES ----
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with startsWith set to A
+        getClient().perform(get("/api/discover/browses/author/entries?startsWith=A")
+                                .param("size", "4"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect 3 elements
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Alonso, Nombre", "Álvarez, Nombre" and "Azuaga, Nombre"
+                   // and diacritics are ignored in sorting
+                   .andExpect(jsonPath("$._embedded.entries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Alonso, Nombre", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Álvarez, Nombre", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Azuaga, Nombre", 1)
+                                               )))
+
+                   //Verify startsWith parameter is included in the links
+                   .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=A")));
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with startsWith set to Ú (accented)
+        getClient().perform(get("/api/discover/browses/author/entries?startsWith=Ó"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect 2 elements
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Ögren, Name"" and "Ortiz, Nombre"
+                   .andExpect(jsonPath("$._embedded.entries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Ögren, Name", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Ortiz, Nombre", 1)
+                                               )))
+                   //Verify that the startsWith paramater is included in the links
+                   .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Ó")));
+
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Subject endpoint
+        //with startsWith set to Cana
+        getClient().perform(get("/api/discover/browses/subject/entries?startsWith=Tele"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect 3 elements
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Telecomunicaciones', "Teléfono" and "Televisor" and
+                   // it is sorted ignoring diacritics
+                   .andExpect(jsonPath("$._embedded.entries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Telecomunicaciones", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Teléfono", 1),
+                                                BrowseEntryResourceMatcher.matchBrowseEntry("Televisor", 1)
+                                               )))
+                   //Verify that the startsWith paramater is included in the links
+                   .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Tele")));
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Subject endpoint
+        //with startsWith set to Guión
+        getClient().perform(get("/api/discover/browses/subject/entries?startsWith=Guión"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the entry "Guion" to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Guion"
+                   .andExpect(jsonPath("$._embedded.entries",
+                                       contains(BrowseEntryResourceMatcher.matchBrowseEntry("Guion", 1)
+                                               )))
+                   //Verify that the startsWith paramater is included in the links
+                   .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=Guión")));
+
+    };
+
+    @Test
     public void testBrowseByItemsStartsWith() throws Exception {
         context.turnOffAuthorisationSystem();
 

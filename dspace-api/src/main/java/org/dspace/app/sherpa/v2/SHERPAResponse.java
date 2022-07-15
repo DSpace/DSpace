@@ -10,8 +10,8 @@ package org.dspace.app.sherpa.v2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -78,7 +78,7 @@ public class SHERPAResponse {
      * @param jsonData - the JSON input stream from the API result response body
      */
     private void parseJSON(InputStream jsonData) throws IOException {
-        InputStreamReader streamReader = new InputStreamReader(jsonData);
+        InputStreamReader streamReader = new InputStreamReader(jsonData, StandardCharsets.UTF_8);
         JSONTokener jsonTokener = new JSONTokener(streamReader);
         JSONObject httpResponse;
         try {
@@ -90,10 +90,10 @@ public class SHERPAResponse {
                 // - however, we only ever want one result since we're passing an "equals ISSN" query
                 if (items.length() > 0) {
                     metadata = new SHERPASystemMetadata();
-                    this.journals = new LinkedList<>();
+                    this.journals = new ArrayList<>();
                     // Iterate search result items
                     for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
-                        List<SHERPAPublisher> sherpaPublishers = new LinkedList<>();
+                        List<SHERPAPublisher> sherpaPublishers = new ArrayList<>();
                         List<SHERPAPublisherPolicy> policies = new ArrayList<>();
                         SHERPAPublisher sherpaPublisher = new SHERPAPublisher();
                         SHERPAJournal sherpaJournal = new SHERPAJournal();
@@ -289,7 +289,7 @@ public class SHERPAResponse {
 
         // Is the item in DOAJ?
         if (item.has("listed_in_doaj")) {
-            sherpaJournal.setInDOAJ(("yes".equals(item.getString("listed_in_doaj"))));
+            sherpaJournal.setInDOAJ("yes".equals(item.getString("listed_in_doaj")));
         }
 
         return sherpaJournal;
@@ -403,7 +403,6 @@ public class SHERPAResponse {
         // published = pdfversion
         // These strings can be used to construct i18n messages.
         String articleVersion = "unknown";
-        String versionLabel = "Unknown";
 
         // Each 'permitted OA' can actually refer to multiple versions
         if (permitted.has("article_version")) {

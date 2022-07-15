@@ -29,7 +29,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -277,7 +277,7 @@ public class SWORDAuthenticator {
                                           "Mediated deposit to this service is not permitted");
         }
 
-        log.info(LogManager.getHeader(context, "sword_authenticate",
+        log.info(LogHelper.getHeader(context, "sword_authenticate",
                                       "username=" + un + ",on_behalf_of=" + obo));
 
         try {
@@ -341,14 +341,14 @@ public class SWORDAuthenticator {
             if (!authenticated) {
                 // decide what kind of error to throw
                 if (ep != null) {
-                    log.info(LogManager.getHeader(context,
+                    log.info(LogHelper.getHeader(context,
                                                   "sword_unable_to_set_user", "username=" + un));
                     throw new SWORDAuthenticationException(
                         "Unable to authenticate the supplied used");
                 } else {
                     // FIXME: this shouldn't ever happen now, but may as well leave it in just in case
                     // there's a bug elsewhere
-                    log.info(LogManager.getHeader(context,
+                    log.info(LogHelper.getHeader(context,
                                                   "sword_unable_to_set_on_behalf_of",
                                                   "username=" + un + ",on_behalf_of=" + obo));
                     throw new SWORDAuthenticationException(

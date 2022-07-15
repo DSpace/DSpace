@@ -9,8 +9,19 @@ package org.dspace.app.rest.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.UUID;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Context;
+import org.dspace.disseminate.service.CitationDocumentService;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
 
 /**
@@ -21,16 +32,24 @@ import org.springframework.core.io.AbstractResource;
  */
 public class BitstreamResource extends AbstractResource {
 
-    private InputStream inputStream;
+    private Bitstream bitstream;
     private String name;
     private UUID uuid;
     private long sizeBytes;
+    private UUID currentUserUUID;
 
-    public BitstreamResource(InputStream inputStream, String name, UUID uuid, long sizeBytes) {
-        this.inputStream = inputStream;
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private CitationDocumentService citationDocumentService =
+        new DSpace().getServiceManager()
+            .getServicesByType(CitationDocumentService.class).get(0);
+
+    public BitstreamResource(Bitstream bitstream, String name, UUID uuid, long sizeBytes, UUID currentUserUUID) {
+        this.bitstream = bitstream;
         this.name = name;
         this.uuid = uuid;
         this.sizeBytes = sizeBytes;
+        this.currentUserUUID = currentUserUUID;
     }
 
     @Override
@@ -40,7 +59,28 @@ public class BitstreamResource extends AbstractResource {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return inputStream;
+        Context context = new Context();
+        try {
+            EPerson currentUser = ePersonService.find(context, currentUserUUID);
+            context.setCurrentUser(currentUser);
+            InputStream out;
+
+            if (citationDocumentService.isCitationEnabledForBitstream(bitstream, context)) {
+                out = citationDocumentService.makeCitedDocument(context, bitstream).getLeft();
+            } else {
+                out = bitstreamService.retrieve(context, bitstream);
+            }
+
+            return out;
+        } catch (SQLException | AuthorizeException e) {
+            throw new IOException(e);
+        } finally {
+            try {
+                context.complete();
+            } catch (SQLException e) {
+                throw new IOException(e);
+            }
+        }
     }
 
     @Override

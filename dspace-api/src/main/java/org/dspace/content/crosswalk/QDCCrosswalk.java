@@ -129,7 +129,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
-    protected static final ConfigurationService configurationService
+    protected final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private final CrosswalkMetadataValidator metadataValidator = new CrosswalkMetadataValidator();
@@ -141,9 +141,17 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static String aliases[] = null;
 
     static {
+        initStatic();
+    }
+
+    /**
+     * Call this method again in tests to repeat initialization if necessary.
+     */
+    public static void initStatic() {
         List<String> aliasList = new ArrayList<>();
         String propname = CONFIG_PREFIX + ".properties.";
-        List<String> configKeys = configurationService.getPropertyKeys(propname);
+        List<String> configKeys =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys(propname);
         for (String key : configKeys) {
             aliasList.add(key.substring(propname.length()));
         }

@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
@@ -26,6 +25,7 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
@@ -67,6 +67,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
     }
 
     @After
+    @Override
     public void destroy() throws Exception {
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
@@ -74,26 +75,20 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         List<EntityType> entityTypeList = entityTypeService.findAll(context);
         List<Relationship> relationships = relationshipService.findAll(context);
 
-        Iterator<Relationship> relationshipIterator = relationships.iterator();
-        while (relationshipIterator.hasNext()) {
-            Relationship relationship = relationshipIterator.next();
-            relationshipIterator.remove();
+        for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
 
-        Iterator<RelationshipType> relationshipTypeIterator = relationshipTypeList.iterator();
-        while (relationshipTypeIterator.hasNext()) {
-            RelationshipType relationshipType = relationshipTypeIterator.next();
-            relationshipTypeIterator.remove();
+        for (RelationshipType relationshipType : relationshipTypeList) {
             relationshipTypeService.delete(context, relationshipType);
         }
 
-        Iterator<EntityType> entityTypeIterator = entityTypeList.iterator();
-        while (entityTypeIterator.hasNext()) {
-            EntityType entityType = entityTypeIterator.next();
-            entityTypeIterator.remove();
-            entityTypeService.delete(context, entityType);
+        for (EntityType entityType: entityTypeList) {
+            if (!Constants.ENTITY_TYPE_NONE.equals(entityType.getLabel())) {
+                entityTypeService.delete(context, entityType);
+            }
         }
+        context.restoreAuthSystemState();
 
         super.destroy();
     }

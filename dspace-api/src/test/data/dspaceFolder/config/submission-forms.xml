@@ -286,6 +286,22 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="qualdroptest">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Identifiers</label>
+         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+         <hint>If the item has any identification numbers or codes associated with
+           it, please enter the types and the actual numbers or codes.</hint>
+         <required>please give an identifier</required>
+       </field>
+     </row>
+   </form>
+
    <form name="languagetest">
       <row>
         <field>

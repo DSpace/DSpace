@@ -78,6 +78,13 @@ public interface DSpaceRunnableHandler {
     public void logError(String message);
 
     /**
+     * This method will perform the error logging of the message given along with a stack trace
+     * @param message   The message to be logged as an error
+     * @param throwable The original exception
+     */
+    public void logError(String message, Throwable throwable);
+
+    /**
      * This method will print the help for the options and name
      * @param options   The options for the script
      * @param name      The name of the script

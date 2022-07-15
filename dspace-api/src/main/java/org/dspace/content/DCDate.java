@@ -34,12 +34,11 @@ import org.apache.logging.log4j.Logger;
  * There are four levels of granularity, depending on how much date information
  * is available: year, month, day, time.
  * <P>
- * Examples: <code>1994-05-03T15:30:24</code>,<code>1995-10-04</code>,
- * <code>2001-10</code>,<code>1975</code>
+ * Examples: {@code 1994-05-03T15:30:24}, {@code 1995-10-04},
+ * {@code 2001-10}, {@code 1975}
  *
  * @author Robert Tansley
  * @author Larry Stone
- * @version $Revision$
  */
 public class DCDate {
     /**
@@ -262,7 +261,7 @@ public class DCDate {
      * @return the year
      */
     public int getYear() {
-        return (!withinGranularity(DateGran.YEAR)) ? -1 : localCalendar.get(Calendar.YEAR);
+        return !withinGranularity(DateGran.YEAR) ? -1 : localCalendar.get(Calendar.YEAR);
     }
 
     /**
@@ -271,7 +270,7 @@ public class DCDate {
      * @return the month
      */
     public int getMonth() {
-        return (!withinGranularity(DateGran.MONTH)) ? -1 : localCalendar.get(Calendar.MONTH) + 1;
+        return !withinGranularity(DateGran.MONTH) ? -1 : localCalendar.get(Calendar.MONTH) + 1;
     }
 
     /**
@@ -280,7 +279,7 @@ public class DCDate {
      * @return the day
      */
     public int getDay() {
-        return (!withinGranularity(DateGran.DAY)) ? -1 : localCalendar.get(Calendar.DAY_OF_MONTH);
+        return !withinGranularity(DateGran.DAY) ? -1 : localCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
@@ -289,7 +288,7 @@ public class DCDate {
      * @return the hour
      */
     public int getHour() {
-        return (!withinGranularity(DateGran.TIME)) ? -1 : localCalendar.get(Calendar.HOUR_OF_DAY);
+        return !withinGranularity(DateGran.TIME) ? -1 : localCalendar.get(Calendar.HOUR_OF_DAY);
     }
 
     /**
@@ -298,7 +297,7 @@ public class DCDate {
      * @return the minute
      */
     public int getMinute() {
-        return (!withinGranularity(DateGran.TIME)) ? -1 : localCalendar.get(Calendar.MINUTE);
+        return !withinGranularity(DateGran.TIME) ? -1 : localCalendar.get(Calendar.MINUTE);
     }
 
     /**
@@ -307,7 +306,7 @@ public class DCDate {
      * @return the second
      */
     public int getSecond() {
-        return (!withinGranularity(DateGran.TIME)) ? -1 : localCalendar.get(Calendar.SECOND);
+        return !withinGranularity(DateGran.TIME) ? -1 : localCalendar.get(Calendar.SECOND);
     }
 
     /**
@@ -316,7 +315,7 @@ public class DCDate {
      * @return the year
      */
     public int getYearUTC() {
-        return (!withinGranularity(DateGran.YEAR)) ? -1 : calendar.get(Calendar.YEAR);
+        return !withinGranularity(DateGran.YEAR) ? -1 : calendar.get(Calendar.YEAR);
     }
 
     /**
@@ -325,7 +324,7 @@ public class DCDate {
      * @return the month
      */
     public int getMonthUTC() {
-        return (!withinGranularity(DateGran.MONTH)) ? -1 : calendar.get(Calendar.MONTH) + 1;
+        return !withinGranularity(DateGran.MONTH) ? -1 : calendar.get(Calendar.MONTH) + 1;
     }
 
     /**
@@ -334,7 +333,7 @@ public class DCDate {
      * @return the day
      */
     public int getDayUTC() {
-        return (!withinGranularity(DateGran.DAY)) ? -1 : calendar.get(Calendar.DAY_OF_MONTH);
+        return !withinGranularity(DateGran.DAY) ? -1 : calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
@@ -343,7 +342,7 @@ public class DCDate {
      * @return the hour
      */
     public int getHourUTC() {
-        return (!withinGranularity(DateGran.TIME)) ? -1 : calendar.get(Calendar.HOUR_OF_DAY);
+        return !withinGranularity(DateGran.TIME) ? -1 : calendar.get(Calendar.HOUR_OF_DAY);
     }
 
     /**
@@ -352,7 +351,7 @@ public class DCDate {
      * @return the minute
      */
     public int getMinuteUTC() {
-        return (!withinGranularity(DateGran.TIME)) ? -1 : calendar.get(Calendar.MINUTE);
+        return !withinGranularity(DateGran.TIME) ? -1 : calendar.get(Calendar.MINUTE);
     }
 
     /**
@@ -361,15 +360,15 @@ public class DCDate {
      * @return the second
      */
     public int getSecondUTC() {
-        return (!withinGranularity(DateGran.TIME)) ? -1 : calendar.get(Calendar.SECOND);
+        return !withinGranularity(DateGran.TIME) ? -1 : calendar.get(Calendar.SECOND);
     }
-
 
     /**
      * Get the date as a string to put back in the Dublin Core. Use the UTC/GMT calendar version.
      *
      * @return The date as a string.
      */
+    @Override
     public String toString() {
         if (calendar == null) {
             return "null";
