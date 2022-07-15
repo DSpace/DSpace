@@ -120,6 +120,13 @@ public class StructBuilderIT
             "        <provenance>Testing</provenance>\n" +
             "      </collection>\n" +
             "    </community>\n" +
+            "    <community>\n" +
+            "      <name>Sub Community 0.1</name>\n" +
+            "      <description>A sub community with no handle</description>\n" +
+            "      <intro>Stop me if you've heard this one</intro>\n" +
+            "      <copyright>2525</copyright>\n" +
+            "      <sidebar>One more sidebar</sidebar>\n" +
+            "    </community>\n" +
             "    <collection identifier='" + COLLECTION_0_1_HANDLE + "'>\n" +
             "      <name>Collection 0.1</name>\n" +
             "      <description>Another collection</description>\n" +
