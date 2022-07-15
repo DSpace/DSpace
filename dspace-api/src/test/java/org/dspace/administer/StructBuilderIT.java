@@ -32,7 +32,6 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.handle.Handle;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -90,28 +89,28 @@ public class StructBuilderIT
         context.restoreAuthSystemState();
     }
 
-    @After
-    public void tearDown() {
-    }
+    private static final String COMMUNITY_0_HANDLE = "https://hdl.handle.net/1/1";
+    private static final String COMMUNITY_0_0_HANDLE = "https://hdl.handle.net/1/1.1";
+    private static final String COLLECTION_0_0_0_HANDLE = "https://hdl.handle.net/1/1.1.1";
+    private static final String COLLECTION_0_1_HANDLE = "https://hdl.handle.net/1/1.2";
 
-    private static final String COMMUNITY_1_HANDLE = "https://hdl.handle.net/1/1";
     /** Test structure document. */
     private static final String IMPORT_DOCUMENT =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<import_structure>\n" +
-            "  <community identifier='" + COMMUNITY_1_HANDLE + "'>\n" +
+            "  <community identifier='" + COMMUNITY_0_HANDLE + "'>\n" +
             "    <name>Top Community 0</name>\n" +
             "    <description>A top level community</description>\n" +
             "    <intro>Testing 1 2 3</intro>\n" +
             "    <copyright>1969</copyright>\n" +
             "    <sidebar>A sidebar</sidebar>\n" +
-            "    <community identifier='https://hdl.handle.net/1/1.1'>\n" +
+            "    <community identifier='" + COMMUNITY_0_0_HANDLE + "'>\n" +
             "      <name>Sub Community 0.0</name>\n" +
             "      <description>A sub community</description>\n" +
             "      <intro>Live from New York....</intro>\n" +
             "      <copyright>1957</copyright>\n" +
             "      <sidebar>Another sidebar</sidebar>\n" +
-            "      <collection identifier='https://hdl.handle.net/1/1.1.1'>\n" +
+            "      <collection identifier='" + COLLECTION_0_0_0_HANDLE + "'>\n" +
             "        <name>Collection 0.0.0</name>\n" +
             "        <description>A collection</description>\n" +
             "        <intro>Our next guest needs no introduction</intro>\n" +
@@ -121,7 +120,7 @@ public class StructBuilderIT
             "        <provenance>Testing</provenance>\n" +
             "      </collection>\n" +
             "    </community>\n" +
-            "    <collection identifier='https://hdl.handle.net/1/1.2'>\n" +
+            "    <collection identifier='" + COLLECTION_0_1_HANDLE + "'>\n" +
             "      <name>Collection 0.1</name>\n" +
             "      <description>Another collection</description>\n" +
             "      <intro>Fourscore and seven years ago</intro>\n" +
@@ -152,7 +151,7 @@ public class StructBuilderIT
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testImportStructure()
+    public void testImportStructureWithoutHandles()
             throws Exception {
         System.out.println("importStructure");
 
@@ -216,20 +215,31 @@ public class StructBuilderIT
             context.restoreAuthSystemState();
         }
 
-        // Check a chosen object for the right Handle.
-        boolean found = false;
+        boolean found;
+
+        // Check a chosen Community for the right Handle.
+        found = false;
         for (Community community : communityService.findAllTop(context)) {
             for (Handle handle : community.getHandles()) {
-                if (handle.getHandle().equals(COMMUNITY_1_HANDLE)) {
+                if (handle.getHandle().equals(COMMUNITY_0_HANDLE)) {
                     found = true;
-                    break;
-                }
-                if (found) {
                     break;
                 }
             }
         }
         assertTrue("A community should have its specified handle", found);
+
+        // Check a chosen Collection for the right Handle.
+        found = false;
+        for (Collection collection : collectionService.findAll(context)) {
+            for (Handle handle : collection.getHandles()) {
+                if (handle.getHandle().equals(COLLECTION_0_1_HANDLE)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        assertTrue("A collection should have its specified handle", found);
 
         // Compare import's output with its input.
         // N.B. here we rely on StructBuilder to emit communities and
