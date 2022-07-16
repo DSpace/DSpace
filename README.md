@@ -64,7 +64,8 @@ install, upgrade, customize or host DSpace, then we recommend getting in touch w
 
 ## Issue Tracker
 
-The DSpace Issue Tracker can be found at: https://jira.duraspace.org/projects/DS/summary
+DSpace uses Github to track issues: 
+https://github.com/DSpace/DSpace/issues
 
 ## License
 
