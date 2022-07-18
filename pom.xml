@@ -12,8 +12,8 @@
     <url>https://github.com/dspace/DSpace</url>
 
     <organization>
-        <name>DuraSpace</name>
-        <url>http://www.dspace.org</url>
+        <name>LYRASIS</name>
+        <url>http://dspace.org</url>
     </organization>
 
     <prerequisites>
@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         
-        <!--  See https://jira.duraspace.org/browse/DS-3903 for a discussion of the version of jackson that is needed -->
+        <!--  See https://github.com/DSpace/DSpace/issues/7250 for a discussion of the version of jackson that is needed -->
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.22.1</jersey.version>
         <java.version>1.7</java.version>
@@ -458,9 +458,9 @@
                                         <licenseMerge>Apache Software License, Version 2.0|http://ant-contrib.sourceforge.net/tasks/LICENSE.txt</licenseMerge>
                                         <!-- XML Commons claims these licenses, but it's really Apache License: https://xerces.apache.org/xml-commons/licenses.html -->
                                         <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
-                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license</licenseMerge>
-                                        <!-- DuraSpace uses a BSD License for DSpace -->
-                                        <licenseMerge>BSD License|DuraSpace BSD License|DuraSpace Sourcecode License</licenseMerge>
+                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|BSD-2-Clause|BSD 3-clause New License</licenseMerge>
+                                        <!-- DSpace uses a BSD License -->
+                                        <licenseMerge>BSD License|DSpace BSD License|DuraSpace BSD License|DuraSpace Sourcecode License</licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
                                         <licenseMerge>BSD License|BSD style modified by Coverity</licenseMerge>
                                         <!-- Jaxen claims this license, but it's really BSD: http://jaxen.codehaus.org/license.html -->
@@ -474,6 +474,10 @@
                                         <licenseMerge>Common Development and Distribution License (CDDL)|GPLv2+CE</licenseMerge>
                                         <!-- JAXB claims this license, but it is dual licensed with CDDL being one: https://jaxb.java.net/ -->
                                         <licenseMerge>Common Development and Distribution License (CDDL)|GPL2 w/ CPE</licenseMerge>
+                                        <!-- JavaBeans Activation Framework claims this license, but it is dual licensed with CDDL -->
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|CDDL/GPLv2+CE</licenseMerge>
+                                        <!-- Extended StAX API claims this license, but it is dual licensed with CDDL -->
+                                        <licenseMerge>Common Development and Distribution License (CDDL)|Dual license consisting of the CDDL v1.1 and GPL v2</licenseMerge>
                                         <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license</licenseMerge>
                                         <!-- JUnit claims this license but is actually Eclipse Public License: http://junit.org/license.html -->
                                         <licenseMerge>Eclipse Public License|Common Public License Version 1.0</licenseMerge>
@@ -481,7 +485,7 @@
                                         <licenseMerge>MIT License|The MIT License|MIT LICENSE</licenseMerge>
                                         <!-- BouncyCastle uses a modified MIT License: http://www.bouncycastle.org/license.html -->
                                         <licenseMerge>MIT License|Bouncy Castle Licence</licenseMerge>
-                                        <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1</licenseMerge>
+                                        <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version 2.0</licenseMerge>
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
                                         <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0</licenseMerge>
                                         <!-- "concurrent.concurrent" claims this license, but is actually Public Domain: http://mvnrepository.com/artifact/concurrent/concurrent/ -->
@@ -774,7 +778,7 @@
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
          This profile contains settings which are ONLY enabled when performing
-         a DSpace release. See alse https://wiki.duraspace.org/display/DSPACE/Release+Procedure
+         a DSpace release. See also https://wiki.lyrasis.org/display/DSPACE/Release+Procedure
         -->
         <profile>
             <id>release</id>
@@ -1476,8 +1480,8 @@
 
     <licenses>
         <license>
-            <name>DuraSpace BSD License</name>
-            <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
+            <name>DSpace BSD License</name>
+            <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
                A BSD 3-Clause license for the DSpace codebase.
@@ -1486,8 +1490,8 @@
     </licenses>
 
     <issueManagement>
-        <system>JIRA</system>
-        <url>https://jira.duraspace.org/browse/DS</url>
+        <system>GitHub</system>
+        <url>https://github.com/DSpace/DSpace/issues</url>
     </issueManagement>
 
     <mailingLists>
@@ -1548,7 +1552,7 @@
         <developer>
            <name>DSpace Committers</name>
            <email>dspace-devel@googlegroups.com</email>
-           <url>https://wiki.duraspace.org/display/DSPACE/DSpace+Committers</url>
+           <url>https://wiki.lyrasis.org/display/DSPACE/DSpace+Committers</url>
            <roles>
              <role>committer</role>
            </roles>
@@ -1559,7 +1563,7 @@
         <contributor>
            <name>DSpace Contributors</name>
            <email>dspace-tech@googlegroups.com</email>
-           <url>https://wiki.duraspace.org/display/DSPACE/DSpaceContributors</url>
+           <url>https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors</url>
            <roles>
              <role>developer</role>
            </roles>
