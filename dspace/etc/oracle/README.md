@@ -6,7 +6,7 @@ Therefore, all `database_schema*.sql` files have been removed. Starting
 with DSpace 4.x -> 5.0 upgrade, you will no longer need to manually run any
 SQL scripts to upgrade your database.
 
-Please see the [5.0 Upgrade Instructions](https://wiki.duraspace.org/display/DSDOC5x/Upgrading+DSpace)
+Please see the [5.0 Upgrade Instructions](https://wiki.lyrasis.org/display/DSDOC5x/Upgrading+DSpace)
 for more information on upgrading to DSpace 5.
 
 
@@ -25,7 +25,7 @@ manually. For more information, please see the `README.md` in the scripts direct
 The `update-sequences.sql` script in this directory may still be used to update
 your internal database counts if you feel they have gotten out of "sync". This
 may sometimes occur after large restores of content (e.g. when using the DSpace
-[AIP Backup and Restore](https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore) 
+[AIP Backup and Restore](https://wiki.lyrasis.org/display/DSDOC5x/AIP+Backup+and+Restore)
 feature).
 
 This `update-sequences.sql` script can be run manually. It will not harm your 
