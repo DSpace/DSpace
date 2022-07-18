@@ -9,6 +9,7 @@ on:
       - dtq-dev
       - dtq-dev-present
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
