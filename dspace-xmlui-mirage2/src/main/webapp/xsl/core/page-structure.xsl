@@ -705,7 +705,7 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            <a href="http://www.dspace.org/" target="_blank" rel="noopener">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank" rel="noopener">DuraSpace</a>
+                            <a href="http://www.dspace.org/" target="_blank" rel="noopener">DSpace software</a> copyright&#160;&#169;&#160;2002-2022&#160; <a href="http://lyrasis.org/" target="_blank" rel="noopener">LYRASIS</a>
                         </div>
                         <div class="hidden-print">
                             <a>

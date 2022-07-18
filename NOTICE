@@ -1,3 +1,13 @@
+Licenses of Third-Party Libraries
+=================================
+
+DSpace uses third-party libraries which may be distributed under
+different licenses than specified in our LICENSE file. Information
+about these licenses is detailed in the LICENSES_THIRD_PARTY file at
+the root of the source tree. You must agree to the terms of these
+licenses, in addition to the DSpace source code license, in order to
+use this software.
+
 Licensing Notices
 =================
 
