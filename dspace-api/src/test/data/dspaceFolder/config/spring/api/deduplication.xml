@@ -30,8 +30,6 @@
 
 	<!-- Deduplication plugin to handle fuzzy search matches. Max distance is the maximum Levenshtein edit distance
 	when comparing metadata values. Whitespace is also stripped at index and query time. -->
-	<!-- Disabled by default, uncomment the block below to enable -->
-	<!--
 	<bean class="org.dspace.app.deduplication.utils.FuzzyMetadataValueSignature" name="FuzzyTitlePlugin">
 		<property name="normalizationRegexp" value="[^\p{L}]" />
 		<property name="signatureType" value="title" />
@@ -39,7 +37,6 @@
 		<property name="resourceTypeID" value="2" />
 		<property name="maxDistance" value="1" />
 	</bean>
-	-->
 
  	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="ArXivSignature">
  		<property name="signatureType" value="identifier" />

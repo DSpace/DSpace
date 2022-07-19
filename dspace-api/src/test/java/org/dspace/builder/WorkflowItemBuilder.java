@@ -215,6 +215,15 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     /**
+     * Add a DOI identifier URI
+     * @param doi   the full DOI URI
+     * @return      this builder
+     */
+    public WorkflowItemBuilder withDoiIdentifier(final String doi) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "doi", doi);
+    }
+
+    /**
      * Grant the owning Collection's license to the Item.
      *
      * @return this builder.
