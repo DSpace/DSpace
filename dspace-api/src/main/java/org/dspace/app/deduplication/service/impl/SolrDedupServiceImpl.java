@@ -316,7 +316,7 @@ public class SolrDedupServiceImpl implements DedupService {
         for (Signature algo : signAlgo) {
             if (dso.getType() == algo.getResourceTypeID()) {
                 String key = algo.getSignatureType() + "_signature";
-                List<String> signatures = algo.getSignature(dso, ctx);
+                List<String> signatures = algo.getSignature(ctx, dso);
                 // This is the list of signatures that could be used for various functions, including indexing
                 // the fake / match / dedup Solr documents
                 for (String signature : signatures) {
@@ -324,7 +324,7 @@ public class SolrDedupServiceImpl implements DedupService {
                 }
                 // This is the list of search values derived from signatures in case we need special Solr or Lucene
                 // operators to use in filter queries, eg ~ fuzzy search, ^ boosts, wildcards, etc.
-                for (String searchFilterValue : algo.getSearchSignature(dso, ctx)) {
+                for (String searchFilterValue : algo.getSearchSignature(ctx, dso)) {
                     populateMapFilter(key, searchFilterValue, signatureSearchValueMap);
                 }
             }
@@ -492,37 +492,42 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     /**
-     * Build and index a Solr document based on the given parameters.
-     * TODO WIP
-     * @param ctx
-     * @param firstId
-     * @param secondId
-     * @param flag
-     * @param signatures
-     * @param searchSignature
-     * @param note
+     * Build and index a Solr document to the deduplication index based on the given parameters.
+     *
+     * @param ctx               DSpace context
+     * @param firstId           First item ID
+     * @param secondId          Second item ID
+     * @param flag              Deduplication flag (decision + type, eg. verify_ws or reject_admin)
+     * @param signatures        Map of signatures -> values
+     * @param pluginService     Access to Solr index plugins
+     * @param note              Text note to store with a decision
      */
     public void build(Context ctx, UUID firstId, UUID secondId, DeduplicationFlag flag,
-                      Map<String, List<String>> signatures, DeduplicationPluginService searchSignature, String note) {
+                      Map<String, List<String>> signatures, DeduplicationPluginService pluginService, String note) {
+
         SolrInputDocument doc = new SolrInputDocument();
 
-        // build upgraded document
+        // Add date
         doc.addField(LAST_INDEXED_FIELD, new Date());
 
+        // Sort and add item IDs, generate dedup ID
         UUID[] sortedIds = new UUID[] { firstId, secondId };
         Arrays.sort(sortedIds);
-
         String dedupID = sortedIds[0] + "-" + sortedIds[1];
-
         doc.addField(UNIQUE_ID_FIELD, dedupID + "-" + flag.getDescription());
         doc.addField(RESOURCE_ID_FIELD, dedupID);
         doc.addField(RESOURCE_IDS_FIELD, sortedIds[0].toString());
         if (!firstId.equals(secondId)) {
             doc.addField(RESOURCE_IDS_FIELD, sortedIds[1].toString());
         }
+
+        // Add resource type
         doc.addField(RESOURCE_RESOURCETYPE_FIELD, Constants.ITEM);
+
+        // Add decision flag description
         doc.addField(RESOURCE_FLAG_FIELD, flag.getDescription());
 
+        // Add signatures
         if (signatures != null) {
             for (String key : signatures.keySet()) {
                 for (String ss : signatures.get(key)) {
@@ -532,18 +537,20 @@ public class SolrDedupServiceImpl implements DedupService {
             }
         }
 
+        // Add note
         if (StringUtils.isNotBlank(note)) {
             doc.addField(RESOURCE_NOTE_FIELD, note);
         }
 
-        if (searchSignature != null) {
-            for (SolrDedupServiceIndexPlugin solrServiceIndexPlugin : searchSignature.getSolrIndexPlugin()) {
+        // Each plugin will add additional fields like parent location, configured metadata, etc.
+        if (pluginService != null) {
+            for (SolrDedupServiceIndexPlugin solrServiceIndexPlugin : pluginService.getSolrIndexPlugin()) {
                 solrServiceIndexPlugin.additionalIndex(ctx, sortedIds[0], sortedIds[1], doc);
             }
 
         }
 
-        // write the document to the index
+        // Write the document to the index
         try {
             writeDocument(doc);
             log.info("Wrote " + flag.description + " duplicate: " + dedupID + " to Index");
@@ -556,6 +563,11 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Write document to the deduplication Solr index
+     * @param doc   Solr document
+     * @throws IOException
+     */
     protected void writeDocument(SolrInputDocument doc) throws IOException {
 
         try {
@@ -568,6 +580,11 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Remove all documents from index for the given item + type
+     * @param context   DSpace context
+     * @param item      DSpace item
+     */
     @Override
     public void unIndexContent(Context context, Item item) {
         try {
@@ -578,6 +595,13 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Search deduplication solr core for the given constructed Solr query
+     *
+     * @param solrQuery Solr query object
+     * @return  Solr query response
+     * @throws SearchServiceException
+     */
     @Override
     public QueryResponse search(SolrQuery solrQuery) throws SearchServiceException {
         try {
@@ -587,6 +611,14 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Find decision Solr records for the given item IDs and decision type
+     * @param firstItemID   First DSpace item ID
+     * @param secondItemID  Second DSpace item ID
+     * @param type      Decision type
+     * @return
+     * @throws SearchServiceException
+     */
     @Override
     public QueryResponse findDecisions(UUID firstItemID, UUID secondItemID, DuplicateDecisionType type)
             throws SearchServiceException {
@@ -618,6 +650,13 @@ public class SolrDedupServiceImpl implements DedupService {
         return response;
     }
 
+    /**
+     * Find all deduplication records for the given query and filters
+     * @param query     Solr query string
+     * @param filters   One or more filter strings
+     * @return          Solr query response
+     * @throws SearchServiceException
+     */
     @Override
     public QueryResponse find(String query, String... filters) throws SearchServiceException {
         try {
@@ -640,6 +679,13 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Clean the entire Solr deduplication index
+     * @param force
+     * @throws IOException
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
     @Override
     public void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException {
         if (force) {
@@ -692,6 +738,13 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Index a Solr deduplication record for the given item
+     * @param context   DSpace context
+     * @param ids       List of DSpace item IDs to index
+     * @param force     Force index?
+     * @throws SearchServiceException
+     */
     @Override
     public void indexContent(Context context, List<UUID> ids, boolean force) {
         try {
@@ -701,6 +754,11 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Update (commit) the deduplication Solr index
+     * @param context   DSpace context
+     * @param force
+     */
     @Override
     public void updateIndex(Context context, boolean force) {
         try {
@@ -713,6 +771,9 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Optimize the deduplication Solr index
+     */
     @Override
     public void optimize() {
         try {
@@ -732,6 +793,11 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Remove the Solr deduplication record for the given item by handle or UUID
+     * @param context       DSpace context
+     * @param handleOrUuid  Handle or UUID of the item
+     */
     @Override
     public void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException {
         Item item = null;
@@ -744,6 +810,13 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Manage the multi-thread indexing process
+     * @param context
+     * @param onlyFake
+     * @param ids
+     * @throws SQLException
+     */
     private void startMultiThreadIndex(Context context, boolean onlyFake, List<UUID> ids) throws SQLException {
         int numThreads = configurationService.getIntProperty("deduplication.indexer.items.threads", 5);
 
@@ -770,6 +843,9 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Subclass to implement multi-thread indexing
+     */
     class IndexerThread extends Thread {
         private boolean onlyFake;
 
@@ -794,7 +870,7 @@ public class SolrDedupServiceImpl implements DedupService {
                         Item item = ContentServiceFactory.getInstance().getItemService().find(context, id);
                         Map<String, List<String>> tmpMapFilter = new HashMap<String, List<String>>();
                         List<String> tmpFilter = new ArrayList<String>();
-                        fillSignature(context, (DSpaceObject) item, tmpMapFilter, tmpFilter);
+                        fillSignature(context, item, tmpMapFilter, tmpFilter);
                         if (!tmpFilter.isEmpty()) {
                             // retrieve all search plugin to build search document in the same index
                             DeduplicationPluginService searchSignature = dspace.getServiceManager().getServiceByName(
@@ -823,11 +899,17 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    private void buildFromDedupReject(Context ctx, DSpaceObject iu) {
+    /**
+     * Build a decision document specifically for "rejection as duplicate"
+     *
+     * @param ctx   DSpace context
+     * @param dso   Item
+     */
+    private void buildFromDedupReject(Context ctx, DSpaceObject dso) {
 
         try {
-            List<Deduplication> tri = deduplicationService.getDeduplicationByFirstAndSecond(ctx, iu.getID(),
-                    iu.getID());
+            List<Deduplication> tri = deduplicationService.getDeduplicationByFirstAndSecond(ctx, dso.getID(),
+                    dso.getID());
 
             for (Deduplication row : tri) {
 
@@ -857,11 +939,24 @@ public class SolrDedupServiceImpl implements DedupService {
 
     }
 
+    /**
+     * Build and index a document representing a Solr document for the given item IDs, deduplication flag and note
+     *
+     * @param context   DSpace context
+     * @param firstItemID   First DSpace item ID
+     * @param secondItemID  Second DSpace item ID
+     * @param flag      Deduplication flag indicating decision type and value (eg verify_ws)
+     * @param note      Decision note
+     */
     @Override
-    public void buildDecision(Context context, UUID firstId, UUID secondId, DeduplicationFlag flag, String note) {
-        build(context, firstId, secondId, flag, null, null, note);
+    public void buildDecision(Context context, UUID firstItemID, UUID secondItemID, DeduplicationFlag flag,
+                              String note) {
+        build(context, firstItemID, secondItemID, flag, null, null, note);
     }
 
+    /**
+     * Commit Solr index
+     */
     @Override
     public void commit() {
         if (getSolr() != null) {
@@ -873,6 +968,11 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Remove the Solr deduplication record for the given item by UUID
+     * @param context   DSpace context
+     * @param id        UUID of the item
+     */
     @Override
     public void unIndexContent(Context context, UUID id) throws IllegalStateException, SQLException {
         try {
@@ -884,6 +984,10 @@ public class SolrDedupServiceImpl implements DedupService {
 
     }
 
+    /**
+     * Spring item service setter
+     * @param itemService
+     */
     public void setItemService(ItemService itemService) {
         this.itemService = itemService;
     }

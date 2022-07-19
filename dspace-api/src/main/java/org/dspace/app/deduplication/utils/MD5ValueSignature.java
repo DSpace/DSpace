@@ -32,41 +32,67 @@ import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
+/**
+ * MD5 hash of configured metadata to allow easy exact matching on a single Solr term
+ * This signature is boosted in Solr query results as it is an exact match.
+ *
+ * See deduplication.xml in Spring API configuration for definition and configuration of signatures.
+ *
+ * @author 4Science
+ */
 public class MD5ValueSignature implements Signature {
     public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
         'f' };
 
-    /** log4j logger */
+    // Logger
     protected static Logger log = LogManager.getLogger(MD5ValueSignature.class);
 
+    // Configured metadata
     private String metadata;
 
+    // Type of resource (eg. item = 2)
     private int resourceTypeID;
 
+    // Type of signature (eg. title, identifier)
     private String signatureType;
 
-    protected List<String> ignorePrefix = new ArrayList<String>();
+    // List of prefixes to ignore / strip when searching and building Solr documents
+    protected List<String> ignorePrefix = new ArrayList<>();
 
+    // Prefix to use in result value
     protected String prefix;
 
+    // Regular expression to normalise metadata values before hashing
     private String normalizationRegexp;
 
+    // Is this signature case sensitive?
     private boolean caseSensitive;
 
+    // Include collection name in the signature hash?
     private boolean useCollection;
 
+    // Include entity type in the signature hash?
     private boolean useEntityType = true;
 
+    // Item service
     private ItemService itemService;
 
+    // Workflow item service
     protected WorkflowItemService<?> workflowItemService = WorkflowServiceFactory.getInstance()
                                                                                  .getWorkflowItemService();
-
+    // Workspace item service
     protected WorkspaceItemService  wsItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
-    public List<String> getSearchSignature(DSpaceObject item, Context context) {
+    /**
+     * Get and modify signature value for use in a Solr search query
+     *
+     * @param context   DSpace context
+     * @param item      DSpace item
+     * @return          List of query / filter values
+     */
+    public List<String> getSearchSignature(Context context, DSpaceObject item) {
         List<String> result = new ArrayList<>();
-        for (String signature: getSignature(item, context)) {
+        for (String signature: getSignature(context, item)) {
             if (StringUtils.isNotEmpty(signature)) {
                 // Boost MD5 signature matches above others
                 String searchFilterValue = signature + "^5";
@@ -78,15 +104,22 @@ public class MD5ValueSignature implements Signature {
         return result;
     }
 
-    public List<String> getSignature(DSpaceObject item, Context context) {
-        List<String> result = new ArrayList<String>();
+    /**
+     * Construct signature: collection metadata, normalise and add each value to the result MD5 hash
+     *
+     * @param context   DSpace context
+     * @param item      DSpace item
+     * @return          List of signature values
+     */
+    public List<String> getSignature(Context context, DSpaceObject item) {
+        List<String> result = new ArrayList<>();
         try {
             MessageDigest digester = MessageDigest.getInstance("MD5");
             List<String> values = getMultiValue(item, metadata);
             if (values != null) {
                 for (String value : values) {
                     if (StringUtils.isNotEmpty(value)) {
-                        String valueNorm = normalize(item, context, value);
+                        String valueNorm = normalize(context, item, value);
                         digester.update(valueNorm.getBytes("UTF-8"));
                         byte[] signature = digester.digest();
                         char[] arr = new char[signature.length << 1];
@@ -102,14 +135,20 @@ public class MD5ValueSignature implements Signature {
                 }
             }
             return result;
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    protected String normalize(DSpaceObject item, Context context, String value) {
+    /**
+     * Normalise a string based on configured rules
+     *
+     * @param context   DSpace context
+     * @param item      DSpace item
+     * @param value     Text to normalise
+     * @return          Normalised string
+     */
+    protected String normalize(Context context, DSpaceObject item, String value) {
         if (value != null) {
             String temp = StringUtils.EMPTY;
             String entityType = StringUtils.EMPTY;
@@ -166,29 +205,13 @@ public class MD5ValueSignature implements Signature {
         }
     }
 
-    protected String normalize(DSpaceObject item, String value) {
-        String result = value;
-        if (StringUtils.isEmpty(value)) {
-            if (StringUtils.isNotEmpty(prefix)) {
-                result = prefix + item.getID();
-            } else {
-                result = "entity:" + item.getID();
-            }
-        } else {
-            for (String prefix : ignorePrefix) {
-                if (value.startsWith(prefix)) {
-                    result = value.substring(prefix.length());
-                    break;
-                }
-            }
-            if (StringUtils.isNotEmpty(prefix)) {
-                result = prefix + result;
-            }
-        }
-
-        return result;
-    }
-
+    /**
+     * Get parent container (collection, community) of a Dspace Object for adding to the MD5 signature
+     *
+     * @param context   DSpace context
+     * @param obj       DSpace object
+     * @return          Parent DSpace object
+     */
     private DSpaceObject getParent(Context context, DSpaceObject obj) {
         Item item = (Item) obj;
         try {
@@ -209,10 +232,13 @@ public class MD5ValueSignature implements Signature {
         return null;
     }
 
-    protected String getSingleValue(DSpaceObject item, String metadata) {
-        return ContentServiceFactory.getInstance().getDSpaceObjectService(item).getMetadata(item, metadata);
-    }
-
+    /**
+     * Get metadata values for a DSpace item
+     *
+     * @param item      DSpace item
+     * @param metadata  Metadata field name
+     * @return          List of metadata string values
+     */
     protected List<String> getMultiValue(DSpaceObject item, String metadata) {
         List<MetadataValue> values = ContentServiceFactory.getInstance().getDSpaceObjectService(item)
                 .getMetadataByMetadataString(item, metadata);
@@ -223,6 +249,10 @@ public class MD5ValueSignature implements Signature {
         }
         return retValue;
     }
+
+    //
+    // Spring getters and setters, no detailed javadoc required
+    //
 
     public String getMetadata() {
         return metadata;

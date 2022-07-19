@@ -14,6 +14,11 @@ import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.model.DuplicateDecisionValue;
 import org.dspace.content.DSpaceObject;
 
+/**
+ * Information about an item and decision appearing in a duplicate list
+ *
+ * @author 4Science
+ */
 public class DuplicateItemInfo {
 
     private int dedupID = -1;

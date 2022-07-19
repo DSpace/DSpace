@@ -18,7 +18,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -62,13 +61,13 @@ public class FuzzyMetadataValueSignature implements Signature {
     /**
      * This list of signatures is specifically intended for search filter values, NOT for inclusion
      * in the _signature field when indexing the document
-     * @param item
      * @param context
+     * @param item
      * @return
      */
-    public List<String> getSearchSignature(DSpaceObject item, Context context) {
+    public List<String> getSearchSignature(Context context, DSpaceObject item) {
         List<String> result = new ArrayList<>();
-        for (String signature: getSignature(item, context)) {
+        for (String signature: getSignature(context, item)) {
             if (StringUtils.isNotEmpty(signature)) {
                 String searchFilterValue = signature + "~" + maxDistance;
                 if (!result.contains(searchFilterValue)) {
@@ -81,11 +80,11 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     /**
      * List of signatures intended for display, report, building and indexing Solr documents, etc.
-     * @param item
      * @param context
+     * @param item
      * @return
      */
-    public List<String> getSignature(DSpaceObject item, Context context) {
+    public List<String> getSignature(Context context, DSpaceObject item) {
         List<String> result = new ArrayList<>();
         List<String> values = getMultiValue(item, metadata);
         if (values != null) {

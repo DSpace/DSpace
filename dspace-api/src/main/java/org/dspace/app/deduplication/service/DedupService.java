@@ -69,6 +69,7 @@ public interface DedupService {
      * @throws SearchServiceException
      */
     void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException;
+
     /**
      * Index a Solr deduplication record for the given item
      * @param context   DSpace context
@@ -117,11 +118,11 @@ public interface DedupService {
      *
      * @param context   DSpace context
      * @param firstItemID   First DSpace item ID
-     * @param secondId  Second DSpace item ID
+     * @param secondItemID  Second DSpace item ID
      * @param flag      Deduplication flag indicating decision type and value (eg verify_ws)
      * @param note      Decision note
      */
-    void buildDecision(Context context, UUID firstItemID, UUID secondId, DeduplicationFlag flag, String note);
+    void buildDecision(Context context, UUID firstItemID, UUID secondItemID, DeduplicationFlag flag, String note);
 
     /**
      * Commit changes to the Solr deduplication index

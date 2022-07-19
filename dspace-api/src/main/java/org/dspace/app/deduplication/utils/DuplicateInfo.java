@@ -12,6 +12,11 @@ import java.util.List;
 
 import org.dspace.content.Item;
 
+/**
+ * Information about items matching a duplicate check
+ *
+ * @author 4Science
+ */
 public abstract class DuplicateInfo {
     private String signatureId;
     private List<Item> items;
@@ -23,7 +28,7 @@ public abstract class DuplicateInfo {
 
     public List<Item> getItems() {
         if (items == null) {
-            items = new ArrayList<Item>();
+            items = new ArrayList<>();
         }
         return items;
     }

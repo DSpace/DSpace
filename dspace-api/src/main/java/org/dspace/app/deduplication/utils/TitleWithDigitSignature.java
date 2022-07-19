@@ -13,11 +13,27 @@ import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.ibm.icu.text.Normalizer;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
+/**
+ *
+ * Signature extending MD5ValueSignature to match on title string. (actually, works on any string)
+ * All non-alphanumeric characters are stripped from the signature value
+ *
+ * @author 4Science
+ */
 public class TitleWithDigitSignature extends MD5ValueSignature {
 
+    /**
+     * Normalise the text value. Strip all non-alphanumeric characters.
+     *
+     * @param context   DSpace context
+     * @param item      DSpace item
+     * @param value     Text to normalise
+     * @return
+     */
     @Override
-    protected String normalize(DSpaceObject item, String value) {
+    protected String normalize(Context context, DSpaceObject item, String value) {
         if (value != null) {
 
             String norm = Normalizer.normalize(value, Normalizer.NFD);

@@ -15,11 +15,25 @@ import com.ibm.icu.text.Normalizer;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Context;
 
+/**
+ * Signature extending MD5ValueSignature to match on title and issue date year.
+ * (actually works on any string passed to the normalize method, not just title, but always adds year)
+ * All non-alphanumeric characters are stripped from the signature value
+ *
+ * @author 4Science
+ */
 public class TitleWithDigitAndYearSignature extends MD5ValueSignature {
 
+    /**
+     * Normalise the value - strip non-alphanum characters, lowercase
+     * @param item
+     * @param value
+     * @return
+     */
     @Override
-    protected String normalize(DSpaceObject item, String value) {
+    protected String normalize(Context context, DSpaceObject item, String value) {
         if (value != null) {
             String temp = null;
             if (item != null) {
@@ -44,6 +58,11 @@ public class TitleWithDigitAndYearSignature extends MD5ValueSignature {
 
     }
 
+    /**
+     * Get the year
+     * @param item      Dspace item
+     * @return          Issue date year as string
+     */
     private String getYear(DSpaceObject item) {
         String year = null;
         String dcvalue = ContentServiceFactory.getInstance().getDSpaceObjectService(item).getMetadata(item,

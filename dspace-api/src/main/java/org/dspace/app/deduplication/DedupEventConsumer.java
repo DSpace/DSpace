@@ -30,6 +30,12 @@ import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.utils.DSpace;
 
+/**
+ * Event consumer to add / update the deduplication Solr index when items are
+ * added, updated, or deleted
+ *
+ * @author 4Science
+ */
 public class DedupEventConsumer implements Consumer {
 
     /**
@@ -37,20 +43,26 @@ public class DedupEventConsumer implements Consumer {
      */
     private static Logger log = LogManager.getLogger(DedupEventConsumer.class);
 
-    // collect Items, Collections, Communities that need indexing
+    // Items, Collections, Communities that need indexing
     private Set<Item> objectsToUpdate = null;
-
     private Set<UUID> objectsToDelete = null;
 
+    // Deduplication service
     DSpace dspace = new DSpace();
-
     DedupService indexer = dspace.getServiceManager().getServiceByName(DedupService.class.getName(),
             DedupService.class);
 
-    Map<UUID, Map<String, List<String>>> cache = new HashMap<UUID, Map<String, List<String>>>();
+    // Item cache
+    Map<UUID, Map<String, List<String>>> cache = new HashMap<>();
 
-    Set<String> configuredMetadata = new HashSet<String>();
+    // Metadata to add to Solr documents
+    Set<String> configuredMetadata = new HashSet<>();
 
+    /**
+     * Initialise consumer, populate configured metadata list
+     * @throws Exception
+     */
+    @Override
     public void initialize() throws Exception {
         List<Signature> signAlgo = dspace.getServiceManager().getServicesByType(Signature.class);
         for (Signature algo : signAlgo) {
@@ -65,6 +77,7 @@ public class DedupEventConsumer implements Consumer {
      * @param ctx   DSpace context
      * @param event Content event
      */
+    @Override
     public void consume(Context ctx, Event event) throws Exception {
 
         if (objectsToUpdate == null) {
@@ -130,6 +143,10 @@ public class DedupEventConsumer implements Consumer {
         }
     }
 
+    /**
+     * Add configured metadata values to item for update
+     * @param subject
+     */
     private void fillObjectToUpdate(Item subject) {
         if (!cache.containsKey(subject.getID())) {
             objectsToUpdate.add(subject);
@@ -202,6 +219,7 @@ public class DedupEventConsumer implements Consumer {
      * interactions between the sets -- e.g. objects which were deleted do not need
      * to be added or updated, new objects don't also need an update, etc.
      */
+    @Override
     public void end(Context ctx) throws Exception {
 
         if (objectsToUpdate != null && objectsToDelete != null) {
@@ -244,9 +262,14 @@ public class DedupEventConsumer implements Consumer {
         objectsToDelete = null;
     }
 
+    /**
+     * Finish event consumer operation
+     * @param ctx the execution context object
+     * @throws Exception
+     */
+    @Override
     public void finish(Context ctx) throws Exception {
         // No-op
-
     }
 
 }

@@ -12,14 +12,19 @@ import java.util.List;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
+/**
+ * Deduplication signature interface, for matching potential duplicate items
+ *
+ * @author 4Science
+ */
 public interface Signature {
-    public List<String> getSignature(/* BrowsableDSpaceObject */DSpaceObject item, Context context);
+    List<String> getSignature(Context context, DSpaceObject item);
 
-    public int getResourceTypeID();
+    int getResourceTypeID();
 
-    public String getSignatureType();
+    String getSignatureType();
 
-    public String getMetadata();
+    String getMetadata();
 
-    public List<String> getSearchSignature(DSpaceObject item, Context context);
+    List<String> getSearchSignature(Context context, DSpaceObject item);
 }
