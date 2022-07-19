@@ -25,11 +25,40 @@ import org.dspace.deduplication.Deduplication;
  */
 public interface DeduplicationDAO extends GenericDAO<Deduplication> {
 
-    public List<Deduplication> findByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException;
+    /**
+     * Find rows in the database where the item IDs match the given first and second item IDs
+     * @param context   DSpace context
+     * @param firstId   first item ID
+     * @param secondId  second item ID
+     * @return          List of deduplication rows
+     * @throws SQLException
+     */
+    List<Deduplication> findByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException;
 
-    public Deduplication uniqueByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException;
+    /**
+     * Find a single row in the database where the item IDs match the given first and second item IDs
+     * @param context   DSpace context
+     * @param firstId   first item ID
+     * @param secondId  second item ID
+     * @return          List of deduplication rows
+     */
+    Deduplication uniqueByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException;
 
-    public List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException;
+    /**
+     * Find all deduplication rows
+     * @param context       DSpace context
+     * @param pageSize      page size for pagination
+     * @param offset        offset for pagination
+     * @return              List of deduplication rows
+     * @throws SQLException
+     */
+    List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException;
 
-    public int countRows(Context context) throws SQLException;
+    /**
+     * Get number of deduplication rows from database
+     * @param context       DSpace context
+     * @return              number of rows
+     * @throws SQLException
+     */
+    int countRows(Context context) throws SQLException;
 }

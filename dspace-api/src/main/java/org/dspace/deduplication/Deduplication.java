@@ -33,57 +33,105 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "deduplication")
 public class Deduplication {
+    /**
+     * Autoincremented deduplication ID
+     */
     @Id
     @Column(name = "deduplication_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "deduplication_id_seq")
     @SequenceGenerator(name = "deduplication_id_seq", sequenceName = "deduplication_id_seq", allocationSize = 1)
     private Integer deduplicationId;
 
+    /**
+     * Is this a 'fake' (aka Potential? TODO confirm) deduplication entry?
+     */
     @Column(name = "fake")
     private Boolean fake;
 
+    /**
+     * Is this deduplication entry marked as 'to fix' by an admin?
+     */
     @Column(name = "tofix")
     private Boolean tofix;
 
+    /**
+     * Admin note about this duplicate match
+     */
     @Column(name = "note", length = 256)
     private String note;
 
+    /**
+     * Time of admin comment
+     */
     @Column(name = "admin_time")
     @Temporal(TemporalType.TIMESTAMP)
     Date adminTime;
 
+    /**
+     * Time of reader comment / decision
+     */
     @Column(name = "reader_time")
     @Temporal(TemporalType.TIMESTAMP)
     Date readerTime;
 
+    /**
+     * Reader note
+     */
     @Column(name = "reader_note", length = 256)
     private String readerNote;
 
+    /**
+     * Time of reject decision
+     */
     @Column(name = "reject_time")
     @Temporal(TemporalType.TIMESTAMP)
     Date rejectTime;
 
+    /**
+     * Time of submitter decision
+     */
     @Column(name = "submitter_decision", length = 256)
     private String submitterDecision;
 
+    /**
+     * Time of workflow decision
+     */
     @Column(name = "workflow_decision", length = 256)
     private String workflowDecision;
 
+    /**
+     * Time of admin decision
+     */
     @Column(name = "admin_decision", length = 256)
     private String adminDecision;
 
+    /**
+     * EPerson ID of submitter or reviewer
+     */
     @Column(name = "eperson_id")
     UUID epersonId;
 
+    /**
+     * EPerson ID of administrator
+     */
     @Column(name = "admin_id")
     UUID adminId;
 
+    /**
+     * EPerson ID of reader
+     */
     @Column(name = "reader_id")
     UUID readerId;
 
+    /**
+     * The first item ID (in practical usage, this is always alphanumerically sorted before second item ID
+     */
     @Column(name = "first_item_id")
     private UUID firstItemId;
 
+    /**
+     * The first item ID (in practical usage, this is always alphanumerically sorted after second item ID
+     */
     @Column(name = "second_item_id")
     private UUID secondItemId;
 

@@ -14,6 +14,11 @@ import java.util.UUID;
 import org.dspace.core.Context;
 import org.dspace.deduplication.Deduplication;
 
+/**
+ * Deduplication service, responsible for creating and retrieving data with the Deduplication DAO
+ *
+ * @author 4Science
+ */
 public interface DeduplicationService {
     /**
      * Create a new Deduplication object
@@ -23,9 +28,9 @@ public interface DeduplicationService {
      * @throws SQLException An exception that provides information on a database
      *                      access error or other errors.
      */
-    public Deduplication create(Context context, Deduplication dedup) throws SQLException;
+    Deduplication create(Context context, Deduplication dedup) throws SQLException;
 
-    /***
+    /**
      * Return all deduplication objects
      * 
      * @param context
@@ -35,7 +40,7 @@ public interface DeduplicationService {
      * @throws SQLException An exception that provides information on a database
      *                      access error or other errors.
      */
-    public List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException;
+    List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException;
 
     /**
      * Count all accounts.
@@ -55,11 +60,27 @@ public interface DeduplicationService {
      * @throws SQLException An exception that provides information on a database
      *                      access error or other errors.
      */
-    public void update(Context context, Deduplication dedup) throws SQLException;
+    void update(Context context, Deduplication dedup) throws SQLException;
 
-    public List<Deduplication> getDeduplicationByFirstAndSecond(Context context, UUID firstId, UUID secondId)
+    /**
+     * Get deduplication entries where the item IDs match the given first and second item IDs
+     * @param context   DSpace context
+     * @param firstId   first item ID
+     * @param secondId  second item ID
+     * @return          List of deduplication objects
+     * @throws SQLException
+     */
+    List<Deduplication> getDeduplicationByFirstAndSecond(Context context, UUID firstId, UUID secondId)
             throws SQLException;
 
-    public Deduplication uniqueDeduplicationByFirstAndSecond(Context context, UUID firstId, UUID secondId)
+    /**
+     * Get a single, unique deduplication entry where the item IDs match the given first and second item IDs
+     * @param context   DSpace context
+     * @param firstId   first item ID
+     * @param secondId  second item ID
+     * @return          Deduplication objects
+     * @throws SQLException
+     */
+    Deduplication uniqueDeduplicationByFirstAndSecond(Context context, UUID firstId, UUID secondId)
             throws SQLException;
 }
