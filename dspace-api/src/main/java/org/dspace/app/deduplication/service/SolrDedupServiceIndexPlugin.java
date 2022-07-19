@@ -18,6 +18,13 @@ import org.dspace.core.Context;
  */
 public interface SolrDedupServiceIndexPlugin {
 
+    /**
+     * Add additional data to the Solr document for the first item, and if they differ, the second item
+     * @param context       DSpace context
+     * @param itemFirst     First DSpace item ID
+     * @param itemSecond    Second DSpace item ID
+     * @param document      Built Solr document
+     */
     void additionalIndex(Context context, UUID itemFirst, UUID itemSecond, SolrInputDocument document);
 
 }

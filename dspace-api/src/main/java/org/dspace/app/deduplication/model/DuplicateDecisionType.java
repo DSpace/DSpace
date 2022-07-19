@@ -9,16 +9,30 @@ package org.dspace.app.deduplication.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * JSON model for a duplicate descision type
+ *
+ * @author 4Science
+ */
 public enum DuplicateDecisionType {
 
     WORKSPACE("WORKSPACE"), WORKFLOW("WORKFLOW"), ADMIN("ADMIN");
 
-    private String text;
+    // Type text, to resolve to a flag
+    private final String text;
 
+    /**
+     * Constructor
+     * @param text  decision type
+     */
     DuplicateDecisionType(String text) {
         this.text = text;
     }
 
+    /**
+     * Render this decision type as a string (eg WORKFLOW)
+     * @return  string representation
+     */
     @Override
     public String toString() {
         return this.text;

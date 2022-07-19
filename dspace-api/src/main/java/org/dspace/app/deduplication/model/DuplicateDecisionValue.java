@@ -13,22 +13,38 @@ package org.dspace.app.deduplication.model;
  * <p>
  * Use VERIFY to mark the deduplication to be verified. Use REJECT to mark the
  * deduplication to be ignored.
+ *
+ * @author 4Science
  */
 public enum DuplicateDecisionValue {
 
     REJECT("reject"), VERIFY("verify");
 
-    private String text;
+    // Value text
+    private final String text;
 
+    /**
+     * Constructor
+     * @param text  value text
+     */
     DuplicateDecisionValue(String text) {
         this.text = text;
     }
 
+    /**
+     * Render this decision value as text
+     * @return  string representation
+     */
     @Override
     public String toString() {
         return this.text;
     }
 
+    /**
+     * Parse a decision value from a string
+     * @param text  string to parse
+     * @return parsed DuplicateDecisionValue object
+     */
     public static DuplicateDecisionValue fromString(String text) {
         if (text == null) {
             return null;

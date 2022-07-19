@@ -25,11 +25,21 @@ import org.dspace.util.ItemUtils;
  * 
  * Item status (like archived, withdrawn, ...) are added to the document index
  * in a "itemstatus_i" field.
+ *
+ * @author 4Science
  */
 public class ItemStatusDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
+    // Logger
     private static final Logger log = LogManager.getLogger(ItemStatusDedupServiceIndexPlugin.class);
 
+    /**
+     * Add item status to the document for the first ID, and if the second is unique, for the second as well
+     * @param context   DSpace context
+     * @param firstId   First item ID
+     * @param secondId  Second item ID
+     * @param document  Built Solr document
+     */
     @Override
     public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
 
@@ -39,6 +49,12 @@ public class ItemStatusDedupServiceIndexPlugin implements SolrDedupServiceIndexP
         }
     }
 
+    /**
+     * Add item status to the given item's document
+     * @param context   DSpace context
+     * @param itemId    DSpaceitem ID
+     * @param document  Built Solr document
+     */
     private void internal(Context context, UUID itemId, SolrInputDocument document) {
         try {
             Item item = ContentServiceFactory.getInstance().getItemService().find(context, itemId);

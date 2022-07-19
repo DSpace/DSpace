@@ -101,7 +101,7 @@
 		</property>
 	</bean>	
 
-	<bean class="org.dspace.app.deduplication.service.SearchDeduplication" name="ITEMSearchDeduplication">
+	<bean class="org.dspace.app.deduplication.service.DeduplicationPluginService" name="ITEMSearchDeduplication">
 		<property name="solrIndexPlugin">
 			<list>
 				<ref bean="itemLocationSearchDeduplication"/>

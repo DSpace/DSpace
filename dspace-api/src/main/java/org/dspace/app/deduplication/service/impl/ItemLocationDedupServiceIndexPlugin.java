@@ -32,6 +32,13 @@ public class ItemLocationDedupServiceIndexPlugin implements SolrDedupServiceInde
 
     private static final Logger log = LogManager.getLogger(ItemLocationDedupServiceIndexPlugin.class);
 
+    /**
+     * Add parent location for the first ID, then the second if the first and second IDs don't match
+     * @param context
+     * @param firstId
+     * @param secondId
+     * @param document
+     */
     @Override
     public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
 
@@ -41,6 +48,13 @@ public class ItemLocationDedupServiceIndexPlugin implements SolrDedupServiceInde
         }
     }
 
+    /**
+     * Simple method that popultes parent community / collection into 'parentlocation_s' fields
+     * for use in the dedup Solr core
+     * @param context
+     * @param itemId
+     * @param document
+     */
     private void internal(Context context, UUID itemId, SolrInputDocument document) {
         try {
 

@@ -36,7 +36,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.service.DedupService;
-import org.dspace.app.deduplication.service.SearchDeduplication;
+import org.dspace.app.deduplication.service.DeduplicationPluginService;
 import org.dspace.app.deduplication.service.SolrDedupServiceIndexPlugin;
 import org.dspace.app.deduplication.utils.Signature;
 import org.dspace.app.util.Util;
@@ -56,6 +56,13 @@ import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service used to handle indexing related to the dedup solr core.
+ * This implements the search, index, update and delete methods as well as defining fields, filter queries
+ * and utility methods to construct deduplication flags and complex queries
+ *
+ * @author 4Science
+ */
 @Service
 public class SolrDedupServiceImpl implements DedupService {
 
@@ -209,6 +216,10 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Initialise and return the Solr client
+     * @return  Deduplication Solr client
+     */
     protected SolrClient getSolr() {
         if (solr == null) {
             String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
@@ -241,80 +252,96 @@ public class SolrDedupServiceImpl implements DedupService {
         return solr;
     }
 
+    /**
+     * Index a Solr deduplication record for the given item
+     * @param ctx   DSpace context
+     * @param item  DSpace item
+     * @param force Force index?
+     * @throws SearchServiceException
+     */
     @Override
-    public void indexContent(Context ctx, Item iu, boolean force) throws SearchServiceException {
+    public void indexContent(Context ctx, Item item, boolean force) throws SearchServiceException {
 
         Map<String, List<String>> tmpMapFilter = new HashMap<String, List<String>>();
         List<String> tmpFilter = new ArrayList<String>();
 
-        fillSignature(ctx, iu, tmpMapFilter, tmpFilter);
+        fillSignature(ctx, item, tmpMapFilter, tmpFilter);
 
         if (tmpFilter.isEmpty()) {
             return;
         }
 
         // the FAKE identifier
-        String dedupID = iu.getID() + "-" + iu.getID();
+        String dedupID = item.getID() + "-" + item.getID();
 
         // retrieve all search plugin to build search document in the same index
-        SearchDeduplication searchSignature = dspace.getServiceManager()
-                .getServiceByName("item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
+        DeduplicationPluginService searchSignature = dspace.getServiceManager()
+                .getServiceByName("item".toUpperCase() + "SearchDeduplication", DeduplicationPluginService.class);
 
         // build the dedup reject in the dedup index core
-        buildFromDedupReject(ctx, iu);
+        buildFromDedupReject(ctx, item);
 
         // clean FAKE documents related to this identifier
-        removeFake(dedupID, iu.getType());
+        removeFake(dedupID, item.getType());
 
         // build the FAKE document
-        build(ctx, iu.getID(), iu.getID(), DeduplicationFlag.FAKE, tmpMapFilter, searchSignature, null);
+        build(ctx, item.getID(), item.getID(), DeduplicationFlag.FAKE, tmpMapFilter, searchSignature, null);
 
         // remove previous potential match
-        removeMatch(iu.getID(), iu.getType());
+        removeMatch(item.getID(), item.getType());
 
         // build the new ones
-        buildPotentialMatch(ctx, iu, tmpMapFilter, tmpFilter, searchSignature);
+        buildPotentialMatch(ctx, item, tmpMapFilter, tmpFilter, searchSignature);
 
     }
 
-    private void fillSignature(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
-            List<String> tmpFilter) {
+    /**
+     * Fill lists of filter query strings with matches for each configured signature
+     * See deduplication.xml spring configuration for signature definitions and configuration
+     * 
+     * @param ctx               DSpace context
+     * @param dso               DSpace object (used to get resource type and match appropriate signatures)
+     * @param signatureValueMap Signature->valueList map
+     * @param filterQueryList   List of filter query strings to use in Solr search
+     */
+    private void fillSignature(Context ctx, DSpaceObject dso, Map<String, List<String>> signatureValueMap,
+            List<String> filterQueryList) {
         // Create a copy of the (empty) signature list. We'll use this to store
         // values that are designed for search filters and might need extra operators
         // like ~n for fuzzy search, or boosting, or so on
-        Map<String, List<String>> tmpSearchMapFilter = new HashMap<>(tmpMapFilter);
+        Map<String, List<String>> signatureSearchValueMap = new HashMap<>(signatureValueMap);
 
         // get all algorithms to build signature
         List<Signature> signAlgo = dspace.getServiceManager().getServicesByType(Signature.class);
         for (Signature algo : signAlgo) {
-            if (iu.getType() == algo.getResourceTypeID()) {
+            if (dso.getType() == algo.getResourceTypeID()) {
                 String key = algo.getSignatureType() + "_signature";
-                List<String> signatures = algo.getSignature(iu, ctx);
+                List<String> signatures = algo.getSignature(dso, ctx);
                 // This is the list of signatures that could be used for various functions, including indexing
                 // the fake / match / dedup Solr documents
                 for (String signature : signatures) {
-                    populateMapFilter(key, signature, tmpMapFilter);
+                    populateMapFilter(key, signature, signatureValueMap);
                 }
                 // This is the list of search values derived from signatures in case we need special Solr or Lucene
                 // operators to use in filter queries, eg ~ fuzzy search, ^ boosts, wildcards, etc.
-                for (String searchFilterValue : algo.getSearchSignature(iu, ctx)) {
-                    populateMapFilter(key, searchFilterValue, tmpSearchMapFilter);
+                for (String searchFilterValue : algo.getSearchSignature(dso, ctx)) {
+                    populateMapFilter(key, searchFilterValue, signatureSearchValueMap);
                 }
             }
         }
 
-        // The result strings that are added to the tmpFilter search query filter should come only
-        // from tmpMapSearchFilter, not tmpMapFilter
+        // The result strings that are added to the filterQueryList should come only
+        // from signatureSearchValueMap, not signatureValueMap
         String result = "";
         int index = 0;
-        for (String tmpF : tmpSearchMapFilter.keySet()) {
+        for (String tmpF : signatureSearchValueMap.keySet()) {
             if (index > 0) {
                 result += " OR ";
             }
 
             result += tmpF + ":(";
             int jindex = 0;
-            for (String s : tmpSearchMapFilter.get(tmpF)) {
+            for (String s : signatureSearchValueMap.get(tmpF)) {
                 if (jindex > 0) {
                     result += " OR ";
                 }
@@ -327,19 +354,18 @@ public class SolrDedupServiceImpl implements DedupService {
         }
 
         if (StringUtils.isNotBlank(result)) {
-            tmpFilter.add(result);
+            filterQueryList.add(result);
         }
     }
 
     /**
      * Utility function to populate a list of signature filter keys and valuelists
-     * @param key
-     * @param value
-     * @param mapFilter
+     * @param key       Signature name
+     * @param value     Text value
+     * @param mapFilter Map to populate
      * @return
      */
-    private static void populateMapFilter(String key, String value, Map<String,
-            List<String>> mapFilter) {
+    private static void populateMapFilter(String key, String value, Map<String, List<String>> mapFilter) {
         if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
             if (mapFilter.containsKey(key)) {
                 List<String> searchVal = mapFilter.get(key);
@@ -353,24 +379,34 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    private void buildPotentialMatch(Context ctx, DSpaceObject iu, Map<String, List<String>> tmpMapFilter,
-            List<String> tmpFilter, SearchDeduplication searchSignature) throws SearchServiceException {
-        tmpFilter.add("+" + RESOURCE_FLAG_FIELD + ":" + DeduplicationFlag.FAKE.getDescription());
+    /**
+     * Build potential match Solr document based on search results
+     * 
+     * @param ctx                   DSpace context
+     * @param dso                   DSpace object to search against
+     * @param signatureValueMap     Map of signatures and values for the DSO type
+     * @param queryFilterList       Query filter list to use in Solr query
+     * @param pluginService         Provides access to list of indexer plugins for deduplication
+     * @throws SearchServiceException
+     */
+    private void buildPotentialMatch(Context ctx, DSpaceObject dso, Map<String, List<String>> signatureValueMap,
+            List<String> queryFilterList, DeduplicationPluginService pluginService) throws SearchServiceException {
+        queryFilterList.add("+" + RESOURCE_FLAG_FIELD + ":" + DeduplicationFlag.FAKE.getDescription());
         // select all fake not in reject and build the potential match
-        String[] tmpArrayFilter = new String[tmpFilter.size()];
-        QueryResponse response = find("*:*", tmpFilter.toArray(tmpArrayFilter));
+        String[] queryFilterArray = new String[queryFilterList.size()];
+        QueryResponse response = find("*:*", queryFilterList.toArray(queryFilterArray));
         SolrDocumentList list = response.getResults();
         external: for (SolrDocument resultDoc : list) {
 
             // build the MATCH identifier
-            Collection<Object> matchIds = (Collection<Object>) resultDoc.getFieldValues(RESOURCE_IDS_FIELD);
-            UUID matchId = iu.getID();
+            Collection<Object> matchIds = resultDoc.getFieldValues(RESOURCE_IDS_FIELD);
+            UUID matchId = dso.getID();
 
             internal: for (Object matchIdObj : matchIds) {
                 try {
                     matchId = UUID.fromString((String) matchIdObj);
 
-                    if (!iu.getID().equals(matchId)) {
+                    if (!dso.getID().equals(matchId)) {
                         break internal;
                     }
                 } catch (IllegalArgumentException ie) {
@@ -379,7 +415,7 @@ public class SolrDedupServiceImpl implements DedupService {
             }
 
             // this check manage fake node
-            if (matchId.equals(iu.getID())) {
+            if (matchId.equals(dso.getID())) {
                 continue external;
             }
 
@@ -389,8 +425,8 @@ public class SolrDedupServiceImpl implements DedupService {
                 List<String> valueResult = new ArrayList<String>();
                 if (field.endsWith("_signature")) {
 
-                    List<String> valueCurrentSignature = tmpMapFilter.get(field);
-                    Collection<Object> valuesSignature = (Collection<Object>) resultDoc.getFieldValues(field);
+                    List<String> valueCurrentSignature = signatureValueMap.get(field);
+                    Collection<Object> valuesSignature = resultDoc.getFieldValues(field);
                     if (valueCurrentSignature != null && !valueCurrentSignature.isEmpty()) {
                         for (Object valSign : valuesSignature) {
                             if (valueCurrentSignature.contains((String) valSign)) {
@@ -404,25 +440,44 @@ public class SolrDedupServiceImpl implements DedupService {
                 }
             }
 
-            build(ctx, iu.getID(), matchId, DeduplicationFlag.MATCH, tmp, searchSignature, null);
-
+            // Build document based on this result document
+            build(ctx, dso.getID(), matchId, DeduplicationFlag.MATCH, tmp, pluginService, null);
         }
     }
 
-    private void removeFake(String dedupID, Integer type) throws SearchServiceException {
+    /**
+     * Remove fake Solr records related to the given item ID
+     * @param itemID   item ID
+     * @param type     resource type
+     * @throws SearchServiceException
+     */
+    private void removeFake(String itemID, Integer type) throws SearchServiceException {
         // remove all FAKE related this deduplication item
         String queryDeleteFake = RESOURCE_RESOURCETYPE_FIELD + ":" + type + " AND " + RESOURCE_FLAG_FIELD + ":"
-                + DeduplicationFlag.FAKE.description + " AND " + RESOURCE_ID_FIELD + ":\"" + dedupID + "\"";
+                + DeduplicationFlag.FAKE.description + " AND " + RESOURCE_ID_FIELD + ":\"" + itemID + "\"";
         delete(queryDeleteFake);
     }
 
-    private void removeMatch(UUID id, Integer type) throws SearchServiceException {
+    /**
+     * Remove match Solr records related to the given item ID
+     * @param itemID   item ID
+     * @param type     resource type
+     * @throws SearchServiceException
+     */
+    private void removeMatch(UUID itemID, Integer type) throws SearchServiceException {
         // remove all MATCH related to deduplication item
         String queryDeleteMatch = RESOURCE_RESOURCETYPE_FIELD + ":" + type + " AND " + RESOURCE_FLAG_FIELD + ":"
-                + DeduplicationFlag.MATCH.description + " AND " + RESOURCE_IDS_FIELD + ":" + id;
+                + DeduplicationFlag.MATCH.description + " AND " + RESOURCE_IDS_FIELD + ":" + itemID;
         delete(queryDeleteMatch);
     }
 
+    /**
+     * Remove a stored decision for the given item IDs and decision type
+     * @param firstId   First DSpace item ID
+     * @param secondId  Second DSpace item ID
+     * @param type      Decision type
+     * @throws SearchServiceException
+     */
     @Override
     public void removeStoredDecision(UUID firstId, UUID secondId, DuplicateDecisionType type)
             throws SearchServiceException {
@@ -436,8 +491,19 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
+    /**
+     * Build and index a Solr document based on the given parameters.
+     * TODO WIP
+     * @param ctx
+     * @param firstId
+     * @param secondId
+     * @param flag
+     * @param signatures
+     * @param searchSignature
+     * @param note
+     */
     public void build(Context ctx, UUID firstId, UUID secondId, DeduplicationFlag flag,
-            Map<String, List<String>> signatures, SearchDeduplication searchSignature, String note) {
+                      Map<String, List<String>> signatures, DeduplicationPluginService searchSignature, String note) {
         SolrInputDocument doc = new SolrInputDocument();
 
         // build upgraded document
@@ -731,8 +797,8 @@ public class SolrDedupServiceImpl implements DedupService {
                         fillSignature(context, (DSpaceObject) item, tmpMapFilter, tmpFilter);
                         if (!tmpFilter.isEmpty()) {
                             // retrieve all search plugin to build search document in the same index
-                            SearchDeduplication searchSignature = dspace.getServiceManager().getServiceByName(
-                                    "item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
+                            DeduplicationPluginService searchSignature = dspace.getServiceManager().getServiceByName(
+                                    "item".toUpperCase() + "SearchDeduplication", DeduplicationPluginService.class);
                             if (onlyFake) {
                                 buildFromDedupReject(context, item);
                                 build(context, item.getID(), item.getID(), DeduplicationFlag.FAKE, tmpMapFilter,

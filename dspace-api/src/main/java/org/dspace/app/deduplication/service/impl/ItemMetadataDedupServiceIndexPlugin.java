@@ -29,20 +29,32 @@ import org.dspace.core.Context;
  * 
  * Metadata values are added to the document index in a field as configured in
  * the bean.
+ *
+ * @author 4Science
  */
 public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
+    // Logger
     private static final Logger log = LogManager.getLogger(ItemMetadataDedupServiceIndexPlugin.class);
 
+    // Metadata
     private List<String> metadata;
 
+    // Field
     private String field;
 
+    // Item entity type
     private Integer itemType;
 
+    /**
+     * Add metadata for the first ID, and if the second is unique, for the second as well
+     * @param context   DSpace context
+     * @param firstId   First item ID
+     * @param secondId  Second item ID
+     * @param document  Built Solr document
+     */
     @Override
     public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
-
         internal(context, firstId, document);
         if (firstId != secondId) {
             internal(context, secondId, document);
@@ -50,6 +62,12 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
 
     }
 
+    /**
+     * Add configured metadata to the document for the given item ID
+     * @param context   DSpace context
+     * @param itemId    DSpaceitem ID
+     * @param document  Built Solr document
+     */
     private void internal(Context context, UUID itemId, SolrInputDocument document) {
         try {
 
@@ -67,6 +85,8 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
                 }
             }
 
+            // Add metadata to the document. See plugin configuration in deduplication.xml spring config
+            // for fields that will be added
             for (String meta : metadata) {
                 for (MetadataValue mm : ContentServiceFactory.getInstance().getItemService()
                         .getMetadataByMetadataString(item, meta)) {
@@ -102,6 +122,11 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
         this.itemType = itemType;
     }
 
+    /**
+     * Get entity type for this item entity type as configured in spring configuration
+     * @param context   DSpace context
+     * @return          Resolved entity type
+     */
     private EntityType getEntityType(Context context) {
         try {
             if (itemType != null) {

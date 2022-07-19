@@ -24,11 +24,21 @@ import org.dspace.util.ItemUtils;
  * information related to firstId and secondId items.
  * 
  * Withdrawn status is collected in "dedup.withdrawn" field.
+ *
+ * @author 4Science
  */
 public class ItemWithdrawnDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
+    // Logger
     private static final Logger log = LogManager.getLogger(ItemWithdrawnDedupServiceIndexPlugin.class);
 
+    /**
+     * Add withdrawn indicator to the doc for the first item, and if they differ, the second item
+     * @param context   DSpace context
+     * @param firstId   The first item ID
+     * @param secondId  The second item ID
+     * @param document  Built Solr document
+     */
     @Override
     public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
 
@@ -38,6 +48,12 @@ public class ItemWithdrawnDedupServiceIndexPlugin implements SolrDedupServiceInd
         }
     }
 
+    /**
+     * Add withdrawn indicator to the doc for the given item ID
+     * @param context
+     * @param itemId
+     * @param document
+     */
     private void internal(Context context, UUID itemId, SolrInputDocument document) {
         try {
             Item item = ContentServiceFactory.getInstance().getItemService().find(context, itemId);
