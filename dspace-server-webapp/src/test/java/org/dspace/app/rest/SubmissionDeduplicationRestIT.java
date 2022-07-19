@@ -8,7 +8,8 @@
 package org.dspace.app.rest;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,7 +40,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.deduplication.MockSolrDedupCore;
