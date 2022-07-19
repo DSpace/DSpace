@@ -57,12 +57,12 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep {
 
         UUID itemID = obj.getItem().getID();
         int typeID = obj.getItem().getType();
-        boolean check = !(obj instanceof WorkspaceItem);
+        boolean isInWorkflow = !(obj instanceof WorkspaceItem);
 
         List<DuplicateItemInfo> potentialDuplicates = dedupUtils.getDuplicateByIDandType(getContext(), itemID, typeID,
-                check);
+                isInWorkflow);
 
-        Map<UUID, DuplicateMatch> matches = processPotentialDuplicates(itemID, check, potentialDuplicates);
+        Map<UUID, DuplicateMatch> matches = processPotentialDuplicates(itemID, isInWorkflow, potentialDuplicates);
         DataDetectDuplicate result = new DataDetectDuplicate();
         if (!matches.isEmpty()) {
             result.setMatches(matches);
