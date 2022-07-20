@@ -205,7 +205,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    // We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    // Match only that a section exists with a submission configuration behind
-                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(8)))
+                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(9)))
                    .andExpect(jsonPath("$._embedded.submissionsections",
                                        Matchers.hasItem(
                                            allOf(
@@ -259,8 +259,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                         Matchers.containsString("/api/config/submissiondefinitions?"),
                         Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(6)))
-                .andExpect(jsonPath("$.page.totalPages", is(6)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)))
+                .andExpect(jsonPath("$.page.totalPages", is(7)))
                 .andExpect(jsonPath("$.page.number", is(0)));
 
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")

@@ -103,6 +103,13 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     }
 
+    /**
+     * Get metadata for a given item and field name
+     *
+     * @param item      DSpace item
+     * @param metadata  Metadata field name
+     * @return          List of metadata string values
+     */
     protected List<String> getMultiValue(DSpaceObject item, String metadata) {
         List<MetadataValue> values = ContentServiceFactory.getInstance().getDSpaceObjectService(item)
                 .getMetadataByMetadataString(item, metadata);
@@ -113,6 +120,10 @@ public class FuzzyMetadataValueSignature implements Signature {
         }
         return retValue;
     }
+
+    //
+    // Simple Spring getters and setters. No detailed javadoc required.
+    //
 
     public String getMetadata() {
         return metadata;

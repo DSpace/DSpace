@@ -1681,32 +1681,33 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         Collection collectionOfComA = CollectionBuilder.createCollection(context, communityA)
                                                        .withEntityType("Publication")
                                                        .withSubmitterGroup(submitter)
-                                                       .withWorkflowGroup(2, editor)
                                                        .withName("Collection Of Community A").build();
 
         Collection collectionOfComB = CollectionBuilder.createCollection(context, communityB)
                                                        .withEntityType("Publication")
                                                        .withSubmitterGroup(submitter)
-                                                       .withWorkflowGroup(2, editor)
+                                                       .withWorkflowGroup("reviewer", editor)
                                                        .withName("Collection Of Community B").build();
 
+        // Create a public archived item with a DOI
         Item item = ItemBuilder.createItem(context, collectionOfComA)
                                .withTitle("Test Item")
                                .withDoiIdentifier("10.1000/182")
                                .build();
+        context.restoreAuthSystemState();
 
+        // Submit workflow item as submitter user with the same DOI
+        context.setCurrentUser(submitter);
         WorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collectionOfComB)
                 .withTitle("Test WorkflowItem").withSubmitter(submitter)
                 .withDoiIdentifier("10.1000/182").build();
 
-        context.restoreAuthSystemState();
-
-        String submitterToken = getAuthToken(submitter.getEmail(), password);
-        getClient(submitterToken).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
-                                 .andExpect(status().isOk())
-                                 .andExpect(jsonPath("$.sections['detect-duplicate']", aMapWithSize(1)))
-                                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['"
-                                     + item.getID().toString() + "'].matchObject.id", is(item.getID().toString())));
+        getClient(getAuthToken(submitter.getEmail(), password)).perform(get("/api/workflow/workflowitems/"
+                        + workflowItem.getID()))
+                         .andExpect(status().isOk())
+                         .andExpect(jsonPath("$.sections['detect-duplicate']", aMapWithSize(1)))
+                         .andExpect(jsonPath("$.sections['detect-duplicate'].matches['"
+                             + item.getID().toString() + "'].matchObject.id", is(item.getID().toString())));
 
     }
 
