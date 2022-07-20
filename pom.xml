@@ -16,14 +16,6 @@
       <url>http://dspace.org</url>
    </organization>
 
-    <!-- brings the sonatype snapshot repository and signing requirement on board -->
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-        <relativePath />
-    </parent>
-
     <prerequisites>
         <maven>3.0</maven>
     </prerequisites>
@@ -85,7 +77,7 @@
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.17</version>
+                <version>2.22.2</version>
                 <configuration>
                     <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                          maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -96,6 +88,8 @@
                     </excludes>
                     <!-- Detailed logs in reportsDirectory/testName-output.txt instead of stdout -->
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!-- Ensure full stacktrace is logged (when errors occur) -->
+                    <trimStackTrace>false</trimStackTrace>
                     <!--
                     Enable to debug Maven Surefire tests in remote proces
                     <debugForkedProcess>true</debugForkedProcess>
@@ -105,7 +99,7 @@
              <plugin>
                   <groupId>org.codehaus.mojo</groupId>
                   <artifactId>findbugs-maven-plugin</artifactId>
-                  <version>3.0.0</version>
+                  <version>3.0.3</version>
                   <configuration>
                       <effort>Max</effort>
                       <threshold>Low</threshold>
@@ -143,6 +137,34 @@
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.6</version>
              </plugin>
+              <!-- Used to generate a new release via Sonatype (see release profile). -->
+              <plugin>
+                  <groupId>org.sonatype.plugins</groupId>
+                  <artifactId>nexus-staging-maven-plugin</artifactId>
+                  <version>1.6.7</version>
+              </plugin>
+              <!-- Used to generate JavaDocs for new releases (see release profile). -->
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-javadoc-plugin</artifactId>
+                  <version>2.10.3</version>
+                  <configuration>
+                      <!-- Never fail a build based on Javadoc errors -->
+                      <failOnError>false</failOnError>
+                  </configuration>
+              </plugin>
+              <!-- Used to generate source JARs for new releases (see release profile). -->
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-source-plugin</artifactId>
+                  <version>2.4</version>
+              </plugin>
+              <!-- Used to sign new releases via GPG (see release profile). -->
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+                  <version>1.6</version>
+              </plugin>
           </plugins>
       </pluginManagement>
 
@@ -182,7 +204,7 @@
 
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.5</version>
+            <version>2.5.3</version>
             <configuration>
                 <!-- During release:perform, enable the "release" profile (see below) -->
                 <releaseProfiles>release</releaseProfiles>
@@ -711,6 +733,66 @@
              <module>dspace-xmlui-mirage2</module>
              <module>dspace-xmlui</module>
          </modules>
+          <build>
+              <plugins>
+                  <!-- Configure Nexus plugin for new releases via Sonatype.
+                       See: http://central.sonatype.org/pages/apache-maven.html -->
+                  <plugin>
+                      <groupId>org.sonatype.plugins</groupId>
+                      <artifactId>nexus-staging-maven-plugin</artifactId>
+                      <version>1.6.7</version>
+                      <extensions>true</extensions>
+                      <configuration>
+                          <!-- In your settings.xml, your username/password
+                               MUST be specified for server 'ossrh' -->
+                          <serverId>ossrh</serverId>
+                          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                      </configuration>
+                  </plugin>
+                  <!-- For new releases, generate Source JAR files -->
+                  <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-source-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <id>attach-sources</id>
+                              <goals>
+                                  <goal>jar-no-fork</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+                  <!-- For new releases, generate JavaDocs -->
+                  <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-javadoc-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <id>attach-javadocs</id>
+                              <goals>
+                                  <goal>aggregate-jar</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+                  <!-- Sign any new releases via GPG.
+                       NOTE: you may optionall specify the "gpg.passphrase" in your settings.xml -->
+                  <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-gpg-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <id>sign-artifacts</id>
+                              <phase>verify</phase>
+                              <goals>
+                                  <goal>sign</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+              </plugins>
+          </build>
       </profile>
 
    </profiles>
@@ -1612,13 +1694,18 @@
    </scm>
 
     <!--
-        Distribution Management is currently used by the Continuum
-        server to update snapshots it generates. This will also be used
-        on release to deploy release versions to the repository by the
-        release manager.
+         Configure our release repositories to use Sonatype.
+         See: http://central.sonatype.org/pages/apache-maven.html
     -->
     <distributionManagement>
-        <!-- further distribution management is found upstream in the sonatype parent -->
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <repositories>
