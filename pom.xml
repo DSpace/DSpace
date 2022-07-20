@@ -12,8 +12,8 @@
    <url>https://github.com/dspace/DSpace</url>
 
    <organization>
-      <name>DuraSpace</name>
-      <url>http://www.dspace.org</url>
+      <name>LYRASIS</name>
+      <url>http://dspace.org</url>
    </organization>
 
     <!-- brings the sonatype snapshot repository and signing requirement on board -->
@@ -413,7 +413,7 @@
                                         <!-- XML Commons claims these licenses, but it's really Apache License: https://xerces.apache.org/xml-commons/licenses.html -->
                                         <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
                                         <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|BSD-Style License|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license</licenseMerge>
-                                        <!-- DuraSpace uses a BSD License for DSpace -->
+                                        <!-- DSpace uses a BSD License -->
                                         <licenseMerge>BSD License|DuraSpace BSD License|DuraSpace Sourcecode License</licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
                                         <licenseMerge>BSD License|BSD style modified by Coverity</licenseMerge>
@@ -1322,8 +1322,8 @@
 
    <licenses>
       <license>
-         <name>DuraSpace BSD License</name>
-         <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
+         <name>DSpace BSD License</name>
+         <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
          <distribution>repo</distribution>
          <comments>
             A BSD 3-Clause license for the DSpace codebase.
@@ -1332,61 +1332,60 @@
     </licenses>
 
    <issueManagement>
-      <system>JIRA</system>
-      <url>https://jira.duraspace.org/browse/DS</url>
+      <system>GitHub</system>
+      <url>https://github.com/DSpace/DSpace/issues</url>
    </issueManagement>
 
    <mailingLists>
       <mailingList>
          <name>DSpace Technical Users List</name>
          <subscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-tech
+            https://groups.google.com/d/forum/dspace-tech
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-tech
+            https://groups.google.com/d/forum/dspace-tech
          </unsubscribe>
-         <post>dspace-tech AT lists.sourceforge.net</post>
+         <post>dspace-tech AT googlegroups.com</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-tech
+            https://groups.google.com/d/forum/dspace-tech
          </archive>
       </mailingList>
       <mailingList>
          <name>DSpace Developers List</name>
          <subscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-devel
+            https://groups.google.com/d/forum/dspace-devel
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-devel
+            https://groups.google.com/d/forum/dspace-devel
          </unsubscribe>
-         <post>dspace-devel AT lists.sourceforge.net</post>
+         <post>dspace-devel AT googlegroups.com</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-devel
+            https://groups.google.com/d/forum/dspace-devel
          </archive>
       </mailingList>
       <mailingList>
-         <name>DSpace General Issues List</name>
+         <name>DSpace Community List</name>
          <subscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-general
+            https://groups.google.com/d/forum/dspace-community
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-general
+            https://groups.google.com/d/forum/dspace-community
          </unsubscribe>
-         <post>dspace-general AT lists.sourceforge.net</post>
+         <post>dspace-community AT googlegroups.com</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-general
+            https://groups.google.com/d/forum/dspace-community
          </archive>
       </mailingList>
       <mailingList>
-         <name>DSpace SCM Commit Change-Log</name>
+         <name>DSpace Commit Change-Log</name>
          <subscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-changelog
+            https://groups.google.com/d/forum/dspace-changelog
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/lists/listinfo/dspace-changelog
+            https://groups.google.com/d/forum/dspace-changelog
          </unsubscribe>
-         <post>noreply AT lists.sourceforge.net</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-changelog
+            https://groups.google.com/d/forum/dspace-changelog
          </archive>
       </mailingList>
    </mailingLists>
@@ -1609,7 +1608,7 @@
       <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
       <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
       <url>git@github.com:DSpace/DSpace.git</url>
-      <tag>dspace-5.1-SNAPSHOT</tag>
+      <tag>HEAD</tag>
    </scm>
 
     <!--

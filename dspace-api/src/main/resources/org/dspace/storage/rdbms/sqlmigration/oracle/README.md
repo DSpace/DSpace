@@ -76,14 +76,14 @@ to upper case.
 
 Oracle complains with ORA-01408 if you attempt to create an index on a column which
 has already had the UNIQUE contraint added (such an index is implicit in maintaining the uniqueness
-of the column). See [DS-1370](https://jira.duraspace.org/browse/DS-1370) for details.
+of the column). See [DS-1370](https://github.com/DSpace/DSpace/issues/4739) for details.
 
 ## Using the update-sequences.sql script
 
 The `update-sequences.sql` script in this directory may still be used to update
 your internal database counts if you feel they have gotten out of "sync". This
 may sometimes occur after large restores of content (e.g. when using the DSpace
-[AIP Backup and Restore](https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore) 
+[AIP Backup and Restore](https://wiki.lyrasis.org/display/DSDOC5x/AIP+Backup+and+Restore) 
 feature).
 
 This `update-sequences.sql` script can be executed by running 
