@@ -285,7 +285,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                         Matchers.containsString("/api/config/submissiondefinitions?"),
                         Matchers.containsString("page="), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(6)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)))
                 .andExpect(jsonPath("$.page.totalPages", is(6)))
                 .andExpect(jsonPath("$.page.number", is(1)));
 
