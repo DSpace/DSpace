@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<!DOCTYPE xmlui SYSTEM "xmlui.dtd">
+
+<!--
+    - xmlui.xconf
+    -
+    - Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+    -
+    - Redistribution and use in source and binary forms, with or without
+    - modification, are permitted provided that the following conditions are
+    - met:
+    -
+    - - Redistributions of source code must retain the above copyright
+    - notice, this list of conditions and the following disclaimer.
+    -
+    - - Redistributions in binary form must reproduce the above copyright
+    - notice, this list of conditions and the following disclaimer in the
+    - documentation and/or other materials provided with the distribution.
+    -
+    - Neither the name of the DSpace Foundation nor the names of its
+    - contributors may be used to endorse or promote products derived from
+    - this software without specific prior written permission.
+    -
+    - THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    - ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    - LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    - A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    - HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+    - INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+    - BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+    - OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+    - ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+    - TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+    - USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+    - DAMAGE.
+-->
+
+
+<!--
+    - The XMLUI (Manakin Release) configuration file
+    -
+    - Authors: Scott Phillips
+    - Version: $Revision$
+    - Date:    $Date$
+-->
+
+<xmlui>
+    <!--
+        This section configures the Aspect "chain". An Aspect provides a set
+        of coupled features for the system. All Aspects are chained together
+        such that together they form the complete DSpace website. This is where
+        the chain is defined, the order in which each aspect is declared
+        determines it's order in the chain. Aspects at the top are invoked
+        first.
+
+        The <aspect> element has two attributes, name & path. The name is used
+        to identify the Aspect, while the path determines the directory. The
+        path attribute should be listed exactly as it is found in the
+        /xmlui/cocoon/aspects/ directory followed by a slash.
+    -->
+    <aspects>
+        <!-- =====================
+             Item Level Versioning
+             ===================== -->
+        <!--
+             To enable Item Level Versioning features, uncomment this aspect.
+             This is currently disabled by default because of one known issue:
+             DS-1382. Please, review them to see whether they apply
+             to you before enabling versioning.
+        -->
+        <!--<aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />-->
+
+        <!-- =====================
+             Base Features/Aspects
+             ===================== -->
+        <!-- Base DSpace XMLUI Aspects for Display, Browse, Search, Admin, Login and Submission -->
+        <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
+        <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
+        <aspect name="Discovery" path="resource://aspects/Discovery/" />
+        <aspect name="Administration" path="resource://aspects/Administrative/" />
+        <aspect name="E-Person" path="resource://aspects/EPerson/" />
+        <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
+
+        <!-- ========================
+             Usage Statistics Engines
+             ======================== -->
+        <!-- By default, DSpace uses a Statistics engine based on SOLR -->
+        <aspect name="Statistics" path="resource://aspects/Statistics/" />
+
+        <!--
+             If you prefer to use "Elastic Search" Statistics, you can uncomment the below
+             aspect and COMMENT OUT the default "Statistics" aspect above.
+             You must also enable the ElasticSearchLoggerEventListener.
+        -->
+        <!-- <aspect name="Statistics - Elastic Search" path="resource://aspects/StatisticsElasticSearch/" /> -->
+
+        <!-- Additionally you may choose to expose your Google Analytics statistics in DSpace -->
+        <!-- <aspect name="StatisticsGoogleAnalytics" path="resource://aspects/StatisticsGoogleAnalytics/" /> -->
+
+        <!-- =========================
+             Approval Workflow Systems
+             ========================= -->
+        <!-- By default, DSpace uses a legacy 3-step approval workflow for new submissions -->
+        <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
+
+        <!-- If you prefer, a Configurable XML-based Workflow is available. To enable it, you can
+             uncomment the below aspect and comment out the "Original Workflow" aspect above.
+             PLEASE NOTE: in order to use the configurable workflow you must also run the
+             database migration scripts as detailed in the DSpace Documentation -->
+        <!-- <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" /> -->
+
+        <!-- ==============
+             SWORDv1 Client
+             ============== -->
+        <!-- DSpace also comes with an option SWORD Client aspect, which allows
+             you to submit content FROM your DSpace TO another SWORD-enabled repository.
+             To enable this feature, uncomment the aspect below. -->
+        <!-- <aspect name="SwordClient" path="resource://aspects/SwordClient/" /> -->
+
+        <!--
+            This demo aspect tests the various possible DRI features.
+            It may be useful to developers in developing new aspects or themes.
+            It's accessible for admins in the XMLTest menu or via the /XMLTest/ URL.
+        -->
+        <!-- <aspect name="XML Tests" path="resource://aspects/XMLTest/"/> -->
+    </aspects>
+
+    <!--
+        This section configures which Theme should apply to a particular URL.
+        Themes stylize an abstract DRI document (generated by the Aspect
+        chain from above) and produce XHTML (or possibly another format) for
+        display to the user. Each theme rule is processed in the order that it
+        is listed below, the first rule that matches is the theme that is applied.
+
+        The <theme> element has several attributes including: name, id, regex,
+        handle, and path. The name attribute is used to identify the theme, while
+        the path determines the directory. The path attribute should be listed
+        exactly as it is found in the /xmlui/cocoon/themes/ directory. Both the
+        regex and handle attributes determine if the theme rule matches the URL.
+        If either the pattern or handle attribute is left off then the only the
+        other component is used to determine matching.
+
+        Keep in mind that the order of <theme> elements matters in the case of
+        overlapping matching rules. For example, a theme rule with a very broad
+        matching rule (like regex=".*") will override a more specific theme
+        declaration (like handle="1234/23") if placed before it.
+
+        Finally, theme application also "cascades" down to pages derived from the
+        one that the theme directly applies to. Thus, a theme applied to a
+        specific community will also apply to that community's collections and
+        their respective items.
+    -->
+    <themes>
+        <!-- Example configuration -->
+
+        <!-- <theme name="Test Theme 1" handle="123456789/1" path="theme1/"/>    -->
+        <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
+
+        <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
+        <theme name="Atmire Mirage Theme" regex=".*" path="Mirage2/" />
+
+        <!-- Reference theme, the default Manakin XMLUI layout up to DSpace 1.8 -->
+        <!-- <theme name="Default Reference Theme" regex=".*" path="Reference/" /> -->
+
+        <!-- Classic theme, inspired by the JSP UI -->
+        <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->
+
+        <!-- The Kubrick theme -->
+        <!-- <theme name="Kubrick" regex=".*" path="Kubrick/" /> -->
+
+        <!--
+             For information on configuring the mobile theme, see:
+             dspace-xmlui/src/main/webapp/themes/mobile/readme.txt
+        -->
+    </themes>
+</xmlui>

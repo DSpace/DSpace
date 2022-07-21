@@ -67,3 +67,12 @@ COPY dspace/src/main/docker/test/rest_web.xml $DSPACE_INSTALL/webapps/rest/WEB-I
 
 RUN sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/solr/WEB-INF/web.xml && \
     sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
+
+COPY dspace/src/main/docker/parse_env_to_configs.sh $DSPACE_INSTALL/bin/parse_env_to_configs.sh
+
+# Ensure all scripts are executable
+RUN chmod +x $DSPACE_INSTALL/bin/*
+
+# On startup run this command to parse environment variables to configs in dspace.cfg
+# Then start Tomcat
+CMD ["sh", "-c", "$DSPACE_INSTALL/bin/parse_env_to_configs.sh && catalina.sh run"]

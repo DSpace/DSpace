@@ -2,11 +2,11 @@
 # See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
 # 
 # This version is JDK8 compatible
-# - tomcat:7-jre8
+# - openjdk:8-jdk
 # - ANT 1.10.7
 # - maven:3-jdk-8
 # - note: 
-# - default tag for branch: dspace/dspace: dspace/dspace:dspace-5_x-jdk8
+# - default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-5_x
 
 # Step 1 - Run Maven Build
 FROM dspace/dspace-dependencies:dspace-5_x-jdk8 as build
@@ -24,12 +24,12 @@ ADD --chown=dspace . /app/
 COPY --chown=dspace dspace/src/main/docker/build.properties /app/build.properties
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package -Dmirage2.on=true && \
+RUN mvn package -P'!dspace-solr,!dspace-jspui,!dspace-xmlui,!dspace-rest,!dspace-xmlui-mirage2,!dspace-rdf,!dspace-sword,!dspace-swordv2' && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM tomcat:7-jre8 as ant_build
+FROM openjdk:8-jdk as ant_build
 ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
@@ -42,31 +42,19 @@ ENV PATH $ANT_HOME/bin:$PATH
 RUN mkdir $ANT_HOME && \
     wget -qO- "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
 
-RUN ant init_installation update_configs update_code update_webapps update_solr_indexes
+RUN ant init_installation update_configs update_code
 
-# Step 3 - Run tomcat
-# Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:7-jre8
+# Step 3 - Run jdk
+# Create a new jdk image that does not retain the the build directory contents
+FROM openjdk:8-jdk
 ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
-EXPOSE 8080 8009
 
-ENV JAVA_OPTS=-Xmx2000m
+ENV JAVA_OPTS=-Xmx1000m
 
-RUN ln -s $DSPACE_INSTALL/webapps/solr    /usr/local/tomcat/webapps/solr    && \
-    ln -s $DSPACE_INSTALL/webapps/xmlui   /usr/local/tomcat/webapps/xmlui   && \
-    ln -s $DSPACE_INSTALL/webapps/jspui   /usr/local/tomcat/webapps/jspui   && \
-    ln -s $DSPACE_INSTALL/webapps/rest    /usr/local/tomcat/webapps/rest    && \
-    ln -s $DSPACE_INSTALL/webapps/oai     /usr/local/tomcat/webapps/oai     && \
-    ln -s $DSPACE_INSTALL/webapps/rdf     /usr/local/tomcat/webapps/rdf     && \
-    ln -s $DSPACE_INSTALL/webapps/sword   /usr/local/tomcat/webapps/sword   && \
-    ln -s $DSPACE_INSTALL/webapps/swordv2 /usr/local/tomcat/webapps/swordv2
-
+# This script is used to parse environment variables to configs in dspace.cfg
+# It is not executed in this Docker file, so it's up to docker-compose to call it.
 COPY dspace/src/main/docker/parse_env_to_configs.sh $DSPACE_INSTALL/bin/parse_env_to_configs.sh
 
 # Ensure all scripts are executable
 RUN chmod +x $DSPACE_INSTALL/bin/*
-
-# On startup run this command to parse environment variables to configs in dspace.cfg
-# Then start Tomcat
-CMD ["sh", "-c", "$DSPACE_INSTALL/bin/parse_env_to_configs.sh && catalina.sh run"]
