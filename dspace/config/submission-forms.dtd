@@ -11,7 +11,7 @@
  <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
- <!ELEMENT dc-qualifier (#PCDATA)? >
+ <!ELEMENT dc-qualifier (#PCDATA?) >
  <!ELEMENT language (#PCDATA)>
  <!ELEMENT type-bind (#PCDATA) >
 
