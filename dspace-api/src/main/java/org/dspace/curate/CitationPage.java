@@ -108,12 +108,9 @@ public class CitationPage extends AbstractCurationTask {
         Bundle dBundle = null;
         if (dBundles == null || dBundles.size() == 0) {
             try {
-            	
                 dBundle = bundleService.create(Curator.curationContext(), item ,CitationPage.DISPLAY_BUNDLE_NAME);
                 // don't inherit now otherwise they will be copied over the moved bitstreams
                 resourcePolicyService.removeAllPolicies(Curator.curationContext(), dBundle);
-                //clonePolicies(Curator.curationContext(), original, dBundle);
-                		
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
@@ -124,7 +121,6 @@ public class CitationPage extends AbstractCurationTask {
 
         //Create a map of the bitstreams in the displayBundle. This is used to
         //check if the bundle being cited is already in the display bundle.
-        
         for (Bitstream bs : dBundle.getBitstreams()) {
             displayMap.put(bs.getName(), bs);
         }
@@ -144,7 +140,6 @@ public class CitationPage extends AbstractCurationTask {
                 pBundle = bundleService.create(Curator.curationContext(), item, CitationPage.PRESERVATION_BUNDLE_NAME);
                 // don't inherit now otherwise they will be copied over the moved bitstreams
                 resourcePolicyService.removeAllPolicies(Curator.curationContext(), pBundle);
-                //clonePolicies(Curator.curationContext(), original, pBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                         + item.getName() + "\": " + e.getMessage());
@@ -215,8 +210,6 @@ public class CitationPage extends AbstractCurationTask {
      * @param pBundle The preservation bundle. The original document should be
      * put in here if it is not already.
      * @param dBundle The display bundle. The cited document gets put in here.
-     * @param displayMap The map of bitstream names to bitstreams in the display
-     * bundle.
      * @param item The item containing the bundles being used.
      * @param bitstream The original source bitstream.
      * @throws SQLException if database error
