@@ -63,18 +63,44 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         }
     }
 
+    /*
+     * If getMostRecentVersion is true that means we are trying to find the handle within the versions. It is the case
+     * when the initialVersionSuffix option is true and we are resolving handle strings.
+     *
+     * If it is false we simply query for the exact handle string from the handles table.
+     */
     @Override
-    public Handle findByHandle(Context context, String handle) throws SQLException {
-        Query query = createQuery(context,
-                                  "SELECT h " +
-                                      "FROM Handle h " +
-                                      "LEFT JOIN FETCH h.dso " +
-                                      "WHERE h.handle = :handle ");
+    public Handle findByHandle(Context context, String handle, boolean getMostRecentVersion) throws SQLException {
+        Query query;
 
-        query.setParameter("handle", handle);
+        if (getMostRecentVersion) {
+            query = createQuery(context,
+                "SELECT h " +
+                "FROM Handle h, DSpaceObject dso, Version v " +
+                "WHERE h.dso = dso.id " +
+                "and v.item = dso.id " +
+                "and h.handle like :handle " +
+                "ORDER BY v.versionDate desc "
+                );
+
+            query.setParameter("handle", handle + "%");
+        } else {
+            query = createQuery(context,
+                "SELECT h " +
+                "FROM Handle h " +
+                "LEFT JOIN FETCH h.dso " +
+                "WHERE h.handle = :handle ");
+
+            query.setParameter("handle", handle);
+        }
 
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return singleResult(query);
+    }
+
+    @Override
+    public Handle findByHandle(Context context, String handle) throws SQLException {
+        return findByHandle(context, handle, false);
     }
 
     @Override
@@ -86,25 +112,6 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         criteriaQuery.select(handleRoot);
         criteriaQuery.where(criteriaBuilder.like(handleRoot.get(Handle_.handle), prefix + "%"));
         return list(context, criteriaQuery, false, Handle.class, -1, -1);
-    }
-
-    // !NEW we need additional javadoc on the service methods to understand the differences between the
-    // findByVersion and findByPrefix methods as they seem to be duplicate
-    @Override
-    public List<Handle> findByVersion(Context context, String prefix) throws SQLException {
-        Query query = createQuery(context,
-            "select h " +
-            "from Handle h, DSpaceObject dso, Version v " +
-            "where h.dso = dso.id " +
-            "and v.item = dso.id " +
-            "and h.handle like :handle " +
-            "order by v.versionDate desc "
-            );
-
-        query.setParameter("handle", prefix + "%");
-
-        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
-        return list(query);
     }
 
     @Override

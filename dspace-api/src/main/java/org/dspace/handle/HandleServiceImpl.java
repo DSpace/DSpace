@@ -114,9 +114,7 @@ public class HandleServiceImpl implements HandleService {
         while (handle.startsWith("/")) {
             handle = handle.substring(1);
         }
-        // origin
-        //Handle dbhandle = findHandleInternal(context, handle);
-        // !NEW
+
         Handle dbhandle = findHandleInternal(context, handle, true);
 
         return (null == dbhandle) ? null : handle;
@@ -376,21 +374,19 @@ public class HandleServiceImpl implements HandleService {
 
         // if there is no handle found AND we currently do not creating a new version ...
         if (tempHandle == null && fallbackResolvingToMostRecentVersion) {
-            List<Handle> tempHandleList;
-            // ... then try to find the most recent DSO within the versions
-            tempHandleList = handleDAO.findByVersion(context, handle);
+            // ... then try to find the most recent handle within the versions
+            tempHandle = handleDAO.findByHandle(context, handle, true);
 
-            // if there is no DSO with this handle within the versions ...
-            if ( (tempHandleList == null) || (tempHandleList.isEmpty()) ) {
-                // ... then give it a last try appending a version string of ".1"
+            // if there is no handle within the versions ...
+            if (tempHandle == null) {
+                // ... then give it a last try appending a version string of ".1" if advanced versioning is enabled.
                 if (configurationService.getBooleanProperty("dspace.initialVersionSuffix", false)) {
                     return handleDAO.findByHandle(context, handle + ".1");
                 } else {
                     return tempHandle;
                 }
             } else {
-                // findByVersion returns the DSO list in descending order by version date field
-                return tempHandleList.get(0);
+                return tempHandle;
             }
         } else {
             return tempHandle;
