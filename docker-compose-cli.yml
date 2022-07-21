@@ -25,10 +25,11 @@ services:
       - dspace__P__hostname=localhost
       - dspace__P__baseUrl=http://localhost:8080
       - dspace__P__name=DSpace Started with Docker Compose
-      - solr__P__server=http://localhost:8080/solr
+      - solr__P__server=http://dspace:8080/solr
     volumes:
       - assetstore:/dspace/assetstore
-    entrypoint: /dspace/bin/parse_env_to_configs.sh && /dspace/bin/dspace
+    entrypoint: /dspace/bin/parse_env_to_configs.sh
+    # Any commands passed here will be forwarded to /dspace/bin/dspace by parse_env_to_configs.sh (see its code)
     command: help
     networks:
       - dspacenet

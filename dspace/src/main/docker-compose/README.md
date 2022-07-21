@@ -10,8 +10,6 @@
 
 - cli.ingest.yml
     - Docker compose file that will run an AIP ingest into DSpace 5.
-- local.cfg
-    - Sets the environment used across containers run with docker-compose
 - xmlui.xconf
     - Brings up the XMLUI Mirage2 theme by default.
 

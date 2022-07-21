@@ -44,8 +44,6 @@ services:
       - solr_oai:/dspace/solr/oai/data
       - solr_search:/dspace/solr/search/data
       - solr_statistics:/dspace/solr/statistics/data
-    #entrypoint: /dspace/bin/parse_configs.sh
-    #command: catalina.sh run
   dspacedb:
     container_name: dspacedb
     environment:
