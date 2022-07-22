@@ -17,6 +17,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -64,7 +65,8 @@ public class CanvasDimensionCLI {
         String identifier = null;
         String eperson = null;
 
-        Context context = new Context();
+        Context context = new Context(Context.Mode.BATCH_EDIT);
+
         IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
                                                                                       .getIiifCanvasDimensionService();
 
