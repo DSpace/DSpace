@@ -17,7 +17,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
