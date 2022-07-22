@@ -234,6 +234,7 @@
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/src/main/license/**</exclude>
+                        <exclude>**/src/main/docker-compose/**</exclude>
                         <exclude>**/testEnvironment.properties</exclude>
                         <exclude>**/META-INF/**</exclude>
                         <exclude>**/robots.txt</exclude>
