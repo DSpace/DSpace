@@ -46,6 +46,8 @@ import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -64,9 +66,6 @@ public class DescribeStep extends AbstractProcessingStep {
     // Configuration service
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
-
-    private RelationshipMetadataService relationshipMetadataService =
-        ContentServiceFactory.getInstance().getRelationshipMetadataService();
 
     public DescribeStep() throws DCInputsReaderException {
         inputReader = new DCInputsReader();

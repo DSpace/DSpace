@@ -127,7 +127,6 @@
                     <repeatable>false</repeatable>
                     <label>Date of Issue</label>
                     <style>col-sm-4</style>
-                    <type-bind>example</type-bind>
                     <input-type>date</input-type>
                     <hint>Please give the date of previous publication or public distribution.
                         You can leave out the day and/or month if they aren't applicable.
@@ -166,6 +165,7 @@
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Series/Report No.</label>
+                    <type-bind>Technical Report</type-bind>
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
                     <required></required>

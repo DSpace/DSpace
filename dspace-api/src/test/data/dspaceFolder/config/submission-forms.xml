@@ -79,6 +79,9 @@
          <input-type>onebox</input-type>
          <hint>Enter the main title of the item.</hint>
          <required>You must enter a main title for this item.</required>
+         <acl>
+           policy=deny,action=read,grantee-type=user,grantee-id=*
+         </acl>
          <!--    <language value-pairs-name="common_iso_languages">true</language> -->
        </field>
      </row>

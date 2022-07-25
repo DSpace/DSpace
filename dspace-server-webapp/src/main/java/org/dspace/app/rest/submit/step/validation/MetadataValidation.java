@@ -61,7 +61,6 @@ public class MetadataValidation extends AbstractValidation {
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
 
-        List<ErrorRest> errors = new ArrayList<>();
         String documentTypeValue = "";
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
         List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
@@ -69,11 +68,6 @@ public class MetadataValidation extends AbstractValidation {
         if (documentType.size() > 0) {
             documentTypeValue = documentType.get(0).getValue();
         }
-
-        // Get list of all field names (including qualdrop names) allowed for this dc.type
-        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
-
-        // Begin the actual validation loop
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey =
@@ -90,21 +84,21 @@ public class MetadataValidation extends AbstractValidation {
                     for (int i = 1; i < inputPairs.size(); i += 2) {
                         String fullFieldname = input.getFieldName() + "." + (String) inputPairs.get(i);
                         List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fullFieldname);
-
-                        // Check the lookup list. If no other inputs of the same field name allow this type,
-                        // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
-                                && !allowedFieldNames.contains(input.getFieldName()))) {
+                        // If the input is not allowed for this type, strip it from item metadata.
+                        if (!input.isAllowedFor(documentTypeValue)) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                        obj.getItem(), mdv);
+                                    obj.getItem(), mdv);
                         } else {
-                            validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
+                            validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
                                 foundResult = true;
                             }
                         }
                     }
-                    if (input.isRequired() && !foundResult) {
+                    // If the input is required but not allowed for this type, and we removed, don't throw
+                    // an error - this way, a field can be required for "Book" to which it is bound, but not
+                    // other types. A user may have switched between types before a final deposit
+                    if (input.isRequired() && !foundResult && input.isAllowedFor(documentTypeValue)) {
                         // for this required qualdrop no value was found, add to the list of error fields
                         addError(errors, ERROR_VALIDATION_REQUIRED,
                                 "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
@@ -120,6 +114,12 @@ public class MetadataValidation extends AbstractValidation {
                 for (String fieldName : fieldsName) {
                     boolean valuesRemoved = false;
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
+                    if (!input.isAllowedFor(documentTypeValue)) {
+                        itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(), obj.getItem(), mdv);
+                        // Continue here, this skips the required check since we've just removed values that previously
+                        // appeared, and the configuration already indicates this field shouldn't be included
+                        continue;
+                    }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey);
                     if (input.isRequired() && input.isVisible(DCInput.SUBMISSION_SCOPE) &&
                             (mdv.size() == 0 || !isValidComplexDefinitionMetadata(input, mdv))) {
