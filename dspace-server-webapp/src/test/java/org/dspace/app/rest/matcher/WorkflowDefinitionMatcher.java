@@ -63,6 +63,14 @@ public class WorkflowDefinitionMatcher {
         );
     }
 
+    /**
+     * Verifies that the content of the `json` matches
+     * the detail of the steps
+     * Actually we can checks only the identifier to assure they are the same.
+     * 
+     * @param step target step of the workflow
+     * @return Matcher
+     */
     public static Matcher<? super Object> matchStep(Step step) {
         return allOf(
                 hasJsonPath("$.id", is(step.getId()))
