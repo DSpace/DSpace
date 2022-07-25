@@ -32,9 +32,9 @@ public abstract class AbstractCondition implements Condition {
     private Map<String, Object> parameters;
 
     // Declare and instantiate spring services
-    //@Autowired(required = true)
+    @Autowired(required = true)
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    //@Autowired(required = true)
+    @Autowired(required = true)
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     @Autowired(required = true)
     protected HandleService handleService;
