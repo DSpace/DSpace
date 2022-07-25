@@ -37,6 +37,15 @@
             <!-- Filter using the properties file defined by dspace-parent POM -->
             <filter>${filters.file}</filter>
         </filters>
+        <extensions>
+            <extension>
+                <!-- Allows us to download Ruby gems -->
+                <!-- See https://github.com/jruby/mavengem -->
+                <groupId>org.torquebox.mojo</groupId>
+                <artifactId>mavengem-wagon</artifactId>
+                <version>1.0.3</version>
+            </extension>
+        </extensions>
         <!-- Centrally manage the versions of all plugins used below -->
         <pluginManagement>
             <plugins>
@@ -295,9 +304,10 @@
                 </property>
             </activation>
             <repositories>
+                <!-- https://github.com/jruby/mavengem -->
                 <repository>
-                    <id>rubygems-release</id>
-                    <url>http://rubygems-proxy.torquebox.org/releases</url>
+                    <id>mavengems</id>
+                    <url>mavengem:https://rubygems.org</url>
                 </repository>
             </repositories>
             <dependencies>
