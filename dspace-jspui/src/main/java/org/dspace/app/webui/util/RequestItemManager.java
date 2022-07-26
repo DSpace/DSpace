@@ -118,7 +118,7 @@ public class RequestItemManager {
      * @exception SQLExeption
      *
      */
-    public static String getLinkTokenEmail(Context context, String bitstreamId
+    public static String getLinkTokenEmail(Context context, int bitstreamId
             , int itemID, String reqEmail, String reqName, boolean allfiles)
             throws SQLException
     {
@@ -128,7 +128,7 @@ public class RequestItemManager {
                 base.endsWith("/") ? "" : "/").append(
                 "request-item").append("?step=" + RequestItemServlet.ENTER_TOKEN)
                 .append("&token=")
-                .append(getNewToken(context, Integer.parseInt(bitstreamId), itemID, reqEmail, reqName, allfiles))
+                .append(getNewToken(context, bitstreamId, itemID, reqEmail, reqName, allfiles))
                 .toString();
         
         return specialLink;

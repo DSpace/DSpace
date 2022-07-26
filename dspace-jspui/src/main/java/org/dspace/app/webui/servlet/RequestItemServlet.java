@@ -8,6 +8,7 @@
 package org.dspace.app.webui.servlet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
@@ -135,7 +136,7 @@ public class RequestItemServlet extends DSpaceServlet
         // handle
         String handle = request.getParameter("handle");
         
-        String bitstream_id=request.getParameter("bitstream-id");
+        int  bitstream_id= UIUtil.getIntParameter(request, "bitstream-id");
         
         // Title
         String title = null;
@@ -160,7 +161,7 @@ public class RequestItemServlet extends DSpaceServlet
 		}
           
         // User email from context
-        String requesterEmail = request.getParameter("email");
+        String requesterEmail = StringEscapeUtils.escapeHtml4(request.getParameter("email"));
         EPerson currentUser = context.getCurrentUser();
         String userName = null;
         
@@ -172,8 +173,8 @@ public class RequestItemServlet extends DSpaceServlet
         
         if (request.getParameter("submit") != null)
         {
-            String reqname = request.getParameter("reqname");
-            String coment = request.getParameter("coment");
+            String reqname = StringEscapeUtils.escapeHtml4(request.getParameter("reqname"));
+            String coment = StringEscapeUtils.escapeHtml4(request.getParameter("coment"));
             if (coment == null || coment.equals(""))
                 coment = "";
             boolean allfiles = "true".equals(request.getParameter("allfiles"));
@@ -217,7 +218,7 @@ public class RequestItemServlet extends DSpaceServlet
 				email.addArgument(requesterEmail);
 				email.addArgument(allfiles ? I18nUtil
 						.getMessage("itemRequest.all") : Bitstream.find(
-						context, Integer.parseInt(bitstream_id)).getName());
+						context, bitstream_id).getName());
 				email.addArgument(HandleManager.getCanonicalForm(item
 						.getHandle()));
 				email.addArgument(title); // request item title
