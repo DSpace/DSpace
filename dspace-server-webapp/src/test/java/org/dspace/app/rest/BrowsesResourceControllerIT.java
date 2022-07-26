@@ -905,7 +905,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the entries in the Browse by Author endpoint
-        //with startsWith set to Ú (accented)
+        //with startsWith set to Ó (accented)
         getClient().perform(get("/api/discover/browses/author/entries?startsWith=Ó"))
 
                    //** THEN **
@@ -930,7 +930,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the entries in the Browse by Subject endpoint
-        //with startsWith set to Cana
+        //with startsWith set to Tele
         getClient().perform(get("/api/discover/browses/subject/entries?startsWith=Tele"))
 
                    //** THEN **
