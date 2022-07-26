@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItemAuthor;
@@ -180,7 +181,7 @@ public class RequestItemServlet extends DSpaceServlet
 		}
           
         // User email from context
-        String requesterEmail = request.getParameter("email");
+        String requesterEmail = StringEscapeUtils.escapeHtml4(request.getParameter("email"));
         EPerson currentUser = context.getCurrentUser();
         String userName = null;
         
@@ -192,8 +193,8 @@ public class RequestItemServlet extends DSpaceServlet
         
         if (request.getParameter("submit") != null)
         {
-            String reqname = request.getParameter("reqname");
-            String coment = request.getParameter("coment");
+            String reqname = StringEscapeUtils.escapeHtml4(request.getParameter("reqname"));
+            String coment = StringEscapeUtils.escapeHtml4(request.getParameter("coment"));
             if (coment == null || coment.equals(""))
                 coment = "";
             boolean allfiles = "true".equals(request.getParameter("allfiles"));
