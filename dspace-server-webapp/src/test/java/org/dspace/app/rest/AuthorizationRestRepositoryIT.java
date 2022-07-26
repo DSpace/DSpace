@@ -1950,8 +1950,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$._links.next.href", containsString("page=2")))
                              .andExpect(jsonPath("$._embedded.authorizations", contains(
                                  allOf(
-                                     hasJsonPath("$.id", is(admin.getID().toString() + "_" + trueForLoggedUsers.getName() + "_"
-                                                                + comRest.getUniqueType() + "_" + comRest.getId())),
+                                     hasJsonPath("$.id",
+                                                 is(admin.getID().toString() +
+                                                        "_" + trueForLoggedUsers.getName() + "_"
+                                                        + comRest.getUniqueType() + "_" + comRest.getId())),
                                      hasJsonPath("$.type", is("authorization")),
                                      hasJsonPath("$._embedded.feature.id", is(trueForLoggedUsers.getName())),
                                      hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString()))
