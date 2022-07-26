@@ -24,7 +24,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.WorkspaceItemDAO;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
