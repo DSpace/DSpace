@@ -23,6 +23,7 @@ import org.dspace.content.Item;
 import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 /**
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca@4science.com)
@@ -44,8 +45,8 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
     }
 
     /**
-     * Verifies that any null hdlIdentifier returns a
-     * <code>HttpStatus.BAD_REQUEST</code>
+     * Verifies that any mapped <code>hdlIdentifier</code> returns the
+     * corresponding <code>handle URL</code>
      * 
      * @throws Exception
      * 
@@ -69,10 +70,27 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
 
         // ** END GIVEN **
 
+        ResultMatcher matchHandleResponse = jsonPath("$[0]",
+                StringContains.containsString("123456789/testHdlResolver"));
         getClient()
-                .perform(get(HdlResolverRestController.BASE_PATH + publicItem1.getHandle()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]", StringContains.containsString("123456789/testHdlResolver")));
+            .perform(get(HdlResolverRestController.LISTPREFIXES + publicItem1.getHandle()))
+            .andExpect(status().isOk())
+            .andExpect(matchHandleResponse);
+        getClient()
+            .perform(get(HdlResolverRestController.RESOLVE  + publicItem1.getHandle()))
+            .andExpect(status().isOk())
+            .andExpect(matchHandleResponse);
+        getClient()
+            .perform(get(HdlResolverRestController.HDL_RESOLVER + publicItem1.getHandle()))
+            .andExpect(status().isOk())
+            .andExpect(matchHandleResponse);
+        getClient()
+            .perform(get(HdlResolverRestController.LISTPREFIXES + publicItem1.getHandle()))
+            .andExpect(status().isOk())
+            .andExpect(matchHandleResponse);
+        getClient()
+            .perform(get("/wrongController/" + publicItem1.getHandle()))
+            .andExpect(status().isNotFound());
 
     }
 
@@ -89,7 +107,16 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
     public void givenNullHdlIdentifierWhenCallHdlresolverThenReturnsBadRequest() throws Exception {
 
         getClient().perform(
-                get(HdlResolverRestController.BASE_PATH + "null"))
+                get(HdlResolverRestController.HDL_RESOLVER + "null"))
+                .andExpect(status().isBadRequest());
+        getClient().perform(
+                get(HdlResolverRestController.RESOLVE + "null"))
+                .andExpect(status().isBadRequest());
+        getClient().perform(
+                get(HdlResolverRestController.LISTHANDLES + "null"))
+                .andExpect(status().isBadRequest());
+        getClient().perform(
+                get(HdlResolverRestController.LISTPREFIXES + "null"))
                 .andExpect(status().isBadRequest());
 
     }
@@ -106,8 +133,17 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
     public void givenEmptyHdlIdentifierWhenCallHdlresolverThenReturnsNull() throws Exception {
 
         getClient()
-                .perform(get(HdlResolverRestController.BASE_PATH + " "))
-                .andExpect(status().isBadRequest());
+            .perform(get(HdlResolverRestController.HDL_RESOLVER + " "))
+            .andExpect(status().isBadRequest());
+        getClient()
+            .perform(get(HdlResolverRestController.RESOLVE + " "))
+            .andExpect(status().isBadRequest());
+        getClient()
+            .perform(get(HdlResolverRestController.LISTHANDLES + " "))
+            .andExpect(status().isBadRequest());
+        getClient()
+            .perform(get(HdlResolverRestController.LISTPREFIXES + " "))
+            .andExpect(status().isBadRequest());
 
     }
 
@@ -120,7 +156,16 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
     @Test
     public void givenIdentifierNotMappedWhenCallHdlresolverThenReturnsNull() throws Exception {
         getClient()
-                .perform(get(HdlResolverRestController.BASE_PATH + "testHdlResolver/2"))
-                .andExpect(status().isOk()).andExpect(content().string("null"));
+            .perform(get(HdlResolverRestController.HDL_RESOLVER + "testHdlResolver/2"))
+            .andExpect(status().isOk()).andExpect(content().string("null"));
+        getClient()
+            .perform(get(HdlResolverRestController.RESOLVE + "testHdlResolver/2"))
+            .andExpect(status().isOk()).andExpect(content().string("null"));
+        getClient()
+            .perform(get(HdlResolverRestController.LISTHANDLES + "testHdlResolver/2"))
+            .andExpect(status().isOk()).andExpect(content().string("null"));
+        getClient()
+            .perform(get(HdlResolverRestController.LISTPREFIXES + "testHdlResolver/2"))
+            .andExpect(status().isOk()).andExpect(content().string("null"));
     }
 }

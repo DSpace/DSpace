@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.hdlresolver;
 
+import java.text.MessageFormat;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,11 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller is public and is useful for handler resolving,
+ * This controller is public and is useful for handle resolving,
  * wheter a target handle identifier will be resolved into the
  * corresponding URL (if found), otherwise will respond a null string.
  * 
@@ -32,9 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping(HdlResolverRestController.BASE_PATH)
+@RequestMapping(path = "/{hdlService:hdlResolver|resolve|listhandles|listprefixes}/")
 public class HdlResolverRestController {
-    static final String BASE_PATH = "/hdlResolver/";
+    static final String HDL_RESOLVER = "/hdlResolver/";
+    static final String RESOLVE = "/resolve/";
+    static final String LISTHANDLES = "/listhandles/";
+    static final String LISTPREFIXES = "/listprefixes/";
 
     private static final Logger log = LogManager.getLogger();
 
@@ -56,10 +61,16 @@ public class HdlResolverRestController {
      *         <code>HttpStatus.OK</code> or <code>HttpStatus.BAD_REQUEST</code> 400
      *         error
      */
-    @GetMapping(value = "**", produces = "application/json;charset=UTF-8")
-    public ResponseEntity<String> getHandleUrlResolver(HttpServletRequest request) {
-        HdlResolverDTO handleResolver = this.hdlResolverService.resolveBy(request.getRequestURI(),
-                request.getContextPath() + HdlResolverRestController.BASE_PATH);
+    @GetMapping(
+        value = "**",
+        produces = "application/json;charset=UTF-8"
+    )
+    public ResponseEntity<String> getHandleUrlResolver(HttpServletRequest request, @PathVariable String hdlService) {
+        HdlResolverDTO handleResolver =
+               this.hdlResolverService.resolveBy(
+                       request.getRequestURI(),
+                       MessageFormat.format("{0}/{1}/", request.getContextPath(), hdlService)
+               );
         if (!handleResolver.isValid()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
