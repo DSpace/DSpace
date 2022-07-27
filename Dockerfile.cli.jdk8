@@ -15,7 +15,8 @@ WORKDIR /app
 
 # The dspace-install directory will be written to /install
 RUN mkdir /install \
-    && chown -Rv dspace: /install
+    && chown -Rv dspace: /install \
+    && chown -Rv dspace: /app
 
 USER dspace
 
@@ -38,10 +39,15 @@ WORKDIR /dspace-src
 ENV ANT_VERSION 1.10.7
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
-
+# Need wget to install ant
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends wget \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+# Download and install 'ant'
 RUN mkdir $ANT_HOME && \
     wget -qO- "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
-
+# Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code
 
 # Step 3 - Run jdk

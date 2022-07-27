@@ -9,7 +9,9 @@ WORKDIR /app
 # The Mirage2 build cannot run as root.  Setting the user to dspace.
 RUN useradd dspace \
     && mkdir /home/dspace \
-    && chown -Rv dspace: /home/dspace
+    && chown -Rv dspace: /home/dspace \
+    && chown -Rv dspace: /app
+
 USER dspace
 
 # Copy the DSpace source code into the workdir (excluding .dockerignore contents)
