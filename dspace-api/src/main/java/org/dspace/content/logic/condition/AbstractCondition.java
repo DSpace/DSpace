@@ -33,9 +33,9 @@ public abstract class AbstractCondition implements Condition {
 
     // Declare and instantiate spring services
     @Autowired(required = true)
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected ItemService itemService;
     @Autowired(required = true)
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected CollectionService collectionService;
     @Autowired(required = true)
     protected HandleService handleService;
 
