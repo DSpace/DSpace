@@ -115,6 +115,9 @@ public class Email
     /** The recipients */
     private List<String> recipients;
 
+    /** The CC recipients */
+    private List<String> carbonCopyRecipients;
+
     /** Reply to field, if any */
     private String replyTo;
 
@@ -133,6 +136,7 @@ public class Email
     {
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
+        carbonCopyRecipients = new ArrayList<String>(50);
         attachments = new ArrayList<FileAttachment>(10);
         moreAttachments = new ArrayList<InputStreamAttachment>(10);
         subject = "";
@@ -150,6 +154,17 @@ public class Email
     public void addRecipient(String email)
     {
         recipients.add(email);
+    }
+
+    /**
+     * Add a carbon copy (CC) recipient
+     *
+     * @param email
+     *            the carbon copy (CC) recipient's email address
+     */
+    public void addCarbonCopyRecipient(String email)
+    {
+        carbonCopyRecipients.add(email);
     }
 
     /**
@@ -261,6 +276,15 @@ public class Email
         {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(
                     i.next()));
+        }
+
+        // Set the carbon copy (CC) recipients of the message
+        Iterator<String> cc = carbonCopyRecipients.iterator();
+
+        while (cc.hasNext())
+        {
+            message.addRecipient(Message.RecipientType.CC, new InternetAddress(
+                    cc.next()));
         }
 
         // Format the mail message
