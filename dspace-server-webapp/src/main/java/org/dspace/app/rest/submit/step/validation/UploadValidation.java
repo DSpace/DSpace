@@ -19,6 +19,7 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 
@@ -43,8 +44,9 @@ public class UploadValidation extends AbstractValidation {
         //TODO MANAGE METADATA
         List<ErrorRest> errors = new ArrayList<>();
         UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(config.getId());
-        if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
-            addError(errors, ERROR_VALIDATION_FILEREQUIRED,
+        if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME) &&
+                !itemService.hasUploadedFiles(obj.getItem(), Constants.METADATA_BUNDLE_NAME)) {
+            addError(ERROR_VALIDATION_FILEREQUIRED,
                      "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
                          + config.getId());
         }

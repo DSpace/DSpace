@@ -217,6 +217,20 @@
             <row>
                 <field>
                     <dc-schema>local</dc-schema>
+                    <dc-element>hasCMDI</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Has CMDI file</label>
+                    <input-type value-pairs-name="hasCMDI_checkbox">list</input-type>
+                    <hint>Are you going to upload cmdi file?</hint>
+                    <required></required>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
                     <dc-element>bitstream</dc-element>
                     <dc-qualifier>redirectToURL</dc-qualifier>
                     <repeatable>false</repeatable>
@@ -1418,6 +1432,12 @@
     <!-- stores the associated stored-values in the database.                  -->
 
     <form-value-pairs>
+        <value-pairs value-pairs-name="hasCMDI_checkbox" dc-term="identifier">
+            <pair>
+                <displayed-value>Yes</displayed-value>
+                <stored-value>yes</stored-value>
+            </pair>
+        </value-pairs>
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
                 <displayed-value>ISSN</displayed-value>
