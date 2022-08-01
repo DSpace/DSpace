@@ -220,10 +220,13 @@
                     <dc-element>bitstream</dc-element>
                     <dc-qualifier>redirectToURL</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Bitstream redirect URL</label>
+                    <label>Big file URL</label>
                     <input-type>onebox</input-type>
                     <hint>
-                        The bitstream will be loaded from this URL. Example: /temp/file.png
+                        The actual maximum upload size of the file is 4GB. To upload the file bigger than maximum
+                        upload size type the URL of that big file. Admin must know URL to that bitstream file.
+                        Then click on the 'Save' button and the file will start to upload. The file will be loaded
+                        from the '/temp' folder of the server. Example: /tomcat/temp/bitstream.png
                     </hint>
                     <required></required>
                     <acl>
