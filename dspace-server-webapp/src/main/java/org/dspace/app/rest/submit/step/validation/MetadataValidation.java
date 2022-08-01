@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.step.validation;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,10 +26,12 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 
 /**
@@ -46,6 +49,8 @@ public class MetadataValidation extends AbstractValidation {
     private static final String ERROR_VALIDATION_AUTHORITY_REQUIRED = "error.validation.authority.required";
 
     private static final String ERROR_VALIDATION_REGEX = "error.validation.regex";
+
+    private static final String LOCAL_METADATA_HAS_CMDI = "local.hasCMDI";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValidation.class);
 
@@ -124,6 +129,15 @@ public class MetadataValidation extends AbstractValidation {
                         addError(ERROR_VALIDATION_REQUIRED,
                             "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
                                 input.getFieldName());
+                    }
+                    if (LOCAL_METADATA_HAS_CMDI.equals(fieldName)) {
+                        try {
+                            Context context = ContextUtil.obtainCurrentRequestContext();
+                            CMDIFileBundleMaintainer.updateCMDIFileBundle(context, obj.getItem(), mdv);
+                        } catch (AuthorizeException | IOException exception) {
+                            log.error("Cannot update CMDI file bundle (ORIGINAL/METADATA) because: " +
+                                    exception.getMessage());
+                        }
                     }
                 }
             }

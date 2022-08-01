@@ -1,0 +1,102 @@
+<cmd:CMD xmlns:ms="http://www.clarin.eu/cmd/" xmlns:olac="http://www.clarin.eu/cmd/" xmlns:cmd="http://www.clarin.eu/cmd/" CMDVersion="1.1" xsi:schemaLocation="http://www.clarin.eu/cmd/ http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd">
+    <cmd:Header>
+        <cmd:MdCreationDate>2021-06-29</cmd:MdCreationDate>
+        <cmd:MdSelfLink>https://hdl.handle.net/</cmd:MdSelfLink>
+        <cmd:MdProfile>profile</cmd:MdProfile>
+        <cmd:MdCollectionDisplayName>name</cmd:MdCollectionDisplayName>
+    </cmd:Header>
+    <cmd:Resources>
+        <cmd:ResourceProxyList>
+            <cmd:ResourceProxy id="2">
+                <cmd:ResourceType>LandingPage</cmd:ResourceType>
+                <cmd:ResourceRef>https://hdl.handle.net/1</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="1">
+                <cmd:ResourceType mimetype="text/html">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>ref</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="2">
+                <cmd:ResourceType mimetype="application/zip">Resource</cmd:ResourceType>
+                <cmd:ResourceRef checksum="177de7ccc7218348a43e4335a4fe7d0f">ref</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="1">
+                <cmd:ResourceType mimetype="text/html">Resource</cmd:ResourceType>
+                <cmd:ResourceRef checksum="e1430e6437b008a6453e9801448f39bc">ref</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+        </cmd:ResourceProxyList>
+        <cmd:JournalFileProxyList />
+        <cmd:ResourceRelationList />
+    </cmd:Resources>
+    <cmd:Components>
+        <cmd:data>
+            <olac:OLAC-DcmiTerms>
+                <olac:alternative>alt</olac:alternative>
+                <olac:available>avlb</olac:available>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:creator>crtr</olac:creator>
+                <olac:date>date</olac:date>
+                <olac:description>desc</olac:description>
+                <olac:identifier>id</olac:identifier>
+                <olac:issued>issd</olac:issued>
+                <olac:language olac-language="ara">ara</olac:language>
+                <olac:publisher>pbshlr</olac:publisher>
+                <olac:rights>rights</olac:rights>
+                <olac:rights>rights</olac:rights>
+                <olac:source>source</olac:source>
+                <olac:subject>subject</olac:subject>
+                <olac:subject>subject</olac:subject>
+                <olac:title>title</olac:title>
+                <olac:type>type</olac:type>
+            </olac:OLAC-DcmiTerms>
+            <ms:resourceInfo>
+                <ms:identificationInfo>
+                    <ms:resourceName>resourceName</ms:resourceName>
+                    <ms:description>description</ms:description>
+                    <ms:metaShareId>metaShareId</ms:metaShareId>
+                    <ms:identifier>identifier</ms:identifier>
+                </ms:identificationInfo>
+                <ms:distributionInfo>
+                    <ms:availability>available-restrictedUse</ms:availability>
+                    <ms:licenceInfo>
+                        <ms:licence>licence</ms:licence>
+                        <ms:restrictionsOfUse>restrictionsOfUse</ms:restrictionsOfUse>
+                        <ms:restrictionsOfUse>restrictionsOfUse</ms:restrictionsOfUse>
+                        <ms:restrictionsOfUse>restrictionsOfUse</ms:restrictionsOfUse>
+                        <ms:distributionAccessMedium>distributionAccessMedium</ms:distributionAccessMedium>
+                    </ms:licenceInfo>
+                </ms:distributionInfo>
+                <ms:contactPerson>
+                    <ms:surname>surname</ms:surname>
+                    <ms:givenName>givenName</ms:givenName>
+                    <ms:communicationInfo>
+                        <ms:email>email</ms:email>
+                    </ms:communicationInfo>
+                    <ms:affiliation>
+                        <ms:organizationName>organizationName</ms:organizationName>
+                        <ms:communicationInfo>
+                            <ms:email>email</ms:email>
+                        </ms:communicationInfo>
+                    </ms:affiliation>
+                </ms:contactPerson>
+                <ms:metadataInfo>
+                    <ms:metadataCreationDate>2021-06-29</ms:metadataCreationDate>
+                </ms:metadataInfo>
+                <ms:validationInfo>
+                    <ms:validated>false</ms:validated>
+                </ms:validationInfo>
+                <ms:resourceCreationInfo>
+                    <ms:fundingProject>
+                        <ms:projectName>projectName</ms:projectName>
+                        <ms:fundingType>fundingType</ms:fundingType>
+                    </ms:fundingProject>
+                </ms:resourceCreationInfo>
+            </ms:resourceInfo>
+        </cmd:data>
+    </cmd:Components>
+</cmd:CMD>
