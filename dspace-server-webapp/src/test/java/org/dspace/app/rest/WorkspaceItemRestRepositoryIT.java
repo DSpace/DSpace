@@ -40,12 +40,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -88,6 +91,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7400,8 +7404,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         } catch (Exception e) {
             throw new Exception("Cannot upload file bigger than upload file size limit, " + e.getMessage());
         } finally {
+            // the big file should be deleted
+            File checkFile = null;
+
+            String shouldDeleteFile = configurationService.getProperty("delete.big.file.after.upload");
+            if (!Objects.isNull(file) && StringUtils.equals("true", shouldDeleteFile)) {
+                checkFile = new File(file.getAbsolutePath());
+                Assert.assertFalse(checkFile.exists());
+            }
+
             try {
-                file.delete();
+                // if is not deleted, delete that test big file
+                if (!Objects.isNull(checkFile) && checkFile.exists()) {
+                    FileUtils.forceDelete(file);
+                }
             } catch (Exception e) {
                 throw new Exception("Cannot delete the file in the end of the test: " + e.getMessage());
             }

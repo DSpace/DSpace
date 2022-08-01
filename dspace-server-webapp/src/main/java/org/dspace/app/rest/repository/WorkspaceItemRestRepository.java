@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -433,5 +434,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         upload(request, "wokspaceitems", "submission", id, multipartFile);
 
         wis.update(context, witem);
+
+        // delete file
+        String shouldDeleteFile = configurationService.getProperty("delete.big.file.after.upload");
+        if (StringUtils.isNotBlank(shouldDeleteFile) && StringUtils.equals("true", shouldDeleteFile)) {
+            FileUtils.forceDelete(file);
+        }
     }
 }
