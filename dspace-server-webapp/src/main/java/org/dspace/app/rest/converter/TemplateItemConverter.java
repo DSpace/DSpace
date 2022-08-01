@@ -18,6 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Component;
 public class TemplateItemConverter
     implements DSpaceConverter<TemplateItem, TemplateItemRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     ConverterService converter;
 

@@ -34,6 +34,9 @@ public class IIIFCacheEventConsumer implements Consumer {
     // Collects modified items for individual removal from cache.
     private final Set<DSpaceObject> toEvictFromManifestCache = new HashSet<>();
 
+    // Collects modified bitstreams for individual removal from canvas dimension cache.
+    private final Set<DSpaceObject> toEvictFromCanvasCache = new HashSet<>();
+
     @Override
     public void initialize() throws Exception {
     }
@@ -44,7 +47,11 @@ public class IIIFCacheEventConsumer implements Consumer {
         if (!(st == Constants.BUNDLE || st == Constants.ITEM || st == Constants.BITSTREAM)) {
             return;
         }
+        // This subject may become a reference to the parent Item that will be evicted from
+        // the manifests cache.
         DSpaceObject subject = event.getSubject(ctx);
+        DSpaceObject unmodifiedSubject = event.getSubject(ctx);
+
         int et = event.getEventType();
 
         if (et == Event.DELETE || et == Event.REMOVE) {
@@ -95,43 +102,60 @@ public class IIIFCacheEventConsumer implements Consumer {
 
         switch (et) {
             case Event.ADD:
-                toEvictFromManifestCache.add(subject);
+                addToCacheEviction(subject, unmodifiedSubject, st);
                 break;
             case Event.MODIFY:
-                toEvictFromManifestCache.add(subject);
+                addToCacheEviction(subject, unmodifiedSubject, st);
                 break;
             case Event.MODIFY_METADATA:
-                toEvictFromManifestCache.add(subject);
+                addToCacheEviction(subject, unmodifiedSubject, st);
                 break;
             case Event.REMOVE:
-                toEvictFromManifestCache.add(subject);
+                addToCacheEviction(subject, unmodifiedSubject, st);
                 break;
             case Event.DELETE:
-                toEvictFromManifestCache.add(subject);
+                addToCacheEviction(subject, unmodifiedSubject, st);
                 break;
             default: {
-                log.warn("IIIFCacheEventConsumer should not have been given this kind of "
-                    + "subject in an event, skipping: " + event.toString());
+                log.warn("ManifestsCacheEventConsumer should not have been given this kind of "
+                    + "subject in an event, skipping: " + event);
             }
         }
     }
 
+    private void addToCacheEviction(DSpaceObject subject, DSpaceObject subject2, int type) {
+        if (type == Constants.BITSTREAM) {
+            toEvictFromCanvasCache.add(subject2);
+        }
+        toEvictFromManifestCache.add(subject);
+    }
+
     @Override
     public void end(Context ctx) throws Exception {
-        // Gets the service bean.
-        CacheEvictService cacheEvictService = CacheEvictBeanLocator.getCacheEvictService();
-        if (cacheEvictService != null) {
+        // Get the eviction service beans.
+        ManifestsCacheEvictService manifestsCacheEvictService = CacheEvictBeanLocator.getManifestsCacheEvictService();
+        CanvasCacheEvictService canvasCacheEvictService = CacheEvictBeanLocator.getCanvasCacheEvictService();
+
+        if (manifestsCacheEvictService != null) {
             if (clearAll) {
-                cacheEvictService.evictAllCacheValues();
+                manifestsCacheEvictService.evictAllCacheValues();
             } else {
                 for (DSpaceObject dso : toEvictFromManifestCache) {
                     UUID uuid = dso.getID();
-                    cacheEvictService.evictSingleCacheValue(uuid.toString());
+                    manifestsCacheEvictService.evictSingleCacheValue(uuid.toString());
                 }
             }
         }
+        if (canvasCacheEvictService != null) {
+            for (DSpaceObject dso : toEvictFromCanvasCache) {
+                UUID uuid = dso.getID();
+                canvasCacheEvictService.evictSingleCacheValue(uuid.toString());
+            }
+        }
+
         clearAll = false;
         toEvictFromManifestCache.clear();
+        toEvictFromCanvasCache.clear();
     }
 
     @Override

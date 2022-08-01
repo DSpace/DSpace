@@ -21,12 +21,17 @@
         <!--Second level cache configuration-->
         <property name="hibernate.cache.use_query_cache">true</property>
         <property name="hibernate.cache.use_second_level_cache">true</property>
-        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
         <property name="hibernate.cache.use_structured_entries">true</property>
+        <property name="hibernate.cache.region.factory_class">
+                  org.hibernate.cache.jcache.JCacheRegionFactory
+        </property>
+        <property name="hibernate.javax.cache.provider">
+                  org.ehcache.jsr107.EhcacheCachingProvider
+        </property>
+        <!-- hibernate.javax.cache.uri is defined in
+                  config/spring/api/core-hibernate.xml so that we can use
+                  property substitution. -->
         <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
-        <!-- Set in config/spring/api/core-hibernate.xml -->
-        <!--<property name="net.sf.ehcache.configurationResourceName">file:${dspace.dir}/config/hibernate-ehcache-config.xml</property>-->
-
 
         <!-- Entities to be loaded by hibernate -->
         <mapping class="org.dspace.app.util.WebApp"/>
@@ -83,6 +88,10 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
         <mapping class="org.dspace.statistics.export.OpenURLTracker"/>
+        
+        <mapping class="org.dspace.orcid.OrcidQueue" />
+        <mapping class="org.dspace.orcid.OrcidHistory" />
+        <mapping class="org.dspace.orcid.OrcidToken"/>
 
     </session-factory>
 </hibernate-configuration>

@@ -27,4 +27,10 @@
         <property name="description" value="Delete all the values of the specified metadata field"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
     </bean>
+
+     <bean id="type-conversion-test" class="org.dspace.app.scripts.TypeConversionTestScriptConfiguration" primary="true">
+        <property name="description" value="Test the type conversion different option types"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.scripts.TypeConversionTestScript"/>
+    </bean>
+
 </beans>

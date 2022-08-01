@@ -12,8 +12,10 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.cli.HelpFormatter;
@@ -27,6 +29,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -59,12 +62,15 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param ePerson       The eperson that creates the process
      * @param scriptName    The name of the script for which is a process will be created
      * @param parameters    The parameters for this process
+     * @param specialGroups specialGroups The list of special groups related to eperson
+     *                      creating process at process creation time
      */
-    public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters) {
+    public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters,
+                                     final Set<Group> specialGroups) {
         Context context = new Context();
         try {
             ePersonId = ePerson.getID();
-            Process process = processService.create(context, ePerson, scriptName, parameters);
+            Process process = processService.create(context, ePerson, scriptName, parameters, specialGroups);
             processId = process.getID();
             this.scriptName = process.getName();
 
@@ -303,5 +309,24 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         } catch (SQLException | IOException | AuthorizeException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
         }
+    }
+
+    @Override
+    public List<UUID> getSpecialGroups() {
+        Context context = new Context();
+        List<UUID> specialGroups = new ArrayList<>();
+        try {
+            Process process = processService.find(context, processId);
+            for (Group group : process.getGroups()) {
+                specialGroups.add(group.getID());
+            }
+        } catch (SQLException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not find the process", e);
+        } finally {
+            if (context.isValid()) {
+                context.abort();
+            }
+        }
+        return specialGroups;
     }
 }

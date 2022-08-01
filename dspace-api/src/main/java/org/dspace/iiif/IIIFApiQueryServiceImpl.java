@@ -34,15 +34,6 @@ public class IIIFApiQueryServiceImpl implements IIIFApiQueryService {
 
     @Override
     public int[] getImageDimensions(Bitstream bitstream) {
-        return getIiifImageDimensions(bitstream);
-    }
-
-    /**
-     * Retrieves image dimensions from the image server (IIIF Image API v.2.1.1).
-     * @param bitstream the bitstream DSO
-     * @return image dimensions
-     */
-    private int[] getIiifImageDimensions(Bitstream bitstream) {
         int[] arr = new int[2];
         String path = IIIFSharedUtils.getInfoJsonPath(bitstream);
         URL url;

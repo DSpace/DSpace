@@ -85,6 +85,12 @@ public class ManifestService extends AbstractResourceService {
     MetadataExposureService metadataExposureService;
 
     protected String[] METADATA_FIELDS;
+
+    /**
+     * Estimate image dimension metadata.
+     */
+    boolean guessCanvasDimension;
+
     /**
      * Constructor.
      * @param configurationService the DSpace configuration service.
@@ -102,6 +108,10 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest as JSON
      */
     public String getManifest(Item item, Context context) {
+        // If default dimensions are provided via configuration do not guess the default dimension.
+        String wid = configurationService.getProperty("iiif.canvas.default-width");
+        String hgt = configurationService.getProperty("iiif.canvas.default-height");
+        guessCanvasDimension = (wid == null && hgt == null);
         populateManifest(item, context);
         return utils.asJson(manifestGenerator.generateResource());
     }
@@ -131,9 +141,9 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Adds Canvases and Ranges to the manifest. Ranges are generated from bitstream
-     * or bundle iiif metadata.
-     * 
+     * Add the ranges to the manifest structure. Ranges are generated from the
+     * iiif.toc metadata
+     *
      * @param context the DSpace Context
      * @param item the DSpace Item to represent
      * @param manifestId the generated manifestId
@@ -142,8 +152,13 @@ public class ManifestService extends AbstractResourceService {
 
         // Set the root Range for this manifest.
         rangeService.setRootRange(manifestId);
-        // Get bundles that can contain IIIF manifest data.
+        // Get bundles that contain manifest data.
         List<Bundle> bundles = utils.getIIIFBundles(item);
+        // Set the default canvas dimensions.
+        if (guessCanvasDimension) {
+            canvasService.guessCanvasDimensions(bundles);
+        }
+        // canvasService.setDefaultCanvasDimensions();
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
@@ -151,13 +166,13 @@ public class ManifestService extends AbstractResourceService {
                 bundleToCPrefix = utils.getBundleIIIFToC(bnd);
             }
             for (Bitstream bitstream : utils.getIIIFBitstreams(context, bnd)) {
-                // Add the Canvas to the manifest Sequence.
+                // Add the Canvas to the Sequence.
                 CanvasGenerator canvas = sequenceService.addCanvas(context, item, bnd, bitstream);
                 // Update the Ranges.
                 rangeService.updateRanges(bitstream, bundleToCPrefix, canvas);
             }
         }
-        // If Ranges were created, add them to manifest Structures element.
+        // If Ranges were created, add them to manifest.
         Map<String, RangeGenerator> tocRanges = rangeService.getTocRanges();
         if (tocRanges != null && tocRanges.size() > 0) {
             RangeGenerator rootRange = rangeService.getRootRange();

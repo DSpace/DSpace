@@ -117,6 +117,7 @@ public class RequestItemBuilder
             throws Exception {
         LOG.debug("cleanup()");
         try ( Context ctx = new Context(); ) {
+            ctx.setDispatcher("noindex");
             ctx.turnOffAuthorisationSystem();
             requestItem = ctx.reloadEntity(requestItem);
             if (null != requestItem) {

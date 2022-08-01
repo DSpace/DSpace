@@ -22,11 +22,11 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AInprogressSubmissionRest;
+import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataCCLicense;
@@ -63,6 +63,7 @@ import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.jdbc.datasource.init.UncategorizedScriptException;
 import org.springframework.stereotype.Component;
@@ -94,6 +95,7 @@ public class SubmissionService {
     protected CreativeCommonsService creativeCommonsService;
     @Autowired
     private RequestService requestService;
+    @Lazy
     @Autowired
     private ConverterService converter;
     @Autowired
@@ -162,7 +164,7 @@ public class SubmissionService {
     /**
      * Build the rest representation of a bitstream as used in the upload section
      * ({@link DataUpload}. It contains all its metadata and the list of applied
-     * access conditions (@link {@link UploadBitstreamAccessConditionDTO}
+     * access conditions (@link {@link AccessConditionDTO}
      *
      * @param configurationService the DSpace ConfigurationService
      * @param source               the bitstream to translate in its rest submission
@@ -204,7 +206,7 @@ public class SubmissionService {
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                UploadBitstreamAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
+                AccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
                 data.getAccessConditions().add(uploadAccessCondition);
             }
         }
@@ -271,8 +273,8 @@ public class SubmissionService {
         return wi;
     }
 
-    private UploadBitstreamAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
-        UploadBitstreamAccessConditionDTO accessCondition = new UploadBitstreamAccessConditionDTO();
+    private AccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
+        AccessConditionDTO accessCondition = new AccessConditionDTO();
 
         accessCondition.setId(rp.getID());
         accessCondition.setName(rp.getRpName());
@@ -304,7 +306,9 @@ public class SubmissionService {
         result.setRights(creativeCommonsService.getLicenseName(item));
 
         Bitstream licenseRdfBitstream = creativeCommonsService.getLicenseRdfBitstream(item);
-        result.setFile(converter.toRest(licenseRdfBitstream, Projection.DEFAULT));
+        if (licenseRdfBitstream != null) {
+            result.setFile(converter.toRest(licenseRdfBitstream, Projection.DEFAULT));
+        }
 
         return result;
     }

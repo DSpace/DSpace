@@ -7,6 +7,8 @@
  */
 package org.dspace.app.iiif.service;
 
+import static org.dspace.app.iiif.service.utils.IIIFUtils.METADATA_IMAGE_WIDTH;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +59,13 @@ public class CanvasService extends AbstractResourceService {
     protected String[] BITSTREAM_METADATA_FIELDS;
 
     /**
+     * Used when default dimensions are set to -1 in configuration.
+     */
+    int dynamicDefaultWidth = 0;
+    int dynamicDefaultHeight = 0;
+
+
+    /**
      * Constructor.
      * 
      * @param configurationService the DSpace configuration service.
@@ -64,6 +73,79 @@ public class CanvasService extends AbstractResourceService {
     public CanvasService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
         BITSTREAM_METADATA_FIELDS = configurationService.getArrayProperty("iiif.metadata.bitstream");
+        // Set default dimensions in parent class.
+        setDefaultCanvasDimensions();
+    }
+
+    /**
+     * Checks for bitstream iiif.image.width metadata in the first
+     * bitstream in first IIIF bundle. If bitstream metadata is not
+     * found, use the IIIF image service to update the default canvas
+     * dimensions for this request. Called once for each manifest.
+     * @param bundles IIIF bundles for this item
+     */
+    protected void guessCanvasDimensions(List<Bundle> bundles) {
+        Bitstream firstBistream = bundles.get(0).getBitstreams().get(0);
+        if (!utils.hasWidthMetadata(firstBistream)) {
+            int[] imageDims = utils.getImageDimensions(firstBistream);
+            if (imageDims != null && imageDims.length == 2) {
+                // update the fallback dimensions
+                defaultCanvasWidthFallback = imageDims[0];
+                defaultCanvasHeightFallback = imageDims[1];
+            }
+            setDefaultCanvasDimensions();
+        }
+    }
+
+    /**
+     * Used to set the height and width dimensions for all images when iiif.image.default-width and
+     * iiif.image.default-height are set to -1 in DSpace configuration.
+     * The values are updated only if the bitstream does not have its own iiif.image.width metadata.
+     * @param bitstream
+     */
+    private void setCanvasDimensions(Bitstream bitstream) {
+        if (DEFAULT_CANVAS_HEIGHT == -1 && DEFAULT_CANVAS_WIDTH == -1) {
+            // When the default dimension is -1, update default dimensions when the
+            // image has no width metadata.
+            if (bitstream.getMetadata().stream().noneMatch(m -> m.getMetadataField().toString('.')
+                                                                 .contentEquals(METADATA_IMAGE_WIDTH))) {
+                int[] imageDims = utils.getImageDimensions(bitstream);
+                if (imageDims != null && imageDims.length == 2) {
+                    // update the dynamic default dimensions for this bitstream
+                    dynamicDefaultWidth  = imageDims[0];
+                    dynamicDefaultHeight = imageDims[1];
+                }
+                if (imageDims == null) {
+                    // use fallback.
+                    dynamicDefaultWidth = defaultCanvasWidthFallback;
+                    dynamicDefaultHeight = defaultCanvasHeightFallback;
+                    log.error("Unable to retrieve dimensions from the image server for: " + bitstream.getID() +
+                        " Using default dimensions.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Use the dynamic default if the configured default width is -1.
+     * @return
+     */
+    private int getDefaultWidth() {
+        if (DEFAULT_CANVAS_WIDTH == -1) {
+            return dynamicDefaultWidth;
+        }
+        return DEFAULT_CANVAS_WIDTH;
+    }
+
+    /**
+     * Use the dynamic default if the configured default height is -1.
+     * @return
+     */
+    private int getDefaultHeight() {
+        if (DEFAULT_CANVAS_HEIGHT == -1) {
+            return dynamicDefaultHeight;
+        }
+        return DEFAULT_CANVAS_HEIGHT;
     }
 
     /**
@@ -84,10 +166,12 @@ public class CanvasService extends AbstractResourceService {
 
         String canvasNaming = utils.getCanvasNaming(item, I18nUtil.getMessage("iiif.canvas.default-naming"));
         String label = utils.getIIIFLabel(bitstream, canvasNaming + " " + pagePosition);
-        int canvasWidth = utils.getCanvasWidth(bitstream, bundle, item, DEFAULT_CANVAS_WIDTH);
-        int canvasHeight = utils.getCanvasHeight(bitstream, bundle, item, DEFAULT_CANVAS_HEIGHT);
-        UUID bitstreamId = bitstream.getID();
 
+        setCanvasDimensions(bitstream);
+
+        int canvasWidth = utils.getCanvasWidth(bitstream, bundle, item, getDefaultWidth());
+        int canvasHeight = utils.getCanvasHeight(bitstream, bundle, item, getDefaultHeight());
+        UUID bitstreamId = bitstream.getID();
         ImageContentGenerator image = imageContentService.getImageContent(bitstreamId, mimeType,
                 imageUtil.getImageProfile(), IMAGE_PATH);
 

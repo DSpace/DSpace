@@ -8,7 +8,6 @@
 package org.dspace.services.factory;
 
 import org.dspace.kernel.ServiceManager;
-import org.dspace.services.CachingService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.services.EventService;
@@ -20,8 +19,6 @@ import org.dspace.utils.DSpace;
  * implementation
  */
 public abstract class DSpaceServicesFactory {
-    public abstract CachingService getCachingService();
-
     public abstract ConfigurationService getConfigurationService();
 
     public abstract EmailService getEmailService();
