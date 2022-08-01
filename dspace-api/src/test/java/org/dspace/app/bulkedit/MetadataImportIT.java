@@ -192,7 +192,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                 itemService.getMetadata(importedItem, "person", "birthDate", null, Item.ANY)
                            .get(0).getValue(), "2000"));
         context.turnOffAuthorisationSystem();
-        itemService.delete(context, importedItem);
+        itemService.delete(context, itemService.find(context, importedItem.getID()));
         context.restoreAuthSystemState();
     }
 

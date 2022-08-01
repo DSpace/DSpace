@@ -82,7 +82,11 @@ public class LicenseCleanup {
 
         Context ctx = new Context();
         ctx.turnOffAuthorisationSystem();
-        Iterator<Item> iter = itemService.findAllReadOnly(ctx);
+
+        int limit = 100;
+        int offset = 0;
+
+        Iterator<Item> iter = itemService.findAll(ctx, limit, offset);
 
         Properties props = new Properties();
 
@@ -96,21 +100,26 @@ public class LicenseCleanup {
 
         try {
             while (iter.hasNext()) {
-                if (i == 100) {
-                    props.store(new FileOutputStream(processed),
-                                "processed license files, remove to restart processing from scratch");
-                    i = 0;
-                }
+                while (iter.hasNext()) {
+                    if (i == 100) {
+                        props.store(new FileOutputStream(processed),
+                                    "processed license files, remove to restart processing from scratch");
+                        i = 0;
+                    }
 
-                Item item = (Item) iter.next();
-                log.info("checking: " + item.getID());
-                if (!props.containsKey("I" + item.getID())) {
-                    handleItem(ctx, item);
-                    log.info("processed: " + item.getID());
-                }
+                    Item item = (Item) iter.next();
+                    log.info("checking: " + item.getID());
+                    if (!props.containsKey("I" + item.getID())) {
+                        handleItem(ctx, item);
+                        log.info("processed: " + item.getID());
+                    }
 
-                props.put("I" + item.getID(), "done");
-                i++;
+                    props.put("I" + item.getID(), "done");
+                    i++;
+                }
+                offset += limit;
+                ctx.commit();
+                iter = itemService.findAll(ctx, limit, offset);
             }
         } finally {
             props

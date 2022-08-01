@@ -264,7 +264,8 @@ public class PolicySet {
 
                             if (!clearOnly) {
                                 // before create a new policy check if an identical policy is already in place
-                                if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, bundle, group, actionID, -1)) {
+                                if (!authorizeService
+                                        .isAnIdenticalPolicyAlreadyInPlace(c, bundle, group, actionID, -1)) {
                                     // now add the policy
                                     ResourcePolicy rp = resourcePolicyService.create(c);
 
@@ -330,6 +331,7 @@ public class PolicySet {
                 }
                 offset += limit;
                 c.commit();
+                c.reloadEntity(collection);
                 i = itemService.findAllByCollection(c, collection, limit, offset);            }
         }
     }

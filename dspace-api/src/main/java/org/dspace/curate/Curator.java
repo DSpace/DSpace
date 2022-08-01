@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -515,8 +514,9 @@ public class Curator {
                 }
                 offset += limit;
                 context.commit();
-                iter = itemService.findByCollection(context, coll, limit, offset);            }
-            
+                context.reloadEntity(coll);
+                iter = itemService.findByCollection(context, coll, limit, offset);
+            }
         } catch (SQLException sqlE) {
             throw new IOException(sqlE.getMessage(), sqlE);
         }

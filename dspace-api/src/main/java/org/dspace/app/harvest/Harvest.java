@@ -350,6 +350,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 }
                 offset += limit;
                 context.commit();
+                context.reloadEntity(collection);
                 items = itemService.findByCollection(context, collection, limit, offset);
             }
 
