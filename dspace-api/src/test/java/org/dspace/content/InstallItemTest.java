@@ -14,23 +14,19 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractUnitTest;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,14 +37,11 @@ import org.junit.rules.ExpectedException;
  *
  * @author pvillega
  */
-public class InstallItemTest extends AbstractUnitTest {
+public class InstallItemTest extends AbstractIntegrationTestWithDatabase {
 
 
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     private Collection collection;
     private Community owningCommunity;
@@ -67,41 +60,13 @@ public class InstallItemTest extends AbstractUnitTest {
 
     @Before
     @Override
-    public void init() {
-        super.init();
-        try {
-            context.turnOffAuthorisationSystem();
-            this.owningCommunity = communityService.create(null, context);
-            this.collection = collectionService.create(context, owningCommunity);
-            context.restoreAuthSystemState();
-        } catch (SQLException | AuthorizeException ex) {
-            log.error("SQL Error in init", ex);
-            fail("SQL Error in init: " + ex.getMessage());
-        }
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+        this.owningCommunity = CommunityBuilder.createCommunity(context).build();
+        this.collection = CollectionBuilder.createCollection(context, owningCommunity).build();
+        context.restoreAuthSystemState();
     }
-
-    /**
-     * This method will be run after every test as per @After. It will
-     * clean resources initialized by the @Before methods.
-     *
-     * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @After
-    @Override
-    public void destroy() {
-        try {
-            context.turnOffAuthorisationSystem();
-            communityService.delete(context, owningCommunity);
-            context.restoreAuthSystemState();
-        } catch (SQLException | AuthorizeException | IOException ex) {
-            log.error("SQL Error in destroy", ex);
-            fail("SQL Error in destroy: " + ex.getMessage());
-            context.abort();
-        }
-        super.destroy();
-    }
-
 
     /**
      * Test of installItem method, of class InstallItem.
@@ -109,7 +74,7 @@ public class InstallItemTest extends AbstractUnitTest {
     @Test
     public void testInstallItem_Context_InProgressSubmission() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
 
         Item result = installItemService.installItem(context, is);
         context.restoreAuthSystemState();
@@ -123,7 +88,7 @@ public class InstallItemTest extends AbstractUnitTest {
     public void testInstallItem_validHandle() throws Exception {
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
 
         //Test assigning a specified handle to an item
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
@@ -141,8 +106,8 @@ public class InstallItemTest extends AbstractUnitTest {
         // create two items for tests
         context.turnOffAuthorisationSystem();
         try {
-            WorkspaceItem is = workspaceItemService.create(context, collection, false);
-            WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
+            WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
+            WorkspaceItem is2 = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
 
             //Test assigning the same Handle to two different items
             String handle = "123456789/56789";
@@ -164,7 +129,7 @@ public class InstallItemTest extends AbstractUnitTest {
     public void testRestoreItem() throws Exception {
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
 
         //get current date
         DCDate now = DCDate.getCurrent();
@@ -199,7 +164,7 @@ public class InstallItemTest extends AbstractUnitTest {
     public void testGetBitstreamProvenanceMessage() throws Exception {
         File f = new File(testProps.get("test.bitstream").toString());
         context.turnOffAuthorisationSystem();
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
         Item item = installItemService.installItem(context, is);
 
         Bitstream one = itemService.createSingleBitstream(context, new FileInputStream(f), item);
@@ -233,7 +198,7 @@ public class InstallItemTest extends AbstractUnitTest {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
 
         // Set "today" as "dc.date.issued"
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "today");
@@ -266,7 +231,7 @@ public class InstallItemTest extends AbstractUnitTest {
         //create a dummy WorkspaceItem with no dc.date.issued
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
 
         Item result = installItemService.installItem(context, is, handle);
         context.restoreAuthSystemState();
@@ -284,8 +249,7 @@ public class InstallItemTest extends AbstractUnitTest {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
-
+        WorkspaceItem is = WorkspaceItemBuilder.createWorkspaceItem(context, collection).build();
         // Set "today" as "dc.date.issued"
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "today");
         itemService.addMetadata(context, is.getItem(), "dc", "date", "issued", Item.ANY, "2011-01-01");

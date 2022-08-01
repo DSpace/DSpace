@@ -12,23 +12,17 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractUnitTest;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
-import org.dspace.content.service.WorkspaceItemService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +31,7 @@ import org.junit.Test;
  *
  * @author pvillega
  */
-public class MetadataValueTest extends AbstractUnitTest {
+public class MetadataValueTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * log4j category
@@ -71,10 +65,6 @@ public class MetadataValueTest extends AbstractUnitTest {
 
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -85,51 +75,17 @@ public class MetadataValueTest extends AbstractUnitTest {
      */
     @Before
     @Override
-    public void init() {
-        super.init();
-        try {
+    public void setUp() throws Exception {
+        super.setUp();
             context.turnOffAuthorisationSystem();
-            this.owningCommunity = communityService.create(null, context);
-            this.collection = collectionService.create(context, owningCommunity);
-            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
-            this.it = installItemService.installItem(context, workspaceItem);
+            this.owningCommunity = CommunityBuilder.createCommunity(context).build();
+            this.collection = CollectionBuilder.createCollection(context, owningCommunity).build();
+            this.it = ItemBuilder.createItem(context, collection).build();
 
             this.mf = metadataFieldService.findByElement(context,
                                                          MetadataSchemaEnum.DC.getName(), element, qualifier);
             this.mv = metadataValueService.create(context, it, mf);
             context.restoreAuthSystemState();
-        } catch (AuthorizeException ex) {
-            log.error("Authorize Error in init", ex);
-            fail("Authorize Error in init: " + ex.getMessage());
-        } catch (SQLException ex) {
-            log.error("SQL Error in init", ex);
-            fail("SQL Error in init: " + ex.getMessage());
-        }
-    }
-
-    /**
-     * This method will be run after every test as per @After. It will
-     * clean resources initialized by the @Before methods.
-     *
-     * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @After
-    @Override
-    public void destroy() {
-        try {
-            context.turnOffAuthorisationSystem();
-            communityService.delete(context, owningCommunity);
-        } catch (SQLException | AuthorizeException | IOException ex) {
-            log.error("Error in destroy", ex);
-            fail("Error in destroy: " + ex.getMessage());
-        } finally {
-            context.restoreAuthSystemState();
-        }
-
-        mf = null;
-        mv = null;
-        super.destroy();
     }
 
     /**
