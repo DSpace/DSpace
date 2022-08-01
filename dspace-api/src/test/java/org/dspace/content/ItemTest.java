@@ -1526,19 +1526,19 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testMoveSameCollection() throws Exception {
         context.turnOffAuthorisationSystem();
-        while (it.getCollections().size() > 1) {
-            it.removeCollection(it.getCollections().get(0));
+        while (item1.getCollections().size() > 1) {
+            item1.removeCollection(item1.getCollections().get(0));
         }
 
-        Collection collection = it.getCollections().get(0);
-        it.setOwningCollection(collection);
+        Collection collection = item1.getCollections().get(0);
+        item1.setOwningCollection(collection);
         ItemService itemServiceSpy = spy(itemService);
 
-        itemService.move(context, it, collection, collection);
+        itemService.move(context, item1, collection, collection);
         context.restoreAuthSystemState();
-        assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
-        assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));
-        verify(itemServiceSpy, times(0)).delete(context, it);
+        assertThat("testMoveSameCollection 0", item1.getOwningCollection(), notNullValue());
+        assertThat("testMoveSameCollection 1", item1.getOwningCollection(), equalTo(collection));
+        verify(itemServiceSpy, times(0)).delete(context, item1);
     }
 
     /**
