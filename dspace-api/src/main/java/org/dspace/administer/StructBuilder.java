@@ -217,6 +217,7 @@ public class StructBuilder {
         // Export? Import?
         if (line.hasOption('x')) { // export
             exportStructure(context, outputStream);
+            outputStream.close();
         } else { // Must be import
             String input = line.getOptionValue('f');
             if (null == input) {
@@ -233,6 +234,10 @@ public class StructBuilder {
 
             boolean keepHandles = options.hasOption("k");
             importStructure(context, inputStream, outputStream, keepHandles);
+
+            inputStream.close();
+            outputStream.close();
+
             // save changes from import
             context.complete();
         }
