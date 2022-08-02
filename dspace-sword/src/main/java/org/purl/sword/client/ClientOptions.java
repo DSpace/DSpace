@@ -199,7 +199,7 @@ public class ClientOptions {
         option = Option.builder().longOpt("formatNamespace").hasArg().build();
         options.addOption(option);
 
-        option = Option.builder().longOpt("checksumError").hasArg().build();
+        option = Option.builder().longOpt("checksumError").build();
         options.addOption(option);
 
         option = Option.builder().longOpt("dest").hasArg().build();

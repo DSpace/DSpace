@@ -368,6 +368,7 @@ public class LogAnalyser {
         options.addOption(option);
 
         option = Option.builder().longOpt("lookup").build();
+        options.addOption(option);
 
         // Parse the command.
         DefaultParser cmdParser = new DefaultParser();
