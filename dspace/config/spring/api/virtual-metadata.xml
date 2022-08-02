@@ -21,6 +21,7 @@
                 <entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
                 <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
                 <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
+                <entry key="isResourceTypeOfPublication" value-ref="isResourceTypeOfPublicationMap" />
             </map>
         </property>
     </bean>
@@ -31,6 +32,7 @@
                 <entry key="Publication" value="f.entityType=Publication,equals"/>
                 <entry key="Person" value="f.entityType=Person,equals"/>
                 <entry key="Journal" value="f.entityType=Journal,equals"/>
+                <entry key="ResourceType" value="f.entityType=ResourceType,equals" />
             </map>
         </property>
     </bean>
@@ -215,6 +217,17 @@
         </property>
         <property name="separator">
             <value>, </value>
+        </property>
+    </bean>
+    
+    <util:map id="isResourceTypeOfPublicationMap">
+        <entry key="dc.type" value-ref="publication_resourceType" />
+    </util:map>
+    <bean class="org.dspace.content.virtual.Collected" id="publication_resourceType">
+        <property name="fields">
+            <util:list>
+                <value>resourcetypes.name</value>
+            </util:list>
         </property>
     </bean>
 

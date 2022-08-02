@@ -107,6 +107,7 @@
                 <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
+                <entry key="resourcetype" value-ref="resourcetype"/>
                 <entry key="eperson_claims" value-ref="eperson_claims"/>
             </map>
         </property>
@@ -162,6 +163,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -182,6 +184,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
+                <ref bean="searchFilterIsPublicationOfResourceTypeRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -297,6 +302,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -317,6 +323,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
+                <ref bean="searchFilterIsPublicationOfResourceTypeRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -435,6 +444,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -455,7 +465,10 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
-            </list>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
+                <ref bean="searchFilterIsPublicationOfResourceTypeRelation"/>
+           </list>
         </property>
         <!--The sort filters for the discovery search-->
         <property name="searchSortConfiguration">
@@ -575,6 +588,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -597,6 +611,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
+                <ref bean="searchFilterIsPublicationOfResourceTypeRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -713,6 +730,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -733,6 +751,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
+                <ref bean="searchFilterIsPublicationOfResourceTypeRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
@@ -1051,6 +1072,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -1071,6 +1093,8 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1120,6 +1144,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -1140,6 +1165,8 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsResourceTypeOfPublicationRelation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2043,6 +2070,49 @@
         <property name="spellCheckEnabled" value="false"/>
     </bean>
 
+    <bean id="resourcetype" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype">
+        <property name="id" value="resourcetype"/>
+        <property name="indexAlways" value="true"/>
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterResourceTypeName"/>
+                <ref bean="searchFilterIsPublicationOfResourceTypeRelation"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortEntityType"/>
+                        <ref bean="sortResourceType" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <value>search.resourcetype:Item AND entityType_keyword:ResourceType</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10"/>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
 
     <!--TagCloud configuration bean for homepage discovery configuration-->
     <bean id="homepageTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration">
@@ -2772,6 +2842,43 @@
         <property name="pageSize" value="10"/>
     </bean>
 
+
+    <bean id="searchFilterResourceTypeName" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="resourceTypeName"/>
+        <property name="metadataFields">
+            <list>
+                <value>resourcetypes.name</value>
+                <value>dc.​type</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterIsResourceTypeOfPublicationRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isResourceTypeOfPublication"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isResourceTypeOfPublication</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterIsPublicationOfResourceTypeRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfResourceType"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isResourceTypedAs</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+
     <!--Sort properties-->
     <bean id="sortScore" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="defaultSortOrder" value="desc"/>
@@ -2845,5 +2952,10 @@
         <property name="metadataField" value="dspace.entity.type"/>
         <property name="defaultSortOrder" value="desc"/>
     </bean>
-
+    
+    <bean id="sortResourceType" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="resourcetype.name"/>
+        <property name="defaultSortOrder" value="desc"/>
+    </bean>
+    
 </beans>
