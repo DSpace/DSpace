@@ -39,5 +39,37 @@
         <qualifier>identifier</qualifier>
         <scope_note>Unique identifier of the funding entity.</scope_note>
     </dc-type>
+    
+    <dc-type>
+        <schema>project</schema>
+        <element>investigator</element>
+        <scope_note>Project investigator</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>project</schema>
+        <element>startDate</element>
+        <scope_note>The project start date</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>project</schema>
+        <element>endDate</element>
+        <scope_note>The project end date</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>project</schema>
+        <element>amount</element>
+        <scope_note>The project amount</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>project</schema>
+        <element>amount</element>
+        <qualifier>currency</qualifier>
+        <scope_note>The project amount currency</scope_note>
+    </dc-type>
+    
 
 </dspace-dc-types>

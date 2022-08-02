@@ -51,6 +51,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
@@ -59,7 +63,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.xpath.XPathAPI;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
 import org.dspace.app.util.RelationshipUtils;
@@ -400,10 +403,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         }
 
                         // Create the relationship
-                        int leftPlace = relationshipService.findNextLeftPlaceByLeftItem(c, leftItem);
-                        int rightPlace = relationshipService.findNextRightPlaceByRightItem(c, rightItem);
-                        Relationship persistedRelationship = relationshipService.create(
-                            c, leftItem, rightItem, foundRelationshipType, leftPlace, rightPlace);
+                        Relationship persistedRelationship =
+                            relationshipService.create(c, leftItem, rightItem, foundRelationshipType, -1, -1);
                         // relationshipService.update(c, persistedRelationship);
 
                         System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
@@ -863,7 +864,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     // Load all metadata schemas into the item.
     protected void loadMetadata(Context c, Item myitem, String path)
         throws SQLException, IOException, ParserConfigurationException,
-        SAXException, TransformerException, AuthorizeException {
+        SAXException, TransformerException, AuthorizeException, XPathExpressionException {
         // Load the dublin core metadata
         loadDublinCore(c, myitem, path + "dublin_core.xml");
 
@@ -877,14 +878,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     protected void loadDublinCore(Context c, Item myitem, String filename)
         throws SQLException, IOException, ParserConfigurationException,
-        SAXException, TransformerException, AuthorizeException {
+        SAXException, TransformerException, AuthorizeException, XPathExpressionException {
         Document document = loadXML(filename);
 
         // Get the schema, for backward compatibility we will default to the
         // dublin core schema if the schema name is not available in the import
         // file
         String schema;
-        NodeList metadata = XPathAPI.selectNodeList(document, "/dublin_core");
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList metadata = (NodeList) xPath.compile("/dublin_core").evaluate(document, XPathConstants.NODESET);
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem(
             "schema");
         if (schemaAttr == null) {
@@ -894,8 +896,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         // Get the nodes corresponding to formats
-        NodeList dcNodes = XPathAPI.selectNodeList(document,
-                                                   "/dublin_core/dcvalue");
+        NodeList dcNodes = (NodeList) xPath.compile("/dublin_core/dcvalue").evaluate(document, XPathConstants.NODESET);
 
         if (!isQuiet) {
             System.out.println("\tLoading dublin core from " + filename);

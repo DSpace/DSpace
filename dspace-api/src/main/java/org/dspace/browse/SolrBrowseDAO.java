@@ -205,6 +205,9 @@ public class SolrBrowseDAO implements BrowseDAO {
                 } else if (valuePartial) {
                     query.addFilterQueries("{!field f=" + facetField + "_partial}" + value);
                 }
+                if (StringUtils.isNotBlank(startsWith) && orderField != null) {
+                    query.addFilterQueries("bi_" + orderField + "_sort:" + startsWith + "*");
+                }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
                 query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);

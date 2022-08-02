@@ -43,11 +43,11 @@
           class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
     </bean>
 
-
     <bean id="pubmedImportService"
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
-        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="urlFetch" value="${pubmed.url.fetch}"/>
+        <property name="urlSearch" value="${pubmed.url.search}"/>
         <property name="generateQueryForItem" ref="pubmedService"></property>
         <property name="supportedExtensions">
             <list>
@@ -55,7 +55,6 @@
             </list>
         </property>
     </bean>
-
 
     <bean id="pubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
@@ -115,6 +114,77 @@
           </property>
     </bean>
 
+    <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
+        <property name="url" value="${crossref.url}"/>
+    </bean>
+    <bean id="CrossRefMetadataFieldMapping" class="org.dspace.importer.external.crossref.CrossRefFieldMapping"/>
+
+    <bean id="EpoImportService" class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
+        <property name="consumerKey" value="${epo.consumerKey}" />
+        <property name="consumerSecret" value="${epo.consumerSecretKey}" />
+        <property name="url" value="${epo.url}" />
+        <property name="authUrl" value="${epo.authUrl}" />
+        <property name="searchUrl" value="${epo.searchUrl}" />
+        <!-- date filed mapped metadata, see epo-integration.xml -->
+        <property name="dateFiled" ref="epo.dc.date.filed" />
+        <property name="applicationNumber" ref="epo.dc.identifier" />
+    </bean>
+    <bean id="epoMetadataFieldMapping" class="org.dspace.importer.external.epo.service.EpoFieldMapping"/>
+
+    <bean id="ScopusImportService" class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
+        <property name="url" value="${scopus.url}"/>
+        <property name="apiKey" value="${scopus.apiKey}"/>
+        <property name="instKey" value="${scopus.instToken}"/>
+        <property name="viewMode" value="${scopus.search-api.viewMode}"/>
+    </bean>
+    <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
+
+    <bean id="vufindImportService" class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
+          <!-- Set to empty to use the default set of fields  -->
+          <constructor-arg type="java.lang.String" value=""/>
+          <property name="metadataFieldMapping" ref="vufindMetadataFieldMapping"/>
+          <property name="url" value="${vufind.url}"/>
+          <property name="urlSearch" value="${vufind.url.search}"/>
+    </bean>
+    <bean id="vufindMetadataFieldMapping" class="org.dspace.importer.external.vufind.metadatamapping.VuFindFieldMapping"/>
+
+    <bean id="ScieloImportService" class="org.dspace.importer.external.scielo.service.ScieloImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scieloMetadataFieldMapping"/>
+        <property name="url" value="${scielo.url}"/>
+    </bean>
+    <bean id="scieloMetadataFieldMapping" class="org.dspace.importer.external.scielo.service.ScieloFieldMapping"/>
+
+    <bean id="WosImportService" class="org.dspace.importer.external.wos.service.WOSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="wosMetadataFieldMapping"/>
+        <property name="apiKey" value="${wos.apiKey}"/>
+        <property name="url" value="${wos.url}"/>
+        <property name="urlSearch" value="${wos.url.search}"/>
+    </bean>
+    <bean id="wosMetadataFieldMapping" class="org.dspace.importer.external.wos.service.WOSFieldMapping"/>
+
+    <bean id="PubmedEuropeImportService" class="org.dspace.importer.external.pubmedeurope.PubmedEuropeMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="PubmedEuropeMetadataFieldMapping"/>
+        <property name="url" value="${pubmedeurope.url}"/>
+    </bean>
+    <bean id="PubmedEuropeMetadataFieldMapping" class="org.dspace.importer.external.pubmedeurope.PubmedEuropeFieldMapping"/>
+
+    <bean id="CiniiImportService" class="org.dspace.importer.external.cinii.CiniiImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="CiniiMetadataFieldMapping"/>
+        <property name="url" value="${cinii.url}"/>
+        <property name="urlSearch" value="${cinii.url.search}"/>
+    </bean>
+    <bean id="CiniiMetadataFieldMapping" class="org.dspace.importer.external.cinii.CiniiFieldMapping"/>
+
+    <bean id="ADSImportService" class="org.dspace.importer.external.ads.ADSImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="apiKey" value="${ads.key}" />
+        <property name="url" value="${ads.url}" />
+        <property name="resultFieldList" value="${ads.resultFieldList}" />
+        <property name="metadataFieldMapping" ref="ADSMetadataFieldMapping"/>
+    </bean>
+    <bean id="ADSMetadataFieldMapping" class="org.dspace.importer.external.ads.ADSFieldMapping"/>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
