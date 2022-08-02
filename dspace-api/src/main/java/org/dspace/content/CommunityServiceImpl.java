@@ -565,6 +565,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             Community subComm = subCommunities.next();
             community.removeSubCommunity(subComm);
             delete(context, subComm);
+            community = context.reloadEntity(community);
         }
 
         // Remove the logo
