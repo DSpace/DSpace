@@ -331,7 +331,7 @@ public class PolicySet {
                 }
                 offset += limit;
                 c.commit();
-                c.reloadEntity(collection);
+                collection = c.reloadEntity(collection);
                 i = itemService.findAllByCollection(c, collection, limit, offset);            }
         }
     }

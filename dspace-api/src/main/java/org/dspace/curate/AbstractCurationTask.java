@@ -94,7 +94,7 @@ public abstract class AbstractCurationTask implements CurationTask {
                     }
                     offset += limit;
                     Curator.curationContext().commit();
-                    Curator.curationContext().reloadEntity(dso);
+                    dso = Curator.curationContext().reloadEntity(dso);
                     iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso, limit, offset);
                 }
             } else if (Constants.COMMUNITY == type) {

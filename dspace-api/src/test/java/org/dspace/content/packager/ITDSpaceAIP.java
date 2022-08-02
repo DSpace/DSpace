@@ -24,11 +24,19 @@ import java.util.List;
 
 import com.google.common.base.Splitter;
 import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractIntegrationTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -47,23 +55,18 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,7 +78,7 @@ import org.junit.rules.TemporaryFolder;
  *
  * @author Tim Donohue
  */
-public class ITDSpaceAIP extends AbstractIntegrationTest {
+public class ITDSpaceAIP extends AbstractIntegrationTestWithDatabase {
     /**
      * log4j category
      */
@@ -93,6 +96,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
     protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
                                                                                    .getResourcePolicyService();
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance()
+                                                                         .getAuthorizeService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     /**
@@ -124,195 +129,94 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
     public final TemporaryFolder aipTempFolder = new TemporaryFolder();
 
     /**
-     * This method will be run during class initialization. It will initialize
-     * shared resources required for all the tests. It is only run once.
-     *
-     * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @BeforeClass
-    public static void setUpClass() {
-        try {
-            Context context = new Context();
-            // Create a dummy Community hierarchy to test with
-            // Turn off authorization temporarily to create some test objects.
-            context.turnOffAuthorisationSystem();
-
-            CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-            CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-            ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-            BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-            WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-            InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-
-            log.info("setUpClass() - CREATE TEST HIERARCHY");
-            // Create a hierachy of sub-Communities and Collections and Items,
-            // which looks like this:
-            //  "Top Community"
-            //      - "Child Community"
-            //          - "Grandchild Community"
-            //              - "GreatGrandchild Collection"
-            //                  - "GreatGrandchild Collection Item #1"
-            //                  - "GreatGrandchild Collection Item #2"
-            //                  - "Mapped Item" (mapped collection)
-            //          - "Grandchild Collection"
-            //              - "Grandchild Collection Item #1"
-            //              - "Mapped Item" (owning collection)
-            //
-            Community topCommunity = communityService.create(null, context);
-            communityService
-                .addMetadata(context, topCommunity, MetadataSchemaEnum.DC.getName(),
-                             "title", null, null, "Top Community");
-            communityService.update(context, topCommunity);
-            topCommunityHandle = topCommunity.getHandle();
-
-            Community child = communityService.createSubcommunity(context, topCommunity);
-            communityService
-                .addMetadata(context, child, MetadataSchemaEnum.DC.getName(), "title", null, null, "Child Community");
-            communityService.update(context, child);
-
-            Community grandchild = communityService.createSubcommunity(context, child);
-            communityService.addMetadata(context, grandchild, MetadataSchemaEnum.DC.getName(), "title", null, null,
-                                         "Grandchild Community");
-            communityService.update(context, grandchild);
-
-            // Create our primary Test Collection
-            Collection grandchildCol = collectionService.create(context, child);
-            collectionService.addMetadata(context, grandchildCol, "dc", "title", null, null, "Grandchild Collection");
-            collectionService.update(context, grandchildCol);
-            testCollectionHandle = grandchildCol.getHandle();
-
-            // Create an additional Test Collection
-            Collection greatgrandchildCol = collectionService.create(context, grandchild);
-            collectionService
-                .addMetadata(context, greatgrandchildCol, "dc", "title", null, null, "GreatGrandchild Collection");
-            collectionService.update(context, greatgrandchildCol);
-
-            EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-            EPerson submitter = ePersonService.create(context);
-            submitter.setEmail(submitterEmail);
-            ePersonService.update(context, submitter);
-            context.setCurrentUser(submitter);
-
-            //Make our test ePerson an admin so he can perform deletes and restores
-            GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-            Group adminGroup = groupService.findByName(context, Group.ADMIN);
-            groupService.addMember(context, adminGroup, submitter);
-
-            // Create our primary Test Item
-            WorkspaceItem wsItem = workspaceItemService.create(context, grandchildCol, false);
-            Item item = installItemService.installItem(context, wsItem);
-            itemService.addMetadata(context, item, "dc", "title", null, null, "Grandchild Collection Item #1");
-            // For our primary test item, create a Bitstream in the ORIGINAL bundle
-            File f = new File(testProps.get("test.bitstream").toString());
-            Bitstream b = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-            b.setName(context, "Test Bitstream");
-            bitstreamService.update(context, b);
-            itemService.update(context, item);
-            testItemHandle = item.getHandle();
-
-            // Create a Mapped Test Item (mapped to multiple collections
-            WorkspaceItem wsItem2 = workspaceItemService.create(context, grandchildCol, false);
-            Item item2 = installItemService.installItem(context, wsItem2);
-            itemService.addMetadata(context, item2, "dc", "title", null, null, "Mapped Item");
-            itemService.update(context, item2);
-            collectionService.addItem(context, greatgrandchildCol, item2);
-            testMappedItemHandle = item2.getHandle();
-
-            WorkspaceItem wsItem3 = workspaceItemService.create(context, greatgrandchildCol, false);
-            Item item3 = installItemService.installItem(context, wsItem3);
-            itemService.addMetadata(context, item3, "dc", "title", null, null, "GreatGrandchild Collection Item #1");
-            itemService.update(context, item3);
-
-            WorkspaceItem wsItem4 = workspaceItemService.create(context, greatgrandchildCol, false);
-            Item item4 = installItemService.installItem(context, wsItem4);
-            itemService.addMetadata(context, item4, "dc", "title", null, null, "GreatGrandchild Collection Item #2");
-            itemService.update(context, item4);
-
-            // Commit these changes to our DB
-            context.restoreAuthSystemState();
-            context.complete();
-        } catch (AuthorizeException ex) {
-            log.error("Authorization Error in setUpClass()", ex);
-            fail("Authorization Error in setUpClass(): " + ex.getMessage());
-        } catch (IOException ex) {
-            log.error("IO Error in setUpClass()", ex);
-            fail("IO Error in setUpClass(): " + ex.getMessage());
-        } catch (SQLException ex) {
-            log.error("SQL Error in setUpClass()", ex);
-            fail("SQL Error in setUpClass(): " + ex.getMessage());
-        }
-    }
-
-    /**
-     * This method will be run once at the very end
-     */
-    @AfterClass
-    public static void tearDownClass() {
-        try {
-            Context context = new Context();
-            CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-            HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
-            Community topCommunity = (Community) handleService.resolveToObject(context, topCommunityHandle);
-
-            // Delete top level test community and test hierarchy under it
-            if (topCommunity != null) {
-                log.info("tearDownClass() - DESTROY TEST HIERARCHY");
-                context.turnOffAuthorisationSystem();
-                communityService.delete(context, topCommunity);
-                context.restoreAuthSystemState();
-                context.commit();
-            }
-
-            // Delete the Eperson created to submit test items
-            EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-            EPerson eperson = ePersonService.findByEmail(context, submitterEmail);
-            if (eperson != null) {
-                log.info("tearDownClass() - DESTROY TEST EPERSON");
-                context.turnOffAuthorisationSystem();
-                ePersonService.delete(context, eperson);
-                context.restoreAuthSystemState();
-                context.commit();
-            }
-
-            if (context.isValid()) {
-                context.abort();
-            }
-        } catch (Exception ex) {
-            log.error("Error in tearDownClass()", ex);
-        }
-    }
-
-    /**
      * Create an initial set of AIPs for the test content generated in setUpClass() above.
      */
     @Before
     @Override
-    public void init() {
+    public void setUp() throws Exception {
         // call init() from AbstractUnitTest to initialize testing framework
-        super.init();
+        super.setUp();
 
         // Override default value of configured temp directory to point at our
         // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk
         // store their temp files in a place where JUnit can clean them up automatically.
         configService.setProperty("upload.temp.dir", uploadTempFolder.getRoot().getAbsolutePath());
 
-        try {
-            context = new Context();
-            context.setCurrentUser(
-                EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, submitterEmail));
-        } catch (SQLException ex) {
-            log.error("SQL Error in init()", ex);
-            fail("SQL Error in init(): " + ex.getMessage());
-        }
+        // Create a dummy Community hierarchy to test with
+        // Turn off authorization temporarily to create some test objects.
+        context.turnOffAuthorisationSystem();
+
+
+        log.info("setUpClass() - CREATE TEST HIERARCHY");
+        // Create a hierachy of sub-Communities and Collections and Items,
+        // which looks like this:
+        //  "Top Community"
+        //      - "Child Community"
+        //          - "Grandchild Community"
+        //              - "GreatGrandchild Collection"
+        //                  - "GreatGrandchild Collection Item #1"
+        //                  - "GreatGrandchild Collection Item #2"
+        //                  - "Mapped Item" (mapped collection)
+        //          - "Grandchild Collection"
+        //              - "Grandchild Collection Item #1"
+        //              - "Mapped Item" (owning collection)
+        //
+        Community topCommunity = CommunityBuilder.createCommunity(context)
+                                                 .withTitle("Top Community")
+                                                 .build();
+
+        topCommunityHandle = topCommunity.getHandle();
+
+        Community child = CommunityBuilder.createSubCommunity(context, topCommunity)
+                                          .withTitle("Child Community")
+                                          .build();
+        Community grandchild = CommunityBuilder.createSubCommunity(context, child)
+                                               .withTitle("Grandchild Community")
+                                               .build();
+
+
+        // Create our primary Test Collection
+        Collection grandchildCol = CollectionBuilder.createCollection(context, child)
+                                                    .withName("Grandchild Collection")
+                                                    .build();
+        testCollectionHandle = grandchildCol.getHandle();
+
+        // Create an additional Test Collection
+        Collection greatgrandchildCol = CollectionBuilder.createCollection(context, grandchild)
+                                                         .withName("GreatGrandchild Collection")
+                                                         .build();
+
+        // Create our primary Test Item
+        Item item = ItemBuilder.createItem(context, grandchildCol).withTitle("Grandchild Collection Item #1").build();
+
+        // For our primary test item, create a Bitstream in the ORIGINAL bundle
+        File f = new File(testProps.get("test.bitstream").toString());
+        BitstreamBuilder.createBitstream(context, item, new FileInputStream(f))
+                        .withName("Test Bitstream")
+                        .build();
+        testItemHandle = item.getHandle();
+
+        // Create a Mapped Test Item (mapped to multiple collections
+        Item item2 = ItemBuilder.createItem(context, grandchildCol).withTitle("Mapped Item").build();
+        collectionService.addItem(context, greatgrandchildCol, item2);
+        testMappedItemHandle = item2.getHandle();
+
+        Item item3 = ItemBuilder.createItem(context, greatgrandchildCol)
+                                .withTitle("GreatGrandchild Collection Item #1")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, greatgrandchildCol)
+                                .withTitle("GreatGrandchild Collection Item #2")
+                                .build();
+
+
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail(submitterEmail)
+                                          .withGroupMembership(groupService.findByName(context, Group.ADMIN)).build();
+        context.restoreAuthSystemState();
+
+        context.setCurrentUser(submitter);
     }
 
-    @After
-    @Override
-    public void destroy() {
-        context.abort();
-        super.destroy();
-    }
 
     /**
      * Test restoration from AIP of entire Community Hierarchy
@@ -374,22 +278,19 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         Community parent = (Community) handleService.resolveToObject(context, topCommunityHandle);
 
         // Create a brand new (empty) Community to test with
-        Community community = communityService.createSubcommunity(context, parent);
-        communityService.addMetadata(context, community, "dc", "title", null, null, "Restricted Community");
-        communityService.update(context, community);
+        Community community = CommunityBuilder.createSubCommunity(context, parent)
+                                              .withTitle("Restricted Community")
+                                              .build();
         String communityHandle = community.getHandle();
 
         // Create a new Group to access restrict to
-        Group group = groupService.create(context);
-        groupService.setName(group, "Special Users");
-        groupService.update(context, group);
+        Group group = GroupBuilder.createGroup(context).withName("Special Users").build();
 
+        ResourcePolicy policy = ResourcePolicyBuilder.createResourcePolicy(context)
+                                                     .withName("Special Read Only")
+                                                     .withGroup(group).withAction(Constants.READ).build();
         // Create a custom resource policy for this community
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
-        policy.setRpName("Special Read Only");
-        policy.setGroup(group);
-        policy.setAction(Constants.READ);
         policies.add(policy);
 
         // Replace default community policies with this new one
@@ -468,6 +369,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         // Now, delete that one collection
         log.info("testReplaceCommunityHierarchy() - DELETE Collection");
         communityService.removeCollection(context, parent, collectionToDelete);
+        context.reloadEntity(parent);
+        topCommunity = context.reloadEntity(topCommunity);
 
         // Assert the deleted collection no longer exists
         DSpaceObject obj = handleService.resolveToObject(context, deletedCollectionHandle);

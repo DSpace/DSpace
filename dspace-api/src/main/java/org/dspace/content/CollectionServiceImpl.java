@@ -760,9 +760,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                     removeItem(context, collection, item);
                 }
             }
-            offset += limit;
             context.commit();
-            context.reloadEntity(collection);
+            collection = context.reloadEntity(collection);
             items = itemService.findAllByCollection(context, collection, limit, offset);
         }
 

@@ -164,7 +164,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 }
                 offset += limit;
                 context.commit();
-                context.reloadEntity(collection);
+                collection = context.reloadEntity(collection);
                 items = itemService.findAllByCollection(context, collection, limit, offset);
             }
         }

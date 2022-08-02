@@ -514,7 +514,7 @@ public class Curator {
                 }
                 offset += limit;
                 context.commit();
-                context.reloadEntity(coll);
+                coll = context.reloadEntity(coll);
                 iter = itemService.findByCollection(context, coll, limit, offset);
             }
         } catch (SQLException sqlE) {

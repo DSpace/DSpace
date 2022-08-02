@@ -556,6 +556,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             Collection collection = collections.next();
             community.removeCollection(collection);
             removeCollection(context, community, collection);
+            community = context.reloadEntity(community);
         }
         // delete subcommunities
         Iterator<Community> subCommunities = community.getSubcommunities().iterator();
