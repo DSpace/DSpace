@@ -105,7 +105,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> resourceTypeNameFacet(boolean hasNext) {
         return allOf(
             hasJsonPath("$.name", is("resourceTypeName")),
-            hasJsonPath("$.facetType", is("hierarchical")),
+            hasJsonPath("$.facetType", is("text")),
             hasJsonPath("$.facetLimit", any(Integer.class)),
             hasJsonPath("$._links.self.href", containsString("api/discover/facets/resourceTypeName")),
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/resourceTypeName"))
