@@ -88,7 +88,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             "SELECT i FROM Item as i " +
             "LEFT JOIN Version as v ON i = v.item " +
             "WHERE i.inArchive=true or i.withdrawn=true or (i.inArchive=false and v.id IS NOT NULL) " +
-            "ORDER BY i.sorting_number"
+            "ORDER BY sorting_number"
         );
         return iterate(query);
     }
