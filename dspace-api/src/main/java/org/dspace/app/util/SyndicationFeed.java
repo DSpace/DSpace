@@ -420,7 +420,7 @@ public class SyndicationFeed {
                     // with length of song in seconds
                     if (extent != null && extent.length() > 0) {
                         extent = extent.split(" ")[0];
-                        Integer duration = Integer.parseInt(extent);
+                        long duration = Long.parseLong(extent);
                         itunes.setDuration(new Duration(duration));             // <itunes:duration>
                     }
 

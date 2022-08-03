@@ -12,7 +12,7 @@ var QueryReport = function() {
     //this.hasSorttable = function(){return true;}
     this.getLangSuffix = function(){
       return "[en]";
-    }
+    };
     
     //Indicate if Password Authentication is supported
     //this.makeAuthLink = function(){return true;};
@@ -31,7 +31,7 @@ var QueryReport = function() {
             "limit"         : this.ITEM_LIMIT,
             "offset"        : 0,          
         };
-    }
+    };
     this.getCurrentParameters = function(){
     var expand = "parentCollection,metadata";
     if (this.myBitstreamFields.hasBitstreamFields()) {
@@ -54,21 +54,20 @@ var QueryReport = function() {
             paramArr[paramArr.length] = $(this).val();
         });
         return params;
-    }
+    };
     var self = this;
 
     this.init = function() {
         this.baseInit();    
-        var communitySelector = new CommunitySelector(this, $("#collSelector"), this.myReportParameters.params["collSel[]"]);
-    }
+    };
     
     this.initMetadataFields = function() {
         this.myMetadataFields = new QueryableMetadataFields(self);
         this.myMetadataFields.load();        
-    }
+    };
     this.myAuth.callback = function(data) {
-        $(".query-button").click(function(){self.runQuery();})
-    }
+        $(".query-button").click(function(){self.runQuery();});
+    };
 
     this.runQuery = function() {
         this.spinner.spin($("body")[0]);
@@ -93,7 +92,7 @@ var QueryReport = function() {
                 $("button").not("#next,#prev").attr("disabled", false);
             }
         });
-    }
+    };
     
     this.drawItemFilterTable = function(data) {
         $("#itemtable").replaceWith($('<table id="itemtable" class="sortable"></table>'));
@@ -150,7 +149,7 @@ var QueryReport = function() {
                 });
                 var fieldtext = self.myBitstreamFields.getKeyText(key, item, data.bitfields);
                 for(var j=0; j<fieldtext.length; j++) {
-                  td.append($("<div>"+fieldtext[j]+"</div>"))
+                  td.append($("<div>"+fieldtext[j]+"</div>"));
                 }
             }
         });
@@ -173,7 +172,7 @@ var QueryReport = function() {
             sorttable.makeSortable(itbl[0]);            
         }
         $("#metadatadiv").accordion("option", "active", $("#metadatadiv > h3").length - 1); 
-    }
+    };
     
     //Ignore the first column containing a row number and the item handle, get handle for the collection
     this.exportCol = function(colnum, col) {
@@ -189,8 +188,8 @@ var QueryReport = function() {
         } else {
             data += self.exportCell(col);        }
         return data;
-    }
-}
+    };
+};
 QueryReport.prototype = Object.create(Report.prototype);
 
 $(document).ready(function(){
@@ -223,7 +222,7 @@ var QueryableMetadataFields = function(report) {
         self.initQueries();        
         report.spinner.stop();
         $(".query-button").attr("disabled", false);
-    }
+    };
     
     this.initQueries = function() {
         $("#predefselect")
@@ -271,7 +270,7 @@ var QueryableMetadataFields = function(report) {
                   self.drawFilterQuery("*","matches","^.*[^[:ascii:]].*$");                        
               }
           });
-    }
+    };
 
     this.drawFilterQuery = function(pField, pOp, pVal) {
         var div = $("<div class='metadata'/>").appendTo("#queries");
@@ -327,7 +326,7 @@ var QueryableMetadataFields = function(report) {
             self.queryButtons();
         });
         self.queryButtons();
-    }
+    };
 
     this.valField = function(valop) {
         var val = valop.val();
@@ -337,7 +336,7 @@ var QueryableMetadataFields = function(report) {
         if (disableval) {
             valinput.val("");        
         }
-    }
+    };
 
     this.queryButtons = function() {
         $("button.field_plus").attr("disabled",true);
@@ -346,6 +345,6 @@ var QueryableMetadataFields = function(report) {
         if ($("button.field_minus").length == 1) {
             $("button.field_minus").attr("disabled",true);                
         }
-    }
-}
+    };
+};
 QueryableMetadataFields.prototype = Object.create(MetadataFields.prototype);

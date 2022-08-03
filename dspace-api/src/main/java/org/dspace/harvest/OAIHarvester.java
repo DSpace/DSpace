@@ -35,6 +35,7 @@ import ORG.oclc.oai.harvester2.verb.Identify;
 import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
 import ORG.oclc.oai.harvester2.verb.ListRecords;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -91,7 +92,7 @@ public class OAIHarvester {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OAIHarvester.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final Namespace ATOM_NS = Namespace.getNamespace("http://www.w3.org/2005/Atom");
     private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
@@ -133,7 +134,7 @@ public class OAIHarvester {
     private String metadataKey;
 
     // DOMbuilder class for the DOM -> JDOM conversions
-    private static DOMBuilder db = new DOMBuilder();
+    private static final DOMBuilder db = new DOMBuilder();
     // The point at which this thread should terminate itself
 
     /* Initialize the harvester with a collection object */
@@ -331,18 +332,16 @@ public class OAIHarvester {
 
             // main loop to keep requesting more objects until we're done
             List<Element> records;
-            Set<String> errorSet = new HashSet<String>();
+            Set<String> errorSet = new HashSet<>();
 
             ListRecords listRecords = new ListRecords(oaiSource, fromDate, toDate, oaiSetId, descMDPrefix);
             log.debug(
                 "Harvesting request parameters: listRecords " + oaiSource + " " + fromDate + " " + toDate + " " +
                     oaiSetId + " " + descMDPrefix);
-            if (listRecords != null) {
-                log.info("HTTP Request: " + listRecords.getRequestURL());
-            }
+            log.info("HTTP Request: " + listRecords.getRequestURL());
 
             while (listRecords != null) {
-                records = new ArrayList<Element>();
+                records = new ArrayList<>();
                 oaiResponse = db.build(listRecords.getDocument());
 
                 if (listRecords.getErrors() != null && listRecords.getErrors().getLength() > 0) {
@@ -376,8 +375,8 @@ public class OAIHarvester {
                 }
 
                 // Process the obtained records
-                if (records != null && records.size() > 0) {
-                    log.info("Found " + records.size() + " records to process");
+                if (!records.isEmpty()) {
+                    log.info("Found {} records to process", records::size);
                     for (Element record : records) {
                         // check for STOP interrupt from the scheduler
                         if (HarvestScheduler.getInterrupt() == HarvestScheduler.HARVESTER_INTERRUPT_STOP) {
@@ -439,7 +438,8 @@ public class OAIHarvester {
             harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             harvestedCollectionService.update(ourContext, harvestRow);
             alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-            log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause(), ex);
+            log.error("Error occurred while generating an OAI response: {} {}",
+                    ex.getMessage(), ex.getCause(), ex);
             ourContext.complete();
             return;
         } finally {
@@ -623,7 +623,7 @@ public class OAIHarvester {
             List<Bundle> OREBundles = itemService.getBundles(item, "ORE");
             Bitstream OREBitstream = null;
 
-            if (OREBundles.size() > 0) {
+            if (!OREBundles.isEmpty()) {
                 OREBundle = OREBundles.get(0);
             } else {
                 OREBundle = bundleService.create(ourContext, item, "ORE");
@@ -698,7 +698,7 @@ public class OAIHarvester {
 
         List<MetadataValue> values = itemService.getMetadata(item, "dc", "identifier", Item.ANY, Item.ANY);
 
-        if (values.size() > 0 && acceptedHandleServers != null) {
+        if (!values.isEmpty() && acceptedHandleServers != null) {
             for (MetadataValue value : values) {
                 //     0   1       2         3   4
                 //   https://hdl.handle.net/1234/12
@@ -732,7 +732,7 @@ public class OAIHarvester {
      * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
      */
     private String processDate(Date date) {
-        Integer timePad = configurationService.getIntProperty("oai.harvester.timePadding");
+        int timePad = configurationService.getIntProperty("oai.harvester.timePadding");
 
         if (timePad == 0) {
             timePad = 120;
@@ -799,16 +799,14 @@ public class OAIHarvester {
         // Query the OAI server for the metadata
         ListMetadataFormats lmf = new ListMetadataFormats(oaiSource);
 
-        if (lmf != null) {
-            Document lmfResponse = db.build(lmf.getDocument());
-            List<Element> mdFormats = lmfResponse.getRootElement().getChild("ListMetadataFormats", OAI_NS)
-                                                 .getChildren("metadataFormat", OAI_NS);
+        Document lmfResponse = db.build(lmf.getDocument());
+        List<Element> mdFormats = lmfResponse.getRootElement().getChild("ListMetadataFormats", OAI_NS)
+                                             .getChildren("metadataFormat", OAI_NS);
 
-            for (Element mdFormat : mdFormats) {
-                if (MDNamespace.equals(mdFormat.getChildText("metadataNamespace", OAI_NS))) {
-                    metaPrefix = mdFormat.getChildText("metadataPrefix", OAI_NS);
-                    break;
-                }
+        for (Element mdFormat : mdFormats) {
+            if (MDNamespace.equals(mdFormat.getChildText("metadataNamespace", OAI_NS))) {
+                metaPrefix = mdFormat.getChildText("metadataPrefix", OAI_NS);
+                break;
             }
         }
 
@@ -874,9 +872,9 @@ public class OAIHarvester {
     protected List<Element> getMDrecord(String oaiSource, String itemOaiId, String metadataPrefix)
         throws IOException, ParserConfigurationException, SAXException, TransformerException, HarvestingException {
         GetRecord getRecord = new GetRecord(oaiSource, itemOaiId, metadataPrefix);
-        Set<String> errorSet = new HashSet<String>();
+        Set<String> errorSet = new HashSet<>();
         // If the metadata is not available for this item, can the whole thing
-        if (getRecord != null && getRecord.getErrors() != null && getRecord.getErrors().getLength() > 0) {
+        if (getRecord.getErrors() != null && getRecord.getErrors().getLength() > 0) {
             for (int i = 0; i < getRecord.getErrors().getLength(); i++) {
                 String errorCode = getRecord.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
                 errorSet.add(errorCode);

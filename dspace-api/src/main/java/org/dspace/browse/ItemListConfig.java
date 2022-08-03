@@ -25,22 +25,7 @@ public class ItemListConfig {
     /**
      * a map of column number to metadata value
      */
-    private Map<Integer, String[]> metadata = new HashMap<Integer, String[]>();
-
-    /**
-     * a map of column number to data type
-     */
-    private Map<Integer, Integer> types = new HashMap<Integer, Integer>();
-
-    /**
-     * constant for a DATE column
-     */
-    private static final int DATE = 1;
-
-    /**
-     * constant for a TEXT column
-     */
-    private static final int TEXT = 2;
+    private Map<Integer, String[]> metadata = new HashMap<>();
 
     private final transient ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -63,14 +48,11 @@ public class ItemListConfig {
             // parse the config
             int i = 1;
             for (String token : browseFields) {
-                Integer key = Integer.valueOf(i);
+                Integer key = i;
 
                 // find out if the field is a date
                 if (token.indexOf("(date)") > 0) {
                     token = token.replaceAll("\\(date\\)", "");
-                    types.put(key, Integer.valueOf(ItemListConfig.DATE));
-                } else {
-                    types.put(key, Integer.valueOf(ItemListConfig.TEXT));
                 }
 
                 String[] mdBits = interpretField(token.trim(), null);
@@ -100,7 +82,7 @@ public class ItemListConfig {
      * @return array of metadata
      */
     public String[] getMetadata(int col) {
-        return metadata.get(Integer.valueOf(col));
+        return metadata.get(col);
     }
 
     /**
