@@ -20,7 +20,4 @@ public class InvalidPasswordChallengeException extends RuntimeException {
         super(message);
     }
 
-    public InvalidPasswordChallengeException(String message, Exception exception) {
-        super(message, exception);
-    }
 }
