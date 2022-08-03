@@ -11,10 +11,12 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.exception.PasswordNotValidException;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.ValidatePasswordService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -53,6 +55,9 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private ValidatePasswordService validatePasswordService;
+
     @Override
     public R perform(Context context, R object, Operation operation) {
         checkOperationValue(operation.getValue());
@@ -66,7 +71,13 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
             if (StringUtils.isNotBlank(token)) {
                 verifyAndDeleteToken(context, eperson, token, operation);
             }
-            ePersonService.setPassword(eperson, (String) operation.getValue());
+
+            String newPassword = (String) operation.getValue();
+            if (!validatePasswordService.isPasswordValid(context, newPassword)) {
+                throw new PasswordNotValidException("The new password to set is not valid");
+            }
+
+            ePersonService.setPassword(eperson, newPassword);
             return object;
         } else {
             throw new DSpaceBadRequestException(this.getClass().getName() + " does not support this operation");

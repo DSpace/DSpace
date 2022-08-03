@@ -10,7 +10,7 @@ package org.dspace.app.exception;
 /**
  * This class provides an exception to be used when trying to create an EPerson
  * with password that not match regular expression configured in this
- * variable "validate-password-reg-expression" in dspace.cfg or during the patch of password.
+ * variable "eperson.password.regex-validation.pattern" in dspace.cfg or during the patch of password.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */

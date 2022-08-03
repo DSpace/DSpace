@@ -144,6 +144,7 @@
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
 
     <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
+    <bean class="org.dspace.authorize.RegexPasswordValidator" />
 
 </beans>
 

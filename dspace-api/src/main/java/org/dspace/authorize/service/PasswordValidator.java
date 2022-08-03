@@ -10,19 +10,24 @@ package org.dspace.authorize.service;
 import org.dspace.core.Context;
 
 /**
- * Services to use during Validating of password.
+ * Interface for classes that validate a given password with a specific
+ * strategy.
  *
- * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-public interface ValidatePasswordService {
+public interface PasswordValidator {
 
     /**
-     * This method checks whether the password is valid based on the configured
-     * rules/strategies.
+     * Check if the password validator is active.
+     */
+    public boolean isPasswordValidationEnabled();
+
+    /**
+     * This method checks whether the password is valid
      * 
      * @param context  the DSpace context
+     * @param ePerson  the ePerson
      * @param password password to validate
      */
     public boolean isPasswordValid(Context context, String password);
-
 }

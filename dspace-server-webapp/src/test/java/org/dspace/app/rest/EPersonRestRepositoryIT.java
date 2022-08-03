@@ -3132,7 +3132,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void validatePasswordRobustnessContainingAtLeastAnUpperCaseCharUnprocessableTest() throws Exception {
-        configurationService.addPropertyValue("validate-password-reg-expression", "^(?=.*[A-Z])");
+        configurationService.addPropertyValue("eperson.password.regex-validation.pattern", "^(?=.*[A-Z])");
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -3177,7 +3177,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void validatePasswordRobustnessContainingAtLeastAnUpperCaseCharTest() throws Exception {
-        configurationService.addPropertyValue("validate-password-reg-expression", "^(?=.*[A-Z])");
+        configurationService.addPropertyValue("eperson.password.regex-validation.pattern", "^(?=.*[A-Z])");
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -3246,7 +3246,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        configurationService.addPropertyValue("validate-password-reg-expression", "^(?=.*[A-Z])");
+        configurationService.addPropertyValue("eperson.password.regex-validation.pattern", "^(?=.*[A-Z])");
 
         String newPassword = "newpassword";
 
@@ -3282,7 +3282,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void validatePasswordRobustnessContainingAtLeastAnUppercaseCharPatchTest() throws Exception {
-        configurationService.addPropertyValue("validate-password-reg-expression", "^(?=.*[A-Z])");
+        configurationService.addPropertyValue("eperson.password.regex-validation.pattern", "^(?=.*[A-Z])");
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)

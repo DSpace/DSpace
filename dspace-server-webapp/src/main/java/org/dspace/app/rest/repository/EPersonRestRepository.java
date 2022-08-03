@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.exception.PasswordNotValidException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -116,22 +117,26 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     private EPerson createEPersonFromRestObject(Context context, EPersonRest epersonRest) throws AuthorizeException {
         EPerson eperson = null;
-        if (validatePasswordService.validatePasswordRobustness(epersonRest.getPassword())) {
-            try {
-                eperson = es.create(context);
-                // this should be probably moved to the converter (a merge method?)
-                eperson.setCanLogIn(epersonRest.isCanLogIn());
-                eperson.setRequireCertificate(epersonRest.isRequireCertificate());
-                eperson.setEmail(epersonRest.getEmail());
-                eperson.setNetid(epersonRest.getNetid());
-                if (epersonRest.getPassword() != null) {
-                    es.setPassword(eperson, epersonRest.getPassword());
+        try {
+            eperson = es.create(context);
+
+            // this should be probably moved to the converter (a merge method?)
+            eperson.setCanLogIn(epersonRest.isCanLogIn());
+            eperson.setRequireCertificate(epersonRest.isRequireCertificate());
+            eperson.setEmail(epersonRest.getEmail());
+            eperson.setNetid(epersonRest.getNetid());
+            if (epersonRest.getPassword() != null) {
+
+                if (!validatePasswordService.isPasswordValid(context, epersonRest.getPassword())) {
+                    throw new PasswordNotValidException("The new password to set is not valid");
                 }
-                es.update(context, eperson);
-                metadataConverter.setMetadata(context, eperson, epersonRest.getMetadata());
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage(), e);
+
+                es.setPassword(eperson, epersonRest.getPassword());
             }
+            es.update(context, eperson);
+            metadataConverter.setMetadata(context, eperson, epersonRest.getMetadata());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
         return eperson;
     }
@@ -292,8 +297,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                          Patch patch) throws AuthorizeException, SQLException {
         boolean passwordChangeFound = false;
         for (Operation operation : patch.getOperations()) {
-            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")
-                && validatePasswordService.validatePasswordRobustness((String) operation.getValue())) {
+            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
                 passwordChangeFound = true;
             }
         }
