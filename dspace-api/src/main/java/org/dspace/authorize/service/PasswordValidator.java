@@ -26,7 +26,6 @@ public interface PasswordValidator {
      * This method checks whether the password is valid
      * 
      * @param context  the DSpace context
-     * @param ePerson  the ePerson
      * @param password password to validate
      */
     public boolean isPasswordValid(Context context, String password);
