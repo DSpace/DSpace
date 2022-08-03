@@ -43,6 +43,7 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String> 
 
         Item item = source.getItem();
         List<Bundle> bbb = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+        bbb.addAll(itemService.getBundles(item, Constants.METADATA_BUNDLE_NAME));
         Bitstream bitstream = null;
         external:
         for (Bundle bb : bbb) {
