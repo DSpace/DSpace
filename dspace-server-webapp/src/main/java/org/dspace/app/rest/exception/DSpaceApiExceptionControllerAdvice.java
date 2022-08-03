@@ -190,7 +190,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpStatus.BAD_REQUEST.value());
     }
 
-    @ExceptionHandler({InvalidPasswordException.class})
+    @ExceptionHandler({InvalidPasswordChallengeException.class})
     protected void handleInvalidPasswordException(HttpServletRequest request, HttpServletResponse response,
                                                Exception ex) throws IOException {
         sendErrorResponse(request, response, ex, "Current password is not valid", HttpServletResponse.SC_FORBIDDEN);

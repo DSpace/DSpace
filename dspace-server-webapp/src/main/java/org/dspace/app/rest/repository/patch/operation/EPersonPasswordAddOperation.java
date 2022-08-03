@@ -8,12 +8,17 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.InvalidPasswordChallengeException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -32,7 +37,7 @@ import org.springframework.stereotype.Component;
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/epersons/eperson/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "add", "path": "
- * /password", "value": "newpassword"]'
+ * /password", "value": {"password": "newpassword", "challenge": "currentpassword"}]'
  * </code>
  */
 @Component
@@ -53,24 +58,51 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+
     @Override
     public R perform(Context context, R object, Operation operation) {
-        checkOperationValue(operation.getValue());
-        if (supports(object, operation)) {
-            EPerson eperson = (EPerson) object;
-            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
-                throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
-                                                        eperson.getEmail());
-            }
-            String token = requestService.getCurrentRequest().getHttpServletRequest().getParameter("token");
-            if (StringUtils.isNotBlank(token)) {
-                verifyAndDeleteToken(context, eperson, token, operation);
-            }
-            ePersonService.setPassword(eperson, (String) operation.getValue());
-            return object;
-        } else {
+
+        if (!supports(object, operation)) {
             throw new DSpaceBadRequestException(this.getClass().getName() + " does not support this operation");
         }
+
+        PasswordVO passwordVO = parseOperationValue(operation);
+
+        String newPassword = passwordVO.getPassword()
+            .orElseThrow(() -> new DSpaceBadRequestException("No password provided"));
+
+        EPerson eperson = (EPerson) object;
+        if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
+            throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
+                                                    eperson.getEmail());
+        }
+
+        String token = requestService.getCurrentRequest().getHttpServletRequest().getParameter("token");
+        if (StringUtils.isNotBlank(token)) {
+            verifyAndDeleteToken(context, eperson, token, operation);
+        } else if (eperson.hasPasswordSet()) {
+            verifyChallenge(context, eperson, passwordVO);
+        }
+
+        ePersonService.setPassword(eperson, newPassword);
+
+        return object;
+    }
+
+    private PasswordVO parseOperationValue(Operation operation) {
+
+        if (operation.getValue() == null) {
+            throw new UnprocessableEntityException("No value provided for operation " + operation.getPath());
+        }
+
+        try {
+            return (PasswordVO) ((JsonValueEvaluator) operation.getValue()).evaluate(PasswordVO.class);
+        } catch (Exception ex) {
+            throw new UnprocessableEntityException("Invalid value provided for operation " + operation.getPath(), ex);
+        }
+
     }
 
     private void verifyAndDeleteToken(Context context, EPerson eperson, String token, Operation operation) {
@@ -91,9 +123,52 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
         }
     }
 
+    private void verifyChallenge(Context context, EPerson eperson, PasswordVO passwordVO) {
+
+        String challenge = passwordVO.getChallenge()
+            .orElseThrow(() -> new InvalidPasswordChallengeException("No challenge provided"));
+
+        boolean canChangePassword = authenticationService.canChangePassword(context, eperson, challenge);
+        if (!canChangePassword) {
+            throw new InvalidPasswordChallengeException("The provided challenge is not valid");
+        }
+
+    }
+
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
         return (objectToMatch instanceof EPerson && operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD)
                 && operation.getPath().trim().equalsIgnoreCase(OPERATION_PASSWORD_CHANGE));
+    }
+
+    /**
+     * Value object that stores the new password to set and the challange to verify.
+     * This object models the value of the operation.
+     *
+     * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+     *
+     */
+    public static class PasswordVO {
+
+        private String password;
+
+        private String challenge;
+
+        public Optional<String> getPassword() {
+            return Optional.ofNullable(password);
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public Optional<String> getChallenge() {
+            return Optional.ofNullable(challenge);
+        }
+
+        public void setChallenge(String challenge) {
+            this.challenge = challenge;
+        }
+
     }
 }

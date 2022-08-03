@@ -182,6 +182,6 @@ public interface AuthenticationService {
      * @param challenge The current password of the user
      * @return true if challenge matches with current password
      */
-    public boolean canChangePassword(Context context, String challenge);
+    public boolean canChangePassword(Context context, EPerson ePerson, String challenge);
 
 }

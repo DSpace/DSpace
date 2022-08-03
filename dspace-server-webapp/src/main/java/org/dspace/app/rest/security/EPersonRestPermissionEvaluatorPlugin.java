@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
-import org.dspace.app.rest.repository.patch.operation.EPersonChallengeAddOperation;
 import org.dspace.app.rest.repository.patch.operation.EPersonPasswordAddOperation;
 import org.dspace.app.rest.repository.patch.operation.PatchOperation;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -124,8 +123,7 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
          */
         for (Operation op: operations) {
             if (!(op.getPath().contentEquals(EPersonPasswordAddOperation.OPERATION_PASSWORD_CHANGE)
-                || (op.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)
-                || op.getPath().contentEquals(EPersonChallengeAddOperation.OPERATION_PASSWORD_CHANGE)))) {
+                || (op.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)))) {
                 return false;
             }
         }

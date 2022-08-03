@@ -226,9 +226,12 @@ public interface AuthenticationMethod {
     public boolean isUsed(Context context, HttpServletRequest request);
 
     /**
-     * @param context The DSpace context
-     * @param challenge The current password of the user
-     * @return true if challenge matches with current password
+     * Check if the given challenge is valid to change the password of the given
+     * ePerson
+     * @param  context   The DSpace context
+     * @param  ePerson   the ePerson related to the password change
+     * @param  challenge The challenge to check
+     * @return           true if challenge matches with current password
      */
-    public boolean canChangePassword(Context context, String challenge);
+    public boolean canChangePassword(Context context, EPerson ePerson, String challenge);
 }

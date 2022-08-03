@@ -610,7 +610,7 @@ public class X509Authentication implements AuthenticationMethod {
     }
 
     @Override
-    public boolean canChangePassword(Context context, String challenge) {
+    public boolean canChangePassword(Context context, EPerson ePerson, String challenge) {
         return false;
     }
 }

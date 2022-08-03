@@ -36,9 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
@@ -1301,13 +1303,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, password);
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1400,13 +1396,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, password);
 
         String token = getAuthToken(ePerson.getEmail(), password);
 
@@ -1445,13 +1435,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, password);
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1539,13 +1523,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-
-        List<Operation> ops = new ArrayList<>();
-        AddOperation addOperation = new AddOperation("/password", null);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(null, password);
 
         // adding null pw should return bad request
         getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
@@ -1586,13 +1564,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         String newPassword = "newpass";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, password);
 
         // initialize password with add operation, not set during creation
         getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
@@ -2027,14 +1999,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword(password)
                                         .build();
 
-        String newPassword = "newpassword";
-
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
+        String newPassword = "newpassword";
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
+
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
@@ -2063,14 +2032,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword(password)
                                         .build();
 
-        String newPassword = "newpassword";
-
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
+        String newPassword = "newpassword";
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
+
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
@@ -2108,14 +2074,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword(password)
                                         .build();
 
-        String newPassword = "newpassword";
-
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
+        String newPassword = "newpassword";
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
+
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         accountService.sendRegistrationInfo(context, ePersonTwo.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
@@ -2199,14 +2162,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword(password)
                                         .build();
 
-        String newPassword = "newpassword";
-
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
+        String newPassword = "newpassword";
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
+
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
@@ -3153,13 +3113,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, password);
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -3201,13 +3155,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String newPassword = "newpassword";
         String wrongPassword = "wrong_password";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", wrongPassword);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, wrongPassword);
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -3231,11 +3179,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        ops.add(addOperation);
-        String patchBody = getPatchContent(ops);
+        String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -3245,35 +3189,17 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isForbidden());
     }
 
-    @Test
-    public void patchChangePasswordWithIPAuthenticationMethod() throws Exception {
+    private String buildPasswordAddOperationPatchBody(String password, String challenge) {
 
-        context.turnOffAuthorisationSystem();
+        Map<String, String> value = new HashMap<>();
+        if (password != null) {
+            value.put("password", password);
+        }
+        if (challenge != null) {
+            value.put("challenge", challenge);
+        }
 
-        EPerson ePerson = EPersonBuilder.createEPerson(context)
-                                        .withNameInMetadata("John", "Doe")
-                                        .withEmail("Johndoe@example.com")
-                                        .withPassword(password)
-                                        .build();
-
-        context.restoreAuthSystemState();
-
-        String newPassword = "newpassword";
-
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation addOperation = new AddOperation("/password", newPassword);
-        AddOperation addOperation2 = new AddOperation("/challenge", password);
-        ops.add(addOperation);
-        ops.add(addOperation2);
-        String patchBody = getPatchContent(ops);
-
-        context.setAuthenticationMethod("ip");
-
-        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
-                            .content(patchBody)
-                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
-                            .with(ip("5.5.5.5")))
-                   .andExpect(status().isUnauthorized());
+        return getPatchContent(List.of(new AddOperation("/password", value)));
 
     }
 

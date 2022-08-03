@@ -8,17 +8,19 @@
 package org.dspace.app.rest.exception;
 
 /**
- * This exception is thrown when the current password of user is invalid
+ * This exception is thrown when the password challenge of user is invalid.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  */
-public class InvalidPasswordException extends RuntimeException {
+public class InvalidPasswordChallengeException extends RuntimeException {
 
-    public InvalidPasswordException(String message) {
+    private static final long serialVersionUID = 7774965236190392985L;
+
+    public InvalidPasswordChallengeException(String message) {
         super(message);
     }
 
-    public InvalidPasswordException(String message, Exception exception) {
+    public InvalidPasswordChallengeException(String message, Exception exception) {
         super(message, exception);
     }
 }

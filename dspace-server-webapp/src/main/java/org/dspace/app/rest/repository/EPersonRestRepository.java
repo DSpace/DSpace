@@ -24,7 +24,6 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
-import org.dspace.app.rest.exception.InvalidPasswordException;
 import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -33,7 +32,6 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.SiteService;
@@ -83,9 +81,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     @Autowired
     private RegistrationDataService registrationDataService;
-
-    @Autowired
-    private AuthenticationService authenticationService;
 
     private final EPersonService es;
 
@@ -299,8 +294,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
         boolean passwordChangeFound = false;
-        boolean challengeFound = false;
-        boolean canChangePassword;
         for (Operation operation : patch.getOperations()) {
             if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
                 passwordChangeFound = true;
@@ -315,21 +308,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             if (passwordChangeFound && !StringUtils.equals(context.getAuthenticationMethod(), "password")) {
                 throw new AccessDeniedException("Refused to perform the EPerson patch based to change the password " +
                                                         "for non \"password\" authentication");
-            } else if (passwordChangeFound) {
-                for (Operation operation : patch.getOperations()) {
-                    if (StringUtils.equalsIgnoreCase(operation.getPath(), "/challenge")) {
-                        challengeFound = true;
-                        canChangePassword =
-                            authenticationService.canChangePassword(context, String.valueOf(operation.getValue()));
-                        if (!canChangePassword) {
-                            throw new InvalidPasswordException("Current password is not valid");
-                        }
-                    }
-                }
-
-                if (!challengeFound) {
-                    throw new InvalidPasswordException("no challenge found");
-                }
             }
         }
         patchDSpaceObject(apiCategory, model, uuid, patch);
