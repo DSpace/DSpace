@@ -100,8 +100,9 @@ public class CitationPage extends AbstractCurationTask {
             try {
                 dBundle = bundleService.create(Curator.curationContext(), item, CitationPage.DISPLAY_BUNDLE_NAME);
             } catch (AuthorizeException e) {
-                log.error("User not authroized to create bundle on item \""
-                              + item.getName() + "\": " + e.getMessage());
+                log.error("User not authroized to create bundle on item \"{}\": {}",
+                        item::getName, e::getMessage);
+                return;
             }
         } else {
             dBundle = dBundles.get(0);
@@ -120,7 +121,7 @@ public class CitationPage extends AbstractCurationTask {
         List<Bundle> pBundles = itemService.getBundles(item, CitationPage.PRESERVATION_BUNDLE_NAME);
         Bundle pBundle = null;
         List<Bundle> bundles = new ArrayList<>();
-        if (pBundles != null && pBundles.size() > 0) {
+        if (pBundles != null && !pBundles.isEmpty()) {
             pBundle = pBundles.get(0);
             bundles.addAll(itemService.getBundles(item, "ORIGINAL"));
             bundles.addAll(pBundles);

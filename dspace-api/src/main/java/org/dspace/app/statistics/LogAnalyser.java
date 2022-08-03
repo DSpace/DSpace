@@ -29,6 +29,10 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -44,6 +48,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * files.  Most input can be configured; use the -help flag for a full list
  * of usage information.
  *
+ * <p>
  * The output of this file is plain text and forms an "aggregation" file which
  * can then be used for display purposes using the related ReportGenerator
  * class.
@@ -167,7 +172,7 @@ public class LogAnalyser {
     /**
      * the average number of views per item
      */
-    private static int views = 0;
+    private static long views = 0;
 
     ///////////////////////
     // regular expressions
@@ -236,12 +241,12 @@ public class LogAnalyser {
     /**
      * pattern to match commented out lines from the config file
      */
-    private static final Pattern comment = Pattern.compile("^#");
+    private static final Pattern COMMENT = Pattern.compile("^#");
 
     /**
      * pattern to match genuine lines from the config file
      */
-    private static final Pattern real = Pattern.compile("^(.+)=(.+)");
+    private static final Pattern REAL = Pattern.compile("^(.+)=(.+)");
 
     /**
      * pattern to match all search types
@@ -337,44 +342,73 @@ public class LogAnalyser {
         Date myEndDate = null;
         boolean myLookUp = false;
 
-        // read in our command line options
-        for (int i = 0; i < argv.length; i++) {
-            if (argv[i].equals("-log")) {
-                myLogDir = argv[i + 1];
-            }
+        // Define command line options.
+        Options options = new Options();
+        Option option;
 
-            if (argv[i].equals("-file")) {
-                myFileTemplate = argv[i + 1];
-            }
+        option = Option.builder().longOpt("log").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-cfg")) {
-                myConfigFile = argv[i + 1];
-            }
+        option = Option.builder().longOpt("file").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-out")) {
-                myOutFile = argv[i + 1];
-            }
+        option = Option.builder().longOpt("cfg").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-help")) {
-                LogAnalyser.usage();
-                System.exit(0);
-            }
+        option = Option.builder().longOpt("out").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-start")) {
-                myStartDate = parseDate(argv[i + 1]);
-            }
+        option = Option.builder().longOpt("help").build();
+        options.addOption(option);
 
-            if (argv[i].equals("-end")) {
-                myEndDate = parseDate(argv[i + 1]);
-            }
+        option = Option.builder().longOpt("start").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-lookup")) {
-                myLookUp = true;
-            }
+        option = Option.builder().longOpt("end").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("lookup").build();
+        options.addOption(option);
+
+        // Parse the command.
+        DefaultParser cmdParser = new DefaultParser();
+        CommandLine cmd = cmdParser.parse(options, argv);
+
+        // Analyze the command.
+        if (cmd.hasOption("help")) {
+            LogAnalyser.usage();
+            System.exit(0);
         }
 
+        if (cmd.hasOption("log")) {
+            myLogDir = cmd.getOptionValue("log");
+        }
+
+        if (cmd.hasOption("file")) {
+            myFileTemplate = cmd.getOptionValue("file");
+        }
+
+        if (cmd.hasOption("cfg")) {
+            myConfigFile = cmd.getOptionValue("cfg");
+        }
+
+        if (cmd.hasOption("out")) {
+            myOutFile = cmd.getOptionValue("out");
+        }
+
+        if (cmd.hasOption("start")) {
+            myStartDate = parseDate(cmd.getOptionValue("start"));
+        }
+
+        if (cmd.hasOption("end")) {
+            myEndDate = parseDate(cmd.getOptionValue("end"));
+        }
+
+        myLookUp = cmd.hasOption("lookup");
+
         // now call the method which actually processes the logs
-        processLogs(context, myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
+        processLogs(context, myLogDir, myFileTemplate, myConfigFile, myOutFile,
+                myStartDate, myEndDate, myLookUp);
     }
 
     /**
@@ -406,18 +440,18 @@ public class LogAnalyser {
         startTime = new GregorianCalendar();
 
         //instantiate aggregators
-        actionAggregator = new HashMap<String, Integer>();
-        searchAggregator = new HashMap<String, Integer>();
-        userAggregator = new HashMap<String, Integer>();
-        itemAggregator = new HashMap<String, Integer>();
-        archiveStats = new HashMap<String, Integer>();
+        actionAggregator = new HashMap<>();
+        searchAggregator = new HashMap<>();
+        userAggregator = new HashMap<>();
+        itemAggregator = new HashMap<>();
+        archiveStats = new HashMap<>();
 
         //instantiate lists
-        generalSummary = new ArrayList<String>();
-        excludeWords = new ArrayList<String>();
-        excludeTypes = new ArrayList<String>();
-        excludeChars = new ArrayList<String>();
-        itemTypes = new ArrayList<String>();
+        generalSummary = new ArrayList<>();
+        excludeWords = new ArrayList<>();
+        excludeTypes = new ArrayList<>();
+        excludeChars = new ArrayList<>();
+        itemTypes = new ArrayList<>();
 
         // set the parameters for this analysis
         setParameters(myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
@@ -529,10 +563,11 @@ public class LogAnalyser {
 
                             // for each search word add to the aggregator or
                             // increment the aggregator's counter
-                            for (int j = 0; j < words.length; j++) {
+                            for (String word : words) {
                                 // FIXME: perhaps aggregators ought to be objects
                                 // themselves
-                                searchAggregator.put(words[j], increment(searchAggregator, words[j]));
+                                searchAggregator.put(word,
+                                        increment(searchAggregator, word));
                             }
                         }
 
@@ -591,13 +626,13 @@ public class LogAnalyser {
         }
 
         // do the average views analysis
-        if ((archiveStats.get("All Items")).intValue() != 0) {
+        if ((archiveStats.get("All Items")) != 0) {
             // FIXME: this is dependent on their being a query on the db, which
             // there might not always be if it becomes configurable
-            Double avg = Math.ceil(
+            double avg = Math.ceil(
                 (actionAggregator.get("view_item")).doubleValue() /
                     (archiveStats.get("All Items")).doubleValue());
-            views = avg.intValue();
+            views = Math.round(avg);
         }
 
         // finally, write the output
@@ -672,55 +707,55 @@ public class LogAnalyser {
         Iterator<String> keys = null;
 
         // output the number of lines parsed
-        summary.append("log_lines=" + Integer.toString(lineCount) + "\n");
+        summary.append("log_lines=").append(Integer.toString(lineCount)).append("\n");
 
         // output the number of warnings encountered
-        summary.append("warnings=" + Integer.toString(warnCount) + "\n");
-        summary.append("exceptions=" + Integer.toString(excCount) + "\n");
+        summary.append("warnings=").append(Integer.toString(warnCount)).append("\n");
+        summary.append("exceptions=").append(Integer.toString(excCount)).append("\n");
 
         // set the general summary config up in the aggregator file
         for (int i = 0; i < generalSummary.size(); i++) {
-            summary.append("general_summary=" + generalSummary.get(i) + "\n");
+            summary.append("general_summary=").append(generalSummary.get(i)).append("\n");
         }
 
         // output the host name
-        summary.append("server_name=" + hostName + "\n");
+        summary.append("server_name=").append(hostName).append("\n");
 
         // output the service name
-        summary.append("service_name=" + name + "\n");
+        summary.append("service_name=").append(name).append("\n");
 
         // output the date information if necessary
         SimpleDateFormat sdf = new SimpleDateFormat("dd'/'MM'/'yyyy");
 
         if (startDate != null) {
-            summary.append("start_date=" + sdf.format(startDate) + "\n");
+            summary.append("start_date=").append(sdf.format(startDate)).append("\n");
         } else if (logStartDate != null) {
-            summary.append("start_date=" + sdf.format(logStartDate) + "\n");
+            summary.append("start_date=").append(sdf.format(logStartDate)).append("\n");
         }
 
         if (endDate != null) {
-            summary.append("end_date=" + sdf.format(endDate) + "\n");
+            summary.append("end_date=").append(sdf.format(endDate)).append("\n");
         } else if (logEndDate != null) {
-            summary.append("end_date=" + sdf.format(logEndDate) + "\n");
+            summary.append("end_date=").append(sdf.format(logEndDate)).append("\n");
         }
 
         // write out the archive stats
         keys = archiveStats.keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
-            summary.append("archive." + key + "=" + archiveStats.get(key) + "\n");
+            summary.append("archive.").append(key).append("=").append(archiveStats.get(key)).append("\n");
         }
 
         // write out the action aggregation results
         keys = actionAggregator.keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
-            summary.append("action." + key + "=" + actionAggregator.get(key) + "\n");
+            summary.append("action.").append(key).append("=").append(actionAggregator.get(key)).append("\n");
         }
 
         // depending on the config settings for reporting on emails output the
         // login information
-        summary.append("user_email=" + userEmail + "\n");
+        summary.append("user_email=").append(userEmail).append("\n");
         int address = 1;
         keys = userAggregator.keySet().iterator();
 
@@ -731,9 +766,10 @@ public class LogAnalyser {
             String key = keys.next();
             summary.append("user.");
             if (userEmail.equals("on")) {
-                summary.append(key + "=" + userAggregator.get(key) + "\n");
+                summary.append(key).append("=").append(userAggregator.get(key)).append("\n");
             } else if (userEmail.equals("alias")) {
-                summary.append("Address " + Integer.toString(address++) + "=" + userAggregator.get(key) + "\n");
+                summary.append("Address ").append(Integer.toString(address++))
+                        .append("=").append(userAggregator.get(key)).append("\n");
             }
         }
 
@@ -742,12 +778,13 @@ public class LogAnalyser {
         // the listing there are
 
         // output the search word information
-        summary.append("search_floor=" + searchFloor + "\n");
+        summary.append("search_floor=").append(searchFloor).append("\n");
         keys = searchAggregator.keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
-            if ((searchAggregator.get(key)).intValue() >= searchFloor) {
-                summary.append("search." + key + "=" + searchAggregator.get(key) + "\n");
+            if ((searchAggregator.get(key)) >= searchFloor) {
+                summary.append("search.").append(key).append("=")
+                        .append(searchAggregator.get(key)).append("\n");
             }
         }
 
@@ -759,35 +796,35 @@ public class LogAnalyser {
         //      be the same thing.
 
         // item viewing information
-        summary.append("item_floor=" + itemFloor + "\n");
-        summary.append("host_url=" + url + "\n");
-        summary.append("item_lookup=" + itemLookup + "\n");
+        summary.append("item_floor=").append(itemFloor).append("\n");
+        summary.append("host_url=").append(url).append("\n");
+        summary.append("item_lookup=").append(itemLookup).append("\n");
 
         // write out the item access information
         keys = itemAggregator.keySet().iterator();
         while (keys.hasNext()) {
             String key = keys.next();
-            if ((itemAggregator.get(key)).intValue() >= itemFloor) {
-                summary.append("item." + key + "=" + itemAggregator.get(key) + "\n");
+            if ((itemAggregator.get(key)) >= itemFloor) {
+                summary.append("item.").append(key).append("=")
+                        .append(itemAggregator.get(key)).append("\n");
             }
         }
 
         // output the average views per item
         if (views > 0) {
-            summary.append("avg_item_views=" + views + "\n");
+            summary.append("avg_item_views=").append(views).append("\n");
         }
 
         // insert the analysis processing time information
         Calendar endTime = new GregorianCalendar();
         long timeInMillis = (endTime.getTimeInMillis() - startTime.getTimeInMillis());
-        summary.append("analysis_process_time=" + Long.toString(timeInMillis / 1000) + "\n");
+        summary.append("analysis_process_time=")
+                .append(Long.toString(timeInMillis / 1000)).append("\n");
 
         // finally write the string into the output file
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(outFile));
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(outFile));) {
             out.write(summary.toString());
             out.flush();
-            out.close();
         } catch (IOException e) {
             System.out.println("Unable to write to output file " + outFile);
             System.exit(0);
@@ -891,11 +928,11 @@ public class LogAnalyser {
             if (i > 0) {
                 wordRXString.append("|");
             }
-            wordRXString.append(" " + excludeWords.get(i) + " ");
+            wordRXString.append(" ").append(excludeWords.get(i)).append(" ");
             wordRXString.append("|");
-            wordRXString.append("^" + excludeWords.get(i) + " ");
+            wordRXString.append("^").append(excludeWords.get(i)).append(" ");
             wordRXString.append("|");
-            wordRXString.append(" " + excludeWords.get(i) + "$");
+            wordRXString.append(" ").append(excludeWords.get(i)).append("$");
         }
         wordRXString.append(")");
         wordRX = Pattern.compile(wordRXString.toString());
@@ -956,8 +993,8 @@ public class LogAnalyser {
         // read in the config file and set up our instance variables
         while ((record = br.readLine()) != null) {
             // check to see what kind of line we have
-            Matcher matchComment = comment.matcher(record);
-            Matcher matchReal = real.matcher(record);
+            Matcher matchComment = COMMENT.matcher(record);
+            Matcher matchReal = REAL.matcher(record);
 
             // if the line is not a comment and is real, read it in
             if (!matchComment.matches() && matchReal.matches()) {
@@ -968,7 +1005,7 @@ public class LogAnalyser {
                 // read the config values into our instance variables (see
                 // documentation for more info on config params)
                 if (key.equals("general.summary")) {
-                    actionAggregator.put(value, Integer.valueOf(0));
+                    actionAggregator.put(value, 0);
                     generalSummary.add(value);
                 }
 
@@ -1022,9 +1059,9 @@ public class LogAnalyser {
         Integer newValue = null;
         if (map.containsKey(key)) {
             // FIXME: this seems like a ridiculous way to add Integers
-            newValue = Integer.valueOf((map.get(key)).intValue() + 1);
+            newValue = (map.get(key)) + 1;
         } else {
-            newValue = Integer.valueOf(1);
+            newValue = 1;
         }
         return newValue;
     }

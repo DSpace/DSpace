@@ -328,45 +328,43 @@ public abstract class AbstractMETSDisseminator
         Mets manifest = makeManifest(context, dso, params, extraStreams);
 
         // copy extra (metadata, license, etc) bitstreams into zip, update manifest
-        if (extraStreams != null) {
-            for (Map.Entry<MdRef, InputStream> ment : extraStreams.getMap().entrySet()) {
-                MdRef ref = ment.getKey();
+        for (Map.Entry<MdRef, InputStream> ment : extraStreams.getMap().entrySet()) {
+            MdRef ref = ment.getKey();
 
-                // Both Deposit Licenses & CC Licenses which are referenced as "extra streams" may already be
-                // included in our Package (if their bundles are already included in the <filSec> section of manifest).
-                // So, do a special check to see if we need to link up extra License <mdRef> entries to the bitstream
-                // in the <fileSec>.
-                // (this ensures that we don't accidentally add the same License file to our package twice)
-                linkLicenseRefsToBitstreams(context, params, dso, ref);
+            // Both Deposit Licenses & CC Licenses which are referenced as "extra streams" may already be
+            // included in our Package (if their bundles are already included in the <filSec> section of manifest).
+            // So, do a special check to see if we need to link up extra License <mdRef> entries to the bitstream
+            // in the <fileSec>.
+            // (this ensures that we don't accidentally add the same License file to our package twice)
+            linkLicenseRefsToBitstreams(context, params, dso, ref);
 
-                //If this 'mdRef' is NOT already linked up to a file in the package,
-                // then its file must be missing.  So, we are going to add a new
-                // file to the Zip package.
-                if (ref.getXlinkHref() == null || ref.getXlinkHref().isEmpty()) {
-                    InputStream is = ment.getValue();
+            //If this 'mdRef' is NOT already linked up to a file in the package,
+            // then its file must be missing.  So, we are going to add a new
+            // file to the Zip package.
+            if (ref.getXlinkHref() == null || ref.getXlinkHref().isEmpty()) {
+                InputStream is = ment.getValue();
 
-                    // create a hopefully unique filename within the Zip
-                    String fname = gensym("metadata");
-                    // link up this 'mdRef' to point to that file
-                    ref.setXlinkHref(fname);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Writing EXTRA stream to Zip: " + fname);
-                    }
-                    //actually add the file to the Zip package
-                    ZipEntry ze = new ZipEntry(fname);
-                    if (lmTime != 0) {
-                        ze.setTime(lmTime);
-                    } else {
-                        // Set a default modified date so that checksum of Zip doesn't change if Zip contents are
-                        // unchanged
-                        ze.setTime(DEFAULT_MODIFIED_DATE);
-                    }
-                    zip.putNextEntry(ze);
-                    Utils.copy(is, zip);
-                    zip.closeEntry();
-
-                    is.close();
+                // create a hopefully unique filename within the Zip
+                String fname = gensym("metadata");
+                // link up this 'mdRef' to point to that file
+                ref.setXlinkHref(fname);
+                if (log.isDebugEnabled()) {
+                    log.debug("Writing EXTRA stream to Zip: " + fname);
                 }
+                //actually add the file to the Zip package
+                ZipEntry ze = new ZipEntry(fname);
+                if (lmTime != 0) {
+                    ze.setTime(lmTime);
+                } else {
+                    // Set a default modified date so that checksum of Zip doesn't change if Zip contents are
+                    // unchanged
+                    ze.setTime(DEFAULT_MODIFIED_DATE);
+                }
+                zip.putNextEntry(ze);
+                Utils.copy(is, zip);
+                zip.closeEntry();
+
+                is.close();
             }
         }
 
