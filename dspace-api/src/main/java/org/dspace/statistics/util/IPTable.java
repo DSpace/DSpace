@@ -112,15 +112,10 @@ public class IPTable {
             if (ip.contains("/")) {
                 String[] parts = ip.split("/");
                 try {
-                    byte[] octets = InetAddress.getByName(parts[0]).getAddress();
-                    long result = 0;
-                    for (byte octet : octets) {
-                        result <<= 8;
-                        result |= octet & 0xff;
-                    }
+                    long ipLong = ipToLong(InetAddress.getByName(parts[0]));
                     long mask = (long) Math.pow(2, 32 - Integer.parseInt(parts[1]));
-                    long ipLo = (result / mask) * mask;
-                    long ipHi = (( (result / mask) + 1) * mask) - 1;
+                    long ipLo = (ipLong / mask) * mask;
+                    long ipHi = (( (ipLong / mask) + 1) * mask) - 1;
                     ipRanges.add(new IPRange(ipLo, ipHi));
                     return;
                 } catch (Exception e) {
