@@ -160,9 +160,83 @@ public class MetadataValueRestRepositoryIT extends AbstractControllerIntegration
 
         getClient().perform(get(SEARCH_BYVALUE_ENDPOINT)
                         .param("schema", metadataSchema)
-                        .param("element",metadataElement)
-                        .param("qualifier",metadataQualifier)
-                        .param("searchValue",searchValue))
+                        .param("element", metadataElement)
+                        .param("qualifier", metadataQualifier)
+                        .param("searchValue", searchValue))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.metadatavalues", Matchers.hasItem(
+                        MetadataValueMatcher.matchMetadataValueByKeys(titleMetadataValue.getValue(),
+                                titleMetadataValue.getLanguage(), titleMetadataValue.getAuthority(),
+                                titleMetadataValue.getConfidence(), titleMetadataValue.getPlace()))
+                ))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByValue_searchValueWithStringAndNumber() throws Exception {
+        MetadataValue titleMetadataValue = this.getTitleMetadataValue();
+
+        // add number to the title
+        titleMetadataValue.setValue(titleMetadataValue.getValue() + "1");
+        context.turnOffAuthorisationSystem();
+
+        // update item with the new title
+        itemService.setMetadataSingleValue(context, publicItem, SCHEMA, ELEMENT, QUALIFIER, null,
+                titleMetadataValue.getValue());
+        itemService.update(context, publicItem);
+
+        context.restoreAuthSystemState();
+
+
+        String metadataSchema = titleMetadataValue.getMetadataField().getMetadataSchema().getName();
+        String metadataElement = titleMetadataValue.getMetadataField().getElement();
+        String metadataQualifier = titleMetadataValue.getMetadataField().getQualifier();
+        String searchValue = titleMetadataValue.getValue();
+
+        getClient().perform(get(SEARCH_BYVALUE_ENDPOINT)
+                        .param("schema", metadataSchema)
+                        .param("element", metadataElement)
+                        .param("qualifier", metadataQualifier)
+                        .param("searchValue", searchValue))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.metadatavalues", Matchers.hasItem(
+                        MetadataValueMatcher.matchMetadataValueByKeys(titleMetadataValue.getValue(),
+                                titleMetadataValue.getLanguage(), titleMetadataValue.getAuthority(),
+                                titleMetadataValue.getConfidence(), titleMetadataValue.getPlace()))
+                ))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByValue_searchValueIsNumber() throws Exception {
+        MetadataValue titleMetadataValue = this.getTitleMetadataValue();
+
+        // add number to the title
+        titleMetadataValue.setValue("123");
+        context.turnOffAuthorisationSystem();
+
+        // update item with the new title
+        itemService.setMetadataSingleValue(context, publicItem, SCHEMA, ELEMENT, QUALIFIER, null,
+                titleMetadataValue.getValue());
+        itemService.update(context, publicItem);
+
+        context.restoreAuthSystemState();
+
+
+        String metadataSchema = titleMetadataValue.getMetadataField().getMetadataSchema().getName();
+        String metadataElement = titleMetadataValue.getMetadataField().getElement();
+        String metadataQualifier = titleMetadataValue.getMetadataField().getQualifier();
+        String searchValue = titleMetadataValue.getValue();
+
+        getClient().perform(get(SEARCH_BYVALUE_ENDPOINT)
+                        .param("schema", metadataSchema)
+                        .param("element", metadataElement)
+                        .param("qualifier", metadataQualifier)
+                        .param("searchValue", searchValue))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.metadatavalues", Matchers.hasItem(

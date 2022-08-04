@@ -10,11 +10,16 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +46,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 /**
  * This is the repository responsible to manage MetadataValueWrapper Rest object.
@@ -117,6 +123,29 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
         DiscoverQuery discoverQuery =
                 this.createDiscoverQuery(metadataField, searchValue, pageable);
 
+        if (ObjectUtils.isEmpty(discoverQuery)) {
+            throw new IllegalArgumentException("Cannot create a DiscoverQuery from the arguments.");
+        }
+
+        // regex if searchValue consist of numbers and characters
+        // \d - digit
+        String regexNumber = "(.)*(\\d)(.)*";
+        // \D - non digit
+        String regexString = "(.)*(\\D)(.)*";
+        Pattern patternNumber = Pattern.compile(regexNumber);
+        Pattern patternString = Pattern.compile(regexString);
+        // if the searchValue is mixed with numbers and characters the Solr ignore numbers by default
+        // divide the characters and numbers from searchValue to the separate queries and from separate queries
+        // create one complex query
+        if (patternNumber.matcher(searchValue).matches() && patternString.matcher(searchValue).matches()) {
+            List<String> characterList = this.extractCharacterListFromString(searchValue);
+            List<String> numberList = this.extractNumberListFromString(searchValue);
+
+            String newQuery = this.composeQueryWithNumbersAndChars(metadataField, characterList, numberList);
+            discoverQuery.setQuery(newQuery);
+        }
+
+
         List<MetadataValueWrapper> metadataValueWrappers = new ArrayList<>();
         try {
             DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
@@ -147,6 +176,40 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
         return converter.toRestPage(metadataValueWrappers, pageable, utils.obtainProjection());
     }
 
+    /**
+     * From searchValue get all String values which are separated by the number to the List of Strings.
+     * @param searchValue e.g. 'my1Search2'
+     * @return e.g. [my, Search]
+     */
+    private List<String> extractCharacterListFromString(String searchValue) {
+        List<String> characterList = null;
+        // get characters from searchValue as List
+        searchValue = searchValue.replaceAll("[0-9]", " ");
+        characterList = new LinkedList<>(Arrays.asList(searchValue.split(" ")));
+        // remove empty characters from the characterList
+        characterList.removeIf(characters -> characters == null || "".equals(characters));
+
+        return characterList;
+    }
+
+    /**
+     * From searchValue get all number values which are separated by the number to the List of Strings.
+     * @param searchValue e.g. 'my1Search2'
+     * @return e.g. [1, 2]
+     */
+    private List<String> extractNumberListFromString(String searchValue) {
+        List<String> numberList = new ArrayList<>();
+
+        // get numbers from searchValue as List
+        Pattern numberRegex = Pattern.compile("-?\\d+");
+        Matcher numberMatcher = numberRegex.matcher(searchValue);
+        while (numberMatcher.find()) {
+            numberList.add(numberMatcher.group());
+        }
+
+        return numberList;
+    }
+
     public List<MetadataValueWrapper> filterEUSponsors(List<MetadataValueWrapper> metadataWrappers) {
         return metadataWrappers.stream().filter(m -> !m.getMetadataValue().getValue().contains("info:eu-repo"))
                 .collect(Collectors.toList());
@@ -156,6 +219,42 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
         return metadataWrappers.stream().filter(
                 distinctByKey(metadataValueWrapper -> metadataValueWrapper.getMetadataValue().getValue()) )
                 .collect( Collectors.toList() );
+    }
+
+    /**
+     * From list of String and list of Numbers create a query for the SolrQuery.
+     * @param metadataField e.g. `dc.contributor.author`
+     * @param characterList e.g. [my, Search]
+     * @param numberList e.g. [1, 2]
+     * @return "dc.contributor.author:*my* AND dc.contributor.author:*Search* AND dc.contributor.author:*1* AND ..."
+     */
+    private String composeQueryWithNumbersAndChars(String metadataField, List<String> characterList,
+                                                   List<String> numberList) {
+        this.addQueryTemplateToList(metadataField, characterList);
+        this.addQueryTemplateToList(metadataField, numberList);
+
+        String joinedChars = String.join(" AND ", characterList);
+        String joinedNumbers = String.join(" AND ", numberList);
+        return joinedChars + " AND " + joinedNumbers;
+
+    }
+
+    /**
+     * Add SolrQuery template to the every item of the List
+     * @param metadataField e.g. `dc.contributor.author`
+     * @param stringList could be List of String or List of Numbers which are in the String format because of Solr
+     *                   e.g. [my, Search]
+     * @return [dc.contributor.author:*my*, dc.contributor.author:*Search*]
+     */
+    private List<String> addQueryTemplateToList(String metadataField, List<String> stringList) {
+        String template = metadataField + ":" + "*" + " " + "*";
+
+        AtomicInteger index = new AtomicInteger();
+        stringList.forEach(characters -> {
+            String queryString = template.replaceAll(" ", characters);
+            stringList.set(index.getAndIncrement(), queryString);
+        });
+        return stringList;
     }
 
     private DiscoverQuery createDiscoverQuery(String metadataField, String searchValue, Pageable pageable) {
