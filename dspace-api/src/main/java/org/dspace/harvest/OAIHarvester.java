@@ -28,12 +28,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 
-import ORG.oclc.oai.harvester2.verb.GetRecord;
-import ORG.oclc.oai.harvester2.verb.Identify;
-import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
-import ORG.oclc.oai.harvester2.verb.ListRecords;
+import org.oclc.oai.harvester2.verb.GetRecord;
+import org.oclc.oai.harvester2.verb.Identify;
+import org.oclc.oai.harvester2.verb.ListMetadataFormats;
+import org.oclc.oai.harvester2.verb.ListRecords;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -493,11 +493,11 @@ public class OAIHarvester {
      * @throws HarvestingException          if harvesting error
      * @throws ParserConfigurationException XML parsing error
      * @throws SAXException                 if XML processing error
-     * @throws TransformerException         if XML transformer error
+     * @throws XPathExpressionException     if XPath error
      */
     protected void processRecord(Element record, String OREPrefix, final long currentRecord, long totalListSize)
         throws SQLException, AuthorizeException, IOException, CrosswalkException, HarvestingException,
-        ParserConfigurationException, SAXException, TransformerException {
+        ParserConfigurationException, SAXException, XPathExpressionException {
         WorkspaceItem wi = null;
         Date timeStart = new Date();
 
@@ -769,10 +769,10 @@ public class OAIHarvester {
      * @throws IOException                  if IO error
      * @throws SAXException                 if XML processing error
      * @throws ParserConfigurationException XML parsing error
-     * @throws TransformerException         if XML transformer error
+     * @throws XPathExpressionException     if XPath error
      */
     private String oaiGetDateGranularity(String oaiSource)
-        throws IOException, ParserConfigurationException, SAXException, TransformerException {
+        throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
         Identify iden = new Identify(oaiSource);
         return iden.getDocument().getElementsByTagNameNS(OAI_NS.getURI(), "granularity").item(0).getTextContent();
     }
@@ -789,11 +789,11 @@ public class OAIHarvester {
      *                                      operations.
      * @throws ParserConfigurationException XML parsing error
      * @throws SAXException                 if XML processing error
-     * @throws TransformerException         if XML transformer error
+     * @throws XPathExpressionException     if XPath error
      * @throws ConnectException             if could not connect to OAI server
      */
     public static String oaiResolveNamespaceToPrefix(String oaiSource, String MDNamespace)
-        throws IOException, ParserConfigurationException, SAXException, TransformerException, ConnectException {
+        throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, ConnectException {
         String metaPrefix = null;
 
         // Query the OAI server for the metadata
@@ -866,11 +866,11 @@ public class OAIHarvester {
      *                                      operations.
      * @throws ParserConfigurationException XML parsing error
      * @throws SAXException                 if XML processing error
-     * @throws TransformerException         if XML transformer error
+     * @throws XPathExpressionException     if XPath error
      * @throws HarvestingException          if harvesting error
      */
     protected List<Element> getMDrecord(String oaiSource, String itemOaiId, String metadataPrefix)
-        throws IOException, ParserConfigurationException, SAXException, TransformerException, HarvestingException {
+        throws IOException, ParserConfigurationException, SAXException, XPathExpressionException, HarvestingException {
         GetRecord getRecord = new GetRecord(oaiSource, itemOaiId, metadataPrefix);
         Set<String> errorSet = new HashSet<>();
         // If the metadata is not available for this item, can the whole thing
