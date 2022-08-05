@@ -21,8 +21,6 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.oclc.oai.harvester2.verb.Identify;
-import org.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
@@ -33,6 +31,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.input.DOMBuilder;
+import org.oclc.oai.harvester2.verb.Identify;
+import org.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
