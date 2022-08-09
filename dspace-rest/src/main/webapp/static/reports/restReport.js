@@ -11,7 +11,7 @@ var Report = function() {
     this.COUNT_LIMIT = 500;
     this.ITEM_LIMIT = 100;
 
-    this.ROOTPATH = "/handle/"
+    this.ROOTPATH = "/handle/";
 
     //Indicate if Password Authentication is supported
     this.makeAuthLink = function(){return false;};
@@ -23,23 +23,23 @@ var Report = function() {
     //Override this to return obj.id for DSpace 5 versions
     this.getId = function(obj) {
         return obj.uuid;
-    }
+    };
 
     //Override this method is sortable.js has been included
     this.hasSorttable = function() {
         return false;
-    }
+    };
 
     this.getDefaultParameters = function(){
         return {};
-    }
+    };
     this.getCurrentParameters = function(){
         return {};
-    }
+    };
 
     this.saveUrl = function() {
         this.myReportParameters.saveAsUrl(this.getCurrentParameters());
-    }
+    };
 
     this.getLoginPayload = function() {
         //Placeholder to allow a customized report to prompt for email/password
@@ -53,15 +53,15 @@ var Report = function() {
         } else {
            return {email: email, password: pass};
         }
-    }
+    };
     this.getLangSuffix = function(){
         return "";
-    }
+    };
     this.myAuth = new Auth(this);
     this.myAuth.authStat();
     this.myAuth.callback = function(data) {
         self.spinner.stop();
-    }
+    };
     this.myHtmlUtil = new HtmlUtil();
     this.spinner = new Spinner({
         lines: 13, // The number of lines to draw
@@ -103,7 +103,7 @@ var Report = function() {
         itemsTitle += " (" + (offset+1) + " - " + last + suff + ")";
         $("#prev,#next").attr("disabled",true);
         $("#itemdiv h3").text(itemsTitle);
-    $("#exlimit").removeClass("red");
+        $("#exlimit").removeClass("red");
         if (offset > 0) $("#prev").attr("disabled", false);
         $("#prev").off("click").on("click", funcdec);
         //in case of filters, always allow next
@@ -112,14 +112,14 @@ var Report = function() {
             $("#next").attr("disabled", false);
         } else if (offset + limit  < total) {
             $("#next").attr("disabled", false);
-      $("#exlimit").addClass("red");
+            $("#exlimit").addClass("red");
         } else if (limit == total) {
             //total may only be accurate to one page
             $("#next").attr("disabled", false);
-      $("#exlimit").addClass("red");
+            $("#exlimit").addClass("red");
         }
         $("#next").off("click").on("click", funcinc);
-    }
+    };
 
     this.myReportParameters = undefined;
     this.myFilters = undefined;
@@ -128,12 +128,12 @@ var Report = function() {
     this.initMetadataFields = function() {
         this.myMetadataFields = new MetadataFields(self);
         this.myMetadataFields.load();
-    }
+    };
 
   this.initBitstreamFields = function() {
     this.myBitstreamFields = new BitstreamFields(self);
     this.myBitstreamFields.load();
-  }
+  };
 
     this.baseInit = function() {
         this.myReportParameters = new ReportParameters(
@@ -144,7 +144,7 @@ var Report = function() {
         this.myFilters = new Filters(this.myReportParameters.params["filters"]);
         this.initMetadataFields();
         this.initBitstreamFields();
-        this.getActiveTab = function(){return 1;}
+        this.getActiveTab = function(){return 1;};
         $("#metadatadiv").accordion({
             heightStyle: "content",
             collapsible: true,
@@ -158,7 +158,7 @@ var Report = function() {
         });
         this.myFilters.createFilterTable(this.myReportParameters.params.filters);
         this.myAuth.init();
-    }
+    };
 
     this.makeCsv = function(rows) {
         var itemdata = "";
@@ -169,13 +169,13 @@ var Report = function() {
             });
         });
         return itemdata;
-    }
+    };
 
     this.export = function(rows) {
     var itemdata = "data:text/csv;charset=utf-8," + this.makeCsv(rows);
         var encodedUri = encodeURI(itemdata);
         window.open(encodedUri);
-    }
+    };
 
     //this is meant to be overridden for each report
     this.exportCol = function(colnum, col) {
@@ -183,7 +183,7 @@ var Report = function() {
         data += (colnum == 0) ? "" : ",";
         data += self.exportCell(col);
         return data;
-    }
+    };
 
     this.exportCell = function(col) {
         data = "\"";
@@ -199,13 +199,12 @@ var Report = function() {
         });
         data += "\"";
         return data;
-    }
+    };
 
     this.init = function() {
         this.baseInit();
-    }
-
-}
+    };
+};
 
 var Auth = function(report) {
     this.report = report;
@@ -214,7 +213,7 @@ var Auth = function(report) {
     };
     this.saveToken = function(data) {
         this.TOKEN = data;
-    }
+    };
     this.init = function() {
         var loginPayload = report.getLoginPayload();
         if (loginPayload == undefined) {
@@ -240,7 +239,7 @@ var Auth = function(report) {
                 self.callback();
             }
         });
-    }
+    };
 
     this.verifyShibLogin = function() {
         var self = this;
@@ -248,7 +247,7 @@ var Auth = function(report) {
             url: "/rest/shibboleth-login",
             success: self.authStat
         });
-    }
+    };
 
     this.authStat = function() {
         var self = this;
@@ -278,7 +277,7 @@ var Auth = function(report) {
                 }
             }
         });
-    }
+    };
 
     this.logout = function() {
         var self = this;
@@ -291,15 +290,15 @@ var Auth = function(report) {
                 self.authStat();
             }
         });
-    }
+    };
     this.getHeaders = function() {
         var HEADERS = {};
         if (this.TOKEN != null) {
             HEADERS['rest-dspace-token'] = this.TOKEN;
         }
         return HEADERS;
-    }
-}
+    };
+};
 
 var ReportParameters = function(defaultParams, prmstr) {
     this.params = defaultParams;
@@ -326,21 +325,21 @@ var ReportParameters = function(defaultParams, prmstr) {
     this.getOffset = function() {
         var offset = $("#offset").val();
         return $.isNumeric(offset) ? Number(offset) : this.offset;
-    }
+    };
 
     this.getNextOffset = function() {
         return this.getOffset() + this.getLimit();
-    }
+    };
 
     this.getPrevOffset = function() {
         var v = this.getOffset() - this.getLimit();
         return v < 0 ? 0 : v;
-    }
+    };
 
     this.getLimit = function() {
         var limit = $("#limit").val();
         return $.isNumeric(limit) ? Number(limit) : this.limit;
-    }
+    };
 
     this.updateOffset = function(increment) {
         var val = $("#offset").val();
@@ -352,13 +351,13 @@ var ReportParameters = function(defaultParams, prmstr) {
                 $("#offset").val(this.getPrevOffset());
             }
         }
-    }
+    };
 
     this.saveAsUrl = function(params) {
         var pstr = $.param(params).replace(/%5B%5D/g,"[]");
         window.location.search = pstr;
-    }
-}
+    };
+};
 
 
 var Filters = function() {
@@ -397,7 +396,7 @@ var Filters = function() {
                 });
             }
         );
-    }
+    };
 
     this.addFilter = function(val, categories, category, title, description, cname) {
         var catdiv = null;
@@ -425,7 +424,7 @@ var Filters = function() {
         div.append(label);
         catdiv.append(div);
         return input;
-    }
+    };
 
     this.getFilterList = function() {
         var list="";
@@ -441,8 +440,8 @@ var Filters = function() {
             list = "none";
         }
         return list;
-    }
-}
+    };
+};
 
 var MetadataFields = function(report) {
     this.metadataSchemas = undefined;
@@ -461,21 +460,20 @@ var MetadataFields = function(report) {
             complete: function(xhr, status) {
             }
         });
-    }
+    };
 
     this.initFields = function(data, report) {
         var params = report.myReportParameters.params;
         self.metadataSchemas = data;
         self.drawShowFields(params["show_fields[]"]);
-    }
+    };
 
     this.getShowFields = function(){
         var val = $("#show-fields select").val();
         return val == null ? Array() : val;
-    }
+    };
 
     this.drawShowFields = function(pfields) {
-        var self = this;
         var sel = $("<select name='show_fields'/>").attr("multiple","true").attr("size","8").appendTo("#show-fields");
         $.each(this.metadataSchemas, function(index, schema){
             if (schema.prefix == 'eperson') {
@@ -493,16 +491,16 @@ var MetadataFields = function(report) {
                 sel.append(opt);
             });
         });
-    }
+    };
 
     this.initQueries = function(){};
-}
+};
 
 var BitstreamFields = function(report) {
   var self = this;
   this.isOriginal = function(bit){
     return bit.bundleName === "ORIGINAL";
-  }
+  };
   this.map = [
     {
       key: "original-file-names",
@@ -559,7 +557,7 @@ var BitstreamFields = function(report) {
 
   this.load = function(){
     self.initFields(report);
-  }
+  };
 
   this.initFields = function(report) {
     var params = report.myReportParameters.params;
@@ -568,11 +566,12 @@ var BitstreamFields = function(report) {
 
   this.hasBitstreamFields = function() {
     return self.getShowFieldsBits() != null;
-  }
+  };
+
   this.getShowFieldsBits = function(){
     var val = $("#show-fields-bits select").val();
     return val == null ? Array() : val;
-  }
+  };
 
   this.drawShowFieldsBits = function(pfieldsBits) {
     var sel = $("<select name='show_fields_bits'/>");
@@ -584,7 +583,7 @@ var BitstreamFields = function(report) {
       }
       sel.append(opt);
     }
-  }
+  };
 
 
   this.getKeyText = function(key, item, bitfields) {
@@ -620,15 +619,15 @@ var BitstreamFields = function(report) {
       }
     });
     return ret;
-  }
-}
+  };
+};
 
 var HtmlUtil = function() {
     this.addTr = function(tbl) {
         var tr = $("<tr/>");
         tbl.append(tr);
         return tr;
-    }
+    };
 
     this.addTd = function(tr, val) {
         var td = $("<td/>");
@@ -637,7 +636,7 @@ var HtmlUtil = function() {
         }
         tr.append(td);
         return td;
-    }
+    };
 
     this.addTh = function(tr, val) {
         var th = $("<th/>");
@@ -646,12 +645,11 @@ var HtmlUtil = function() {
         }
         tr.append(th);
         return th;
-    }
-
+    };
 
     this.addTdAnchor = function(tr, val, href) {
         return this.addTd(tr, this.getAnchor(val, href));
-    }
+    };
 
     this.getAnchor = function(val, href) {
         var a = $("<a/>");
@@ -660,29 +658,29 @@ var HtmlUtil = function() {
         a.attr("target", "_blank");
         a.attr("rel", "noopener noreferrer");
         return a;
-    }
+    };
 
     this.createOpt = function(name, val) {
         var opt = $("<option/>");
         opt.attr("value", val).text(name);
         return opt;
-    }
+    };
 
     this.addOpt = function(sel, name, val) {
         var opt = this.createOpt(name, val);
         sel.append(opt);
         return opt;
-    }
+    };
 
     this.addDisabledOpt = function(sel, name, val) {
         var opt = this.createOpt(name, val).attr("disabled",true);
         sel.append(opt);
         return opt;
-    }
+    };
 
     this.makeTotalCol = function(th) {
         th.append($("<hr><span class='num'>-</span>"));
-    }
+    };
 
     this.totalCol = function(index){
         var total = 0;
@@ -693,9 +691,9 @@ var HtmlUtil = function() {
             }
         });
         $($("#table tr.header th")[index]).find("span.num").text(total);
-    }
+    };
 
-}
+};
 
 var CommunitySelector = function(report, parent, paramCollSel) {
     var self = this;
@@ -743,5 +741,5 @@ var CommunitySelector = function(report, parent, paramCollSel) {
                 self.addCommLabel(collSel, scomm, indent + 1, paramCollSel);
             });
         }
-    }
-}
+    };
+};

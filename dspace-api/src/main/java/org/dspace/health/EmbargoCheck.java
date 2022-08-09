@@ -26,9 +26,8 @@ public class EmbargoCheck extends Check {
     @Override
     public String run(ReportInfo ri) {
         String ret = "";
-        Context context = null;
+        Context context = new Context();
         try {
-            context = new Context();
             Iterator<Item> item_iter = null;
             try {
                 item_iter = embargoService.findItemsByLiftMetadata(context);
@@ -56,9 +55,7 @@ public class EmbargoCheck extends Check {
         } catch (SQLException e) {
             error(e);
             try {
-                if (null != context) {
-                    context.abort();
-                }
+                context.abort();
             } catch (Exception e1) {
                 error(e);
             }

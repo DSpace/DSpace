@@ -370,9 +370,10 @@ public class Utils {
             }
         }
         File file = File.createTempFile(prefixTempName + "-" + suffixTempName, ".temp", uploadDir);
-        InputStream io = new BufferedInputStream(multipartFile.getInputStream());
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-        org.dspace.core.Utils.bufferedCopy(io, out);
+        try (InputStream io = new BufferedInputStream(multipartFile.getInputStream());
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));) {
+            org.dspace.core.Utils.bufferedCopy(io, out);
+        }
         return file;
     }
 

@@ -75,7 +75,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
             if (ePerson == null) {
                 return false;
             }
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
             XmlWorkflowItem workflowItem = workflowItemService.find(context, dsoId);
             // submitter can see their inprogress submission
             if (ePerson.equals(workflowItem.getSubmitter())) {
