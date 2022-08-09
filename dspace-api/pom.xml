@@ -801,7 +801,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.116</version>
+            <version>1.12.261</version>
         </dependency>
 
         <dependency>
@@ -850,7 +850,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.2</version>
+            <version>5.6</version>
         </dependency>
 
         <!-- Email templating -->

@@ -37,7 +37,7 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private EventService eventService;
 
-    private List<String> typeList = Arrays.asList(Constants.typeText);
+    private final List<String> typeList = Arrays.asList(Constants.typeText);
 
     public ViewEventRest createViewEvent() throws AuthorizeException, SQLException {
 
@@ -54,7 +54,7 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
         if (viewEventRest.getTargetId() == null || StringUtils.isBlank(viewEventRest.getTargetType()) ||
             !typeList.contains(viewEventRest.getTargetType().toUpperCase())) {
             throw new DSpaceBadRequestException("The given ViewEvent was invalid, one or more properties are either" +
-                                                    "wrong or missing");
+                                                    " wrong or missing");
         }
         DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(
             Constants.getTypeID(viewEventRest.getTargetType().toUpperCase(Locale.getDefault())));

@@ -64,7 +64,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
             if (ePerson == null) {
                 return false;
             }
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
 
             PoolTask poolTask = poolTaskService.find(context, dsoId);
             // If the pool task is null then we give permission so we can throw another status code instead

@@ -24,7 +24,7 @@
         <spring-security.version>5.6.5</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.5.Final</hibernate.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.3.3</postgresql.driver.version>
+        <postgresql.driver.version>42.4.1</postgresql.driver.version>
         <solr.client.version>8.11.1</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
@@ -158,6 +158,7 @@
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            <arg>-Xpkginfo:always</arg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>
@@ -1431,7 +1432,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.7</version>
+                <version>2.8.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

@@ -290,7 +290,7 @@ public class BrowseEngine {
                 // now, if we don't have any results, we are at the end of the browse.  This will
                 // be because a starts_with value has been supplied for which we don't have
                 // any items.
-                if (results.size() == 0) {
+                if (results.isEmpty()) {
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
                     if (offset < 0) {
@@ -450,7 +450,7 @@ public class BrowseEngine {
                 // now, if we don't have any results, we are at the end of the browse.  This will
                 // be because a starts_with value has been supplied for which we don't have
                 // any items.
-                if (results.size() == 0) {
+                if (results.isEmpty()) {
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
                     if (offset < 0) {
@@ -463,7 +463,7 @@ public class BrowseEngine {
                 }
             } else {
                 // No records, so make an empty list
-                results = new ArrayList<String[]>();
+                results = new ArrayList<>();
             }
 
             // construct the BrowseInfo object to pass back
@@ -554,7 +554,7 @@ public class BrowseEngine {
         }
 
         String col = "sort_1";
-        if (so.getNumber() > 0) {
+        if (so != null && so.getNumber() > 0) {
             col = "sort_" + Integer.toString(so.getNumber());
         }
 
@@ -591,7 +591,7 @@ public class BrowseEngine {
         }
 
         String col = "sort_1";
-        if (so.getNumber() > 0) {
+        if (so != null && so.getNumber() > 0) {
             col = "sort_" + Integer.toString(so.getNumber());
         }
 
