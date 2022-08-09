@@ -31,10 +31,14 @@ import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.impl.RequestCopyFeature;
 import org.dspace.app.rest.converter.RequestItemConverter;
 import org.dspace.app.rest.exception.IncompleteItemRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
@@ -78,6 +82,9 @@ public class RequestItemRepository
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected AuthorizationFeatureService authorizationFeatureService;
 
     /*
      * DSpaceRestRepository
@@ -152,6 +159,13 @@ public class RequestItemRepository
         Item item = itemService.find(ctx, UUID.fromString(itemId));
         if (null == item) {
             throw new IncompleteItemRequestException("That item does not exist");
+        }
+
+        // Check for restrictions on specific items.
+        ItemRest itemRest = converter.toRest(item, utils.obtainProjection());
+        AuthorizationFeature requestCopyFeature = authorizationFeatureService.find(RequestCopyFeature.NAME);
+        if (!requestCopyFeature.isAuthorized(ctx, itemRest)) {
+            throw new AuthorizeException("Requests are not permitted for item: " + itemId);
         }
 
         // Requester's email address.

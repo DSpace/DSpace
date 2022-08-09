@@ -57,6 +57,7 @@ import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,6 +83,9 @@ public class RequestItemRepositoryIT
 
     @Autowired(required = true)
     RequestItemService requestItemService;
+
+    @Autowired(required = true)
+    ConfigurationService configurationService;
 
     private Collection collection;
 
@@ -246,6 +250,81 @@ public class RequestItemRepositoryIT
         } finally {
             // Clean up the created request.
             RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
+        }
+    }
+
+    /**
+     * Test of createAndReturn method, with a restriction on item.
+     *
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     */
+    @Test
+    public void testCreateAndReturnRestrictedAndAuthenticated()
+            throws SQLException, AuthorizeException, IOException, Exception {
+        System.out.println("createAndReturn (restricted)");
+
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setAllfiles(true);
+        String itemId = item.getID().toString();
+        rir.setItemId(itemId);
+        rir.setRequestEmail(eperson.getEmail());
+        rir.setRequestName(eperson.getFullName());
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
+
+        // Create it and see if it was restricted.
+        ObjectMapper mapper = new ObjectMapper();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        String configName = "request.item.restricted";
+        try {
+            configurationService.setProperty(configName, itemId);
+            getClient(authToken)
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isForbidden());
+        } finally {
+            // Clean up.
+            configurationService.setProperty(configName, null);
+        }
+    }
+
+    /**
+     * Test of createAndReturn method, with a restriction on item.
+     *
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     */
+    @Test
+    public void testCreateAndReturnRestrictedAndNotAuthenticated()
+            throws SQLException, AuthorizeException, IOException, Exception {
+        System.out.println("createAndReturn (restricted)");
+
+        // Fake up a request in REST form.
+        RequestItemRest rir = new RequestItemRest();
+        rir.setAllfiles(true);
+        String itemId = item.getID().toString();
+        rir.setItemId(itemId);
+        rir.setRequestEmail(eperson.getEmail());
+        rir.setRequestName(eperson.getFullName());
+        rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
+
+        // Create it and see if it was restricted.
+        ObjectMapper mapper = new ObjectMapper();
+        String configName = "request.item.restricted";
+        try {
+            configurationService.setProperty(configName, itemId);
+            getClient()
+                    .perform(post(URI_ROOT)
+                            .content(mapper.writeValueAsBytes(rir))
+                            .contentType(contentType))
+                    .andExpect(status().isUnauthorized());
+        } finally {
+            // Clean up.
+            configurationService.setProperty(configName, null);
         }
     }
 
