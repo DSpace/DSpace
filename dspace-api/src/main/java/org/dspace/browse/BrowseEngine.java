@@ -203,7 +203,7 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            if (scope.getBrowseIndex().getDataType().equals(OrderFormat.TITLE)) {
+            if (scope.getBrowseIndex() != null && OrderFormat.TITLE.equals(scope.getBrowseIndex().getDataType())) {
                 // For browsing by title, apply the same normalization applied to indexed titles
                 dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
             } else {
