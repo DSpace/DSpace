@@ -203,7 +203,12 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            if (scope.getBrowseIndex() != null && OrderFormat.TITLE.equals(scope.getBrowseIndex().getDataType())) {
+                // For browsing by title, apply the same normalization applied to indexed titles
+                dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
+            } else {
+                dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            }
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
