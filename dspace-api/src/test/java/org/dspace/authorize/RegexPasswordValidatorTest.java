@@ -9,11 +9,9 @@ package org.dspace.authorize;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -36,12 +34,6 @@ public class RegexPasswordValidatorTest {
 
     @InjectMocks
     private RegexPasswordValidator regexPasswordValidator;
-
-    @Before
-    public void setup() {
-        when(configurationService.getProperty("eperson.password.regex-validation.pattern"))
-            .thenReturn("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\da-zA-Z]).{8,15}$");
-    }
 
     @Test
     public void testValidPassword() {

@@ -43,7 +43,7 @@ public class RegexPasswordValidator implements PasswordValidator {
     }
 
     private String getPasswordValidationPattern() {
-        return configurationService.getProperty("eperson.password.regex-validation.pattern");
+        return configurationService.getProperty("authentication-password.regex-validation.pattern");
     }
 
 }

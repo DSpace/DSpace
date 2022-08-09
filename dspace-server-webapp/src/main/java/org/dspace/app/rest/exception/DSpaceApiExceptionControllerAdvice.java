@@ -191,10 +191,11 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpStatus.BAD_REQUEST.value());
     }
 
-    @ExceptionHandler({ PasswordNotValidException.class})
+    @ExceptionHandler(PasswordNotValidException.class)
     protected void handlePasswordNotValidException(HttpServletRequest request, HttpServletResponse resp, Exception ex)
         throws IOException {
-        sendErrorResponse(request, resp, null, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
+        String message = "The new password to set is not valid";
+        sendErrorResponse(request, resp, null, message, HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
     @Override
