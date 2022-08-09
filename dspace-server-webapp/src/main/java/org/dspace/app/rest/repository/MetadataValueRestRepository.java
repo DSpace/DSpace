@@ -75,6 +75,8 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
 
     private static final String UNDEFINED = "undefined";
 
+    private static final String NULL = "null";
+
     /**
      * Endpoint for the search in the {@link MetadataValue} objects by the metadataField and various values.
      *
@@ -103,8 +105,7 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
         String separator = ".";
         String metadataField = StringUtils.isNotBlank(schemaName) ? schemaName + separator : "";
         metadataField += StringUtils.isNotBlank(elementName) ? elementName : "";
-        metadataField += StringUtils.isNotBlank(qualifierName) && !StringUtils.equals(UNDEFINED, qualifierName) ?
-                separator + qualifierName : "";
+        metadataField += this.qualifierIsNotEmpty(qualifierName) ? separator + qualifierName : "";
 
         List<String> metadata = List.of(metadataField.split("\\."));
         // metadataField validation
@@ -148,7 +149,7 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
 
         List<MetadataValueWrapper> metadataValueWrappers = new ArrayList<>();
         try {
-            DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
+            DiscoverResult searchResult = searchService.search(context, discoverQuery);
             for (IndexableObject object : searchResult.getIndexableObjects()) {
                 if (object instanceof IndexableItem) {
                     // get metadata values of the item
@@ -264,6 +265,7 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
         discoverQuery.setMaxResults(pageable.getPageSize());
         // return only metadata field values
         discoverQuery.addSearchField(metadataField);
+        discoverQuery.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 
         return discoverQuery;
     }
@@ -321,5 +323,10 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
     @Override
     public Class<MetadataValueWrapperRest> getDomainClass() {
         return MetadataValueWrapperRest.class;
+    }
+
+    private boolean qualifierIsNotEmpty(String qualifier) {
+        return StringUtils.isNotBlank(qualifier) && !StringUtils.equals(UNDEFINED, qualifier) &&
+                !StringUtils.equals(NULL, qualifier);
     }
 }
