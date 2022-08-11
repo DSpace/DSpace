@@ -132,9 +132,9 @@ public final class CreateAdministrator {
 
         System.out.println("Creating an initial administrator account");
 
-        String email = null;
-        String firstName = null;
-        String lastName = null;
+        String email = line.getOptionValue('e');
+        String firstName = line.getOptionValue('f');
+        String lastName = line.getOptionValue('l');
         String language = I18nUtil.getDefaultLocale().getLanguage();
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         boolean flag = line.hasOption('p');
