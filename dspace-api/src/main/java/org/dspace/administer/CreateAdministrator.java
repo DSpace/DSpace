@@ -139,7 +139,7 @@ public final class CreateAdministrator {
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         boolean flag = line.hasOption('p');
         char[] password = null;
-        boolean dataOK = !(!line.hasOption('f') || !line.hasOption('e') || !line.hasOption('l'));
+        boolean dataOK = line.hasOption('f') && line.hasOption('e') && line.hasOption('l');
 
         while (!dataOK) {
             System.out.print("E-mail address: ");
