@@ -49,14 +49,19 @@ import org.dspace.app.rest.model.RequestItemRest;
 import org.dspace.app.rest.repository.RequestItemRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RequestItemBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -87,9 +92,14 @@ public class RequestItemRepositoryIT
     @Autowired(required = true)
     ConfigurationService configurationService;
 
+    @Autowired(required = true)
+    ResourcePolicyService resourcePolicyService;
+
     private Collection collection;
 
     private Item item;
+
+    private Bundle bundle;
 
     private Bitstream bitstream;
 
@@ -107,7 +117,6 @@ public class RequestItemRepositoryIT
         collection = CollectionBuilder
                 .createCollection(context, parentCommunity)
                 .withName("Collection")
-                .withAdminGroup(eperson)
                 .build();
 
         item = ItemBuilder
@@ -115,11 +124,21 @@ public class RequestItemRepositoryIT
                 .withTitle("Item")
                 .build();
 
+        bundle = BundleBuilder.createBundle(context, item)
+                .withName(Constants.DEFAULT_BUNDLE_NAME)
+                .build();
+
         InputStream is = new ByteArrayInputStream(new byte[0]);
         bitstream = BitstreamBuilder
-                .createBitstream(context, item, is)
+                .createBitstream(context, bundle, is)
                 .withName("Bitstream")
                 .build();
+
+        resourcePolicyService.removePolicies(context, collection, Constants.ADMIN);
+        resourcePolicyService.removePolicies(context, bitstream, Constants.READ);
+
+        configurationService.setProperty("request.item.type", "all");
+        configurationService.setProperty("request.item.restricted", "");
 
         context.restoreAuthSystemState();
     }
@@ -263,7 +282,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnRestrictedAndAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (restricted)");
+        System.out.println("createAndReturn (restricted & authenticated)");
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -301,7 +320,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnRestrictedAndNotAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (restricted)");
+        System.out.println("createAndReturn (restricted & not authenticated)");
 
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
@@ -562,6 +581,13 @@ public class RequestItemRepositoryIT
     public void testPut()
             throws Exception {
         System.out.println("put");
+
+        ResourcePolicyBuilder
+                .createResourcePolicy(context)
+                .withUser(eperson)
+                .withAction(Constants.ADMIN)
+                .withDspaceObject(collection)
+                .build();
 
         // Create an item request to approve.
         RequestItem itemRequest = RequestItemBuilder
