@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
+import com.ibm.icu.text.Normalizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,6 +58,9 @@ public class FuzzyMetadataValueSignature implements Signature {
 
     private ItemService itemService;
 
+    // Is this signature case sensitive?
+    private boolean caseSensitive;
+
     protected WorkflowItemService<?> workflowItemService = WorkflowServiceFactory.getInstance()
                                                                                  .getWorkflowItemService();
 
@@ -93,8 +99,7 @@ public class FuzzyMetadataValueSignature implements Signature {
                     // Normalisation - this should match the index plugin normalisation and handling
                     // but only for the puporses of *indexed* or other uses of this signature.
                     // For search query value handling, see getSearchSignature(...)
-                    String normValue = value.toLowerCase(Locale.ROOT)
-                            .replaceAll("\\s", "");
+                    String normValue = normalise(value);
                     result.add(normValue);
                 }
             }
@@ -119,6 +124,29 @@ public class FuzzyMetadataValueSignature implements Signature {
             retValue.add(v.getValue());
         }
         return retValue;
+    }
+
+    // Normalise the string using the provided regular expression
+    private String normalise(String value) {
+        String norm = value;
+        // Normalise using regular expression
+        if (StringUtils.isNotBlank(this.normalizationRegexp)) {
+            norm = Normalizer.normalize(value, Normalizer.NFD);
+            norm = norm.replaceAll(this.normalizationRegexp, "");
+        }
+
+        // Case insensitive?
+        if (!this.caseSensitive) {
+            CharsetDetector cd = new CharsetDetector();
+            cd.setText(norm.getBytes());
+            CharsetMatch detect = cd.detect();
+            Locale locale = Locale.ROOT;
+            if (detect != null && detect.getLanguage() != null) {
+                locale = new Locale(detect.getLanguage());
+            }
+            norm = norm.toLowerCase(locale);
+        }
+        return norm;
     }
 
     //
@@ -168,15 +196,16 @@ public class FuzzyMetadataValueSignature implements Signature {
         this.normalizationRegexp = normalizationRegexp;
     }
 
-    public boolean isUseCollection() {
-        return useCollection;
-    }
-
-    public void setUseCollection(boolean useCollection) {
-        this.useCollection = useCollection;
-    }
-
     public void setMaxDistance(int maxDistance) {
         this.maxDistance = maxDistance;
     }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
 }

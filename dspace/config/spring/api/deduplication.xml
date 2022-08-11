@@ -38,6 +38,7 @@
 		<property name="metadata" value="dc.title" />
 		<property name="resourceTypeID" value="2" />
 		<property name="maxDistance" value="1" />
+		<property name="caseSensitive" value="false"/>
 	</bean>
 	-->
 
