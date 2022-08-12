@@ -27,10 +27,10 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
     }
 
     /**
-     * Returns the submitter of an Item as RequestItemAuthor or null if the
-     * Submitter is deleted.
+     * Returns the submitter of an Item as RequestItemAuthor or an empty List if
+     * the Submitter is deleted.
      *
-     * @return The submitter of the item or null if the submitter is deleted
+     * @return The submitter of the item or empty List if the submitter is deleted
      * @throws SQLException if database error
      */
     @Override

@@ -19,14 +19,14 @@ import org.dspace.eperson.EPerson;
 import org.springframework.lang.NonNull;
 
 /**
- * Derive request recipients from groups of all collections which hold an Item.
+ * Derive request recipients from groups of the Collection which owns an Item.
  * The list will include all members of the administrators group.  If the
  * resulting list is empty, delegates to {@link RequestItemHelpdeskStrategy}.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
 public class CollectionAdministratorsRequestItemStrategy
-        implements RequestItemAuthorExtractor {
+        extends RequestItemHelpdeskStrategy {
     @Override
     @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context,
@@ -38,8 +38,7 @@ public class CollectionAdministratorsRequestItemStrategy
             recipients.add(new RequestItemAuthor(admin));
         }
         if (recipients.isEmpty()) {
-            return new RequestItemHelpdeskStrategy()
-                    .getRequestItemAuthor(context, item);
+            return super.getRequestItemAuthor(context, item);
         } else {
             return recipients;
         }
