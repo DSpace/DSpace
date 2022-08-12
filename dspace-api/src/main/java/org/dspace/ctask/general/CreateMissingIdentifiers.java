@@ -11,6 +11,8 @@ package org.dspace.ctask.general;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -19,10 +21,8 @@ import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.IdentifierService;
-import org.dspace.utils.DSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Ensure that an object has all of the identifiers that it should, minting them
@@ -32,8 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CreateMissingIdentifiers
         extends AbstractCurationTask {
-    private static final Logger LOG
-            = LoggerFactory.getLogger(CreateMissingIdentifiers.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     @Override
     public int perform(DSpaceObject dso)
@@ -55,9 +54,9 @@ public class CreateMissingIdentifiers
         }
 
         // Find the IdentifierService implementation
-        IdentifierService identifierService = new DSpace()
-                .getServiceManager()
-                .getServiceByName(null, IdentifierService.class);
+        IdentifierService identifierService = IdentifierServiceFactory
+                .getInstance()
+                .getIdentifierService();
 
         // Register any missing identifiers.
         try {
