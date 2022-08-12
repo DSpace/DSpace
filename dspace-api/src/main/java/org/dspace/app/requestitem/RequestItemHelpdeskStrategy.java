@@ -19,6 +19,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 
 /**
  * RequestItem strategy to allow DSpace support team's helpdesk to receive requestItem request.
@@ -41,6 +42,7 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
     }
 
     @Override
+    @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
             throws SQLException {
         boolean helpdeskOverridesSubmitter = configuration

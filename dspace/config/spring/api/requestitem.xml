@@ -34,14 +34,19 @@
 	</bean>
 
     <!-- HelpDesk to instead get RequestItem emails-->
+    <!--
     <bean class="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
           id="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"/>
+    -->
 
     <!-- List a Collection's administrators. -->
+    <!--
     <bean class='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'
           id='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'/>
+    -->
 
     <!-- Concatenate the results of other strategies. -->
+    <!--
     <bean class='org.dspace.app.requestitem.CombiningRequestItemStrategy'
           id='org.dspace.app.requestitem.CombiningRequestItemStrategy'
           autowire='no'>
@@ -53,5 +58,5 @@
             </list>
         </constructor-arg>
     </bean>
-
+    -->
 </beans>

@@ -35,7 +35,8 @@ public class CollectionAdministratorsRequestItemStrategyTest {
     public void testGetRequestItemAuthor()
             throws Exception {
         System.out.println("getRequestItemAuthor");
-        Context context = null;
+
+        Context context = Mockito.mock(Context.class);
 
         EPerson eperson1 = Mockito.mock(EPerson.class);
         Mockito.when(eperson1.getEmail()).thenReturn(EMAIL);
@@ -48,7 +49,8 @@ public class CollectionAdministratorsRequestItemStrategyTest {
         Mockito.when(collection1.getAdministrators()).thenReturn(group1);
 
         Item item = Mockito.mock(Item.class);
-        Mockito.when(item.getCollections()).thenReturn(List.of(collection1));
+        Mockito.when(item.getOwningCollection()).thenReturn(collection1);
+        Mockito.when(item.getSubmitter()).thenReturn(eperson1);
 
         CollectionAdministratorsRequestItemStrategy instance = new CollectionAdministratorsRequestItemStrategy();
         List<RequestItemAuthor> result = instance.getRequestItemAuthor(context,

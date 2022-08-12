@@ -40,7 +40,7 @@ public class CombiningRequestItemStrategyTest {
         RequestItemAuthorExtractor strategy1 = Mockito.mock(RequestItemHelpdeskStrategy.class);
         Mockito.when(strategy1.getRequestItemAuthor(context, item)).thenReturn(List.of(author1));
 
-        RequestItemAuthorExtractor strategy2 = Mockito.mock(RequestItemHelpdeskStrategy.class);
+        RequestItemAuthorExtractor strategy2 = Mockito.mock(RequestItemMetadataStrategy.class);
         Mockito.when(strategy2.getRequestItemAuthor(context, item)).thenReturn(List.of(author2, author3));
 
         List<RequestItemAuthorExtractor> strategies = List.of(strategy1, strategy2);

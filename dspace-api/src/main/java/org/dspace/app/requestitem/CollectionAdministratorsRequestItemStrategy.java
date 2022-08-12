@@ -16,6 +16,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.springframework.lang.NonNull;
 
 /**
  * Derive request recipients from groups of all collections which hold an Item.
@@ -27,14 +28,14 @@ import org.dspace.eperson.EPerson;
 public class CollectionAdministratorsRequestItemStrategy
         implements RequestItemAuthorExtractor {
     @Override
+    @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context,
             Item item)
             throws SQLException {
         List<RequestItemAuthor> recipients = new ArrayList<>();
-        for (Collection collection : item.getCollections()) {
-            for (EPerson admin : collection.getAdministrators().getMembers()) {
-                recipients.add(new RequestItemAuthor(admin));
-            }
+        Collection collection = item.getOwningCollection();
+        for (EPerson admin : collection.getAdministrators().getMembers()) {
+            recipients.add(new RequestItemAuthor(admin));
         }
         if (recipients.isEmpty()) {
             return new RequestItemHelpdeskStrategy()

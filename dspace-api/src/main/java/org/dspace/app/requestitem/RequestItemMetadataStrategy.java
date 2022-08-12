@@ -21,6 +21,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 
 /**
  * Try to look to an item metadata for the corresponding author name and email.
@@ -40,21 +41,26 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
     }
 
     @Override
+    @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
         throws SQLException {
         List<RequestItemAuthor> authors;
         if (emailMetadata != null) {
             List<MetadataValue> vals = itemService.getMetadataByMetadataString(item, emailMetadata);
-            if (vals.size() > 0) {
+            List<MetadataValue> nameVals;
+            if (null != fullNameMetadata) {
+                nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
+            } else {
+                nameVals = Collections.EMPTY_LIST;
+            }
+            boolean useNames = vals.size() == nameVals.size();
+            if (!vals.isEmpty()) {
                 authors = new ArrayList<>(vals.size());
-                for (MetadataValue datum : vals) {
-                    String email = datum.getValue();
+                for (int authorIndex = 0; authorIndex < vals.size(); authorIndex++) {
+                    String email = vals.get(authorIndex).getValue();
                     String fullname = null;
-                    if (fullNameMetadata != null) {
-                        List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
-                        if (!nameVals.isEmpty()) {
-                            fullname = nameVals.get(0).getValue();
-                        }
+                    if (useNames) {
+                        fullname = nameVals.get(authorIndex).getValue();
                     }
 
                     if (StringUtils.isBlank(fullname)) {
@@ -100,11 +106,11 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
         }
     }
 
-    public void setEmailMetadata(String emailMetadata) {
+    public void setEmailMetadata(@NonNull String emailMetadata) {
         this.emailMetadata = emailMetadata;
     }
 
-    public void setFullNameMetadata(String fullNameMetadata) {
+    public void setFullNameMetadata(@NonNull String fullNameMetadata) {
         this.fullNameMetadata = fullNameMetadata;
     }
 

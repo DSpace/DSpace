@@ -10,25 +10,31 @@ package org.dspace.app.requestitem;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Named;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 
 /**
  * Assemble a list of recipients from the results of other strategies.
- * The list of strategy classes is injected as the property {@code strategies}.
- * If the property is not configured, returns an empty List.
+ * The list of strategy classes is injected as the constructor argument
+ * {@code strategies}.
+ * If the strategy list is not configured, returns an empty List.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Named
 public class CombiningRequestItemStrategy
         implements RequestItemAuthorExtractor {
     /** The strategies to combine. */
     private final List<RequestItemAuthorExtractor> strategies;
 
-    public CombiningRequestItemStrategy(List<RequestItemAuthorExtractor> strategies) {
+    /**
+     * Initialize a combination of strategies.
+     * @param strategies the author extraction strategies to combine.
+     */
+    public CombiningRequestItemStrategy(@NonNull List<RequestItemAuthorExtractor> strategies) {
+        Assert.notNull(strategies, "Strategy list may not be null");
         this.strategies = strategies;
     }
 
@@ -41,14 +47,13 @@ public class CombiningRequestItemStrategy
     }
 
     @Override
+    @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
             throws SQLException {
         List<RequestItemAuthor> recipients = new ArrayList<>();
 
-        if (null != strategies) {
-            for (RequestItemAuthorExtractor strategy : strategies) {
-                recipients.addAll(strategy.getRequestItemAuthor(context, item));
-            }
+        for (RequestItemAuthorExtractor strategy : strategies) {
+            recipients.addAll(strategy.getRequestItemAuthor(context, item));
         }
 
         return recipients;
