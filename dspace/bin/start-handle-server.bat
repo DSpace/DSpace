@@ -27,9 +27,11 @@ set HANDLEDIR=
 for /f "delims=" %%a in ('%BINDIR%\dspace dsprop --property handle.dir') do @set HANDLEDIR=%%a
 echo Using Handle server directory: %HANDLEDIR%
 
-REM Assume log directory is a subdirectory of DSPACEDIR.
+REM Read 'log.dir' parameter from DSpace config (using dspace.bat script)
 REM If you want your handle server logs stored elsewhere, change this value
-set LOGDIR=%DSPACEDIR%/log
+set LOGDIR=
+for /f "delims=" %%a in ('%BINDIR%\dspace dsprop --property log.dir') do @set LOGDIR=%%a
+echo Using Log directory: %LOGDIR%
 
 REM Build a CLASSPATH including all classes in oai webapp, all libraries in [dspace]/lib and the config folder.
 set DSPACE_CLASSPATH=%CLASSPATH%;%DSPACEDIR%\config;%DSPACEDIR%\webapps\oai\WEB-INF\classes\
