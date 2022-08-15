@@ -9,10 +9,17 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.Filter;
+import org.dspace.content.logic.FilterUtils;
+import org.dspace.content.logic.TrueFilter;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -20,8 +27,12 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.service.EmbargoService;
 import org.dspace.event.Event;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.Handle;
+import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,9 +53,11 @@ public class InstallItemServiceImpl implements InstallItemService {
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = false)
+
+    Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
 
     protected InstallItemServiceImpl() {
-
     }
 
     @Override
@@ -59,11 +72,17 @@ public class InstallItemServiceImpl implements InstallItemService {
         AuthorizeException {
         Item item = is.getItem();
         Collection collection = is.getCollection();
+        // Get map of filters to use for identifier types
+        Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters("install");
         try {
             if (suppliedHandle == null) {
-                identifierService.register(c, item);
+                // Register with the filters we've set up
+                identifierService.register(c, item, filters);
             } else {
+                // This will register the handle but a pending DOI won't be compatible and so won't be registered
                 identifierService.register(c, item, suppliedHandle);
+                // Continue to register just a DOI
+                identifierService.register(c, item, DOI.class, filters.get(DOI.class));
             }
         } catch (IdentifierException e) {
             throw new RuntimeException("Can't create an Identifier!", e);

@@ -36,6 +36,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.DefaultFilter;
 import org.dspace.content.logic.LogicalStatement;
+import org.dspace.content.logic.TrueFilter;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -128,7 +129,7 @@ public class DOIIdentifierProviderTest
             provider.itemService = itemService;
             provider.setConfigurationService(config);
             provider.setDOIConnector(connector);
-            provider.setFilterService(null);
+            provider.setFilter(null);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -504,7 +505,7 @@ public class DOIIdentifierProviderTest
         String doi = null;
         try {
             // get a DOI (skipping any filters)
-            doi = provider.mint(context, item, true);
+            doi = provider.mint(context, item);
         } catch (IdentifierException e) {
             e.printStackTrace(System.err);
             fail("Got an IdentifierException: " + e.getMessage());
@@ -544,23 +545,18 @@ public class DOIIdentifierProviderTest
         Item item = newItem();
         boolean wasFiltered = false;
         try {
-            // Temporarily set the provider to have a filter that always returns false for an item
-            // (therefore, the item should be 'filtered' out and not apply to this minting request)
+            // Mint this with the filter
             DefaultFilter doiFilter = new DefaultFilter();
             LogicalStatement alwaysFalse = (context, i) -> false;
             doiFilter.setStatement(alwaysFalse);
-            provider.setFilterService(doiFilter);
             // get a DOI with the method that applies filters by default
-            provider.mint(context, item);
+            provider.mint(context, item, doiFilter);
         } catch (DOIIdentifierNotApplicableException e) {
             // This is what we wanted to see - we can return safely
             wasFiltered = true;
         } catch (IdentifierException e) {
             e.printStackTrace();
             fail("Got an IdentifierException: " + e.getMessage());
-        } finally {
-            // Set filter service back to null
-            provider.setFilterService(null);
         }
         // Fail the test if the filter didn't throw a "not applicable" exception
         assertTrue("DOI minting attempt was not filtered by filter service", wasFiltered);
@@ -583,17 +579,14 @@ public class DOIIdentifierProviderTest
             DefaultFilter doiFilter = new DefaultFilter();
             LogicalStatement alwaysTrue = (context, i) -> true;
             doiFilter.setStatement(alwaysTrue);
-            provider.setFilterService(doiFilter);
             // get a DOI with the method that applies filters by default
-            doi = provider.mint(context, item);
+            doi = provider.mint(context, item, doiFilter);
         } catch (DOIIdentifierNotApplicableException e) {
             // This is what we wanted to see - we can return safely
             wasFiltered = true;
         } catch (IdentifierException e) {
             e.printStackTrace();
             fail("Got an IdentifierException: " + e.getMessage());
-        } finally {
-            provider.setFilterService(null);
         }
         // If the attempt was filtered, fail
         assertFalse("DOI minting attempt was incorrectly filtered by filter service", wasFiltered);
@@ -665,7 +658,7 @@ public class DOIIdentifierProviderTest
         Item item = newItem();
 
         // Register, skipping the filter
-        String doi = provider.register(context, item, true);
+        String doi = provider.register(context, item, new TrueFilter());
 
         // we want the created DOI to be returned in the following format:
         // doi:10.<prefix>/<suffix>.

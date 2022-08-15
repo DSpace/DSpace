@@ -9,6 +9,7 @@ package org.dspace.content.logic;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.BeanNameAware;
 
 /**
  * The interface for Filter currently doesn't add anything to LogicalStatement but inherits from it
@@ -22,7 +23,7 @@ import org.dspace.core.Context;
  * @author Kim Shepherd
  * @see org.dspace.content.logic.DefaultFilter
  */
-public interface Filter extends LogicalStatement {
+public interface Filter extends LogicalStatement, BeanNameAware {
     /**
      * Get the result of logical evaluation for an item
      * @param context   DSpace context
@@ -32,4 +33,6 @@ public interface Filter extends LogicalStatement {
      */
     @Override
     boolean getResult(Context context, Item item) throws LogicalStatementException;
+
+    String getName();
 }

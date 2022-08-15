@@ -45,6 +45,10 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
+import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -91,6 +95,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    IdentifierService identifierService;
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
@@ -355,6 +362,44 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         context.commit();
 
         return bundle;
+    }
+
+    /**
+     * Register an identifier for an item
+     * @param context
+     * @param item
+     * @param identifier
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IdentifierException
+     */
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADMIN')")
+    public boolean registerIdentifier(Context context, Item item, String identifier)
+            throws SQLException, AuthorizeException, IdentifierException {
+        if (item != null) {
+            if (identifier != null) {
+                // Try to register the supplied identifier
+                identifierService.register(context, item, identifier);
+                return item.equals(identifierService.resolve(context, identifier));
+            } else {
+                DSpaceServicesFactory.getInstance().getServiceManager()
+                        .getServicesByType(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+                // Call plain 'register' which will mint a new DOI, handle, etc if needed
+                // this NOT compatible with versioned handle provider with canonical handles
+                boolean compatible = DSpaceServicesFactory.getInstance().getServiceManager()
+                        .getServicesByType(VersionedHandleIdentifierProviderWithCanonicalHandles.class).isEmpty();
+                if (compatible) {
+                    // Register without a supplied identifier
+                    identifierService.register(context, item);
+                    return true;
+                } else {
+                    log.error("This register method is NOT compatible with" +
+                            "VersionedHandleIdentifierProviderWithCanonicalHandles");
+                }
+            }
+        }
+        return false;
     }
 
     @Override

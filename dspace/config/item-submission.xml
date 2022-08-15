@@ -240,7 +240,7 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-
+            <step id="identifiers"/>
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>

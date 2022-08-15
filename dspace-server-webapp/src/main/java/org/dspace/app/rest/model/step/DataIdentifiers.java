@@ -20,6 +20,10 @@ public class DataIdentifiers implements SectionData {
     String doi;
     List<String> otherIdentifiers;
 
+    public DataIdentifiers() {
+
+    }
+
     public String getHandle() {
         return handle;
     }

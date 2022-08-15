@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.Handle;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
@@ -90,20 +92,31 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
                 IdentifierServiceFactory.getInstance().getIdentifierService();
         // Attempt to look up handle and DOI identifiers for this item
         String handle = identifierService.lookup(context, obj.getItem(), Handle.class);
-        String doi = identifierService.lookup(context, obj.getItem(), DOI.class);
+        String simpleDoi = identifierService.lookup(context, obj.getItem(), DOI.class);
+        DOI doi = null;
+        String doiString = null;
+        try {
+            doi = IdentifierServiceFactory.getInstance().getDOIService().findDOIByDSpaceObject(context, obj.getItem());
+            if (doi != null && !DOIIdentifierProvider.MINTED.equals(doi.getStatus())
+                    && !DOIIdentifierProvider.MINTED.equals(doi.getStatus())) {
+                doiString = doi.getDoi();
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+        }
 
         // Look up all identifiers and if they're not the DOI or handle, add them to the 'other' list
         List<String> otherIdentifiers = new ArrayList<>();
         for (String identifier : identifierService.lookup(context, obj.getItem())) {
-            if (!StringUtils.equals(doi, identifier) && !StringUtils.equals(handle, identifier)) {
+            if (!StringUtils.equals(simpleDoi, identifier) && !StringUtils.equals(handle, identifier)) {
                 otherIdentifiers.add(identifier);
             }
         }
 
         // If we got a DOI, format it to its external form
-        if (StringUtils.isNotEmpty(doi)) {
+        if (StringUtils.isNotEmpty(doiString)) {
             try {
-                doi = IdentifierServiceFactory.getInstance().getDOIService().DOIToExternalForm(doi);
+                doiString = IdentifierServiceFactory.getInstance().getDOIService().DOIToExternalForm(doiString);
             } catch (IdentifierException e) {
                 log.error("Error formatting DOI: " + doi);
             }
@@ -114,7 +127,7 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
         }
 
         // Populate bean with data and return
-        result.setDoi(doi);
+        result.setDoi(doiString);
         result.setHandle(handle);
         result.setOtherIdentifiers(otherIdentifiers);
 
