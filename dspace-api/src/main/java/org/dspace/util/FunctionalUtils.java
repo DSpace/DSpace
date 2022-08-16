@@ -12,6 +12,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
+ * 
+ * These methods are linked to the functional paradigm and use {@code Functional} interfaces of java 8+, all the main
+ * interfaces are in the package {@link java.util.function}.
+ * 
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  *
  */

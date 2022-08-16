@@ -7,7 +7,7 @@
         <property name="incoming" value="0"/>
         <property name="stores">
             <map>
-                <entry key="0" value-ref="${assetstore.storename.0}"/>
+                <entry key="0" value-ref="${assetstore.storename.primary}"/>
                 <!--<entry key="1" value-ref="s3Store"/>-->
             </map>
         </property>

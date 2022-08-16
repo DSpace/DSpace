@@ -22,6 +22,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Utils;
 
+/**
+ * BaseBitStoreService base implementation to store
+ * and organize assets in digits.
+ *
+ */
 public abstract class BaseBitStoreService implements BitStoreService {
 
     protected static Logger log = LogManager.getLogger(DSBitStoreService.class);
@@ -143,6 +148,14 @@ public abstract class BaseBitStoreService implements BitStoreService {
         return endIndex > internalId.length();
     }
 
+    /**
+     * Retrieves a map of useful metadata about the File (size, checksum, modified)
+     * 
+     * @param file The File to analyze
+     * @param attrs The map where we are storing values 
+     * @return Map of updated metadatas / attrs
+     * @throws IOException
+     */
     public Map about(File file, Map attrs) throws IOException {
         try {
             if (file != null && file.exists()) {
