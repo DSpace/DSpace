@@ -895,25 +895,25 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
         String anotherToken = getAuthToken(anotherEperson.getEmail(), password);
 
-        // verify that he cannot search the admin authorizations - by using the eperson parameter
+        // verify that admin cannot search the admin authorizations - by using the eperson parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the admin authorizations - by assuming login
+        // verify that admin cannot search the admin authorizations - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .header("X-On-Behalf-Of", admin.getID()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the authorizations of another "normal" eperson - by using the eperson parameter
+        // verify that eperson cannot search the authorizations of another "normal" eperson - by using the parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the authorizations of another "normal" eperson - by assuming login
+        // verify that eperson cannot search the authorizations of another "normal" eperson - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .header("X-On-Behalf-Of", eperson.getID()))
@@ -1452,28 +1452,28 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
         String anotherToken = getAuthToken(anotherEperson.getEmail(), password);
 
-        // verify that he cannot search the admin authorizations - by using the eperson parameter
+        // verify that admin cannot search the admin authorizations - by using the eperson parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the admin authorizations - by assuming login
+        // verify that admin cannot search the admin authorizations - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("feature", alwaysTrue.getName())
                 .header("X-On-Behalf-Of", admin.getID()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the authorizations of another "normal" eperson - by using the eperson parameter
+        // verify that eperson cannot search the authorizations of another "normal" eperson - by using the parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the authorizations of another "normal" eperson - by assuming login
+        // verify that eperson cannot search the authorizations of another "normal" eperson - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", siteUri)
                 .param("feature", alwaysTrue.getName())
@@ -2508,7 +2508,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
         String anotherToken = getAuthToken(anotherEperson.getEmail(), password);
 
-        // verify that he cannot search the admin authorizations - by using the eperson parameter
+        // verify that admin cannot search the admin authorizations - by using the eperson parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
             .param("type", "core.site")
             .param("uuid", siteId)
@@ -2517,7 +2517,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .param("eperson", admin.getID().toString()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the admin authorizations - by assuming login
+        // verify that admin cannot search the admin authorizations - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
             .param("type", "core.site")
             .param("uuid", siteId)
@@ -2526,7 +2526,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .header("X-On-Behalf-Of", admin.getID()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the authorizations of another "normal" eperson - by using the eperson parameter
+        // verify that eperson cannot search the authorizations of another "normal" eperson - by using the parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
             .param("type", "core.site")
             .param("uuid", siteId)
@@ -2535,7 +2535,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .param("eperson", eperson.getID().toString()))
             .andExpect(status().isForbidden());
 
-        // verify that he cannot search the authorizations of another "normal" eperson - by assuming login
+        // verify that eperson cannot search the authorizations of another "normal" eperson - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
             .param("type", "core.site")
             .param("uuid", siteId)
@@ -2691,7 +2691,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", trueForUsersInGroupTest.getName())
                 .param("eperson", normalUser.getID().toString()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
-        // but he should have the authorization if loggedin directly
+        // but user should have the authorization if loggedin directly
         getClient(normalUserToken).perform(get("/api/authz/authorizations/" + authNormalUserSite.getID()))
             .andExpect(status().isOk());
         getClient(normalUserToken).perform(get("/api/authz/authorizations/search/object")

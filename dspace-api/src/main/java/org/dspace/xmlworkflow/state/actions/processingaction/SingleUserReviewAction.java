@@ -25,7 +25,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Processing class of an action where a single user has
- * been assigned and he can either accept/reject the workflow item
+ * been assigned and they can either accept/reject the workflow item
  * or reject the task
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
@@ -90,7 +90,7 @@ public class SingleUserReviewAction extends ProcessingAction {
             } else {
                 request.setAttribute("page", REJECT_PAGE);
             }
-            // We have pressed reject item, so take the user to a page where he can reject
+            // We have pressed reject item, so take the user to a page where they can reject
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
         } else if (request.getParameter(SUBMIT_DECLINE_TASK) != null) {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, OUTCOME_REJECT);
