@@ -4165,7 +4165,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
         //** WHEN **
-        // each submitter, including the administrator should see only her submission
+        // each submitter, including the administrator should see only their submission
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 

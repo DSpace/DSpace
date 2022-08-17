@@ -187,7 +187,7 @@ public class DatasetTimeGenerator extends DatasetGenerator {
             cal2.clear(Calendar.HOUR);
             cal1.clear(Calendar.HOUR_OF_DAY);
             cal2.clear(Calendar.HOUR_OF_DAY);
-            //yet i know calendar just won't clear his hours
+            //yet i know calendar just won't clear its hours
             cal1.set(Calendar.HOUR_OF_DAY, 0);
             cal2.set(Calendar.HOUR_OF_DAY, 0);
         }

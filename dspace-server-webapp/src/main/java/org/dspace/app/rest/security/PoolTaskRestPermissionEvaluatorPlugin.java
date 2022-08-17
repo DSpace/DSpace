@@ -30,7 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to interact with a pool task only if it is in his list.
+ * An authenticated user is allowed to interact with a pool task only if it is in their list.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
