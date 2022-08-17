@@ -89,7 +89,7 @@ public class SelectReviewerAction extends ProcessingAction {
             //Retrieve the identifier of the eperson which will do the reviewing
             UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
             EPerson reviewer = ePersonService.find(c, reviewerId);
-            //We have a reviewer, assign him, the workflowitemrole will be translated into a task in the autoassign
+            //Assign the reviewer. The workflowitemrole will be translated into a task in the autoassign
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
             workflowItemRole.setEPerson(reviewer);
             workflowItemRole.setRoleId(getRole().getId());

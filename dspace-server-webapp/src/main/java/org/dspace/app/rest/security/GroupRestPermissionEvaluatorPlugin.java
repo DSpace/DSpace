@@ -29,7 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to view information on all the groups he or she is a member of (READ permission).
+ * An authenticated user is allowed to view information on all the groups they are a member of (READ permission).
  * This {@link RestPermissionEvaluatorPlugin} implements that requirement by validating the group membership.
  */
 @Component
