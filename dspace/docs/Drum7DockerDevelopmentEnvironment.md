@@ -28,6 +28,17 @@ using docker.
     cp dspace/config/local.cfg.TEMPLATE dspace/config/local.cfg
     ```
 
+4. Edit the local configuration file:
+
+    ```bash
+    vi dspace/config/local.cfg
+    ```
+
+   and enter values for the following properties:
+
+   * drum.ldap.bind.auth
+   * drum.ldap.bind.password
+
 4. Build the application and client docker images:
 
     ```bash

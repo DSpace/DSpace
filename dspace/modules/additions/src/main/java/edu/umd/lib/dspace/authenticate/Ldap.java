@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2004 The University of Maryland. All Rights Reserved.
- * 
+ *
  */
 
 package edu.umd.lib.dspace.authenticate;
@@ -55,20 +55,20 @@ public class Ldap {
   private String strUid = null;
   private SearchResult entry = null;
 
-  private static final String[] strRequestAttributes = 
-  new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber", 
+  private static final String[] strRequestAttributes =
+  new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber",
                "ou", "umappointment"};
-    
+
   private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
   private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-  private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();   
-  
+  private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
   // Begin UMD Customization
-  private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();   
+  private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
   // End UMD Customization
-  
+
   /**
   * Wild card for Dublin Core metadata qualifiers/languages
   */
@@ -80,7 +80,7 @@ public class Ldap {
    * Create an ldap connection
    */
 
-  public 
+  public
   Ldap(org.dspace.core.Context context)
     throws NamingException
   {
@@ -101,7 +101,7 @@ public class Ldap {
     env.put(Context.PROVIDER_URL, strUrl);
     env.put(Context.SECURITY_PROTOCOL, "ssl");
     env.put(javax.naming.Context.SECURITY_PRINCIPAL, strBindAuth);
-    env.put(javax.naming.Context.SECURITY_CREDENTIALS, strBindPassword); 
+    env.put(javax.naming.Context.SECURITY_CREDENTIALS, strBindPassword);
     env.put("com.sun.jndi.ldap.connect.timeout", strConnectTimeout);
     env.put("com.sun.jndi.ldap.read.timeout", strReadTimeout);
 
@@ -127,9 +127,9 @@ public class Ldap {
     String strFilter = "uid=" + strUid;
 
     // Setup the search controls
-    SearchControls sc =  new SearchControls(); 
+    SearchControls sc =  new SearchControls();
     sc.setReturningAttributes(strRequestAttributes);
-    sc.setSearchScope(SearchControls.SUBTREE_SCOPE); 
+    sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
     // Search
     NamingEnumeration entries = ctx.search("", strFilter, sc);
@@ -253,7 +253,7 @@ public class Ldap {
     return false;
   }
 
-      
+
   /***************************************************************** close */
   /**
    * Close the ldap connection
@@ -283,7 +283,7 @@ public class Ldap {
     close();
   }
 
-  
+
   /****************************************************** getAttributeAll */
   /**
    * get all instances of an attribute.
@@ -393,7 +393,7 @@ public class Ldap {
    * Groups mapped by the Units for faculty.
    */
 
-  public List<Group> getGroups() throws NamingException, java.sql.SQLException 
+  public List<Group> getGroups() throws NamingException, java.sql.SQLException
   {
     HashSet<Group> ret = new HashSet();
 
@@ -424,10 +424,10 @@ public class Ldap {
     }
 
     List l = getAttributeAll("umappointment");
-    
+
     if (l != null) {
       Iterator i = l.iterator();
-      
+
       while (i.hasNext()) {
 
         String strAppt = (String)i.next();
@@ -478,7 +478,7 @@ public class Ldap {
 
       // Create a new eperson
       EPerson eperson = epersonService.create(context);
-                        
+
       String strFirstName = getFirstName();
       if (strFirstName == null)
         strFirstName = "??";
@@ -487,21 +487,16 @@ public class Ldap {
       if (strLastName == null)
         strLastName = "??";
 
-      String strPhone = getPhone();
-      if (strPhone == null)
-        strPhone = "??";
-
       eperson.setNetid(uid);
       eperson.setEmail(uid + "@umd.edu");
       eperson.setFirstName(context, strFirstName);
       eperson.setLastName(context, strLastName);
-      epersonService.setMetadata(context, eperson, "phone", strPhone);
       eperson.setCanLogIn(true);
       eperson.setRequireCertificate(false);
 
       epersonService.update(context, eperson);
       context.commit();
-                        
+
       log.info(LogHelper.getHeader(context,
                                     "create_um_eperson",
                                     "eperson_id="+eperson.getID() +
@@ -512,7 +507,7 @@ public class Ldap {
 
     finally {
       context.setCurrentUser(user);
-    }                        
+    }
   }
 
 
@@ -525,10 +520,10 @@ public class Ldap {
     this.context = context;
   }
 
-  
+
   public String toString() {
 	  if (entry == null) return "null";
-	  
+
 	  return strUid + " (" + entry.getName() + ")";
   }
 

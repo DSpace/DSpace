@@ -78,7 +78,14 @@ drum.cas.validate.url=https://login.umd.edu/cas/serviceValidate
 
 drum.webui.cas.autoregister = true
 
-# LDAP Configuration necessary for CAS to work
+# LDAP Credentials (needed for CAS)
+# Note: Commas should be escaped, i.e. if the LDAP bind authDn is
+#
+# uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot
+#
+# The property should be:
+# drum.ldap.bind.auth = uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot
+#
 drum.ldap.url = ldap://directory.umd.edu:636/dc=umd\,dc=edu
 drum.ldap.bind.auth =
 drum.ldap.bind.password =
@@ -147,17 +154,6 @@ request.item.type =
 #######################
 # OTHER CONFIGURATION #
 #######################
-
-# LDAP Credentials
-# Note: Commas should be escaped, i.e. if the LDAP bind auth is
-#
-# uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot
-#
-# The property should be:
-# drum.ldap.bind.auth = uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot
-#
-drum.ldap.bind.auth =
-drum.ldap.bind.password =
 
 # ETD loader email settings
 drum.mail.etdmarc.recipient = mohideen@umd.edu

@@ -3,8 +3,6 @@ package org.dspace.authenticate;
 import static org.dspace.core.LogHelper.getHeader;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,12 +11,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.umd.lib.dspace.authenticate.Ldap;
 import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tools.ant.types.CharSet;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -61,8 +59,7 @@ public class CASAuthentication implements AuthenticationMethod {
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-    public final static String CAS_USER = "dspace.current.user.ldap";
-    private static final String CAS_AUTHENTICATED = "cas.authenticated";
+    public final static String CAS_AUTHENTICATED = "cas.authenticated";
 
     private final static ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -106,8 +103,32 @@ public class CASAuthentication implements AuthenticationMethod {
      */
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
-        // TODO: retrieve groups from LDAP
-        return new ArrayList<>();
+      try
+      {
+          Ldap ldap = (Ldap) request.getSession().getAttribute(CAS_AUTHENTICATED);
+          if (ldap != null)
+          {
+              ldap.setContext(context);
+              List<Group> groups = ldap.getGroups();
+
+              Group CASGroup = groupService.findByName(context, "CAS Authenticated");
+              if (CASGroup == null)
+              {
+                  throw new Exception(
+                          "Unable to find 'CAS Authenticated' group");
+              }
+
+              groups.add(CASGroup);
+
+              return groups;
+          }
+      }
+      catch (Exception e)
+      {
+          log.error("Ldap exception", e);
+      }
+
+      return new ArrayList<Group>();
     }
 
     /**
@@ -147,6 +168,20 @@ public class CASAuthentication implements AuthenticationMethod {
                     throw new ServletException("Ticket '" + ticket + "' is not valid");
                 }
 
+                // Check directory
+                Ldap ldap = new Ldap(context);
+                if (ldap.checkUid(netid))
+                {
+                    ldap.close();
+                }
+                else
+                {
+                    throw new ServletException("Unknown directory id " + netid);
+                }
+
+                // Save the ldap object in the session
+                request.getSession().setAttribute(CAS_AUTHENTICATED, ldap);
+
                 log.info("netid = " + netid);
 
                 // Locate the eperson in DSpace
@@ -173,9 +208,21 @@ public class CASAuthentication implements AuthenticationMethod {
                     context.setCurrentUser(eperson);
                     log.info(getHeader(context, "authenticate", "type=CAS"));
                 } else {
-                    // the user does not exist in DSpace
-                    // TODO: create an eperson
-                    return NO_SUCH_USER;
+                  if (canSelfRegister(context, request, netid))
+                  {
+                      eperson = ldap.registerEPerson(netid);
+
+                      context.restoreAuthSystemState();
+                      context.setCurrentUser(eperson);
+                      return SUCCESS;
+                  }
+                  else
+                  {
+                      // No auto-registration for valid netid
+                      log.warn(getHeader(context, "authenticate",
+                               "type=netid_but_no_record, cannot auto-register"));
+                      return NO_SUCH_USER;
+                  }
                 }
                 return SUCCESS;
 
@@ -208,7 +255,7 @@ public class CASAuthentication implements AuthenticationMethod {
         }
 
         stv.setCasValidateUrl(validateURL);
-        stv.setService(java.net.URLEncoder.encode(service, StandardCharsets.UTF_8));
+        stv.setService(java.net.URLEncoder.encode(service));
         stv.setServiceTicket(ticket);
 
         try {
