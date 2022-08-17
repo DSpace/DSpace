@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * test that the enroll process for a new administrator, i.e. create an user and
- * add him to the administrators group, will result in the Administrator Feature(s) to be available to such user.
+ * add user to the administrators group, will result in the Administrator Feature(s) to be available to such user.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  *
