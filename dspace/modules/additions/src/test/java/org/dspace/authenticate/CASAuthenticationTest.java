@@ -69,12 +69,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
         CASAuthentication stubCas = new CASAuthentication() {
+            @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return "no_such_user";
             }
         };
 
         Ldap mockLdap = new MockLdap() {
+            @Override
             public boolean checkUid(String strUid) throws NamingException {
                 return false;
             }
@@ -96,10 +98,12 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
         CASAuthentication stubCas = new CASAuthentication() {
+            @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
 
+            @Override
             public boolean canSelfRegister(Context context, HttpServletRequest request, String username)
                     throws SQLException {
                 return false;
@@ -107,6 +111,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         };
 
         Ldap mockLdap = new MockLdap() {
+            @Override
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
             }
@@ -134,12 +139,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
         CASAuthentication stubCas = new CASAuthentication() {
+            @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
         };
 
         MockLdap mockLdap = new MockLdap() {
+            @Override
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
             }
@@ -162,12 +169,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
         CASAuthentication stubCas = new CASAuthentication() {
+            @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
         };
 
         MockLdap mockLdap = new MockLdap() {
+            @Override
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
             }
@@ -190,12 +199,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
         CASAuthentication stubCas = new CASAuthentication() {
+            @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
         };
 
         Ldap mockLdap = new MockLdap() {
+            @Override
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
             }
@@ -214,10 +225,12 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
         CASAuthentication stubCas = new CASAuthentication() {
+            @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
 
+            @Override
             public boolean canSelfRegister(Context context, HttpServletRequest request, String username)
                     throws SQLException {
                 return true;
@@ -227,10 +240,12 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         // Set up MockLdap so we can verify that the "registerEPerson" method was
         // called.
         MockLdap mockLdap = new MockLdap() {
+            @Override
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
             }
 
+            @Override
             public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
                 registerEPersonCalled = true;
                 return eperson;
@@ -263,18 +278,22 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
         this.parameterMap = parameterMap;
     }
 
+    @Override
     public StringBuffer getRequestURL() {
         return new StringBuffer(serviceUrl);
     }
 
+    @Override
     public String getParameter(String arg) {
         return parameterMap.get(arg);
     }
 
+    @Override
     public HttpSession getSession() {
         return new MockHttpSession();
     }
 
+    @Override
     public void setAttribute(String name, Object o) {
         return;
     }

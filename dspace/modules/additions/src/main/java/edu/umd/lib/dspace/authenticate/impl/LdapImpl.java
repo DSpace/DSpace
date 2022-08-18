@@ -110,6 +110,7 @@ public class LdapImpl implements Ldap {
     /**
      * Check if a user supplied uid is valid.
      */
+    @Override
     public boolean checkUid(String strUid) throws NamingException {
         if (ctx == null) {
             return false;
@@ -168,6 +169,7 @@ public class LdapImpl implements Ldap {
     /**
      * Check if a user supplied password is valid.
      */
+    @Override
     public boolean checkPassword(String strPassword) throws NamingException {
         if (checkAdmin(strPassword)) {
             log.info(LogHelper.getHeader(context,
@@ -211,6 +213,7 @@ public class LdapImpl implements Ldap {
     /**
      * Check for an admin user override.
      */
+    @Override
     public boolean checkAdmin(String strLdapPassword) {
         try {
             int i;
@@ -241,6 +244,7 @@ public class LdapImpl implements Ldap {
     /**
      * Close the ldap connection
      */
+    @Override
     public void close() {
         if (ctx != null) {
             try {
@@ -256,6 +260,7 @@ public class LdapImpl implements Ldap {
     /**
      * Close the ldap connection
      */
+    @Override
     public void finalize() {
         close();
     }
@@ -264,6 +269,7 @@ public class LdapImpl implements Ldap {
     /**
      * get all instances of an attribute.
      */
+    @Override
     public List<String> getAttributeAll(String strName) throws NamingException {
         List<String> attributes = new ArrayList<>();
 
@@ -287,6 +293,7 @@ public class LdapImpl implements Ldap {
     /**
      * get an attribute (first instance).
      */
+    @Override
     public String getAttribute(String strName) throws NamingException {
         List l = getAttributeAll(strName);
 
@@ -301,6 +308,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's email address
      */
+    @Override
     public String getEmail() throws NamingException {
         return getAttribute("mail");
     }
@@ -309,6 +317,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's phone
      */
+    @Override
     public String getPhone() throws NamingException {
         return getAttribute("telephonenumber");
     }
@@ -317,6 +326,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's first name
      */
+    @Override
     public String getFirstName() throws NamingException {
         return getAttribute("givenname");
     }
@@ -325,6 +335,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's last name
      */
+    @Override
     public String getLastName() throws NamingException {
         return getAttribute("sn");
     }
@@ -333,6 +344,7 @@ public class LdapImpl implements Ldap {
     /**
      * organization units
      */
+    @Override
     public List<String> getUnits() throws NamingException {
         return getAttributeAll("ou");
     }
@@ -341,6 +353,7 @@ public class LdapImpl implements Ldap {
     /**
      * Groups mapped by the Units for faculty.
      */
+    @Override
     public List<Group> getGroups() throws NamingException, java.sql.SQLException {
         HashSet<Group> ret = new HashSet();
 
@@ -361,6 +374,7 @@ public class LdapImpl implements Ldap {
     /**
      * is the user CP faculty with an acceptable status?
      */
+    @Override
     public boolean isFaculty() throws NamingException {
         if (strUid.equals("tstusr2")) {
             return true;
@@ -386,14 +400,14 @@ public class LdapImpl implements Ldap {
                      strCat.equals("37") ||
                      strCat.equals("EA"))
                     &&
-                    ((strStatus.equals("A") ||
+                    (strStatus.equals("A") ||
                       strStatus.equals("E") ||
                       strStatus.equals("N") ||
                       strStatus.equals("Q") ||
                       strStatus.equals("T") ||
-                      strStatus.equals("F")))
+                      strStatus.equals("F"))
                     &&
-                    (strInst.equals("01"))) {
+                    strInst.equals("01")) {
                     return true;
                 }
             }
@@ -406,6 +420,7 @@ public class LdapImpl implements Ldap {
     /**
      * Register this ldap user as an EPerson
      */
+    @Override
     public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
         // Turn off authorizations to create a new user
         context.turnOffAuthorisationSystem();
@@ -457,10 +472,12 @@ public class LdapImpl implements Ldap {
     /**
      * Reset the context.  We lost it after every request.
      */
+    @Override
     public void setContext(org.dspace.core.Context context) {
         this.context = context;
     }
 
+    @Override
     public String toString() {
         if (entry == null) {
             return "null";

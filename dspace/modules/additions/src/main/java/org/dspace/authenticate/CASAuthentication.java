@@ -3,6 +3,7 @@ package org.dspace.authenticate;
 import static org.dspace.core.LogHelper.getHeader;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -291,7 +292,7 @@ public class CASAuthentication implements AuthenticationMethod {
         }
 
         stv.setCasValidateUrl(validateURL);
-        stv.setService(java.net.URLEncoder.encode(service));
+        stv.setService(java.net.URLEncoder.encode(service, StandardCharsets.UTF_8));
         stv.setServiceTicket(ticket);
 
         try {
