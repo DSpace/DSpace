@@ -486,10 +486,15 @@ public class LdapImpl implements Ldap {
       if (strLastName == null)
         strLastName = "??";
 
+      String strPhone = getPhone();
+        if (strPhone == null)
+          strPhone = "??";
+
       eperson.setNetid(uid);
       eperson.setEmail(uid + "@umd.edu");
       eperson.setFirstName(context, strFirstName);
       eperson.setLastName(context, strLastName);
+      epersonService.setMetadataSingleValue(context, eperson, EPersonService.MD_PHONE, null, strPhone);
       eperson.setCanLogIn(true);
       eperson.setRequireCertificate(false);
 
