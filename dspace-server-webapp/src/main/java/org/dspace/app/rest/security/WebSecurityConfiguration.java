@@ -141,7 +141,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // UMD - Add a filter before our CAS endpoints to do authentication
             // based on the data in the HTTP request.
             .addFilterBefore(new CASLoginFilter("/api/authn/cas", authenticationManager(),
-                                               restAuthenticationService),
+                                                restAuthenticationService),
                              LogoutFilter.class)
             // UMD End
 

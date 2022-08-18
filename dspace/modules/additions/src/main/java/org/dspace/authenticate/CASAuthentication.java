@@ -3,11 +3,9 @@ package org.dspace.authenticate;
 import static org.dspace.core.LogHelper.getHeader;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +18,6 @@ import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.authenticate.factory.AuthenticateServiceFactory;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -95,32 +91,27 @@ public class CASAuthentication implements AuthenticationMethod {
      */
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
-      try
-      {
-          Ldap ldap = (Ldap) request.getSession().getAttribute(CAS_LDAP);
-          if (ldap != null)
-          {
-              ldap.setContext(context);
-              List<Group> groups = ldap.getGroups();
+        try {
+            Ldap ldap = (Ldap) request.getSession().getAttribute(CAS_LDAP);
+            if (ldap != null) {
+                ldap.setContext(context);
+                List<Group> groups = ldap.getGroups();
 
-              Group CASGroup = groupService.findByName(context, "CAS Authenticated");
-              if (CASGroup == null)
-              {
-                  throw new Exception(
-                          "Unable to find 'CAS Authenticated' group");
-              }
+                Group CASGroup = groupService.findByName(context, "CAS Authenticated");
+                if (CASGroup == null) {
+                    throw new Exception(
+                            "Unable to find 'CAS Authenticated' group");
+                }
 
-              groups.add(CASGroup);
+                groups.add(CASGroup);
 
-              return groups;
-          }
-      }
-      catch (Exception e)
-      {
-          log.error("Ldap exception", e);
-      }
+                return groups;
+            }
+        } catch (Exception e) {
+            log.error("Ldap exception", e);
+        }
 
-      return new ArrayList<Group>();
+        return new ArrayList<Group>();
     }
 
     /**
@@ -131,17 +122,17 @@ public class CASAuthentication implements AuthenticationMethod {
      * @param context the current Context
      * @param request the HttpServletRequest
      * @return a String representing the service URL to be sent as part of the
-     * CAS ticket validation.
+     *         CAS ticket validation.
      */
     protected String getServiceUrlFromRequest(Context context, HttpServletRequest request) {
-      String serviceUrl = request.getRequestURL().toString();
+        String serviceUrl = request.getRequestURL().toString();
 
-      // Append "redirectUrl" query parameter (if present) onto "service"
-      if (request.getParameter("redirectUrl") != null) {
-        serviceUrl = serviceUrl + "?redirectUrl="+request.getParameter("redirectUrl");
-      }
+        // Append "redirectUrl" query parameter (if present) onto "service"
+        if (request.getParameter("redirectUrl") != null) {
+            serviceUrl = serviceUrl + "?redirectUrl=" + request.getParameter("redirectUrl");
+        }
 
-      return serviceUrl;
+        return serviceUrl;
     }
 
     /**
@@ -155,13 +146,13 @@ public class CASAuthentication implements AuthenticationMethod {
      * @return the username of the authenticated user, or null.
      */
     protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl)
-      throws IOException, ServletException {
+            throws IOException, ServletException {
         // Determine CAS validation URL
         final String validateURL = configurationService.getProperty("drum.cas.validate.url");
         log.info(getHeader(context, "login", "CAS validate:  " + validateURL));
         if (validateURL == null) {
-          log.error("No CAS validation URL specified. You need to set property 'drum.cas.validate.url'");
-          return null;
+            log.error("No CAS validation URL specified. You need to set property 'drum.cas.validate.url'");
+            return null;
         }
 
         // Validate ticket (it is assumed that CAS validator returns the
@@ -171,12 +162,12 @@ public class CASAuthentication implements AuthenticationMethod {
     }
 
     protected boolean isLdapUser(Ldap ldap, String netid) {
-      try {
-          return ldap.checkUid(netid);
-      } catch(NamingException ne) {
-          log.error("LDAP NamingException for '" + netid + "'", ne);
-          return false;
-      }
+        try {
+            return ldap.checkUid(netid);
+        } catch (NamingException ne) {
+            log.error("LDAP NamingException for '" + netid + "'", ne);
+            return false;
+        }
     }
 
     /**
@@ -191,7 +182,7 @@ public class CASAuthentication implements AuthenticationMethod {
         try {
             ldap = new LdapImpl(context);
             return authenticate(context, username, password, realm, request, ldap);
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error("Unexpected exception caught", e);
         } finally {
             if (ldap != null) {
@@ -202,15 +193,15 @@ public class CASAuthentication implements AuthenticationMethod {
         return BAD_ARGS;
     }
 
-    protected int authenticate(Context context, String username, String password, String realm, HttpServletRequest request, Ldap ldap)
-    {
+    protected int authenticate(Context context, String username, String password, String realm,
+            HttpServletRequest request, Ldap ldap) {
         final String ticket = request.getParameter("ticket");
         log.info(getHeader(context, "login", " ticket: " + ticket));
 
         if (ticket == null) {
-          // No CAS ticket
-          log.error("'ticket' from request is null.");
-          return BAD_ARGS;
+            // No CAS ticket
+            log.error("'ticket' from request is null.");
+            return BAD_ARGS;
         }
 
         final String serviceUrl = getServiceUrlFromRequest(context, request);
@@ -220,13 +211,12 @@ public class CASAuthentication implements AuthenticationMethod {
         try {
             String netid = getNetIdFromCasTicket(context, ticket, serviceUrl);
             if (netid == null) {
-              log.error("Ticket '" + ticket + "' is not valid. netid is null.");
-              return BAD_ARGS;
+                log.error("Ticket '" + ticket + "' is not valid. netid is null.");
+                return BAD_ARGS;
             }
 
             // Check directory
-            if (!isLdapUser(ldap, netid))
-            {
+            if (!isLdapUser(ldap, netid)) {
                 log.error("Unknown directory id " + netid);
                 return NO_SUCH_USER;
             }
@@ -235,7 +225,6 @@ public class CASAuthentication implements AuthenticationMethod {
             request.getSession().setAttribute(CAS_LDAP, ldap);
 
             log.info("netid = " + netid);
-
 
             // Locate the eperson in DSpace
             EPerson eperson = null;
@@ -247,19 +236,19 @@ public class CASAuthentication implements AuthenticationMethod {
 
             // Register New User, if necessary
             if (eperson == null) {
-               if (canSelfRegister(context,request, netid)) {
+                if (canSelfRegister(context, request, netid)) {
                     eperson = ldap.registerEPerson(netid, request);
 
                     context.setCurrentUser(eperson);
-               } else {
-                  // No auto-registration for valid netid
-                  log.warn(getHeader(context, "authenticate", "type=netid_but_no_record, cannot auto-register"));
-                  return NO_SUCH_USER;
-               }
+                } else {
+                    // No auto-registration for valid netid
+                    log.warn(getHeader(context, "authenticate", "type=netid_but_no_record, cannot auto-register"));
+                    return NO_SUCH_USER;
+                }
             }
 
             if (eperson == null) {
-              return AuthenticationMethod.NO_SUCH_USER;
+                return AuthenticationMethod.NO_SUCH_USER;
             }
 
             if (eperson.getRequireCertificate()) {
@@ -287,10 +276,8 @@ public class CASAuthentication implements AuthenticationMethod {
      * Returns the NetID of the owner of the given ticket, or null if the ticket
      * isn't valid.
      *
-     * @param service
-     *            the service ID for the application validating the ticket
-     * @param ticket
-     *            the opaque service ticket (ST) to validate
+     * @param service the service ID for the application validating the ticket
+     * @param ticket  the opaque service ticket (ST) to validate
      */
     public static String validate(String service, String ticket, String validateURL)
             throws IOException, ServletException {
@@ -349,7 +336,7 @@ public class CASAuthentication implements AuthenticationMethod {
         if (request.getHeader("Referer") != null && StringUtils.isNotBlank(request.getHeader("Referer"))) {
             redirectUrl = request.getHeader("Referer");
         } else if (request.getHeader("X-Requested-With") != null
-            && StringUtils.isNotBlank(request.getHeader("X-Requested-With"))) {
+                && StringUtils.isNotBlank(request.getHeader("X-Requested-With"))) {
             redirectUrl = request.getHeader("X-Requested-With");
         }
 
@@ -359,7 +346,7 @@ public class CASAuthentication implements AuthenticationMethod {
         //
         // The path for the URL is configured in org.dspace.app.rest.security.WebSecurityConfiguration
         String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/cas"
-            + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
+                + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
 
         // Determine CAS server URL
         final String authServer = configurationService.getProperty("drum.cas.server.url");

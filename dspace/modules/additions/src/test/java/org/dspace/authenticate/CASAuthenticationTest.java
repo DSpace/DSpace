@@ -7,11 +7,11 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import edu.umd.lib.dspace.authenticate.Ldap;
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -22,8 +22,6 @@ import org.dspace.statistics.util.DummyHttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpSession;
-
-import edu.umd.lib.dspace.authenticate.Ldap;
 
 public class CASAuthenticationTest extends AbstractUnitTest {
     private CASAuthentication cas;
@@ -181,7 +179,6 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                 AuthenticationMethod.BAD_ARGS, response);
     }
 
-
     // Successful authenticaations
     @Test
     public void authenticate_success_userFoundInLdapAndEpersonExists() throws Exception {
@@ -210,7 +207,6 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                 AuthenticationMethod.SUCCESS, response);
     }
 
-
     @Test
     public void authenticate_success_userFoundInLdapAndEpersonCreated() throws Exception {
         String netid = "eperson_that_does_not_exist_yet";
@@ -228,7 +224,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        // Set up MockLdap so we can verify that the "registerEPerson" method was called.
+        // Set up MockLdap so we can verify that the "registerEPerson" method was
+        // called.
         MockLdap mockLdap = new MockLdap() {
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
@@ -249,7 +246,6 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         assertTrue("Ldap.registerEPerson was not called", mockLdap.registerEPersonCalled);
     }
 }
-
 
 class MockHttpServletRequest extends DummyHttpServletRequest {
     private String serviceUrl = null;
