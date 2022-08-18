@@ -41,6 +41,11 @@ using docker.
 
    The appropriate values can be found in LastPass.
 
+   **Note:** The "drum.ldap.bind.auth" value typically contains commas (for
+   example "uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot"), which must be escaped. So
+   the actual value added to the file would be similar to
+   `uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot`.
+
 5. Build the application and client docker images:
 
     ```bash
