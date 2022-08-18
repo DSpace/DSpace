@@ -39,7 +39,9 @@ using docker.
    * drum.ldap.bind.auth
    * drum.ldap.bind.password
 
-4. Build the application and client docker images:
+   The appropriate values can be found in LastPass.
+
+5. Build the application and client docker images:
 
     ```bash
     # Build the dspace image
@@ -47,9 +49,9 @@ using docker.
 
     ```
 
-5. Follow the instructions at [DRUM7DBRestore.md](./DRUM7DBRestore.md) to restore DRUM's DSpace 6 DB dump to DSpace 7.
+6. Follow the instructions at [DRUM7DBRestore.md](./DRUM7DBRestore.md) to restore DRUM's DSpace 6 DB dump to DSpace 7.
 
-6. Start all the containers
+7. Start all the containers
 
     ```bash
     docker compose -p d7 up
