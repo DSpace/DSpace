@@ -27,6 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 /**
  * This is the converter from/to the Item in the DSpace API data model and the
@@ -85,8 +86,24 @@ public class ItemConverter
         List<MetadataValue> returnList = new LinkedList<>();
         try {
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
-                                      Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
-                return new MetadataValueList(new ArrayList<MetadataValue>());
+                                      Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context)) &&
+                    ObjectUtils.isEmpty(itemService.getMetadataByMetadataString(obj, "local.withdrawn.reason"))) {
+                // if the item is withdrawn and is replaced the item could have a tombstone -
+                // return message for the tombstone
+                List<MetadataValue> isReplacedBy =
+                        itemService.getMetadataByMetadataString(obj, "dc.relation.isreplacedby");
+                if (!ObjectUtils.isEmpty(isReplacedBy)) {
+                    ArrayList<MetadataValue> allowedMetadataValues = new ArrayList<>();
+                    allowedMetadataValues.addAll(isReplacedBy);
+                    // Add authors to the tombstone
+                    allowedMetadataValues.addAll(
+                            itemService.getMetadataByMetadataString(obj, "dc.contributor.author"));
+                    allowedMetadataValues.addAll(
+                            itemService.getMetadataByMetadataString(obj, "dc.contributor.other"));
+                    return new MetadataValueList(allowedMetadataValues);
+                } else {
+                    return new MetadataValueList(new ArrayList<MetadataValue>());
+                }
             }
             if (context != null && authorizeService.isAdmin(context)) {
                 return new MetadataValueList(fullList);

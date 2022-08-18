@@ -56,4 +56,11 @@
     <scope_note>Get the bitstream from this URL.</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>local</schema>
+    <element>withdrawn</element>
+    <qualifier>reason</qualifier>
+    <scope_note>Store the withdrawal reason in addition to provenance</scope_note>
+  </dc-type>
+
 </dspace-dc-types>
