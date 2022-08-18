@@ -20,7 +20,6 @@ import com.rometools.modules.opensearch.OpenSearchModule;
 import com.rometools.modules.opensearch.entity.OSQuery;
 import com.rometools.modules.opensearch.impl.OpenSearchModuleImpl;
 import com.rometools.rome.io.FeedException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
@@ -179,9 +178,9 @@ public class OpenSearchServiceImpl implements OpenSearchService {
         OSQuery osq = new OSQuery();
         osq.setRole("request");
         try {
-        	if (StringUtils.isNotBlank(query)) {
-        		osq.setSearchTerms(URLEncoder.encode(query, "UTF-8"));
-        	}
+            if (StringUtils.isNotBlank(query)) {
+                osq.setSearchTerms(URLEncoder.encode(query, "UTF-8"));
+            }
         } catch (UnsupportedEncodingException e) {
             log.error(e);
         }
