@@ -22,8 +22,10 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
@@ -469,15 +471,10 @@ public class LdapImpl implements Ldap {
    * Register this ldap user as an EPerson
    */
 
-  public EPerson registerEPerson(String uid) throws Exception {
-    // Save the current dspace user
-    EPerson user = context.getCurrentUser();
-
+  public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
+    // Turn off authorizations to create a new user
+    context.turnOffAuthorisationSystem();
     try {
-      // Use the admin account to create the eperson
-      EPerson admin = epersonService.findByEmail(context, "ldap_um@drum.umd.edu");
-      context.setCurrentUser(admin);
-
       // Create a new eperson
       EPerson eperson = epersonService.create(context);
 
@@ -496,8 +493,9 @@ public class LdapImpl implements Ldap {
       eperson.setCanLogIn(true);
       eperson.setRequireCertificate(false);
 
+      AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
       epersonService.update(context, eperson);
-      context.commit();
+      context.dispatchEvents();
 
       log.info(LogHelper.getHeader(context,
                                     "create_um_eperson",
@@ -508,7 +506,8 @@ public class LdapImpl implements Ldap {
     }
 
     finally {
-      context.setCurrentUser(user);
+        // Turn authorizations back on.
+        context.restoreAuthSystemState();
     }
   }
 

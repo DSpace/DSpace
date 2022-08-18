@@ -8,6 +8,7 @@ package edu.umd.lib.dspace.authenticate;
 import java.util.List;
 
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -128,7 +129,7 @@ public interface Ldap {
      * Register this ldap user as an EPerson
      */
 
-    public EPerson registerEPerson(String uid) throws Exception;
+    public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception;
 
     /*********************************************************** setContext */
     /**

@@ -228,12 +228,13 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
+        // Set up MockLdap so we can verify that the "registerEPerson" method was called.
         MockLdap mockLdap = new MockLdap() {
             public boolean checkUid(String strUid) throws NamingException {
                 return true;
             }
 
-            public EPerson registerEPerson(String uid) throws Exception {
+            public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
                 registerEPersonCalled = true;
                 return eperson;
             }
@@ -244,7 +245,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
 
-        // Assume Ldap.registerPerson would have created the user
+        // Verify that Ldap.registerPerson was called
         assertTrue("Ldap.registerEPerson was not called", mockLdap.registerEPersonCalled);
     }
 }
@@ -353,7 +354,7 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     }
 
     @Override
-    public EPerson registerEPerson(String uid) throws Exception {
+    public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
         return null;
     }
 

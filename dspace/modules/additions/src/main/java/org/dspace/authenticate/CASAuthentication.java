@@ -245,12 +245,11 @@ public class CASAuthentication implements AuthenticationMethod {
                 log.warn("ignored SQL exception");
             }
 
-            // Step 2: Register New User, if necessary
+            // Register New User, if necessary
             if (eperson == null) {
                if (canSelfRegister(context,request, netid)) {
-                    eperson = ldap.registerEPerson(netid);
+                    eperson = ldap.registerEPerson(netid, request);
 
-                    context.restoreAuthSystemState();
                     context.setCurrentUser(eperson);
                } else {
                   // No auto-registration for valid netid
@@ -263,14 +262,12 @@ public class CASAuthentication implements AuthenticationMethod {
               return AuthenticationMethod.NO_SUCH_USER;
             }
 
-
-            // if they entered a netid that matches an eperson, and they are
-            // allowed to log in
-            // e-mail address corresponds to active account
             if (eperson.getRequireCertificate()) {
                 // they must use a certificate
                 return CERT_REQUIRED;
-            } else if (!eperson.canLogIn()) {
+            }
+
+            if (!eperson.canLogIn()) {
                 return BAD_ARGS;
             }
 
@@ -282,7 +279,6 @@ public class CASAuthentication implements AuthenticationMethod {
             return SUCCESS;
         } catch (Exception e) {
             log.error("Unexpected exception caught", e);
-            // throw new ServletException(e);
         }
         return BAD_ARGS;
     }
@@ -388,36 +384,5 @@ public class CASAuthentication implements AuthenticationMethod {
             return true;
         }
         return false;
-    }
-
-    protected EPerson createEperson(Context context, HttpServletRequest request, String netid, String email,
-                                    String fname, String lname) throws SQLException, AuthorizeException {
-        // copied from the ShibAuthentication class
-        // Turn off authorizations to create a new user
-        context.turnOffAuthorisationSystem();
-        EPerson eperson = ePersonService.create(context);
-
-        // Set the minimum attributes for the new eperson
-        if (netid != null) {
-            eperson.setNetid(netid);
-        }
-        eperson.setEmail(email.toLowerCase());
-        if (fname != null) {
-            eperson.setFirstName(context, fname);
-        }
-        if (lname != null) {
-            eperson.setLastName(context, lname);
-        }
-        eperson.setCanLogIn(true);
-
-        // Commit the new eperson
-        AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
-        ePersonService.update(context, eperson);
-        context.dispatchEvents();
-
-        // Turn authorizations back on.
-        context.restoreAuthSystemState();
-
-        return eperson;
     }
 }
