@@ -63,7 +63,7 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
         } else {
             // Uses the basic strategy to look for the original submitter
             author = super.getRequestItemAuthor(context, item);
-            // Is the author or his email  null, so get the help desk or admin name and email
+            // Is the author or their email null. If so get the help desk or admin name and email
             if (null == author || null == author.getEmail()) {
                 String email = null;
                 String name = null;

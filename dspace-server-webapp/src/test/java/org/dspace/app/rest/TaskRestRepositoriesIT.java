@@ -1511,7 +1511,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isForbidden());
 
-        // nor the administrator can approve a task that he doesn't own
+        // nor the administrator can approve a task that it doesn't own
         getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
                 .param("submit_approve", "true")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
@@ -1687,7 +1687,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isForbidden());
 
-        // nor the administrator can approve a task that he doesn't own
+        // nor the administrator can approve a task that it doesn't own
         getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
                 .param("submit_reject", "true")
                 .param("reason", "I need to test the reject")

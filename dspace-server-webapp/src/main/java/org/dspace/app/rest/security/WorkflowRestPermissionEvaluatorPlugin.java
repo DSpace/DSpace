@@ -31,7 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to interact with workflow item only if they belong to a task that she own or could
+ * An authenticated user is allowed to interact with workflow item only if they belong to a task that they own or could
  * claim.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
