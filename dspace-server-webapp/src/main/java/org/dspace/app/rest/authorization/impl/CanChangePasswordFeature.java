@@ -29,7 +29,8 @@ public class CanChangePasswordFeature implements AuthorizationFeature {
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (context.getCurrentUser() != null && StringUtils.equals(context.getAuthenticationMethod(), "password")) {
+        if (context.getCurrentUser() != null && !context.isSwitchedContextUser()
+            && StringUtils.equals(context.getAuthenticationMethod(), "password")) {
             return true;
         }
         return false;

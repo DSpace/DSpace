@@ -119,6 +119,8 @@ public class Context implements AutoCloseable {
      */
     private Mode mode;
 
+    private boolean switchedContextUser = false;
+
     /**
      * Cache that is only used the context is in READ_ONLY mode
      */
@@ -715,6 +717,7 @@ public class Context implements AutoCloseable {
         specialGroupsPreviousState = specialGroups;
         specialGroups = new HashSet<>();
         currentUser = newUser;
+        switchedContextUser = true;
     }
 
     /**
@@ -730,6 +733,7 @@ public class Context implements AutoCloseable {
         specialGroups = specialGroupsPreviousState;
         specialGroupsPreviousState = null;
         currentUserPreviousState = null;
+        switchedContextUser = false;
     }
 
     /**
@@ -943,5 +947,9 @@ public class Context implements AutoCloseable {
 
     public void setAuthenticationMethod(final String authenticationMethod) {
         this.authenticationMethod = authenticationMethod;
+    }
+
+    public boolean isSwitchedContextUser() {
+        return switchedContextUser;
     }
 }

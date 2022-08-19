@@ -132,6 +132,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     private Authorization authorization;
     private EPersonRest ePersonRest;
+    private EPersonRest adminRest;
     private final String feature = CanChangePasswordFeature.NAME;
 
 
@@ -150,6 +151,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testStatusAuthenticatedAsAdmin() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+
+        AuthorizationFeature canChangePasswordFeature = authorizationFeatureService.find(CanChangePasswordFeature.NAME);
+        adminRest = ePersonConverter.convert(admin, DefaultProjection.DEFAULT);
+        authorization = new Authorization(admin, canChangePasswordFeature, adminRest);
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
                         .andExpect(status().isOk())
