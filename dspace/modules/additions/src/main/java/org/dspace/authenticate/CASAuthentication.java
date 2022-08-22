@@ -341,23 +341,37 @@ public class CASAuthentication implements AuthenticationMethod {
             redirectUrl = request.getHeader("X-Requested-With");
         }
 
-        // Determine the server return URL, where CAS will send the user after authenticating.
-        // We need it to trigger the CASLoginFilter in order to extract the user's information,
-        // locally authenticate them & then redirect back to the UI.
+        // Determine the "service" URL, i.e., the DSpace authentication endpoint
+        // where CAS will send the user after successfully authenticating.
+        // The serviceUrl triggers the CASLoginFilter in order to extract
+        // the user's information, locally authenticate them & then
+        // redirect back to the UI.
         //
         // The path for the URL is configured in org.dspace.app.rest.security.WebSecurityConfiguration
-        String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/cas"
+        String serviceUrl = configurationService.getProperty("dspace.server.url") + "/api/authn/cas"
                 + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
+
+        if (serviceUrl.startsWith("https")) {
+            // Ensure that the serviceUrl uses "http", instead of "https".
+            // This is needed for Kubernetes, where HTTPS is handled
+            // by Nginx, and the serviceUrl called after successful CAS
+            // authentication is made to the DSpace endpoint as HTTP.
+            // When validating the CAS ticket, the serviceUrl must exactly
+            // match the serviceUrl returned by the "getServiceUrlFromRequest"
+            // method (which calculates the serviceUrl from the parameters
+            // of the incoming request), including protocol.
+            serviceUrl = serviceUrl.replaceFirst("https", "http");
+        }
 
         // Determine CAS server URL
         final String authServer = configurationService.getProperty("drum.cas.server.url");
 
         log.debug("CAS server:  " + authServer);
-        log.debug("Return URL: " + returnURL);
+        log.debug("Service URL: " + serviceUrl);
         log.debug("redirectUrl: " + redirectUrl);
 
         // Redirect to CAS server
-        String result = response.encodeRedirectURL(authServer + "?service=" + returnURL);
+        String result = response.encodeRedirectURL(authServer + "?service=" + serviceUrl);
         return result;
     }
 

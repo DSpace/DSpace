@@ -32,7 +32,7 @@ The following configuration properties are used for CAS/LDAP authentication:
 * drum.cas.logout.url - The URL to the CAS logout endpoint.
     **Not currently used**
 * drum.webui.cas.autoregister - "true" if an EPerson should be automatically
-    created on a succesful login, "false" otherwise.
+    created on a successful login, "false" otherwise.
 
 * drum.ldap.url - URL to the LDAP server to use for retrieving user information,
     typically "ldap://directory.umd.edu:636/dc=umd\,dc=edu"
@@ -62,8 +62,8 @@ The overall CAS login process is as follows:
    with a URL path of "/api/authn/cas" in
    `org.dspace.app.rest.security.WebSecurityConfiguration`) and the
    "redirectUrl" is the URL the browser should be redirected to when
-   authentication is complete. The "service" and "redirectURl" are full URLs,
-   with the "host" portion being the DSpace server URL.
+   authentication is complete. The "service" and "redirectUrl" parameters
+   are full URLs, with the "host" portion being the DSpace server URL.
 
    **Note:** For the DSpace backend application, the path of the "redirectUrl"
    should be "/server/login.html" to ensure that the temporary
