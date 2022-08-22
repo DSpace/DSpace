@@ -1,4 +1,10 @@
 
+# Dataquest wiki
+When installing, please checkout wiki on this repo
+
+## [Nginx information](https://github.com/dataquest-dev/DSpace/wiki/Installation#nginx)
+
+
 # DSpace
 ## Overview
 
