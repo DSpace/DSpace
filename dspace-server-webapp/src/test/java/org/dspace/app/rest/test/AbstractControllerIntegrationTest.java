@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -89,8 +90,9 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public static final String REST_SERVER_URL = "http://localhost/api/";
     public static final String BASE_REST_SERVER_URL = "http://localhost";
 
+    // Our standard/expected content type
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
-                                                    MediaTypes.HAL_JSON.getSubtype());
+                                                    MediaTypes.HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 

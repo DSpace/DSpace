@@ -107,6 +107,15 @@
   </bitstream-type>
 
   <bitstream-type>
+    <mimetype>text/csv</mimetype>
+    <short_description>CSV</short_description>
+    <description>Comma-Separated Values</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>csv</extension>
+  </bitstream-type>
+
+  <bitstream-type>
     <mimetype>application/msword</mimetype>
     <short_description>Microsoft Word</short_description>
     <description>Microsoft Word</description>

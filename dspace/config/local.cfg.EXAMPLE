@@ -59,25 +59,32 @@ dspace.name = DSpace at My University
 # Since DSpace 7, SOLR must be installed as a stand-alone service
 #solr.server = http://localhost:8983/solr
 
+# Solr core name prefix.
+# If you connect multiple instances of DSpace to a single Solr instance, you
+# can organize them with a common core name prefix.
+#solr.multicorePrefix =
+
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
 # DSpace only supports two database types: PostgreSQL or Oracle
+# PostgreSQL is highly recommended.
+# Oracle support is DEPRECATED. See https://github.com/DSpace/DSpace/issues/8214
 
 # URL for connecting to database
 #    * Postgres template: jdbc:postgresql://localhost:5432/dspace
-#    * Oracle template: jdbc:oracle:thin:@//localhost:1521/xe
+#    * Oracle template (DEPRECATED): jdbc:oracle:thin:@//localhost:1521/xe
 db.url = jdbc:postgresql://localhost:5432/dspace
 
 # JDBC Driver
 #    * For Postgres: org.postgresql.Driver
-#    * For Oracle:   oracle.jdbc.OracleDriver
+#    * For Oracle (DEPRECATED):   oracle.jdbc.OracleDriver
 db.driver = org.postgresql.Driver
 
 # Database Dialect (for Hibernate)
-#    * For Postgres: org.dspace.storage.rdbms.hibernate.postgres.DSpacePostgreSQL82Dialect
-#    * For Oracle:   org.hibernate.dialect.Oracle10gDialect
-db.dialect = org.dspace.storage.rdbms.hibernate.postgres.DSpacePostgreSQL82Dialect
+#    * For Postgres: org.hibernate.dialect.PostgreSQL94Dialect
+#    * For Oracle (DEPRECATED):   org.hibernate.dialect.Oracle10gDialect
+db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
 
 # Database username and password
 db.username = dspace
@@ -85,7 +92,7 @@ db.password = dspace
 
 # Database Schema name
 #    * For Postgres, this is often "public" (default schema)
-#    * For Oracle, schema is equivalent to the username of your database account,
+#    * For Oracle (DEPRECATED), schema is equivalent to the username of your database account,
 #      so this may be set to ${db.username} in most scenarios.
 db.schema = public
 
@@ -127,6 +134,10 @@ db.schema = public
 
 # General site administration (Webmaster) e-mail
 #mail.admin = dspace-help@myu.edu
+
+# Helpdesk E-mail
+#mail.helpdesk = ${mail.admin}
+#mail.helpdesk.name = Help Desk
 
 # Recipient for server errors and alerts (defaults to mail.admin)
 #alert.recipient = ${mail.admin}
@@ -196,6 +207,9 @@ db.schema = public
 # Shibboleth authentication/authorization. See authentication-shibboleth.cfg for default configuration.
 # Check also the cors settings below
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
+
+# ORCID certificate authentication.
+# plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OrcidAuthentication
 
 # X.509 certificate authentication. See authentication-x509.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication

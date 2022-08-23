@@ -50,7 +50,7 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
      */
     protected SolrClient solr = null;
 
-    protected SolrClient getSolr()
+    public SolrClient getSolr()
             throws MalformedURLException, SolrServerException, IOException {
         if (solr == null) {
 
@@ -67,7 +67,11 @@ public class AuthoritySolrServiceImpl implements AuthorityIndexingService, Autho
 
             SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
 
-            solrServer.query(solrQuery);
+            try {
+                solrServer.query(solrQuery);
+            } catch (Exception ex) {
+                log.error("An error occurs querying authority solr core", ex);
+            }
 
             solr = solrServer;
         }

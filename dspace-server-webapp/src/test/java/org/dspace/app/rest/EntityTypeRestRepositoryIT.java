@@ -86,13 +86,13 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/entitytypes")))
                    //We have 4 facets in the default configuration, they need to all be present in the embedded section
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context,
-                             Constants.ENTITY_TYPE_NONE)),
+                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
                        EntityTypeMatcher
-                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit"))
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue")),
+                       EntityTypeMatcher
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume")),
+                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit")),
+                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person"))
                    )));
 
         getClient().perform(get("/api/core/entitytypes").param("size", "5").param("page", "1"))
@@ -108,11 +108,12 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/entitytypes")))
                    //We have 4 facets in the default configuration, they need to all be present in the embedded section
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
-                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
+                       EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
                        EntityTypeMatcher
-                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalVolume")),
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
                        EntityTypeMatcher
-                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue"))
+                           .matchEntityTypeEntry(entityTypeService.findByEntityType(context,
+                                                                                    Constants.ENTITY_TYPE_NONE))
                    )));
     }
 
@@ -137,10 +138,11 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                    .param("size", "3"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
-                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
-                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context,
-                    Constants.ENTITY_TYPE_NONE))
+                                                                                              "JournalIssue")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context,
+                                                                                              "JournalVolume"))
                     )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                            Matchers.containsString("/api/core/entitytypes?"),
@@ -165,7 +167,7 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "OrgUnit")),
-                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Person")),
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project"))
                     )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(

@@ -14,11 +14,12 @@ import java.util.Iterator;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.xpath.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,36 +63,26 @@ public class XMLUtils {
 
     /**
      * @param xml           The starting context (a Node or a Document, for example).
-     * @param NodeListXPath xpath
+     * @param nodeListXPath xpath
      * @return A Node matches the NodeListXPath
      * null if nothing matches the NodeListXPath
      * @throws XPathExpressionException if xpath error
      */
-    public static Node getNode(Node xml, String NodeListXPath) throws XPathExpressionException {
-        Node result = null;
-        try {
-            result = XPathAPI.selectSingleNode(xml, NodeListXPath);
-        } catch (TransformerException e) {
-            log.error("Error", e);
-        }
-        return result;
+    public static Node getNode(Node xml, String nodeListXPath) throws XPathExpressionException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        return (Node) xPath.compile(nodeListXPath).evaluate(xml, XPathConstants.NODE);
     }
 
     /**
      * @param xml           The starting context (a Node or a Document, for example).
-     * @param NodeListXPath xpath
+     * @param nodeListXPath xpath
      * @return A NodeList containing the nodes that match the NodeListXPath
      * null if nothing matches the NodeListXPath
      * @throws XPathExpressionException if xpath error
      */
-    public static NodeList getNodeList(Node xml, String NodeListXPath) throws XPathExpressionException {
-        NodeList nodeList = null;
-        try {
-            nodeList = XPathAPI.selectNodeList(xml, NodeListXPath);
-        } catch (TransformerException e) {
-            log.error("Error", e);
-        }
-        return nodeList;
+    public static NodeList getNodeList(Node xml, String nodeListXPath) throws XPathExpressionException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        return (NodeList) xPath.compile(nodeListXPath).evaluate(xml, XPathConstants.NODESET);
     }
 
     public static Iterator<Node> getNodeListIterator(Node xml, String NodeListXPath) throws XPathExpressionException {

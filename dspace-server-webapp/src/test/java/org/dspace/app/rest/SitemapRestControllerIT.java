@@ -107,7 +107,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       //** THEN **
                                       .andExpect(status().isOk())
                                       //We expect the content type to match
-                                      .andExpect(content().contentType("text/html"))
+                                      .andExpect(content().contentType("text/html;charset=UTF-8"))
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
@@ -123,7 +123,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       //** THEN **
                                       .andExpect(status().isOk())
                                       //We expect the content type to match
-                                      .andExpect(content().contentType("text/html"))
+                                      .andExpect(content().contentType("text/html;charset=UTF-8"))
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
@@ -140,7 +140,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       //** THEN **
                                       .andExpect(status().isOk())
                                       //We expect the content type to match
-                                      .andExpect(content().contentType("application/xml"))
+                                      .andExpect(content().contentType("application/xml;charset=UTF-8"))
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
@@ -156,7 +156,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       //** THEN **
                                       .andExpect(status().isOk())
                                       //We expect the content type to match
-                                      .andExpect(content().contentType("application/xml"))
+                                      .andExpect(content().contentType("application/xml;charset=UTF-8"))
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();

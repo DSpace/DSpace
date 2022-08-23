@@ -15,26 +15,26 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.syndication.feed.module.DCModule;
-import com.sun.syndication.feed.module.DCModuleImpl;
-import com.sun.syndication.feed.module.Module;
-import com.sun.syndication.feed.module.itunes.EntryInformation;
-import com.sun.syndication.feed.module.itunes.EntryInformationImpl;
-import com.sun.syndication.feed.module.itunes.types.Duration;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEnclosure;
-import com.sun.syndication.feed.synd.SyndEnclosureImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndImage;
-import com.sun.syndication.feed.synd.SyndImageImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
+import com.rometools.modules.itunes.EntryInformation;
+import com.rometools.modules.itunes.EntryInformationImpl;
+import com.rometools.modules.itunes.types.Duration;
+import com.rometools.rome.feed.module.DCModule;
+import com.rometools.rome.feed.module.DCModuleImpl;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEnclosure;
+import com.rometools.rome.feed.synd.SyndEnclosureImpl;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.feed.synd.SyndImage;
+import com.rometools.rome.feed.synd.SyndImageImpl;
+import com.rometools.rome.feed.synd.SyndPerson;
+import com.rometools.rome.feed.synd.SyndPersonImpl;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -193,13 +193,11 @@ public class SyndicationFeed {
         String defaultTitle = null;
         boolean podcastFeed = false;
         this.request = request;
-
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
             feed.setDescription(localize(labels, MSG_FEED_DESCRIPTION));
             objectURL = resolveURL(request, null);
-            logoURL = configurationService.getProperty("webui.feed.logo.url");
         } else {
             Bitstream logo = null;
             if (dso instanceof IndexableCollection) {
@@ -329,7 +327,8 @@ public class SyndicationFeed {
                     dcDescriptionField != null) {
                     DCModule dc = new DCModuleImpl();
                     if (dcCreatorField != null) {
-                        List<MetadataValue> dcAuthors = itemService.getMetadataByMetadataString(item, dcCreatorField);
+                        List<MetadataValue> dcAuthors = itemService
+                                .getMetadataByMetadataString(item, dcCreatorField);
                         if (dcAuthors.size() > 0) {
                             List<String> creators = new ArrayList<>();
                             for (MetadataValue author : dcAuthors) {
@@ -345,7 +344,8 @@ public class SyndicationFeed {
                         }
                     }
                     if (dcDescriptionField != null) {
-                        List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDescriptionField);
+                        List<MetadataValue> v = itemService
+                                .getMetadataByMetadataString(item, dcDescriptionField);
                         if (v.size() > 0) {
                             StringBuilder descs = new StringBuilder();
                             for (MetadataValue d : v) {
@@ -376,6 +376,7 @@ public class SyndicationFeed {
                                     enc.setLength(bit.getSizeBytes());
                                     enc.setUrl(urlOfBitstream(request, bit));
                                     enclosures.add(enc);
+
                                 }
                             }
                         }

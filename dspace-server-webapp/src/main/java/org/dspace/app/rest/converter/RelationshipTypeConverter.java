@@ -11,6 +11,7 @@ import org.dspace.app.rest.model.RelationshipTypeRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.RelationshipType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RelationshipTypeConverter implements DSpaceConverter<RelationshipType, RelationshipTypeRest>  {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 

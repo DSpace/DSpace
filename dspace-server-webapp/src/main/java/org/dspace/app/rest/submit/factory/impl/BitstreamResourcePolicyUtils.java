@@ -10,9 +10,9 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -37,27 +37,26 @@ public class BitstreamResourcePolicyUtils {
      * This function applies the resource policies.
      *
      * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
+     * @param uploadConfig          The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
      * @param newAccessCondition    The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+     * @throws ParseException       If parse error
      */
-    public static void findApplyResourcePolicy(Context context, Iterator<UploadConfiguration> uploadConfigs,
+    public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, List<AccessConditionDTO> newAccessConditions)
             throws SQLException, AuthorizeException, ParseException {
-        while (uploadConfigs.hasNext()) {
-            UploadConfiguration uploadConfiguration = uploadConfigs.next();
-            for (AccessConditionDTO newAccessCondition : newAccessConditions) {
-                String name = newAccessCondition.getName();
-                String description = newAccessCondition.getDescription();
+        for (AccessConditionDTO newAccessCondition : newAccessConditions) {
+            String name = newAccessCondition.getName();
+            String description = newAccessCondition.getDescription();
 
-                Date startDate = newAccessCondition.getStartDate();
-                Date endDate = newAccessCondition.getEndDate();
+            Date startDate = newAccessCondition.getStartDate();
+            Date endDate = newAccessCondition.getEndDate();
 
-                findApplyResourcePolicy(context, uploadConfiguration, obj, name, description, startDate, endDate);
-            }
+            findApplyResourcePolicy(context, uploadConfiguration, obj, name, description, startDate, endDate);
         }
+
     }
 
     /**
@@ -66,7 +65,7 @@ public class BitstreamResourcePolicyUtils {
      * The description, start date and end date are applied as well
      *
      * @param context               The relevant DSpace Context.
-     * @param uploadConfigs         The configured UploadConfigurations
+     * @param uploadConfiguration   The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
      * @param name                  The name of the access condition matching the desired policies
      * @param description           An optional description for the policies
@@ -74,16 +73,24 @@ public class BitstreamResourcePolicyUtils {
      * @param endDate               An optional end date for the policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
+     * @throws ParseException       If parse error
      */
     public static void findApplyResourcePolicy(Context context, UploadConfiguration uploadConfiguration,
             DSpaceObject obj, String name, String description,
                                                Date startDate, Date endDate)
             throws SQLException, AuthorizeException, ParseException {
+        boolean found = false;
         for (AccessConditionOption aco : uploadConfiguration.getOptions()) {
             if (aco.getName().equalsIgnoreCase(name)) {
                 aco.createResourcePolicy(context, obj, name, description, startDate, endDate);
-                return;
+                found = true;
+                break;
             }
         }
+        // unexisting/unconfigured access conditions are no longer accepted
+        if (!found) {
+            throw new UnprocessableEntityException("The provided access condition: " + name + " is not supported!");
+        }
+        return;
     }
 }
