@@ -67,21 +67,28 @@ handle.dir = ${dspace.dir}/handle-server
 ##########################
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = \
         org.dspace.authenticate.IPAuthentication, \
-        # org.dspace.authenticate.CASAuthentication, \
+        org.dspace.authenticate.CASAuthentication, \
         org.dspace.authenticate.PasswordAuthentication
 
 ##### CAS AUTHENTICATION CONFIG ######
 drum.cas.server.url=https://login.umd.edu/cas/login
 drum.cas.validate.url=https://login.umd.edu/cas/serviceValidate
 # Currently not used
-#drum.cas.logout.url=https://login.umd.edu/cas/logout 
+#drum.cas.logout.url=https://login.umd.edu/cas/logout
 
 drum.webui.cas.autoregister = true
 
-# LDAP Configuration necessary for CAS to work
+# LDAP Credentials (needed for CAS)
+# Note: Commas should be escaped, i.e. if the LDAP bind authDn is
+#
+# uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot
+#
+# The property should be:
+# drum.ldap.bind.auth = uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot
+#
 drum.ldap.url = ldap://directory.umd.edu:636/dc=umd\,dc=edu
-drum.ldap.bind.auth = 
-drum.ldap.bind.password = 
+drum.ldap.bind.auth =
+drum.ldap.bind.password =
 drum.ldap.connect.timeout = 1000
 drum.ldap.read.timeout = 5000
 
@@ -98,7 +105,7 @@ identifier.doi.password =
 identifier.doi.prefix = 10.33522
 identifier.doi.datacite.host = mds.test.datacite.org
 identifier.doi.mintRandom = true
-identifier.doi.namespaceseparator = 
+identifier.doi.namespaceseparator =
 crosswalk.dissemination.DataCite.publisher = Digital Repository at the University of Maryland
 crosswalk.dissemination.DataCite.stylesheet = crosswalks/DIM2UmdDataCite.xsl
 
@@ -148,10 +155,6 @@ request.item.type =
 # OTHER CONFIGURATION #
 #######################
 
-# LDAP Credentials
-drum.ldap.bind.auth = 
-drum.ldap.bind.password = 
-
 # ETD loader email settings
 drum.mail.etdmarc.recipient = mohideen@umd.edu
 drum.mail.etd.recipient = mohideen@umd.edu
@@ -187,4 +190,4 @@ wufoo.feedback.field.session = Field11
 wufoo.feedback.field.host = Field15
 
 # Data Community
-data.community.handle = 
+data.community.handle =
