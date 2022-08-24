@@ -73,8 +73,17 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
                 if (entry.getValue().getFields() != null) {
                     for (Entry<Key,Value> subentry : entry.getValue().getFields().entrySet()) {
                         PlainMetadataKeyValueItem innerItem = new PlainMetadataKeyValueItem();
-                        innerItem.setKey(subentry.getKey().getValue());
-                        innerItem.setValue(subentry.getValue().toUserString());
+                        innerItem.setKey(subentry.getKey().getValue().toLowerCase());
+                        String latexString = subentry.getValue().toUserString();
+                        try {
+                            org.jbibtex.LaTeXParser laTeXParser = new org.jbibtex.LaTeXParser();
+                            List<org.jbibtex.LaTeXObject> latexObjects = laTeXParser.parse(latexString);
+                            org.jbibtex.LaTeXPrinter laTeXPrinter = new org.jbibtex.LaTeXPrinter();
+                            String plainTextString = laTeXPrinter.print(latexObjects);
+                            innerItem.setValue(plainTextString.replaceAll("\n", " "));
+                        } catch (ParseException e) {
+                            innerItem.setValue(latexString);
+                        }
                         keyValues.add(innerItem);
                     }
                 }
