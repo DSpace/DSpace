@@ -70,6 +70,10 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
                 keyValueItem.setKey(entry.getValue().getType().getValue());
                 keyValueItem.setValue(entry.getKey().getValue());
                 keyValues.add(keyValueItem);
+                PlainMetadataKeyValueItem typeItem = new PlainMetadataKeyValueItem();
+                typeItem.setKey("type");
+                typeItem.setValue(entry.getValue().getType().getValue());
+                keyValues.add(typeItem);
                 if (entry.getValue().getFields() != null) {
                     for (Entry<Key,Value> subentry : entry.getValue().getFields().entrySet()) {
                         PlainMetadataKeyValueItem innerItem = new PlainMetadataKeyValueItem();

@@ -994,6 +994,107 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         }
         bibtex.close();
     }
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a bibtex file
+     *
+     * @throws Exception
+     */
+    public void createSingleWorkspaceItemFromBibtexArticleFileWithOneEntryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withSubmitterGroup(eperson)
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withSubmitterGroup(eperson)
+                .build();
+
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test-article.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "/local/path/bibtex-test-article.bib",
+                "application/x-bibtex", bibtex);
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        try {
+            // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
+                            .file(bibtexFile))
+                    // create should return 200, 201 (created) is better for single resource
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0]" +
+                                    ".sections.traditionalpageone['dc.title'][0].value",
+                            is("My Article")))
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0]" +
+                                    ".sections.traditionalpageone['dc.type'][0].value",
+                            is("article")))
+                    .andExpect(
+                            jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id",
+                                    is(col1.getID().toString())))
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                                    + ".metadata['dc.source'][0].value",
+                            is("/local/path/bibtex-test-article.bib")))
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                                    + ".metadata['dc.title'][0].value",
+                            is("bibtex-test-article.bib")))
+                    .andExpect(
+                            jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                            "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
+
+        // create a workspaceitem from a single bibliographic entry file explicitly in the col2
+        try {
+            getClient(authToken).perform(multipart("/api/submission/workspaceitems")
+                            .file(bibtexFile)
+                            .param("owningCollection", col2.getID().toString()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0]" +
+                                    ".sections.traditionalpageone['dc.title'][0].value",
+                            is("My Article")))
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0]" +
+                                    ".sections.traditionalpageone['dc.type'][0].value",
+                            is("article")))
+                    .andExpect(
+                            jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id",
+                                    is(col2.getID().toString())))
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                                    + ".metadata['dc.source'][0].value",
+                            is("/local/path/bibtex-test-article.bib")))
+                    .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload"
+                                    + ".files[0].metadata['dc.title'][0].value",
+                            is("bibtex-test-article.bib")))
+                    .andExpect(
+                            jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                            "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
+        bibtex.close();
+    }
 
     @Test
     public void createSingleWorkspaceItemFromBibtexFileWithDiacriticsTest() throws Exception {
