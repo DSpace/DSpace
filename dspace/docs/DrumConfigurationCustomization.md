@@ -42,9 +42,16 @@ to the Java classes specified in the XML files. To fix this, place the
 of the module. For example, for the "dspace-api" module, the "stock" versions
 of the above files would be placed in:
 
-* dspace-api/test/data/dspaceFolder/config/hibernate.cfg.xml
-* dspace-api/test/data/dspaceFolder/spring/api/core-services.xml
-* dspace-api/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
+* dspace-api/src/test/data/dspaceFolder/config/hibernate.cfg.xml
+* dspace-api/src/test/data/dspaceFolder/config/spring/api/core-services.xml
+* dspace-api/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
+
+The UMD-customized versions of these files (from the "dspace/config/" directory)
+should be placed in:
+
+* dspace/modules/additions/src/test/data/dspaceFolder/config/hibernate.cfg.xml
+* dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-services.xml
+* dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
 
 ## Database Schema Changes
 
