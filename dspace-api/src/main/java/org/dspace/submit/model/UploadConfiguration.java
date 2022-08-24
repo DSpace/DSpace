@@ -8,6 +8,7 @@
 package org.dspace.submit.model;
 
 import java.util.List;
+import javax.inject.Inject;
 
 import org.dspace.services.ConfigurationService;
 
@@ -16,6 +17,7 @@ import org.dspace.services.ConfigurationService;
  */
 public class UploadConfiguration {
 
+    @Inject
     private ConfigurationService configurationService;
 
     private String metadataDefinition;
@@ -62,14 +64,6 @@ public class UploadConfiguration {
 
     public void setRequired(Boolean required) {
         this.required = required;
-    }
-
-    public ConfigurationService getConfigurationService() {
-        return configurationService;
-    }
-
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
     }
 
     public String getName() {
