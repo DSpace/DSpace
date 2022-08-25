@@ -25,10 +25,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
                 name = ItemRest.BUNDLES,
                 method = "getBundles"
         ),
-        //@LinkRest(
-        //        name = ItemRest.IDENTIFIERS,
-        //       method = "getIdentifiers"
-        //),
+        @LinkRest(
+                name = ItemRest.IDENTIFIERS,
+               method = "getIdentifiers"
+        ),
         @LinkRest(
                 name = ItemRest.MAPPED_COLLECTIONS,
                 method = "getMappedCollections"

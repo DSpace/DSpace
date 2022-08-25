@@ -364,44 +364,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         return bundle;
     }
 
-    /**
-     * Register an identifier for an item
-     * @param context
-     * @param item
-     * @param identifier
-     * @return
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IdentifierException
-     */
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADMIN')")
-    public boolean registerIdentifier(Context context, Item item, String identifier)
-            throws SQLException, AuthorizeException, IdentifierException {
-        if (item != null) {
-            if (identifier != null) {
-                // Try to register the supplied identifier
-                identifierService.register(context, item, identifier);
-                return item.equals(identifierService.resolve(context, identifier));
-            } else {
-                DSpaceServicesFactory.getInstance().getServiceManager()
-                        .getServicesByType(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
-                // Call plain 'register' which will mint a new DOI, handle, etc if needed
-                // this NOT compatible with versioned handle provider with canonical handles
-                boolean compatible = DSpaceServicesFactory.getInstance().getServiceManager()
-                        .getServicesByType(VersionedHandleIdentifierProviderWithCanonicalHandles.class).isEmpty();
-                if (compatible) {
-                    // Register without a supplied identifier
-                    identifierService.register(context, item);
-                    return true;
-                } else {
-                    log.error("This register method is NOT compatible with" +
-                            "VersionedHandleIdentifierProviderWithCanonicalHandles");
-                }
-            }
-        }
-        return false;
-    }
-
     @Override
     protected ItemRest createAndReturn(Context context, List<String> stringList)
         throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {

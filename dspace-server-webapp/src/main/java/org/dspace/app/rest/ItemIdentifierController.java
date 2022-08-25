@@ -21,6 +21,7 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.model.IdentifierRest;
 import org.dspace.app.rest.model.IdentifiersRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,6 +80,7 @@ public class ItemIdentifierController {
     @Autowired
     Utils utils;
 
+    @RequestMapping(method = RequestMethod.GET)
     public IdentifiersRest get(@PathVariable UUID uuid, HttpServletRequest request,
                                           HttpServletResponse response)
             throws SQLException, AuthorizeException {
@@ -87,22 +90,22 @@ public class ItemIdentifierController {
             throw new ResourceNotFoundException("Could not find item with id " + uuid);
         }
         IdentifiersRest identifiersRest = new IdentifiersRest();
-        List<IdentifierRest> identifierRests = new ArrayList<>();
+        List<IdentifierRest> identifierRestList = new ArrayList<>();
         DOI doi = doiService.findDOIByDSpaceObject(context, item);
         String handle = HandleServiceFactory.getInstance().getHandleService().findHandle(context, item);
         try {
             if (doi != null) {
                 String doiUrl = doiService.DOIToExternalForm(doi.getDoi());
                 IdentifierRest identifierRest = new IdentifierRest(doiUrl, "doi", String.valueOf(doi.getStatus()));
-                identifierRests.add(identifierRest);
+                identifierRestList.add(identifierRest);
             }
             if (handle != null) {
-                identifierRests.add(new IdentifierRest(handle, "handle", null));
+                identifierRestList.add(new IdentifierRest(handle, "handle", null));
             }
         } catch (IdentifierException e) {
             throw new IllegalStateException("Failed to register identifier: " + e.getMessage());
         }
-
+        identifiersRest.setIdentifiers(identifierRestList);
         return identifiersRest;
     }
 
@@ -114,12 +117,13 @@ public class ItemIdentifierController {
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADMIN')")
     public ResponseEntity<RepresentationModel<?>> registerIdentifierForItem(@PathVariable UUID uuid,
-                                                                  HttpServletRequest request,
-                                                                  HttpServletResponse response)
+                                                                            HttpServletRequest request,
+                                                                            HttpServletResponse response)
             throws SQLException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
         Item item = itemService.find(context, uuid);
+        ItemRest itemRest;
 
         if (item == null) {
             throw new ResourceNotFoundException("Could not find item with id " + uuid);
@@ -129,16 +133,20 @@ public class ItemIdentifierController {
         try {
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
-            doiIdentifierProvider.register(context, item, new TrueFilter());
-            if (context != null) {
-                context.commit();
+            if (doiIdentifierProvider != null) {
+                doiIdentifierProvider.register(context, item, new TrueFilter());
             }
         } catch (IdentifierNotFoundException e) {
-            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+            // Log?
+            return converter.toRest(item, utils.obtainProjection());
         } catch (IdentifierException e) {
             throw new IllegalStateException("Failed to register identifier: " + identifier);
         }
-        return ControllerUtils.toEmptyResponse(HttpStatus.CREATED);
+        itemService.updateLastModified(context, item);
+        itemRest = converter.toRest(item, utils.obtainProjection());
+        context.complete();
+        ItemResource itemResource = converter.toResource(itemRest);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), itemResource);
     }
 
 }
