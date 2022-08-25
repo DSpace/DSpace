@@ -40,9 +40,14 @@
         <property name="key" value="journal" />
     </bean>
     
-    <bean id="bibtexAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcAuthors"/>
-        <property name="key" value="author" />
+    <bean id="bibtexAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SplitMetadataContributor">
+        <constructor-arg name="innerContributor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+                <property name="field" ref="dcAuthors"/>
+                <property name="key" value="author" />
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="regex" value="\sand\s"/>
     </bean>
     
     <bean id="bibtexTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
