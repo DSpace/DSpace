@@ -22,7 +22,8 @@ import javax.naming.directory.SearchResult;
 import javax.servlet.http.HttpServletRequest;
 
 import edu.umd.lib.dspace.authenticate.Ldap;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
@@ -46,7 +47,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class LdapImpl implements Ldap {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(LdapImpl.class);
+    private static Logger log = LogManager.getLogger(LdapImpl.class);
 
     private org.dspace.core.Context context = null;
     private DirContext ctx = null;

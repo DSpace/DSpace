@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObjectServiceImpl;
@@ -36,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class UnitServiceImpl extends DSpaceObjectServiceImpl<Unit> implements UnitService {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(UnitServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(UnitServiceImpl.class);
 
     @Autowired(required = true)
     protected UnitDAO unitDAO;
