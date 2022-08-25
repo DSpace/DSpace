@@ -72,16 +72,13 @@ import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
-import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.workflow.WorkflowService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -93,12 +90,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private EPersonService ePersonService;
-
-    @Autowired
-    private WorkflowService workflowService;
-
-    @Autowired
-    private RegistrationDataDAO registrationDataDAO;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -1290,7 +1281,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchPassword() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
@@ -1387,7 +1378,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchPasswordForNonAdminUser() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
@@ -1565,7 +1556,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchPasswordNotInitialised() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
@@ -2010,6 +2001,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchReplacePasswordWithToken() throws Exception {
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
@@ -2223,7 +2215,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void postEPersonWithTokenWithoutEmailProperty() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         ObjectMapper mapper = new ObjectMapper();
 
         String newRegisterEmail = "new-register@fake-email.com";
@@ -2287,7 +2279,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void postEPersonWithTokenWithEmailProperty() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         ObjectMapper mapper = new ObjectMapper();
 
         String newRegisterEmail = "new-register@fake-email.com";
@@ -2349,7 +2341,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void postEPersonWithTokenWithEmailAndSelfRegisteredProperty() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         ObjectMapper mapper = new ObjectMapper();
 
         String newRegisterEmail = "new-register@fake-email.com";
@@ -2802,7 +2794,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void postEPersonWithTokenWithEmailPropertyAnonUser() throws Exception {
-
+        configurationService.setProperty("authentication-password.regex-validation.pattern", "");
         ObjectMapper mapper = new ObjectMapper();
 
         String newRegisterEmail = "new-register@fake-email.com";
