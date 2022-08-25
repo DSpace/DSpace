@@ -53,6 +53,14 @@ should be placed in:
 * dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-services.xml
 * dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
 
+### discovery.xml
+
+The "dspace/config/spring/api/discovery.xml" file has been modified from the
+stock DSpace version. The support the "dspace-server-webapp" tests, the
+"stock" DSpace "dspace/config/spring/api/discovery.xml" file should be placed in
+
+* dspace-server-webapp/src/test/data/dspaceFolder/config/spring/api/discovery.xml
+
 ## Database Schema Changes
 
 Database schema changes to support new entities are implemented as Flyway
