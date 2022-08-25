@@ -152,7 +152,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
      * Retrieves a map of useful metadata about the File (size, checksum, modified)
      * 
      * @param file The File to analyze
-     * @param attrs The map where we are storing values 
+     * @param attrs The map where we are storing values
      * @return Map of updated metadatas / attrs
      * @throws IOException
      */
