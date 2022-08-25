@@ -92,27 +92,26 @@ this will fail with an error message similar:
 
 ```bash
 [ERROR] Failures:
-[ERROR]   UnitTest>AbstractUnitTest.initDatabase:80 Error initializing database: Flyway migration error occurred:
-Migration V6.2_2018.04.05__drum-0_LIBDRUM-511_hibernate_migration_of_customization.sql failed
+[ERROR]   CASAuthenticationTest>AbstractUnitTest.initDatabase:80 Error initializing database: Flyway migration error occurred: Migration V6.2_2018.04.05__drum-0_LIBDRUM-511_hibernate_migration_of_customization.sql failed
 ---------------------------------------------------------------------------------------------
 SQL State  : 90085
 Error Code : 90085
-Message    : Index "PRIMARY_KEY_FF" belongs to constraint "CONSTRAINT_F267"; SQL statement:
-ALTER TABLE etdunit DROP PRIMARY KEY [90085-187]
+Message    : Index "PRIMARY_KEY_FF" belongs to constraint "CONSTRAINT_D"; SQL statement:
 ...
 ```
 
-indicating that there is an "implicit" constraint (named "CONSTRAINT_F267" in
+indicating that there is an "implicit" constraint (named "CONSTRAINT_D" in
 the example).
 
 This implicit constraint must be removed, so to actually change the primary key
 in the example, the following commands are necessary:
 
 ```sql
-ALTER TABLE etdunit DROP CONSTRAINT CONSTRAINT_F267;
-ALTER TABLE etdunit DROP PRIMARY KEY;
+ALTER TABLE etdunit DROP CONSTRAINT CONSTRAINT_D CASCADE;
 ALTER TABLE etdunit ADD PRIMARY KEY (uuid);
 ```
+
+The "CASCADE" option deletes the primary key associated with the constraint.
 
 The implicit contraint names are believed to be stable, so while kludgy, this
 should work consistently.
