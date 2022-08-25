@@ -28,7 +28,6 @@
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
-                <!-- <bean class="org.dspace.authority.orcid.Orcidv2AuthorityValue"/> -->
                 <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/>
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
