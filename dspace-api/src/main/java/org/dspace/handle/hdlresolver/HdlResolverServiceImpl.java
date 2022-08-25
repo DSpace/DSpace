@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.hdlresolver;
+package org.dspace.handle.hdlresolver;
 
 import java.sql.SQLException;
 

@@ -21,7 +21,6 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.hamcrest.core.StringContains;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -30,19 +29,6 @@ import org.springframework.test.web.servlet.ResultMatcher;
  *
  */
 public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTest {
-
-    /**
-     * This method will be run before every test as per @Before. It will initialize
-     * resources required for the tests.
-     *
-     * Other methods can be annotated with @Before here or in subclasses but no
-     * execution order is guaranteed
-     */
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     /**
      * Verifies that any mapped <code>hdlIdentifier</code> returns the

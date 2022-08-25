@@ -5,11 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.hdlresolver;
+package org.dspace.handle.hdlresolver;
 
 import org.dspace.core.Context;
 
 /**
+ * Service used to for utilities involving {@code HdlResolverDTO} and its
+ * resolution to handle URI and vice-versa.
+ * 
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.it)
  *
  */

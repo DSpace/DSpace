@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.handle.hdlresolver.HdlResolverDTO;
+import org.dspace.handle.hdlresolver.HdlResolverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,12 +51,18 @@ public class HdlResolverRestController {
     /**
      * REST GET Method used to find and retrieve the URL of a target Handle. It
      * should return only one item, if found, else a null body value.
-     * 
+     * </br>
      * Generate an <code>HttpStatus.BAD_REQUEST</code> 400 Error if the handle used
      * in path isn't valid.
-     * 
-     * The response type will be the same that is in the /xmlui/handleresolver/resolve
-     * (<code>application/json;charset=UTF-8</code>)
+     * </br>
+     * The response type will be (<code>application/json;charset=UTF-8</code>)
+     * a string representing an array-like list of handlers:
+     * </br>
+     * Example:
+     *      <ul>
+     *          <li>Request: GET - http://{dspace.url}/hdlResolver/handleIdExample/1</li>
+     *          <li>Response: 200 - ["http://localhost/handle/hanldeIdExample1"]
+     *      </ul>
      * 
      * @param request HttpServletRequest
      * @return One element List or <code>null</code> with status 200
