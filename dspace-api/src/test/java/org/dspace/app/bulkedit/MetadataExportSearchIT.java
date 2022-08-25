@@ -39,10 +39,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase {
 
     private String subject1 = "subject1";
