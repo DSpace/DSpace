@@ -18,14 +18,22 @@ import org.dspace.services.ConfigurationService;
  */
 public class UploadConfiguration {
 
-    @Inject
-    private ConfigurationService configurationService;
+    private final ConfigurationService configurationService;
 
     private String metadataDefinition;
     private List<AccessConditionOption> options;
     private Long maxSize;
     private Boolean required;
     private String name;
+
+    /**
+     * Construct a bitstream uploading configuration.
+     * @param configurationService DSpace configuration provided by the DI container.
+     */
+    @Inject
+    public UploadConfiguration(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
 
     /**
      * The list of access restriction types from which a submitter may choose.
