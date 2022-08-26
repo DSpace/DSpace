@@ -465,17 +465,17 @@ public abstract class AbstractMETSDisseminator
                                 Utils.copy(input, zip);
                                 input.close();
                             } else {
-                                log.warn("Adding zero-length file for Bitstream, SID="
-                                             + String.valueOf(bitstream.getSequenceID())
+                                log.warn("Adding zero-length file for Bitstream, uuid="
+                                             + String.valueOf(bitstream.getID())
                                              + ", not authorized for READ.");
                             }
                             zip.closeEntry();
                         } else if (unauth != null && unauth.equalsIgnoreCase("skip")) {
-                            log.warn("Skipping Bitstream, SID=" + String
-                                .valueOf(bitstream.getSequenceID()) + ", not authorized for READ.");
+                            log.warn("Skipping Bitstream, uuid=" + String
+                                .valueOf(bitstream.getID()) + ", not authorized for READ.");
                         } else {
                             throw new AuthorizeException(
-                                "Not authorized to read Bitstream, SID=" + String.valueOf(bitstream.getSequenceID()));
+                                "Not authorized to read Bitstream, uuid=" + String.valueOf(bitstream.getID()));
                         }
                     }
                 }
@@ -896,12 +896,12 @@ public abstract class AbstractMETSDisseminator
                             continue;
                         } else if (!(unauth != null && unauth.equalsIgnoreCase("zero"))) {
                             throw new AuthorizeException(
-                                "Not authorized to read Bitstream, SID=" + String.valueOf(bitstream.getSequenceID()));
+                                "Not authorized to read Bitstream, uuid=" + String.valueOf(bitstream.getID()));
                         }
                     }
 
-                    String sid = String.valueOf(bitstream.getSequenceID());
-                    String fileID = bitstreamIDstart + sid;
+                    String uuid = String.valueOf(bitstream.getID());
+                    String fileID = bitstreamIDstart + uuid;
                     edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
                     file.setID(fileID);
                     file.setSEQ(bitstream.getSequenceID());
@@ -924,7 +924,7 @@ public abstract class AbstractMETSDisseminator
                      * extracted text or a thumbnail, so we use the name to work
                      * out which bitstream to be in the same group as
                      */
-                    String groupID = "GROUP_" + bitstreamIDstart + sid;
+                    String groupID = "GROUP_" + bitstreamIDstart + uuid;
                     if ((bundle.getName() != null)
                         && (bundle.getName().equals("THUMBNAIL") ||
                         bundle.getName().startsWith("TEXT"))) {
@@ -934,7 +934,7 @@ public abstract class AbstractMETSDisseminator
                                                                    bitstream);
                         if (original != null) {
                             groupID = "GROUP_" + bitstreamIDstart
-                                + original.getSequenceID();
+                                + String.valueOf(original.getID());
                         }
                     }
                     file.setGROUPID(groupID);
@@ -1403,7 +1403,7 @@ public abstract class AbstractMETSDisseminator
         // if bare manifest, use external "persistent" URI for bitstreams
         if (params != null && (params.getBooleanProperty("manifestOnly", false))) {
             // Try to build a persistent(-ish) URI for bitstream
-            // Format: {site-base-url}/bitstream/{item-handle}/{sequence-id}/{bitstream-name}
+            // Format: {site-ui-url}/bitstreams/{bitstream-uuid}
             try {
                 // get handle of parent Item of this bitstream, if there is one:
                 String handle = null;
@@ -1414,26 +1414,13 @@ public abstract class AbstractMETSDisseminator
                         handle = bi.get(0).getHandle();
                     }
                 }
-                if (handle != null) {
-                    return configurationService
-                        .getProperty("dspace.ui.url")
-                        + "/bitstream/"
-                        + handle
-                        + "/"
-                        + String.valueOf(bitstream.getSequenceID())
-                        + "/"
-                        + URLEncoder.encode(bitstream.getName(), "UTF-8");
-                } else {   //no Handle assigned, so persistent(-ish) URI for bitstream is
-                    // Format: {site-base-url}/retrieve/{bitstream-internal-id}
-                    return configurationService
-                        .getProperty("dspace.ui.url")
-                        + "/retrieve/"
-                        + String.valueOf(bitstream.getID());
-                }
+                return configurationService
+                    .getProperty("dspace.ui.url")
+                    + "/bitstreams/"
+                    + String.valueOf(bitstream.getID())
+                    + "/download";
             } catch (SQLException e) {
                 log.error("Database problem", e);
-            } catch (UnsupportedEncodingException e) {
-                log.error("Unknown character set", e);
             }
 
             // We should only get here if we failed to build a nice URL above
