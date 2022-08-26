@@ -25,7 +25,7 @@ using docker.
 3. Create the local configuration file
 
     ```bash
-    cp dspace/config/local.cfg.TEMPLATE dspace/config/local.cfg
+    cp dspace/config/local.cfg.EXAMPLE dspace/config/local.cfg
     ```
 
 4. Edit the local configuration file:
