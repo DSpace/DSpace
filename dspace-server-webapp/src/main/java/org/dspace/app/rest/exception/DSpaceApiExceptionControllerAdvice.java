@@ -20,9 +20,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.orcid.exception.OrcidValidationException;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -115,7 +117,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    @ExceptionHandler( {UnprocessableEntityException.class})
+    @ExceptionHandler({ UnprocessableEntityException.class, ResourceAlreadyExistsException.class })
     protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
@@ -134,6 +136,18 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     }
 
     /**
+     * Handle the {@link OrcidValidationException} returning the exception message
+     * in the response, that always contains only the validation error codes (usable
+     * for example to show specific messages to users). No other details are present
+     * in the exception message.
+     */
+    @ExceptionHandler({ OrcidValidationException.class })
+    protected void handleOrcidValidationException(HttpServletRequest request, HttpServletResponse response,
+        OrcidValidationException ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    /**
      * Add user-friendly error messages to the response body for selected errors.
      * Since the error messages will be exposed to the API user, the
      * exception classes are expected to implement {@link TranslatableException}
@@ -148,6 +162,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         RESTEmptyWorkflowGroupException.class,
         EPersonNameNotProvidedException.class,
         GroupNameNotProvidedException.class,
+        GroupHasPendingWorkflowTasksException.class,
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {

@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.3-SNAPSHOT</version>
+      <version>7.4-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -254,30 +254,54 @@
             </exclusion>
          </exclusions>
       </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-        </dependency>
-
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj</artifactId>
+         <version>${solr.client.version}</version>
+      </dependency>
+      <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
+      <!-- The following Solr / Lucene dependencies also support integration tests -->
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-core</artifactId>
+         <version>${solr.client.version}</version>
+         <scope>test</scope>
+         <exclusions>
+            <!-- Newer version brought in by opencsv -->
+            <exclusion>
+               <groupId>org.apache.commons</groupId>
+               <artifactId>commons-text</artifactId>
+            </exclusion>
+            <!-- Newer Jetty version brought in via Parent POM -->
+            <exclusion>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-http</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-io</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-util</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-icu</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-smartcn</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-stempel</artifactId>
+         <scope>test</scope>
+      </dependency>
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>

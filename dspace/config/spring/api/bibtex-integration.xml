@@ -17,6 +17,7 @@
             only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
             what metadatafield is generated.
         </description>
+        <entry key-ref="dcType" value-ref="bibtexTypeContrib" />
         <entry key-ref="dcTitle" value-ref="bibtexTitleContrib" />
         <entry key-ref="dcAuthors" value-ref="bibtexAuthorsContrib" />
         <entry key-ref="dcJournal" value-ref="bibtexJournalContrib" />
@@ -48,5 +49,10 @@
         <property name="field" ref="dcTitle"/>
         <property name="key" value="title" />
     </bean>
-    
+
+    <bean id="bibtexTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcType"/>
+        <property name="key" value="type" />
+    </bean>
+
 </beans>

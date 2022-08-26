@@ -204,7 +204,7 @@ public class ItemExportCLITool {
                     || (mycollection.getType() != Constants.COLLECTION)) {
                     mycollection = null;
                 }
-            } else if (myIDString != null) {
+            } else {
                 mycollection = collectionService.find(c, UUID.fromString(myIDString));
             }
 

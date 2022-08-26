@@ -72,7 +72,12 @@ public class DSpaceOAIDataProvider {
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
 
-    @RequestMapping({"", "/"})
+    @RequestMapping("")
+    public void index(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        response.sendRedirect(request.getRequestURI() + "/");
+    }
+
+    @RequestMapping({"/"})
     public String indexAction(HttpServletResponse response, Model model) throws ServletException {
         try {
             XOAIManager manager = xoaiManagerResolver.getManager();

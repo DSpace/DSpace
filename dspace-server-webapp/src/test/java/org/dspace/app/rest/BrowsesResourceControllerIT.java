@@ -905,7 +905,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the entries in the Browse by Author endpoint
-        //with startsWith set to Ú (accented)
+        //with startsWith set to Ó (accented)
         getClient().perform(get("/api/discover/browses/author/entries?startsWith=Ó"))
 
                    //** THEN **
@@ -930,7 +930,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the entries in the Browse by Subject endpoint
-        //with startsWith set to Cana
+        //with startsWith set to Tele
         getClient().perform(get("/api/discover/browses/subject/entries?startsWith=Tele"))
 
                    //** THEN **
@@ -1049,8 +1049,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         // ---- BROWSES BY ITEM ----
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 1990
-        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+        //with startsWith set to 199
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=199")
                                 .param("size", "2"))
 
                    //** THEN **
@@ -1059,12 +1059,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 7 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect the totalElements to be the 2 items present in the repository
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
                    //We expect to jump to page 1 of the index
-                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$.page.size", is(2)))
-                   .andExpect(jsonPath("$._links.first.href", containsString("startsWith=1990")))
 
                    //Verify that the index jumps to the "Python" item.
                    .andExpect(jsonPath("$._embedded.items",
@@ -1085,19 +1084,16 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 7 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect the totalElements to be the 1 item present in the repository
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
                    //We expect to jump to page 2 in the index
-                   .andExpect(jsonPath("$.page.number", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$._links.self.href", containsString("startsWith=T")))
 
                    //Verify that the index jumps to the "T-800" item.
                    .andExpect(jsonPath("$._embedded.items",
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item7,
-                                                                                            "T-800", "2029"),
-                                               ItemMatcher.matchItemWithTitleAndDateIssued(item5,
-                                                                                            "Zeta Reticuli",
-                                                                                            "2018-01-01")
+                                                                                            "T-800", "2029")
                                        )));
 
         //** WHEN **
@@ -1113,8 +1109,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 3 items present in the collection
-                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   //We expect the totalElements to be the 1 item present in the collection
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
                    //As this is is a small collection, we expect to go-to page 0
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Blade")))
@@ -1123,9 +1119,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.items",
                            contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
                                                                                             "Blade Runner",
-                                                                                            "1982-06-25"),
-                                               ItemMatcher.matchItemWithTitleAndDateIssued(item3,
-                                                                                            "Python", "1990")
+                                                                                            "1982-06-25")
                                        )));
     }
 
@@ -1200,9 +1194,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
-        //with startsWith set to 1990 and Page to 3
-        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
-                                .param("size", "2").param("page", "2"))
+        //with startsWith set to 199 and Page to 1
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=199")
+                                .param("size", "1").param("page", "1"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -1210,20 +1204,98 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect the totalElements to be the 7 items present in the repository
-                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   //We expect the totalElements to be the 2 items present in the repository
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
                    //We expect to jump to page 1 of the index
-                   .andExpect(jsonPath("$.page.number", is(2)))
-                   .andExpect(jsonPath("$.page.size", is(2)))
-                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=1990")))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$._links.self.href", containsString("startsWith=199")))
 
-                   //Verify that the index jumps to the "Zeta Reticuli" item.
+                   //Verify that the index jumps to the "Java" item.
                    .andExpect(jsonPath("$._embedded.items",
-                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item7,
-                                                                                        "Zeta Reticuli", "2018-01-01"),
-                                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
-                                                                                        "Moon", "2018-01-02")
-                                       )));
+                        contains(
+                            ItemMatcher.matchItemWithTitleAndDateIssued(item3, "Java", "1995-05-23")
+                        )));
+    }
+
+
+    @Test
+    public void testBrowseByTitleStartsWithAndDiacritics() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. 2 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Número 1")
+                .withAuthor("Surname, Name")
+                .withIssueDate("2020")
+                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col1)
+                .withTitle("Numero 2")
+                .withAuthor("Surname, Name")
+                .withIssueDate("2010")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by Title endpoint
+        //with startsWith set to Num (unaccented)
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=Num")
+                        .param("size", "2"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+
+                //We expect the totalElements to be the 1 item present in the repository
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                //We expect to jump to page 2 in the index
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Num")))
+
+                //Verify that the index contains both items (the accented and the unaccented)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item1,
+                                        "Número 1", "2020"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Numero 2", "2010")
+                        )));
+
+        //An anonymous user browses the items in the Browse by Title endpoint
+        //with startsWith set to Núm (accented)
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=Núm")
+                        .param("size", "2"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+
+                //We expect the totalElements to be the 1 item present in the repository
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                //We expect to jump to page 2 in the index
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Núm")))
+
+                //Verify that the index contains both items (the accented and the unaccented)
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item1,
+                                        "Número 1", "2020"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Numero 2", "2010")
+                        )));
+
     }
 
     @Test

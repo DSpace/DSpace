@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.3-SNAPSHOT</version>
+        <version>7.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -135,7 +135,8 @@
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>fom-impl</artifactId>
-            <version>${axiom.version}</version>
+            <!-- CANNOT UPGRADE WITHOUT BREAKING sword2-server (see above) -->
+            <version>1.2.22</version>
             <exclusions>
                 <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
                      See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->

@@ -35,6 +35,9 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
     protected String fullNameMetadata;
 
     @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
     protected ItemService itemService;
 
     public RequestItemMetadataStrategy() {
@@ -88,13 +91,9 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
             }
 
             if (authors.isEmpty()) { // No author email addresses!  Fall back
-                String email = null;
-                String name = null;
-                ConfigurationService configurationService
-                        = DSpaceServicesFactory.getInstance().getConfigurationService();
                 //First get help desk name and email
-                email = configurationService.getProperty("mail.helpdesk");
-                name = configurationService.getProperty("mail.helpdesk.name");
+                String email = configurationService.getProperty("mail.helpdesk");
+                String name = configurationService.getProperty("mail.helpdesk.name");
                 // If help desk mail is null get the mail and name of admin
                 if (email == null) {
                     email = configurationService.getProperty("mail.admin");

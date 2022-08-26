@@ -103,7 +103,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
 
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token).perform(
-                MockMvcRequestBuilders.fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                       .file(file)
                                       .param("properties", mapper
                                               .writeValueAsString(bitstreamRest)))
@@ -167,7 +167,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                        input.getBytes());
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token)
-                .perform(MockMvcRequestBuilders.fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                .perform(MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                                .file(file))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.bundleName", is("TESTINGBUNDLE")))
@@ -223,7 +223,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
 
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token)
-                .perform(MockMvcRequestBuilders.fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                .perform(MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                                .file(file))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.uuid", notNullValue())).andReturn();
@@ -273,7 +273,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
 
         context.restoreAuthSystemState();
         getClient(token).perform(MockMvcRequestBuilders
-                                         .fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                                         .multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                          .file(file))
                         .andExpect(status().isForbidden());
 
@@ -315,7 +315,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                        input.getBytes());
 
         context.restoreAuthSystemState();
-        getClient().perform(MockMvcRequestBuilders.fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+        getClient().perform(MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                                   .file(file))
                    .andExpect(status().isUnauthorized());
 
@@ -367,7 +367,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
 
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token)
-                .perform(MockMvcRequestBuilders.fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                .perform(MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                                .file(file)
                                                .param("properties", mapper
                                                        .writeValueAsString(bitstreamRest)))
@@ -422,7 +422,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                         input.getBytes());
         context.restoreAuthSystemState();
         getClient(token)
-                .perform(MockMvcRequestBuilders.fileUpload("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                .perform(MockMvcRequestBuilders.multipart("/api/core/bundles/" + bundle.getID() + "/bitstreams")
                                                .file(file).file(file2))
                 .andExpect(status().isUnprocessableEntity());
     }

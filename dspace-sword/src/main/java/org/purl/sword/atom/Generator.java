@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.purl.sword.base.Namespaces;
 import org.purl.sword.base.SwordElementInterface;
@@ -62,7 +63,7 @@ public class Generator extends XmlElement implements SwordElementInterface {
     /**
      * The logger.
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Generator.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * The Xml name details for the element.
@@ -94,6 +95,7 @@ public class Generator extends XmlElement implements SwordElementInterface {
      *
      * @return The element.
      */
+    @Override
     public Element marshall() {
         Element element = new Element(getQualifiedName(), xmlName.getNamespace());
 
@@ -122,6 +124,7 @@ public class Generator extends XmlElement implements SwordElementInterface {
      * @throws UnmarshallException If the specified element is not an atom:generator
      *                             element, or if there is an error accessing the data.
      */
+    @Override
     public void unmarshall(Element generator)
         throws UnmarshallException {
         unmarshall(generator, null);
@@ -133,8 +136,8 @@ public class Generator extends XmlElement implements SwordElementInterface {
             return handleIncorrectElement(generator, validationProperties);
         }
 
-        ArrayList<SwordValidationInfo> validationItems = new ArrayList<SwordValidationInfo>();
-        ArrayList<SwordValidationInfo> attributeValidationItems = new ArrayList<SwordValidationInfo>();
+        ArrayList<SwordValidationInfo> validationItems = new ArrayList<>();
+        ArrayList<SwordValidationInfo> attributeValidationItems = new ArrayList<>();
 
         try {
             initialise();
@@ -228,7 +231,7 @@ public class Generator extends XmlElement implements SwordElementInterface {
                 new SwordValidationInfo(xmlName, attributeName,
                                         SwordValidationInfo.MISSING_ATTRIBUTE_WARNING,
                                         SwordValidationInfoType.WARNING));
-        } else if (validateAll && uri != null) {
+        } else if (validateAll) {
             result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_URI, uri));
         }
 
@@ -241,7 +244,7 @@ public class Generator extends XmlElement implements SwordElementInterface {
                 new SwordValidationInfo(xmlName, attributeName,
                                         SwordValidationInfo.MISSING_ATTRIBUTE_WARNING,
                                         SwordValidationInfoType.WARNING));
-        } else if (validateAll && version != null) {
+        } else if (validateAll) {
             result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_VERSION, version));
         }
 
@@ -306,6 +309,7 @@ public class Generator extends XmlElement implements SwordElementInterface {
     /**
      * Get a string representation.
      */
+    @Override
     public String toString() {
         return "Generator - content: " + getContent() +
             " version: " + getVersion() +

@@ -543,7 +543,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
         if (DELETED.equals(doiRow.getStatus()) || TO_BE_DELETED.equals(doiRow.getStatus())) {
             throw new DOIIdentifierException("You tried to update the metadata"
-                    + "of a DOI that is marked as DELETED.",
+                    + " of a DOI that is marked as DELETED.",
                     DOIIdentifierException.DOI_IS_DELETED);
         }
 

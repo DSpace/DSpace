@@ -56,14 +56,15 @@ public class IPTableTest {
         IPTable instance = new IPTable();
         // Add IP address
         instance.add(LOCALHOST);
-        // Add IP range
+        // Add IP range (contains 256 addresses)
         instance.add("192.168.1");
 
-        // Make sure both exist
+        // Make sure it returns the addresses for all ranges
         Set<String> ipSet = instance.toSet();
-        assertEquals(2, ipSet.size());
+        assertEquals(257, ipSet.size());
         assertTrue(ipSet.contains(LOCALHOST));
-        assertTrue(ipSet.contains("192.168.1"));
+        assertTrue(ipSet.contains("192.168.1.0"));
+        assertTrue(ipSet.contains("192.168.1.255"));
     }
 
     @Test
@@ -76,13 +77,13 @@ public class IPTableTest {
         assertEquals(1, instance.toSet().size());
 
         instance = new IPTable();
-        // Add IP range & then add an IP from within that range
+        // Add IP range w/ 256 addresses & then add an IP from within that range
         instance.add("192.168.1");
         instance.add("192.168.1.1");
         // Verify only the range exists
         Set<String> ipSet = instance.toSet();
-        assertEquals(1, ipSet.size());
-        assertTrue(ipSet.contains("192.168.1"));
+        assertEquals(256, ipSet.size());
+        assertTrue(ipSet.contains("192.168.1.1"));
 
         instance = new IPTable();
         // Now, switch order. Add IP address, then add a range encompassing that IP
@@ -90,8 +91,8 @@ public class IPTableTest {
         instance.add("192.168.1");
         // Verify only the range exists
         ipSet = instance.toSet();
-        assertEquals(1, ipSet.size());
-        assertTrue(ipSet.contains("192.168.1"));
+        assertEquals(256, ipSet.size());
+        assertTrue(ipSet.contains("192.168.1.1"));
     }
 
     /**
@@ -118,6 +119,48 @@ public class IPTableTest {
         instance.add("192.168.1");
         contains = instance.contains("192.168.1.1");
         assertTrue("IP within an add()ed range should match", contains);
+    }
+
+    @Test
+    public void testDashRangeContains() throws Exception {
+        IPTable instance = new IPTable();
+        instance.add("192.168.0.0 - 192.168.0.245");
+
+        assertTrue("Range should contain lower limit", instance.contains("192.168.0.0"));
+        assertTrue("Range should contain upper limit", instance.contains("192.168.0.245"));
+        assertTrue("Range should contain value in between limits", instance.contains("192.168.0.123"));
+        assertTrue("Range should contain value in between limits", instance.contains("192.168.0.234"));
+
+        assertFalse("Range should not contain value below lower limit", instance.contains("192.167.255.255"));
+        assertFalse("Range should not contain value above upper limit", instance.contains("192.168.0.246"));
+    }
+
+    @Test
+    public void testSubnetRangeContains() throws Exception {
+        IPTable instance = new IPTable();
+        instance.add("192.168.0.0/30");  // translates to 192.168.0.0 - 192.168.0.3
+
+        assertTrue("Range should contain lower limit", instance.contains("192.168.0.0"));
+        assertTrue("Range should contain upper limit", instance.contains("192.168.0.3"));
+        assertTrue("Range should contain values in between limits", instance.contains("192.168.0.1"));
+        assertTrue("Range should contain values in between limits", instance.contains("192.168.0.2"));
+
+        assertFalse("Range should not contain value below lower limit", instance.contains("192.167.255.255"));
+        assertFalse("Range should not contain value above upper limit", instance.contains("192.168.0.4"));
+    }
+
+    @Test
+    public void testImplicitRangeContains() throws Exception {
+        IPTable instance = new IPTable();
+        instance.add("192.168.1");
+
+        assertTrue("Range should contain lower limit", instance.contains("192.168.1.0"));
+        assertTrue("Range should contain upper limit", instance.contains("192.168.1.255"));
+        assertTrue("Range should contain values in between limits", instance.contains("192.168.1.123"));
+        assertTrue("Range should contain values in between limits", instance.contains("192.168.1.234"));
+
+        assertFalse("Range should not contain value below lower limit", instance.contains("192.168.0.0"));
+        assertFalse("Range should not contain value above upper limit", instance.contains("192.168.2.0"));
     }
 
     /**

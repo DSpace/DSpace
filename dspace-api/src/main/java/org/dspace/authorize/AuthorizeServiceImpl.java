@@ -7,6 +7,9 @@
  */
 package org.dspace.authorize;
 
+import static org.dspace.app.util.AuthorizeUtil.canCollectionAdminManageAccounts;
+import static org.dspace.app.util.AuthorizeUtil.canCommunityAdminManageAccounts;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -898,6 +901,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                               IndexableCollection.TYPE,
             null, null);
         return discoverResult.getTotalSearchResults();
+    }
+
+    @Override
+    public boolean isAccountManager(Context context) {
+        try {
+            return (canCommunityAdminManageAccounts() && isCommunityAdmin(context)
+                || canCollectionAdminManageAccounts() && isCollectionAdmin(context));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean performCheck(Context context, String query) throws SQLException {
