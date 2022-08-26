@@ -8,7 +8,7 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -146,7 +146,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         locale = Locale.ENGLISH;
         collection = collectionService.create(context, owningCommunity);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
-        additionalInfo = new HashMap<String, Object>();
+        additionalInfo = new HashMap<>();
         additionalInfo.put("arg1", "arg1");
         additionalInfo.put("arg2", "arg2");
         additionalInfo.put("arg3", "arg3");
@@ -177,7 +177,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         collection = collectionService.create(context, owningCommunity);
         collection.setLicense(context, templateLong);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
-        additionalInfo = new LinkedHashMap<String, Object>();
+        additionalInfo = new LinkedHashMap<>();
         additionalInfo.put("arg1", "arg1");
         additionalInfo.put("arg2", "arg2");
         additionalInfo.put("arg3", "arg3");

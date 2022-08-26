@@ -50,7 +50,7 @@ public class StatisticsDataSearches extends StatisticsData {
 
 
     @Override
-    public Dataset createDataset(Context context)
+    public Dataset createDataset(Context context, int facetMinCount)
         throws SQLException, SolrServerException, IOException, ParseException {
         // Check if we already have one.
         // If we do then give it back.
@@ -85,7 +85,7 @@ public class StatisticsDataSearches extends StatisticsData {
 
                     ObjectCount[] topCounts = solrLoggerService
                         .queryFacetField(query, fqBuffer.toString(), typeGenerator.getType(), typeGenerator.getMax(),
-                                         (typeGenerator.isPercentage() || typeGenerator.isIncludeTotal()), null);
+                                         (typeGenerator.isPercentage() || typeGenerator.isIncludeTotal()), null, 0);
                     long totalCount = -1;
                     if (typeGenerator.isPercentage() && 0 < topCounts.length) {
                         //Retrieve the total required to calculate the percentage
@@ -133,14 +133,15 @@ public class StatisticsDataSearches extends StatisticsData {
                                 queryString = "\"\"";
                             }
 
-                            ObjectCount totalPageViews = getTotalPageViews("query:" + queryString, defaultFilterQuery);
+                            ObjectCount totalPageViews = getTotalPageViews("query:" + queryString, defaultFilterQuery
+                                , facetMinCount);
                             dataset.addValueToMatrix(i, 3, pageViewFormat
                                 .format((float) totalPageViews.getCount() / queryCount.getCount()));
                         }
                     }
                 } else if (typeGenerator.getMode() == DatasetSearchGenerator.Mode.SEARCH_OVERVIEW_TOTAL) {
                     //Retrieve the total counts !
-                    ObjectCount totalCount = solrLoggerService.queryTotal(query, getSearchFilterQuery());
+                    ObjectCount totalCount = solrLoggerService.queryTotal(query, getSearchFilterQuery(), facetMinCount);
 
                     //Retrieve the filtered count by using the default filter query
                     StringBuilder fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -149,7 +150,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     }
                     fqBuffer.append(getSearchFilterQuery());
 
-                    ObjectCount totalFiltered = solrLoggerService.queryTotal(query, fqBuffer.toString());
+                    ObjectCount totalFiltered = solrLoggerService.queryTotal(query, fqBuffer.toString(), facetMinCount);
 
 
                     fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -159,7 +160,7 @@ public class StatisticsDataSearches extends StatisticsData {
                     fqBuffer.append("statistics_type:")
                             .append(SolrLoggerServiceImpl.StatisticsType.SEARCH_RESULT.text());
 
-                    ObjectCount totalPageViews = getTotalPageViews(query, defaultFilterQuery);
+                    ObjectCount totalPageViews = getTotalPageViews(query, defaultFilterQuery, facetMinCount);
 
                     dataset = new Dataset(1, 3);
                     dataset.setRowLabel(0, "");
@@ -221,7 +222,7 @@ public class StatisticsDataSearches extends StatisticsData {
         return query;
     }
 
-    protected ObjectCount getTotalPageViews(String query, String defaultFilterQuery)
+    protected ObjectCount getTotalPageViews(String query, String defaultFilterQuery, int facetMinCount)
             throws SolrServerException, IOException {
         StringBuilder fqBuffer;
         fqBuffer = new StringBuilder(defaultFilterQuery);
@@ -232,7 +233,7 @@ public class StatisticsDataSearches extends StatisticsData {
 
 
         //Retrieve the number of page views by this query !
-        return solrLoggerService.queryTotal(query, fqBuffer.toString());
+        return solrLoggerService.queryTotal(query, fqBuffer.toString(), facetMinCount);
     }
 
     /**

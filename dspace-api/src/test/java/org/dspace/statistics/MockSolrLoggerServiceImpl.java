@@ -9,13 +9,13 @@ package org.dspace.statistics;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
@@ -28,6 +28,7 @@ import com.maxmind.geoip2.record.Postal;
 import com.maxmind.geoip2.record.RepresentedCountry;
 import com.maxmind.geoip2.record.Traits;
 import org.dspace.solr.MockSolrServer;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class MockSolrLoggerServiceImpl
         // Mock GeoIP's DatabaseReader
         DatabaseReader reader = mock(DatabaseReader.class);
         // Ensure that any tests requesting a city() get a mock/fake CityResponse
-        when(reader.city(any(InetAddress.class))).thenReturn(mockCityResponse());
+        Mockito.lenient().when(reader.city(any(InetAddress.class))).thenReturn(mockCityResponse());
         // Save this mock DatabaseReader to be used by SolrLoggerService
         locationService = reader;
     }
@@ -66,8 +67,10 @@ public class MockSolrLoggerServiceImpl
      * @return faked CityResponse
      */
     private CityResponse mockCityResponse() {
-        List<String> cityNames = new ArrayList<>(Collections.singleton("New York"));
-        City city = new City(cityNames, 1, 1, new HashMap());
+        List<String> cityLocales = new ArrayList<String>(Collections.singleton("en"));
+        Map<String, String> cityNames = new HashMap<>();
+        cityNames.put("en", "New York");
+        City city = new City(cityLocales, 1, 1, cityNames);
 
         List<String> countryNames = new ArrayList<>(Collections.singleton("United States"));
         Country country = new Country(countryNames, 1, 1, "US", new HashMap());

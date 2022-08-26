@@ -27,14 +27,15 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.base.AtomDocumentRequest;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.ErrorCodes;
@@ -53,7 +54,7 @@ public class SWORDAuthenticator {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SWORDAuthenticator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SWORDAuthenticator.class);
 
     protected AuthenticationService authenticationService =
         AuthenticateServiceFactory.getInstance().getAuthenticationService();
@@ -72,6 +73,9 @@ public class SWORDAuthenticator {
 
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
+
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Does the given username and password authenticate for the
@@ -263,8 +267,8 @@ public class SWORDAuthenticator {
         }
 
         // first find out if we support on-behalf-of deposit
-        boolean mediated = ConfigurationManager.getBooleanProperty(
-            "sword-server", "on-behalf-of.enable");
+        boolean mediated = configurationService.getBooleanProperty(
+            "sword-server.on-behalf-of.enable");
         if (!mediated && obo != null) {
             // user is trying to do a mediated deposit on a repository which does not support it
             log.error(
@@ -273,7 +277,7 @@ public class SWORDAuthenticator {
                                           "Mediated deposit to this service is not permitted");
         }
 
-        log.info(LogManager.getHeader(context, "sword_authenticate",
+        log.info(LogHelper.getHeader(context, "sword_authenticate",
                                       "username=" + un + ",on_behalf_of=" + obo));
 
         try {
@@ -337,14 +341,14 @@ public class SWORDAuthenticator {
             if (!authenticated) {
                 // decide what kind of error to throw
                 if (ep != null) {
-                    log.info(LogManager.getHeader(context,
+                    log.info(LogHelper.getHeader(context,
                                                   "sword_unable_to_set_user", "username=" + un));
                     throw new SWORDAuthenticationException(
                         "Unable to authenticate the supplied used");
                 } else {
                     // FIXME: this shouldn't ever happen now, but may as well leave it in just in case
                     // there's a bug elsewhere
-                    log.info(LogManager.getHeader(context,
+                    log.info(LogHelper.getHeader(context,
                                                   "sword_unable_to_set_on_behalf_of",
                                                   "username=" + un + ",on_behalf_of=" + obo));
                     throw new SWORDAuthenticationException(

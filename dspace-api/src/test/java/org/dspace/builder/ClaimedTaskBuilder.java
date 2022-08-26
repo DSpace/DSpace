@@ -16,10 +16,8 @@ import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.event.Event;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
@@ -88,15 +86,13 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             // temporary switch to the wf user
             EPerson submitter = context.getCurrentUser();
             context.setCurrentUser(user);
-            XmlWorkflowServiceFactory factory = (XmlWorkflowServiceFactory) XmlWorkflowServiceFactory.getInstance();
+            XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
             Workflow workflow = factory.getWorkflowFactory().getWorkflow(task.getWorkflowItem().getCollection());
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
             workflowService
                 .doState(context, user, null, task.getWorkflowItem().getID(), workflow,
                     currentActionConfig);
-            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, task.getWorkflowItem().getItem().getID(), null,
-                itemService.getIdentifiers(context, task.getWorkflowItem().getItem())));
             claimedTask = getService().findByWorkflowIdAndEPerson(context, workflowItem, user);
             // restore the submitter as current user
             context.setCurrentUser(submitter);
@@ -128,6 +124,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             workspaceItem = c.reloadEntity(workspaceItem);

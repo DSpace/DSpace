@@ -16,10 +16,11 @@ import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class allows the running of the DSpace statistic tools
@@ -56,19 +57,12 @@ public class CreateStatReport {
     /**
      * File suffix for log files
      */
-    private static String outputSuffix = ".dat";
+    private static final String outputSuffix = ".dat";
 
     /**
      * User context
      */
     private static Context context;
-
-    /**
-     * the config file from which to configure the analyser
-     */
-    private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
-        File.separator + "config" + File.separator +
-        "dstat.cfg";
 
     /**
      * Default constructor
@@ -81,8 +75,12 @@ public class CreateStatReport {
      * Usage: java CreateStatReport -r <statistic to run>
      */
     public static void main(String[] argv) throws Exception {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Open the statistics config file
+        final String configFile = configurationService.getProperty("dspace.dir")
+                + File.separator + "config" + File.separator + "dstat.cfg";
         FileInputStream fis = new java.io.FileInputStream(new File(configFile));
         Properties config = new Properties();
         config.load(fis);
@@ -108,11 +106,11 @@ public class CreateStatReport {
         context.turnOffAuthorisationSystem();
 
         //get paths to directories
-        outputLogDirectory = ConfigurationManager.getProperty("log.report.dir") + File.separator;
-        outputReportDirectory = ConfigurationManager.getProperty("report.dir") + File.separator;
+        outputLogDirectory = configurationService.getProperty("log.report.dir") + File.separator;
+        outputReportDirectory = configurationService.getProperty("report.dir") + File.separator;
 
         //read in command line variable to determine which statistic to run
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("r", "report", true, "report");
         CommandLine line = parser.parse(options, argv);
@@ -168,22 +166,19 @@ public class CreateStatReport {
         String myLogDir = null;
         String myFileTemplate = null;
         String myConfigFile = null;
-        StringBuffer myOutFile = null;
-        Date myStartDate = null;
-        Date myEndDate = null;
         boolean myLookUp = false;
 
         Calendar start = new GregorianCalendar(calendar.get(Calendar.YEAR),
                                                calendar.get(Calendar.MONTH),
                                                calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
-        myStartDate = start.getTime();
+        Date myStartDate = start.getTime();
 
         Calendar end = new GregorianCalendar(calendar.get(Calendar.YEAR),
                                              calendar.get(Calendar.MONTH),
                                              calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        myEndDate = end.getTime();
+        Date myEndDate = end.getTime();
 
-        myOutFile = new StringBuffer(outputLogDirectory);
+        StringBuilder myOutFile = new StringBuilder(outputLogDirectory);
         myOutFile.append(outputPrefix);
         myOutFile.append(calendar.get(Calendar.YEAR));
         myOutFile.append("-");
@@ -209,12 +204,11 @@ public class CreateStatReport {
         String myLogDir = null;
         String myFileTemplate = null;
         String myConfigFile = null;
-        StringBuffer myOutFile = null;
         Date myStartDate = null;
         Date myEndDate = null;
         boolean myLookUp = false;
 
-        myOutFile = new StringBuffer(outputLogDirectory);
+        StringBuilder myOutFile = new StringBuilder(outputLogDirectory);
         myOutFile.append(outputPrefix);
         myOutFile.append(calendar.get(Calendar.YEAR));
         myOutFile.append("-");
@@ -243,9 +237,6 @@ public class CreateStatReport {
         String myLogDir = null;
         String myFileTemplate = null;
         String myConfigFile = null;
-        StringBuffer myOutFile = null;
-        Date myStartDate = null;
-        Date myEndDate = null;
         boolean myLookUp = false;
 
         Calendar reportEndDate = new GregorianCalendar(calendar.get(Calendar.YEAR),
@@ -258,14 +249,14 @@ public class CreateStatReport {
             Calendar start = new GregorianCalendar(currentMonth.get(Calendar.YEAR),
                                                    currentMonth.get(Calendar.MONTH),
                                                    currentMonth.getActualMinimum(Calendar.DAY_OF_MONTH));
-            myStartDate = start.getTime();
+            Date myStartDate = start.getTime();
 
             Calendar end = new GregorianCalendar(currentMonth.get(Calendar.YEAR),
                                                  currentMonth.get(Calendar.MONTH),
                                                  currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
-            myEndDate = end.getTime();
+            Date myEndDate = end.getTime();
 
-            myOutFile = new StringBuffer(outputLogDirectory);
+            StringBuilder myOutFile = new StringBuilder(outputLogDirectory);
             myOutFile.append(outputPrefix);
             myOutFile.append(currentMonth.get(Calendar.YEAR));
             myOutFile.append("-");
@@ -291,11 +282,9 @@ public class CreateStatReport {
         String outputPrefix = "report-general-";
 
         String myFormat = "html";
-        StringBuffer myInput = null;
-        StringBuffer myOutput = null;
         String myMap = null;
 
-        myInput = new StringBuffer(outputLogDirectory);
+        StringBuilder myInput = new StringBuilder(outputLogDirectory);
         myInput.append(inputPrefix);
         myInput.append(calendar.get(Calendar.YEAR));
         myInput.append("-");
@@ -304,7 +293,7 @@ public class CreateStatReport {
         myInput.append(calendar.get(Calendar.DAY_OF_MONTH));
         myInput.append(outputSuffix);
 
-        myOutput = new StringBuffer(outputReportDirectory);
+        StringBuilder myOutput = new StringBuilder(outputReportDirectory);
         myOutput.append(outputPrefix);
         myOutput.append(calendar.get(Calendar.YEAR));
         myOutput.append("-");
@@ -330,8 +319,6 @@ public class CreateStatReport {
         String outputPrefix = "report-";
 
         String myFormat = "html";
-        StringBuffer myInput = null;
-        StringBuffer myOutput = null;
         String myMap = null;
 
         Calendar reportEndDate = new GregorianCalendar(calendar.get(Calendar.YEAR),
@@ -342,14 +329,14 @@ public class CreateStatReport {
 
         while (currentMonth.before(reportEndDate)) {
 
-            myInput = new StringBuffer(outputLogDirectory);
+            StringBuilder myInput = new StringBuilder(outputLogDirectory);
             myInput.append(inputPrefix);
             myInput.append(currentMonth.get(Calendar.YEAR));
             myInput.append("-");
             myInput.append(currentMonth.get(Calendar.MONTH) + 1);
             myInput.append(outputSuffix);
 
-            myOutput = new StringBuffer(outputReportDirectory);
+            StringBuilder myOutput = new StringBuilder(outputReportDirectory);
             myOutput.append(outputPrefix);
             myOutput.append(currentMonth.get(Calendar.YEAR));
             myOutput.append("-");
@@ -374,18 +361,16 @@ public class CreateStatReport {
         String outputPrefix = "report-";
 
         String myFormat = "html";
-        StringBuffer myInput = null;
-        StringBuffer myOutput = null;
         String myMap = null;
 
-        myInput = new StringBuffer(outputLogDirectory);
+        StringBuilder myInput = new StringBuilder(outputLogDirectory);
         myInput.append(inputPrefix);
         myInput.append(calendar.get(Calendar.YEAR));
         myInput.append("-");
         myInput.append(calendar.get(Calendar.MONTH) + 1);
         myInput.append(outputSuffix);
 
-        myOutput = new StringBuffer(outputReportDirectory);
+        StringBuilder myOutput = new StringBuilder(outputReportDirectory);
         myOutput.append(outputPrefix);
         myOutput.append(calendar.get(Calendar.YEAR));
         myOutput.append("-");
@@ -405,6 +390,5 @@ public class CreateStatReport {
         System.out.println(
             "Available: <stat-initial> <stat-general> <stat-monthly> <stat-report-initial> <stat-report-general> " +
                 "<stat-report-monthly>");
-        return;
     }
 }

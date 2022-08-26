@@ -8,8 +8,10 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -17,6 +19,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataField_;
 import org.dspace.content.MetadataSchema;
@@ -24,6 +27,7 @@ import org.dspace.content.MetadataSchema_;
 import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataField object.
@@ -33,6 +37,17 @@ import org.dspace.core.Context;
  * @author kevinvandevelde at atmire.com
  */
 public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> implements MetadataFieldDAO {
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldDAOImpl.class);
+
+    /**
+     * Cache for improvement the performance of searching metadata fields
+     * This cache only stores IDs, the actual MetadataField is retrieved from hibernate
+     */
+    private static Map<String, Integer> cachedFields = new HashMap();
+
     protected MetadataFieldDAOImpl() {
         super();
     }
@@ -79,6 +94,30 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     @Override
     public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier)
         throws SQLException {
+        String key = metadataSchema + "." + element + "." + qualifier;
+        if (cachedFields.containsKey(key)) {
+            Session session = getHibernateSession(context);
+            MetadataField metadataField = null;
+            try {
+                metadataField = session.load(MetadataField.class, cachedFields.get(key));
+            } catch (Throwable e) {
+                log.error("Failed to load metadata field " + key + " using ID " + cachedFields.get(key));
+            }
+            try {
+                if (metadataField != null &&
+                        (metadataField.getMetadataSchema().getName() + "." + metadataField.getElement() +
+                                "." + metadataField.getQualifier()).equals(key)) {
+                    return metadataField;
+                } else {
+                    cachedFields.remove(key);
+                }
+            } catch (Throwable e) {
+                log.error("Failed to verify consistence of metadata field " + key +
+                        " using ID " + cachedFields.get(key));
+                cachedFields.clear();
+            }
+        }
+
         Query query;
 
         if (StringUtils.isNotBlank(qualifier)) {
@@ -103,7 +142,11 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         }
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-        return singleResult(query);
+        MetadataField metadataField = singleResult(query);
+        if (metadataField != null) {
+            cachedFields.put(key, metadataField.getID());
+        }
+        return metadataField;
     }
 
     @Override

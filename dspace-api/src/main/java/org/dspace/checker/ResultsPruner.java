@@ -19,12 +19,14 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Manages the deletion of results from the checksum history. It uses the
@@ -40,7 +42,7 @@ public final class ResultsPruner {
     /**
      * Default logger.
      */
-    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(ResultsPruner.class);
+    private static final Logger LOG = LogManager.getLogger(ResultsPruner.class);
 
     /**
      * Factory method for the default results pruner configuration using
@@ -51,12 +53,13 @@ public final class ResultsPruner {
      */
     public static ResultsPruner getDefaultPruner(Context context) {
         try {
-            return getPruner(context, ConfigurationManager.getProperties());
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            return getPruner(context, configurationService.getProperties());
         } catch (FileNotFoundException e) {
             throw new IllegalStateException(
                 "VeryExceptionalException - config file not there! ", e);
         }
-
     }
 
 

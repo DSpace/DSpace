@@ -12,14 +12,14 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -41,7 +41,7 @@ public class RestartWorkflow {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RestartWorkflow.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RestartWorkflow.class);
 
     public static boolean useWorkflowSendEmail = false;
 
@@ -58,7 +58,7 @@ public class RestartWorkflow {
             Context context = new Context();
             context.turnOffAuthorisationSystem();
             // create an options object and populate it
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
 
             Options options = new Options();
             options.addOption("e", "eperson", true,
@@ -137,7 +137,7 @@ public class RestartWorkflow {
                 WorkspaceItem wsi = workflowService
                     .sendWorkflowItemBackSubmission(context, workflowItem, myEPerson, provenance, "");
 
-                log.info(LogManager.getHeader(context, "restart_workflow", "workflow_item_id="
+                log.info(LogHelper.getHeader(context, "restart_workflow", "workflow_item_id="
                     + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
                     + "collection_id=" + workflowItem.getCollection().getID()));
 

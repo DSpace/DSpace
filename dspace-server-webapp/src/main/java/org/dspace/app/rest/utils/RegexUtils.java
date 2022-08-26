@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.utils;
 
+/**
+ * Spring URI templates for matching various types of request parameters,
+ * to use with {@code @RequestMapping}.
+ */
 public class RegexUtils {
 
     private RegexUtils(){}
@@ -28,11 +32,18 @@ public class RegexUtils {
      * identifier (digits or uuid)
      */
     public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG = "/{id:^(?!^\\d+$)" +
-        "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-\\.]+$+}";
+        "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)"
+        + "[\\w+\\-\\.:]+$+}";
 
     /**
      * Regular expression in the request mapping to accept number as identifier
      */
     public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT = "/{id:\\d+}";
+
+    /**
+     * Regular expression to accept a string of 32 hexadecimal digits.
+     */
+    public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32
+            = "/{id:[0-9a-fA-F]{32}}";
 
 }

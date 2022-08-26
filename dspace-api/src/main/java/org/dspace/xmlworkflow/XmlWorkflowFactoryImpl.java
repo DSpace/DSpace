@@ -24,15 +24,17 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- * The workflowfactory is responsible for parsing the workflow xml file and is used to retrieve info about the workflow:
- * - the workflow for a certain collection
- * - collections mapped to a certain workflow
- * - collections not mapped to any workflow
- * - configured workflows and the default workflow
- * - workflow action by name
+ * This is injected with the external workflow configuration and is used to
+ * retrieve information about the workflow:
+ * <ul>
+ *   <li>the workflow for a certain collection
+ *   <li>collections mapped to a certain workflow
+ *   <li>collections not mapped to any workflow
+ *   <li>configured workflows and the default workflow
+ *   <li>workflow action by name
+ * </ul>
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -44,8 +46,9 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
 
     public static final String LEGACY_WORKFLOW_NAME = "defaultWorkflow";
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryImpl.class);
 
+    /** Map Handles into Workflows. */
     private Map<String, Workflow> workflowMapping;
 
     @Autowired
@@ -70,7 +73,11 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                 "Error while retrieving workflow for the following collection: " + collection.getHandle());
     }
 
-    @Required
+    /**
+     * Inject the mapping from Collection Handle into Workflow.
+     * @param workflowMapping map from Handle name to Workflow object.
+     */
+    @Autowired(required = true)
     public void setWorkflowMapping(Map<String, Workflow> workflowMapping) {
         this.workflowMapping = workflowMapping;
     }
@@ -97,7 +104,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     }
 
     @Override
-    public List<Collection> getCollectionHandlesMappedToWorklow(Context context, String workflowName) {
+    public List<Collection> getCollectionHandlesMappedToWorkflow(Context context, String workflowName) {
         List<Collection> collectionsMapped = new ArrayList<>();
         for (String handle : this.workflowMapping.keySet()) {
             if (this.workflowMapping.get(handle).getID().equals(workflowName)) {
@@ -107,7 +114,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                         collectionsMapped.add(collection);
                     }
                 } catch (SQLException e) {
-                    log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorklow trying to " +
+                    log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorkflow trying to " +
                             "retrieve collection with handle: " + handle, e);
                 }
             }

@@ -34,9 +34,12 @@ public class SearchEventConverter {
                                                                              null);
         usageSearchEvent.setQuery(searchEventRest.getQuery());
         usageSearchEvent.setDsoType(searchEventRest.getDsoType());
-        IndexableObject scopeObject = scopeResolver.resolveScope(context, String.valueOf(searchEventRest.getScope()));
-        if (scopeObject instanceof DSpaceObject) {
-            usageSearchEvent.setScope((DSpaceObject) scopeObject);
+        if (searchEventRest.getScope() != null) {
+            IndexableObject scopeObject =
+                    scopeResolver.resolveScope(context, String.valueOf(searchEventRest.getScope()));
+            if (scopeObject instanceof DSpaceObject) {
+                usageSearchEvent.setScope((DSpaceObject) scopeObject);
+            }
         }
         usageSearchEvent.setConfiguration(searchEventRest.getConfiguration());
         if (searchEventRest.getAppliedFilters() != null) {

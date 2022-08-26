@@ -18,10 +18,10 @@ import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
- * A class that contains utililty methods related to the workflow
- * The adding/removing from claimed users and ensuring that
- * if multiple users have to perform these steps that a count is kept
- * so that no more then the allowed user count are allowed to perform their actions
+ * A class that contains utility methods related to the workflow.
+ * The adding/removing of claimed users, and ensuring that
+ * if multiple users have to perform these steps that a count is kept so that
+ * no more than the allowed user count are allowed to perform their actions.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -34,9 +34,9 @@ public interface WorkflowRequirementsService {
 
 
     /**
-     * Adds a claimed user in the metadata
-     * if enough users have claimed this task (claimed or finished) to meet the required number
-     * the pooled tasks will be deleted
+     * Adds a claimed user in the metadata.
+     * If enough users have claimed this task (claimed or finished) to meet the
+     * required number, the pooled tasks will be deleted.
      *
      * @param context the dspace context
      * @param wfi     the workflow item
@@ -53,8 +53,8 @@ public interface WorkflowRequirementsService {
         throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException;
 
     /**
-     * Adds a finished user in the metadata
-     * this method will also remove the user from the inprogress metadata
+     * Adds a finished user in the metadata.
+     * This method will also remove the user from the in-progress metadata.
      *
      * @param context the dspace context
      * @param wfi     the workflow item
@@ -65,5 +65,6 @@ public interface WorkflowRequirementsService {
     public void addFinishedUser(Context context, XmlWorkflowItem wfi, EPerson user)
         throws AuthorizeException, SQLException;
 
-    public void clearInProgressUsers(Context context, XmlWorkflowItem wfi) throws AuthorizeException, SQLException;
+    public void clearInProgressUsers(Context context, XmlWorkflowItem wfi)
+            throws AuthorizeException, SQLException;
 }

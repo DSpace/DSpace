@@ -20,7 +20,6 @@ import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author pbecker
@@ -30,7 +29,7 @@ public class DOIURIGenerator implements URIGenerator {
 
     protected static URIGenerator fallback;
 
-    @Required
+    @Autowired(required = true)
     public static void setFallback(URIGenerator fallback) {
         DOIURIGenerator.fallback = fallback;
     }

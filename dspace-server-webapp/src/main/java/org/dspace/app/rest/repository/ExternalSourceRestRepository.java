@@ -9,7 +9,10 @@ package org.dspace.app.rest.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ExternalSourceEntryRest;
 import org.dspace.app.rest.model.ExternalSourceRest;
@@ -73,6 +76,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
             .searchExternalDataObjects(externalSourceName, query, Math.toIntExact(pageable.getOffset()),
                     pageable.getPageSize());
         int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
+
         return converter.toRestPage(externalDataObjects, pageable, numberOfResults,
                                     utils.obtainProjection());
     }
@@ -89,10 +93,30 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public Page<ExternalSourceRest> findAll(Context context, Pageable pageable) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders();
-        return converter.toRestPage(externalSources, pageable, externalSources.size(),
-                                    utils.obtainProjection());
+        return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
+    }
+
+    /**
+     * Retrieves all ExternalDataProviders that supports the provided EntityType.
+     * 
+     * @param context       The relevant DSpace context
+     * @param pageable      The pagination information
+     * @param entityType    Entity type label
+     * @return
+     */
+    @PreAuthorize("permitAll()")
+    @SearchRestMethod(name = "findByEntityType")
+    public Page<ExternalSourceRest> findByEntityType(Context context, Pageable pageable,
+          @Parameter(required = true, value = "entityType") String entityType) {
+        List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders()
+                                                                        .stream()
+                                                                        .filter(ep -> ep.supportsEntityType(entityType))
+                                                                        .collect(Collectors.toList());
+
+        return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
 
     public Class<ExternalSourceRest> getDomainClass() {

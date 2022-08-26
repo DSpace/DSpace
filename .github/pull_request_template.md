@@ -1,7 +1,7 @@
 ## References
 _Add references/links to any related issues or PRs. These may include:_
-* Related to [REST Contract](https://github.com/DSpace/Rest7Contract) or an open REST Contract PR, if any
-* Fixes [GitHub issue](https://github.com/DSpace/DSpace/issues), if any
+* Fixes #[issue-number]
+* Related to [REST Contract](https://github.com/DSpace/Rest7Contract)
 
 ## Description
 Short summary of changes (1-2 sentences).

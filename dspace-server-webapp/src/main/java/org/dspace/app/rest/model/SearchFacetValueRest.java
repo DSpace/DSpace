@@ -22,7 +22,6 @@ public class SearchFacetValueRest extends RestAddressableModel {
     @JsonIgnore
     private String filterValue;
     private long count;
-    @JsonIgnore
     private String authorityKey;
     @JsonIgnore
     private String sortValue;

@@ -23,6 +23,7 @@ import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,6 +49,9 @@ public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
      *                          itemUuid param as UUID
      * @throws SQLException     If something goes wrong
      */
+    @PreAuthorize("@versioningSecurity.isEnableVersioning() && " +
+        "(hasPermission(@extractorOf.getVersionIdByItemUUID(#request, #itemUuid), 'VERSION', 'READ') || " +
+        "(@extractorOf.getVersionIdByItemUUID(#request, #itemUuid) == null && hasPermission(#itemUuid,'ITEM','READ')))")
     public VersionRest getItemVersion(@Nullable HttpServletRequest request,
                                       UUID itemUuid,
                                       @Nullable Pageable optionalPageable,

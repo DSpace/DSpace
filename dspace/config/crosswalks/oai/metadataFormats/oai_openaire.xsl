@@ -5,9 +5,9 @@
     detailed in the LICENSE and NOTICE files at the root of the source
     tree and available online at
 
-	Developed by Paulo Graça <paulo.graca@fccn.pt>
-	
-	> https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd
+    Developed by Paulo Graça <paulo.graca@fccn.pt>
+    
+    > https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd
 
  -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -42,6 +42,15 @@
             <!-- datacite:relatedIdentifier -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']" mode="datacite"/>
+            <!-- if dc.identifier.uri has more than 1 value -->
+            <xsl:if
+                test="count(doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value'])>1">
+                <datacite:alternateIdentifiers>
+                    <xsl:apply-templates
+                        select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']"
+                        mode="datacite_altid"/>
+                </datacite:alternateIdentifiers>
+            </xsl:if>
             <!-- datacite:dates and embargo -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']" mode="datacite"/>
@@ -81,7 +90,9 @@
             <!-- oaire:citation* -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='citation']" mode="oaire"/>
-
+            <!-- CREATIVE COMMON LICENSE -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='others']/doc:element[@name='cc']" mode="oaire" />
         </oaire:resource>
     </xsl:template>
 
@@ -471,35 +482,108 @@
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_relatedidentifier.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='identifier']" mode="datacite">
         <datacite:relatedIdentifiers>
-            <xsl:for-each select="./doc:element">
-                <xsl:apply-templates select="." mode="datacite_ids"/>
-            </xsl:for-each>
+            <xsl:apply-templates select="./doc:element" mode="datacite_ids"/>
         </datacite:relatedIdentifiers>
     </xsl:template>
-
+        
    <!-- datacite:relatedIdentifier -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='identifier']/doc:element"
-        mode="datacite_ids">
-        <xsl:variable name="relatedIdentifierType">
-            <xsl:call-template name="getRelatedIdentifierType">
-                <xsl:with-param name="element" select="."/>
+   <!-- handle: dc.identifier.issn -->
+    <xsl:template match="doc:element[@name='issn']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'ISSN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
             </xsl:call-template>
-        </xsl:variable>
-        <!-- Don't consider Handles as related identifiers -->
-        <xsl:variable name="isHandle">
-            <xsl:call-template name="isHandle">
-                <xsl:with-param name="field" select="./doc:field"/>
+        </xsl:for-each>
+    </xsl:template>
+
+    <!-- handle: dc.identifier.ismn -->
+    <xsl:template match="doc:element[@name='ismn']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value"
+                    select="concat('ISMN:',normalize-space(text()))"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
             </xsl:call-template>
-        </xsl:variable>
-        <xsl:if test="$isHandle = 'false'">
-            <datacite:relatedIdentifier>
-                <xsl:attribute name="relatedIdentifierType">
+        </xsl:for-each>
+    </xsl:template>
+
+    <!-- handle: dc.identifier.govdoc -->
+    <xsl:template match="doc:element[@name='govdoc']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value"
+                    select="concat('govdoc:',normalize-space(text()))"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>
+
+    <!-- handle: dc.identifier.isbn -->
+    <xsl:template match="doc:element[@name='isbn']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'ISBN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>
+
+    <!-- handle: dc.identifier.sici -->
+    <xsl:template match="doc:element[@name='sici']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value"
+                    select="concat('sici:',normalize-space(text()))"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>
+
+    <!-- handle: dc.identifier.other -->
+    <xsl:template match="doc:element[@name='other']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'URN'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>    
+
+    <!-- handle: dc.identifier.doi -->
+    <xsl:template match="doc:element[@name='doi']" mode="datacite_ids">
+        <xsl:for-each select=".//doc:field[@name='value']">
+            <xsl:call-template name="relatedIdentifierTemplate">
+                <xsl:with-param name="value" select="text()"/>
+                <xsl:with-param name="relatedIdentifierType" select="'DOI'"/>
+                <xsl:with-param name="relationType" select="'IsPartOf'"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </xsl:template>
+
+    <!-- handle: dc.identifier.* -->
+    <xsl:template match="doc:element" mode="datacite_ids"/>
+    
+    <!-- template for all relatedIdentifier -->
+    <xsl:template name="relatedIdentifierTemplate">
+        <xsl:param name="value"/>
+        <xsl:param name="relatedIdentifierType"/>
+        <xsl:param name="relationType"/>
+        <datacite:relatedIdentifier>
+            <xsl:attribute name="relatedIdentifierType">
                     <xsl:value-of select="$relatedIdentifierType"/>
                 </xsl:attribute>
-                <!-- relationType="Continues" relatedMetadataScheme="" schemeURI="" schemeType="" -->
-                <xsl:value-of select="./doc:element/doc:field[@name='value']/text()"/>
-            </datacite:relatedIdentifier>
-        </xsl:if>
+            <xsl:attribute name="relationType">
+                    <xsl:value-of select="$relationType"/>
+                </xsl:attribute>
+            <xsl:value-of select="normalize-space($value)"/>
+        </datacite:relatedIdentifier>
     </xsl:template>
 
 
@@ -509,8 +593,9 @@
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']"
         mode="datacite">
         <xsl:variable name="identifierType">
+            <!--  only consider the first dc.identifier.uri -->
             <xsl:call-template name="resolveFieldType">
-                <xsl:with-param name="field" select="./doc:element/doc:field[@name='value'][1]"/>
+                <xsl:with-param name="field" select="./doc:element[1]/doc:field[@name='value'][1]"/>
             </xsl:call-template>
         </xsl:variable>
         <!-- only process the first element -->
@@ -518,27 +603,59 @@
             <xsl:attribute name="identifierType">
                 <xsl:value-of select="$identifierType"/>
             </xsl:attribute>
-            <xsl:value-of select="./doc:element/doc:field[@name='value'][1]"/>
+            <xsl:value-of select="./doc:element[1]/doc:field[@name='value'][1]"/>
         </datacite:identifier>
     </xsl:template>
 
+    <!--  datacite:alternateIdentifier dc.identifier.uri  -->
+    <!--  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_alternativeidentifier.html -->
+    <xsl:template match="doc:element[@name='uri']" mode="datacite_altid">
+        <xsl:for-each select="./doc:element/doc:field[@name='value']">
+        <!-- don't process the first element -->
+            <xsl:if test="position()>1">
+                <xsl:variable name="identifierType">
+                    <xsl:call-template name="resolveFieldType">
+                        <xsl:with-param name="field" select="."/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <datacite:alternateIdentifier>
+                    <xsl:attribute name="alternateIdentifierType">
+                <xsl:value-of select="$identifierType"/>
+            </xsl:attribute>
+                    <xsl:value-of select="./text()"/>
+                </datacite:alternateIdentifier>
+            </xsl:if>
+        </xsl:for-each>
+    </xsl:template>
 
    <!-- datacite:rights -->
    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_accessrights.html -->
-    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element" mode="datacite">
+    <xsl:template match="doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']" mode="datacite">
+        <xsl:variable name="rightsValue" select="text()"/>
         <xsl:variable name="rightsURI">
             <xsl:call-template name="resolveRightsURI">
-                <xsl:with-param name="field" select="doc:field[@name='value']/text()"/>
+                <xsl:with-param name="field" select="$rightsValue"/>
             </xsl:call-template>
         </xsl:variable>
-        <datacite:rights>
-            <xsl:if test="$rightsURI">
-                <xsl:attribute name="rightsURI">
-                <xsl:value-of select="$rightsURI"/>
-            </xsl:attribute>
-            </xsl:if>
-            <xsl:value-of select="doc:field[@name='value']/text()"/>
-        </datacite:rights>
+        <xsl:variable name="lc_rightsValue">
+            <xsl:call-template name="lowercase">
+                <xsl:with-param name="value" select="$rightsValue"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <!-- We are checking to ensure that only values ending in "access" can be used as datacite:rights. 
+        This is a valid solution as we pre-normalize dc.rights values in openaire4.xsl to end in the term 
+        "access" according to COAR Controlled Vocabulary -->
+        <xsl:if test="ends-with($lc_rightsValue,'access')">
+            <datacite:rights>
+                <xsl:if test="$rightsURI">
+                    <xsl:attribute name="rightsURI">
+                    <xsl:value-of select="$rightsURI"/>
+                </xsl:attribute>
+                </xsl:if>
+                <xsl:value-of select="$rightsValue"/>
+            </datacite:rights>
+        </xsl:if>
     </xsl:template>
 
 
@@ -621,18 +738,22 @@
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_language.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']"
         mode="dc">
-        <dc:language>
-            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
-        </dc:language>
+        <xsl:for-each select="./doc:element/doc:field[@name='value']">
+	        <dc:language>
+	            <xsl:value-of select="./text()"/>
+	        </dc:language>
+        </xsl:for-each>
     </xsl:template>
 
 
     <!-- dc:publisher -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publisher.html -->
     <xsl:template match="doc:element[@name='dc']/doc:element[@name='publisher']" mode="dc">
-        <dc:publisher>
-            <xsl:value-of select="./doc:element/doc:field[@name='value']"/>
-        </dc:publisher>
+    	<xsl:for-each select="./doc:element/doc:field[@name='value']">
+	       <dc:publisher>
+	           <xsl:value-of select="./text()"/>
+	       </dc:publisher>
+        </xsl:for-each>
     </xsl:template>
 
 
@@ -1008,7 +1129,7 @@
     <xsl:template name="getRightsURI">
         <xsl:call-template name="resolveRightsURI">
             <xsl:with-param name="field"
-                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']/text()"/>
+                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value'and ends-with(translate(text(), $uppercase, $smallcase),'access')]/text()"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -1113,7 +1234,7 @@
    <!-- Other Auxiliary templates -->
    <!--  -->
     <xsl:param name="smallcase" select="'abcdefghijklmnopqrstuvwxyzàèìòùáéíóúýâêîôûãñõäëïöüÿåæœçðø'"/>
-    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'"/>    
+    <xsl:param name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÈÌÒÙÁÉÍÓÚÝÂÊÎÔÛÃÑÕÄËÏÖÜŸÅÆŒÇÐØ'"/>
 
    <!-- to retrieve a string in uppercase -->
     <xsl:template name="uppercase">
@@ -1237,7 +1358,7 @@
             <xsl:when test="$isDOI = 'true'">
                 <xsl:text>DOI</xsl:text>
             </xsl:when>
-            <xsl:when test="$isURL = 'true' and $isHandle = 'false'">
+            <xsl:when test="$isURL = 'true' and $isHandle = 'false' and $isDOI = 'false'">
                 <xsl:text>URL</xsl:text>
             </xsl:when>
             <xsl:otherwise>
@@ -1281,7 +1402,7 @@
                 <xsl:text>software</xsl:text>
             </xsl:when>
             <xsl:otherwise>
-                other research product
+                <xsl:text>other research product</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -1527,7 +1648,25 @@
         </xsl:if>
     </xsl:template>
 
-
+    <!-- Prepare data for CC License -->
+    <xsl:variable name="ccstart">
+        <xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']/doc:element/doc:field[@name='value']/text()"/>
+    </xsl:variable>
+    
+    <xsl:template
+        match="doc:element[@name='others']/doc:element[@name='cc']"
+        mode="oaire">
+        <oaire:licenseCondition>
+            <xsl:attribute name="startDate">
+                <xsl:value-of
+                    select="$ccstart"/>
+            </xsl:attribute>
+            <xsl:attribute name="uri">
+                <xsl:value-of select="./doc:field[@name='uri']/text()" />
+            </xsl:attribute>
+            <xsl:value-of select="./doc:field[@name='name']/text()" />
+        </oaire:licenseCondition>
+    </xsl:template>
 
     <!-- ignore all non specified text values or attributes -->
     <xsl:template match="text()|@*"/>

@@ -1,46 +1,49 @@
 
 # DSpace
 
-[![Build Status](https://travis-ci.com/DSpace/DSpace.png?branch=main)](https://travis-ci.com/DSpace/DSpace)
+[![Build Status](https://github.com/DSpace/DSpace/workflows/Build/badge.svg)](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild)
 
 [DSpace Documentation](https://wiki.lyrasis.org/display/DSDOC/) |
 [DSpace Releases](https://github.com/DSpace/DSpace/releases) |
 [DSpace Wiki](https://wiki.lyrasis.org/display/DSPACE/Home) |
 [Support](https://wiki.lyrasis.org/display/DSPACE/Support)
 
+## Overview
+
 DSpace open source software is a turnkey repository application used by more than
 2,000 organizations and institutions worldwide to provide durable access to digital resources.
 For more information, visit http://www.dspace.org/
 
-***
-:warning: **Work on DSpace 7 has begun on our `main` branch.** This means that there is NO user interface on this `main` branch. DSpace 7 will feature a new, unified [Angular](https://angular.io/) user interface, along with an enhanced, rebuilt REST API. The latest status of this work can be found on the [DSpace 7 Working Group](https://wiki.lyrasis.org/display/DSPACE/DSpace+7+Working+Group) page.  Additionally, the codebases can be found in the following places:
-  * DSpace 7 REST API work is occurring on the [`main` branch](https://github.com/DSpace/DSpace/tree/main/dspace-server-webapp) of this repository.
-     * The REST Contract is at https://github.com/DSpace/Rest7Contract
-  * DSpace 7 Angular UI work is occurring at https://github.com/DSpace/dspace-angular
+DSpace consists of both a Java-based backend and an Angular-based frontend.
 
-**If you would like to get involved in our DSpace 7 development effort, we welcome new contributors.** Just join one of our meetings or get in touch via Slack. See the [DSpace 7 Working Group](https://wiki.lyrasis.org/display/DSPACE/DSpace+7+Working+Group) wiki page for more info.
+* Backend (this codebase) provides a REST API, along with other machine-based interfaces (e.g. OAI-PMH, SWORD, etc)
+    * The REST Contract is at https://github.com/DSpace/RestContract
+* Frontend (https://github.com/DSpace/dspace-angular/) is the User Interface built on the REST API
 
-**If you are looking for the ongoing maintenance work for DSpace 6 (or prior releases)**, you can find that work on the corresponding maintenance branch (e.g. [`dspace-6_x`](https://github.com/DSpace/DSpace/tree/dspace-6_x)) in this repository.
-***
+Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPUI). Those UIs are no longer supported in v7 (and above).
+* A maintenance branch for older versions is still available, see `dspace-6_x` for 6.x maintenance.
 
 ## Downloads
 
-The latest release of DSpace can be downloaded from the [DSpace website](http://www.dspace.org/latest-release/) or from [GitHub](https://github.com/DSpace/DSpace/releases).
-
-Past releases are all available via GitHub at https://github.com/DSpace/DSpace/releases
+* Backend (REST API): https://github.com/DSpace/DSpace/releases
+* Frontend (User Interface): https://github.com/DSpace/dspace-angular/releases
 
 ## Documentation / Installation
 
 Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC6x/Installing+DSpace
+https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
 
-Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL or Oracle)
+Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
 ## Running DSpace 7 in Docker
+
+NOTE: At this time, we do not have production-ready Docker images for DSpace.
+That said, we do have quick-start Docker Compose scripts for development or testing purposes.
+
 See [Running DSpace 7 with Docker Compose](dspace/src/main/docker-compose/README.md)
 
 ## Contributing
@@ -86,37 +89,37 @@ DSpace uses GitHub to track issues:
 ### Running Tests
 
 By default, in DSpace, Unit Tests and Integration Tests are disabled. However, they are
-run automatically by [Travis CI](https://travis-ci.com/DSpace/DSpace/) for all Pull Requests and code commits.
+run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild) for all Pull Requests and code commits.
 
 * How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
   ```
-  mvn clean test -DskipTests=false -DskipITs=false
+  mvn install -DskipUnitTests=false -DskipIntegrationTests=false
   ```
-* How to run just Unit Tests:
+* How to run _only_ Unit Tests:
   ```
-  mvn test -DskipTests=false
+  mvn test -DskipUnitTests=false
   ```
 * How to run a *single* Unit Test
   ```
   # Run all tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn test -DskipTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+  mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
 
   # Run one test method in a specific test class
-  mvn test -DskipTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
+  mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
-* How to run Integration Tests (requires enabling Unit tests too)
+* How to run _only_ Integration Tests
   ```
-  mvn verify -DskipTests=false -DskipITs=false
+  mvn install -DskipIntegrationTests=false
   ```
-* How to run a *single* Integration Test (requires enabling Unit tests too)
+* How to run a *single* Integration Test
   ```
   # Run all integration tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn test -DskipTests=false -DskipITs=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName] -DfailIfNoTests=false
 
   # Run one test method in a specific test class
-  mvn test -DskipTests=false -DskipITs=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
+  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
 * How to run only tests of a specific DSpace module
   ```
@@ -133,3 +136,6 @@ run automatically by [Travis CI](https://travis-ci.com/DSpace/DSpace/) for all P
 
 DSpace source code is freely available under a standard [BSD 3-Clause license](https://opensource.org/licenses/BSD-3-Clause).
 The full license is available in the [LICENSE](LICENSE) file or online at http://www.dspace.org/license/
+
+DSpace uses third-party libraries which may be distributed under different licenses. Those licenses are listed
+in the [LICENSES_THIRD_PARTY](LICENSES_THIRD_PARTY) file.

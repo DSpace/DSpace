@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.MissingResourceException;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -28,7 +28,6 @@ import org.dspace.eperson.Group;
  * @author kevinvandevelde at atmire.com
  */
 public interface CommunityService extends DSpaceObjectService<Community>, DSpaceObjectLegacySupportService<Community> {
-
 
     /**
      * Create a new top-level community, with a new ID.
@@ -54,6 +53,20 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      */
     public Community create(Community parent, Context context, String handle)
         throws SQLException, AuthorizeException;
+
+    /**
+     * Create a new top-level community, with a new ID.
+     *
+     * @param parent  parent community
+     * @param context DSpace context object
+     * @param handle  the pre-determined Handle to assign to the new community
+     * @param uuid    the pre-determined uuid to assign to the new community
+     * @return the newly created community
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Community create(Community parent, Context context,
+                            String handle, UUID uuid) throws SQLException, AuthorizeException;
 
 
     /**
@@ -87,36 +100,6 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @throws SQLException if database error
      */
     public List<Community> findAllTop(Context context) throws SQLException;
-
-    /**
-     * Get the value of a metadata field
-     *
-     * @param community community
-     * @param field     the name of the metadata field to get
-     * @return the value of the metadata field
-     * @throws IllegalArgumentException if the requested metadata field doesn't exist
-     * @deprecated
-     */
-    @Override
-    @Deprecated
-    public String getMetadata(Community community, String field);
-
-
-    /**
-     * Set a metadata value
-     *
-     * @param context   context
-     * @param community community
-     * @param field     the name of the metadata field to get
-     * @param value     value to set the field to
-     * @throws IllegalArgumentException if the requested metadata field doesn't exist
-     * @throws MissingResourceException if resource missing
-     * @throws SQLException             if database error
-     * @deprecated
-     */
-    @Deprecated
-    public void setMetadata(Context context, Community community, String field, String value)
-        throws MissingResourceException, SQLException;
 
     /**
      * Give the community a logo. Passing in <code>null</code> removes any
@@ -233,6 +216,20 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      */
     public Community createSubcommunity(Context context, Community parentCommunity, String handle)
         throws SQLException, AuthorizeException;
+
+    /**
+     * Create a new sub-community within this community.
+     *
+     * @param context context
+     * @param handle the pre-determined Handle to assign to the new community
+     * @param parentCommunity parent community
+     * @param uuid the pre-determined UUID to assign to the new community
+     * @return the new community
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Community createSubcommunity(Context context, Community parentCommunity, String handle, UUID uuid)
+            throws SQLException, AuthorizeException;
 
     /**
      * Add an existing community as a subcommunity to the community

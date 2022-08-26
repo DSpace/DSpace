@@ -8,11 +8,12 @@
 package org.dspace.core;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
@@ -511,9 +512,8 @@ public class ContextTest extends AbstractUnitTest {
 
         // Now get our special groups
         List<Group> specialGroups = instance.getSpecialGroups();
-        assertThat("testGetSpecialGroup 0", specialGroups.size(), equalTo(2));
-        assertThat("testGetSpecialGroup 1", specialGroups.get(0), equalTo(group));
-        assertThat("testGetSpecialGroup 1", specialGroups.get(1), equalTo(adminGroup));
+        assertThat("testGetSpecialGroup size", specialGroups.size(), equalTo(2));
+        assertThat("testGetSpecialGroup content", specialGroups, hasItems(group, adminGroup));
 
         // Cleanup our context & group
         groupService.delete(instance, group);

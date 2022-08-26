@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
@@ -23,23 +24,25 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 
 /**
  * Configurable XSLT-driven ingestion Crosswalk
@@ -140,7 +143,12 @@ public class XSLTIngestionCrosswalk
         try {
             JDOMResult result = new JDOMResult();
             xform.transform(new JDOMSource(metadata), result);
-            ingestDIM(context, dso, result.getResult(), createMissingMetadataFields);
+            List<Content> contentList = result.getResult();
+            // Transform List<Content> into List<Element>
+            List<Element> elementList = contentList.stream()
+                                                   .filter(obj -> obj instanceof Element)
+                                                   .map(Element.class::cast).collect(Collectors.toList());
+            ingestDIM(context, dso, elementList, createMissingMetadataFields);
         } catch (TransformerException e) {
             log.error("Got error: " + e.toString());
             throw new CrosswalkInternalException("XSL Transformation failed: " + e.toString(), e);
@@ -180,15 +188,11 @@ public class XSLTIngestionCrosswalk
     }
 
     // return coll/comm "metadata" label corresponding to a DIM field.
-    private static String getMetadataForDIM(Element field) {
+    private static MetadataFieldName getMetadataForDIM(Element field) {
         // make up fieldname, then look for it in xwalk
         String element = field.getAttributeValue("element");
         String qualifier = field.getAttributeValue("qualifier");
-        String fname = "dc." + element;
-        if (qualifier != null) {
-            fname += "." + qualifier;
-        }
-        return PackageUtils.dcToContainerMetadata(fname);
+        return new MetadataFieldName(MetadataSchemaEnum.DC.getName(), element, qualifier);
     }
 
     /**
@@ -234,16 +238,18 @@ public class XSLTIngestionCrosswalk
                 } else if ("field".equals(field.getName()) &&
                     DIM_NS.equals(field.getNamespace()) &&
                     schema != null && "dc".equals(schema)) {
-                    String md = getMetadataForDIM(field);
+                    MetadataFieldName md = getMetadataForDIM(field);
                     if (md == null) {
                         log.warn("Cannot map to Coll/Comm metadata field, DIM element=" +
                                      field.getAttributeValue("element") + ", qualifier=" + field
                             .getAttributeValue("qualifier"));
                     } else {
                         if (type == Constants.COLLECTION) {
-                            collectionService.setMetadata(context, (Collection) dso, md, field.getText());
+                            collectionService.setMetadataSingleValue(context,
+                                    (Collection) dso, md, null, field.getText());
                         } else {
-                            communityService.setMetadata(context, (Community) dso, md, field.getText());
+                            communityService.setMetadataSingleValue(context,
+                                    (Community) dso, md, null, field.getText());
                         }
                     }
                 } else {

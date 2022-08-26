@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery.indexobject.factory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -31,5 +32,5 @@ public interface InprogressSubmissionIndexFactory<T extends IndexableInProgressS
      * @throws SQLException         If database error
      */
     void storeInprogressItemFields(Context context, SolrInputDocument doc, InProgressSubmission inProgressSubmission)
-            throws SQLException;
+        throws SQLException, IOException;
 }

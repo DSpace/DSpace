@@ -7,14 +7,15 @@
  */
 package org.dspace.builder.util;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BitstreamFormatBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -24,10 +25,15 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.MetadataFieldBuilder;
 import org.dspace.builder.MetadataSchemaBuilder;
+import org.dspace.builder.OrcidHistoryBuilder;
+import org.dspace.builder.OrcidQueueBuilder;
+import org.dspace.builder.OrcidTokenBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
+import org.dspace.builder.RequestItemBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.SiteBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
@@ -35,7 +41,7 @@ import org.dspace.builder.WorkspaceItemBuilder;
 /**
  * This class will ensure that all the builders that are registered will be cleaned up in the order as defined
  * in the constructor. This will ensure foreign-key constraint safe deletion of the objects made with these
- * builders
+ * builders.
  */
 public class AbstractBuilderCleanupUtil {
 
@@ -43,28 +49,40 @@ public class AbstractBuilderCleanupUtil {
             = new LinkedHashMap<>();
 
     /**
-     * Constructor that will initialize the Map with a predefined order for deletion
+     * Constructor that will initialize the Map with a predefined order for deletion.
+     * <P>
+     * Objects are deleted top-to-bottom in this Map. Objects that need to be removed *first*
+     * should appear at the top. Objects that may be deleted later, appear at the bottom.
      */
     public AbstractBuilderCleanupUtil() {
-        map.put(RelationshipBuilder.class.getName(), new LinkedList<>());
-        map.put(RelationshipTypeBuilder.class.getName(), new LinkedList<>());
-        map.put(EntityTypeBuilder.class.getName(), new LinkedList<>());
-        map.put(PoolTaskBuilder.class.getName(), new LinkedList<>());
-        map.put(WorkflowItemBuilder.class.getName(), new LinkedList<>());
-        map.put(WorkspaceItemBuilder.class.getName(), new LinkedList<>());
-        map.put(BitstreamBuilder.class.getName(), new LinkedList<>());
-        map.put(BitstreamFormatBuilder.class.getName(), new LinkedList<>());
-        map.put(ClaimedTaskBuilder.class.getName(), new LinkedList<>());
-        map.put(CollectionBuilder.class.getName(), new LinkedList<>());
-        map.put(CommunityBuilder.class.getName(), new LinkedList<>());
-        map.put(EPersonBuilder.class.getName(), new LinkedList<>());
-        map.put(GroupBuilder.class.getName(), new LinkedList<>());
-        map.put(ItemBuilder.class.getName(), new LinkedList<>());
-        map.put(MetadataFieldBuilder.class.getName(), new LinkedList<>());
-        map.put(MetadataSchemaBuilder.class.getName(), new LinkedList<>());
-        map.put(SiteBuilder.class.getName(), new LinkedList<>());
-        map.put(ProcessBuilder.class.getName(), new LinkedList<>());
+        initMap();
+    }
 
+    private void initMap() {
+        map.put(OrcidQueueBuilder.class.getName(), new ArrayList<>());
+        map.put(OrcidHistoryBuilder.class.getName(), new ArrayList<>());
+        map.put(OrcidTokenBuilder.class.getName(), new ArrayList<>());
+        map.put(ResourcePolicyBuilder.class.getName(), new ArrayList<>());
+        map.put(RelationshipBuilder.class.getName(), new ArrayList<>());
+        map.put(RequestItemBuilder.class.getName(), new ArrayList<>());
+        map.put(PoolTaskBuilder.class.getName(), new ArrayList<>());
+        map.put(WorkflowItemBuilder.class.getName(), new ArrayList<>());
+        map.put(WorkspaceItemBuilder.class.getName(), new ArrayList<>());
+        map.put(BitstreamBuilder.class.getName(), new ArrayList<>());
+        map.put(BitstreamFormatBuilder.class.getName(), new ArrayList<>());
+        map.put(ClaimedTaskBuilder.class.getName(), new ArrayList<>());
+        map.put(BundleBuilder.class.getName(), new ArrayList<>());
+        map.put(ItemBuilder.class.getName(), new ArrayList<>());
+        map.put(CollectionBuilder.class.getName(), new ArrayList<>());
+        map.put(CommunityBuilder.class.getName(), new ArrayList<>());
+        map.put(GroupBuilder.class.getName(), new ArrayList<>());
+        map.put(EPersonBuilder.class.getName(), new ArrayList<>());
+        map.put(RelationshipTypeBuilder.class.getName(), new ArrayList<>());
+        map.put(EntityTypeBuilder.class.getName(), new ArrayList<>());
+        map.put(MetadataFieldBuilder.class.getName(), new ArrayList<>());
+        map.put(MetadataSchemaBuilder.class.getName(), new ArrayList<>());
+        map.put(SiteBuilder.class.getName(), new ArrayList<>());
+        map.put(ProcessBuilder.class.getName(), new ArrayList<>());
     }
 
     /**
@@ -74,7 +92,7 @@ public class AbstractBuilderCleanupUtil {
      * @param abstractBuilder   The AbstractBuilder to be added
      */
     public void addToMap(AbstractBuilder abstractBuilder) {
-        map.computeIfAbsent(abstractBuilder.getClass().getName(), k -> new LinkedList<>()).add(abstractBuilder);
+        map.computeIfAbsent(abstractBuilder.getClass().getName(), k -> new ArrayList<>()).add(abstractBuilder);
     }
 
     /**
@@ -89,5 +107,13 @@ public class AbstractBuilderCleanupUtil {
                 abstractBuilder.cleanup();
             }
         }
+    }
+
+    /**
+     * Clears and re-initialises the map of builders
+     */
+    public void cleanupMap() {
+        this.map.clear();
+        initMap();
     }
 }

@@ -65,7 +65,7 @@ public class Curator {
      */
     public static final int CURATE_SKIP = 2;
 
-    // invocation modes - used by Suspendable tasks
+    /** invocation modes - used by {@link Suspendable} tasks */
     public static enum Invoked {
         INTERACTIVE, BATCH, ANY
     }
@@ -337,6 +337,11 @@ public class Curator {
      * @param message the message to output to the reporting stream.
      */
     public void report(String message) {
+        if (null == reporter) {
+            log.warn("report called with no Reporter set:  {}", message);
+            return;
+        }
+
         try {
             reporter.append(message);
         } catch (IOException ex) {

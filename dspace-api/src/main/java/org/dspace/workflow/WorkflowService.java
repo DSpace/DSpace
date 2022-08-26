@@ -32,8 +32,10 @@ public interface WorkflowService<T extends WorkflowItem> {
 
 
     /**
-     * startWorkflow() begins a workflow - in a single transaction do away with
-     * the PersonalWorkspace entry and turn it into a WorkflowItem.
+     * Move an Item from a submitter's workspace into a collection's workflow
+     * - in a single transaction do away with
+     * the WorkspaceItem and turn it into a WorkflowItem.
+     * The WorkspaceItem which wraps the submitted Item is deleted.
      *
      * @param context The relevant DSpace Context.
      * @param wsi     The WorkspaceItem to convert to a workflow item
@@ -48,9 +50,9 @@ public interface WorkflowService<T extends WorkflowItem> {
         throws SQLException, AuthorizeException, IOException, WorkflowException;
 
     /**
-     * startWithoutNotify() starts the workflow normally, but disables
-     * notifications (useful for large imports,) for the first workflow step -
-     * subsequent notifications happen normally
+     * Start the workflow normally, but disable notifications for the first
+     * workflow step.  Subsequent notifications happen normally.  Useful for
+     * large imports.
      *
      * @param c   The relevant DSpace Context.
      * @param wsi workspace item
@@ -79,6 +81,20 @@ public interface WorkflowService<T extends WorkflowItem> {
      * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public WorkspaceItem abort(Context c, T wi, EPerson e) throws SQLException, AuthorizeException, IOException;
+
+    /**
+     * Deletes workflow task item in correct order.
+     *
+     * @param c  The relevant DSpace Context.
+     * @param wi The WorkflowItem that shall be deleted.
+     * @param e  Admin that deletes this workflow task and item (for logging
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     */
+    public void deleteWorkflowByWorkflowItem(Context c, T wi, EPerson e)
+        throws SQLException, AuthorizeException, IOException;
 
     public WorkspaceItem sendWorkflowItemBackSubmission(Context c, T workflowItem, EPerson e, String provenance,
                                                         String rejection_message)

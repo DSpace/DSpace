@@ -9,14 +9,18 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -49,7 +53,7 @@ import org.springframework.stereotype.Component;
 @Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME)
 public class RelationshipRestRepository extends DSpaceRestRepository<RelationshipRest, Integer> {
 
-    private static final Logger log = Logger.getLogger(RelationshipRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String ALL = "all";
     private static final String LEFT = "left";
@@ -75,7 +79,12 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     @PreAuthorize("permitAll()")
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
-            return converter.toRest(relationshipService.find(context, integer), utils.obtainProjection());
+            Relationship relationship = relationshipService.find(context, integer);
+
+            if (relationship == null) {
+                return null;
+            }
+            return converter.toRest(relationship, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -119,15 +128,6 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 Relationship relationship = relationshipService.create(context, leftItem, rightItem,
                                                                        relationshipType, -1, -1,
                                                                        leftwardValue, rightwardValue);
-                // The above if check deals with the case that a Relationship can be created if the user has write
-                // rights on one of the two items. The following updateItem calls can however call the
-                // ItemService.update() functions which would fail if the user doesn't have permission on both items.
-                // Since we allow this creation to happen under these circumstances, we need to turn off the
-                // authorization system here so that this failure doesn't happen when the items need to be update
-                context.turnOffAuthorisationSystem();
-                relationshipService.updateItem(context, relationship.getLeftItem());
-                relationshipService.updateItem(context, relationship.getRightItem());
-                context.restoreAuthSystemState();
                 return converter.toRest(relationship, utils.obtainProjection());
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
@@ -168,25 +168,21 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         }
         List<DSpaceObject> dSpaceObjects = utils.constructDSpaceObjectList(context, stringList);
         if (dSpaceObjects.size() == 1 && dSpaceObjects.get(0).getType() == Constants.ITEM) {
-
             Item replacementItemInRelationship = (Item) dSpaceObjects.get(0);
-            Item leftItem;
-            Item rightItem;
+            Item newLeftItem;
+            Item newRightItem;
+
             if (itemToReplaceIsRight) {
-                leftItem = relationship.getLeftItem();
-                rightItem = replacementItemInRelationship;
+                newLeftItem = null;
+                newRightItem = replacementItemInRelationship;
             } else {
-                leftItem = replacementItemInRelationship;
-                rightItem = relationship.getRightItem();
+                newLeftItem = replacementItemInRelationship;
+                newRightItem = null;
             }
 
-            if (isAllowedToModifyRelationship(context, relationship, leftItem, rightItem)) {
-                relationship.setLeftItem(leftItem);
-                relationship.setRightItem(rightItem);
-
+            if (isAllowedToModifyRelationship(context, relationship, newLeftItem, newRightItem)) {
                 try {
-                    relationshipService.updatePlaceInRelationship(context, relationship);
-                    relationshipService.update(context, relationship);
+                    relationshipService.move(context, relationship, newLeftItem, newRightItem);
                     context.commit();
                     context.reloadEntity(relationship);
                 } catch (AuthorizeException e) {
@@ -245,15 +241,17 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             relationship.setLeftwardValue(relationshipRest.getLeftwardValue());
             relationship.setRightwardValue(relationshipRest.getRightwardValue());
 
+            Integer newRightPlace = null;
+            Integer newLeftPlace = null;
             if (jsonNode.hasNonNull("rightPlace")) {
-                relationship.setRightPlace(relationshipRest.getRightPlace());
+                newRightPlace = relationshipRest.getRightPlace();
             }
 
             if (jsonNode.hasNonNull("leftPlace")) {
-                relationship.setLeftPlace(relationshipRest.getLeftPlace());
+                newLeftPlace = relationshipRest.getLeftPlace();
             }
 
-            relationshipService.update(context, relationship);
+            relationshipService.move(context, relationship, newLeftPlace, newRightPlace);
             context.commit();
             context.reloadEntity(relationship);
 
@@ -275,10 +273,13 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
      */
     private boolean isAllowedToModifyRelationship(Context context, Relationship relationship, Item leftItem,
                                                   Item rightItem) throws SQLException {
-        return (authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE) ||
-            authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE)) &&
-            (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
-                authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)
+        return (
+            // Authorized to write new Items (if specified)
+            (leftItem == null || authorizeService.authorizeActionBoolean(context, leftItem, Constants.WRITE))
+                || (rightItem == null || authorizeService.authorizeActionBoolean(context, rightItem, Constants.WRITE))
+            // Authorized to write old Items
+            && (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE)
+                || authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE))
             );
     }
 
@@ -356,7 +357,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 if (relationshipType.getLeftwardType().equalsIgnoreCase(label)) {
                     isLeft = true;
                 }
-                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType);
+                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
                         isLeft, pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
             }
@@ -370,4 +371,47 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }
+
+    /**
+     * This method is intended to be used when giving an item (focus) and a list
+     * of potentially related items we need to know which of these other items
+     * are already in a specific relationship with the focus item and,
+     * by exclusion which ones are not yet related.
+     * 
+     * @param typeId          The relationship type id to apply as a filter to the returned relationships
+     * @param label           The name of the relation as defined from the side of the 'focusItem'
+     * @param focusUUID       The uuid of the item to be checked on the side defined by 'relationshipLabel'
+     * @param items           The uuid of the items to be found on the other side of returned relationships
+     * @param pageable        The page information
+     * @return
+     * @throws SQLException   If database error
+     */
+    @SearchRestMethod(name = "byItemsAndType")
+    public Page<RelationshipRest> findByItemsAndType(
+                                            @Parameter(value = "typeId", required = true) Integer typeId,
+                                            @Parameter(value = "relationshipLabel", required = true) String label,
+                                            @Parameter(value = "focusItem", required = true) UUID focusUUID,
+                                            @Parameter(value = "relatedItem", required = true) Set<UUID> items,
+                                             Pageable pageable) throws SQLException {
+        Context context = obtainContext();
+        int total = 0;
+        List<Relationship> relationships = new LinkedList<>();
+        RelationshipType relationshipType = relationshipTypeService.find(context, typeId);
+        if (Objects.nonNull(relationshipType)) {
+            if (!relationshipType.getLeftwardType().equals(label) &&
+                !relationshipType.getRightwardType().equals(label)) {
+                throw new UnprocessableEntityException("The provided label: " + label +
+                                                       " , does not match any relation!");
+            }
+            relationships = relationshipService.findByItemRelationshipTypeAndRelatedList(context, focusUUID,
+                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label),
+                       Math.toIntExact(pageable.getOffset()),
+                       Math.toIntExact(pageable.getPageSize()));
+
+            total = relationshipService.countByItemRelationshipTypeAndRelatedList(context, focusUUID,
+                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label));
+        }
+        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
+    }
+
 }

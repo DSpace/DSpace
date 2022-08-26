@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -18,42 +20,60 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.RelationshipRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.MetadataFieldBuilder;
 import org.dspace.builder.RelationshipBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.MockSolrSearchCore;
 import org.dspace.eperson.EPerson;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,39 +84,51 @@ import org.springframework.test.web.servlet.MvcResult;
 public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
-    private RelationshipTypeService relationshipTypeService;
+    protected RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    private EntityTypeService entityTypeService;
+    protected EntityTypeService entityTypeService;
 
     @Autowired
-    private AuthorizeService authorizeService;
+    protected AuthorizeService authorizeService;
 
     @Autowired
-    private ItemService itemService;
+    protected ItemService itemService;
 
+    @Autowired
+    protected MetadataFieldService metadataFieldService;
 
-    private Community parentCommunity;
-    private Community child1;
+    @Autowired
+    protected MetadataSchemaService metadataSchemaService;
 
-    private Collection col1;
-    private Collection col2;
-    private Collection col3;
+    @Autowired
+    MockSolrSearchCore mockSolrSearchCore;
+    protected Community parentCommunity;
+    protected Community child1;
 
-    private Item author1;
-    private Item author2;
-    private Item author3;
+    protected Collection col1;
+    protected Collection col2;
+    protected Collection col3;
+    protected Collection col4;
+    protected Collection col5;
+    protected Collection col6;
+    protected Collection col7;
 
-    private Item orgUnit1;
-    private Item orgUnit2;
-    private Item project1;
+    protected Item author1;
+    protected Item author2;
+    protected Item author3;
 
-    private Item publication1;
-    private Item publication2;
+    protected Item orgUnit1;
+    protected Item orgUnit2;
+    protected Item orgUnit3;
+    protected Item project1;
 
-    private RelationshipType isAuthorOfPublicationRelationshipType;
-    private RelationshipType isOrgUnitOfPersonRelationshipType;
-    private EPerson user1;
+    protected Item publication1;
+    protected Item publication2;
+
+    protected RelationshipType isAuthorOfPublicationRelationshipType;
+    protected RelationshipType isOrgUnitOfPersonRelationshipType;
+    protected EPerson user1;
 
     @Before
     public void setUp() throws Exception {
@@ -111,9 +143,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                  .withName("Sub Community")
                                  .build();
 
-        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
-        col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+        col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                .withEntityType("Person").build();
+        col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                                .withEntityType("Publication").build();
+        col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits")
+                                .withEntityType("OrgUnit").build();
+        col4 = CollectionBuilder.createCollection(context, child1).withName("Projects")
+                                .withEntityType("Project").build();
+        col5 = CollectionBuilder.createCollection(context, child1).withName("Projects")
+                                .withEntityType("Journal").build();
+        col6 = CollectionBuilder.createCollection(context, child1).withName("Projects")
+                                .withEntityType("JournalVolume").build();
+        col7 = CollectionBuilder.createCollection(context, child1).withName("Projects")
+                                .withEntityType("JournalIssue").build();
 
         author1 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author1")
@@ -121,57 +164,58 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withAuthor("Smith, Donald")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
                              .build();
 
-        author2 = ItemBuilder.createItem(context, col2)
+        author2 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author2")
                              .withIssueDate("2016-02-13")
                              .withAuthor("Smith, Maria")
-                             .withRelationshipType("Person")
+                             .withPersonIdentifierLastName("Smith")
+                             .withPersonIdentifierFirstName("Maria")
+                             .withMetadata("dspace", "entity", "type", "Person")
                              .build();
 
-        author3 = ItemBuilder.createItem(context, col2)
+        author3 = ItemBuilder.createItem(context, col1)
                              .withTitle("Author3")
                              .withIssueDate("2016-02-13")
                              .withPersonIdentifierFirstName("Maybe")
                              .withPersonIdentifierLastName("Maybe")
-                             .withRelationshipType("Person")
                              .build();
 
-        publication1 = ItemBuilder.createItem(context, col3)
+        publication1 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Publication1")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
                                   .build();
 
-        publication2 = ItemBuilder.createItem(context, col3)
+        publication2 = ItemBuilder.createItem(context, col2)
                                   .withTitle("Publication2")
                                   .withAuthor("Testy, TEst")
                                   .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
                                   .build();
 
         orgUnit1 = ItemBuilder.createItem(context, col3)
                               .withTitle("OrgUnit1")
                               .withAuthor("Testy, TEst")
                               .withIssueDate("2015-01-01")
-                              .withRelationshipType("OrgUnit")
                               .build();
 
         orgUnit2 = ItemBuilder.createItem(context, col3)
                 .withTitle("OrgUnit2")
                 .withAuthor("Testy, TEst")
                 .withIssueDate("2015-01-01")
-                .withRelationshipType("OrgUnit")
                 .build();
 
-        project1 = ItemBuilder.createItem(context, col3)
+        orgUnit3 = ItemBuilder.createItem(context, col3)
+                              .withTitle("OrgUnit3")
+                              .withAuthor("Test, Testy")
+                              .withIssueDate("2015-02-01")
+                              .build();
+
+        project1 = ItemBuilder.createItem(context, col4)
                               .withTitle("Project1")
                               .withAuthor("Testy, TEst")
                               .withIssueDate("2015-01-01")
-                              .withRelationshipType("Project")
                               .build();
 
         isAuthorOfPublicationRelationshipType = relationshipTypeService
@@ -491,6 +535,80 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
+    public void createMultipleRelationshipsAppendToEndTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        authorizeService.addPolicy(context, publication1, Constants.WRITE, user1);
+        authorizeService.addPolicy(context, author1, Constants.WRITE, user1);
+        authorizeService.addPolicy(context, author2, Constants.WRITE, user1);
+
+        context.setCurrentUser(user1);
+        context.restoreAuthSystemState();
+
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            String token = getAuthToken(user1.getEmail(), password);
+
+            // Add a relationship @ leftPlace 2
+            getClient(token).perform(post("/api/core/relationships")
+                                         .param("relationshipType",
+                                                isAuthorOfPublicationRelationshipType.getID()
+                                                                                     .toString())
+                                         .contentType(MediaType.parseMediaType
+                                                                   (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                        .TEXT_URI_LIST_VALUE))
+                                         .content(
+                                             "https://localhost:8080/server/api/core/items/" + publication1
+                                                 .getID() + "\n" +
+                                                 "https://localhost:8080/server/api/core/items/" + author1
+                                                 .getID()))
+                            .andExpect(status().isCreated())
+                            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient().perform(get("/api/core/relationships/" + idRef))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.id", is(idRef.get())))
+                       .andExpect(jsonPath("$.leftPlace", is(1)));
+
+            getClient(token).perform(post("/api/core/relationships")
+                                         .param("relationshipType",
+                                                isAuthorOfPublicationRelationshipType.getID()
+                                                                                     .toString())
+                                         .contentType(MediaType.parseMediaType
+                                                                   (org.springframework.data.rest.webmvc.RestMediaTypes
+                                                                        .TEXT_URI_LIST_VALUE))
+                                         .content(
+                                             "https://localhost:8080/server/api/core/items/" + publication1
+                                                 .getID() + "\n" +
+                                                 "https://localhost:8080/server/api/core/items/" + author2
+                                                 .getID()))
+                            .andExpect(status().isCreated())
+                            .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient().perform(get("/api/core/relationships/" + idRef2))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.id", is(idRef2.get())))
+                       .andExpect(jsonPath("$.leftPlace", is(2)));
+
+            // Check Item author order
+            getClient().perform(get("/api/core/items/" + publication1.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.metadata", allOf(
+                           matchMetadata("dc.contributor.author", "Testy, TEst", 0),
+                           matchMetadata("dc.contributor.author", "Smith, Donald", 1),
+                           matchMetadata("dc.contributor.author", "Smith, Maria", 2)
+                       )));
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+            if (idRef2.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef2.get());
+            }
+        }
+    }
+
+    @Test
     public void createRelationshipAndAddLeftWardValueAfterwards() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -529,13 +647,14 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
                    .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
 
-        JsonObject contentObj = new JsonObject();
-        contentObj.addProperty("leftwardValue", leftwardValue);
+        Map<String, String> map = new HashMap<>();
+        map.put("leftwardValue", leftwardValue);
+        String json = new ObjectMapper().writeValueAsString(map);
 
         // Add leftwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
                                      .contentType("application/json")
-                                     .content(contentObj.toString()))
+                                     .content(json))
                         .andExpect(status().isOk());
 
         // Verify leftwardValue is present and rightwardValue not
@@ -587,14 +706,15 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    .andExpect(jsonPath("$.leftwardValue", is(nullValue())))
                    .andExpect(jsonPath("$.rightwardValue", is(nullValue())));
 
-        JsonObject contentObj = new JsonObject();
-        contentObj.addProperty("leftwardValue", leftwardValue);
-        contentObj.addProperty("rightwardValue", rightwardValue);
+        Map<String, String> map = new HashMap<>();
+        map.put("leftwardValue", leftwardValue);
+        map.put("rightwardValue", rightwardValue);
+        String json = new ObjectMapper().writeValueAsString(map);
 
         // Add leftwardValue and rightwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
                                      .contentType("application/json")
-                                     .content(contentObj.toString()))
+                                     .content(json))
                         .andExpect(status().isOk());
 
         // Verify leftwardValue and rightwardValue are present
@@ -636,29 +756,25 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withIssueDate("2017-10-17")
                                   .withPersonIdentifierFirstName("Donald")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
                                   .build();
 
-        Item author2 = ItemBuilder.createItem(context, col2)
+        Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
                                   .build();
 
-        Item author3 = ItemBuilder.createItem(context, col2)
+        Item author3 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
                                   .build();
 
-        Item publication1 = ItemBuilder.createItem(context, col3)
+        Item publication1 = ItemBuilder.createItem(context, col2)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
                                        .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
@@ -746,6 +862,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Ensure that we now have three dc.contributor.author mdv ("Smith, Donald", "plain text", "Smith, Maria"
         // In that order which will be checked below the rest call
@@ -772,6 +889,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         // Assert that the list of dc.contributor.author mdv is now of size 4 in the following order:
@@ -809,6 +927,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                          .andExpect(status().isCreated())
                    .andDo(result -> idRef3.set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
         // Assert that our dc.contributor.author mdv list is now of size 5
         assertEquals(5, list.size());
@@ -872,6 +991,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
+        publication1 = itemService.find(context, publication1.getID());
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
 
         assertEquals(10, list.size());
@@ -917,7 +1037,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         list = itemService.getMetadata(publication1, "dc", Item.ANY, Item.ANY, Item.ANY);
         assertEquals(16, list.size()); //also includes title, 4 date fields, uri
         list = itemService.getMetadata(publication1, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        assertEquals(20, list.size()); //also includes type and 3 relation.isAuthorOfPublication values
+        // also includes type, 3 relation.isAuthorOfPublication and 3 relation.isAuthorOfPublication.latestForDiscovery
+        // values
+        assertEquals(23, list.size());
 
         } finally {
             RelationshipBuilder.deleteRelationship(idRef1.get());
@@ -936,26 +1058,23 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.turnOffAuthorisationSystem();
 
-        Item publication1 = ItemBuilder.createItem(context, col3)
+        Item publication1 = ItemBuilder.createItem(context, col2)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
                                        .build();
 
-        Item author2 = ItemBuilder.createItem(context, col2)
+        Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
                                   .build();
 
-        Item author3 = ItemBuilder.createItem(context, col2)
+        Item author3 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1149,26 +1268,23 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.turnOffAuthorisationSystem();
 
-        Item publication1 = ItemBuilder.createItem(context, col3)
+        Item publication1 = ItemBuilder.createItem(context, col2)
                                        .withTitle("Publication1")
                                        .withIssueDate("2015-01-01")
-                                       .withRelationshipType("Publication")
                                        .build();
 
-        Item author2 = ItemBuilder.createItem(context, col2)
+        Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
                                   .build();
 
-        Item author3 = ItemBuilder.createItem(context, col2)
+        Item author3 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author3")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maybe")
                                   .withPersonIdentifierLastName("Maybe")
-                                  .withRelationshipType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1361,12 +1477,11 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     public void deleteRelationship() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Item author2 = ItemBuilder.createItem(context, col2)
+        Item author2 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author2")
                                   .withIssueDate("2016-02-13")
                                   .withPersonIdentifierFirstName("Maria")
                                   .withPersonIdentifierLastName("Smith")
-                                  .withRelationshipType("Person")
                                   .build();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -1494,8 +1609,12 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("page.totalElements", is(0)));
         } finally {
-            RelationshipBuilder.deleteRelationship(idRef1.get());
-            RelationshipBuilder.deleteRelationship(idRef2.get());
+            if (idRef1.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef1.get());
+            }
+            if (idRef2.get() != null) {
+                RelationshipBuilder.deleteRelationship(idRef2.get());
+            }
         }
     }
 
@@ -2356,7 +2475,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                   .withAuthor("Smith, Donald")
                                   .withPersonIdentifierFirstName("testingFirstName")
                                   .withPersonIdentifierLastName("testingLastName")
-                                  .withRelationshipType("Person")
                                   .build();
 
         Relationship relationship3 = RelationshipBuilder
@@ -2482,5 +2600,777 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     }
 
+    @Test
+    public void putRelationshipWithJsonMoveInFrontOtherMetadata() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+        Integer idRef = null;
+        Integer idRef2 = null;
+        try {
+            // Add a relationship
+            MvcResult mvcResult = getClient(token)
+                .perform(post("/api/core/relationships")
+                             .param("relationshipType", isAuthorOfPublicationRelationshipType.getID().toString())
+                             .contentType(MediaType.parseMediaType(
+                                 org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content(
+                                 "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                     "https://localhost:8080/server/api/core/items/" + author1.getID()))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+            ObjectMapper mapper = new ObjectMapper();
+            String content = mvcResult.getResponse().getContentAsString();
+            Map<String, Object> map = mapper.readValue(content, Map.class);
+            String id = String.valueOf(map.get("id"));
+            idRef = Integer.parseInt(id);
+
+            // Add some more metadata
+            List<Operation> ops = new ArrayList<Operation>();
+            ops.add(new AddOperation("/metadata/dc.contributor.author/-", "Metadata, First"));
+            ops.add(new AddOperation("/metadata/dc.contributor.author/-", "Metadata, Second"));
+
+            getClient(token).perform(patch("/api/core/items/" + publication1.getID())
+                                         .content(getPatchContent(ops))
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
+
+            // Add another relationship
+            mvcResult = getClient(token)
+                .perform(post("/api/core/relationships")
+                             .param("relationshipType", isAuthorOfPublicationRelationshipType.getID().toString())
+                             .contentType(MediaType.parseMediaType(
+                                 org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                             .content(
+                                 "https://localhost:8080/server/api/core/items/" + publication1.getID() + "\n" +
+                                     "https://localhost:8080/server/api/core/items/" + author2.getID()))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+            content = mvcResult.getResponse().getContentAsString();
+            map = mapper.readValue(content, Map.class);
+            id = String.valueOf(map.get("id"));
+            idRef2 = Integer.parseInt(id);
+
+            // Check Item author order
+            getClient().perform(get("/api/core/items/" + publication1.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.metadata", allOf(
+                           matchMetadata("dc.contributor.author", "Testy, TEst", 0),
+                           matchMetadata("dc.contributor.author", "Smith, Donald", 1),      // first relationship
+                           matchMetadata("dc.contributor.author", "Metadata, First", 2),
+                           matchMetadata("dc.contributor.author", "Metadata, Second", 3),
+                           matchMetadata("dc.contributor.author", "Smith, Maria", 4)        // second relationship
+                       )));
+
+            RelationshipRest relationshipRest = new RelationshipRest();
+            relationshipRest.setLeftPlace(0);
+            relationshipRest.setRightPlace(1);
+            relationshipRest.setLeftwardValue(null);
+            relationshipRest.setRightwardValue(null);
+
+            // Modify the place of the second relationship -> put it in front of all other metadata
+            getClient(token).perform(put("/api/core/relationships/" + idRef2)
+                                         .contentType(contentType)
+                                         .content(mapper.writeValueAsBytes(relationshipRest)))
+                            .andExpect(status().isOk());
+
+            // Verify the place has changed to the new value
+            getClient(token).perform(get("/api/core/relationships/" + idRef2))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.leftPlace", is(0)))
+                            .andExpect(jsonPath("$.rightPlace", is(1)));
+
+            // Verify the other metadata have moved back
+            getClient().perform(get("/api/core/items/" + publication1.getID()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.metadata", allOf(
+                           matchMetadata("dc.contributor.author", "Smith, Maria", 0),       // second relationship
+                           matchMetadata("dc.contributor.author", "Testy, TEst", 1),
+                           matchMetadata("dc.contributor.author", "Smith, Donald", 2),      // first relationship
+                           matchMetadata("dc.contributor.author", "Metadata, First", 3),
+                           matchMetadata("dc.contributor.author", "Metadata, Second", 4)
+                       )));
+
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef);
+            RelationshipBuilder.deleteRelationship(idRef2);
+        }
+
+    }
+
+    @Test
+    public void orgUnitAndOrgUnitRelationshipVirtualMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType orgUnit = entityTypeService.findByEntityType(context, "OrgUnit");
+        RelationshipType isParentOrgUnitOf = relationshipTypeService
+            .findbyTypesAndTypeName(context, orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
+
+        MetadataSchema metadataSchema = metadataSchemaService.find(context, "relation");
+        MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isParentOrgUnitOf", null, null).build();
+        MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isChildOrgUnitOf", null, null).build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+            // metadata field.
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit2
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            itemService.getMetadata(orgUnit1, "*", "*", "*", "*", true);
+
+            getClient(adminToken).perform(get("/api/core/items/" + orgUnit1.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.metadata['relation.isParentOrgUnitOf'][0].value",
+                                     is(String.valueOf(orgUnit2.getID()))));
+            getClient(adminToken).perform(get("/api/core/items/" + orgUnit2.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.metadata['relation.isChildOrgUnitOf'][0].value",
+                                     is(String.valueOf(orgUnit1.getID()))));
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+        }
+    }
+
+    @Test
+    public void orgUnitFindByLabelParentChildOfCountTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType orgUnit = entityTypeService.findByEntityType(context, "OrgUnit");
+        RelationshipType isParentOrgUnitOf = relationshipTypeService
+            .findbyTypesAndTypeName(context, orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
+
+        MetadataSchema metadataSchema = metadataSchemaService.find(context, "relation");
+        MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isParentOrgUnitOf", null, null).build();
+        MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isChildOrgUnitOf", null, null).build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+            // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+            // metadata field.
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit2
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit2
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit3
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef2
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient().perform(get("/api/core/relationships/search/byLabel")
+                .param("label", "isChildOrgUnitOf")
+                .param("dso", String.valueOf(orgUnit2.getID()))
+                .param("page", "0")
+                .param("size", "1"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 1, 1, 1)));
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+            RelationshipBuilder.deleteRelationship(idRef2.get());
+        }
+    }
+
+
+    @Test
+    public void orgUnitLeftMaxCardinalityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType orgUnit = entityTypeService.findByEntityType(context, "OrgUnit");
+        RelationshipType isParentOrgUnitOf = relationshipTypeService
+            .findbyTypesAndTypeName(context, orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
+
+        MetadataSchema metadataSchema = metadataSchemaService.find(context, "relation");
+        MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isParentOrgUnitOf", null, null).build();
+        MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isChildOrgUnitOf", null, null).build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        context.restoreAuthSystemState();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            // Here we create our first Relationship to the Publication to give it a dc.contributor.author virtual
+            // metadata field.
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit2
+                        .getID()))
+                                 .andExpect(status().isCreated())
+                                 .andDo(result -> idRef
+                                     .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(adminToken).perform(post("/api/core/relationships")
+                .param("relationshipType",
+                    isParentOrgUnitOf.getID().toString())
+                .contentType(MediaType.parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                        .TEXT_URI_LIST_VALUE))
+                .content(
+                    "https://localhost:8080/server/api/core/items/" + orgUnit1
+                        .getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items" +
+                    "/" + orgUnit3
+                        .getID()))
+                                 .andExpect(status().isBadRequest());
+
+            getClient().perform(get("/api/core/relationships/search/byLabel")
+                .param("label", "isParentOrgUnitOf")
+                .param("dso", String.valueOf(orgUnit1.getID()))
+                .param("page", "0"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)));
+
+        } finally {
+            RelationshipBuilder.deleteRelationship(idRef.get());
+        }
+    }
+
+    @Test
+    public void testVirtualMdInRESTAndSolrDoc() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity types if needed
+        EntityType journalEntityType = entityTypeService.findByEntityType(context, "Journal");
+        if (journalEntityType == null) {
+            journalEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        }
+        EntityType journalVolumeEntityType = entityTypeService.findByEntityType(context, "JournalVolume");
+        if (journalVolumeEntityType == null) {
+            journalVolumeEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+        }
+        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "JournalIssue");
+        if (journalIssueEntityType == null) {
+            journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        }
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
+        if (publicationEntityType == null) {
+            publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        }
+
+        // Create relationship types if needed
+        RelationshipType isPublicationOfJournalIssue = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+                "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
+        if (isPublicationOfJournalIssue == null) {
+            isPublicationOfJournalIssue = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
+                journalIssueEntityType, publicationEntityType, "isPublicationOfJournalIssue",
+                "isJournalIssueOfPublication", null, null, null, null).build();
+        }
+        RelationshipType isIssueOfJournalVolume = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalVolumeEntityType, journalIssueEntityType,
+                "isIssueOfJournalVolume", "isJournalVolumeOfIssue");
+        if (isIssueOfJournalVolume == null) {
+            isIssueOfJournalVolume = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
+                journalVolumeEntityType, journalIssueEntityType, "isIssueOfJournalVolume",
+                "isJournalVolumeOfIssue", null, null, null, null).build();
+        } else {
+            // Otherwise error in destroy methods when removing Journal Issue-Journal Volume relationship
+            // since the rightMinCardinality constraint would be violated upon deletion
+            isIssueOfJournalVolume.setRightMinCardinality(0);
+        }
+        RelationshipType isVolumeOfJournal = relationshipTypeService
+            .findbyTypesAndTypeName(context, journalEntityType, journalVolumeEntityType,
+                "isVolumeOfJournal", "isJournalOfVolume");
+        if (isVolumeOfJournal == null) {
+            isVolumeOfJournal = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
+                journalEntityType, journalVolumeEntityType, "isVolumeOfJournal", "isJournalOfVolume",
+                null, null, null, null).build();
+        } else {
+            // Otherwise error in destroy methods when removing Journal Volume - Journal relationship
+            // since the rightMinCardinality constraint would be violated upon deletion
+            isVolumeOfJournal.setRightMinCardinality(0);
+        }
+
+        // Create virtual metadata fields if needed
+        MetadataSchema journalSchema = metadataSchemaService.find(context, "journal");
+        if (journalSchema == null) {
+            journalSchema = metadataSchemaService.create(context, "journal", "journal");
+        }
+        String journalTitleVirtualMdField = "journal.title";
+        MetadataField journalTitleField = metadataFieldService.findByString(context, journalTitleVirtualMdField, '.');
+        if (journalTitleField == null) {
+            metadataFieldService.create(context, journalSchema, "title", null, "Journal Title");
+        }
+
+        String journalTitle = "Journal Title Test";
+
+        // Create entity items
+        Item journal = ItemBuilder.createItem(context, col5).withTitle(journalTitle).build();
+        Item journalVolume = ItemBuilder.createItem(context, col6).withTitle("JournalVolume").build();
+        Item journalIssue = ItemBuilder.createItem(context, col7).withTitle("JournalIssue").build();
+        Item publication = ItemBuilder.createItem(context, col2).withTitle("Publication").build();
+
+        // Link Publication-Journal Issue
+        RelationshipBuilder.createRelationshipBuilder(context, journalIssue, publication, isPublicationOfJournalIssue)
+                           .build();
+        // Link Journal Issue-Journal Volume
+        RelationshipBuilder.createRelationshipBuilder(context, journalVolume, journalIssue, isIssueOfJournalVolume)
+                           .build();
+        mockSolrSearchCore.getSolr().commit(false, false);
+
+        // Verify Publication item via REST does not contain virtual md journal.title
+        getClient().perform(get("/api/core/items/" + publication.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata." + journalTitleVirtualMdField).doesNotExist());
+
+        // Verify Publication item via Solr does not contain virtual md journal.title
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("search.resourceid:" + publication.getID());
+        QueryResponse queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertNull(queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField));
+
+        // Link Journal Volume - Journal
+        RelationshipBuilder.createRelationshipBuilder(context, journal, journalVolume, isVolumeOfJournal).build();
+        mockSolrSearchCore.getSolr().commit(false, false);
+
+        // Verify Publication item via REST does contain virtual md journal.title
+        getClient().perform(get("/api/core/items/" + publication.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Publication item via Solr contains virtual md journal.title
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        // Verify Journal Volume item via REST also contains virtual md journal.title
+        getClient().perform(get("/api/core/items/" + journalVolume.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Journal Volume item via Solr also contains virtual md journal.title
+        solrQuery.setQuery("search.resourceid:" + journalVolume.getID());
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        // Verify Journal Issue item via REST also contains virtual md journal.title
+        getClient().perform(get("/api/core/items/" + journalIssue.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.metadata", allOf(
+                       matchMetadata(journalTitleVirtualMdField, journalTitle))));
+
+        // Verify Journal Issue item via Solr also contains virtual md journal.title
+        solrQuery.setQuery("search.resourceid:" + journalIssue.getID());
+        queryResponse = mockSolrSearchCore.getSolr().query(solrQuery);
+        assertThat(queryResponse.getResults().size(), equalTo(1));
+        assertEquals(journalTitle,
+            ((List) queryResponse.getResults().get(0).getFieldValues(journalTitleVirtualMdField)).get(0));
+
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void findOneTestWrongUUID() throws Exception {
+        getClient().perform(get("/api/core/relationships/" + 1000))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Verify whether the relationship metadata appears correctly on both members.
+     * {@link #isAuthorOfPublicationRelationshipType} is tested again in
+     * {@link LeftTiltedRelationshipRestRepositoryIT} with tilted set to left.
+     */
+    @Test
+    public void testIsAuthorOfPublicationRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+                context, publication1, author1, isAuthorOfPublicationRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPublicationOfAuthor", MetadataSchemaEnum.RELATION.getName()),
+                publication1.getID().toString()
+            )));
+
+        // get publication metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", publication1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isAuthorOfPublication", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
+
+    /**
+     * Verify whether the relationship metadata appears correctly on both members.
+     * {@link #isOrgUnitOfPersonRelationshipType} is tested again in
+     * {@link RightTiltedRelationshipRestRepositoryIT} with tilted set to right.
+     */
+    @Test
+    public void testIsOrgUnitOfPersonRelationshipMetadataViaREST() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.createRelationshipBuilder(
+            context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType
+        ).build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // get author metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", author1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isOrgUnitOfPerson", MetadataSchemaEnum.RELATION.getName()),
+                orgUnit1.getID().toString()
+            )));
+
+        // get org unit metadata using REST
+        getClient(adminToken)
+            .perform(
+                get("/api/core/items/{uuid}", orgUnit1.getID())
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.metadata", matchMetadata(
+                String.format("%s.isPersonOfOrgUnit", MetadataSchemaEnum.RELATION.getName()),
+                author1.getID().toString()
+            )));
+    }
+
+    @Test
+    public void findByItemsAndTypeTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        Relationship relationship1 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
+                                                         isAuthorOfPublicationRelationshipType)
+                                                        .withLeftPlace(1)
+                                                        .build();
+        Relationship relationship2 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author1,
+                                                         isAuthorOfPublicationRelationshipType)
+                                                        .withLeftPlace(1)
+                                                        .build();
+
+        context.restoreAuthSystemState();
+
+        // by left relation
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                              RelationshipMatcher.matchRelationshipValues(relationship1),
+                              RelationshipMatcher.matchRelationshipValues(relationship2)
+                              )))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        // by right relation
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                   .param("relationshipLabel", "isPublicationOfAuthor")
+                   .param("focusItem", author1.getID().toString())
+                   .param("relatedItem", publication1.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships", contains(
+                              RelationshipMatcher.matchRelationshipValues(relationship2)
+                              )))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByItemsAndTypeBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                             entityTypeService.findByEntityType(context, "Person"),
+                                             "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
+                            isAuthorOfPublicationRelationshipType)
+                           .withLeftPlace(1)
+                           .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author1,
+                            isAuthorOfPublicationRelationshipType)
+                           .withLeftPlace(1)
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        // missing relationshipLabel
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", "1")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isBadRequest());
+
+        // missing typeId
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isBadRequest());
+
+        // missing focusItem
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", "1")
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isBadRequest());
+
+        // missing relatedItem
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", "1")
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString()))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByItemsAndTypeUnprocessableEntityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                  entityTypeService.findByEntityType(context, "Person"),
+                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
+                            isAuthorOfPublicationRelationshipType)
+                           .withLeftPlace(1)
+                           .build();
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author1,
+                            isAuthorOfPublicationRelationshipType)
+                           .withLeftPlace(1)
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                   .param("relationshipLabel", "wrongLabel")
+                   .param("focusItem", orgUnit1.getID().toString())
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findByItemsAndTypeEmptyResponceTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                             entityTypeService.findByEntityType(context, "Person"),
+                                             "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
+                            isAuthorOfPublicationRelationshipType)
+                           .withLeftPlace(1)
+                           .build();
+        RelationshipBuilder.createRelationshipBuilder(context, publication1, author1,
+                            isAuthorOfPublicationRelationshipType)
+                           .withLeftPlace(1)
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        Integer typeId = Integer.MAX_VALUE;
+
+        // with typeId that does not exist
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", typeId.toString())
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships").doesNotExist());
+
+        // with focus item that does not exist
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                .param("relationshipLabel", "isAuthorOfPublication")
+                .param("focusItem", UUID.randomUUID().toString())
+                .param("relatedItem", author1.getID().toString(),
+                                      author2.getID().toString(),
+                                      author3.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.relationships").doesNotExist());
+    }
+
+    @Test
+    public void findByItemsAndTypePaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                             entityTypeService.findByEntityType(context, "Person"),
+                                             "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        Relationship relationship1 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
+                                                         isAuthorOfPublicationRelationshipType)
+                                                        .withLeftPlace(2)
+                                                        .build();
+        Relationship relationship2 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author1,
+                                                         isAuthorOfPublicationRelationshipType)
+                                                        .withLeftPlace(2)
+                                                        .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("size", "1")
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships", contains(
+                              RelationshipMatcher.matchRelationshipValues(relationship1)
+                              )))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("page", "1")
+                   .param("size", "1")
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships", contains(
+                              RelationshipMatcher.matchRelationshipValues(relationship2)
+                              )))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient().perform(get("/api/core/relationships/search/byItemsAndType")
+                   .param("typeId", isAuthorOfPublicationRelationshipType.getID().toString())
+                   .param("relationshipLabel", "isAuthorOfPublication")
+                   .param("focusItem", publication1.getID().toString())
+                   .param("page", "5")
+                   .param("relatedItem", author1.getID().toString(),
+                                         author2.getID().toString(),
+                                         author3.getID().toString()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.number", is(5)))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findTheCreatedRelationshipTypeTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Relationship relationship = RelationshipBuilder
+            .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
+
+        context.restoreAuthSystemState();
+
+        Integer relationshipId = relationship.getID();
+        getClient().perform(get("/api/core/relationships/" + relationshipId))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.id", is(relationship.getID())))
+                   .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
+                   .andExpect(jsonPath("$._links.relationshipType.href",
+                       containsString("/api/core/relationships/" + relationshipId + "/relationshipType"))
+                   );
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/relationships/" + relationshipId + "/relationshipType"))
+                             .andExpect(status().isOk());
+    }
 
 }

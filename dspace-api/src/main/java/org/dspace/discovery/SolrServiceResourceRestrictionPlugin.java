@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
@@ -27,7 +28,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
@@ -84,17 +85,19 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
             try {
                 List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
                 for (ResourcePolicy resourcePolicy : policies) {
-                    String fieldValue;
-                    if (resourcePolicy.getGroup() != null) {
-                        //We have a group add it to the value
-                        fieldValue = "g" + resourcePolicy.getGroup().getID();
-                    } else {
-                        //We have an eperson add it to the value
-                        fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                    if (resourcePolicyService.isDateValid(resourcePolicy)) {
+                        String fieldValue;
+                        if (resourcePolicy.getGroup() != null) {
+                            //We have a group add it to the value
+                            fieldValue = "g" + resourcePolicy.getGroup().getID();
+                        } else {
+                            //We have an eperson add it to the value
+                            fieldValue = "e" + resourcePolicy.getEPerson().getID();
 
+                        }
+
+                        document.addField("read", fieldValue);
                     }
-
-                    document.addField("read", fieldValue);
 
                     //remove the policy from the cache to save memory
                     context.uncacheEntity(resourcePolicy);
@@ -106,15 +109,18 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                         List<ResourcePolicy> policiesAdmin = authorizeService
                                      .getPoliciesActionFilter(context, dso, Constants.ADMIN);
                         for (ResourcePolicy resourcePolicy : policiesAdmin) {
-                            String fieldValue;
-                            if (resourcePolicy.getGroup() != null) {
-                                // We have a group add it to the value
-                                fieldValue = "g" + resourcePolicy.getGroup().getID();
-                            } else {
-                                // We have an eperson add it to the value
-                                fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                            if (resourcePolicyService.isDateValid(resourcePolicy)) {
+                                String fieldValue;
+                                if (resourcePolicy.getGroup() != null) {
+                                    // We have a group add it to the value
+                                    fieldValue = "g" + resourcePolicy.getGroup().getID();
+                                } else {
+                                    // We have an eperson add it to the value
+                                    fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                                }
+                                document.addField("read", fieldValue);
+                                document.addField("admin", fieldValue);
                             }
-                            document.addField("read", fieldValue);
 
                             // remove the policy from the cache to save memory
                             context.uncacheEntity(resourcePolicy);
@@ -123,7 +129,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     dso = ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);
                 }
             } catch (SQLException e) {
-                log.error(LogManager.getHeader(context, "Error while indexing resource policies",
+                log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                                                "DSpace object: (id " + dso.getID() + " type " + dso.getType() + ")"
                 ));
             }
@@ -155,20 +161,21 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                 resourceQuery.append(")");
 
-                if (authorizeService.isCommunityAdmin(context)
-                    || authorizeService.isCollectionAdmin(context)) {
+                String locations = DSpaceServicesFactory.getInstance()
+                                                          .getServiceManager()
+                                                          .getServiceByName(SearchService.class.getName(),
+                                                                            SearchService.class)
+                                                          .createLocationQueryForAdministrableItems(context);
+
+                if (StringUtils.isNotBlank(locations)) {
                     resourceQuery.append(" OR ");
-                    resourceQuery.append(DSpaceServicesFactory.getInstance()
-                                                              .getServiceManager()
-                                                              .getServiceByName(SearchService.class.getName(),
-                                                                                SearchService.class)
-                                                              .createLocationQueryForAdministrableItems(context));
+                    resourceQuery.append(locations);
                 }
 
                 solrQuery.addFilterQuery(resourceQuery.toString());
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(context, "Error while adding resource policy information to query", ""), e);
+            log.error(LogHelper.getHeader(context, "Error while adding resource policy information to query", ""), e);
         }
     }
 }

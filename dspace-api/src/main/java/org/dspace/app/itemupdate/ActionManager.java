@@ -7,6 +7,7 @@
  */
 package org.dspace.app.itemupdate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,22 +21,25 @@ import java.util.Map;
 public class ActionManager implements Iterable<UpdateAction> {
 
     protected Map<Class<? extends UpdateAction>, UpdateAction> registry
-        = new LinkedHashMap<Class<? extends UpdateAction>, UpdateAction>();
+        = new LinkedHashMap<>();
 
     /**
-     * Get update action
+     * Get update action.
      *
      * @param actionClass UpdateAction class
      * @return instantiation of UpdateAction class
      * @throws InstantiationException if instantiation error
      * @throws IllegalAccessException if illegal access error
+     * @throws NoSuchMethodException passed through.
+     * @throws InvocationTargetException passed through.
      */
     public UpdateAction getUpdateAction(Class<? extends UpdateAction> actionClass)
-        throws InstantiationException, IllegalAccessException {
+        throws InstantiationException, IllegalAccessException,
+            NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
         UpdateAction action = registry.get(actionClass);
 
         if (action == null) {
-            action = actionClass.newInstance();
+            action = actionClass.getDeclaredConstructor().newInstance();
             registry.put(actionClass, action);
         }
 
@@ -58,7 +62,8 @@ public class ActionManager implements Iterable<UpdateAction> {
     @Override
     public Iterator<UpdateAction> iterator() {
         return new Iterator<UpdateAction>() {
-            private Iterator<Class<? extends UpdateAction>> itr = registry.keySet().iterator();
+            private final Iterator<Class<? extends UpdateAction>> itr
+                    = registry.keySet().iterator();
 
             @Override
             public boolean hasNext() {

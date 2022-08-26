@@ -21,7 +21,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.SyndicationFeed;
@@ -33,15 +33,20 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.dspace.discovery.indexobject.IndexableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +64,7 @@ import org.w3c.dom.Document;
 @RequestMapping("/opensearch")
 public class OpenSearchController {
 
-    private static final Logger log = Logger.getLogger(ScopeResolver.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
     private static final String errorpath = "/error";
     private List<String> searchIndices = null;
 
@@ -68,7 +73,16 @@ public class OpenSearchController {
     private AuthorizeService authorizeService;
     private OpenSearchService openSearchService;
 
+    @Autowired
+    private SearchService searchService;
+
+    @Autowired
+    private DiscoveryConfigurationService searchConfigurationService;
+
     private Context context;
+
+    @Autowired
+    private ScopeResolver scopeResolver;
 
     /**
      * This method provides the OpenSearch query on the path /search
@@ -81,6 +95,9 @@ public class OpenSearchController {
                          @RequestParam(name = "start", required = false) Integer start,
                          @RequestParam(name = "rpp", required = false) Integer count,
                          @RequestParam(name = "format", required = false) String format,
+                         @RequestParam(name = "sort", required = false) String sort,
+                         @RequestParam(name = "sort_direction", required = false) String sortDirection,
+                         @RequestParam(name = "scope", required = false) String dsoObject,
                          Model model) throws IOException, ServletException {
         context = ContextUtil.obtainContext(request);
         if (start == null) {
@@ -116,9 +133,34 @@ public class OpenSearchController {
 
             // support pagination parameters
             DiscoverQuery queryArgs = new DiscoverQuery();
-            queryArgs.setQuery(query);
+            if (query == null) {
+                query = "";
+            } else {
+                queryArgs.setQuery(query);
+            }
             queryArgs.setStart(start);
             queryArgs.setMaxResults(count);
+            queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
+            if (sort != null) {
+                //this is the default sort so we want to switch this to date accessioned
+                if (sortDirection != null && sortDirection.equals("DESC")) {
+                    queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
+                } else {
+                    queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
+                }
+            } else {
+                queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
+            }
+            if (dsoObject != null) {
+                container = scopeResolver.resolveScope(context, dsoObject);
+                DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
+                        .getDiscoveryConfigurationByNameOrDso("site", container);
+                queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
+                queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
+                        .toArray(
+                                new String[discoveryConfiguration.getDefaultFilterQueries()
+                                        .size()]));
+            }
 
             // Perform the search
             DiscoverResult qResults = null;
@@ -126,8 +168,7 @@ public class OpenSearchController {
                 qResults = SearchUtils.getSearchService().search(context,
                     container, queryArgs);
             } catch (SearchServiceException e) {
-                log.error(
-                    LogManager.getHeader(context, "opensearch", "query="
+                log.error(LogHelper.getHeader(context, "opensearch", "query="
                             + queryArgs.getQuery()
                             + ",error=" + e.getMessage()), e);
                 throw new RuntimeException(e.getMessage(), e);

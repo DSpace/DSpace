@@ -1,0 +1,201 @@
+<eSearchResult>
+<Count>4</Count>
+<RetMax>4</RetMax>
+<RetStart>0</RetStart>
+<IdList>
+<Id>31031165</Id>
+<Id>22172896</Id>
+<Id>21766079</Id>
+<Id>18926410</Id>
+</IdList>
+<TranslationSet>
+<Translation>
+<From>Transfer</From>
+<To>"Transfer (Bruss)"[Journal] OR "transfer"[All Fields]</To>
+</Translation>
+<Translation>
+<From>donor</From>
+<To>"tissue donors"[MeSH Terms] OR ("tissue"[All Fields] AND "donors"[All Fields]) OR "tissue donors"[All Fields] OR "donor"[All Fields]</To>
+</Translation>
+<Translation>
+<From>lung transplant</From>
+<To>"lung transplantation"[MeSH Terms] OR ("lung"[All Fields] AND "transplantation"[All Fields]) OR "lung transplantation"[All Fields] OR ("lung"[All Fields] AND "transplant"[All Fields]) OR "lung transplant"[All Fields]</To>
+</Translation>
+<Translation>
+<From>peanut allergy</From>
+<To>"peanut hypersensitivity"[MeSH Terms] OR ("peanut"[All Fields] AND "hypersensitivity"[All Fields]) OR "peanut hypersensitivity"[All Fields] OR ("peanut"[All Fields] AND "allergy"[All Fields]) OR "peanut allergy"[All Fields]</To>
+</Translation>
+</TranslationSet>
+<TranslationStack>
+<TermSet>
+<Term>"Transfer (Bruss)"[Journal]</Term>
+<Field>Journal</Field>
+<Count>3</Count>
+<Explode>N</Explode>
+</TermSet>
+<TermSet>
+<Term>"transfer"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>536344</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<OP>GROUP</OP>
+<TermSet>
+<Term>"peanut hypersensitivity"[MeSH Terms]</Term>
+<Field>MeSH Terms</Field>
+<Count>1378</Count>
+<Explode>Y</Explode>
+</TermSet>
+<TermSet>
+<Term>"peanut"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>12786</Count>
+<Explode>N</Explode>
+</TermSet>
+<TermSet>
+<Term>"hypersensitivity"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>169206</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>AND</OP>
+<OP>GROUP</OP>
+<OP>OR</OP>
+<TermSet>
+<Term>"peanut hypersensitivity"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>1401</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<TermSet>
+<Term>"peanut"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>12786</Count>
+<Explode>N</Explode>
+</TermSet>
+<TermSet>
+<Term>"allergy"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>217627</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>AND</OP>
+<OP>GROUP</OP>
+<OP>OR</OP>
+<TermSet>
+<Term>"peanut allergy"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>1363</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<OP>GROUP</OP>
+<OP>AND</OP>
+<TermSet>
+<Term>"tissue donors"[MeSH Terms]</Term>
+<Field>MeSH Terms</Field>
+<Count>75060</Count>
+<Explode>Y</Explode>
+</TermSet>
+<TermSet>
+<Term>"tissue"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>1890325</Count>
+<Explode>N</Explode>
+</TermSet>
+<TermSet>
+<Term>"donors"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>189053</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>AND</OP>
+<OP>GROUP</OP>
+<OP>OR</OP>
+<TermSet>
+<Term>"tissue donors"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>40014</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<TermSet>
+<Term>"donor"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>227824</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<OP>GROUP</OP>
+<OP>AND</OP>
+<TermSet>
+<Term>"lung transplantation"[MeSH Terms]</Term>
+<Field>MeSH Terms</Field>
+<Count>16696</Count>
+<Explode>Y</Explode>
+</TermSet>
+<TermSet>
+<Term>"lung"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>918785</Count>
+<Explode>N</Explode>
+</TermSet>
+<TermSet>
+<Term>"transplantation"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>775195</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>AND</OP>
+<OP>GROUP</OP>
+<OP>OR</OP>
+<TermSet>
+<Term>"lung transplantation"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>21427</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<TermSet>
+<Term>"lung"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>918785</Count>
+<Explode>N</Explode>
+</TermSet>
+<TermSet>
+<Term>"transplant"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>280415</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>AND</OP>
+<OP>GROUP</OP>
+<OP>OR</OP>
+<TermSet>
+<Term>"lung transplant"[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>8224</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>OR</OP>
+<OP>GROUP</OP>
+<OP>AND</OP>
+<TermSet>
+<Term>recipient[All Fields]</Term>
+<Field>All Fields</Field>
+<Count>74692</Count>
+<Explode>N</Explode>
+</TermSet>
+<OP>AND</OP>
+<OP>GROUP</OP>
+</TranslationStack>
+<QueryTranslation>("Transfer (Bruss)"[Journal] OR "transfer"[All Fields]) AND ("peanut hypersensitivity"[MeSH Terms] OR ("peanut"[All Fields] AND "hypersensitivity"[All Fields]) OR "peanut hypersensitivity"[All Fields] OR ("peanut"[All Fields] AND "allergy"[All Fields]) OR "peanut allergy"[All Fields]) AND ("tissue donors"[MeSH Terms] OR ("tissue"[All Fields] AND "donors"[All Fields]) OR "tissue donors"[All Fields] OR "donor"[All Fields]) AND ("lung transplantation"[MeSH Terms] OR ("lung"[All Fields] AND "transplantation"[All Fields]) OR "lung transplantation"[All Fields] OR ("lung"[All Fields] AND "transplant"[All Fields]) OR "lung transplant"[All Fields]) AND recipient[All Fields]</QueryTranslation>
+<WarningList>
+<PhraseIgnored>of</PhraseIgnored>
+<PhraseIgnored>from</PhraseIgnored>
+<PhraseIgnored>the</PhraseIgnored>
+<QuotedPhraseNotFound>"Transfer of peanut allergy from the donor to a lung transplant recipient"</QuotedPhraseNotFound>
+</WarningList>
+</eSearchResult>

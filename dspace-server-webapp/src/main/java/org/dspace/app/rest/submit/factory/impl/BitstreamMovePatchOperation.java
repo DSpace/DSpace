@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,7 +40,7 @@ public class BitstreamMovePatchOperation extends MovePatchOperation<String> {
     }
 
     @Override
-    void move(Context context, Request currentRequest, InProgressSubmission source, String path, String from)
+    void move(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, String from)
         throws Exception {
         // TODO Auto-generated method stub
 

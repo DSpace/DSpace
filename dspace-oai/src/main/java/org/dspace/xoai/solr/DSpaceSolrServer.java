@@ -13,7 +13,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.service.impl.HttpConnectionPoolService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
@@ -30,9 +32,18 @@ public class DSpaceSolrServer {
 
     public static SolrClient getServer() throws SolrServerException {
         if (_server == null) {
-            String serverUrl = ConfigurationManager.getProperty("oai.solr.url");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            HttpConnectionPoolService httpConnectionPoolService
+                    = DSpaceServicesFactory.getInstance()
+                            .getServiceManager()
+                            .getServiceByName("solrHttpConnectionPoolService",
+                                    HttpConnectionPoolService.class);
+            String serverUrl = configurationService.getProperty("oai.solr.url");
             try {
-                _server = new HttpSolrClient.Builder(serverUrl).build();
+                _server = new HttpSolrClient.Builder(serverUrl)
+                        .withHttpClient(httpConnectionPoolService.getClient())
+                        .build();
                 log.debug("OAI Solr Server Initialized");
             } catch (Exception e) {
                 log.error("Could not initialize OAI Solr Server at " + serverUrl , e);

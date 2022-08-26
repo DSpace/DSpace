@@ -9,12 +9,14 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-import com.google.common.collect.Iterators;
 import org.dspace.app.bulkedit.DSpaceCSV;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Constants;
@@ -31,8 +33,11 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private DSpaceObjectUtils dSpaceObjectUtils;
+
     @Override
-    public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String handle,
+    public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String identifier,
                                   DSpaceRunnableHandler handler) throws Exception {
         Iterator<Item> toExport = null;
 
@@ -40,26 +45,32 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             handler.logInfo("Exporting whole repository WARNING: May take some time!");
             toExport = itemService.findAll(context);
         } else {
-            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
+            DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
+                .resolveToObject(context, identifier);
+            if (dso == null) {
+                dso = dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(identifier));
+            }
             if (dso == null) {
                 throw new IllegalArgumentException(
-                    "Item '" + handle + "' does not resolve to an item in your repository!");
+                    "DSO '" + identifier + "' does not resolve to a DSpace Object in your repository!");
             }
 
             if (dso.getType() == Constants.ITEM) {
-                handler.logInfo("Exporting item '" + dso.getName() + "' (" + handle + ")");
+                handler.logInfo("Exporting item '" + dso.getName() + "' (" + identifier + ")");
                 List<Item> item = new ArrayList<>();
                 item.add((Item) dso);
                 toExport = item.iterator();
             } else if (dso.getType() == Constants.COLLECTION) {
-                handler.logInfo("Exporting collection '" + dso.getName() + "' (" + handle + ")");
+                handler.logInfo("Exporting collection '" + dso.getName() + "' (" + identifier + ")");
                 Collection collection = (Collection) dso;
                 toExport = itemService.findByCollection(context, collection);
             } else if (dso.getType() == Constants.COMMUNITY) {
-                handler.logInfo("Exporting community '" + dso.getName() + "' (" + handle + ")");
+                handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
                 toExport = buildFromCommunity(context, (Community) dso);
             } else {
-                throw new IllegalArgumentException("Error identifying '" + handle + "'");
+                throw new IllegalArgumentException(
+                    String.format("DSO with id '%s' (type: %s) can't be exported. Supported types: %s", identifier,
+                        Constants.typeText[dso.getType()], "Item | Collection | Community"));
             }
         }
 
@@ -91,40 +102,36 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
     }
 
     /**
-     * Build an array list of item ids that are in a community (include sub-communities and collections)
+     * Build a Java Collection of item IDs that are in a Community (including
+     * its sub-Communities and Collections)
      *
      * @param context   DSpace context
      * @param community The community to build from
-     * @return The list of item ids
+     * @return Iterator over the Collection of item ids
      * @throws SQLException if database error
      */
     private Iterator<Item> buildFromCommunity(Context context, Community community)
         throws SQLException {
+        Set<Item> result = new HashSet<>();
+
         // Add all the collections
         List<Collection> collections = community.getCollections();
-        Iterator<Item> result = Collections.<Item>emptyIterator();
         for (Collection collection : collections) {
             Iterator<Item> items = itemService.findByCollection(context, collection);
-            result = addItemsToResult(result, items);
-
+            while (items.hasNext()) {
+                result.add(items.next());
+            }
         }
-        // Add all the sub-communities
+
+    // Add all the sub-communities
         List<Community> communities = community.getSubcommunities();
         for (Community subCommunity : communities) {
             Iterator<Item> items = buildFromCommunity(context, subCommunity);
-            result = addItemsToResult(result, items);
+            while (items.hasNext()) {
+                result.add(items.next());
+            }
         }
 
-        return result;
-    }
-
-    private Iterator<Item> addItemsToResult(Iterator<Item> result, Iterator<Item> items) {
-        if (result == null) {
-            result = items;
-        } else {
-            result = Iterators.concat(result, items);
-        }
-
-        return result;
+        return result.iterator();
     }
 }

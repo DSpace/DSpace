@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -33,11 +34,15 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.DefaultFilter;
+import org.dspace.content.logic.LogicalStatement;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.identifier.doi.DOIConnector;
+import org.dspace.identifier.doi.DOIIdentifierException;
+import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
@@ -60,7 +65,7 @@ public class DOIIdentifierProviderTest
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DOIIdentifierProviderTest.class);
+    private static final Logger log = LogManager.getLogger(DOIIdentifierProviderTest.class);
 
     private static final String PREFIX = "10.5072";
     private static final String NAMESPACE_SEPARATOR = "dspaceUnitTests-";
@@ -99,10 +104,12 @@ public class DOIIdentifierProviderTest
             context.turnOffAuthorisationSystem();
             // Create an environment for our test objects to live in.
             community = communityService.create(null, context);
-            communityService.setMetadata(context, community, "name", "A Test Community");
+            communityService.setMetadataSingleValue(context, community,
+                    CommunityService.MD_NAME, null, "A Test Community");
             communityService.update(context, community);
             collection = collectionService.create(context, community);
-            collectionService.setMetadata(context, collection, "name", "A Test Collection");
+            collectionService.setMetadataSingleValue(context, collection,
+                    CollectionService.MD_NAME, null, "A Test Collection");
             collectionService.update(context, collection);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
@@ -115,11 +122,13 @@ public class DOIIdentifierProviderTest
 
             connector = mock(DOIConnector.class);
 
-            provider = DSpaceServicesFactory.getInstance().getServiceManager()
-                                            .getServiceByName(DOIIdentifierProvider.class.getName(),
-                                                              DOIIdentifierProvider.class);
+            provider = new DOIIdentifierProvider();
+            provider.doiService = doiService;
+            provider.contentServiceFactory = ContentServiceFactory.getInstance();
+            provider.itemService = itemService;
             provider.setConfigurationService(config);
             provider.setDOIConnector(connector);
+            provider.setFilterService(null);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -179,10 +188,10 @@ public class DOIIdentifierProviderTest
                                                                DOIIdentifierProvider.DOI_ELEMENT,
                                                                DOIIdentifierProvider.DOI_QUALIFIER,
                                                                null);
-        List<String> remainder = new ArrayList<String>();
+        List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
-            if (!id.getValue().startsWith(DOI.RESOLVER)) {
+            if (!id.getValue().startsWith(doiService.getResolver())) {
                 remainder.add(id.getValue());
             }
         }
@@ -216,9 +225,11 @@ public class DOIIdentifierProviderTest
      * @param item     Item the DOI should be created for.
      * @param status   The status of the DOI.
      * @param metadata Whether the DOI should be included in the metadata of the item.
-     * @param doi      The doi or null if we should generate one.
+     * @param doi      The DOI or null if we should generate one.
      * @return the DOI
      * @throws SQLException if database error
+     * @throws org.dspace.identifier.IdentifierException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     public String createDOI(Item item, Integer status, boolean metadata, String doi)
         throws SQLException, IdentifierException, AuthorizeException {
@@ -267,11 +278,11 @@ public class DOIIdentifierProviderTest
             PREFIX + "/" + NAMESPACE_SEPARATOR + "lkjljasd1234",
             DOI.SCHEME + "10.5072/123abc-lkj/kljl",
             "http://dx.doi.org/10.5072/123abc-lkj/kljl",
-            DOI.RESOLVER + "/10.5072/123abc-lkj/kljl"
+            doiService.getResolver() + "/10.5072/123abc-lkj/kljl"
         };
 
         for (String doi : validDOIs) {
-            assertTrue("DOI should be supported", provider.supports(doi));
+            assertTrue("DOI " + doi + " should be supported", provider.supports(doi));
         }
     }
 
@@ -331,8 +342,8 @@ public class DOIIdentifierProviderTest
         itemService.update(context, item);
         context.restoreAuthSystemState();
 
-        assertTrue("Failed to recognize DOI in item metadata.",
-                   doi.equals(provider.getDOIOutOfObject(item)));
+        assertEquals("Failed to recognize DOI in item metadata.",
+                doi, provider.getDOIOutOfObject(item));
     }
 
     @Test
@@ -492,10 +503,10 @@ public class DOIIdentifierProviderTest
         Item item = newItem();
         String doi = null;
         try {
-            // get a DOI:
-            doi = provider.mint(context, item);
+            // get a DOI (skipping any filters)
+            doi = provider.mint(context, item, true);
         } catch (IdentifierException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             fail("Got an IdentifierException: " + e.getMessage());
         }
 
@@ -504,8 +515,8 @@ public class DOIIdentifierProviderTest
 
         try {
             doiService.formatIdentifier(doi);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (DOIIdentifierException e) {
+            e.printStackTrace(System.err);
             fail("Minted an unrecognizable DOI: " + e.getMessage());
         }
     }
@@ -522,6 +533,82 @@ public class DOIIdentifierProviderTest
         assertNotNull("Minted DOI is null?!", retrievedDOI);
         assertEquals("Mint did not returned an existing DOI!", doi, retrievedDOI);
     }
+
+    /**
+     * Test minting a DOI with a filter that always returns false and therefore never mints the DOI
+     */
+    @Test
+    public void testMint_DOI_withNonMatchingFilter()
+        throws SQLException, AuthorizeException, IOException, IllegalAccessException, IdentifierException,
+        WorkflowException {
+        Item item = newItem();
+        boolean wasFiltered = false;
+        try {
+            // Temporarily set the provider to have a filter that always returns false for an item
+            // (therefore, the item should be 'filtered' out and not apply to this minting request)
+            DefaultFilter doiFilter = new DefaultFilter();
+            LogicalStatement alwaysFalse = (context, i) -> false;
+            doiFilter.setStatement(alwaysFalse);
+            provider.setFilterService(doiFilter);
+            // get a DOI with the method that applies filters by default
+            provider.mint(context, item);
+        } catch (DOIIdentifierNotApplicableException e) {
+            // This is what we wanted to see - we can return safely
+            wasFiltered = true;
+        } catch (IdentifierException e) {
+            e.printStackTrace();
+            fail("Got an IdentifierException: " + e.getMessage());
+        } finally {
+            // Set filter service back to null
+            provider.setFilterService(null);
+        }
+        // Fail the test if the filter didn't throw a "not applicable" exception
+        assertTrue("DOI minting attempt was not filtered by filter service", wasFiltered);
+    }
+
+    /**
+     * Test minting a DOI with a filter that always returns true and therefore allows the DOI to be minted
+     * (this should have hte same results as base testMint_DOI, but here we use an explicit filter rather than null)
+     */
+    @Test
+    public void testMint_DOI_withMatchingFilter()
+        throws SQLException, AuthorizeException, IOException, IllegalAccessException, IdentifierException,
+        WorkflowException {
+        Item item = newItem();
+        String doi = null;
+        boolean wasFiltered = false;
+        try {
+            // Temporarily set the provider to have a filter that always returns true for an item
+            // (therefore, the item is allowed to have a DOI minted)
+            DefaultFilter doiFilter = new DefaultFilter();
+            LogicalStatement alwaysTrue = (context, i) -> true;
+            doiFilter.setStatement(alwaysTrue);
+            provider.setFilterService(doiFilter);
+            // get a DOI with the method that applies filters by default
+            doi = provider.mint(context, item);
+        } catch (DOIIdentifierNotApplicableException e) {
+            // This is what we wanted to see - we can return safely
+            wasFiltered = true;
+        } catch (IdentifierException e) {
+            e.printStackTrace();
+            fail("Got an IdentifierException: " + e.getMessage());
+        } finally {
+            provider.setFilterService(null);
+        }
+        // If the attempt was filtered, fail
+        assertFalse("DOI minting attempt was incorrectly filtered by filter service", wasFiltered);
+
+        // Continue with regular minting tests
+        assertNotNull("Minted DOI is null!", doi);
+        assertFalse("Minted DOI is empty!", doi.isEmpty());
+        try {
+            doiService.formatIdentifier(doi);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Minted an unrecognizable DOI: " + e.getMessage());
+        }
+    }
+
 
     @Test
     public void testReserve_DOI()
@@ -577,7 +664,8 @@ public class DOIIdentifierProviderTest
         IdentifierException, WorkflowException, IllegalAccessException {
         Item item = newItem();
 
-        String doi = provider.register(context, item);
+        // Register, skipping the filter
+        String doi = provider.register(context, item, true);
 
         // we want the created DOI to be returned in the following format:
         // doi:10.<prefix>/<suffix>.

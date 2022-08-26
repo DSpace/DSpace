@@ -20,7 +20,8 @@ import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -30,13 +31,14 @@ import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
-import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.RequestService;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
@@ -51,11 +53,16 @@ import org.springframework.stereotype.Service;
 /**
  * Converts domain objects from the DSpace service layer to rest objects, and from rest objects to resource
  * objects, applying {@link Projection}s where applicable.
+ * <P>
+ * MUST be loaded @Lazy, as this service requires other services to be preloaded (especially DSpaceConverter components)
+ * and that can result in circular references if those services need this ConverterService (and many do).
+ * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  */
+@Lazy
 @Service
 public class ConverterService {
 
-    private static final Logger log = Logger.getLogger(ConverterService.class);
+    private static final Logger log = LogManager.getLogger();
 
     private final Map<String, Projection> projectionMap = new HashMap<>();
 
@@ -74,9 +81,6 @@ public class ConverterService {
 
     @Autowired
     private List<Projection> projections;
-
-    @Autowired
-    private DSpacePermissionEvaluator dSpacePermissionEvaluator;
 
     @Autowired
     private WebSecurityExpressionEvaluator webSecurityExpressionEvaluator;
@@ -149,12 +153,28 @@ public class ConverterService {
         DSpaceRestRepository repositoryToUse = utils
             .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
         Annotation preAuthorize = null;
-        for (Method m : repositoryToUse.getClass().getMethods()) {
+        int maxDepth = 0;
+        // DS-4530 exclude the AOP Proxy from determining the annotations
+        for (Method m : AopUtils.getTargetClass(repositoryToUse).getMethods()) {
             if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
-                preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                int depth = howManySuperclass(m.getDeclaringClass());
+                if (depth > maxDepth) {
+                    preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                    maxDepth = depth;
+                }
             }
         }
         return preAuthorize;
+    }
+
+    private int howManySuperclass(Class<?> declaringClass) {
+        Class curr = declaringClass;
+        int count = 0;
+        while (curr != Object.class) {
+            curr = curr.getSuperclass();
+            count++;
+        }
+        return count;
     }
 
     private Annotation getDefaultFindOnePreAuthorize() {

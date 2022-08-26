@@ -92,7 +92,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
             return poolTask;
         } else {
             //If the user has a is processing or has finished the step for a workflowitem, there is no need to look
-            // for pooltasks for one of his
+            // for pooltasks for one of their
             //groups because the user already has the task claimed
             if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) != null) {
                 return null;
@@ -116,6 +116,19 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException, AuthorizeException {
         List<PoolTask> tasks = find(context, xmlWorkflowItem);
+        //Use an iterator to remove the tasks !
+        Iterator<PoolTask> iterator = tasks.iterator();
+        while (iterator.hasNext()) {
+            PoolTask poolTask = iterator.next();
+            iterator.remove();
+            delete(context, poolTask);
+        }
+    }
+
+    @Override
+    public void deleteByEperson(Context context, EPerson ePerson)
+        throws SQLException, AuthorizeException, IOException {
+        List<PoolTask> tasks = findByEperson(context, ePerson);
         //Use an iterator to remove the tasks !
         Iterator<PoolTask> iterator = tasks.iterator();
         while (iterator.hasNext()) {

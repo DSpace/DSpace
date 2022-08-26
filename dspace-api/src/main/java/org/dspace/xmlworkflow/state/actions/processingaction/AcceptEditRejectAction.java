@@ -36,6 +36,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
     private static final String SUBMIT_APPROVE = "submit_approve";
     private static final String SUBMIT_REJECT = "submit_reject";
+    private static final String SUBMITTER_IS_DELETED_PAGE = "submitter_deleted";
 
     //TODO: rename to AcceptAndEditMetadataAction
 
@@ -53,6 +54,8 @@ public class AcceptEditRejectAction extends ProcessingAction {
                     return processAccept(c, wfi);
                 case SUBMIT_REJECT:
                     return processRejectPage(c, wfi, request);
+                case SUBMITTER_IS_DELETED_PAGE:
+                    return processSubmitterIsDeletedPage(c, wfi, request);
                 default:
                     return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
             }
@@ -91,6 +94,22 @@ public class AcceptEditRejectAction extends ProcessingAction {
                 c.getCurrentUser(), this.getProvenanceStartId(), reason);
 
         return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+    }
+
+    public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
+            throws SQLException, AuthorizeException, IOException {
+        if (request.getParameter("submit_delete") != null) {
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                                     .deleteWorkflowByWorkflowItem(c, wfi, c.getCurrentUser());
+            // Delete and send user back to myDspace page
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        } else if (request.getParameter("submit_keep_it") != null) {
+            // Do nothing, just send it back to myDspace page
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        } else {
+            //Cancel, go back to the main task page
+            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
+        }
     }
 
     private void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {

@@ -14,9 +14,10 @@ import javax.persistence.Transient;
 
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
@@ -56,7 +57,9 @@ public class Site extends DSpaceObject {
     }
 
     public String getURL() {
-        return ConfigurationManager.getProperty("dspace.ui.url");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        return configurationService.getProperty("dspace.ui.url");
     }
 
     private SiteService getSiteService() {

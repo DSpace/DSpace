@@ -7,26 +7,30 @@
  */
 package org.dspace.storage.bitstore;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 
 /**
  * Cleans up asset store.
  *
  * @author Peter Breton
- * @version $Revision$
  */
 public class Cleanup {
     /**
      * log4j log
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Cleanup.class);
+    private static final Logger log = LogManager.getLogger(Cleanup.class);
 
     /**
      * Default constructor
@@ -43,7 +47,7 @@ public class Cleanup {
             log.info("Cleaning up asset store");
 
             // set up command line parser
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine line = null;
 
             // create an options object and populate it
@@ -77,7 +81,7 @@ public class Cleanup {
                                  .cleanup(deleteDbRecords, line.hasOption('v'));
 
             System.exit(0);
-        } catch (Exception e) {
+        } catch (IOException | SQLException | AuthorizeException e) {
             log.fatal("Caught exception:", e);
             System.exit(1);
         }

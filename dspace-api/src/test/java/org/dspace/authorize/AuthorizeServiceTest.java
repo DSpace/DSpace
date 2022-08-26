@@ -15,6 +15,7 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -26,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Created by pbecker as he wanted to write a test against DS-3572.
+ * Created by pbecker to write a test against DS-3572.
  * This definitely needs to be extended, but it's at least a start.
  */
 public class AuthorizeServiceTest extends AbstractUnitTest {
@@ -36,6 +37,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
     protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
                                                                                    .getResourcePolicyService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     public AuthorizeServiceTest() {
     }
@@ -78,7 +80,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
         }
 
         try {
-            // eperson1 should be able to write as he is member of a group that has write permissions
+            // eperson1 should be able to write as it is a member of a group that has write permissions
             Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
             // person2 shouldn't have write access
             Assert.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));
@@ -125,4 +127,72 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             throw new AssertionError(ex);
         }
     }
+//
+//    @Test
+//    public void testIsCollectionAdmin() throws SQLException, AuthorizeException, IOException {
+//
+//        Community community = null;
+//        EPerson eperson = null;
+//
+//        try {
+//
+//            context.turnOffAuthorisationSystem();
+//
+//            community = communityService.create(null, context);
+//            Collection collection = collectionService.create(context, community);
+//            eperson = ePersonService.create(context);
+//
+//            Group administrators = collectionService.createAdministrators(context, collection);
+//            groupService.addMember(context, administrators, eperson);
+//            context.commit();
+//            context.setCurrentUser(eperson);
+//
+//            Assert.assertTrue(authorizeService.isCollectionAdmin(context));
+//
+//        } finally {
+//
+//            if (community != null) {
+//                communityService.delete(context, context.reloadEntity(community));
+//            }
+//            if (eperson != null) {
+//                ePersonService.delete(context, context.reloadEntity(eperson));
+//            }
+//
+//            context.restoreAuthSystemState();
+//        }
+//    }
+//
+//    @Test
+//    public void testIsCollectionAdminReturnsTrueIfTheUserIsCommunityAdmin()
+//        throws SQLException, AuthorizeException, IOException {
+//
+//        Community community = null;
+//        EPerson eperson = null;
+//
+//        try {
+//
+//            context.turnOffAuthorisationSystem();
+//
+//            community = communityService.create(null, context);
+//            eperson = ePersonService.create(context);
+//
+//            Group administrators = communityService.createAdministrators(context, community);
+//            groupService.addMember(context, administrators, eperson);
+//            context.setCurrentUser(eperson);
+//            context.commit();
+//
+//            Assert.assertTrue(authorizeService.isCollectionAdmin(context));
+//
+//        } finally {
+//
+//            if (community != null) {
+//                communityService.delete(context, context.reloadEntity(community));
+//            }
+//            if (eperson != null) {
+//                ePersonService.delete(context, context.reloadEntity(eperson));
+//            }
+//
+//            context.restoreAuthSystemState();
+//        }
+//    }
 }

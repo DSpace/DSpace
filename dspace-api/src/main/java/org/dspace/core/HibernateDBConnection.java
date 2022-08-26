@@ -169,7 +169,8 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
     @Override
     public String getType() {
-        return ((SessionFactoryImplementor) sessionFactory).getDialect().toString();
+        return ((SessionFactoryImplementor) sessionFactory)
+                .getJdbcServices().getDialect().toString();
     }
 
     @Override

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.bulkedit;
 
-import java.io.OutputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
@@ -55,15 +54,9 @@ public class MetadataExportScriptConfiguration<T extends MetadataExport> extends
             Options options = new Options();
 
             options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
-            options.getOption("i").setType(String.class);
-            options.addOption("f", "file", true, "destination where you want file written");
-            options.getOption("f").setType(OutputStream.class);
-            options.getOption("f").setRequired(true);
             options.addOption("a", "all", false,
                               "include all metadata fields that are not normally changed (e.g. provenance)");
-            options.getOption("a").setType(boolean.class);
             options.addOption("h", "help", false, "help");
-            options.getOption("h").setType(boolean.class);
 
 
             super.options = options;

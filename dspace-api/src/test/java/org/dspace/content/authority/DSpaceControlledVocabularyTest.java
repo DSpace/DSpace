@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 
 import org.dspace.AbstractDSpaceTest;
-import org.dspace.content.Collection;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,6 +65,8 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
 
     /**
      * Test of getMatches method, of class DSpaceControlledVocabulary.
+     * @throws java.io.IOException passed through.
+     * @throws java.lang.ClassNotFoundException passed through.
      */
     @Test
     public void testGetMatches() throws IOException, ClassNotFoundException {
@@ -74,11 +75,9 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         final String PLUGIN_INTERFACE = "org.dspace.content.authority.ChoiceAuthority";
 
         // Ensure that 'id' attribute is optional
-        String field = null; // not used
         String text = "north 40";
-        Collection collection = null;
         int start = 0;
-        int limit = 0;
+        int limit = 10;
         String locale = null;
         // This "farm" Controlled Vocab is included in TestEnvironment data
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
@@ -86,8 +85,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
             CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
-        Choices result = instance.getMatches(field, text, collection, start,
-                                             limit, locale);
+        Choices result = instance.getMatches(text, start, limit, locale);
         assertEquals("the farm::north 40", result.values[0].value);
     }
 

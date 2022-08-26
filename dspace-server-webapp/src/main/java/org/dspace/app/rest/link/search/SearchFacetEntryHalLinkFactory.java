@@ -8,6 +8,7 @@
 package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -39,7 +40,7 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
         DiscoveryResultsRest searchData = halResource.getSearchData();
 
         String query = searchData == null ? null : searchData.getQuery();
-        String dsoType = searchData == null ? null : searchData.getDsoType();
+        List<String> dsoType = searchData == null ? null : searchData.getDsoTypes();
         String scope = searchData == null ? null : searchData.getScope();
         String configuration = searchData == null ? null : searchData.getConfiguration();
 

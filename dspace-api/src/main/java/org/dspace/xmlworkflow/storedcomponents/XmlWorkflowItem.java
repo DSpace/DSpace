@@ -24,6 +24,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 
 /**
  * Class representing an item going through the workflow process in DSpace
@@ -62,7 +63,7 @@ public class XmlWorkflowItem implements WorkflowItem {
 
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService#create(Context, Item, Collection)}
+     * {@link XmlWorkflowItemService#create(Context, Item, Collection)}
      */
     protected XmlWorkflowItem() {
 
@@ -130,12 +131,5 @@ public class XmlWorkflowItem implements WorkflowItem {
     @Override
     public void setPublishedBefore(boolean b) {
         this.publishedBefore = b;
-    }
-
-    @Override
-    public int getState() {
-        // FIXME not used by the xml workflow, should be removed when the basic workflow is removed and the interfaces
-        // simplified
-        return 0;
     }
 }

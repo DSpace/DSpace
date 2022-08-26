@@ -20,14 +20,24 @@ import org.dspace.eperson.EPerson;
 
 /**
  * Service interface class for the Workflow items.
- * All WorkflowItem service classes should implement this class since it offers some basic methods which all
- * WorkflowItems
- * are required to have.
+ * All WorkflowItem service classes should implement this class since it offers
+ * some basic methods which all WorkflowItems are required to have.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> Specific type of workflow.
  */
 public interface WorkflowItemService<T extends WorkflowItem> extends InProgressSubmissionService<T> {
 
+    /**
+     * Wrap an Item in a WorkflowItem to place it in a Collection's workflow.
+     *
+     * @param context current DSpace session.
+     * @param item the Item to be wrapped.
+     * @param collection place the Item in this Collection's workflow (if any).
+     * @return the wrapped Item.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
     public T create(Context context, Item item, Collection collection) throws SQLException, AuthorizeException;
 
     /**

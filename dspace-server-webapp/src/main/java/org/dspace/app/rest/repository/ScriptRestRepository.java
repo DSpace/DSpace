@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,8 +56,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
+    // TODO: findOne() currently requires site ADMIN permissions as all scripts are admin-only at this time.
+    // If scripts ever need to be accessible to Comm/Coll Admins, we would likely need to create a new GrantedAuthority
+    // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ScriptRest findOne(Context context, String name) {
 
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
@@ -70,7 +74,11 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         throw new DSpaceBadRequestException("The script with name: " + name + " could not be found");
     }
 
+    // TODO: findAll() currently requires site ADMIN permissions as all scripts are admin-only at this time.
+    // If scripts ever need to be accessible to Comm/Coll Admins, we would likely need to create a new GrantedAuthority
+    // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
         List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(context);
         return converter.toRestPage(scriptConfigurations, pageable, utils.obtainProjection());
@@ -102,7 +110,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
         }
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
-            context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
+            context.getCurrentUser(), scriptToExecute.getName(), dSpaceCommandLineParameters,
+            new HashSet<>(context.getSpecialGroups()));
         List<String> args = constructArgs(dSpaceCommandLineParameters);
         runDSpaceScript(files, context, scriptToExecute, restDSpaceRunnableHandler, args);
         return converter.toRest(restDSpaceRunnableHandler.getProcess(context), utils.obtainProjection());
@@ -140,15 +149,21 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         DSpaceRunnable dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
         try {
             dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, context.getCurrentUser());
-            checkFileNames(dSpaceRunnable, files);
-            processFiles(context, restDSpaceRunnableHandler, files);
+            if (files != null && !files.isEmpty()) {
+                checkFileNames(dSpaceRunnable, files);
+                processFiles(context, restDSpaceRunnableHandler, files);
+            }
             restDSpaceRunnableHandler.schedule(dSpaceRunnable);
         } catch (ParseException e) {
             dSpaceRunnable.printHelp();
-            restDSpaceRunnableHandler
-                .handleException(
-                    "Failed to parse the arguments given to the script with name: " + scriptToExecute.getName()
-                        + " and args: " + args, e);
+            try {
+                restDSpaceRunnableHandler.handleException(
+                    "Failed to parse the arguments given to the script with name: "
+                        + scriptToExecute.getName() + " and args: " + args, e
+                );
+            } catch (Exception re) {
+                // ignore re-thrown exception
+            }
         }
     }
 

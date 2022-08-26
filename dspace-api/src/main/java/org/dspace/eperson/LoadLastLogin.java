@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,10 +28,10 @@ import jdbm.helper.StringComparator;
 import jdbm.helper.Tuple;
 import jdbm.helper.TupleBrowser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -68,7 +69,7 @@ public class LoadLastLogin {
         options.addOption("p", "pretend", false, "Output TSV instead of updating database");
         options.addOption("v", "verbose", false, "Talk more about what we are doing");
 
-        PosixParser parser = new PosixParser();
+        DefaultParser parser = new DefaultParser();
         CommandLine command = null;
         try {
             command = parser.parse(options, argv);
@@ -108,7 +109,7 @@ public class LoadLastLogin {
         final SimpleDateFormat dateEncoder = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         for (String logName : args) {
-            BufferedReader logReader = new BufferedReader(new FileReader(logName));
+            BufferedReader logReader = new BufferedReader(new FileReader(logName, StandardCharsets.UTF_8));
             while (true) {
                 String line = logReader.readLine();
                 // End of file?

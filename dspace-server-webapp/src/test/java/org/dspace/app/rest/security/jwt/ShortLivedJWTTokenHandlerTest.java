@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     public void testJWTNoEncryption() throws Exception {
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         String token = shortLivedJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         SignedJWT signedJWT = SignedJWT.parse(token);
         String personId = (String) signedJWT.getJWTClaimsSet().getClaim(EPersonClaimProvider.EPERSON_ID);
         assertEquals("epersonID", personId);
@@ -70,7 +69,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
         when(configurationService.getProperty("jwt.shortLived.encryption.secret"))
             .thenReturn(keyGenerator.generateKey());
         String token = shortLivedJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         SignedJWT signedJWT = SignedJWT.parse(token);
     }
 
@@ -82,7 +81,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
         String token = shortLivedJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         EPerson parsed = shortLivedJWTTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
         assertEquals(null, parsed);
 
@@ -95,7 +94,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
         String token = shortLivedJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(
             new Date(System.currentTimeMillis() + 99999999)).build();
         String tamperedPayload = new String(Base64.getUrlEncoder().encode(jwtClaimsSet.toString().getBytes()));
@@ -110,7 +109,7 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         // create a new token
         String token = shortLivedJWTTokenHandler
-            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous);
         // immediately invalidate it
         shortLivedJWTTokenHandler.invalidateToken(token, new MockHttpServletRequest(), context);
         // Check if it is still valid by trying to parse the EPerson from it (should return null)

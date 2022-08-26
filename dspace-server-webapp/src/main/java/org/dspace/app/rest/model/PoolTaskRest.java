@@ -24,6 +24,7 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 })
 public class PoolTaskRest extends BaseObjectRest<Integer> {
     public static final String NAME = "pooltask";
+    public static final String PLURAL_NAME = "pooltasks";
     public static final String CATEGORY = RestAddressableModel.WORKFLOW;
 
     public static final String STEP = "step";

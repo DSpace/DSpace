@@ -263,6 +263,9 @@
 
     <!-- used to track which group(s) have submit permissions -->
     <field name="submit" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+
+    <!-- used to track entity type of collections -->
+    <field name="search.entitytype" type="string" indexed="true" stored="true" required="false" />
    
     <!-- Community and collection hierarchy of the Item of interest (candidate for hierarchical facetting ) -->
     <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
@@ -277,6 +280,12 @@
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
     <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
+
+    <!-- used to filter out items that are older versions of another item -->
+    <field name="latestVersion" type="boolean" indexed="true" stored="true" default="true" multiValued="false" omitNorms="true"/>
+
+     <!-- The database status of the current item -->
+     <field name="database_status" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" />
 
      <!-- Dynamic field used to store the relation metadata as a keywordFilter -->
      <dynamicField name="relation.*" type="keywordFilter" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
@@ -342,5 +351,6 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
  <copyField source="*" dest="search_text"/>
+ <copyField source="dspace.entity.type" dest="search.entitytype"/>
 
 </schema>

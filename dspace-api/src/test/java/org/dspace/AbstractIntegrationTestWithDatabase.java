@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.MockAuthoritySolrServiceImpl;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.AbstractBuilder;
@@ -30,8 +31,10 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
+import org.dspace.statistics.MockSolrStatisticsCore;
+import org.dspace.statistics.SolrStatisticsCore;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.jdom.Document;
+import org.jdom2.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -83,11 +86,6 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      */
     @BeforeClass
     public static void initDatabase() {
-        // Clear our old flyway object. Because this DB is in-memory, its
-        // data is lost when the last connection is closed. So, we need
-        // to (re)start Flyway from scratch for each Unit Test class.
-        DatabaseUtils.clearFlywayDBCache();
-
         try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();
@@ -109,7 +107,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     public void setUp() throws Exception {
         try {
             //Start a new context
-            context = new Context(Context.Mode.BATCH_EDIT);
+            context = new Context(Context.Mode.READ_WRITE);
             context.turnOffAuthorisationSystem();
 
             //Find our global test EPerson account. If it doesn't exist, create it.
@@ -185,17 +183,23 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             MockSolrSearchCore searchService = serviceManager
                     .getServiceByName(null, MockSolrSearchCore.class);
             searchService.reset();
+            // Clear the statistics core.
+            serviceManager
+                    .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class)
+                    .reset();
 
             MockSolrLoggerServiceImpl statisticsService = serviceManager
-                    .getServiceByName(null, MockSolrLoggerServiceImpl.class);
+                    .getServiceByName("solrLoggerService", MockSolrLoggerServiceImpl.class);
             statisticsService.reset();
 
             MockAuthoritySolrServiceImpl authorityService = serviceManager
-                    .getServiceByName(null, MockAuthoritySolrServiceImpl.class);
+                    .getServiceByName(AuthoritySearchService.class.getName(), MockAuthoritySolrServiceImpl.class);
             authorityService.reset();
 
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+            AbstractBuilder.cleanupBuilderCache();
 
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
             // are cached and reused for all tests. This speeds up all tests.

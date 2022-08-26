@@ -9,13 +9,15 @@ package org.dspace.core;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.Stack;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.Logger;
@@ -46,8 +48,6 @@ import org.springframework.util.CollectionUtils;
  * changes and free up the resources.
  * <P>
  * The context object is also used as a cache for CM API objects.
- *
- * @version $Revision$
  */
 public class Context implements AutoCloseable {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Context.class);
@@ -81,23 +81,28 @@ public class Context implements AutoCloseable {
     /**
      * A stack with the history of authorisation system check modify
      */
-    private Stack<Boolean> authStateChangeHistory;
+    private Deque<Boolean> authStateChangeHistory;
 
     /**
      * A stack with the name of the caller class that modify authorisation
      * system check
      */
-    private Stack<String> authStateClassCallHistory;
+    private Deque<String> authStateClassCallHistory;
 
     /**
      * Group IDs of special groups user is a member of
      */
-    private List<UUID> specialGroups;
+    private Set<UUID> specialGroups;
 
     /**
      * Temporary store for the specialGroups when the current user is temporary switched
      */
-    private List<UUID> specialGroupsPreviousState;
+    private Set<UUID> specialGroupsPreviousState;
+
+    /**
+     * The currently used authentication method
+     */
+    private String authenticationMethod;
 
     /**
      * Content events
@@ -112,12 +117,12 @@ public class Context implements AutoCloseable {
     /**
      * Context mode
      */
-    private Mode mode = Mode.READ_WRITE;
+    private Mode mode;
 
     /**
      * Cache that is only used the context is in READ_ONLY mode
      */
-    private ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
+    private final ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
 
     protected EventService eventService;
 
@@ -130,7 +135,6 @@ public class Context implements AutoCloseable {
     }
 
     protected Context(EventService eventService, DBConnection dbConnection) {
-        this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
@@ -142,7 +146,6 @@ public class Context implements AutoCloseable {
      * No user is authenticated.
      */
     public Context() {
-        this.mode = Mode.READ_WRITE;
         init();
     }
 
@@ -159,8 +162,6 @@ public class Context implements AutoCloseable {
 
     /**
      * Initializes a new context object.
-     *
-     * @throws SQLException if there was an error obtaining a database connection
      */
     protected void init() {
         updateDatabase();
@@ -183,14 +184,26 @@ public class Context implements AutoCloseable {
         extraLogInfo = "";
         ignoreAuth = false;
 
-        specialGroups = new ArrayList<>();
+        specialGroups = new HashSet<>();
 
-        authStateChangeHistory = new Stack<>();
-        authStateClassCallHistory = new Stack<>();
-        setMode(this.mode);
+        authStateChangeHistory = new ConcurrentLinkedDeque<>();
+        authStateClassCallHistory = new ConcurrentLinkedDeque<>();
+
+        if (this.mode != null) {
+            setMode(this.mode);
+        }
+
     }
 
-    public static boolean updateDatabase() {
+    /**
+     * Update the DSpace database, ensuring that any necessary migrations are run prior to initializing
+     * Hibernate.
+     * <P>
+     * This is synchronized as it only needs to be run successfully *once* (for the first Context initialized).
+     *
+     * @return true/false, based on whether database was successfully updated
+     */
+    public static synchronized boolean updateDatabase() {
         //If the database has not been updated yet, update it and remember that.
         if (databaseUpdated.compareAndSet(false, true)) {
 
@@ -200,7 +213,7 @@ public class Context implements AutoCloseable {
             try {
                 DatabaseUtils.updateDatabase();
             } catch (SQLException sqle) {
-                log.fatal("Cannot initialize database via Flyway!", sqle);
+                log.fatal("Cannot update or initialize database via Flyway!", sqle);
                 databaseUpdated.set(false);
             }
         }
@@ -304,10 +317,10 @@ public class Context implements AutoCloseable {
         Boolean previousState;
         try {
             previousState = authStateChangeHistory.pop();
-        } catch (EmptyStackException ex) {
-            log.warn(LogManager.getHeader(this, "restore_auth_sys_state",
-                                          "not previous state info available "
-                                              + ex.getLocalizedMessage()));
+        } catch (NoSuchElementException ex) {
+            log.warn(LogHelper.getHeader(this, "restore_auth_sys_state",
+                    "not previous state info available:  {}"),
+                    ex::getLocalizedMessage);
             previousState = Boolean.FALSE;
         }
         if (log.isDebugEnabled()) {
@@ -315,13 +328,19 @@ public class Context implements AutoCloseable {
             StackTraceElement[] stackTrace = currThread.getStackTrace();
             String caller = stackTrace[stackTrace.length - 1].getClassName();
 
-            String previousCaller = (String) authStateClassCallHistory.pop();
+            String previousCaller;
+            try {
+                previousCaller = (String) authStateClassCallHistory.pop();
+            } catch (NoSuchElementException ex) {
+                previousCaller = "none";
+                log.warn(LogHelper.getHeader(this, "restore_auth_sys_state",
+                        "no previous caller info available:  {}"),
+                        ex::getLocalizedMessage);
+            }
 
             // if previousCaller is not the current caller *only* log a warning
             if (!previousCaller.equals(caller)) {
-                log
-                    .warn(LogManager
-                              .getHeader(
+                log.warn(LogHelper.getHeader(
                                   this,
                                   "restore_auth_sys_state",
                                   "Class: "
@@ -330,7 +349,7 @@ public class Context implements AutoCloseable {
                                       + previousCaller));
             }
         }
-        ignoreAuth = previousState.booleanValue();
+        ignoreAuth = previousState;
     }
 
     /**
@@ -482,7 +501,7 @@ public class Context implements AutoCloseable {
             throw new IllegalStateException("Attempt to mutate object in read-only context");
         }
         if (events == null) {
-            events = new LinkedList<Event>();
+            events = new LinkedList<>();
         }
 
         events.add(event);
@@ -516,6 +535,36 @@ public class Context implements AutoCloseable {
             return events.poll();
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Rollback the current transaction with the database, without persisting any
+     * pending changes. The database connection is not closed and can be reused
+     * afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are
+     * "detached" (pending changes are not tracked anymore). You have to reload all
+     * entities you still want to work with manually after this method call (see
+     * {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When rollbacking the transaction in the database fails.
+     */
+    public void rollback() throws SQLException {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if (!isValid()) {
+            log.info("rollback() was called on a closed Context object. No changes to abort.");
+            return;
+        }
+
+        try {
+            // Rollback ONLY if we have a database transaction, and it is NOT Read Only
+            if (!isReadOnly() && isTransactionAlive()) {
+                dbConnection.rollback();
+                reloadContextBoundEntities();
+            }
+        } finally {
+            events = null;
         }
     }
 
@@ -557,6 +606,10 @@ public class Context implements AutoCloseable {
         }
     }
 
+    /**
+     * Close this Context, discarding any uncommitted changes and releasing its
+     * database connection.
+     */
     @Override
     public void close() {
         if (isValid()) {
@@ -616,11 +669,7 @@ public class Context implements AutoCloseable {
      * @return true if member
      */
     public boolean inSpecialGroup(UUID groupID) {
-        if (specialGroups.contains(groupID)) {
-            return true;
-        }
-
-        return false;
+        return specialGroups.contains(groupID);
     }
 
     /**
@@ -630,7 +679,7 @@ public class Context implements AutoCloseable {
      * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException {
-        List<Group> myGroups = new ArrayList<Group>();
+        List<Group> myGroups = new ArrayList<>();
         for (UUID groupId : specialGroups) {
             myGroups.add(EPersonServiceFactory.getInstance().getGroupService().find(this, groupId));
         }
@@ -639,11 +688,20 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Get a set of all of the special groups uuids that current user is a member of.
+     *
+     * @return list of special groups uuids
+     */
+    public Set<UUID> getSpecialGroupUuids() {
+        return CollectionUtils.isEmpty(specialGroups) ? Set.of() : specialGroups;
+    }
+
+    /**
      * Temporary change the user bound to the context, empty the special groups that
      * are retained to allow subsequent restore
-     * 
+     *
      * @param newUser the EPerson to bound to the context
-     * 
+     *
      * @throws IllegalStateException if the switch was already performed without be
      *                               restored
      */
@@ -655,13 +713,13 @@ public class Context implements AutoCloseable {
 
         currentUserPreviousState = currentUser;
         specialGroupsPreviousState = specialGroups;
-        specialGroups = new ArrayList<UUID>();
+        specialGroups = new HashSet<>();
         currentUser = newUser;
     }
 
     /**
-     * Restore the user bound to the context and his special groups
-     * 
+     * Restore the user bound to the context and their special groups
+     *
      * @throws IllegalStateException if no switch was performed before
      */
     public void restoreContextUser() {
@@ -697,11 +755,13 @@ public class Context implements AutoCloseable {
 
 
     /**
-     * Returns the size of the cache of all object that have been read from the database so far. A larger number
-     * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
-     * that case you should consider uncaching entities when they are no longer needed (see
-     * {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
+     * Returns the size of the cache of all object that have been read from the
+     * database so far.  A larger number means that more memory is consumed by
+     * the cache. This also has a negative impact on the query performance. In
+     * that case you should consider uncaching entities when they are no longer
+     * needed (see {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
      *
+     * @return cache size.
      * @throws SQLException When connecting to the active cache fails.
      */
     public long getCacheSize() throws SQLException {
@@ -737,7 +797,7 @@ public class Context implements AutoCloseable {
                     dbConnection.setConnectionMode(false, false);
                     break;
                 default:
-                    log.warn("New context mode detected that has nog been configured.");
+                    log.warn("New context mode detected that has not been configured.");
                     break;
             }
         } catch (SQLException ex) {
@@ -760,7 +820,7 @@ public class Context implements AutoCloseable {
      * @return The current mode
      */
     public Mode getCurrentMode() {
-        return mode;
+        return mode != null ? mode : Mode.READ_WRITE;
     }
 
     /**
@@ -799,7 +859,7 @@ public class Context implements AutoCloseable {
      * entity. This means changes to the entity will be tracked and persisted to the database.
      *
      * @param entity The entity to reload
-     * @param <E>    The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
      * @return A (possibly) <b>NEW</b> reference to the entity that should be used for further processing.
      * @throws SQLException When reloading the entity from the database fails.
      */
@@ -812,7 +872,7 @@ public class Context implements AutoCloseable {
      * Remove an entity from the cache. This is necessary when batch processing a large number of items.
      *
      * @param entity The entity to reload
-     * @param <E>    The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
      * @throws SQLException When reloading the entity from the database fails.
      */
     @SuppressWarnings("unchecked")
@@ -877,4 +937,11 @@ public class Context implements AutoCloseable {
         currentUser = reloadEntity(currentUser);
     }
 
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    public void setAuthenticationMethod(final String authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
+    }
 }

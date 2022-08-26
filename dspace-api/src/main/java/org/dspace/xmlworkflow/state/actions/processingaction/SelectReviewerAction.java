@@ -25,7 +25,6 @@ import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Processing class for an action where an assigned user can
@@ -90,7 +89,7 @@ public class SelectReviewerAction extends ProcessingAction {
             //Retrieve the identifier of the eperson which will do the reviewing
             UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
             EPerson reviewer = ePersonService.find(c, reviewerId);
-            //We have a reviewer, assign him, the workflowitemrole will be translated into a task in the autoassign
+            //Assign the reviewer. The workflowitemrole will be translated into a task in the autoassign
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
             workflowItemRole.setEPerson(reviewer);
             workflowItemRole.setRoleId(getRole().getId());
@@ -115,7 +114,7 @@ public class SelectReviewerAction extends ProcessingAction {
         return role;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setRole(Role role) {
         this.role = role;
     }

@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.DSBitStoreService;
 import org.dspace.utils.DSpace;
@@ -24,9 +23,9 @@ public class InfoCheck extends Check {
 
     @Override
     public String run(ReportInfo ri) {
-        StringBuilder sb = new StringBuilder();
         ConfigurationService configurationService
             = new DSpace().getConfigurationService();
+        StringBuilder sb = new StringBuilder();
         sb.append("Generated: ").append(
             new Date().toString()
         ).append("\n");
@@ -38,12 +37,13 @@ public class InfoCheck extends Check {
         ).append("\n");
 
         sb.append("Url: ").append(
-            ConfigurationManager.getProperty("dspace.ui.url")
+            configurationService.getProperty("dspace.ui.url")
         ).append("\n");
         sb.append("\n");
 
-        DSBitStoreService localStore = new DSpace().getServiceManager().getServicesByType(DSBitStoreService.class)
-                                                   .get(0);
+        DSBitStoreService localStore = new DSpace().getServiceManager()
+                .getServicesByType(DSBitStoreService.class)
+                .get(0);
         for (String[] ss : new String[][] {
             new String[] {
                 localStore.getBaseDir().toString(),

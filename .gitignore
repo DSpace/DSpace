@@ -19,7 +19,7 @@ tags
 overlays/
 
 ## Ignore project files created by NetBeans
-nbproject/private/
+nbproject/
 build/
 nbbuild/
 dist/
@@ -42,3 +42,7 @@ nb-configuration.xml
 
 ##Ignore JRebel project configuration
 rebel.xml
+
+
+## Ignore jenv configuration
+.java-version

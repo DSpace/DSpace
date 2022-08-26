@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
@@ -14,7 +16,6 @@ import org.dspace.content.LicenseUtils;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,7 +50,7 @@ public class LicenseAddPatchOperation extends AddPatchOperation<String> {
     }
 
     @Override
-    void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
+    void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
         throws Exception {
 
         Boolean grant = null;

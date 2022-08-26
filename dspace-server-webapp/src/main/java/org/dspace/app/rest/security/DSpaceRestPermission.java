@@ -18,7 +18,11 @@ public enum DSpaceRestPermission {
     WRITE(Constants.WRITE),
     DELETE(Constants.DELETE),
     ADD(Constants.ADD),
-    ADMIN(Constants.ADMIN);
+    ADMIN(Constants.ADMIN),
+    // STATUS permissions allows someone to see the status of an object, without necessarily being able to fully READ it
+    // For example, STATUS is used to allow withdrawn Items to be seen as withdrawn,
+    // while hiding all their metadata/links.
+    STATUS(Constants.READ);
 
     private int dspaceApiActionId;
 

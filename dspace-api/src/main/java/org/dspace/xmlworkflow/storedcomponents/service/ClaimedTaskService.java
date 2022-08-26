@@ -28,6 +28,14 @@ public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
 
     public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
+    /**
+     * Find the single task for a given workflow item claimed by a given EPerson.
+     * @param context
+     * @param workflowItem find task for this item.
+     * @param ePerson find task claimed by this EPerson.
+     * @return the single matching task, or null if none.
+     * @throws SQLException passed through.
+     */
     public ClaimedTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
@@ -41,6 +49,14 @@ public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
     public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID)
         throws SQLException;
 
+    /**
+     * Find all claimed tasks for a given workflow item.
+     *
+     * @param context current DSpace session.
+     * @param workflowItem the given workflow item.
+     * @return all claimed tasks for that item.
+     * @throws SQLException passed through.
+     */
     public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
     public List<ClaimedTask> findAllInStep(Context context, String stepID) throws SQLException;

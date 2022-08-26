@@ -7,7 +7,6 @@
  */
 package org.dspace.discovery.indexobject;
 
-import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 
 /**
@@ -15,7 +14,7 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public class IndexableClaimedTask implements IndexableObject<ClaimedTask, Integer> {
+public class IndexableClaimedTask extends AbstractIndexableObject<ClaimedTask, Integer> {
 
     private ClaimedTask claimedTask;
     public static final String TYPE = ClaimedTask.class.getSimpleName();

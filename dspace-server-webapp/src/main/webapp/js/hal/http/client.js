@@ -12,18 +12,49 @@ HAL.Http.Client = function(opts) {
     this.defaultHeaders = {'Accept': 'application/hal+json, application/json, */*; q=0.01'};
     var authorizationHeader = getAuthorizationHeader();
     authorizationHeader ? this.defaultHeaders.Authorization = authorizationHeader : '';
-    console.log(this.defaultHeaders);
+    // Write all headers to console (for easy debugging)
+    //console.log(this.defaultHeaders);
     this.headers = this.defaultHeaders;
 };
 
-function getAuthorizationHeader() {
-    var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserToken' + '\\s*=\\s*([^;]+)');
-    if(cookie != undefined) {
-        return 'Bearer ' + cookie.pop();
+/**
+ * Get CSRF Token by parsing it out of the "MyHalBrowserCsrfToken" cookie.
+ * This cookie is set in login.html after a successful login occurs.
+ **/
+function getCSRFToken() {
+    var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserCsrfToken' + '\\s*=\\s*([^;]+)');
+    if (cookie != null) {
+        return cookie.pop();
     } else {
-        return undefined;
+        return null;
     }
 }
+
+/**
+ * Check current response headers to see if the CSRF Token has changed. If a new value is found in headers,
+ * save the new value into our "MyHalBrowserCsrfToken" cookie.
+ **/
+function checkForUpdatedCSRFTokenInResponse(jqxhr) {
+    // look for DSpace-XSRF-TOKEN header & save to our MyHalBrowserCsrfToken cookie (if found)
+    var updatedCsrfToken = jqxhr.getResponseHeader('DSPACE-XSRF-TOKEN');
+    if (updatedCsrfToken != null) {
+        document.cookie = "MyHalBrowserCsrfToken=" + updatedCsrfToken;
+    }
+}
+
+/**
+ * Get Authorization Header by parsing it out of the "MyHalBrowserToken" cookie.
+ * This cookie is set in login.html after a successful login occurs.
+ **/
+function getAuthorizationHeader() {
+    var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserToken' + '\\s*=\\s*([^;]+)');
+    if (cookie != null) {
+        return 'Bearer ' + cookie.pop();
+    } else {
+        return null;
+    }
+}
+
 function downloadFile(url) {
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
@@ -61,7 +92,7 @@ function downloadFile(url) {
 HAL.Http.Client.prototype.get = function(url) {
     var self = this;
     this.vent.trigger('location-change', { url: url });
-    var jqxhr = $.ajax({
+    $.ajax({
         url: url,
         dataType: 'json',
         xhrFields: {
@@ -69,21 +100,27 @@ HAL.Http.Client.prototype.get = function(url) {
         },
         headers: this.headers,
         success: function(resource, textStatus, jqXHR) {
+            // NOTE: A GET never requires sending an CSRF Token, but the response may send an updated token back.
+            // So, we need to check if a token came back in this GET response.
+            checkForUpdatedCSRFTokenInResponse(jqXHR);
             self.vent.trigger('response', {
                 resource: resource,
                 jqxhr: jqXHR,
                 headers: jqXHR.getAllResponseHeaders()
             });
         },
-        error: function() {
-            self.vent.trigger('fail-response', { jqxhr: jqxhr });
-            var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
+        error: function(jqXHR, textStatus, errorThrown) {
+            // Also check for updated token during errors. E.g. when a login failure occurs, token may be changed.
+            checkForUpdatedCSRFTokenInResponse(jqXHR);
+            self.vent.trigger('fail-response', { jqxhr: jqXHR });
+            var contentTypeResponseHeader = jqXHR.getResponseHeader("content-type");
             if (contentTypeResponseHeader != undefined
                     && !contentTypeResponseHeader.startsWith("application/hal")
                     && !contentTypeResponseHeader.startsWith("application/json")) {
                 downloadFile(url);
             }
-        }});
+        }
+    });
 };
 
 HAL.Http.Client.prototype.request = function(opts) {
@@ -91,6 +128,23 @@ HAL.Http.Client.prototype.request = function(opts) {
     opts.dataType = 'json';
     opts.xhrFields = opts.xhrFields || {};
     opts.xhrFields.withCredentials = opts.xhrFields.withCredentials || true;
+    opts.headers = opts.headers || {};
+    // If CSRFToken exists, append as a new X-XSRF-Token header
+    var csrfToken = getCSRFToken();
+    if (csrfToken != null) {
+      opts.headers['X-XSRF-Token'] = csrfToken;
+    }
+
+    // Also check response to see if CSRF Token has been updated
+    opts.success = function(resource, textStatus, jqXHR) {
+        checkForUpdatedCSRFTokenInResponse(jqXHR);
+    };
+
+    // Also check error responses to see if CSRF Token has been updated
+    opts.error = function(jqXHR, textStatus, errorThrown) {
+         checkForUpdatedCSRFTokenInResponse(jqXHR);
+    };
+
     self.vent.trigger('location-change', { url: opts.url });
     return jqxhr = $.ajax(opts);
 };

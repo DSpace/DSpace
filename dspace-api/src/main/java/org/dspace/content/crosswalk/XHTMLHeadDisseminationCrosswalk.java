@@ -29,13 +29,14 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Verifier;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Verifier;
 
 /**
  * Crosswalk for creating appropriate &lt;meta&gt; elements to appear in the
@@ -59,63 +60,58 @@ import org.jdom.Verifier;
  * collections.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
-public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
-                                                                     DisseminationCrosswalk {
+public class XHTMLHeadDisseminationCrosswalk
+        extends SelfNamedPlugin
+        implements DisseminationCrosswalk {
     /**
      * log4j logger
      */
-    private static Logger log = LogManager.getLogger(XHTMLHeadDisseminationCrosswalk.class);
+    private static final Logger log = LogManager.getLogger(XHTMLHeadDisseminationCrosswalk.class);
+
+    private static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
+
+    protected final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    protected final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
-     * Location of config file
+     * Location of configuration file
      */
-    private final String config = ConfigurationManager
-        .getProperty("dspace.dir")
+    private final String config = configurationService.getProperty("dspace.dir")
         + File.separator
         + "config"
         + File.separator
         + "crosswalks"
         + File.separator + "xhtml-head-item.properties";
 
-    private static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
-    protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-
     /**
      * Maps DSpace metadata field to name to use in XHTML head element, e.g.
      * dc.creator or dc.description.abstract
      */
-    private Map<String, String> names;
+    private final Map<String, String> names;
 
     /**
      * Maps DSpace metadata field to scheme for that field, if any
      */
-    private Map<String, String> schemes;
+    private final Map<String, String> schemes;
 
     /**
      * Schemas to add -- maps schema.NAME to schema URL
      */
-    private Map<String, String> schemaURLs;
+    private final Map<String, String> schemaURLs;
 
     public XHTMLHeadDisseminationCrosswalk() throws IOException {
-        names = new HashMap<String, String>();
-        schemes = new HashMap<String, String>();
-        schemaURLs = new HashMap<String, String>();
+        names = new HashMap<>();
+        schemes = new HashMap<>();
+        schemaURLs = new HashMap<>();
 
         // Read in configuration
         Properties crosswalkProps = new Properties();
-        FileInputStream fis = new FileInputStream(config);
-        try {
+
+        try (FileInputStream fis = new FileInputStream(config);) {
             crosswalkProps.load(fis);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
         }
 
         Enumeration e = crosswalkProps.keys();
@@ -174,6 +170,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
      * @throws IOException        if IO error
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
+     * @return List of Elements
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso) throws CrosswalkException,
@@ -189,7 +186,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
 
         Item item = (Item) dso;
         String handle = item.getHandle();
-        List<Element> metas = new ArrayList<Element>();
+        List<Element> metas = new ArrayList<>();
         List<MetadataValue> values = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // Add in schema URLs e.g. <link rel="schema.DC" href="...." />

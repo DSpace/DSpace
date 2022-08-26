@@ -57,25 +57,16 @@ public class MetadataImportScriptConfiguration<T extends MetadataImport> extends
             options.addOption("f", "file", true, "source file");
             options.getOption("f").setType(InputStream.class);
             options.getOption("f").setRequired(true);
-            options.addOption("e", "email", true, "email address or user id of user (required if adding new items)");
-            options.getOption("e").setType(String.class);
-            options.getOption("e").setRequired(true);
             options.addOption("s", "silent", false,
                               "silent operation - doesn't request confirmation of changes USE WITH CAUTION");
-            options.getOption("s").setType(boolean.class);
             options.addOption("w", "workflow", false, "workflow - when adding new items, use collection workflow");
-            options.getOption("w").setType(boolean.class);
             options.addOption("n", "notify", false,
                               "notify - when adding new items using a workflow, send notification emails");
-            options.getOption("n").setType(boolean.class);
             options.addOption("v", "validate-only", false,
                               "validate - just validate the csv, don't run the import");
-            options.getOption("v").setType(boolean.class);
             options.addOption("t", "template", false,
                               "template - when adding new items, use the collection template (if it exists)");
-            options.getOption("t").setType(boolean.class);
             options.addOption("h", "help", false, "help");
-            options.getOption("h").setType(boolean.class);
 
             super.options = options;
         }

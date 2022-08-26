@@ -56,13 +56,13 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
 
         EPerson ePerson = null;
         WorkspaceItem witem = null;
         try {
             ePerson = context.getCurrentUser();
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
 
             // anonymous user
             if (ePerson == null) {

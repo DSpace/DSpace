@@ -82,13 +82,22 @@ public class AnonymousAdditionalAuthorizationFilterIT extends AbstractController
                    .andExpect(status().isUnauthorized());
 
         // Test that we can access the item using the IP that's configured for the Staff group
+        // (in our test environment's local.cfg)
+        getClient().perform(get("/api/core/items/" + staffAccessItem1.getID()).with(ip("5.5.5.5")))
+                   .andExpect(status().isOk());
+
+        // Test that we also can access the item using that same IP via a proxy
         getClient().perform(get("/api/core/items/" + staffAccessItem1.getID())
                                 .header("X-Forwarded-For", "5.5.5.5"))
                    .andExpect(status().isOk());
 
         // Test that we can't access the item using the IP that's configured for the Students group
+        getClient().perform(get("/api/core/items/" + staffAccessItem1.getID()).with(ip("6.6.6.6")))
+                   .andExpect(status().isUnauthorized());
+
+        // Test that we also can't also access the item using that same IP via a proxy
         getClient().perform(get("/api/core/items/" + staffAccessItem1.getID())
-                                .header("X-FORWARDED-FOR", "6.6.6.6"))
+                                .header("X-Forwarded-For", "6.6.6.6"))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -103,11 +112,20 @@ public class AnonymousAdditionalAuthorizationFilterIT extends AbstractController
                    .andExpect(status().isUnauthorized());
 
         // Test that we can access the item using the IP that's configured for the Staff group
+        // (in our test environment's local.cfg)
+        getClient().perform(get("/api/core/items/" + staffAccessItem1.getID()).with(ip("5.5.5.5")))
+                   .andExpect(status().isOk());
+
+        // Test that we can also access the item using that same IP via a proxy
         getClient().perform(get("/api/core/items/" + staffAccessItem1.getID())
                                 .header("X-Forwarded-For", "5.5.5.5"))
                    .andExpect(status().isOk());
 
         // Test that we can't access the item using the IP that's configured for the Students group
+        getClient().perform(get("/api/core/items/" + staffAccessItem1.getID()).with(ip("6.6.6.6")))
+                   .andExpect(status().isUnauthorized());
+
+        // Test that we also can't also access the item using that same IP via a proxy
         getClient().perform(get("/api/core/items/" + staffAccessItem1.getID())
                                 .header("X-Forwarded-For", "6.6.6.6"))
                    .andExpect(status().isUnauthorized());

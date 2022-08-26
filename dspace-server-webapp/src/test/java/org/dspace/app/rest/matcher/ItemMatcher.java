@@ -50,12 +50,14 @@ public class ItemMatcher {
      */
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
+                "accessStatus",
                 "bundles[]",
                 "mappedCollections[]",
                 "owningCollection",
                 "version",
                 "relationships[]",
-                "templateItemOf"
+                "templateItemOf",
+                "thumbnail"
         );
     }
 
@@ -64,13 +66,15 @@ public class ItemMatcher {
      */
     public static Matcher<? super Object> matchLinks(UUID uuid) {
         return HalMatcher.matchLinks(REST_SERVER_URL + "core/items/" + uuid,
+                "accessStatus",
                 "bundles",
                 "mappedCollections",
                 "owningCollection",
                 "relationships",
                 "self",
                 "version",
-                "templateItemOf"
+                "templateItemOf",
+                "thumbnail"
         );
     }
 

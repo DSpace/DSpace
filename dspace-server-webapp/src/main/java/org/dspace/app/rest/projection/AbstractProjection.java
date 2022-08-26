@@ -11,6 +11,7 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
 
 /**
@@ -45,4 +46,11 @@ public abstract class AbstractProjection implements Projection {
     public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
         return true;
     }
+
+    @Override
+    public PageRequest getPagingOptions(String rel, HALResource<? extends RestAddressableModel> resource,
+                                        Link... oldLinks) {
+        return null;
+    }
+
 }

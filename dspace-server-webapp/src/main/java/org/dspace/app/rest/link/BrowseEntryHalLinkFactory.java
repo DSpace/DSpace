@@ -42,7 +42,7 @@ public class BrowseEntryHalLinkFactory extends HalLinkFactory<BrowseEntryResourc
             addFilterParams(baseLink, data);
 
             list.add(buildLink(BrowseIndexRest.ITEMS,
-                               baseLink.build().toUriString()));
+                               baseLink.build().encode().toUriString()));
         }
     }
 

@@ -34,6 +34,8 @@ public class ResourcePolicyUtils {
     public static final String OPERATION_PATH_ENDDATE = "/endDate";
     public static final String OPERATION_PATH_DESCRIPTION = "/description";
     public static final String OPERATION_PATH_NAME = "/name";
+    public static final String OPERATION_PATH_POLICY_TYPE = "/policyType";
+    public static final String OPERATION_PATH_ACTION = "/action";
 
     /**
      * Throws PatchBadRequestException for missing value in the /startDate path.
@@ -134,7 +136,7 @@ public class ResourcePolicyUtils {
         String dateS = (String) operation.getValue();
         try {
             Date date = simpleDateFormat.parse(dateS);
-            if (resource.getEndDate() != null && resource.getStartDate().after(date)) {
+            if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
                 throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
             }
         } catch (ParseException e) {

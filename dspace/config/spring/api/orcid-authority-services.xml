@@ -15,9 +15,20 @@
 
     <bean id="dspace.DSpaceAuthorityIndexer" class="org.dspace.authority.indexer.DSpaceAuthorityIndexer"/>
 
+<!--
+    <alias name="OrcidSource" alias="AuthoritySource"/>
+    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv3SolrAuthorityImpl">
+        <property name="clientId" value="${orcid.application-client-id}" />
+        <property name="clientSecret" value="${orcid.application-client-secret}" />
+        <property name="OAUTHUrl" value="${orcid.token-url}" />
+        <property name="orcidRestConnector" ref="orcidRestConnector"/>
+    </bean>
+ -->
+ 
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
+                <!-- <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/> -->
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
         </property>

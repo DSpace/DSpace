@@ -10,7 +10,8 @@ package org.dspace.browse;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class to represent the configuration of the cross-linking between browse
@@ -23,7 +24,7 @@ public class CrossLinks {
     /**
      * a map of the desired links
      */
-    private Map<String, String> links = new HashMap<String, String>();
+    private Map<String, String> links = new HashMap<>();
 
     /**
      * Construct a new object which will obtain the configuration for itself.
@@ -35,7 +36,9 @@ public class CrossLinks {
         int i = 1;
         while (true) {
             String field = "webui.browse.link." + i;
-            String config = ConfigurationManager.getProperty(field);
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String config = configurationService.getProperty(field);
             if (config == null) {
                 break;
             }

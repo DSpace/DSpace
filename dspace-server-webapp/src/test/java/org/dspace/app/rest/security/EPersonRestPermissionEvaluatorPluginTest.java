@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
@@ -59,8 +60,8 @@ public class EPersonRestPermissionEvaluatorPluginTest {
     public void testHasPatchPermissionAuthFails() throws Exception {
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation passwordOperation = new ReplaceOperation("/password", "testpass");
-        ops.add(passwordOperation);
+        AddOperation addOperation = new AddOperation("/password", "testpass");
+        ops.add(addOperation);
         ReplaceOperation canLoginOperation = new ReplaceOperation("/canLogin", false);
         ops.add(canLoginOperation);
         Patch patch = new Patch(ops);
@@ -73,8 +74,8 @@ public class EPersonRestPermissionEvaluatorPluginTest {
     public void testHasPatchPermissionAuthOk() throws Exception {
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation passwordOperation = new ReplaceOperation("/password", "testpass");
-        ops.add(passwordOperation);
+        AddOperation addOperation = new AddOperation("/password", "testpass");
+        ops.add(addOperation);
         Patch patch = new Patch(ops);
         assertTrue(ePersonRestPermissionEvaluatorPlugin
                        .hasPatchPermission(authentication, null, null, patch));

@@ -9,7 +9,8 @@ package org.dspace.statistics.util;
 
 import java.io.IOException;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xbill.DNS.DClass;
 import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Message;
@@ -21,7 +22,7 @@ import org.xbill.DNS.Section;
 import org.xbill.DNS.Type;
 
 /**
- * XBill DNS resolver to retrieve hostnames for client IP addresses.
+ * XBill DNS resolver to retrieve host names for client IP addresses.
  * TODO: deal with IPv6 addresses.
  *
  * @author kevinvandevelde at atmire.com
@@ -42,10 +43,12 @@ public class DnsLookup {
      * @throws IOException from infrastructure.
      */
     public static String reverseDns(String hostIp) throws IOException {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
         Resolver res = new ExtendedResolver();
 
         // set the timeout, defaults to 200 milliseconds
-        int timeout = ConfigurationManager.getIntProperty("usage-statistics", "resolver.timeout", 200);
+        int timeout = configurationService.getIntProperty("usage-statistics.resolver.timeout", 200);
         res.setTimeout(0, timeout);
 
         Name name = ReverseMap.fromAddress(hostIp);
@@ -72,9 +75,10 @@ public class DnsLookup {
      */
     public static String forward(String hostname)
         throws IOException {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
         Resolver res = new ExtendedResolver();
-        int timeout = ConfigurationManager.getIntProperty("usage-statistics",
-                                                          "resolver.timeout", 200);
+        int timeout = configurationService.getIntProperty("usage-statistics.resolver.timeout", 200);
         res.setTimeout(0, timeout);
 
         Name name = Name.fromString(hostname, Name.root);

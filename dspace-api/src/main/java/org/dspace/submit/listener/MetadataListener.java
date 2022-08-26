@@ -7,55 +7,37 @@
  */
 package org.dspace.submit.listener;
 
-import java.util.Map;
+import java.util.Set;
 
-import gr.ekt.bte.core.DataLoader;
-import org.dspace.services.ConfigurationService;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.external.model.ExternalDataObject;
 
 /**
- * Configuration bean to map metadata to identifiers (i.e dc.identifier.doi -> doi, dc.identifier.isbn -> isbn) and
- * alias to BTE Data Loader. See config/spring/api/step-processing.xml
+ * The interface to implement to support the ExtractMetadata enrichment step
  * 
- * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class MetadataListener {
+public interface MetadataListener {
+    /**
+     * Return the list of metadata that should be monitored as change to them could
+     * allow the service to retrieve an ExternalDataObject to enrich the current
+     * item
+     *
+     * @return the list of metadata to monitor
+     */
+    public Set<String> getMetadataToListen();
 
     /**
-     * Metadata to identifier map
+     * Retrieve an ExternalDataObject to enrich the current item using the current
+     * metadata and the information about which listened metadata are changed
+     * 
+     * @param context         the DSpace Context Object
+     * @param item            the item in its current status
+     * @param changedMetadata the list of listened metadata that are changed
+     * @return an ExternalDataObject that can be used to enrich the current item
      */
-    private Map<String, String> metadata;
-
-    private ConfigurationService configurationService;
-
-    /**
-     * Alias to data loader map
-     */
-    private Map<String, DataLoader> dataloadersMap;
-
-    public ConfigurationService getConfigurationService() {
-        return configurationService;
-    }
-
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
-    public Map<String, String> getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Map<String, String> metadata) {
-        this.metadata = metadata;
-    }
-
-    public Map<String, DataLoader> getDataloadersMap() {
-        return dataloadersMap;
-    }
-
-    public void setDataloadersMap(Map<String, DataLoader> dataloadersMap) {
-        this.dataloadersMap = dataloadersMap;
-    }
+    public ExternalDataObject getExternalDataObject(Context context, Item item, Set<String> changedMetadata);
 
 }

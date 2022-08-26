@@ -20,7 +20,6 @@ import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -46,6 +45,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
     protected HandleService handleService =
         HandleServiceFactory.getInstance().getHandleService();
 
+    @Override
     public DepositResult ingest(Context context, Deposit deposit,
                                 DSpaceObject dso, VerboseDescription verboseDescription)
         throws DSpaceSwordException, SwordError, SwordAuthException,
@@ -90,8 +90,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             File depositFile = deposit.getFile();
 
             // load the plugin manager for the required configuration
-            String cfg = ConfigurationManager.getProperty("swordv2-server",
-                                                          "mets-ingester.package-ingester");
+            String cfg = configurationService.getProperty("swordv2-server.mets-ingester.package-ingester");
             if (cfg == null || "".equals(cfg)) {
                 cfg = "METS";  // default to METS
             }
@@ -109,13 +108,13 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             params.setWorkflowEnabled(true);
 
             // Should restore mode be enabled, i.e. keep existing handle?
-            if (ConfigurationManager.getBooleanProperty(
-                "swordv2-server", "restore-mode.enable", false)) {
+            if (configurationService.getBooleanProperty(
+                "swordv2-server.restore-mode.enable", false)) {
                 params.setRestoreModeEnabled(true);
             }
 
             // Whether or not to use the collection template
-            params.setUseCollectionTemplate(ConfigurationManager
+            params.setUseCollectionTemplate(configurationService
                                                 .getBooleanProperty(
                                                     "mets.default.ingest.useCollectionTemplate", false));
 
@@ -203,8 +202,8 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             File depositFile = deposit.getFile();
 
             // load the plugin manager for the required configuration
-            String cfg = ConfigurationManager.getProperty(
-                "swordv2-server", "mets-ingester.package-ingester");
+            String cfg = configurationService.getProperty(
+                "swordv2-server.mets-ingester.package-ingester");
             if (cfg == null || "".equals(cfg)) {
                 cfg = "METS";  // default to METS
             }
@@ -222,13 +221,13 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
             params.setWorkflowEnabled(true);
 
             // Should restore mode be enabled, i.e. keep existing handle?
-            if (ConfigurationManager.getBooleanProperty(
-                "swordv2-server", "restore-mode.enable", false)) {
+            if (configurationService.getBooleanProperty(
+                "swordv2-server.restore-mode.enable", false)) {
                 params.setRestoreModeEnabled(true);
             }
 
             // Whether or not to use the collection template
-            params.setUseCollectionTemplate(ConfigurationManager
+            params.setUseCollectionTemplate(configurationService
                                                 .getBooleanProperty(
                                                     "mets.default.ingest.useCollectionTemplate", false));
 

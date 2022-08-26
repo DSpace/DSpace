@@ -9,40 +9,152 @@ package org.dspace.app.rest.submit.step;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringJoiner;
 
-import gr.ekt.bte.core.Record;
-import gr.ekt.bte.core.RecordSet;
-import gr.ekt.bte.core.Value;
-import gr.ekt.bte.dataloader.FileDataLoader;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
-import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
+import org.dspace.app.rest.submit.ListenerProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.dto.MetadataValueDTO;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.submit.extraction.MetadataExtractor;
-import org.dspace.submit.step.ExtractionStep;
+import org.dspace.external.model.ExternalDataObject;
+import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.service.ImportService;
+import org.dspace.submit.listener.MetadataListener;
+import org.dspace.utils.DSpace;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * This submission step allows to extract metadata from an uploaded file to enrich or initialize a submission. The
- * processing is delegated to a list of extractor specialized by format (i.e. a Grobid extractor to get data from a PDF
- * file, an extractor to get data from bibliographic file such as BibTeX, etc)
+ * This submission step allows to extract metadata from an uploaded file and/or
+ * use provided identifiers/metadata to further enrich a submission.
+ * 
+ * The processing of the file is delegated to the Import Service (see
+ * {@link ImportService} that can be extended with Data Provider specialized by
+ * format (i.e. a Grobid extractor to get data from a PDF file, an extractor to
+ * get data from bibliographic file such as BibTeX, etc)
  *
+ * Some metadata are monitored by listener (see {@link MetadataListener} and when
+ * changed the are used to generate an identifier that is used to query the
+ * External Data Provider associated with the specific listener
+ * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class ExtractMetadataStep extends ExtractionStep implements UploadableStep {
+public class ExtractMetadataStep implements ListenerProcessingStep, UploadableStep {
+
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private ImportService importService = new DSpace().getSingletonService(ImportService.class);
+    private MetadataListener listener = new DSpace().getSingletonService(MetadataListener.class);
+
+    // we need to use thread local as we need to store the status of the item before that changes are performed
+    private ThreadLocal<Map<String, List<MetadataValue>>> metadataMap =
+            new ThreadLocal<Map<String, List<MetadataValue>>>();
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ExtractMetadataStep.class);
+
+    @Override
+    public void doPreProcessing(Context context, InProgressSubmission wsi) {
+        Map<String, List<MetadataValue>> metadataMapValue = new HashMap<String, List<MetadataValue>>();
+        for (String metadata : listener.getMetadataToListen()) {
+            String[] tokenized = org.dspace.core.Utils.tokenize(metadata);
+            List<MetadataValue> mm = itemService.getMetadata(wsi.getItem(), tokenized[0], tokenized[1],
+                    tokenized[2], Item.ANY);
+            if (mm != null && !mm.isEmpty()) {
+                metadataMapValue.put(metadata, mm);
+            } else {
+                metadataMapValue.put(metadata, new ArrayList<MetadataValue>());
+            }
+        }
+        metadataMap.set(metadataMapValue);
+    }
+
+    @Override
+    public void doPostProcessing(Context context, InProgressSubmission wsi) {
+        Map<String, List<MetadataValue>> metadataMapValue = metadataMap.get();
+        Set<String> changedMetadata = getChangedMetadata(wsi.getItem(), listener.getMetadataToListen(),
+                metadataMapValue);
+        // are listened metadata changed?
+        try {
+            if (!changedMetadata.isEmpty()) {
+                ExternalDataObject obj = listener.getExternalDataObject(context, wsi.getItem(), changedMetadata);
+                if (obj != null) {
+                    // add metadata to the item if no values are already here
+                    Set<String> alreadyFilledMetadata = new HashSet();
+                    for (MetadataValue mv : wsi.getItem().getMetadata()) {
+                        alreadyFilledMetadata.add(mv.getMetadataField().toString('.'));
+                    }
+                    for (MetadataValueDTO metadataValue : obj.getMetadata()) {
+                        StringJoiner joiner = new StringJoiner(".");
+                        joiner.add(metadataValue.getSchema());
+                        joiner.add(metadataValue.getElement());
+                        if (StringUtils.isNoneBlank(metadataValue.getQualifier())) {
+                            joiner.add(metadataValue.getQualifier());
+                        }
+                        if (!alreadyFilledMetadata.contains(joiner.toString())) {
+                            itemService.addMetadata(context, wsi.getItem(), metadataValue.getSchema(),
+                                metadataValue.getElement(), metadataValue.getQualifier(), null,
+                                metadataValue.getValue());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Set<String> getChangedMetadata(Item item, Set<String> listenedMedata,
+            Map<String, List<MetadataValue>> previousValues) {
+        Set<String> changedMetadata = new HashSet<String>();
+        for (String metadata : listenedMedata) {
+            List<MetadataValue> prevMetadata = previousValues.get(metadata);
+            List<MetadataValue> currMetadata = itemService.getMetadataByMetadataString(item, metadata);
+            if (prevMetadata != null) {
+                if (currMetadata != null) {
+                    if (!CollectionUtils.isEqualCollection(prevMetadata, currMetadata, new Equator<MetadataValue>() {
+                        @Override
+                        public boolean equate(MetadataValue o1, MetadataValue o2) {
+                            return StringUtils.equals(o1.getValue(), o2.getValue())
+                                    && StringUtils.equals(o1.getAuthority(), o2.getAuthority());
+                        }
+                        @Override
+                        public int hash(MetadataValue o) {
+                            return o.getValue().hashCode()
+                                    + (o.getAuthority() != null ? o.getAuthority().hashCode() : 0);
+                        }
+                    })) {
+                        // one or more values has been changed from the listened metadata
+                        changedMetadata.add(metadata);
+                    }
+                } else if (prevMetadata.size() != 0) {
+                    // a value has been removed from the listened metadata
+                    changedMetadata.add(metadata);
+                }
+            } else if (currMetadata != null && currMetadata.size() != 0) {
+                // a value has been added to the listened metadata
+                changedMetadata.add(metadata);
+            }
+        }
+        return changedMetadata;
+    }
 
     @Override
     public ErrorRest upload(Context context, SubmissionService submissionService, SubmissionStepConfig stepConfig,
@@ -50,64 +162,36 @@ public class ExtractMetadataStep extends ExtractionStep implements UploadableSte
         throws IOException {
 
         Item item = wsi.getItem();
+        File file = Utils.getFile(multipartFile, "extract-metadata-step", stepConfig.getId());
         try {
-            List<MetadataExtractor> extractors =
-                DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(MetadataExtractor.class);
-            File file = null;
-            for (MetadataExtractor extractor : extractors) {
-                FileDataLoader dataLoader = extractor.getDataLoader();
-                RecordSet recordSet = null;
-                if (extractor.getExtensions()
-                    .contains(FilenameUtils.getExtension(multipartFile.getOriginalFilename()))) {
-
-                    if (file == null) {
-                        file = Utils.getFile(multipartFile, "submissionlookup-loader", stepConfig.getId());
+            ImportRecord record = importService.getRecord(file, multipartFile.getOriginalFilename());
+            if (record != null) {
+                // add metadata to the item if no values are already here
+                Set<String> alreadyFilledMetadata = new HashSet();
+                for (MetadataValue mv : item.getMetadata()) {
+                    alreadyFilledMetadata.add(mv.getMetadataField().toString('.'));
+                }
+                for (MetadatumDTO metadataValue : record.getValueList()) {
+                    StringJoiner joiner = new StringJoiner(".");
+                    joiner.add(metadataValue.getSchema());
+                    joiner.add(metadataValue.getElement());
+                    if (StringUtils.isNoneBlank(metadataValue.getQualifier())) {
+                        joiner.add(metadataValue.getQualifier());
                     }
-
-                    FileDataLoader fdl = (FileDataLoader) dataLoader;
-                    fdl.setFilename(Utils.getFileName(multipartFile));
-
-
-                    recordSet = convertFields(dataLoader.getRecords(), bteBatchImportService.getOutputMap());
-
-                    enrichItem(context, recordSet.getRecords(), item);
-
+                    if (!alreadyFilledMetadata.contains(joiner.toString())) {
+                        itemService.addMetadata(context, item, metadataValue.getSchema(),
+                            metadataValue.getElement(), metadataValue.getQualifier(), null,
+                            metadataValue.getValue());
+                    }
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ErrorRest result = new ErrorRest();
-            result.setMessage(e.getMessage());
-            result.getPaths().add("/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + stepConfig.getId());
-            return result;
+            log.error("Error processing data", e);
+            throw new RuntimeException(e);
+        } finally {
+            file.delete();
         }
         return null;
     }
 
-    private RecordSet convertFields(RecordSet recordSet, Map<String, String> fieldMap) {
-        RecordSet result = new RecordSet();
-        for (Record publication : recordSet.getRecords()) {
-            for (String fieldName : fieldMap.keySet()) {
-                String md = null;
-                if (fieldMap != null) {
-                    md = fieldMap.get(fieldName);
-                }
-
-                if (StringUtils.isBlank(md)) {
-                    continue;
-                } else {
-                    md = md.trim();
-                }
-
-                if (publication.isMutable()) {
-                    List<Value> values = publication.getValues(md);
-                    publication.makeMutable().removeField(md);
-                    publication.makeMutable().addField(fieldName, values);
-                }
-            }
-
-            result.addRecord(publication);
-        }
-        return result;
-    }
 }

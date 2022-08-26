@@ -20,25 +20,7 @@ public class DiscoverySortConfiguration {
 
     public static final String SCORE = "score";
 
-    /** Attributes used for sorting of results **/
-    public enum SORT_ORDER {
-        desc,
-        asc
-    }
-
-    private DiscoverySortFieldConfiguration defaultSort = null;
-
     private List<DiscoverySortFieldConfiguration> sortFields = new ArrayList<DiscoverySortFieldConfiguration>();
-
-    private SORT_ORDER defaultSortOrder = SORT_ORDER.desc;
-
-    public DiscoverySortFieldConfiguration getDefaultSort() {
-        return defaultSort;
-    }
-
-    public void setDefaultSort(DiscoverySortFieldConfiguration defaultSort) {
-        this.defaultSort = defaultSort;
-    }
 
     public List<DiscoverySortFieldConfiguration> getSortFields() {
         return sortFields;
@@ -46,14 +28,6 @@ public class DiscoverySortConfiguration {
 
     public void setSortFields(List<DiscoverySortFieldConfiguration> sortFields) {
         this.sortFields = sortFields;
-    }
-
-    public SORT_ORDER getDefaultSortOrder() {
-        return defaultSortOrder;
-    }
-
-    public void setDefaultSortOrder(SORT_ORDER defaultSortOrder) {
-        this.defaultSortOrder = defaultSortOrder;
     }
 
     public DiscoverySortFieldConfiguration getSortFieldConfiguration(String sortField) {
@@ -65,10 +39,6 @@ public class DiscoverySortConfiguration {
             DiscoverySortFieldConfiguration configuration = new DiscoverySortFieldConfiguration();
             configuration.setMetadataField(SCORE);
             return configuration;
-        }
-
-        if (defaultSort != null && StringUtils.equals(defaultSort.getMetadataField(), sortField)) {
-            return defaultSort;
         }
 
         for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {

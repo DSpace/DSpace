@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean name="xmlWorkflowFactory" class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl">
         <property name="workflowMapping">
             <util:map>
                 <entry key="defaultWorkflow"
                        value-ref="defaultWorkflow"/>
-                <entry key="123456789/workflow-test-1" value-ref="selectSingleReviewer"/>
-<!--                <entry key="123456789/5" value-ref="scoreReview"/>-->
+                <entry key="123456789/workflow-test-1"
+                       value-ref="selectSingleReviewer"/>
+                <entry key='123456789/curation-test-1'
+                       value-ref='nullWorkflow'/>
             </util:map>
         </property>
+    </bean>
+
+    <bean class='org.dspace.workflow.CurationTaskConfig'>
+        <constructor-arg name='configurationDocument'
+                         value='file:${dspace.dir}/config/workflow-curation.xml'/>
     </bean>
 
     <!--Standard DSpace workflow-->
@@ -186,5 +196,70 @@
     <bean id="scorereviewers" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="ScoreReviewers"/>
+    </bean>
+
+    <!-- Workflow for testing curation -->
+    <bean class='org.dspace.xmlworkflow.state.Workflow'
+          id='nullWorkflow'>
+        <description>No-action workflow for curation testing</description>
+        <property name='firstStep'
+                  ref='nullStep'/>
+        <property name='steps'>
+            <util:list>
+                <ref bean='nullStep'/>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean class='org.dspace.xmlworkflow.state.Step'
+          id='nullStep'>
+        <description>Selects current user, does nothing</description>
+        <property name='role'
+                  ref='nullRole'/>
+        <property name='userSelectionMethod'
+                  ref='claimactionNoUi'/>
+        <property name='actions'>
+            <util:list>
+                <ref bean='noAction'/>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean class='org.dspace.xmlworkflow.Role'
+          id='nullRole'>
+        <description>
+            To attach null actions to a Collection for curation testing.
+        </description>
+        <property name='name'
+                  value='nullRole'/>
+        <property name='scope'
+                  value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
+        <property name='description'
+                  value='Does nothing'/>
+    </bean>
+
+    <bean class='org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig'
+          id='claimactionNoUi'
+          scope="prototype">
+        <description>Claim task for current user without interaction</description>
+        <constructor-arg type="java.lang.String"
+                         value="claimactionNoUi"/>
+        <property name="processingAction"
+                  ref="claimactionAPI"/>
+        <property name="requiresUI"
+                  value="false"/>
+    </bean>
+
+    <bean class='org.dspace.xmlworkflow.state.actions.WorkflowActionConfig'
+          id='noAction'
+          scope='prototype'>
+        <description>Takes no action</description>
+        <constructor-arg type='java.lang.String'
+                         value='noaction'/>
+        <property name='processingAction'>
+            <bean class='org.dspace.xmlworkflow.state.actions.processingaction.NoAction'/>
+        </property>
+        <property name='requiresUI'
+                  value='false'/>
     </bean>
 </beans>

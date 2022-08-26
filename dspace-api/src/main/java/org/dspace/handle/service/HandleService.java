@@ -14,8 +14,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 /**
- * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
- * System </a>.
+ * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
+ * System</a>.
  *
  * <p>
  * Currently, this class simply maps handles to local facilities; handles which
@@ -24,7 +24,6 @@ import org.dspace.core.Context;
  * </p>
  *
  * @author Peter Breton
- * @version $Revision$
  */
 public interface HandleService {
 
@@ -42,7 +41,6 @@ public interface HandleService {
     public String resolveToURL(Context context, String handle)
         throws SQLException;
 
-
     /**
      * Try to detect a handle in a URL.
      *
@@ -56,18 +54,18 @@ public interface HandleService {
         throws SQLException;
 
     /**
-     * Provides handle canonical prefix using http://hdl.handle.net if not
+     * Provides handle canonical prefix using https://hdl.handle.net if not
      * overridden by the configuration property handle.canonical.prefix.
      *
      * No attempt is made to verify that handle is in fact valid.
      *
-     * @param handle The handle
+     *
      * @return The canonical form
      */
     public String getCanonicalPrefix();
 
     /**
-     * Transforms handle into a URI using http://hdl.handle.net if not
+     * Transforms handle into a URI using https://hdl.handle.net if not
      * overridden by the configuration property handle.canonical.prefix.
      *
      * No attempt is made to verify that handle is in fact valid.
@@ -181,4 +179,15 @@ public interface HandleService {
     public void modifyHandleDSpaceObject(Context context, String handle, DSpaceObject newOwner) throws SQLException;
 
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * Format a handle ~
+     *   - hdl:123456789/1                     -> 123456789/1
+     *   - info:hdl/123456789/1                -> 123456789/1
+     *   - https://hdl.handle.net/123456789/1  -> 123456789/1
+     *
+     * @param identifier
+     * @return
+     */
+    String parseHandle(String identifier);
 }

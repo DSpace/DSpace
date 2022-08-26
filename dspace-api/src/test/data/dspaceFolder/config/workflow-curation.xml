@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<workflow-curation xmlns='https://dspace.org/workflow-curation'>
+
+    <taskset-map>
+        <mapping collection-handle='default'
+                 taskset='none'/>
+        <mapping collection-handle='123456789/curation-test-1'
+                 taskset='test1'/>
+    </taskset-map>
+
+    <tasksets>
+        <!-- A taskset that does no curation. -->
+        <taskset name='none'/>
+
+        <!--
+            A taskset that runs a curation task which only marks the object as
+            having been curated.
+            See config/modules/curate.cfg for 'marker' task.
+        -->
+        <taskset name='test1'>
+            <flowstep name='markingStep'>
+                <task name='marker'/>
+            </flowstep>
+        </taskset>
+    </tasksets>
+
+</workflow-curation>

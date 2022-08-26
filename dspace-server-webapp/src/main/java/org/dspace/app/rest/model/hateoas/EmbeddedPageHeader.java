@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.utils.URLUtils;
+import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -102,6 +103,8 @@ public class EmbeddedPageHeader {
         if (page != null) {
             // replace existing page & size params (if exist), otherwise append them
             uriComp = uriComp.replaceQueryParam("page", page);
+        }
+        if (size != Utils.DEFAULT_PAGE_SIZE) {
             uriComp = uriComp.replaceQueryParam("size", size);
         }
         return new Href(uriComp.build().toUriString());

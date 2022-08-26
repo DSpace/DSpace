@@ -32,7 +32,21 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
 
+    @Deprecated
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
+
+    /**
+     * Find all items that are:
+     * - NOT in the workspace
+     * - NOT in the workflow
+     * - NOT a template item for e.g. a collection
+     *
+     * This implies that the result also contains older versions of items and withdrawn items.
+     * @param context the DSpace context.
+     * @return iterator over all regular items.
+     * @throws SQLException if database error.
+     */
+    public Iterator<Item> findAllRegularItems(Context context) throws SQLException;
 
     /**
      * Find all Items modified since a Date.
@@ -46,6 +60,19 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
         throws SQLException;
 
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
+
+    /**
+     * Find all the items by a given submitter. The order is
+     * indeterminate. All items are included.
+     *
+     * @param context DSpace context object
+     * @param eperson the submitter
+     * @param retrieveAllItems flag to determine if only archive should be returned
+     * @return an iterator over the items submitted by eperson
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException;
 
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
         throws SQLException;

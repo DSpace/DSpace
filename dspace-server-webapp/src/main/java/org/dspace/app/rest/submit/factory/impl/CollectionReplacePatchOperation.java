@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
@@ -17,7 +18,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,8 +36,8 @@ public class CollectionReplacePatchOperation extends ReplacePatchOperation<Strin
     WorkspaceItemService workspaceItemService;
 
     @Override
-    void replace(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws SQLException, DCInputsReaderException {
+    void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
+            Object value) throws SQLException, DCInputsReaderException {
 
         if (!(source instanceof WorkspaceItem)) {
             throw new IllegalArgumentException("the replace operation is only supported on workspaceitem");

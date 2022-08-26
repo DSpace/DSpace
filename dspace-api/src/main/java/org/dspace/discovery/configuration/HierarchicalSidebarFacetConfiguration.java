@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Special sidebar facet configuration used for hierarchical facets
@@ -31,7 +31,7 @@ public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilter
         return splitter;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSplitter(String splitter) {
         this.splitter = splitter;
     }

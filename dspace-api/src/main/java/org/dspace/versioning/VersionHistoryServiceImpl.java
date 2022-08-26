@@ -11,11 +11,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.dao.VersionHistoryDAO;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -33,6 +37,12 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Autowired(required = true)
     private VersioningService versioningService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     protected VersionHistoryServiceImpl() {
 
@@ -208,6 +218,22 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     @Override
     public VersionHistory findByItem(Context context, Item item) throws SQLException {
         return versionHistoryDAO.findByItem(context, item);
+    }
+
+    @Override
+    public boolean canSeeDraftVersion(Context context, VersionHistory versionHistory) throws SQLException {
+        Version version = this.getLatestVersion(context, versionHistory);
+        if (Objects.nonNull(version)) {
+            EPerson submitter = version.getItem().getSubmitter();
+            boolean isAdmin = authorizeService.isAdmin(context);
+            boolean canCreateVersion = configurationService
+                    .getBooleanProperty("versioning.submitterCanCreateNewVersion");
+            if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser()))) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
 }

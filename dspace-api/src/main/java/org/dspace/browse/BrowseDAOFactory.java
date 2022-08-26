@@ -7,8 +7,11 @@
  */
 package org.dspace.browse;
 
-import org.dspace.core.ConfigurationManager;
+import java.lang.reflect.InvocationTargetException;
+
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Factory class to generate DAOs based on the configuration
@@ -33,16 +36,21 @@ public class BrowseDAOFactory {
      */
     public static BrowseDAO getInstance(Context context)
         throws BrowseException {
-        String className = ConfigurationManager.getProperty("browseDAO.class");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String className = configurationService.getProperty("browseDAO.class");
         if (className == null) {
             // SOLR implementation is the default since DSpace 4.0
             return new SolrBrowseDAO(context);
         }
         try {
             return (BrowseDAO) Class
-                .forName(ConfigurationManager.getProperty("browseDAO.class"))
+                .forName(configurationService.getProperty("browseDAO.class"))
                 .getConstructor(Context.class).newInstance(context);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | IllegalAccessException
+                | IllegalArgumentException | InstantiationException
+                | NoSuchMethodException | SecurityException |
+                InvocationTargetException e) {
             throw new BrowseException("The configuration for browseDAO is invalid: " + className, e);
         }
     }

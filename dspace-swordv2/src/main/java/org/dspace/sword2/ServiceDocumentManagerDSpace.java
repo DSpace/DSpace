@@ -15,9 +15,10 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.ServiceDocument;
 import org.swordapp.server.ServiceDocumentManager;
@@ -32,12 +33,16 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager
+    private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(ServiceDocumentManagerDSpace.class);
 
     protected CommunityService communityService = ContentServiceFactory
         .getInstance().getCommunityService();
 
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    @Override
     public ServiceDocument getServiceDocument(String sdUri,
                                               AuthCredentials authCredentials, SwordConfiguration config)
         throws SwordError, SwordServerException, SwordAuthException {
@@ -54,7 +59,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
             WorkflowManagerFactory.getInstance().retrieveServiceDoc(context);
 
             if (log.isDebugEnabled()) {
-                log.debug(LogManager
+                log.debug(LogHelper
                               .getHeader(context, "sword_do_service_document", ""));
             }
 
@@ -65,7 +70,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
             String obo = authCredentials.getOnBehalfOf() != null ?
                 authCredentials.getOnBehalfOf() :
                 "NONE";
-            log.info(LogManager
+            log.info(LogHelper
                          .getHeader(context, "sword_service_document_request",
                                     "username=" + un + ",on_behalf_of=" + obo));
 
@@ -118,13 +123,13 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
             // we are dealing with the default service document
 
             // set the title of the workspace as per the name of the DSpace installation
-            String ws = ConfigurationManager.getProperty("dspace.name");
+            String ws = configurationService.getProperty("dspace.name");
             SwordWorkspace workspace = new SwordWorkspace();
             workspace.setTitle(ws);
 
             // next thing to do is determine whether the default is communities or collections
-            boolean swordCommunities = ConfigurationManager
-                .getBooleanProperty("swordv2-server", "expose-communities");
+            boolean swordCommunities = configurationService
+                .getBooleanProperty("swordv2-server.expose-communities");
 
             if (swordCommunities) {
                 List<Community> comms = swordAuth

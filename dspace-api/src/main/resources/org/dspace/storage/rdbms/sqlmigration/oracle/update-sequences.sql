@@ -47,8 +47,6 @@ BEGIN
   updateseq('fileextension_seq', 'fileextension', 'file_extension_id');
   updateseq('resourcepolicy_seq', 'resourcepolicy', 'policy_id');
   updateseq('workspaceitem_seq', 'workspaceitem', 'workspace_item_id');
-  updateseq('workflowitem_seq', 'workflowitem', 'workflow_id');
-  updateseq('tasklistitem_seq', 'tasklistitem', 'tasklist_id');
   updateseq('registrationdata_seq', 'registrationdata',
             'registrationdata_id');
   updateseq('subscription_seq', 'subscription', 'subscription_id');

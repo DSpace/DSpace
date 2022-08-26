@@ -28,12 +28,13 @@ public interface MetadataDSpaceCsvExportService {
      * @param context           The relevant DSpace context
      * @param exportAllItems    A boolean indicating whether or not the entire repository should be exported
      * @param exportAllMetadata Defines if all metadata should be exported or only the allowed ones
-     * @param handle            The handle for the DSpaceObject to be exported, can be a Community, Collection or Item
+     * @param identifier        The handle or UUID for the DSpaceObject to be exported, can be a Community,
+     *                          Collection or Item
      * @return                  A DSpaceCSV object containing the exported information
      * @throws Exception        If something goes wrong
      */
     public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata,
-                                  String handle, DSpaceRunnableHandler dSpaceRunnableHandler) throws Exception;
+                                  String identifier, DSpaceRunnableHandler dSpaceRunnableHandler) throws Exception;
 
     /**
      * This method will export all the Items in the given toExport iterator to a DSpaceCSV

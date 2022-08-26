@@ -9,6 +9,7 @@ package org.dspace.app.rest.utils;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
+import static org.dspace.app.rest.utils.URLUtils.urlIsPrefixOf;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.beans.IntrospectionException;
@@ -22,8 +23,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,21 +48,24 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
-import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.OrcidHistoryRest;
+import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -71,15 +79,16 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -99,12 +108,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class Utils {
 
-    private static final Logger log = Logger.getLogger(Utils.class);
+    private static final Logger log = LogManager.getLogger(Utils.class);
 
     /**
      * The default page size, if unspecified in the request.
      */
-    private static final int DEFAULT_PAGE_SIZE = 20;
+    public static final int DEFAULT_PAGE_SIZE = 20;
 
     /**
      * The maximum number of embed levels to allow.
@@ -127,6 +136,8 @@ public class Utils {
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
+    // Must be loaded @Lazy, as ConverterService also autowires Utils
+    @Lazy
     @Autowired
     private ConverterService converter;
 
@@ -134,7 +145,7 @@ public class Utils {
     private ConfigurationService configurationService;
 
     /** Cache to support fast lookups of LinkRest method annotation information. */
-    private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
+    private final Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
 
     public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
         Pageable pageable = getPageable(optionalPageable);
@@ -149,7 +160,7 @@ public class Utils {
                 pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
                         Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
             }
-            return new PageImpl<T>(pageContent, pageable, total);
+            return new PageImpl<>(pageContent, pageable, total);
         }
     }
 
@@ -220,9 +231,11 @@ public class Utils {
      *
      * @param apiCategory
      * @param modelPlural
-     * @return
+     * @return the requested repository.
+     * @throws RepositoryNotFoundException passed through.
      */
-    public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
+    public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural)
+            throws RepositoryNotFoundException {
         String model = makeSingular(modelPlural);
         return getResourceRepositoryByCategoryAndModel(apiCategory, model);
     }
@@ -233,9 +246,11 @@ public class Utils {
      *
      * @param apiCategory
      * @param modelSingular
-     * @return
+     * @return the requested repository.
+     * @throws RepositoryNotFoundException if no such repository can be found.
      */
-    public DSpaceRestRepository getResourceRepositoryByCategoryAndModel(String apiCategory, String modelSingular) {
+    public DSpaceRestRepository getResourceRepositoryByCategoryAndModel(String apiCategory, String modelSingular)
+            throws RepositoryNotFoundException {
         try {
             return applicationContext.getBean(apiCategory + "." + modelSingular, DSpaceRestRepository.class);
         } catch (NoSuchBeanDefinitionException e) {
@@ -243,6 +258,10 @@ public class Utils {
         }
     }
 
+    /**
+     * Find the names of all {@link DSpaceRestRepository} implementations.
+     * @return the names of all repository types.
+     */
     public String[] getRepositories() {
         return applicationContext.getBeanNamesForType(DSpaceRestRepository.class);
     }
@@ -254,7 +273,7 @@ public class Utils {
             return CommunityRest.NAME;
         }
         if (modelPlural.equals("authorities")) {
-            return AuthorityRest.NAME;
+            return VocabularyRest.NAME;
         }
         if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
@@ -267,6 +286,15 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "properties")) {
             return PropertyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "vocabularies")) {
+            return VocabularyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, OrcidQueueRest.PLURAL_NAME)) {
+            return OrcidQueueRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "orcidhistories")) {
+            return OrcidHistoryRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
@@ -301,11 +329,12 @@ public class Utils {
     }
 
     /**
-     * Build the canonical representation of a metadata key in DSpace. ie
-     * <schema>.<element>[.<qualifier>]
+     * Build the canonical representation of a metadata key in DSpace.  I.e.
+     * {@code <schema>.<element>[.<qualifier>]}
      *
      * @param schema
      * @param element
+     * @param qualifier
      * @return
      */
     public String getMetadataKey(String schema, String element, String qualifier) {
@@ -317,11 +346,11 @@ public class Utils {
      *
      * @param multipartFile
      *            the multipartFile representing the uploaded file. Please note that it is a complex object including
-     *            additional information other than the binary like the orginal file name and the mimetype
+     *            additional information other than the binary like the original file name and the MIME type
      * @param prefixTempName
      *            the prefix to use to generate the filename of the temporary file
      * @param suffixTempName
-     *            the suffic to use to generate the filename of the temporary file
+     *            the suffix to use to generate the filename of the temporary file
      * @return the temporary file on the server
      * @throws IOException
      * @throws FileNotFoundException
@@ -329,8 +358,10 @@ public class Utils {
     public static File getFile(MultipartFile multipartFile, String prefixTempName, String suffixTempName)
             throws IOException, FileNotFoundException {
         // TODO after change item-submission into
-        String tempDir = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir")
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String tempDir = (configurationService.hasProperty("upload.temp.dir"))
+                ? configurationService.getProperty("upload.temp.dir")
                 : System.getProperty("java.io.tmpdir");
         File uploadDir = new File(tempDir);
         if (!uploadDir.exists()) {
@@ -339,14 +370,15 @@ public class Utils {
             }
         }
         File file = File.createTempFile(prefixTempName + "-" + suffixTempName, ".temp", uploadDir);
-        InputStream io = new BufferedInputStream(multipartFile.getInputStream());
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-        org.dspace.core.Utils.bufferedCopy(io, out);
+        try (InputStream io = new BufferedInputStream(multipartFile.getInputStream());
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));) {
+            org.dspace.core.Utils.bufferedCopy(io, out);
+        }
         return file;
     }
 
     /**
-     * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
+     * Return the filename part from a multipartFile upload that could eventually contains the full path on the client
 
      *
      * @param multipartFile
@@ -407,6 +439,7 @@ public class Utils {
      * It will then look through all the DSpaceObjectServices to try and match this UUID to a DSpaceObject.
      * If one is found, this DSpaceObject is added to the List of DSpaceObjects that we will return.
      * @param context   The relevant DSpace context
+     * @param list      The interesting UUIDs.
      * @return          The resulting list of DSpaceObjects that we parsed out of the request
      */
     public List<DSpaceObject> constructDSpaceObjectList(Context context, List<String> list) {
@@ -448,7 +481,7 @@ public class Utils {
 
                 String line = scanner.nextLine();
                 if (org.springframework.util.StringUtils.hasText(line)) {
-                    list.add(line);
+                    list.add(decodeUrl(line));
                 }
             }
 
@@ -458,6 +491,14 @@ public class Utils {
         return list;
     }
 
+    private String decodeUrl(String url) {
+        try {
+            return URLDecoder.decode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.warn("The following url could not be decoded: " + url);
+        }
+        return StringUtils.EMPTY;
+    }
 
     /**
      * This method will retrieve a list of DSpaceObjects from the Request by reading in the Request's InputStream
@@ -541,8 +582,10 @@ public class Utils {
             projections.add(converter.getProjection(projectionName));
         }
 
+
         if (!embedRels.isEmpty()) {
-            projections.add(new EmbedRelsProjection(embedRels));
+            Set<String> embedSizes = new HashSet<>(getValues(servletRequest, "embed.size"));
+            projections.add(new EmbedRelsProjection(embedRels, embedSizes));
         }
 
         if (projections.isEmpty()) {
@@ -670,7 +713,8 @@ public class Utils {
             Method method = requireMethod(linkRepository.getClass(), linkRest.method());
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
-                Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
+                Object linkedObject = method.invoke(linkRepository, null, contentId,
+                                                    projection.getPagingOptions(rel, resource, oldLinks), projection);
                 resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
                 // This will be thrown from the LinkRepository if a Resource has been requested that'll try to embed
@@ -693,6 +737,7 @@ public class Utils {
     /**
      * Adds embeds (if the maximum embed level has not been exceeded yet) for all properties annotated with
      * {@code @LinkRel} or whose return types are {@link RestAddressableModel} subclasses.
+     * @param resource the resource to be so augmented.
      */
     public void embedMethodLevelRels(HALResource<? extends RestAddressableModel> resource) {
         if (resource.getContent().getEmbedLevel() == EMBED_MAX_LEVELS) {
@@ -910,34 +955,84 @@ public class Utils {
     */
     public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
-        // first check if the uri could be valid
-        if (!StringUtils.startsWith(uri, dspaceUrl)) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+
+        // Convert strings to URL objects.
+        // Do this early to check that inputs are well-formed.
+        URL dspaceUrlObject;
+        URL requestUrlObject;
+        try {
+            dspaceUrlObject = new URL(dspaceUrl);
+            requestUrlObject = new URL(uri);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(
+                    String.format("Configuration '%s' or request '%s' is malformed", dspaceUrl, uri));
         }
-        // extract from the uri the category, model and id components
-        // they start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
-        String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
-                .split("/", 3);
+
+        // Check whether the URI could be valid.
+        if (!urlIsPrefixOf(dspaceUrl, uri)) {
+            throw new IllegalArgumentException("the supplied uri is not ours: " + uri);
+        }
+
+        // Extract from the URI the category, model and id components.
+        // They start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
+        int dspacePathLength = StringUtils.split(dspaceUrlObject.getPath(), '/').length;
+        String[] requestPath = StringUtils.split(requestUrlObject.getPath(), '/');
+        String[] uriParts = Arrays.copyOfRange(requestPath, dspacePathLength,
+                requestPath.length);
+        if ("api".equalsIgnoreCase(uriParts[0])) {
+            uriParts = Arrays.copyOfRange(uriParts, 1, uriParts.length);
+        }
         if (uriParts.length != 3) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+            throw new IllegalArgumentException("the supplied uri lacks required path elements: " + uri);
         }
+
+        return findBaseObjectRest(context, uriParts[0], uriParts[1], uriParts[2]);
+    }
+
+    /**
+     * Gets the rest object of of specified type (i.e. "core.item", "core.collection", "workflow.workflowitem",...)
+     * having given uuid.
+     *
+     * @param context the DSpace context
+     * @param type Object type
+     * @param uuid Object uuid
+     * @return the {@link BaseObjectRest} identified by the provided uuid
+     */
+    public BaseObjectRest getBaseObjectRestFromTypeAndUUID(Context context, String type, String uuid) {
+
+        if (StringUtils.isBlank(type)) {
+            throw new IllegalArgumentException("Type is missing");
+        }
+
+        String[] split = type.split("\\.");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("Provided type is not valid: " + type);
+        }
+        return findBaseObjectRest(context, split[0], split[1], uuid);
+    }
+
+    private BaseObjectRest findBaseObjectRest(Context context, String apiCategory, String model, String uuid) {
 
         DSpaceRestRepository repository;
         try {
-            repository = getResourceRepository(uriParts[0], uriParts[1]);
+            repository = getResourceRepository(apiCategory, model);
             if (!(repository instanceof ReloadableEntityObjectRepository)) {
-                throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+                throw new IllegalArgumentException("the supplied category and model are not" +
+                    " for the right type of repository: " +
+                    String.format("%s.%s", apiCategory, model));
             }
         } catch (RepositoryNotFoundException e) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
+            throw new IllegalArgumentException("the repository for the category '" + apiCategory + "' and model '"
+                + model + "' was not found", e);
         }
 
         Serializable pk;
         try {
             // cast the string id in the uriParts to the real pk class
-            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uriParts[2]);
+            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uuid);
         } catch (Exception e) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
+            throw new IllegalArgumentException(
+                "the supplied uuid could not be cast to a Primary Key class: " + uuid, e);
         }
         try {
             // disable the security as we only need to retrieve the object to further process the authorization

@@ -121,7 +121,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     public RelationshipType create(Context context, EntityType leftEntityType, EntityType rightEntityType,
                                    String leftwardType, String rightwardType, Integer leftCardinalityMinInteger,
                                    Integer leftCardinalityMaxInteger, Integer rightCardinalityMinInteger,
-                                   Integer rightCardinalityMaxInteger, Boolean copyToLeft, Boolean copyToRight)
+                                   Integer rightCardinalityMaxInteger, Boolean copyToLeft, Boolean copyToRight,
+                                   RelationshipType.Tilted tilted)
         throws SQLException, AuthorizeException {
         RelationshipType relationshipType = new RelationshipType();
         relationshipType.setLeftType(leftEntityType);
@@ -130,6 +131,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         relationshipType.setRightwardType(rightwardType);
         relationshipType.setCopyToLeft(copyToLeft);
         relationshipType.setCopyToRight(copyToRight);
+        relationshipType.setTilted(tilted);
         relationshipType.setLeftMinCardinality(leftCardinalityMinInteger);
         relationshipType.setLeftMaxCardinality(leftCardinalityMaxInteger);
         relationshipType.setRightMinCardinality(rightCardinalityMinInteger);
@@ -171,5 +173,10 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
                 "Only administrators can delete entityType");
         }
         relationshipTypeDAO.delete(context, relationshipType);
+    }
+
+    @Override
+    public int countByEntityType(Context context, EntityType entityType) throws SQLException {
+        return relationshipTypeDAO.countByEntityType(context, entityType);
     }
 }

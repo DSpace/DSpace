@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.WorkflowDefinitionMatcher;
@@ -29,6 +31,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -121,8 +124,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         String token = "NonValidToken";
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT))
-            //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            //We expect a 401 Unauthorized status
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -192,8 +195,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         String workflowName = defaultWorkflow.getID();
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName))
-            //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            //We expect a 401 Unauthorized status
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -338,18 +341,21 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             .build();
         context.restoreAuthSystemState();
 
+        // XXX xmlWorkflowFactory.getWorkflowByName(String) might be safer than
+        // assuming that the first non-default workflow is the one designed for this test.
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
         List<Workflow> allConfiguredWorkflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
         String firstNonDefaultWorkflowName = "";
         for (Workflow workflow : allConfiguredWorkflows) {
             if (!workflow.getID().equalsIgnoreCase(defaultWorkflow.getID())) {
                 firstNonDefaultWorkflowName = workflow.getID();
+                break;
             }
         }
 
         if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
             List<Collection> mappedCollections
-                = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, firstNonDefaultWorkflowName);
+                = xmlWorkflowFactory.getCollectionHandlesMappedToWorkflow(context, firstNonDefaultWorkflowName);
             //When we call this facets endpoint
             if (mappedCollections.size() > 0) {
                 //returns array of collection jsons that are mapped to given workflow
@@ -402,8 +408,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
-            //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            //We expect a 401 Unauthorized status
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -434,6 +440,34 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
     }
 
     @Test
+    public void getStepsOfWorkflowByName_DefaultWorkflow_Ordered() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
+        List<Step> steps = defaultWorkflow.getSteps();
+
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
+        + "/steps")
+                .param("projection", "full"))
+        //We expect a 200 OK status
+        .andExpect(status().isOk())
+        //Number of total workflows is equals to number of non-mapped collections
+        .andExpect(jsonPath("$.page.totalElements", is(steps.size())))
+        // assert the two list equality using ids (preserves order)
+        .andExpect(
+                jsonPath(
+                        "$._embedded.steps",
+                        contains(
+                                steps
+                                    .stream()
+                                    .map(WorkflowDefinitionMatcher::matchStep)
+                                    .collect(Collectors.toList())
+                        )
+                )
+        );
+    }
+
+    @Test
     public void getStepsOfWorkflowByName_DefaultWorkflow_NoValidToken() throws Exception {
         String token = "NonValidToken";
         Workflow defaultWorkflow = xmlWorkflowFactory.getDefaultWorkflow();
@@ -441,8 +475,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/steps"))
-            //We expect a 403 Forbidden status
-            .andExpect(status().isForbidden());
+            //We expect a 401 Unauthorized status
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

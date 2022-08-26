@@ -17,17 +17,19 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.SimpleReporterService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * <p>
@@ -44,7 +46,7 @@ public class DailyReportEmailer {
     /**
      * log4j logger.
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DailyReportEmailer.class);
+    private static final Logger log = LogManager.getLogger(DailyReportEmailer.class);
 
     /**
      * Default constructor.
@@ -63,14 +65,16 @@ public class DailyReportEmailer {
     public void sendReport(File attachment, int numberOfBitstreams)
         throws IOException, javax.mail.MessagingException {
         if (numberOfBitstreams > 0) {
-            String hostname = Utils.getHostName(ConfigurationManager.getProperty("dspace.ui.url"));
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
             Email email = new Email();
-            email.setSubject(
-                "Checksum checker Report - " + numberOfBitstreams + " Bitstreams found with POSSIBLE issues on " +
-                    hostname);
+            email.setSubject(String.format(
+                "Checksum checker Report - %d Bitstreams found with POSSIBLE issues on %s",
+                    numberOfBitstreams, hostname));
             email.setContent("Checker Report", "report is attached ...");
             email.addAttachment(attachment, "checksum_checker_report.txt");
-            email.addRecipient(ConfigurationManager.getProperty("mail.admin"));
+            email.addRecipient(configurationService.getProperty("mail.admin"));
             email.send();
         }
     }
@@ -98,7 +102,7 @@ public class DailyReportEmailer {
      */
     public static void main(String[] args) {
         // set up command line parser
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
 
         // create an options object and populate it
@@ -164,7 +168,9 @@ public class DailyReportEmailer {
             int numBitstreams = 0;
 
             // create a temporary file in the log directory
-            String dirLocation = ConfigurationManager.getProperty("log.report.dir");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String dirLocation = configurationService.getProperty("log.report.dir");
             File directory = new File(dirLocation);
 
             if (directory.exists() && directory.isDirectory()) {
@@ -247,7 +253,7 @@ public class DailyReportEmailer {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     log.fatal("Could not close writer", e);
                 }
             }

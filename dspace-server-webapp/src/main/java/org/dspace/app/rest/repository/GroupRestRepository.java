@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
+import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
@@ -71,7 +72,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         }
 
         if (isBlank(groupRest.getName())) {
-            throw new UnprocessableEntityException("cannot create group, no group name is provided");
+            throw new GroupNameNotProvidedException();
         }
 
         Group group;
@@ -140,7 +141,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             Context context = obtainContext();
             long total = gs.searchResultCount(context, query);
             List<Group> groups = gs.search(context, query, Math.toIntExact(pageable.getOffset()),
-                                           Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                                           Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

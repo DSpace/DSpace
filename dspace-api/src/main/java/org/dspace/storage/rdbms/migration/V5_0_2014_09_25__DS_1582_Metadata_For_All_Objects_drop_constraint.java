@@ -8,11 +8,10 @@
 package org.dspace.storage.rdbms.migration;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.flywaydb.core.api.migration.MigrationChecksumProvider;
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 
 /**
  * This class is in support of the DS-1582 Metadata for All Objects feature.
@@ -39,22 +38,22 @@ import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
  * @author Tim Donohue
  */
 public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
-    implements JdbcMigration, MigrationChecksumProvider {
+    extends BaseJavaMigration {
     /* The checksum to report for this migration (when successful) */
     private int checksum = -1;
 
     /**
      * Actually migrate the existing database
      *
-     * @param connection SQL Connection object
+     * @param context Flyway Migration Context
      * @throws IOException  A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     @Override
-    public void migrate(Connection connection)
+    public void migrate(Context context)
         throws IOException, SQLException {
         // Drop the constraint associated with "item_id" column of "metadatavalue"
-        checksum = MigrationUtils.dropDBConstraint(connection, "metadatavalue", "item_id", "fkey");
+        checksum = MigrationUtils.dropDBConstraint(context.getConnection(), "metadatavalue", "item_id", "fkey");
     }
 
     /**

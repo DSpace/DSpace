@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -19,10 +20,11 @@ import org.dspace.content.DCDate;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.InvalidMediaTypeException;
@@ -40,13 +42,15 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemEntryGenerator.class);
+    private static final Logger log = LogManager.getLogger(ItemEntryGenerator.class);
 
     protected HandleService handleService = HandleServiceFactory.getInstance()
                                                                 .getHandleService();
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     protected ItemEntryGenerator(SWORDService service) {
         super(service);
@@ -56,6 +60,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
      * Add all the subject classifications from the bibliographic
      * metadata.
      */
+    @Override
     protected void addCategories() {
         List<MetadataValue> dcv = itemService
             .getMetadataByMetadataString(item, "dc.subject.*");
@@ -70,6 +75,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
      * Set the content type that DSpace received.  This is just
      * "application/zip" in this default implementation.
      */
+    @Override
     protected void addContentElement()
         throws DSpaceSWORDException {
         // get the things we need out of the service
@@ -83,11 +89,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
                 }
 
                 if (StringUtils.isNotBlank(handle)) {
-                    boolean keepOriginal = ConfigurationManager
-                        .getBooleanProperty("sword-server",
-                                            "keep-original-package");
-                    String swordBundle = ConfigurationManager
-                        .getProperty("sword-server", "bundle.name");
+                    boolean keepOriginal = configurationService
+                        .getBooleanProperty("sword-server.keep-original-package");
+                    String swordBundle = configurationService
+                        .getProperty("sword-server.bundle.name");
                     if (StringUtils.isBlank(swordBundle)) {
                         swordBundle = "SWORD";
                     }
@@ -146,6 +151,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
      * they can be used to access the resource over http (i.e.
      * a real URL).
      */
+    @Override
     protected void addIdentifier() {
         // it's possible that the item hasn't been assigned a handle yet
         if (!this.deposit.isNoOp()) {
@@ -162,7 +168,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
 
         // if we get this far, then we just use the dspace url as the
         // property
-        String cfg = ConfigurationManager.getProperty("dspace.ui.url");
+        String cfg = configurationService.getProperty("dspace.ui.url");
         entry.setId(cfg);
 
         // FIXME: later on we will maybe have a workflow page supplied
@@ -172,6 +178,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add links associated with this item.
      */
+    @Override
     protected void addLinks()
         throws DSpaceSWORDException {
         SWORDUrlManager urlManager = swordService.getUrlManager();
@@ -223,6 +230,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the date of publication from the bibliographic metadata
      */
+    @Override
     protected void addPublishDate() {
         List<MetadataValue> dcv = itemService
             .getMetadataByMetadataString(item, "dc.date.issued");
@@ -233,8 +241,9 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
 
     /**
      * Add rights information.  This attaches an href to the URL
-     * of the item's licence file
+     * of the item's license file
      */
+    @Override
     protected void addRights()
         throws DSpaceSWORDException {
         SWORDUrlManager urlManager = swordService.getUrlManager();
@@ -246,7 +255,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
             return;
         }
 
-        String base = ConfigurationManager.getProperty("dspace.ui.url");
+        String base = configurationService.getProperty("dspace.ui.url");
 
         // if there's no base URL, we are stuck
         if (base == null) {
@@ -275,6 +284,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the summary/abstract from the bibliographic metadata
      */
+    @Override
     protected void addSummary() {
         List<MetadataValue> dcv = itemService
             .getMetadataByMetadataString(item, "dc.description.abstract");
@@ -291,6 +301,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the title from the bibliographic metadata
      */
+    @Override
     protected void addTitle() {
         List<MetadataValue> dcv = itemService
             .getMetadataByMetadataString(item, "dc.title");
@@ -307,9 +318,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
     /**
      * Add the date that this item was last updated
      */
+    @Override
     protected void addLastUpdatedDate() {
-        String config = ConfigurationManager
-            .getProperty("sword-server", "updated.field");
+        String config = configurationService
+            .getProperty("sword-server.updated.field");
         List<MetadataValue> dcv = itemService
             .getMetadataByMetadataString(item, config);
         if (dcv != null && dcv.size() == 1) {

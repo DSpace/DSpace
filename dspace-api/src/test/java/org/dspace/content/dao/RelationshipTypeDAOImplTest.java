@@ -82,8 +82,8 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
             WorkspaceItem workspaceItemTwo = workspaceItemService.create(context, collection, false);
             itemOne = installItemService.installItem(context, workspaceItem);
             itemTwo = installItemService.installItem(context, workspaceItemTwo);
-            itemService.addMetadata(context, itemOne, "relationship", "type", null, Item.ANY, "Publication");
-            itemService.addMetadata(context, itemTwo, "relationship", "type", null, Item.ANY, "Person");
+            itemService.addMetadata(context, itemOne, "dspace", "entity", "type", Item.ANY, "Publication");
+            itemService.addMetadata(context, itemTwo, "dspace", "entity", "type", Item.ANY, "Person");
             itemService.update(context, itemOne);
             itemService.update(context, itemTwo);
             entityTypeOne = entityTypeService.create(context, "Person");

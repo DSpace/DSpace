@@ -8,8 +8,8 @@
 package org.dspace.xmlworkflow.state.actions;
 
 /**
- * This empty interface can be implemented by the UI module(s)
- * it does not contain any methods since each UI has there own methods
+ * This empty interface can be implemented by the UI module(s).
+ * It does not contain any methods since each UI has its own methods
  * of rendering the action.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)

@@ -22,7 +22,7 @@ public interface DSpaceWebappMXBean {
     public boolean isUI();
 
     /**
-     * What kind of webapp?  XMLUI, OAI, etc.
+     * What kind of webapp? Server, etc.
      *
      * @return kind of webapp
      */

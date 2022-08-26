@@ -58,12 +58,23 @@ public class CommunityMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchCommunityEntryNonAdminEmbeds(String name, UUID uuid, String handle) {
+        return allOf(
+            matchProperties(name, uuid, handle),
+            hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
+            hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+            matchLinks(uuid),
+            matchNonAdminEmbeds()
+        );
+    }
+
     public static Matcher<? super Object> matchCommunityEntryFullProjection(String name, UUID uuid, String handle) {
         return allOf(
             matchProperties(name, uuid, handle),
             hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
             hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
-            matchLinks(uuid)
+            matchLinks(uuid),
+            matchFullEmbeds()
         );
     }
 
@@ -82,12 +93,25 @@ public class CommunityMatcher {
     /**
      * Gets a matcher for all expected embeds when the full projection is requested.
      */
-    public static Matcher<? super Object> matchFullEmbeds() {
+    public static Matcher<? super Object> matchNonAdminEmbeds() {
         return matchEmbeds(
                 "collections[]",
                 "logo",
                 "parentCommunity",
                 "subcommunities[]"
+        );
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+            "collections[]",
+            "logo",
+            "parentCommunity",
+            "subcommunities[]",
+            "adminGroup"
         );
     }
 
@@ -117,7 +141,7 @@ public class CommunityMatcher {
         );
     }
 
-    public static String getFullEmbedsParameters() {
+    public static String getNonAdminEmbeds() {
         return "collections,logo,parentCommunity,subcommunities";
     }
 

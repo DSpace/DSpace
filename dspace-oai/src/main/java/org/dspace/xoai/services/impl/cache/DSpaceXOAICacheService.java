@@ -27,7 +27,6 @@ import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import com.lyncode.xoai.dataprovider.xml.oaipmh.OAIPMH;
 import com.lyncode.xoai.util.Base64Utils;
 import org.apache.commons.io.FileUtils;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.util.DateUtils;
@@ -39,9 +38,12 @@ public class DSpaceXOAICacheService implements XOAICacheService {
     private static String baseDir;
     private static String staticHead;
 
-    private static String getBaseDir() {
+    @Autowired
+    ConfigurationService configurationService;
+
+    private String getBaseDir() {
         if (baseDir == null) {
-            String dir = ConfigurationManager.getProperty("oai", "cache.dir") + REQUEST_DIR;
+            String dir = configurationService.getProperty("oai.cache.dir") + REQUEST_DIR;
             baseDir = dir;
         }
         return baseDir;
@@ -61,10 +63,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
         return staticHead + "<responseDate>" + DateUtils.format(date) + "</responseDate>";
     }
 
-    @Autowired
-    ConfigurationService configurationService;
-
-    private XOAIManager manager;
+    private final XOAIManager manager;
 
     public DSpaceXOAICacheService(XOAIManager manager) {
         this.manager = manager;
@@ -82,7 +81,7 @@ public class DSpaceXOAICacheService implements XOAICacheService {
 
     @Override
     public boolean isActive() {
-        return configurationService.getBooleanProperty("oai", "cache", true);
+        return configurationService.getBooleanProperty("oai.cache", true);
     }
 
     @Override

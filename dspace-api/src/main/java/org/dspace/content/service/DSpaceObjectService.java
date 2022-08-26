@@ -7,6 +7,8 @@
  */
 package org.dspace.content.service;
 
+import static org.dspace.content.MetadataSchemaEnum.DC;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,25 +18,46 @@ import java.util.UUID;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 
 /**
  * Service interface class for the DSpaceObject.
- * All DSpaceObject service classes should implement this class since it offers some basic methods which all
- * DSpaceObjects
- * are required to have.
+ * All DSpaceObject service classes should implement this class since it offers
+ * some basic methods which all {@code DSpaceObject}s are required to have.
  *
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
 public interface DSpaceObjectService<T extends DSpaceObject> {
 
+    // Some common metadata fields which must be defined.
+
+    public static final MetadataFieldName MD_INTRODUCTORY_TEXT
+            = new MetadataFieldName(DC, "description");
+    public static final MetadataFieldName MD_SHORT_DESCRIPTION
+            = new MetadataFieldName(DC, "description", "abstract");
+    public static final MetadataFieldName MD_SIDEBAR_TEXT
+            = new MetadataFieldName(DC, "description", "tableofcontents");
+    public static final MetadataFieldName MD_COPYRIGHT_TEXT
+            = new MetadataFieldName(DC, "rights");
+    public static final MetadataFieldName MD_NAME
+            = new MetadataFieldName(DC, "title");
+    public static final MetadataFieldName MD_PROVENANCE_DESCRIPTION
+            = new MetadataFieldName(DC, "provenance");
+    public static final MetadataFieldName MD_LICENSE
+            = new MetadataFieldName(DC, "rights", "license");
+    public static final MetadataFieldName MD_USER_FORMAT_DESCRIPTION
+            = new MetadataFieldName(DC, "format");
+    public static final MetadataFieldName MD_SOURCE
+            = new MetadataFieldName(DC, "source");
+
     /**
      * Generic find for when the precise type of an Entity is not known
      *
      * @param context - the context
-     * @param uuid      - uuid within table of type'd dspace objects
+     * @param uuid      - uuid within table of typed dspace objects
      * @return the dspace object found, or null if it does not exist.
      * @throws SQLException only upon failure accessing the database.
      */
@@ -175,10 +198,29 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public String getMetadata(T dSpaceObject, String value);
 
 
+    /**
+     * Get the value(s) of a metadata field.
+     * @param dSpaceObject the object whose metadata are sought.
+     * @param mdString the name of the field:  {@code schema.element.qualifier}.
+     * @param authority name of the authority which controls these values, or null.
+     * @return all matching metadata values, or null if none.
+     */
     public List<MetadataValue> getMetadata(T dSpaceObject, String mdString, String authority);
 
-    public List<MetadataValue> getMetadata(T dSpaceObject, String schema, String element, String qualifier, String lang,
-                                           String authority);
+    /**
+     * Get the value(s) of a metadata field.
+     * @param dSpaceObject the object whose metadata are sought.
+     * @param schema name of the schema which defines the field.
+     * @param element the field's element name.
+     * @param qualifier the field's qualifier name, or null.
+     * @param lang the language of the requested field value(s),
+     *              null if explicitly no language,
+     *              or {@link org.dspace.content.Item.ANY} to match all languages.
+     * @param authority name of the authority which controls these values, or null.
+     * @return value(s) of the indicated field for the given DSO, or null.
+     */
+    public List<MetadataValue> getMetadata(T dSpaceObject, String schema,
+            String element, String qualifier, String lang, String authority);
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -200,10 +242,11 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *                  and the ISO3166 country code. <code>null</code> means the
      *                  value has no language (for example, a date).
      * @param values    the values to add.
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            List<String> values) throws SQLException;
+    public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                            String lang, List<String> values) throws SQLException;
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -223,10 +266,11 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param values      the values to add.
      * @param authorities the external authority key for this value (or null)
      * @param confidences the authority confidence (default 0)
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            List<String> values, List<String> authorities, List<Integer> confidences)
+    public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                            String lang, List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException;
 
     /**
@@ -243,32 +287,64 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param values        the values to add.
      * @param authorities   the external authority key for this value (or null)
      * @param confidences   the authority confidence (default 0)
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-            List<String> authorities, List<Integer> confidences) throws SQLException;
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
+                       List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
 
     /**
      * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List)} when a single
      * value need to be added
-     * 
-     * @param context
-     * @param dso
-     * @param metadataField
-     * @param language
-     * @param value
-     * @param authority
-     * @param confidence
+     *
+     * @param context       DSpace context
+     * @param dso           DSpaceObject
+     * @param metadataField the metadata field to which the value is to be set
+     * @param language      the ISO639 language code, optionally followed by an underscore
+     *                      and the ISO3166 country code. <code>null</code> means the
+     *                      value has no language (for example, a date).
+     * @param value         the value to add.
+     * @param authority     the external authority key for this value (or null)
+     * @param confidence    the authority confidence (default 0)
+     * @return the MetadataValue added ot the object
      * @throws SQLException
      */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-            String authority, int confidence) throws SQLException;
+    public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
+           String value, String authority, int confidence) throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
+    /**
+     * Add a metadatafield. These are appended to existing values.
+     * Use <code>clearMetadata</code> to remove values.
+     *
+     * @param context       DSpace context
+     * @param dso           DSpaceObject
+     * @param metadataField the metadata field to which the value is to be set
+     * @param language      the ISO639 language code, optionally followed by an underscore
+     *                      and the ISO3166 country code. <code>null</code> means the
+     *                      value has no language (for example, a date).
+     * @param value        the value to add.
+     * @return the MetadataValue added ot the object
+     * @throws SQLException if database error
+     */
+    public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values)
-        throws SQLException;
+    /**
+     * Add a metadatafields. These are appended to existing values.
+     * Use <code>clearMetadata</code> to remove values.
+     *
+     * @param context       DSpace context
+     * @param dso           DSpaceObject
+     * @param metadataField the metadata field to which the value is to be set
+     * @param language      the ISO639 language code, optionally followed by an underscore
+     *                      and the ISO3166 country code. <code>null</code> means the
+     *                      value has no language (for example, a date).
+     * @param values        the values to add.
+     * @return the list of MetadataValues added to the object
+     * @throws SQLException if database error
+     */
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String language,
+                       List<String> values) throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing
@@ -285,10 +361,35 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *                  and the ISO3166 country code. <code>null</code> means the
      *                  value has no language (for example, a date).
      * @param value     the value to add.
+     * @return the MetadataValue added ot the object
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            String value) throws SQLException;
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                             String lang, String value) throws SQLException;
+
+    /**
+     * Add a single metadata value at the given place position.
+     *
+     * @param context    DSpace context
+     * @param dso        DSpaceObject
+     * @param schema     the schema for the metadata field. <em>Must</em> match
+     *                   the <code>name</code> of an existing metadata schema.
+     * @param element    the metadata element name
+     * @param qualifier  the metadata qualifier, or <code>null</code> for
+     *                   unqualified
+     * @param lang       the ISO639 language code, optionally followed by an underscore
+     *                   and the ISO3166 country code. <code>null</code> means the
+     *                   value has no language (for example, a date).
+     * @param value      the value to add.
+     * @param authority  the external authority key for this value (or null)
+     * @param confidence the authority confidence (default 0)
+     * @param place      the metadata position
+     * @return the MetadataValue added ot the object
+     * @throws SQLException if database error
+     */
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                           String lang, String value, String authority, int confidence, int place) throws SQLException;
+
 
     /**
      * Add a single metadata field. This is appended to existing
@@ -307,10 +408,11 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param value      the value to add.
      * @param authority  the external authority key for this value (or null)
      * @param confidence the authority confidence (default 0)
+     * @return the MetadataValue added ot the object
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            String value, String authority, int confidence) throws SQLException;
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                           String lang, String value, String authority, int confidence) throws SQLException;
 
     /**
      * Clear metadata values. As with <code>getDC</code> above,
@@ -340,7 +442,25 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void removeMetadataValues(Context context, T dso, List<MetadataValue> values) throws SQLException;
 
+    /**
+     * Get the first value of a metadata field.
+     * @param dso the object whose metadata are sought.
+     * @param schema name of the schema which defines the field.
+     * @param element element name of the field.
+     * @param qualifier qualifier name of the field, or null.
+     * @param language select only values in this language.
+     * @return first value of the field, or null if none.
+     */
     public String getMetadataFirstValue(T dso, String schema, String element, String qualifier, String language);
+
+    /**
+     * Get the first value of a metadata field.
+     * @param dso the object whose metadata are sought.
+     * @param field {schema, element, qualifier} for the desired field.
+     * @param language select only values in this language.
+     * @return first value of the field, or null if none.
+     */
+    public String getMetadataFirstValue(T dso, MetadataFieldName field, String language);
 
     /**
      * Set first metadata field value
@@ -363,6 +483,24 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public void setMetadataSingleValue(Context context, T dso, String schema, String element, String qualifier,
                                        String language, String value) throws SQLException;
+
+    /**
+     * Set first metadata field value
+     *
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param field     {schema, element, qualifier} for the desired field.
+     * @param language  the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means only
+     *                  values with no language are removed, and <code>Item.ANY</code>
+     *                  means values with any country code or no country code are
+     *                  removed.
+     * @param value     metadata value
+     * @throws SQLException if database error
+     */
+    public void setMetadataSingleValue(Context context, T dso,
+            MetadataFieldName field, String language, String value)
+            throws SQLException;
 
     public void updateLastModified(Context context, T dso) throws SQLException, AuthorizeException;
 

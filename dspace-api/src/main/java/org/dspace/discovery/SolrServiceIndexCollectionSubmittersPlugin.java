@@ -19,7 +19,7 @@ import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -53,8 +53,9 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
                         parent = (Community) ContentServiceFactory.getInstance().getDSpaceObjectService(parent)
                                                                                 .getParentObject(context, parent);
                     }
-                    List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, col,
-                                                    Constants.ADD);
+                    List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context,col,Constants.ADD);
+                    policies.addAll(authorizeService.getPoliciesActionFilter(context, col, Constants.ADMIN));
+
                     for (ResourcePolicy resourcePolicy : policies) {
                         if (resourcePolicy.getGroup() != null) {
                             fieldValue = "g" + resourcePolicy.getGroup().getID();
@@ -66,7 +67,7 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
                         context.uncacheEntity(resourcePolicy);
                     }
                 } catch (SQLException e) {
-                    log.error(LogManager.getHeader(context, "Error while indexing resource policies",
+                    log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                              "Collection: (id " + col.getID() + " type " + col.getName() + ")" ));
                 }
             }

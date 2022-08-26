@@ -28,6 +28,10 @@ import org.dspace.scripts.Process;
     @LinkRest(
         name = ProcessRest.FILE_TYPES,
         method = "getFileTypesFromProcess"
+    ),
+    @LinkRest(
+        name = ProcessRest.OUTPUT,
+        method = "getOutputFromProcess"
     )
 })
 public class ProcessRest extends BaseObjectRest<Integer> {
@@ -37,6 +41,8 @@ public class ProcessRest extends BaseObjectRest<Integer> {
 
     public static final String FILES = "files";
     public static final String FILE_TYPES = "filetypes";
+    public static final String OUTPUT = "output";
+
     public String getCategory() {
         return CATEGORY;
     }

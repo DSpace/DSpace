@@ -19,12 +19,12 @@ import org.dspace.core.Context;
  */
 public abstract class PatchOperation<M> {
 
-    // All PATCH operations's string (in operation.getOp())
-    protected static final String OPERATION_REPLACE = "replace";
-    protected static final String OPERATION_ADD = "add";
-    protected static final String OPERATION_COPY = "copy";
-    protected static final String OPERATION_MOVE = "move";
-    protected static final String OPERATION_REMOVE = "remove";
+    // All PATCH operations' string (in operation.getOp())
+    public static final String OPERATION_REPLACE = "replace";
+    public static final String OPERATION_ADD = "add";
+    public static final String OPERATION_COPY = "copy";
+    public static final String OPERATION_MOVE = "move";
+    public static final String OPERATION_REMOVE = "remove";
 
     /**
      * Updates the rest model by applying the patch operation.

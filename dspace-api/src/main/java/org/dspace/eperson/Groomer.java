@@ -16,13 +16,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -73,7 +74,7 @@ public class Groomer {
                               + ')');
         options.addOption("d", "delete", false, "delete matching epersons");
 
-        PosixParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command = null;
         try {
             command = parser.parse(options, argv);

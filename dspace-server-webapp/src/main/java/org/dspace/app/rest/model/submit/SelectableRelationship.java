@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model.submit;
 
+import java.util.List;
+
 /**
  * The SelectableRelationship REST Resource. It is not addressable directly, only
  * used as inline object in the InputForm resource.
@@ -24,6 +26,7 @@ public class SelectableRelationship {
     private String filter;
     private String searchConfiguration;
     private String nameVariants;
+    private List<String> externalSources;
 
     public void setRelationshipType(String relationshipType) {
         this.relationshipType = relationshipType;
@@ -55,5 +58,13 @@ public class SelectableRelationship {
 
     public String getNameVariants() {
         return nameVariants;
+    }
+
+    public List<String> getExternalSources() {
+        return externalSources;
+    }
+
+    public void setExternalSources(List<String> externalSources) {
+        this.externalSources = externalSources;
     }
 }

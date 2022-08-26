@@ -46,6 +46,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -256,10 +257,12 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(authToken).perform(post("/api/workflow/pooltasks/" + poolTask.getID())
-                                             .header("X-On-Behalf-Of", reviewer.getID())
-                                             .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                                .andExpect(status().isNoContent());
+        getClient(authToken).perform(post("/api/workflow/claimedtasks")
+                 .header("X-On-Behalf-Of", reviewer.getID())
+                 .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                 .content("/api/workflow/pooltasks/" + poolTask.getID()))
+                 .andExpect(status().isCreated())
+                 .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))));
 
         // verify that the pool task no longer exists
         getClient(authToken).perform(get("/api/workflow/pooltasks/" + poolTask.getID()))

@@ -30,4 +30,8 @@
     <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
     <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl" lazy-init="true"/>
 
+    <bean class="org.dspace.statistics.SolrStatisticsCore" autowire-candidate="true"/>
+    
+    <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
+
 </beans>

@@ -8,6 +8,7 @@
 package org.dspace.external;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -28,15 +30,16 @@ public class OrcidRestConnector {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OrcidRestConnector.class);
+    private static final Logger log = LogManager.getLogger(OrcidRestConnector.class);
 
-    private String url;
+    private final String url;
 
     public OrcidRestConnector(String url) {
         this.url = url;
     }
 
     public InputStream get(String path, String accessToken) {
+        HttpResponse getResponse = null;
         InputStream result = null;
         path = trimSlashes(path);
 
@@ -48,7 +51,7 @@ public class OrcidRestConnector {
         }
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpResponse getResponse = httpClient.execute(httpGet);
+            getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();
         } catch (Exception e) {
@@ -73,9 +76,7 @@ public class OrcidRestConnector {
     }
 
     public static String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
+        Scanner s = new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
-
-
 }

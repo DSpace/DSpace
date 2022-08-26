@@ -12,7 +12,8 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Filter image bitstreams, scaling the image to be within the bounds of
@@ -66,17 +67,19 @@ public class BrandedPreviewJPEGFilter extends MediaFilter {
         BufferedImage buf = ImageIO.read(source);
 
         // get config params
-        float xmax = (float) ConfigurationManager
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        float xmax = (float) configurationService
             .getIntProperty("webui.preview.maxwidth");
-        float ymax = (float) ConfigurationManager
+        float ymax = (float) configurationService
             .getIntProperty("webui.preview.maxheight");
-        boolean blurring = (boolean) ConfigurationManager
+        boolean blurring = (boolean) configurationService
             .getBooleanProperty("webui.preview.blurring");
-        boolean hqscaling = (boolean) ConfigurationManager
+        boolean hqscaling = (boolean) configurationService
             .getBooleanProperty("webui.preview.hqscaling");
-        int brandHeight = ConfigurationManager.getIntProperty("webui.preview.brand.height");
-        String brandFont = ConfigurationManager.getProperty("webui.preview.brand.font");
-        int brandFontPoint = ConfigurationManager.getIntProperty("webui.preview.brand.fontpoint");
+        int brandHeight = configurationService.getIntProperty("webui.preview.brand.height");
+        String brandFont = configurationService.getProperty("webui.preview.brand.font");
+        int brandFontPoint = configurationService.getIntProperty("webui.preview.brand.fontpoint");
 
         JPEGFilter jpegFilter = new JPEGFilter();
         return jpegFilter

@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -24,7 +25,7 @@ import org.dspace.eperson.Group;
 public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, ResourcePolicyService> {
 
     /* Log4j logger*/
-    private static final Logger log = Logger.getLogger(ResourcePolicyBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     private ResourcePolicy resourcePolicy;
 
@@ -40,6 +41,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             resourcePolicy = c.reloadEntity(resourcePolicy);
@@ -80,6 +82,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
     public void delete(ResourcePolicy rp) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            c.setDispatcher("noindex");
             ResourcePolicy attachedDso = c.reloadEntity(rp);
             if (attachedDso != null) {
                 getService().delete(c, attachedDso);

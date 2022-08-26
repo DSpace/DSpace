@@ -11,18 +11,31 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataStringEndsWith;
 import static org.dspace.core.Constants.WRITE;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,11 +44,15 @@ import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -44,14 +61,20 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
+import org.dspace.content.Item;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +93,26 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     GroupService groupService;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    CollectionService collectionService;
+
+    private Community topLevelCommunityA;
+    private Community subCommunityA;
+    private Community communityB;
+    private Community communityC;
+    private Collection collectionA;
+    private Collection collectionB;
+    private Collection collectionC;
+
+    private EPerson topLevelCommunityAAdmin;
+    private EPerson subCommunityAAdmin;
+    private EPerson collectionAAdmin;
+    private EPerson submitter;
+
 
     @Test
     public void findAllTest() throws Exception {
@@ -242,7 +285,23 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )
-                   )));
+                   )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   ;
 
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1")
@@ -260,7 +319,22 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                 col1.getHandle())
                        )
-                   )));
+                   )))
+                   .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                              Matchers.containsString("/api/core/collections?"),
+                              Matchers.containsString("page=1"), Matchers.containsString("size=1"))))
+                   .andExpect(jsonPath("$.page.size", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(1)));
     }
 
 
@@ -303,6 +377,44 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$", CollectionMatcher.matchProperties(
                         col1.getName(), col1.getID(), col1.getHandle())));
+    }
+
+    @Test
+    public void findOneCollectionFullProjectionTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/collections/" + col1.getID())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
+                       col1.getName(), col1.getID(), col1.getHandle())));
+
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.not(CollectionMatcher.matchCollectionEntryFullProjection(
+                       col1.getName(), col1.getID(), col1.getHandle()))));
     }
 
     @Test
@@ -1036,6 +1148,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         AtomicReference<UUID> idRef = new AtomicReference<>();
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
+        AtomicReference<String> handle = new AtomicReference<>();
         try {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1083,6 +1196,15 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                     MetadataMatcher.matchMetadata("dc.title",
                                             "Title Text")
                                 )))))
+                            // capture "handle" returned in JSON response and check against the metadata
+                            .andDo(result -> handle.set(
+                                    read(result.getResponse().getContentAsString(), "$.handle")))
+                            .andExpect(jsonPath("$",
+                                hasJsonPath("$.metadata", Matchers.allOf(
+                                    matchMetadataNotEmpty("dc.identifier.uri"),
+                                    matchMetadataStringEndsWith("dc.identifier.uri", handle.get())
+                                )
+                            )))
                             .andDo(result -> idRef
                                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
 
@@ -1755,4 +1877,1692 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
 
     }
+
+    @Test
+    public void findAuthorizedCollectionsPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Collection 2")
+                                           .build();
+        Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 3")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col4 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 4")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col5 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 5")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col6 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 6")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col7 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 7")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                 .param("page", "0")
+                 .param("size", "2"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                            CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle()),
+                            CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())
+                            )))
+                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                         Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                         Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
+                 .andExpect(jsonPath("$.page.size", is(2)))
+                 .andExpect(jsonPath("$.page.totalPages", is(4)))
+                 .andExpect(jsonPath("$.page.number", is(0)))
+                 .andExpect(jsonPath("$.page.totalElements", is(7)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle()),
+                           CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
+                           )))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(4)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle()),
+                           CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())
+                           )))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=3"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(4)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("page", "1")
+                .param("size", "3"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle()),
+                           CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle()),
+                           CollectionMatcher.matchProperties(col6.getName(), col6.getID(), col6.getHandle())
+                           )))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(3)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=3"))))
+                .andExpect(jsonPath("$.page.size", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)));
+    }
+
+    @Test
+    public void findAuthorizedCollectionsWithQueryAndPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Sample 1 collection")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Sample 2 collection")
+                                           .build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Sample 3 collection")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col4 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Sample 4 collection")
+                                           .build();
+
+        Collection col5 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Sample 5 collection")
+                                           .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("query", "sample")
+                .param("page", "0")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.everyItem(
+                        hasJsonPath("$.type", is("collection")))
+                        ))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("query", "sample")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.everyItem(
+                        hasJsonPath("$.type", is("collection")))
+                        ))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.next.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
+                .param("query", "sample")
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.everyItem(
+                        hasJsonPath("$.type", is("collection")))
+                        ))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=0"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.prev.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=1"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$._links.last.href", Matchers.allOf(
+                        Matchers.containsString("/api/core/collections/search/findSubmitAuthorized?"),
+                        Matchers.containsString("query=sample"),
+                        Matchers.containsString("page=2"), Matchers.containsString("size=2"))))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void findAuthorizedByCommunityPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson).build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Test collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Test collection 2")
+                                           .build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Test collection 3")
+                                           .build();
+        Collection col4 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Test collection 4")
+                                           .build();
+        Collection col5 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Test collection 5")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
+                 .param("uuid", parentCommunity.getID().toString())
+                 .param("page", "0")
+                 .param("size", "2"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                            CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle()),
+                            CollectionMatcher.matchProperties(col2.getName(), col2.getID(), col2.getHandle())
+                            )))
+                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                 .andExpect(jsonPath("$.page.size", is(2)))
+                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                 .andExpect(jsonPath("$.page.number", is(0)))
+                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle()),
+                           CollectionMatcher.matchProperties(col4.getName(), col4.getID(), col4.getHandle())
+                           )))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchProperties(col5.getName(), col5.getID(), col5.getHandle())
+                           )))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+    }
+
+    @Test
+    public void findAuthorizedByCommunityWithQueryPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Sample 1 collection")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Sample 2 collection")
+                                           .build();
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Sample 3 collection")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col4 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Sample 4 collection")
+                                           .build();
+
+        Collection col5 = CollectionBuilder.createCollection(context, child2)
+                                           .withName("Sample 5 collection")
+                                           .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("query", "sample")
+                .param("page", "0")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections",  Matchers.everyItem(
+                        hasJsonPath("$.type", is("collection")))
+                        ))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("query", "sample")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.everyItem(
+                        hasJsonPath("$.type", is("collection")))
+                        ))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("query", "sample")
+                .param("page", "2")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.everyItem(
+                        hasJsonPath("$.type", is("collection")))
+                        ))
+                .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void findOneTestWithEmbedsNoPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Collection mappedCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Mapped Collection")
+                                                       .build();
+
+        Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
+        Item item1 = ItemBuilder.createItem(context, collection).withTitle("Item 1").build();
+        Item item2 = ItemBuilder.createItem(context, collection).withTitle("Item 2").build();
+        Item item3 = ItemBuilder.createItem(context, collection).withTitle("Item 3").build();
+        Item item4 = ItemBuilder.createItem(context, collection).withTitle("Item 4").build();
+        Item item5 = ItemBuilder.createItem(context, collection).withTitle("Item 5").build();
+        Item item6 = ItemBuilder.createItem(context, collection).withTitle("Item 6").build();
+        Item item7 = ItemBuilder.createItem(context, collection).withTitle("Item 7").build();
+        Item item8 = ItemBuilder.createItem(context, collection).withTitle("Item 8").build();
+        Item item9 = ItemBuilder.createItem(context, collection).withTitle("Item 9").build();
+
+        collectionService.addItem(context, mappedCollection, item0);
+        collectionService.addItem(context, mappedCollection, item1);
+        collectionService.addItem(context, mappedCollection, item2);
+        collectionService.addItem(context, mappedCollection, item3);
+        collectionService.addItem(context, mappedCollection, item4);
+        collectionService.addItem(context, mappedCollection, item5);
+        collectionService.addItem(context, mappedCollection, item6);
+        collectionService.addItem(context, mappedCollection, item7);
+        collectionService.addItem(context, mappedCollection, item8);
+        collectionService.addItem(context, mappedCollection, item9);
+
+        collectionService.update(context, mappedCollection);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/collections/" + mappedCollection.getID())
+                                    .param("embed", "mappedItems"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CollectionMatcher.matchCollection(mappedCollection)))
+                   .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems", Matchers.containsInAnyOrder(
+                           ItemMatcher.matchItemProperties(item0),
+                           ItemMatcher.matchItemProperties(item1),
+                           ItemMatcher.matchItemProperties(item2),
+                           ItemMatcher.matchItemProperties(item3),
+                           ItemMatcher.matchItemProperties(item4),
+                           ItemMatcher.matchItemProperties(item5),
+                           ItemMatcher.matchItemProperties(item6),
+                           ItemMatcher.matchItemProperties(item7),
+                           ItemMatcher.matchItemProperties(item8),
+                           ItemMatcher.matchItemProperties(item9)
+                   )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/collections/" + mappedCollection.getID())))
+                   .andExpect(jsonPath("$._embedded.mappedItems.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.mappedItems.page.totalElements", is(10)));
+    }
+
+
+    @Test
+    public void findOneTestWithEmbedsWithPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Collection mappedCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Mapped Collection")
+                                                       .build();
+
+        List<Item> items = new ArrayList();
+        // Hibernate 5.x's org.hibernate.dialect.H2Dialect sorts UUIDs as if they are Strings.
+        // So, we must compare UUIDs as if they are strings.
+        // In Hibernate 6, the H2Dialect has been updated with native UUID type support, at which point
+        // we'd need to update the below comparator to compare them as java.util.UUID (which sorts based on RFC 4412).
+        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID().toString());
+
+        Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
+        items.add(item0);
+        Item item1 = ItemBuilder.createItem(context, collection).withTitle("Item 1").build();
+        items.add(item1);
+        Item item2 = ItemBuilder.createItem(context, collection).withTitle("Item 2").build();
+        items.add(item2);
+        Item item3 = ItemBuilder.createItem(context, collection).withTitle("Item 3").build();
+        items.add(item3);
+        Item item4 = ItemBuilder.createItem(context, collection).withTitle("Item 4").build();
+        items.add(item4);
+        Item item5 = ItemBuilder.createItem(context, collection).withTitle("Item 5").build();
+        items.add(item5);
+        Item item6 = ItemBuilder.createItem(context, collection).withTitle("Item 6").build();
+        items.add(item6);
+        Item item7 = ItemBuilder.createItem(context, collection).withTitle("Item 7").build();
+        items.add(item7);
+        Item item8 = ItemBuilder.createItem(context, collection).withTitle("Item 8").build();
+        items.add(item8);
+        Item item9 = ItemBuilder.createItem(context, collection).withTitle("Item 9").build();
+        items.add(item9);
+
+        // sort items list by UUID (as Items will come back ordered by UUID)
+        items.sort(compareByUUID);
+
+        collectionService.addItem(context, mappedCollection, item0);
+        collectionService.addItem(context, mappedCollection, item1);
+        collectionService.addItem(context, mappedCollection, item2);
+        collectionService.addItem(context, mappedCollection, item3);
+        collectionService.addItem(context, mappedCollection, item4);
+        collectionService.addItem(context, mappedCollection, item5);
+        collectionService.addItem(context, mappedCollection, item6);
+        collectionService.addItem(context, mappedCollection, item7);
+        collectionService.addItem(context, mappedCollection, item8);
+        collectionService.addItem(context, mappedCollection, item9);
+
+        collectionService.update(context, mappedCollection);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/collections/" + mappedCollection.getID())
+                                    .param("embed", "mappedItems")
+                                    .param("embed.size", "mappedItems=5"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CollectionMatcher.matchCollection(mappedCollection)))
+                   .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems",
+                       Matchers.containsInRelativeOrder(
+                           ItemMatcher.matchItemProperties(items.get(0)),
+                           ItemMatcher.matchItemProperties(items.get(1)),
+                           ItemMatcher.matchItemProperties(items.get(2)),
+                           ItemMatcher.matchItemProperties(items.get(3)),
+                           ItemMatcher.matchItemProperties(items.get(4))
+                   )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/collections/" + mappedCollection.getID())))
+                   .andExpect(jsonPath("$._embedded.mappedItems.page.size", is(5)))
+                   .andExpect(jsonPath("$._embedded.mappedItems.page.totalElements", is(10)));
+    }
+
+
+    @Test
+    public void findOneTestWithEmbedsWithInvalidPageSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+
+        Collection mappedCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Mapped Collection")
+                                                       .build();
+
+        Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
+        Item item1 = ItemBuilder.createItem(context, collection).withTitle("Item 1").build();
+        Item item2 = ItemBuilder.createItem(context, collection).withTitle("Item 2").build();
+        Item item3 = ItemBuilder.createItem(context, collection).withTitle("Item 3").build();
+        Item item4 = ItemBuilder.createItem(context, collection).withTitle("Item 4").build();
+        Item item5 = ItemBuilder.createItem(context, collection).withTitle("Item 5").build();
+        Item item6 = ItemBuilder.createItem(context, collection).withTitle("Item 6").build();
+        Item item7 = ItemBuilder.createItem(context, collection).withTitle("Item 7").build();
+        Item item8 = ItemBuilder.createItem(context, collection).withTitle("Item 8").build();
+        Item item9 = ItemBuilder.createItem(context, collection).withTitle("Item 9").build();
+
+        collectionService.addItem(context, mappedCollection, item0);
+        collectionService.addItem(context, mappedCollection, item1);
+        collectionService.addItem(context, mappedCollection, item2);
+        collectionService.addItem(context, mappedCollection, item3);
+        collectionService.addItem(context, mappedCollection, item4);
+        collectionService.addItem(context, mappedCollection, item5);
+        collectionService.addItem(context, mappedCollection, item6);
+        collectionService.addItem(context, mappedCollection, item7);
+        collectionService.addItem(context, mappedCollection, item8);
+        collectionService.addItem(context, mappedCollection, item9);
+
+        collectionService.update(context, mappedCollection);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/collections/" + mappedCollection.getID())
+                                    .param("embed", "mappedItems")
+                                    .param("embed.size", "mappedItems=invalidPage"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", CollectionMatcher.matchCollection(mappedCollection)))
+                   .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems", Matchers.containsInAnyOrder(
+                           ItemMatcher.matchItemProperties(item0),
+                           ItemMatcher.matchItemProperties(item1),
+                           ItemMatcher.matchItemProperties(item2),
+                           ItemMatcher.matchItemProperties(item3),
+                           ItemMatcher.matchItemProperties(item4),
+                           ItemMatcher.matchItemProperties(item5),
+                           ItemMatcher.matchItemProperties(item6),
+                           ItemMatcher.matchItemProperties(item7),
+                           ItemMatcher.matchItemProperties(item8),
+                           ItemMatcher.matchItemProperties(item9)
+                   )))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/collections/" + mappedCollection.getID())))
+                   .andExpect(jsonPath("$._embedded.mappedItems.page.size", is(20)))
+                   .andExpect(jsonPath("$._embedded.mappedItems.page.totalElements", is(10)));
+    }
+
+
+    private void setUpAuthorizedSearch() throws Exception {
+        super.setUp();
+
+        /**
+         * The common Community/Collection structure for the AuthorizedSearch tests:
+         *
+         * topLevelCommunityA
+         * └── subCommunityA
+         *     └── collectionA
+         */
+        context.turnOffAuthorisationSystem();
+
+        topLevelCommunityAAdmin = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Jhon", "Brown")
+            .withEmail("topLevelCommunityAAdmin@my.edu")
+            .withPassword(password)
+            .build();
+        topLevelCommunityA = CommunityBuilder.createCommunity(context)
+            .withName("The name of this community is topLevelCommunityA")
+            .withAdminGroup(topLevelCommunityAAdmin)
+            .build();
+
+        subCommunityAAdmin = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Jhon", "Brown")
+            .withEmail("subCommunityAAdmin@my.edu")
+            .withPassword(password)
+            .build();
+        subCommunityA = CommunityBuilder.createCommunity(context)
+            .withName("The name of this sub-community is subCommunityA")
+            .withAdminGroup(subCommunityAAdmin)
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+
+        submitter = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Jhon", "Brown")
+            .withEmail("submitter@my.edu")
+            .withPassword(password)
+            .build();
+        collectionAAdmin = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Jhon", "Brown")
+            .withEmail("collectionAAdmin@my.edu")
+            .withPassword(password)
+            .build();
+        collectionA = CollectionBuilder.createCollection(context, subCommunityA)
+            .withName("The name of this collection is collectionA")
+            .withAdminGroup(collectionAAdmin)
+            .withSubmitterGroup(submitter)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty(
+            "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", "true");
+    }
+
+    @Test
+    public void testAdminAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .withAdminGroup(admin)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is named topLevelCommunityC")
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, subCommunityA)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Verify the site admin gets all collections
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle()),
+                CollectionMatcher.matchProperties(collectionC.getName(), collectionC.getID(), collectionC.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+    }
+
+    @Test
+    public void testCommunityAdminAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        /**
+         * The Community/Collection structure for this test:
+         *
+         * topLevelCommunityA
+         * ├── subCommunityA
+         * |   └── collectionA
+         * └── collectionB
+         * communityB
+         * communityC
+         * └── collectionC
+         */
+        context.turnOffAuthorisationSystem();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .withAdminGroup(topLevelCommunityAAdmin)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is named topLevelCommunityC")
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, topLevelCommunityA)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(topLevelCommunityAAdmin.getEmail(), password);
+
+        // Verify the community admin gets all the communities they are admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testSubCommunityAdminAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .addParentCommunity(context, subCommunityA)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, communityB)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(subCommunityAAdmin.getEmail(), password);
+
+        // Verify the subcommunity admin gets all the communities they are admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testCollectionAdminAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .addParentCommunity(context, subCommunityA)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, communityB)
+            .withName("collectionB is a very original name")
+            .withAdminGroup(collectionAAdmin)
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(collectionAAdmin.getEmail(), password);
+
+        // Verify the collection admin gets all the communities they are admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testSubmitterAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .addParentCommunity(context, subCommunityA)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, communityB)
+            .withName("collectionB is a very original name")
+            .withSubmitterGroup(submitter)
+            .withAdminGroup(collectionAAdmin)
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(submitter.getEmail(), password);
+
+        // Verify the submitter doesn't have any matches for collections
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testSubGroupOfAdminGroupAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        GroupBuilder.createGroup(context)
+            .withName("adminSubGroup")
+            .withParent(groupService.findByName(context, Group.ADMIN))
+            .addMember(eperson)
+            .build();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, subCommunityA)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify the site admins' subgroups members get all collections
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle()),
+                CollectionMatcher.matchProperties(collectionC.getName(), collectionC.getID(), collectionC.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+    }
+
+    @Test
+    public void testSubGroupOfCommunityAdminGroupAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        GroupBuilder.createGroup(context)
+            .withName("communityAdminSubGroup")
+            .withParent(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .addMember(eperson)
+            .build();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(communityB)
+            .withAction(Constants.ADMIN)
+            .withGroup(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, subCommunityA)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify an ePerson in a subgroup of a community admin group gets all the collections they are admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testSubGroupOfSubCommunityAdminGroupAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        GroupBuilder.createGroup(context)
+            .withName("communityAdminSubGroup")
+            .withParent(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .addMember(eperson)
+            .build();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(communityB)
+            .withAction(Constants.ADMIN)
+            .withGroup(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, subCommunityA)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify an ePerson in a subgroup of a subcommunity admin group gets all the collections they are admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testSubGroupOfCollectionAdminGroupAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        GroupBuilder.createGroup(context)
+            .withName("collectionAdminSubGroup")
+            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .addMember(eperson)
+            .build();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, communityB)
+            .withName("collectionB is a very original name")
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(collectionB)
+            .withAction(Constants.ADMIN)
+            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify an ePerson in a subgroup of a collection admin group gets all the collections they are admin for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionA.getName(), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                CollectionMatcher.matchProperties(collectionB.getName(), collectionB.getID(), collectionB.getHandle())
+            )));
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testSubGroupOfSubmitterGroupAuthorizedSearch() throws Exception {
+        setUpAuthorizedSearch();
+
+        context.turnOffAuthorisationSystem();
+        GroupBuilder.createGroup(context)
+            .withName("collectionAdminSubGroup")
+            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .addMember(eperson)
+            .build();
+        communityB = CommunityBuilder.createCommunity(context)
+            .withName("topLevelCommunityB is a very original name")
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+        communityC = CommunityBuilder.createCommunity(context)
+            .withName("the last community is topLevelCommunityC")
+            .addParentCommunity(context, topLevelCommunityA)
+            .build();
+        collectionB = CollectionBuilder.createCollection(context, communityB)
+            .withName("collectionB is a very original name")
+            .build();
+        ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(collectionB)
+            .withAction(Constants.ADD)
+            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .build();
+        collectionC = CollectionBuilder.createCollection(context, communityC)
+            .withName("the last collection is collectionC")
+            .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify an ePerson in a subgroup of submitter group doesn't have any matches for collections
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+
+        // Verify the search only shows dso's which according to the query
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionB.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+
+        // Verify that a query doesn't show dso's which the user doesn't have rights for
+        getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized")
+            .param("query", collectionC.getName()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.collections").doesNotExist());
+    }
+
+    @Test
+    public void testAdminAuthorizedSearchUnauthenticated() throws Exception {
+        // Verify a non-authenticated user can't use this function
+        getClient().perform(get("/api/core/collections/search/findAdminAuthorized"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void patchMetadataCheckReindexingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        CollectionBuilder.createCollection(context, parentCommunity)
+                         .withName("Collection 1")
+                         .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("MyTest")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/collections/search/findAdminAuthorized")
+                             .param("query", "MyTest"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.collections", Matchers.contains(CollectionMatcher
+                                       .matchProperties(col.getName(), col.getID(), col.getHandle())
+                                       )))
+                             .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Name");
+        updateTitle.add(new ReplaceOperation("/metadata/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+        getClient(adminToken).perform(patch("/api/core/collections/" + col.getID())
+                             .content(patchBody)
+                             .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata['dc.title'][0].value", is("New Name")));
+
+        getClient(adminToken).perform(get("/api/core/collections/search/findAdminAuthorized")
+                             .param("query", "MyTest"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded").doesNotExist())
+                             .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void removeColAdminGroupToCheckReindexingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("MyTest")
+                                           .withAdminGroup(eperson)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/collections/search/findAdminAuthorized")
+                               .param("query", "MyTest"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.collections", Matchers.contains(CollectionMatcher
+                                          .matchProperties(col1.getName(), col1.getID(), col1.getHandle())
+                                          )))
+                               .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(delete("/api/core/collections/" + col1.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+
+        getClient(epersonToken).perform(get("/api/core/collections/search/findAdminAuthorized")
+                               .param("query", "MyTest"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded").doesNotExist())
+                               .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void addColAdminGroupToCheckReindexingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("MyTest")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/core/collections/search/findAdminAuthorized")
+                               .param("query", "MyTest"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded").doesNotExist())
+                               .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/collections/" + col1.getID() + "/adminGroup")
+                        .content(mapper.writeValueAsBytes(groupRest))
+                        .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef.set(
+                               UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(post("/api/eperson/groups/" + idRef.get() + "/epersons")
+                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                             .content(REST_SERVER_URL + "eperson/groups/" + eperson.getID()
+                             ));
+
+        getClient(epersonToken).perform(get("/api/core/collections/search/findAdminAuthorized")
+                               .param("query", "MyTest"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.collections", Matchers.contains(CollectionMatcher
+                                          .matchProperties(col1.getName(), col1.getID(), col1.getHandle())
+                                          )))
+                               .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAuthorizedCollectionsByEntityType() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType journal = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Community subCommunityA = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                  .withName("SubCommunity A")
+                                                  .build();
+
+        Community subCommunityB = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                  .withName("SubCommunity B")
+                                                  .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
+                                           .withEntityType(journal.getLabel())
+                                           .withName("Collection 1")
+                                           .withAdminGroup(eperson)
+                                           .build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, subCommunityB)
+                                           .withEntityType(journal.getLabel())
+                                           .withName("Collection 2")
+                                           .withAdminGroup(eperson)
+                                           .build();
+
+        CollectionBuilder.createCollection(context, subCommunityA)
+                         .withEntityType(publication.getLabel())
+                         .withName("Collection 3")
+                         .withAdminGroup(eperson)
+                         .build();
+
+        CollectionBuilder.createCollection(context, subCommunityA)
+                         .withEntityType(journal.getLabel())
+                         .withName("Collection 4")
+                         .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
+                               .param("entityType", journal.getLabel()))
+                               .andExpect(status().isOk())
+                               .andExpect(content().contentType(contentType))
+                               .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
+                               .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
+                                          CollectionMatcher.matchCollection(col1),
+                                          CollectionMatcher.matchCollection(col2)
+                                          )));
+    }
+
+    @Test
+    public void findSubmitAuthorizedByEntityTypeNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType journal = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        CollectionBuilder.createCollection(context, parentCommunity)
+                         .withEntityType(journal.getLabel())
+                         .withName("Collection 1")
+                         .withAdminGroup(eperson)
+                         .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        String adminToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(ePersonToken).perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
+                               .param("entityType", "test"))
+                               .andExpect(status().isNotFound());
+
+        getClient(adminToken).perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
+                             .param("entityType", "test"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findAuthorizedCollectionsByEntityTypeEmptyResponseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
+                               .param("entityType", publication.getLabel()))
+                               .andExpect(status().isOk())
+                               .andExpect(content().contentType(contentType))
+                               .andExpect(jsonPath("$.page.totalElements", equalTo(0)));
+    }
+
+    @Test
+    public void findAuthorizedCollectionsByEntityAndQueryType() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType journal = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Community subCommunityA = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                  .withName("SubCommunity A")
+                                                  .build();
+
+        Community subCommunityB = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                  .withName("SubCommunity B")
+                                                  .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, subCommunityA)
+                                           .withEntityType(journal.getLabel())
+                                           .withName("Thesis Collection")
+                                           .withAdminGroup(eperson)
+                                           .build();
+
+        CollectionBuilder.createCollection(context, subCommunityB)
+                         .withEntityType(journal.getLabel())
+                         .withName("Work Collection")
+                         .withAdminGroup(eperson)
+                         .build();
+
+        CollectionBuilder.createCollection(context, subCommunityA)
+                         .withEntityType(publication.getLabel())
+                         .withName("Thesis")
+                         .withAdminGroup(eperson)
+                         .build();
+
+        CollectionBuilder.createCollection(context, subCommunityA)
+                         .withEntityType(journal.getLabel())
+                         .withName("Collection 1")
+                         .build();
+
+        context.restoreAuthSystemState();
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/core/collections/search/findSubmitAuthorizedByEntityType")
+                               .param("entityType", journal.getLabel())
+                               .param("query", "Thesis"))
+                               .andExpect(status().isOk())
+                               .andExpect(content().contentType(contentType))
+                               .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
+                               .andExpect(jsonPath("$._embedded.collections", contains(
+                                          CollectionMatcher.matchCollection(col1)
+                                          )));
+    }
+
+    @Test
+    public void findSubmitAuthorizedCollectionsByCommunityAndEntityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+
+        CollectionBuilder.createCollection(context, child1)
+                         .withEntityType(publication.getLabel())
+                         .withName("Test Collection 1")
+                         .withSubmitterGroup(eperson)
+                         .build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child2)
+                                           .withEntityType(publication.getLabel())
+                                           .withName("Publication Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col3 = CollectionBuilder.createCollection(context, child2)
+                                           .withEntityType(publication.getLabel())
+                                           .withName("Publication Collection 3")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection colWithoutEntity = CollectionBuilder.createCollection(context, child2)
+                                           .withName(" Test Collection 4")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("uuid", child2.getID().toString())
+                        .param("entityType", publication.getLabel()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
+                        .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                                   CollectionMatcher.matchCollection(col2),
+                                   CollectionMatcher.matchCollection(col3))))
+                        .andExpect(jsonPath("$._embedded.collections", not(containsInAnyOrder(
+                                   CollectionMatcher.matchCollection(colWithoutEntity)))));
+    }
+
+    @Test
+    public void findSubmitAuthorizedCollectionsByCommunityAndEntityWithQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType journal = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType(journal.getLabel())
+                                           .withName("Test Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType(journal.getLabel())
+                                           .withName("Publication Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withEntityType(publication.getLabel())
+                                           .withName("Publication Collection 3 Test")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Collection colWithoutEntity = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Collection 4 Test")
+                                                       .withSubmitterGroup(eperson)
+                                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("uuid", parentCommunity.getID().toString())
+                        .param("entityType", journal.getLabel())
+                        .param("query", "test"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.collections", contains(CollectionMatcher.matchCollection(col1))))
+                .andExpect(jsonPath("$._embedded.collections",not(contains(
+                                    CollectionMatcher.matchCollection(colWithoutEntity)))));
+
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("uuid", parentCommunity.getID().toString())
+                        .param("entityType", publication.getLabel())
+                        .param("query", "publication"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.collections", contains(CollectionMatcher.matchCollection(col3))))
+                .andExpect(jsonPath("$._embedded.collections", not(containsInAnyOrder(
+                           CollectionMatcher.matchCollection(colWithoutEntity),
+                           CollectionMatcher.matchCollection(col2)))));
+    }
+
+    @Test
+    public void findSubmitAuthorizedAllCollectionsByCommunityAndEntityBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        CollectionBuilder.createCollection(context, parentCommunity)
+                         .withEntityType(publication.getLabel())
+                         .withName("Test Collection 1")
+                         .withSubmitterGroup(eperson)
+                         .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType"))
+                        .andExpect(status().isBadRequest());
+
+        // missing entityType param
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("uuid", parentCommunity.getID().toString()))
+                        .andExpect(status().isBadRequest());
+
+        // missing community uuid param
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("entityType", publication.getLabel()))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findSubmitAuthorizedByCommunityAndEntityTypeNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        CollectionBuilder.createCollection(context, parentCommunity)
+                         .withEntityType(publication.getLabel())
+                         .withName("Test Collection 1")
+                         .withSubmitterGroup(eperson)
+                         .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("entityType", publication.getLabel())
+                        .param("uuid", UUID.randomUUID().toString()))
+                        .andExpect(status().isNotFound());
+
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndEntityType")
+                        .param("entityType", "test")
+                        .param("uuid", parentCommunity.getID().toString()))
+                        .andExpect(status().isNotFound());
+    }
+
 }

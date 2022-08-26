@@ -10,15 +10,17 @@ package org.dspace.content;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -41,6 +43,7 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
@@ -490,8 +493,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Set the item to have two pieces of metadata for dc.type and dc2.type
         String dcType = "DC-TYPE";
         String testType = "TEST-TYPE";
-        itemService.addMetadata(context, it, "dc", "type", null, null, dcType, "accepted", 0);
-        itemService.addMetadata(context, it, "test", "type", null, null, testType, "accepted", 0);
+        itemService.addMetadata(context, it, "dc", "type", null, null, dcType);
+        itemService.addMetadata(context, it, "test", "type", null, null, testType);
 
         // Check that only one is returned when we ask for all dc.type values
         List<MetadataValue> values = itemService.getMetadata(it, "dc", "type", null, null);
@@ -679,7 +682,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         String schema = "dc";
         String element = "contributor";
-        String qualifier = "author";
+        String qualifier = "editor";
         String lang = Item.ANY;
         String values = "value0";
         String authorities = "auth0";
@@ -1411,6 +1414,27 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     }
 
     /**
+     * Test of move method, of class Item, where both Collections are the same.
+     */
+    @Test
+    public void testMoveSameCollection() throws Exception {
+        context.turnOffAuthorisationSystem();
+        while (it.getCollections().size() > 1) {
+            it.removeCollection(it.getCollections().get(0));
+        }
+
+        Collection collection = it.getCollections().get(0);
+        it.setOwningCollection(collection);
+        ItemService itemServiceSpy = spy(itemService);
+
+        itemService.move(context, it, collection, collection);
+        context.restoreAuthSystemState();
+        assertThat("testMoveSameCollection 0", it.getOwningCollection(), notNullValue());
+        assertThat("testMoveSameCollection 1", it.getOwningCollection(), equalTo(collection));
+        verify(itemServiceSpy, times(0)).delete(context, it);
+    }
+
+    /**
      * Test of hasUploadedFiles method, of class Item.
      */
     @Test
@@ -1598,8 +1622,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testGetAdminObject 0", (Item) itemService.getAdminObject(context, it, Constants.REMOVE),
                    equalTo(it));
         assertThat("testGetAdminObject 1", (Item) itemService.getAdminObject(context, it, Constants.ADD), equalTo(it));
-        assertThat("testGetAdminObject 2", (Collection) itemService.getAdminObject(context, it, Constants.DELETE),
-                   equalTo(collection));
+        assertThat("testGetAdminObject 2", (Item) itemService.getAdminObject(context, it, Constants.DELETE),
+                   equalTo(it));
         assertThat("testGetAdminObject 3", (Item) itemService.getAdminObject(context, it, Constants.ADMIN),
                    equalTo(it));
     }

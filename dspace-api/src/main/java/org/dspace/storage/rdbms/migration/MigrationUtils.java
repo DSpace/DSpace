@@ -7,12 +7,19 @@
  */
 package org.dspace.storage.rdbms.migration;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.Constants;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * This Utility class offers utility methods which may be of use to perform
@@ -79,10 +86,11 @@ public class MigrationUtils {
                 cascade = true;
                 break;
             case "h2":
-                // In H2, constraints are listed in the "information_schema.constraints" table
+                // In H2, column constraints are listed in the "INFORMATION_SCHEMA.KEY_COLUMN_USAGE" table
                 constraintNameSQL = "SELECT DISTINCT CONSTRAINT_NAME " +
-                    "FROM information_schema.constraints " +
-                    "WHERE table_name = ? AND column_list = ?";
+                    "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+                    "WHERE TABLE_NAME = ? AND COLUMN_NAME = ?";
+                cascade = true;
                 break;
             default:
                 throw new SQLException("DBMS " + dbtype + " is unsupported in this migration.");
@@ -269,5 +277,26 @@ public class MigrationUtils {
         }
 
         return checksum;
+    }
+
+    /**
+     * Read a given Resource, converting to a String. This is used by several Java-based
+     * migrations to read a SQL migration into a string, so that it can be executed under
+     * specific scenarios.
+     * @param resourcePath relative path of resource to read
+     * @return String contents of Resource
+     */
+    public static String getResourceAsString(String resourcePath) {
+        // Read the resource, copying to a string
+        try (Reader reader =
+                 new InputStreamReader(
+                     Objects.requireNonNull(MigrationUtils.class.getClassLoader().getResourceAsStream(resourcePath)),
+                     Constants.DEFAULT_ENCODING)) {
+            return FileCopyUtils.copyToString(reader);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (NullPointerException e) {
+            throw new IllegalStateException("Resource at " + resourcePath + " was not found", e);
+        }
     }
 }

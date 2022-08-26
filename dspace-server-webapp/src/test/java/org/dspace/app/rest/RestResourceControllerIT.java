@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
@@ -70,5 +72,39 @@ public class RestResourceControllerIT extends AbstractControllerIntegrationTest 
                 // The status has to be 404 Not Found
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void selfLinkContainsRequestParametersWhenProvided() throws Exception {
+        // When we call a search endpoint with additional parameters
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0"))
+                   // The self link should contain those same parameters
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                           "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
+    }
+
+    @Test
+    public void selfLinkDevoidOfRequestParametersWhenNoneProvided() throws Exception {
+        // When we call a search endpoint without additional parameters
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName"))
+                   // The self link should match the initial request exactly
+                   .andExpect(jsonPath("$._links.self.href",
+                                       endsWith("/api/core/metadatafields/search/byFieldName")));
+    }
+
+    @Test
+    public void selfLinkContainsRequestParametersAndEmbedsWhenProvided() throws Exception {
+        // When we call a search endpoint with additional parameters and an embed parameter
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0&embed=schema"))
+                   // The self link should contain those same parameters
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                           "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
+
+        getClient().perform(get("/api/core/metadatafields/search/byFieldName?schema=dc&offset=0&embed.size=schema=5"))
+                   // The self link should contain those same parameters
+                   .andExpect(jsonPath("$._links.self.href", endsWith(
+                           "/api/core/metadatafields/search/byFieldName?schema=dc&offset=0")));
+    }
+
+
 
 }

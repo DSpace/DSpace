@@ -15,10 +15,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
@@ -36,19 +36,21 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Verifier;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Verifier;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,11 +97,14 @@ public class XSLTDisseminationCrosswalk
 
     private static final String DIRECTION = "dissemination";
 
-    protected static final CommunityService communityService = ContentServiceFactory.getInstance()
-                                                                                    .getCommunityService();
-    protected static final CollectionService collectionService = ContentServiceFactory.getInstance()
-                                                                                      .getCollectionService();
-    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private static final String aliases[] = makeAliases(DIRECTION);
 
@@ -133,7 +138,7 @@ public class XSLTDisseminationCrosswalk
 
         // get the schema location string, should already be in the
         // right format for value of "schemaLocation" attribute.
-        schemaLocation = ConfigurationManager.getProperty(prefix + "schemaLocation");
+        schemaLocation = configurationService.getProperty(prefix + "schemaLocation");
         if (schemaLocation == null) {
             LOG.warn("No schemaLocation for crosswalk=" + myAlias + ", key=" + prefix + "schemaLocation");
         } else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0) {
@@ -146,18 +151,15 @@ public class XSLTDisseminationCrosswalk
         // grovel for namespaces of the form:
         //  crosswalk.diss.{PLUGIN_NAME}.namespace.{PREFIX} = {URI}
         String nsPrefix = prefix + "namespace.";
-        Enumeration<String> pe = (Enumeration<String>) ConfigurationManager.propertyNames();
+        List<String> configKeys = configurationService.getPropertyKeys(nsPrefix);
         List<Namespace> nsList = new ArrayList<>();
-        while (pe.hasMoreElements()) {
-            String key = pe.nextElement();
-            if (key.startsWith(nsPrefix)) {
-                nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
-                                                  ConfigurationManager.getProperty(key)));
-            }
+        for (String key : configKeys) {
+            nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
+                                              configurationService.getProperty(key)));
         }
         namespaces = nsList.toArray(new Namespace[nsList.size()]);
 
-        preferList = ConfigurationManager.getBooleanProperty(prefix + "preferList", false);
+        preferList = configurationService.getBooleanProperty(prefix + "preferList", false);
     }
 
     /**
@@ -244,6 +246,7 @@ public class XSLTDisseminationCrosswalk
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      * @see DisseminationCrosswalk
+     * @return List of Elements
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
@@ -268,7 +271,12 @@ public class XSLTDisseminationCrosswalk
         try {
             JDOMResult result = new JDOMResult();
             xform.transform(new JDOMSource(createDIM(dso).getChildren()), result);
-            return result.getResult();
+            List<Content> contentList = result.getResult();
+            // Transform List<Content> into List<Element>
+            List<Element> elementList = contentList.stream()
+                                                   .filter(obj -> obj instanceof Element)
+                                                   .map(Element.class::cast).collect(Collectors.toList());
+            return elementList;
         } catch (TransformerException e) {
             LOG.error("Got error: " + e.toString());
             throw new CrosswalkInternalException("XSL translation failed: " + e.toString(), e);
@@ -341,14 +349,21 @@ public class XSLTDisseminationCrosswalk
             if (dso.getType() == Constants.COLLECTION) {
                 Collection collection = (Collection) dso;
 
-                String description = collectionService.getMetadata(collection, "introductory_text");
-                String description_abstract = collectionService.getMetadata(collection, "short_description");
-                String description_table = collectionService.getMetadata(collection, "side_bar_text");
+                String description = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY);
+                String description_abstract = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
+                String description_table = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SIDEBAR_TEXT, Item.ANY);
                 String identifier_uri = "hdl:" + collection.getHandle();
-                String provenance = collectionService.getMetadata(collection, "provenance_description");
-                String rights = collectionService.getMetadata(collection, "copyright_text");
-                String rights_license = collectionService.getMetadata(collection, "license");
-                String title = collectionService.getMetadata(collection, "name");
+                String provenance = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY);
+                String rights = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_COPYRIGHT_TEXT, Item.ANY);
+                String rights_license = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_LICENSE, Item.ANY);
+                String title = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_NAME, Item.ANY);
 
                 dim.addContent(createField("dc", "description", null, null, description));
                 dim.addContent(createField("dc", "description", "abstract", null, description_abstract));
@@ -361,12 +376,17 @@ public class XSLTDisseminationCrosswalk
             } else if (dso.getType() == Constants.COMMUNITY) {
                 Community community = (Community) dso;
 
-                String description = communityService.getMetadata(community, "introductory_text");
-                String description_abstract = communityService.getMetadata(community, "short_description");
-                String description_table = communityService.getMetadata(community, "side_bar_text");
+                String description = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY);
+                String description_abstract = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
+                String description_table = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_SIDEBAR_TEXT, Item.ANY);
                 String identifier_uri = "hdl:" + community.getHandle();
-                String rights = communityService.getMetadata(community, "copyright_text");
-                String title = communityService.getMetadata(community, "name");
+                String rights = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_COPYRIGHT_TEXT, Item.ANY);
+                String title = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_NAME, Item.ANY);
 
                 dim.addContent(createField("dc", "description", null, null, description));
                 dim.addContent(createField("dc", "description", "abstract", null, description_abstract));
@@ -463,7 +483,7 @@ public class XSLTDisseminationCrosswalk
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Filtering out non-XML characters in string, reason=" + reason);
             }
-            StringBuffer result = new StringBuffer(value.length());
+            StringBuilder result = new StringBuilder(value.length());
             for (int i = 0; i < value.length(); ++i) {
                 char c = value.charAt(i);
                 if (Verifier.isXMLCharacter((int) c)) {
@@ -558,7 +578,7 @@ public class XSLTDisseminationCrosswalk
         try {
             XMLOutputter xmlout = new XMLOutputter(Format.getPrettyFormat());
             xmlout.output(new Document(root), out);
-        } catch (Exception e) {
+        } catch (IOException e) {
             // as this script is for testing dissemination crosswalks, we want
             // verbose information in case of an exception.
             System.err.println("An error occurred after processing the dissemination crosswalk.");

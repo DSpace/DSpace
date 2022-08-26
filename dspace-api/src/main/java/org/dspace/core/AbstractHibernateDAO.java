@@ -147,20 +147,19 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param cacheable
      *         Whether or not this query should be cacheable
      * @param clazz
-     *         The clazz for which this CriteriaQuery will be executed on
+     *         The class for which this CriteriaQuery will be executed on
      * @param maxResults
-     *         The maxmimum amount of results that will be returned for this CriteriaQuery
+     *         The maximum amount of results that will be returned for this CriteriaQuery
      * @param offset
      *         The offset to be used for the CriteriaQuery
      * @return A list of distinct results as depicted by the CriteriaQuery and parameters
      * @throws SQLException
      */
-    public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults,
-                        int offset) throws SQLException {
+    public List<T> list(
+        Context context, CriteriaQuery<T> criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults, int offset
+    ) throws SQLException {
         criteriaQuery.distinct(true);
-        @SuppressWarnings("unchecked")
-        List<T> result = (List<T>) executeCriteriaQuery(context, criteriaQuery, cacheable, maxResults, offset);
-        return result;
+        return executeCriteriaQuery(context, criteriaQuery, cacheable, maxResults, offset);
     }
 
     /**
@@ -183,12 +182,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @return A list of results determined by the CriteriaQuery and parameters
      * @throws SQLException
      */
-    public List<T> list(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults,
-                        int offset, boolean distinct) throws SQLException {
+    public List<T> list(
+        Context context, CriteriaQuery<T> criteriaQuery, boolean cacheable, Class<T> clazz, int maxResults, int offset,
+        boolean distinct
+    ) throws SQLException {
         criteriaQuery.distinct(distinct);
-        @SuppressWarnings("unchecked")
-        List<T> result = (List<T>) executeCriteriaQuery(context, criteriaQuery, cacheable, maxResults, offset);
-        return result;
+        return executeCriteriaQuery(context, criteriaQuery, cacheable, maxResults, offset);
     }
 
     /**
@@ -205,15 +204,37 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     /**
-     * Retrieve a unique result from the query.  If multiple results CAN be
-     * retrieved an exception will be thrown,
-     * so only use when the criteria state uniqueness in the database.
-     * @param criteriaQuery JPA criteria
-     * @return a DAO specified by the criteria
+     * This method will return a list of results for the given Query and parameters
+     * 
+     * @param query     The query for which the resulting list will be returned
+     * @param limit     The maximum amount of results to be returned
+     * @param offset    The offset to be used for the Query
+     * @return          A list of results determined by the Query and parameters
      */
-    public T uniqueResult(Context context, CriteriaQuery criteriaQuery, boolean cacheable, Class<T> clazz,
-                          int maxResults, int offset) throws SQLException {
-        List<T> list = list(context, criteriaQuery, cacheable, clazz, maxResults, offset);
+    public List<T> list(Query query, int limit, int offset) {
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+        @SuppressWarnings("unchecked")
+        List<T> result = (List<T>) query.getResultList();
+        return result;
+    }
+
+    /**
+     * Retrieve a unique result from the query.  If multiple results CAN be
+     * retrieved an exception will be thrown, so only use when the criteria
+     * state uniqueness in the database.
+     * @param context current DSpace session.
+     * @param criteriaQuery JPA criteria
+     * @param cacheable whether or not this query should be cacheable.
+     * @param clazz type of object that should match the query.
+     * @return the single model object specified by the criteria,
+     *          or {@code null} if none match.
+     * @throws java.sql.SQLException passed through.
+     * @throws IllegalArgumentException if multiple objects match.
+     */
+    public T uniqueResult(Context context, CriteriaQuery criteriaQuery,
+            boolean cacheable, Class<T> clazz) throws SQLException {
+        List<T> list = list(context, criteriaQuery, cacheable, clazz, -1, -1);
         if (CollectionUtils.isNotEmpty(list)) {
             if (list.size() == 1) {
                 return list.get(0);
@@ -228,8 +249,10 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * Retrieve a single result from the query.  Best used if you expect a
      * single result, but this isn't enforced on the database.
+     * @param context current DSpace session
      * @param criteriaQuery JPA criteria
      * @return a DAO specified by the criteria
+     * @throws java.sql.SQLException passed through.
      */
     public T singleResult(Context context, CriteriaQuery criteriaQuery) throws SQLException {
         Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
@@ -300,7 +323,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * @param criteriaQuery
      *         The CriteriaQuery for which this result will be retrieved
      * @param criteriaBuilder
-     *         The CriteriaBuilder that accompagnies the CriteriaQuery
+     *         The CriteriaBuilder that accompanies the CriteriaQuery
      * @param root
      *         The root that'll determine on which class object we need to calculate the result
      * @return The amount of results that would be found by this CriteriaQuery as an integer value

@@ -113,6 +113,13 @@ public class RelationshipType implements ReloadableEntity<Integer> {
      */
     @Column(name = "copy_to_right", nullable = false)
     private boolean copyToRight;
+
+    /**
+     * The value indicating whether relationships of this type should be ignored on the right/left/neither.
+     */
+    @Column(name = "tilted")
+    private Tilted tilted;
+
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.RelationshipTypeService#create(Context)} }
@@ -201,7 +208,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
 
     /**
      * Standard setter for the leftMinCardinality Integer for this RelationshipType
-     * @param leftMinCardinality    The leftMinCardinality Integer that this RelationshipType should recieve
+     * @param leftMinCardinality    The leftMinCardinality Integer that this RelationshipType should receive
      */
     public void setLeftMinCardinality(Integer leftMinCardinality) {
         this.leftMinCardinality = leftMinCardinality;
@@ -217,7 +224,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
 
     /**
      * Standard setter for the leftMaxCardinality Integer for this RelationshipType
-     * @param leftMaxCardinality    The leftMaxCardinality Integer that this RelationshipType should recieve
+     * @param leftMaxCardinality    The leftMaxCardinality Integer that this RelationshipType should receive
      */
     public void setLeftMaxCardinality(Integer leftMaxCardinality) {
         this.leftMaxCardinality = leftMaxCardinality;
@@ -233,7 +240,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
 
     /**
      * Standard setter for the rightMinCardinality Integer for this RelationshipType
-     * @param rightMinCardinality    The rightMinCardinality Integer that this RelationshipType should recieve
+     * @param rightMinCardinality    The rightMinCardinality Integer that this RelationshipType should receive
      */
     public void setRightMinCardinality(Integer rightMinCardinality) {
         this.rightMinCardinality = rightMinCardinality;
@@ -249,7 +256,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
 
     /**
      * Standard setter for the rightMaxCardinality Integer for this RelationshipType
-     * @param rightMaxCardinality    The rightMaxCardinality Integer that this RelationshipType should recieve
+     * @param rightMaxCardinality    The rightMaxCardinality Integer that this RelationshipType should receive
      */
     public void setRightMaxCardinality(Integer rightMaxCardinality) {
         this.rightMaxCardinality = rightMaxCardinality;
@@ -288,9 +295,30 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     }
 
     /**
+     * Generic getter for tilted
+     * @return the tilted value of this RelationshipType
+     */
+    public Tilted getTilted() {
+        return tilted;
+    }
+
+    /**
+     * Generic setter for tilted
+     * @param tilted   The tilted to be set on this RelationshipType
+     */
+    public void setTilted(Tilted tilted) {
+        this.tilted = tilted;
+    }
+
+    public enum Tilted {
+        NONE, LEFT, RIGHT;
+    }
+
+    /**
      * Standard getter for the ID of this RelationshipType
      * @return  The ID of this RelationshipType
      */
+    @Override
     public Integer getID() {
         return id;
     }

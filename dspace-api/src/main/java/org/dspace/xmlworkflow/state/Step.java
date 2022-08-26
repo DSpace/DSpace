@@ -22,10 +22,9 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- * A class that contains all the data of an xlworkflow step
+ * A class that contains all the data of a {@link Workflow} step.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -47,7 +46,7 @@ public class Step implements BeanNameAware {
 
     /**
      * Get an WorkflowActionConfiguration object for the provided action identifier
-     * @param actionID the action id for which we want our action config
+     * @param actionID the action id for which we want our action configuration.
      * @return The corresponding WorkflowActionConfiguration
      * @throws WorkflowConfigurationException occurs if the provided action isn't part of the step
      */
@@ -81,26 +80,42 @@ public class Step implements BeanNameAware {
     /**
      * Get the next step based on out the outcome
      * @param outcome the outcome of the previous step
-     * @return the next stepp or NULL if there is no step configured for this outcome
+     * @return the next step or NULL if there is no step configured for this outcome
      */
     public Step getNextStep(int outcome) {
         return outcomes.get(outcome);
     }
 
-
+    /**
+     * Is this step "valid"?
+     *
+     * @param context current DSpace session.
+     * @param wfi the current workflow item in this step.
+     * @return true if the user selection is "valid".
+     * @throws WorkflowConfigurationException passed through.
+     * @throws SQLException passed through.
+     */
     public boolean isValidStep(Context context, XmlWorkflowItem wfi)
         throws WorkflowConfigurationException, SQLException {
         //Check if our next step has a UI, if not then the step is valid, no need for a group
         return !(getUserSelectionMethod() == null || getUserSelectionMethod()
             .getProcessingAction() == null) && getUserSelectionMethod().getProcessingAction()
                                                                        .isValidUserSelection(context, wfi, hasUI());
-
     }
 
+    /**
+     * Getter for the step's configured user selection method.
+     * @return the configured user selection method for this step.
+     */
     public UserSelectionActionConfig getUserSelectionMethod() {
         return userSelectionMethod;
     }
 
+    /**
+     * Look up the action which follows a given action.
+     * @param currentAction the action in question.
+     * @return the next action in sequence.
+     */
     public WorkflowActionConfig getNextAction(WorkflowActionConfig currentAction) {
         int index = actions.indexOf(currentAction);
         if (index < actions.size() - 1) {
@@ -130,26 +145,35 @@ public class Step implements BeanNameAware {
         return inProgressUserService.getNumberOfFinishedUsers(c, wfi) == requiredUsers;
     }
 
+    /**
+     * Getter for the number of required reviews.
+     * @return the number of users required to review this step.
+     */
     public int getRequiredUsers() {
         return requiredUsers;
     }
 
+    /**
+     * Get the configured {@link Role} for this step.
+     * @return the configured role.
+     */
     public Role getRole() {
         return role;
     }
 
     /**
-     * Set the user selection configuration, this is required as every step requires one
+     * Set the user selection configuration.  Every step requires one.
      * @param userSelectionMethod the user selection method configuration
      */
-    @Required
+    @Autowired(required = true)
     public void setUserSelectionMethod(UserSelectionActionConfig userSelectionMethod) {
         this.userSelectionMethod = userSelectionMethod;
         userSelectionMethod.setStep(this);
     }
 
     /**
-     * Set the outcomes as a map, if no outcomes are configured this step will be last step in the workflow
+     * Set the outcomes as a map.  If no outcomes are configured, this step will
+     * be last step in the workflow.
      * @param outcomes the map containing the outcomes.
      */
     public void setOutcomes(Map<Integer, Step> outcomes) {
@@ -171,7 +195,7 @@ public class Step implements BeanNameAware {
      * operations in each step.
      * @param actions the list of actions
      */
-    @Required
+    @Autowired(required = true)
     public void setActions(List<WorkflowActionConfig> actions) {
         for (WorkflowActionConfig workflowActionConfig : actions) {
             workflowActionConfig.setStep(this);

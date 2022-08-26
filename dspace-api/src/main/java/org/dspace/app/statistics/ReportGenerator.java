@@ -27,15 +27,20 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class performs the action of coordinating a usage report being
@@ -161,7 +166,7 @@ public class ReportGenerator {
     /**
      * pattern that matches an unqualified aggregator property
      */
-    private static Pattern real = Pattern.compile("^(.+)=(.+)");
+    private static final Pattern REAL = Pattern.compile("^(.+)=(.+)");
 
     //////////////////////////
     // Miscellaneous variables
@@ -189,11 +194,12 @@ public class ReportGenerator {
     /**
      * the log file action to human readable action map
      */
-    private static String map = ConfigurationManager.getProperty("dspace.dir") +
-        File.separator + "config" + File.separator + "dstat.map";
+    private static String map;
 
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Default constructor
@@ -219,28 +225,46 @@ public class ReportGenerator {
         String myOutput = null;
         String myMap = null;
 
-        // read in our command line options
-        for (int i = 0; i < argv.length; i++) {
-            if (argv[i].equals("-format")) {
-                myFormat = argv[i + 1].toLowerCase();
-            }
+        Options options = new Options();
+        Option option;
 
-            if (argv[i].equals("-in")) {
-                myInput = argv[i + 1];
-            }
+        option = Option.builder().longOpt("format").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-out")) {
-                myOutput = argv[i + 1];
-            }
+        option = Option.builder().longOpt("in").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-map")) {
-                myMap = argv[i + 1];
-            }
+        option = Option.builder().longOpt("out").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-help")) {
-                usage();
-                System.exit(0);
-            }
+        option = Option.builder().longOpt("map").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("help").build();
+        options.addOption(option);
+
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, argv);
+
+        if (cmd.hasOption("help")) {
+            usage();
+            System.exit(0);
+        }
+
+        if (cmd.hasOption("format")) {
+            myFormat = cmd.getOptionValue("format");
+        }
+
+        if (cmd.hasOption("in")) {
+            myInput = cmd.getOptionValue("in");
+        }
+
+        if (cmd.hasOption("out")) {
+            myOutput = cmd.getOptionValue("out");
+        }
+
+        if (cmd.hasOption("map")) {
+            myMap = cmd.getOptionValue("map");
         }
 
         processReport(context, myFormat, myInput, myOutput, myMap);
@@ -268,6 +292,9 @@ public class ReportGenerator {
         throws Exception, SQLException {
         if (myMap != null) {
             map = myMap;
+        } else {
+            map = configurationService.getProperty("dspace.dir")
+                    + File.separator + "config" + File.separator + "dstat.map";
         }
 
         // create the relevant report type
@@ -302,15 +329,15 @@ public class ReportGenerator {
         startTime = new GregorianCalendar();
 
         /** instantiate aggregators */
-        actionAggregator = new HashMap<String, String>();
-        searchAggregator = new HashMap<String, String>();
-        userAggregator = new HashMap<String, String>();
-        itemAggregator = new HashMap<String, String>();
-        archiveStats = new HashMap<String, String>();
-        actionMap = new HashMap<String, String>();
+        actionAggregator = new HashMap<>();
+        searchAggregator = new HashMap<>();
+        userAggregator = new HashMap<>();
+        itemAggregator = new HashMap<>();
+        archiveStats = new HashMap<>();
+        actionMap = new HashMap<>();
 
-        /** instantite lists */
-        generalSummary = new ArrayList<String>();
+        /** instantiate lists */
+        generalSummary = new ArrayList<>();
 
         // set the parameters for this analysis
         setParameters(myInput);
@@ -486,8 +513,6 @@ public class ReportGenerator {
         report.addBlock(process);
 
         report.render();
-
-        return;
     }
 
 
@@ -573,7 +598,7 @@ public class ReportGenerator {
 
             // loop through the map file and read in the values
             while ((record = br.readLine()) != null) {
-                Matcher matchReal = real.matcher(record);
+                Matcher matchReal = REAL.matcher(record);
 
                 // if the line is real then read it in
                 if (matchReal.matches()) {
@@ -612,8 +637,6 @@ public class ReportGenerator {
         if (myInput != null) {
             input = myInput;
         }
-
-        return;
     }
 
 
@@ -649,7 +672,7 @@ public class ReportGenerator {
         // loop through the aggregator file and read in the values
         while ((record = br.readLine()) != null) {
             // match real lines
-            Matcher matchReal = real.matcher(record);
+            Matcher matchReal = REAL.matcher(record);
 
             // pre-prepare our input strings
             String section = null;
@@ -768,9 +791,9 @@ public class ReportGenerator {
         List<MetadataValue> author = itemService
             .getMetadata(item, MetadataSchemaEnum.DC.getName(), "contributor", "author", Item.ANY);
 
-        StringBuffer authors = new StringBuffer();
+        StringBuilder authors = new StringBuilder();
         if (author.size() > 0) {
-            authors.append("(" + author.get(0).getValue());
+            authors.append("(").append(author.get(0).getValue());
         }
         if (author.size() > 1) {
             authors.append(" et al");

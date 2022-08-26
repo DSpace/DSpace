@@ -10,7 +10,9 @@ package org.dspace.scripts.handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.AuthorizeException;
@@ -78,6 +80,13 @@ public interface DSpaceRunnableHandler {
     public void logError(String message);
 
     /**
+     * This method will perform the error logging of the message given along with a stack trace
+     * @param message   The message to be logged as an error
+     * @param throwable The original exception
+     */
+    public void logError(String message, Throwable throwable);
+
+    /**
      * This method will print the help for the options and name
      * @param options   The options for the script
      * @param name      The name of the script
@@ -107,4 +116,12 @@ public interface DSpaceRunnableHandler {
      */
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
         throws IOException, SQLException, AuthorizeException;
+
+    /**
+     * This method will return a List of UUIDs for the special groups
+     * associated with the processId contained by specific implementations of this interface.
+     * Otherwise, it returns an empty collection.
+     * @return List containing UUIDs of Special Groups of the associated Process.
+     */
+    public List<UUID> getSpecialGroups();
 }

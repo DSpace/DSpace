@@ -19,8 +19,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A class that that extends the action to support the common
- * isAuthorized method
+ * Represent an action that can be offered to a workflow step's user(s).
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)

@@ -17,16 +17,19 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -46,7 +49,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProvider.class);
+    private static final Logger log
+            = org.apache.logging.log4j.LogManager.getLogger(VersionedHandleIdentifierProvider.class);
 
     /**
      * Prefix registered to no one
@@ -65,7 +69,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     private HandleService handleService;
 
     @Autowired(required = true)
-    private ItemService itemService;
+    protected ContentServiceFactory contentServiceFactory;
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
@@ -74,44 +78,18 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public boolean supports(String identifier) {
-        String prefix = handleService.getPrefix();
-        String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService()
-                                                      .getProperty("handle.canonical.prefix");
-        if (identifier == null) {
-            return false;
-        }
-        // return true if handle has valid starting pattern
-        if (identifier.startsWith(prefix + "/")
-            || identifier.startsWith(canonicalPrefix)
-            || identifier.startsWith("hdl:")
-            || identifier.startsWith("info:hdl")
-            || identifier.matches("^https?://hdl\\.handle\\.net/.*")
-            || identifier.matches("^https?://.+/handle/.*")) {
-            return true;
-        }
-
-        //Check additional prefixes supported in the config file
-        String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService()
-                                                           .getArrayProperty("handle.additional.prefixes");
-        for (String additionalPrefix : additionalPrefixes) {
-            if (identifier.startsWith(additionalPrefix + "/")) {
-                return true;
-            }
-        }
-
-        // otherwise, assume invalid handle
-        return false;
+        return handleService.parseHandle(identifier) != null;
     }
 
     @Override
     public String register(Context context, DSpaceObject dso) {
         String id = mint(context, dso);
         try {
-            if (dso instanceof Item) {
-                populateHandleMetadata(context, (Item) dso, id);
+            if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
+                populateHandleMetadata(context, dso, id);
             }
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while attempting to create handle",
+        } catch (IOException | SQLException | AuthorizeException e) {
+            log.error(LogHelper.getHeader(context, "Error while attempting to create handle",
                                            "Item id: " + (dso != null ? dso.getID() : "")), e);
             throw new RuntimeException(
                 "Error while attempting to create identifier for Item id: " + (dso != null ? dso.getID() : ""));
@@ -261,9 +239,10 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     public void reserve(Context context, DSpaceObject dso, String identifier) {
         try {
             handleService.createHandle(context, dso, identifier);
-        } catch (Exception e) {
-            log.error(
-                LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+        } catch (IllegalStateException | SQLException e) {
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -295,9 +274,10 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                 handleId = createNewIdentifier(context, dso, null);
             }
             return handleId;
-        } catch (Exception e) {
-            log.error(
-                LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+        } catch (SQLException | AuthorizeException e) {
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -306,9 +286,10 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
+        } catch (IllegalStateException | SQLException e) {
+            log.error(LogHelper.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
                       e);
         }
         return null;
@@ -356,7 +337,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
      * @return configured prefix or "123456789"
      */
     public static String getPrefix() {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String prefix = configurationService.getProperty("handle.prefix");
         if (null == prefix) {
             prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
             log.error("handle.prefix is not configured; using " + prefix);
@@ -410,16 +393,17 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         return identifier;
     }
 
-    protected void populateHandleMetadata(Context context, Item item, String handle)
+    protected void populateHandleMetadata(Context context, DSpaceObject dso, String handle)
         throws SQLException, IOException, AuthorizeException {
         String handleref = handleService.getCanonicalForm(handle);
         // we want to remove the old handle and insert the new. To do so, we
         // load all identifiers, clear the metadata field, re add all
         // identifiers which are not from type handle and add the new handle.
-        List<MetadataValue> identifiers = itemService.getMetadata(item,
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
+        List<MetadataValue> identifiers = dsoService.getMetadata(dso,
                                                                   MetadataSchemaEnum.DC.getName(), "identifier", "uri",
                                                                   Item.ANY);
-        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+        dsoService.clearMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
                                   "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (this.supports(identifier.getValue())) {
@@ -428,8 +412,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
                 continue;
             }
             log.debug("Preserving identifier " + identifier.getValue());
-            itemService.addMetadata(context,
-                                    item,
+            dsoService.addMetadata(context,
+                                    dso,
                                     identifier.getMetadataField(),
                                     identifier.getLanguage(),
                                     identifier.getValue(),
@@ -439,9 +423,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
         // Add handle as identifier.uri DC value.
         if (StringUtils.isNotBlank(handleref)) {
-            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+            dsoService.addMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
                                     "identifier", "uri", null, handleref);
         }
-        itemService.update(context, item);
+        dsoService.update(context, dso);
     }
 }

@@ -19,7 +19,4 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <!-- the bean processor interceptor -->
-    <bean class="org.dspace.servicemanager.spring.DSpaceBeanPostProcessor"/>
-
 </beans>

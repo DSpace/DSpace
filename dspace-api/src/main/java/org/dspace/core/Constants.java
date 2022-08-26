@@ -157,6 +157,7 @@ public class Constants {
     /**
      * @deprecated As of DSpace 1.6, replaced by Constants.ADMIN
      */
+    @Deprecated
     public static final int COLLECTION_ADMIN = 11;
 
     /**
@@ -225,6 +226,12 @@ public class Constants {
     public static final String DEFAULT_ENCODING = "UTF-8";
 
     public static final String VIRTUAL_AUTHORITY_PREFIX = "virtual::";
+
+    /*
+     * Label used by the special entity type assigned when no explicit assignment is defined
+     */
+    public static final String ENTITY_TYPE_NONE = "none";
+
     /**
      * Default constructor
      */

@@ -8,10 +8,12 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -25,8 +27,8 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 public interface SearchService {
 
     /**
-     * Convenient method to call @see #search(Context, DSpaceObject,
-     * DiscoverQuery) with a null DSpace Object as scope (i.e. all the
+     * Convenient method to call {@link #search(Context, DSpaceObject,
+     * DiscoverQuery)} with a null DSpace Object as scope (i.e. all the
      * repository)
      *
      * @param context DSpace Context object.
@@ -36,6 +38,7 @@ public interface SearchService {
      */
     DiscoverResult search(Context context, DiscoverQuery query)
         throws SearchServiceException;
+
 
     /**
      * Convenient method to call @see #search(Context, DSpaceObject,
@@ -51,9 +54,22 @@ public interface SearchService {
     DiscoverResult search(Context context, IndexableObject dso, DiscoverQuery query)
         throws SearchServiceException;
 
+    /**
+     * Convenience method to call @see #search(Context, DSpaceObject, DiscoverQuery) and getting an iterator for the
+     * results
+     *
+     * @param context   DSpace context object
+     * @param dso       a DSpace object to use as a scope of the search
+     * @param query     the discovery query object
+     * @return          an iterator iterating over all results from the search
+     * @throws SearchServiceException   if search error
+     */
+    Iterator<Item> iteratorSearch(Context context, IndexableObject dso, DiscoverQuery query)
+        throws SearchServiceException;
+
 
     List<IndexableObject> search(Context context, String query, String orderfield, boolean ascending, int offset,
-            int max, String... filterquery);
+                                 int max, String... filterquery);
 
     /**
      * Transforms the given string field and value into a filter query
@@ -62,11 +78,14 @@ public interface SearchService {
      * @param field    the field of the filter query
      * @param operator equals/notequals/notcontains/authority/notauthority
      * @param value    the filter query value
+     * @param config   (nullable) the discovery configuration (if not null, field's corresponding facet.type checked to
+     *                be standard so suffix is not added for equals operator)
      * @return a filter query
      * @throws SQLException if database error
      *                      An exception that provides information on a database access error or other errors.
      */
-    DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value) throws SQLException;
+    DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value,
+        DiscoveryConfiguration config) throws SQLException;
 
     List<Item> getRelatedItems(Context context, Item item,
                                DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration);

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,13 +17,12 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.utils.DateMathParser;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
+import org.dspace.util.DateMathParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -96,30 +94,6 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         result.setProjection(projection);
         for (AccessConditionOption option : config.getOptions()) {
             AccessConditionOptionRest optionRest = new AccessConditionOptionRest();
-            if (option.getGroupName() != null) {
-                Group group;
-                try {
-                    group = groupService.findByName(context, option.getGroupName());
-                } catch (SQLException e) {
-                    throw new IllegalStateException("Wrong group name configuration for the access condition "
-                            + "option named " + option.getName());
-                }
-                if (group != null) {
-                    optionRest.setGroupUUID(group.getID());
-                }
-            }
-            if (option.getSelectGroupName() != null) {
-                Group group;
-                try {
-                    group = groupService.findByName(context, option.getSelectGroupName());
-                } catch (SQLException e) {
-                    throw new IllegalStateException("Wrong select group name configuration for the access condition "
-                            + "option named " + option.getName());
-                }
-                if (group != null) {
-                    optionRest.setSelectGroupUUID(group.getID());
-                }
-            }
             optionRest.setHasStartDate(option.getHasStartDate());
             optionRest.setHasEndDate(option.getHasEndDate());
             if (StringUtils.isNotBlank(option.getStartDateLimit())) {

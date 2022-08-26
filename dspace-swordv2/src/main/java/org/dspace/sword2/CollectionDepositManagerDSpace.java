@@ -15,7 +15,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.CollectionDepositManager;
 import org.swordapp.server.Deposit;
@@ -57,8 +57,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI
             Context context = sc.getContext();
 
             if (log.isDebugEnabled()) {
-                log.debug(
-                    LogManager.getHeader(context, "sword_create_new", ""));
+                log.debug(LogHelper.getHeader(context, "sword_create_new", ""));
             }
 
             // get the deposit target
@@ -81,7 +80,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI
                 if (sc.getOnBehalfOf() != null) {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
+                log.info(LogHelper
                              .getHeader(context, "deposit_failed_authorisation",
                                         "user=" +
                                             sc.getAuthenticated().getEmail() +

@@ -12,8 +12,10 @@ import java.util.Locale;
 import com.ibm.icu.text.CollationElementIterator;
 import com.ibm.icu.text.Collator;
 import com.ibm.icu.text.RuleBasedCollator;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.text.filter.TextFilter;
 
 /**
@@ -32,7 +34,7 @@ import org.dspace.text.filter.TextFilter;
  * @author Graham Triggs
  */
 public class LocaleOrderingFilter implements TextFilter {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(LocaleOrderingFilter.class);
+    private static final Logger log = LogManager.getLogger(LocaleOrderingFilter.class);
 
     /**
      * Uses a Locale dependent Collator to generate a sort string
@@ -47,7 +49,7 @@ public class LocaleOrderingFilter implements TextFilter {
         // Have we got a collator?
         if (collator != null) {
             int element;
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             // Iterate through the elements of the collator
             CollationElementIterator iter = collator.getCollationElementIterator(str);
@@ -107,7 +109,9 @@ public class LocaleOrderingFilter implements TextFilter {
         Locale theLocale = null;
 
         // Get a Locale configuration from the dspace.cfg
-        String locale = ConfigurationManager.getProperty("webui.browse.sort.locale");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String locale = configurationService.getProperty("webui.browse.sort.locale");
 
         if (locale != null) {
             // Attempt to create Locale for the configured value

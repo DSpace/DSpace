@@ -16,12 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
+import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -34,6 +37,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EmptyWorkflowGroupException;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
@@ -58,7 +62,7 @@ import org.springframework.stereotype.Component;
 public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, EPersonRest>
                                    implements InitializingBean {
 
-    private static final Logger log = Logger.getLogger(EPersonRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     AuthorizeService authorizeService;
@@ -199,8 +203,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
             if (epersonFirstName == null || epersonLastName == null ||
                 epersonFirstName.isEmpty() || epersonLastName.isEmpty()) {
-                throw new UnprocessableEntityException("The eperson.firstname and eperson.lastname values need to be " +
-                                                    "filled in");
+                throw new EPersonNameNotProvidedException();
             }
         }
         String password = epersonRest.getPassword();
@@ -279,7 +282,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             Context context = obtainContext();
             long total = es.searchResultCount(context, query);
             List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
-                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                                               Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -290,16 +293,21 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
-        if (StringUtils.isNotBlank(request.getParameter("token"))) {
-            boolean passwordChangeFound = false;
-            for (Operation operation : patch.getOperations()) {
-                if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
-                    passwordChangeFound = true;
-                }
+        boolean passwordChangeFound = false;
+        for (Operation operation : patch.getOperations()) {
+            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
+                passwordChangeFound = true;
             }
+        }
+        if (StringUtils.isNotBlank(request.getParameter("token"))) {
             if (!passwordChangeFound) {
                 throw new AccessDeniedException("Refused to perform the EPerson patch based on a token without " +
                                                     "changing the password");
+            }
+        } else {
+            if (passwordChangeFound && !StringUtils.equals(context.getAuthenticationMethod(), "password")) {
+                throw new AccessDeniedException("Refused to perform the EPerson patch based to change the password " +
+                                                        "for non \"password\" authentication");
             }
         }
         patchDSpaceObject(apiCategory, model, uuid, patch);
@@ -310,19 +318,13 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPerson eperson = null;
         try {
             eperson = es.find(context, id);
-            List<String> constraints = es.getDeleteConstraints(context, eperson);
-            if (constraints != null && constraints.size() > 0) {
-                throw new UnprocessableEntityException(
-                        "The eperson cannot be deleted due to the following constraints: "
-                                + StringUtils.join(constraints, ", "));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        try {
             es.delete(context, eperson);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
+        } catch (EmptyWorkflowGroupException e) {
+            throw new RESTEmptyWorkflowGroupException(e);
+        } catch (IllegalStateException e) {
+            throw new UnprocessableEntityException(e.getMessage(), e);
         }
     }
 
@@ -334,6 +336,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
+                Link.of("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
     }
 }

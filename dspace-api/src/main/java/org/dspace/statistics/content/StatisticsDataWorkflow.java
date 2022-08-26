@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -46,15 +50,16 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
  */
 public class StatisticsDataWorkflow extends StatisticsData {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StatisticsDataWorkflow.class);
+    private static final Logger log = LogManager.getLogger(StatisticsDataWorkflow.class);
 
     /**
      * Current DSpaceObject for which to generate the statistics.
      */
-    private DSpaceObject currentDso;
+    private final DSpaceObject currentDso;
+
     /**
-     * Variable used to indicate of how many months an average is required (-1 is inactive)
-     **/
+     * Variable used to indicate of how many months an average is required (-1 is inactive).
+     */
     private int averageMonths = -1;
 
     public StatisticsDataWorkflow(DSpaceObject dso, int averageMonths) {
@@ -65,7 +70,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
 
     @Override
-    public Dataset createDataset(Context context)
+    public Dataset createDataset(Context context, int facetMinCount)
         throws SQLException, SolrServerException, IOException, ParseException {
         // Check if we already have one.
         // If we do then give it back.
@@ -74,7 +79,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
         }
 
         List<StatisticsFilter> filters = getFilters();
-        List<String> defaultFilters = new ArrayList<String>();
+        List<String> defaultFilters = new ArrayList<>();
         for (StatisticsFilter statisticsFilter : filters) {
             defaultFilters.add(statisticsFilter.toQuery());
         }
@@ -92,16 +97,16 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 DatasetTypeGenerator typeGenerator = (DatasetTypeGenerator) datasetGenerator;
                 ObjectCount[] topCounts = solrLoggerService
                     .queryFacetField(query, defaultFilterQuery, typeGenerator.getType(), typeGenerator.getMax(),
-                                     typeGenerator.isIncludeTotal(), null);
+                                     typeGenerator.isIncludeTotal(), null, facetMinCount);
 
                 //Retrieve our total field counts
-                Map<String, Long> totalFieldCounts = new HashMap<String, Long>();
+                Map<String, Long> totalFieldCounts = new HashMap<>();
                 if (averageMonths != -1) {
-                    totalFieldCounts = getTotalFacetCounts(typeGenerator);
+                    totalFieldCounts = getTotalFacetCounts(typeGenerator, facetMinCount);
                 }
                 long monthDifference = 1;
-                if (getOldestWorkflowItemDate() != null) {
-                    monthDifference = getMonthsDifference(new Date(), getOldestWorkflowItemDate());
+                if (getOldestWorkflowItemDate(facetMinCount) != null) {
+                    monthDifference = getMonthsDifference(new Date(), getOldestWorkflowItemDate(facetMinCount));
                 }
 
                 dataset = new Dataset(topCounts.length, (averageMonths != -1 ? 3 : 2));
@@ -153,10 +158,10 @@ public class StatisticsDataWorkflow extends StatisticsData {
         return query;
     }
 
-    private int getMonthsDifference(Date date1, Date date2) {
-        int m1 = date1.getYear() * 12 + date1.getMonth();
-        int m2 = date2.getYear() * 12 + date2.getMonth();
-        return m2 - m1 + 1;
+    private long getMonthsDifference(Date date1, Date date2) {
+        LocalDate earlier = LocalDate.ofInstant(date1.toInstant(), ZoneOffset.UTC);
+        LocalDate later = LocalDate.ofInstant(date2.toInstant(), ZoneOffset.UTC);
+        return Period.between(earlier, later).toTotalMonths();
     }
 
 
@@ -164,14 +169,15 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * Retrieve the total counts for the facets (total count is same query but none of the filter queries).
      *
      * @param typeGenerator the type generator
+     * @param facetMinCount return only facets having at least this many hits.
      * @return counts for each facet by name.
      * @throws org.apache.solr.client.solrj.SolrServerException passed through.
      * @throws java.io.IOException passed through.
      */
-    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator)
+    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator, int facetMinCount)
             throws SolrServerException, IOException {
         ObjectCount[] objectCounts = solrLoggerService
-            .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
+            .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null, facetMinCount);
         Map<String, Long> result = new HashMap<>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
@@ -179,14 +185,14 @@ public class StatisticsDataWorkflow extends StatisticsData {
         return result;
     }
 
-    protected Date getOldestWorkflowItemDate()
+    protected Date getOldestWorkflowItemDate(int facetMinCount)
             throws SolrServerException, IOException {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if (workflowStartDate == null) {
             //Query our solr for it !
             QueryResponse oldestRecord = solrLoggerService
-                .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true);
+                .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
             if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
                 Date oldestDate = (Date) solrDocument.getFieldValue("time");

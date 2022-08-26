@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -91,25 +92,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected CommunityRest createAndReturn(Context context) throws AuthorizeException {
-        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
-        CommunityRest communityRest;
-        try {
-            ServletInputStream input = req.getInputStream();
-            communityRest = mapper.readValue(input, CommunityRest.class);
-        } catch (IOException e1) {
-            throw new UnprocessableEntityException("Error parsing request body: " + e1.toString());
-        }
 
-        Community community;
-        try {
-            // top-level community
-            community = cs.create(null, context);
-            cs.update(context, community);
-            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        // top-level community
+        Community community = createCommunity(context, null);
 
         return converter.toRest(community, utils.obtainProjection());
     }
@@ -123,6 +108,24 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
                 "Cannot create a SubCommunity without providing a parent Community.");
         }
 
+        Community parent;
+        try {
+            parent = cs.find(context, id);
+            if (parent == null) {
+                throw new UnprocessableEntityException("Parent community for id: "
+                        + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        // sub-community
+        Community community = createCommunity(context, parent);
+
+        return converter.toRest(community, utils.obtainProjection());
+    }
+
+    private Community createCommunity(Context context, Community parent) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         CommunityRest communityRest;
@@ -134,21 +137,15 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
 
         Community community;
+
         try {
-            Community parent = cs.find(context, id);
-            if (parent == null) {
-                throw new UnprocessableEntityException("Parent community for id: "
-                    + id + " not found");
-            }
-            // sub-community
             community = cs.create(parent, context);
             cs.update(context, community);
-            metadataConverter.setMetadata(context, community, communityRest.getMetadata());
+            metadataConverter.mergeMetadata(context, community, communityRest.getMetadata());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        return converter.toRest(community, utils.obtainProjection());
+        return community;
     }
 
     @Override
@@ -195,14 +192,42 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         }
     }
 
-    // TODO: Add methods in dspace api to support pagination of top level
-    // communities
     @SearchRestMethod(name = "top")
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
-            List<Community> communities = cs.findAllTop(obtainContext());
-            return converter.toRestPage(communities, pageable, utils.obtainProjection());
-        } catch (SQLException e) {
+            Context context = obtainContext();
+            List<Community> topLevelCommunities = new LinkedList<Community>();
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.setQuery("*:*");
+            discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
+            discoverQuery.addFilterQueries("-location.parent:*");
+            discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+            discoverQuery.setSortField("dc.title_sort", DiscoverQuery.SORT_ORDER.asc);
+            discoverQuery.setMaxResults(pageable.getPageSize());
+            DiscoverResult resp = searchService.search(context, discoverQuery);
+            long tot = resp.getTotalSearchResults();
+            for (IndexableObject solrCommunities : resp.getIndexableObjects()) {
+                Community c = ((IndexableCommunity) solrCommunities).getIndexedObject();
+                topLevelCommunities.add(c);
+            }
+            return converter.toRestPage(topLevelCommunities, pageable, tot, utils.obtainProjection());
+        } catch (SearchServiceException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "findAdminAuthorized")
+    public Page<CommunityRest> findAdminAuthorized (
+        Pageable pageable, @Parameter(value = "query") String query) {
+        try {
+            Context context = obtainContext();
+            List<Community> communities = authorizeService.findAdminAuthorizedCommunity(context, query,
+                Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getPageSize()));
+            long tot = authorizeService.countAdminAuthorizedCommunity(context, query);
+            return converter.toRestPage(communities, pageable, tot , utils.obtainProjection());
+        } catch (SearchServiceException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

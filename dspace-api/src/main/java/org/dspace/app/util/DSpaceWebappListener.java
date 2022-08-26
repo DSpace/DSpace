@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.lang.reflect.InvocationTargetException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -27,13 +28,11 @@ public class DSpaceWebappListener implements ServletContextListener {
 
         try {
             Class webappClass = Class.forName("org.dspace.utils.DSpaceWebapp");
-            webApp = (AbstractDSpaceWebapp) webappClass.newInstance();
+            webApp = (AbstractDSpaceWebapp) webappClass.getDeclaredConstructor().newInstance();
             webApp.register();
-        } catch (ClassNotFoundException ex) {
-            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
-        } catch (InstantiationException ex) {
-            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
-        } catch (IllegalAccessException ex) {
+        } catch (ClassNotFoundException | InstantiationException
+                | IllegalAccessException | IllegalArgumentException
+                | NoSuchMethodException | InvocationTargetException ex) {
             event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
         }
     }

@@ -8,6 +8,7 @@
 package org.dspace.authority;
 
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -15,19 +16,22 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -40,21 +44,23 @@ public class UpdateAuthorities {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(UpdateAuthorities.class);
+    private static final Logger log = LogManager.getLogger(UpdateAuthorities.class);
 
     protected PrintWriter print = null;
 
-    private Context context;
+    private final Context context;
     private List<String> selectedIDs;
 
     protected final ItemService itemService;
     protected final AuthorityValueService authorityValueService;
+    protected final ConfigurationService configurationService;
 
     public UpdateAuthorities(Context context) {
         print = new PrintWriter(System.out);
         this.context = context;
         this.authorityValueService = AuthorityServiceFactory.getInstance().getAuthorityValueService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     public static void main(String[] args) throws ParseException {
@@ -78,7 +84,7 @@ public class UpdateAuthorities {
     }
 
     protected static int processArgs(String[] args, UpdateAuthorities UpdateAuthorities) throws ParseException {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = createCommandLineOptions();
         CommandLine line = parser.parse(options, args);
 
@@ -102,7 +108,7 @@ public class UpdateAuthorities {
     }
 
     private void setSelectedIDs(String b) {
-        this.selectedIDs = new ArrayList<String>();
+        this.selectedIDs = new ArrayList<>();
         String[] orcids = b.split(",");
         for (String orcid : orcids) {
             this.selectedIDs.add(orcid.trim());
@@ -125,7 +131,7 @@ public class UpdateAuthorities {
         List<AuthorityValue> authorities;
 
         if (selectedIDs != null && !selectedIDs.isEmpty()) {
-            authorities = new ArrayList<AuthorityValue>();
+            authorities = new ArrayList<>();
             for (String selectedID : selectedIDs) {
                 AuthorityValue byUID = authorityValueService.findByUID(context, selectedID);
                 authorities.add(byUID);
@@ -149,7 +155,7 @@ public class UpdateAuthorities {
     protected void followUp(AuthorityValue authority) {
         print.println("Updated: " + authority.getValue() + " - " + authority.getId());
 
-        boolean updateItems = ConfigurationManager.getBooleanProperty("solrauthority", "auto-update-items");
+        boolean updateItems = configurationService.getBooleanProperty("solrauthority.auto-update-items");
         if (updateItems) {
             updateItems(authority);
         }
@@ -169,7 +175,7 @@ public class UpdateAuthorities {
                     print.println("Updated item with handle " + next.getHandle());
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException | AuthorizeException e) {
             log.error("Error updating item", e);
             print.println("Error updating item. " + Arrays.toString(e.getStackTrace()));
         }

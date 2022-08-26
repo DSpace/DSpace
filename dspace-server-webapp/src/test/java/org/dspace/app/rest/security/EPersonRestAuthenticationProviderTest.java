@@ -47,7 +47,8 @@ public class EPersonRestAuthenticationProviderTest {
     public void testGetGrantedAuthoritiesAdmin() throws Exception {
         when(authorizeService.isAdmin(context, ePerson)).thenReturn(true);
 
-        List<GrantedAuthority> authorities = ePersonRestAuthenticationProvider.getGrantedAuthorities(context, ePerson);
+        when(context.getCurrentUser()).thenReturn(ePerson);
+        List<GrantedAuthority> authorities = ePersonRestAuthenticationProvider.getGrantedAuthorities(context);
 
         assertThat(authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList()), containsInAnyOrder(
             WebSecurityConfiguration.ADMIN_GRANT, WebSecurityConfiguration.AUTHENTICATED_GRANT));
@@ -57,8 +58,9 @@ public class EPersonRestAuthenticationProviderTest {
     @Test
     public void testGetGrantedAuthoritiesEPerson() throws Exception {
         when(authorizeService.isAdmin(context, ePerson)).thenReturn(false);
+        when(context.getCurrentUser()).thenReturn(ePerson);
 
-        List<GrantedAuthority> authorities = ePersonRestAuthenticationProvider.getGrantedAuthorities(context, ePerson);
+        List<GrantedAuthority> authorities = ePersonRestAuthenticationProvider.getGrantedAuthorities(context);
 
         assertThat(authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList()), containsInAnyOrder(
             WebSecurityConfiguration.AUTHENTICATED_GRANT));

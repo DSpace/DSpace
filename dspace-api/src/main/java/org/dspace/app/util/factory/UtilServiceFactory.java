@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util.factory;
 
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.app.util.service.WebAppService;
@@ -24,6 +25,8 @@ public abstract class UtilServiceFactory {
     public abstract OpenSearchService getOpenSearchService();
 
     public abstract MetadataExposureService getMetadataExposureService();
+
+    public abstract DSpaceObjectUtils getDSpaceObjectUtils();
 
     public static UtilServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()

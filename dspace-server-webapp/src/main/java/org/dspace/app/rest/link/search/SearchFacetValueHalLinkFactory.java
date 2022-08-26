@@ -36,7 +36,7 @@ public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<
 
             addFilterForFacetValue(builder, halResource.getFacetData(), halResource.getValueData());
 
-            list.add(buildLink("search", builder.build().toUriString()));
+            list.add(buildLink("search", builder.build().encode().toUriString()));
 
         }
     }

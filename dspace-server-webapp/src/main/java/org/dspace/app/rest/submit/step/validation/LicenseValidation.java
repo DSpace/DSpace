@@ -8,9 +8,11 @@
 package org.dspace.app.rest.submit.step.validation;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -32,7 +34,7 @@ public class LicenseValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_LICENSEREQUIRED = "error.validation.license.notgranted";
 
-    private static final Logger log = Logger.getLogger(LicenseValidation.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private BitstreamService bitstreamService;
@@ -41,13 +43,14 @@ public class LicenseValidation extends AbstractValidation {
     public List<ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj,
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
 
+        List<ErrorRest> errors = new ArrayList<>();
         Bitstream bitstream = bitstreamService
             .getBitstreamByName(obj.getItem(), Constants.LICENSE_BUNDLE_NAME, Constants.LICENSE_BITSTREAM_NAME);
         if (bitstream == null) {
-            addError(ERROR_VALIDATION_LICENSEREQUIRED,
+            addError(errors, ERROR_VALIDATION_LICENSEREQUIRED,
                 "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId());
         }
-        return getErrors();
+        return errors;
     }
 
     public BitstreamService getBitstreamService() {

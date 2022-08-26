@@ -22,13 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.RelationshipTypeService;
-import org.h2.util.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +42,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     @Test
     public void findAllRelationshipTypesTest() throws SQLException {
-        assertEquals(11, relationshipTypeService.findAll(context).size());
+        assertEquals(12, relationshipTypeService.findAll(context).size());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
                    //We expect a 200 OK status
                    .andExpect(status().isOk())
                    //The type has to be 'discover'
-                   .andExpect(jsonPath("$.page.totalElements", is(11)))
+                   .andExpect(jsonPath("$.page.totalElements", is(12)))
                    //There needs to be a self link to this endpoint
                    .andExpect(jsonPath("$._links.self.href", containsString("api/core/relationshiptypes")))
                    //We have 4 facets in the default configuration, they need to all be present in the embedded section
@@ -157,7 +157,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(7)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(8)),
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(9)),
-                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(10)))
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(10)),
+                       RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipTypes.get(11)))
                    ));
     }
 
@@ -253,5 +254,72 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     }
 
+    @Test
+    public void findByEntityTypePublicationTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                              "isProjectOfPublication", "isPublicationOfProject"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                              "isOrgUnitOfPublication", "isPublicationOfOrgUnit"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
+                           )))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void findByEntityTypeMissingParamTest() throws Exception {
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByEntityTypeInvalidEntityTypeTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "WrongEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByEntityTypePublicationPaginationTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication")
+                   .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                   "isAuthorOfPublication", "isPublicationOfAuthor"),
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                 "isProjectOfPublication", "isPublicationOfProject"),
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                 "isOrgUnitOfPublication", "isPublicationOfOrgUnit")
+                              )))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication")
+                   .param("page", "1")
+                   .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                   "isAuthorOfPublication", "isPublicationOfAuthor"),
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                       "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
+                              )))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
 
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchemaEnum;
@@ -143,7 +144,8 @@ public class DCInput {
     private boolean isMetadataField = false;
     private String relationshipType = null;
     private String searchConfiguration = null;
-    private String filter;
+    private final String filter;
+    private final List<String> externalSources;
 
     /**
      * The scope of the input sets, this restricts hidden metadata fields from
@@ -211,7 +213,7 @@ public class DCInput {
             || "yes".equalsIgnoreCase(closedVocabularyStr);
 
         // parsing of the <type-bind> element (using the colon as split separator)
-        typeBind = new ArrayList<String>();
+        typeBind = new ArrayList<>();
         String typeBindDef = fieldMap.get("type-bind");
         if (typeBindDef != null && typeBindDef.trim().length() > 0) {
             String[] types = typeBindDef.split(",");
@@ -225,6 +227,15 @@ public class DCInput {
         relationshipType = fieldMap.get("relationship-type");
         searchConfiguration = fieldMap.get("search-configuration");
         filter = fieldMap.get("filter");
+        externalSources = new ArrayList<>();
+        String externalSourcesDef = fieldMap.get("externalsources");
+        if (StringUtils.isNotBlank(externalSourcesDef)) {
+            String[] sources = StringUtils.split(externalSourcesDef, ",");
+            for (String source: sources) {
+                externalSources.add(StringUtils.trim(source));
+            }
+        }
+
     }
 
     /**
@@ -291,7 +302,7 @@ public class DCInput {
      *
      * @return the input type
      */
-    public String getInputType() {
+    public @Nullable String getInputType() {
         return inputType;
     }
 
@@ -521,6 +532,10 @@ public class DCInput {
         return filter;
     }
 
+    public List<String> getExternalSources() {
+        return externalSources;
+    }
+
     public boolean isQualdropValue() {
         if ("qualdrop_value".equals(getInputType())) {
             return true;
@@ -538,7 +553,7 @@ public class DCInput {
                     }
                 }
             } catch (PatternSyntaxException ex) {
-                log.error("Regex validation failed!", ex.getMessage());
+                log.error("Regex validation failed!  {}", ex.getMessage());
             }
 
         }
@@ -547,18 +562,31 @@ public class DCInput {
     }
 
     /**
-     * Verify whether the current field contains an entity relationship
-     * This also implies a relationship type is defined for this field
-     * The field can contain both an entity relationship and a metadata field simultaneously
+     * Get the type bind list for use in determining whether
+     * to display this field in angular dynamic form building
+     * @return list of bound types
+     */
+    public List<String> getTypeBindList() {
+        return typeBind;
+    }
+
+    /**
+     * Verify whether the current field contains an entity relationship.
+     * This also implies a relationship type is defined for this field.
+     * The field can contain both an entity relationship and a metadata field
+     * simultaneously.
+     * @return true if the field contains a relationship.
      */
     public boolean isRelationshipField() {
         return isRelationshipField;
     }
 
     /**
-     * Verify whether the current field contains a metadata field
-     * This also implies a field type is defined for this field
-     * The field can contain both an entity relationship and a metadata field simultaneously
+     * Verify whether the current field contains a metadata field.
+     * This also implies a field type is defined for this field.
+     * The field can contain both an entity relationship and a metadata field
+     * simultaneously.
+     * @return true if the field contains a metadata field.
      */
     public boolean isMetadataField() {
         return isMetadataField;

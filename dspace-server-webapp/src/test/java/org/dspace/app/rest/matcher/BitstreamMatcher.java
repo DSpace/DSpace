@@ -10,6 +10,7 @@ package org.dspace.app.rest.matcher;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
@@ -100,7 +101,8 @@ public class BitstreamMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "bundle",
-                "format"
+                "format",
+                "thumbnail"
         );
     }
 
@@ -112,7 +114,8 @@ public class BitstreamMatcher {
                 "bundle",
                 "content",
                 "format",
-                "self"
+                "self",
+                "thumbnail"
         );
     }
 
@@ -123,9 +126,11 @@ public class BitstreamMatcher {
                     hasJsonPath("$.name", is(bitstream.getName())),
                     hasJsonPath("$.bundleName", is(bitstream.getBundles().get(0).getName())),
                     hasJsonPath("$.metadata", allOf(
-                            matchMetadata("dc.title", bitstream.getName()),
-                            matchMetadata("dc.description", bitstream.getDescription())
+                            matchMetadata("dc.title", bitstream.getName())
                     )),
+                    bitstream.getDescription() != null ?
+                            hasJsonPath("$.metadata", matchMetadata("dc.description", bitstream.getDescription())) :
+                            hasJsonPath("$.metadata", matchMetadataDoesNotExist("dc.description")),
                     hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
                     hasJsonPath("$.checkSum", matchChecksum())
             );
@@ -139,9 +144,11 @@ public class BitstreamMatcher {
                 hasJsonPath("$.uuid", is(uuid.toString())),
                 hasJsonPath("$.name", is(name)),
                 hasJsonPath("$.metadata", allOf(
-                        matchMetadata("dc.title", name),
-                        matchMetadata("dc.description", description)
+                        matchMetadata("dc.title", name)
                 )),
+                description != null ?
+                        hasJsonPath("$.metadata", matchMetadata("dc.description", description)) :
+                        hasJsonPath("$.metadata", matchMetadataDoesNotExist("dc.description")),
                 hasJsonPath("$.sizeBytes", is((int) size)),
                 hasJsonPath("$.checkSum", matchChecksum())
         );

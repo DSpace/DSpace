@@ -20,11 +20,11 @@ import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 
 /**
- * Commandline utility to create a file of spider addresses from an Apache
+ * Command line utility to create a file of spider addresses from an Apache
  * log file.
  *
  * @author Mark Diggory (mdiggory at atmire.com)
@@ -39,7 +39,7 @@ public class ApacheLogRobotsProcessor {
     private ApacheLogRobotsProcessor() { }
 
     /**
-     * Creates a file containing spiders based on an Apache logfile
+     * Creates a file containing spiders based on an Apache log file
      * by analyzing users of the robots.txt file
      *
      * @param args the command line arguments given
@@ -48,7 +48,7 @@ public class ApacheLogRobotsProcessor {
 
     public static void main(String[] args) throws Exception {
         // create an Options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
         options.addOption("l", "logfile", true, "type: Input log file");
@@ -77,7 +77,7 @@ public class ApacheLogRobotsProcessor {
         Writer output;
 
         if ("-".equals(spiderIpPath)) {
-            logSpiders = new HashSet<String>();
+            logSpiders = new HashSet<>();
             output = new BufferedWriter(new OutputStreamWriter(System.out));
         } else {
             File spiderIpFile = new File(spiderIpPath);
@@ -85,7 +85,7 @@ public class ApacheLogRobotsProcessor {
             if (spiderIpFile.exists()) {
                 logSpiders = SpiderDetector.readPatterns(spiderIpFile);
             } else {
-                logSpiders = new HashSet<String>();
+                logSpiders = new HashSet<>();
             }
             output = new BufferedWriter(new FileWriter(spiderIpFile));
         }

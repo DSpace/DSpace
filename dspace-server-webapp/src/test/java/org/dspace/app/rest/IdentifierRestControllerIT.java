@@ -12,7 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -48,6 +52,32 @@ public class IdentifierRestControllerIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isFound())
                         //We expect a Location header to redirect to the community details
                         .andExpect(header().string("Location", communityDetail));
+    }
+
+    @Test
+
+    public void testValidIdentifierItemHandlePrefix() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // Create an item with a handle identifier
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection owningCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                       .withName("Owning Collection")
+                                                       .build();
+        Item item = ItemBuilder.createItem(context, owningCollection)
+                               .withTitle("Test item")
+                               .build();
+
+        String handle = item.getHandle();
+        String itemLocation = REST_SERVER_URL + "core/items/" + item.getID();
+
+        getClient().perform(get("/api/pid/find?id=hdl:{handle}", handle))
+                   .andExpect(status().isFound())
+                   // We expect a Location header to redirect to the item's page
+                   .andExpect(header().string("Location", itemLocation));
     }
 
     @Test
