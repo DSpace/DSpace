@@ -21,8 +21,11 @@ import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierProvider;
+import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Ensure that an object has all of the identifiers that it should, minting them
@@ -41,6 +44,20 @@ public class CreateMissingIdentifiers
         if (!(dso instanceof Item)) {
             return Curator.CURATE_SKIP;
         }
+
+        // XXX Temporary escape when an incompatible provider is configured.
+        // XXX Remove this when the provider is fixed.
+        boolean compatible = DSpaceServicesFactory
+                .getInstance()
+                .getServiceManager()
+                .getServiceByName(
+                        VersionedHandleIdentifierProviderWithCanonicalHandles.class.getCanonicalName(),
+                        IdentifierProvider.class) == null;
+        if (!compatible) {
+            setResult("This task is not compatible with VersionedHandleIdentifierProviderWithCanonicalHandles");
+            return Curator.CURATE_ERROR;
+        }
+        // XXX End of escape
 
         String typeText = Constants.typeText[dso.getType()];
 
