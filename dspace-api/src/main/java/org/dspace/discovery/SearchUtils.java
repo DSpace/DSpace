@@ -52,12 +52,25 @@ public class SearchUtils {
      */
     private SearchUtils() { }
 
+    /**
+     * Return an instance of the {@link SearchService}.
+     */
     public static SearchService getSearchService() {
         if (searchService == null) {
             org.dspace.kernel.ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
             searchService = manager.getServiceByName(SearchService.class.getName(), SearchService.class);
         }
         return searchService;
+    }
+
+    /**
+     * Clear the cached {@link SearchService} instance, forcing it to be retrieved from the service manager again
+     * next time {@link SearchUtils#getSearchService} is called.
+     * In practice, this is only necessary for integration tests in some environments
+     * where the cached version may no longer be up to date between tests.
+     */
+    public static void clearCachedSearchService() {
+        searchService = null;
     }
 
     public static DiscoveryConfiguration getDiscoveryConfiguration() {
