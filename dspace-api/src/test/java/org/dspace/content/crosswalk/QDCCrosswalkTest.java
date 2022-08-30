@@ -14,7 +14,7 @@ import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Namespace;
+import org.jdom2.Namespace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

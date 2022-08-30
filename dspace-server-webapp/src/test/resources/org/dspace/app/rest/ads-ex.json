@@ -1,0 +1,186 @@
+{
+    "responseHeader": {
+        "status": 0,
+        "QTime": 13,
+        "params": {
+            "q": "roma",
+            "fl": "abstract,aff,alternate_bibcode,alternate_title,arxiv_class,author,bibcode,bibgroup,bibstem,citation_count,copyright,database,doi,doctype,first_author,grant,id,indexstamp,issue,keyword,lang,orcid_pub,orcid_user,orcid_other,page,property,pub,pubdate,read_count,title,vizier,volume,year",
+            "start": "0",
+            "internal_logging_params": "X-Amzn-Trace-Id=Root=1-624bf56a-2c4cc8a73c5ebd7648dd283d",
+            "rows": "2",
+            "wt": "json"
+        }
+    },
+    "response": {
+        "numFound": 9383,
+        "start": 0,
+        "docs": [
+            {
+                "bibcode": "2016PhRvL.116f1102A",
+                "abstract": "On September 14, 2015 at 09:50:45 UTC the two detectors of the Laser Interferometer Gravitational-Wave Observatory simultaneously observed a transient gravitational-wave signal. The signal sweeps upwards in frequency from 35 to 250 Hz with a peak gravitational-wave strain of 1.0 ×10<SUP>-21</SUP>. It matches the waveform predicted by general relativity for the inspiral and merger of a pair of black holes and the ringdown of the resulting single black hole. The signal was observed with a matched-filter signal-to-noise ratio of 24 and a false alarm rate estimated to be less than 1 event per 203 000 years, equivalent to a significance greater than 5.1 σ . The source lies at a luminosity distance of 41 0<SUB>-180</SUB><SUP>+160</SUP> Mpc corresponding to a redshift z =0.0 9<SUB>-0.04</SUB><SUP>+0.03</SUP> . In the source frame, the initial black hole masses are 3 6<SUB>-4</SUB><SUP>+5</SUP>M<SUB>⊙</SUB> and 2 9<SUB>-4</SUB><SUP>+4</SUP>M<SUB>⊙</SUB> , and the final black hole mass is 6 2<SUB>-4</SUB><SUP>+4</SUP>M<SUB>⊙</SUB> , with 3. 0<SUB>-0.5</SUB><SUP>+0.5</SUP>M<SUB>⊙</SUB> c<SUP>2</SUP> radiated in gravitational waves. All uncertainties define 90% credible intervals. These observations demonstrate the existence of binary stellar-mass black hole systems. This is the first direct detection of gravitational waves and the first observation of a binary black hole merger.",
+                "aff": [
+                    "LIGO, California Institute of Technology, Pasadena, California 91125, USA",
+                    "The University of Mississippi, University, Mississippi 38677, USA",
+                    "California State University Fullerton, Fullerton, California 92831, USA",
+                    "LAL, Université Paris-Sud, CNRS/IN2P3, Université Paris-Saclay, Orsay, France"
+                ],
+                "alternate_bibcode": [
+                    "2016arXiv160203837T"
+                ],
+                "arxiv_class": [
+                    "gr-qc",
+                    "astro-ph.HE"
+                ],
+                "author": [
+                    "Abbott, B. P.",
+                    "Babak, S.",
+                    "Di Fiore, L.",
+                    "Virgo Collaboration"
+                ],
+                "bibstem": [
+                    "PhRvL",
+                    "PhRvL.116"
+                ],
+                "copyright": "2016: authors",
+                "database": [
+                    "astronomy",
+                    "physics"
+                ],
+                "doctype": "article",
+                "doi": [
+                    "10.1103/PhysRevLett.116.061102"
+                ],
+                "first_author": "Abbott, B. P.",
+                "id": "1360978",
+                "issue": "6",
+                "keyword": [
+                    "General Relativity and Quantum Cosmology",
+                    "Astrophysics - High Energy Astrophysical Phenomena"
+                ],
+                "orcid_pub": [
+                    "-",
+                    "-",
+                    "-",
+                    "-"
+                ],
+                "page": [
+                    "061102"
+                ],
+                "pub": "Physical Review Letters",
+                "pubdate": "2016-02-00",
+                "title": [
+                    "Observation of Gravitational Waves from a Binary Black Hole Merger"
+                ],
+                "volume": "116",
+                "year": "2016",
+                "orcid_user": [
+                    "-",
+                    "-",
+                    "-",
+                    "-"
+                ],
+                "orcid_other": [
+                    "-",
+                    "-",
+                    "-",
+                    "-"
+                ],
+                "read_count": 639,
+                "property": [
+                    "ARTICLE",
+                    "DATA",
+                    "EPRINT_OPENACCESS",
+                    "ESOURCE",
+                    "OPENACCESS",
+                    "PUB_OPENACCESS",
+                    "REFEREED"
+                ],
+                "citation_count": 7348,
+                "indexstamp": "2022-04-04T22:08:12.481Z"
+            },
+            {
+                "bibcode": "2017PhRvL.119p1101A",
+                "abstract": "On August 17, 2017 at 12∶41:04 UTC the Advanced LIGO and Advanced Virgo gravitational-wave detectors made their first observation of a binary neutron star inspiral. The signal, GW170817, was detected with a combined signal-to-noise ratio of 32.4 and a false-alarm-rate estimate of less than one per 8.0 ×10<SUP>4</SUP> years . We infer the component masses of the binary to be between 0.86 and 2.26 M<SUB>⊙</SUB> , in agreement with masses of known neutron stars. Restricting the component spins to the range inferred in binary neutron stars, we find the component masses to be in the range 1.17 - 1.60 M<SUB>⊙</SUB> , with the total mass of the system 2.7 4<SUB>-0.01</SUB><SUP>+0.04</SUP>M<SUB>⊙</SUB> . The source was localized within a sky region of 28 deg<SUP>2</SUP> (90% probability) and had a luminosity distance of 4 0<SUB>-14</SUB><SUP>+8</SUP> Mpc , the closest and most precisely localized gravitational-wave signal yet. The association with the γ -ray burst GRB 170817A, detected by Fermi-GBM 1.7 s after the coalescence, corroborates the hypothesis of a neutron star merger and provides the first direct evidence of a link between these mergers and short γ -ray bursts. Subsequent identification of transient counterparts across the electromagnetic spectrum in the same location further supports the interpretation of this event as a neutron star merger. This unprecedented joint gravitational and electromagnetic observation provides insight into astrophysics, dense matter, gravitation, and cosmology.",
+                "aff": [
+                    "The University of Mississippi, University, Mississippi 38677, USA",
+                    "The Chinese University of Hong Kong, Shatin, NT, Hong Kong",
+                    "Nikhef, Science Park, 1098 XG Amsterdam, Netherlands",
+                    "INFN, Sezione di Padova, I-35131 Padova, Italy"
+                ],
+                "alternate_bibcode": [
+                    "2017arXiv171005832T"
+                ],
+                "arxiv_class": [
+                    "gr-qc",
+                    "astro-ph.HE"
+                ],
+                "author": [
+                    "Abbott, B. P.",
+                    "Babak, S.",
+                    "Vorvick, C.",
+                    "Wade, M."
+                ],
+                "bibstem": [
+                    "PhRvL",
+                    "PhRvL.119"
+                ],
+                "copyright": "2017: authors",
+                "database": [
+                    "astronomy",
+                    "physics"
+                ],
+                "doctype": "article",
+                "doi": [
+                    "10.1103/PhysRevLett.119.161101"
+                ],
+                "first_author": "Abbott, B. P.",
+                "id": "11492510",
+                "issue": "16",
+                "keyword": [
+                    "General Relativity and Quantum Cosmology",
+                    "Astrophysics - High Energy Astrophysical Phenomena"
+                ],
+                "orcid_pub": [
+                    "-",
+                    "-",
+                    "-",
+                    "-"
+                ],
+                "page": [
+                    "161101"
+                ],
+                "pub": "Physical Review Letters",
+                "pubdate": "2017-10-00",
+                "title": [
+                    "GW170817: Observation of Gravitational Waves from a Binary Neutron Star Inspiral"
+                ],
+                "volume": "119",
+                "year": "2017",
+                "orcid_user": [
+                    "-",
+                    "-",
+                    "-",
+                    "-"
+                ],
+                "orcid_other": [
+                    "-",
+                    "-",
+                    "-",
+                    "-"
+                ],
+                "read_count": 475,
+                "property": [
+                    "ARTICLE",
+                    "DATA",
+                    "EPRINT_OPENACCESS",
+                    "ESOURCE",
+                    "OPENACCESS",
+                    "PUB_OPENACCESS",
+                    "REFEREED"
+                ],
+                "citation_count": 5260,
+                "indexstamp": "2022-04-04T22:08:08.068Z"
+            }
+        ]
+    }
+}

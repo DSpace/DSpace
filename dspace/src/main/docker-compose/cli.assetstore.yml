@@ -24,6 +24,6 @@ services:
           tar xvfz /tmp/assetstore.tar.gz
         fi
 
-        /dspace/bin/dspace index-discovery
+        /dspace/bin/dspace index-discovery -b
         /dspace/bin/dspace oai import
         /dspace/bin/dspace oai clean-cache

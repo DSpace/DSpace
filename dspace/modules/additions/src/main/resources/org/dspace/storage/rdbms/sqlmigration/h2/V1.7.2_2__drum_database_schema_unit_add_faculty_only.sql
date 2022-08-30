@@ -22,7 +22,7 @@ CREATE TABLE EPersonGroup2Unit
 (
   id               INTEGER PRIMARY KEY,
   eperson_group_id INTEGER REFERENCES EPersonGroup(eperson_group_id),
-  unit_id          INTEGER REFERENCES Unit(unit_id),
+  unit_id          INTEGER REFERENCES Unit(unit_id)
 );
 
 -- Index by group ID (used heavily by AuthorizeManager)

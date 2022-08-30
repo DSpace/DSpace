@@ -19,7 +19,7 @@ All source code and resources for DRUM customizations should be placed in the
 The "dspace/config/dspace.cfg" file contains the default DSpace configuration.
 In general, changes *should not* be made to this file.
 
-DRUM customization should be added to the "dspace/config/local.cfg.TEMPLATE"
+DRUM customization should be added to the "dspace/config/local.cfg.EXAMPLE"
 file, which, when deployed, should be copied to "dspace/config/local.cfg" (see
 the [DRUM 7 Docker Development Environment](Drum7DockerDevelopmentEnvironment.md).
 
@@ -42,9 +42,24 @@ to the Java classes specified in the XML files. To fix this, place the
 of the module. For example, for the "dspace-api" module, the "stock" versions
 of the above files would be placed in:
 
-* dspace-api/test/data/dspaceFolder/config/hibernate.cfg.xml
-* dspace-api/test/data/dspaceFolder/spring/api/core-services.xml
-* dspace-api/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
+* dspace-api/src/test/data/dspaceFolder/config/hibernate.cfg.xml
+* dspace-api/src/test/data/dspaceFolder/config/spring/api/core-services.xml
+* dspace-api/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
+
+The UMD-customized versions of these files (from the "dspace/config/" directory)
+should be placed in:
+
+* dspace/modules/additions/src/test/data/dspaceFolder/config/hibernate.cfg.xml
+* dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-services.xml
+* dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
+
+### discovery.xml
+
+The "dspace/config/spring/api/discovery.xml" file has been modified from the
+stock DSpace version. The support the "dspace-server-webapp" tests, the
+"stock" DSpace "dspace/config/spring/api/discovery.xml" file should be placed in
+
+* dspace-server-webapp/src/test/data/dspaceFolder/config/spring/api/discovery.xml
 
 ## Database Schema Changes
 
@@ -85,27 +100,26 @@ this will fail with an error message similar:
 
 ```bash
 [ERROR] Failures:
-[ERROR]   UnitTest>AbstractUnitTest.initDatabase:80 Error initializing database: Flyway migration error occurred:
-Migration V6.2_2018.04.05__drum-0_LIBDRUM-511_hibernate_migration_of_customization.sql failed
+[ERROR]   CASAuthenticationTest>AbstractUnitTest.initDatabase:80 Error initializing database: Flyway migration error occurred: Migration V6.2_2018.04.05__drum-0_LIBDRUM-511_hibernate_migration_of_customization.sql failed
 ---------------------------------------------------------------------------------------------
 SQL State  : 90085
 Error Code : 90085
-Message    : Index "PRIMARY_KEY_FF" belongs to constraint "CONSTRAINT_F267"; SQL statement:
-ALTER TABLE etdunit DROP PRIMARY KEY [90085-187]
+Message    : Index "PRIMARY_KEY_FF" belongs to constraint "CONSTRAINT_D"; SQL statement:
 ...
 ```
 
-indicating that there is an "implicit" constraint (named "CONSTRAINT_F267" in
+indicating that there is an "implicit" constraint (named "CONSTRAINT_D" in
 the example).
 
 This implicit constraint must be removed, so to actually change the primary key
 in the example, the following commands are necessary:
 
 ```sql
-ALTER TABLE etdunit DROP CONSTRAINT CONSTRAINT_F267;
-ALTER TABLE etdunit DROP PRIMARY KEY;
+ALTER TABLE etdunit DROP CONSTRAINT CONSTRAINT_D CASCADE;
 ALTER TABLE etdunit ADD PRIMARY KEY (uuid);
 ```
+
+The "CASCADE" option deletes the primary key associated with the constraint.
 
 The implicit contraint names are believed to be stable, so while kludgy, this
 should work consistently.

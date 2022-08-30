@@ -2421,9 +2421,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                                        .build();
 
         List<Item> items = new ArrayList();
-        // This comparator is used to sort our test Items by java.util.UUID (which sorts them based on the RFC
-        // and not based on String comparison, see also https://stackoverflow.com/a/51031298/3750035 )
-        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID());
+        // Hibernate 5.x's org.hibernate.dialect.H2Dialect sorts UUIDs as if they are Strings.
+        // So, we must compare UUIDs as if they are strings.
+        // In Hibernate 6, the H2Dialect has been updated with native UUID type support, at which point
+        // we'd need to update the below comparator to compare them as java.util.UUID (which sorts based on RFC 4412).
+        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID().toString());
 
         Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
         items.add(item0);

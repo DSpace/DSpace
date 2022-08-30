@@ -6,7 +6,7 @@ CREATE SEQUENCE etdunit_seq;
 CREATE TABLE EtdUnit
 (
   etdunit_id INTEGER PRIMARY KEY,
-  name    VARCHAR(256) UNIQUE,
+  name    VARCHAR(256) UNIQUE
 );
 
 
@@ -19,7 +19,7 @@ CREATE TABLE Collection2EtdUnit
 (
   id             INTEGER PRIMARY KEY,
   collection_id  INTEGER REFERENCES Collection(collection_id),
-  etdunit_id     INTEGER REFERENCES EtdUnit(etdunit_id),
+  etdunit_id     INTEGER REFERENCES EtdUnit(etdunit_id)
 );
 
 -- Index by collection ID

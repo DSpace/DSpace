@@ -35,7 +35,7 @@ import org.dspace.eperson.PasswordHash;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.jdom.Namespace;
+import org.jdom2.Namespace;
 
 /**
  * Plugin to export all Group and EPerson objects in XML, perhaps for reloading.

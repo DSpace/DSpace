@@ -57,7 +57,7 @@ public class StatisticsRestController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
             .register(this, Arrays
-                .asList(new Link("/api/" + RestAddressableModel.STATISTICS, RestAddressableModel.STATISTICS)));
+                .asList(Link.of("/api/" + RestAddressableModel.STATISTICS, RestAddressableModel.STATISTICS)));
     }
 
     @RequestMapping(method = RequestMethod.GET)
