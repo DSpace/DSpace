@@ -8,7 +8,14 @@
            http://www.springframework.org/schema/context/spring-context-2.5.xsd"
     default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
-    <description>Strategies for determining who receives Request Copy emails.</description>
+    <description>
+        Strategies for determining who receives Request Copy emails.
+        A copy request "strategy" class produces a list of addresses to which a
+        request email should be sent.  Each strategy gets its addresses from a
+        different source.  Select the one that meets your need, or use the
+        CombiningRequestItemStrategy to meld the lists from two or more other
+        strategies.
+    </description>
 
     <context:annotation-config /> <!-- allows us to use Spring annotations in beans -->
 
@@ -20,18 +27,20 @@
     <bean class="org.dspace.app.requestitem.RequestItemMetadataStrategy"
           id="org.dspace.app.requestitem.RequestItemMetadataStrategy"
           autowire-candidate="true">
-	<!-- 
-		Uncomment these properties if you want lookup in metadata the email and
-        the name of the author to contact for request copy.
-		If you don't configure that or if the requested item doesn't have these
-        metadata, the submitter data are used as fail over.
+        <!-- 
+            Uncomment these properties if you want lookup in metadata the email
+            and the name of the author to contact for request copy.
+            If you don't configure that or if the requested item doesn't have
+            these metadata, the submitter data are used as fail over.
+        -->
+        <!--
 
-		<property name="emailMetadata"
-                  value="schema.element.qualifier" />
-		<property name="fullNameMetadata"
-                  value="schema.element.qualifier" />
-	-->	
-	</bean>
+            <property name="emailMetadata"
+                      value="schema.element.qualifier" />
+            <property name="fullNameMetadata"
+                      value="schema.element.qualifier" />
+        -->
+    </bean>
 
     <!-- HelpDesk to instead get RequestItem emails-->
     <!--
@@ -39,13 +48,14 @@
           id="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"/>
     -->
 
-    <!-- List a Collection's administrators. -->
+    <!-- Send request emails to administrators of an Item's owning Collection. -->
     <!--
     <bean class='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'
           id='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'/>
     -->
 
-    <!-- Concatenate the results of other strategies. -->
+    <!-- Execute multiple strategies and concatenate their lists of recipients.
+         Mail will go to all members of the combined list. -->
     <!--
     <bean class='org.dspace.app.requestitem.CombiningRequestItemStrategy'
           id='org.dspace.app.requestitem.CombiningRequestItemStrategy'
