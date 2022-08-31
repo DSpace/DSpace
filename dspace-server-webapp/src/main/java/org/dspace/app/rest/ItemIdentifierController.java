@@ -80,6 +80,17 @@ public class ItemIdentifierController {
     @Autowired
     Utils utils;
 
+    /**
+     * Get list of identifiers associated with this item, along with type (eg doi, handle)
+     * and status (eg PENDING, REGISTERED)
+     *
+     * @param uuid
+     * @param request
+     * @param response
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     @RequestMapping(method = RequestMethod.GET)
     public IdentifiersRest get(@PathVariable UUID uuid, HttpServletRequest request,
                                           HttpServletResponse response)
@@ -110,9 +121,10 @@ public class ItemIdentifierController {
     }
 
     /**
-     * Method to register an identifier for an item.
+     * Queue a new, pending or minted DOI for registration for a given item. Requires administrative privilege.
+     * This request is sent from the Register DOI button (configurable) on the item status page.
      *
-     * @return OK
+     * @return 302 FOUND if the DOI is already registered or reserved, 201 CREATED if queued for registration
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADMIN')")
@@ -130,23 +142,37 @@ public class ItemIdentifierController {
         }
 
         String identifier = null;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         try {
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
             if (doiIdentifierProvider != null) {
-                doiIdentifierProvider.register(context, item, new TrueFilter());
+                Integer doiStatus = doiService.findDOIByDSpaceObject(context, item).getStatus();
+                // Check if this DOI has a status which makes it eligible for registration
+                if (null == doiStatus || DOIIdentifierProvider.MINTED.equals(doiStatus)
+                        || DOIIdentifierProvider.PENDING.equals(doiStatus)) {
+                    // Mint identifier and return 201 CREATED
+                    doiIdentifierProvider.register(context, item, new TrueFilter());
+                    httpStatus = HttpStatus.CREATED;
+                } else {
+                    // This DOI exists and isn't in a state where it can be queued for registration
+                    // We'll return 302 FOUND to indicate it's here and not an error, but no creation was performed
+                    httpStatus = HttpStatus.FOUND;
+                }
             }
         } catch (IdentifierNotFoundException e) {
-            // Log?
-            return converter.toRest(item, utils.obtainProjection());
+            httpStatus = HttpStatus.NOT_FOUND;
         } catch (IdentifierException e) {
             throw new IllegalStateException("Failed to register identifier: " + identifier);
         }
+        // We didn't exactly change the item, but we did queue an identifier which is closely associated with it
+        // so we should update the last modified date here
         itemService.updateLastModified(context, item);
         itemRest = converter.toRest(item, utils.obtainProjection());
         context.complete();
         ItemResource itemResource = converter.toResource(itemRest);
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), itemResource);
+        // Return the status and item resource
+        return ControllerUtils.toResponseEntity(httpStatus, new HttpHeaders(), itemResource);
     }
 
 }
