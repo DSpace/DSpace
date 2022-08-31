@@ -1,11 +1,11 @@
-| Phases            | MM  |  MB  | MR |   JM | Total  |
-|-----------------|----:|----:|-----:|-----:|-------:|
-| ETA                  |  0  |    0 |     0 |      0 |        0 |
-| Developing      |  0  |    0 |    0 |      0 |         0 |
-| Review             |  0  |    0 |    0 |      0 |         0 |
-| Total                |   -  |   -   |  -    |   -    |         0 |
-| ETA est.             |      |       |       |         |         0 |
-| ETA cust.           |   -  |   -  |   -   |   -     |        0 |
+| Phases            | MP | MM  |  MB  | MR |   JM | Total  |
+|-----------------|----:|----:|----:|-----:|-----:|-------:|
+| ETA                  |  0  |  0  |    0 |     0 |      0 |        0 |
+| Developing      |  0  |  0  |    0 |    0 |      0 |         0 |
+| Review             |  0  |  0  |    0 |    0 |      0 |         0 |
+| Total                |   -  |   -  |   -   |  -    |   -    |         0 |
+| ETA est.             |      |      |       |       |         |         0 |
+| ETA cust.           |   -  |   -  |   -  |   -   |   -     |        0 |
 ## Problem description
 ### Reported issues
 ### Not-reported issues
