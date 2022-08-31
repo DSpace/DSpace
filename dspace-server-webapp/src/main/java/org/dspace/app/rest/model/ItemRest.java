@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         ),
         @LinkRest(
                 name = ItemRest.IDENTIFIERS,
-               method = "getIdentifiers"
+                method = "getIdentifiers"
         ),
         @LinkRest(
                 name = ItemRest.MAPPED_COLLECTIONS,

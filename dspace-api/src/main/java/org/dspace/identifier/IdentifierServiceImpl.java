@@ -182,7 +182,7 @@ public class IdentifierServiceImpl implements IdentifierService {
                     FilteredIdentifierProvider filteredService = (FilteredIdentifierProvider)service;
                     Filter filter = null;
                     for (Class<? extends Identifier> type : typeFilters.keySet()) {
-                        if (service.supports(type)) {
+                        if (filteredService.supports(type)) {
                             filter = typeFilters.get(type);
                             break;
                         }

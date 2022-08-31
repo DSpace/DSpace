@@ -81,8 +81,6 @@ public class InstallItemServiceImpl implements InstallItemService {
             } else {
                 // This will register the handle but a pending DOI won't be compatible and so won't be registered
                 identifierService.register(c, item, suppliedHandle);
-                // Continue to register just a DOI
-                identifierService.register(c, item, DOI.class, filters.get(DOI.class));
             }
         } catch (IdentifierException e) {
             throw new RuntimeException("Can't create an Identifier!", e);

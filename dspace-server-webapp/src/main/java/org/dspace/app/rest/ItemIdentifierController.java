@@ -52,7 +52,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller to register identifiers
+ * Controller to register a DOI for an item, if it has no DOI already, or a DOI in a state where it can be
+ * advanced to queue for reservation or registration.
+ *
+ * @author Kim Shepherd
  */
 @RestController
 @RequestMapping("/api/" + ItemRest.CATEGORY + "/" + ItemRest.PLURAL_NAME + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID
@@ -147,10 +150,19 @@ public class ItemIdentifierController {
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
             if (doiIdentifierProvider != null) {
-                Integer doiStatus = doiService.findDOIByDSpaceObject(context, item).getStatus();
-                // Check if this DOI has a status which makes it eligible for registration
-                if (null == doiStatus || DOIIdentifierProvider.MINTED.equals(doiStatus)
-                        || DOIIdentifierProvider.PENDING.equals(doiStatus)) {
+                DOI doi = doiService.findDOIByDSpaceObject(context, item);
+                boolean exists = false;
+                boolean pending = false;
+                if (null != doi) {
+                    exists = true;
+                    Integer doiStatus = doiService.findDOIByDSpaceObject(context, item).getStatus();
+                    // Check if this DOI has a status which makes it eligible for registration
+                    if (null == doiStatus || DOIIdentifierProvider.MINTED.equals(doiStatus)
+                            || DOIIdentifierProvider.PENDING.equals(doiStatus)) {
+                        pending = true;
+                    }
+                }
+                if (!exists || pending) {
                     // Mint identifier and return 201 CREATED
                     doiIdentifierProvider.register(context, item, new TrueFilter());
                     httpStatus = HttpStatus.CREATED;
