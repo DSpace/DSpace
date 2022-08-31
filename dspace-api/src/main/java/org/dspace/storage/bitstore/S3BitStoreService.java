@@ -49,6 +49,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * NB: you must have obtained an account with Amazon to use this store
  *
  * @author Richard Rodgers, Peter Dietz
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
+ *
  */
 public class S3BitStoreService extends BaseBitStoreService {
     protected static final String DEFAULT_BUCKET_PREFIX = "dspace-asset-";
@@ -62,6 +64,17 @@ public class S3BitStoreService extends BaseBitStoreService {
      * Checksum algorithm
      */
     private static final String CSA = "MD5";
+
+    // These settings control the way an identifier is hashed into
+    // directory and file names
+    //
+    // With digitsPerLevel 2 and directoryLevels 3, an identifier
+    // like 12345678901234567890 turns into the relative name
+    // /12/34/56/12345678901234567890.
+    //
+    // You should not change these settings if you have data in the
+    // asset store, as the BitstreamStorageManager will be unable
+    // to find your existing data.
     protected static final int digitsPerLevel = 2;
     protected static final int directoryLevels = 3;
 
@@ -275,6 +288,34 @@ public class S3BitStoreService extends BaseBitStoreService {
             throw new IOException(e);
         }
         return null;
+    }
+
+    /**
+     * Populates map values by checking key existence
+     * <br>
+     * Adds technical metadata about an asset in the asset store, like:
+     * <ul>
+     *  <li>size_bytes</li>
+     *  <li>checksum</li>
+     *  <li>checksum_algorithm</li>
+     *  <li>modified</li>
+     * </ul>
+     * 
+     * @param objectMetadata containing technical data
+     * @param attrs map with keys populated
+     * @return Map of enriched attrs with values
+     */
+    public Map about(ObjectMetadata objectMetadata, Map attrs) {
+        if (objectMetadata != null) {
+            this.putValueIfExistsKey(attrs, SIZE_BYTES, objectMetadata.getContentLength());
+
+            // put CHECKSUM_ALGORITHM if exists CHECKSUM
+            this.putValueIfExistsKey(attrs, CHECKSUM, objectMetadata.getETag());
+            this.putEntryIfExistsKey(attrs, CHECKSUM, Map.entry(CHECKSUM_ALGORITHM, CSA));
+
+            this.putValueIfExistsKey(attrs, MODIFIED, String.valueOf(objectMetadata.getLastModified().getTime()));
+        }
+        return attrs;
     }
 
     /**

@@ -8,6 +8,7 @@
 package org.dspace.storage.bitstore;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.startsWith;
@@ -224,6 +225,38 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
                 )
         );
 
+    }
+
+    @Test
+    public void givenBitStreamIdentifierLongerThanPossibleWhenIntermediatePathIsComputedThenIsSplittedAndTruncated() {
+        String path = "01234567890123456789";
+        String computedPath = this.s3BitStoreService.getIntermediatePath(path);
+        String expectedPath = "01" + File.separator + "23" + File.separator + "45" + File.separator;
+        assertThat(computedPath, equalTo(expectedPath));
+    }
+
+    @Test
+    public void givenBitStreamIdentifierShorterThanAFolderLengthWhenIntermediatePathIsComputedThenIsSingleFolder() {
+        String path = "0";
+        String computedPath = this.s3BitStoreService.getIntermediatePath(path);
+        String expectedPath = "0" + File.separator;
+        assertThat(computedPath, equalTo(expectedPath));
+    }
+
+    @Test
+    public void givenPartialBitStreamIdentifierWhenIntermediatePathIsComputedThenIsCompletlySplitted() {
+        String path = "01234";
+        String computedPath = this.s3BitStoreService.getIntermediatePath(path);
+        String expectedPath = "01" + File.separator + "23" + File.separator + "4" + File.separator;
+        assertThat(computedPath, equalTo(expectedPath));
+    }
+
+    @Test
+    public void givenMaxLengthBitStreamIdentifierWhenIntermediatePathIsComputedThenIsSplittedAllAsSubfolder() {
+        String path = "012345";
+        String computedPath = this.s3BitStoreService.getIntermediatePath(path);
+        String expectedPath = "01" + File.separator + "23" + File.separator + "45" + File.separator;
+        assertThat(computedPath, equalTo(expectedPath));
     }
 
     @Test

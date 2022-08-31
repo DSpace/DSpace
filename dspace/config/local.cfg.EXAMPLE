@@ -248,7 +248,7 @@ db.schema = public
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
 
-#---------------------------------------------------------------#
-#-----------------STORAGE CONFIGURATIONS------------------------#
-#---------------------------------------------------------------#
+# Assetstore configurations have moved to config/modules/assetstore.cfg
+# and config/spring/api/bitstore.xml.
 # Additional storage options (e.g. Amazon S3) are available in `assetstore.cfg`
+# assetstore.dir = ${dspace.dir}/assetstore

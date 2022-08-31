@@ -16,7 +16,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -198,24 +197,11 @@ public abstract class BaseBitStoreService implements BitStoreService {
         }
     }
 
-    public Map about(ObjectMetadata objectMetadata, Map attrs) {
-        if (objectMetadata != null) {
-            this.putValueIfExistsKey(attrs, SIZE_BYTES, objectMetadata.getContentLength());
-
-            // put CHECKSUM_ALGORITHM if exists CHECKSUM
-            this.putValueIfExistsKey(attrs, CHECKSUM, objectMetadata.getETag());
-            this.putEntryIfExistsKey(attrs, CHECKSUM, Map.entry(CHECKSUM_ALGORITHM, CSA));
-
-            this.putValueIfExistsKey(attrs, MODIFIED, String.valueOf(objectMetadata.getLastModified().getTime()));
-        }
-        return attrs;
-    }
-
-    private void putValueIfExistsKey(Map attrs, String key, Object value) {
+    protected void putValueIfExistsKey(Map attrs, String key, Object value) {
         this.putEntryIfExistsKey(attrs, key, Map.entry(key, value));
     }
 
-    private void putEntryIfExistsKey(Map attrs, String key, Map.Entry entry) {
+    protected void putEntryIfExistsKey(Map attrs, String key, Map.Entry entry) {
         if (attrs.containsKey(key)) {
             attrs.put(entry.getKey(), entry.getValue());
         }
