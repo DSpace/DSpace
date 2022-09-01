@@ -60,7 +60,9 @@
                     <label>Author</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
-                    <required></required>
+                    <!-- UMD customization for LIBDRUM-675 -->
+                    <required>You must enter an author for this item.</required>
+                    <!-- End customization for LIBDRUM-675 -->
                 </field>
             </row>
             <row>
