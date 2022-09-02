@@ -30,6 +30,7 @@ import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * Curator orchestrates and manages the application of a one or more curation
@@ -90,6 +91,7 @@ public class Curator {
     protected CommunityService communityService;
     protected ItemService itemService;
     protected HandleService handleService;
+    protected DSpaceRunnableHandler handler;
 
     /**
      * No-arg constructor
@@ -338,7 +340,7 @@ public class Curator {
      */
     public void report(String message) {
         if (null == reporter) {
-            log.warn("report called with no Reporter set:  {}", message);
+            logWarning("report called with no Reporter set:  {}", message);
             return;
         }
 
@@ -435,7 +437,7 @@ public class Curator {
             // Site-wide Tasks really should have an EPerson performer associated with them,
             // otherwise they are run as an "anonymous" user with limited access rights.
             if (ctx.getCurrentUser() == null && !ctx.ignoreAuthorization()) {
-                log.warn("You are running one or more Site-Wide curation tasks in ANONYMOUS USER mode," +
+                logWarning("You are running one or more Site-Wide curation tasks in ANONYMOUS USER mode," +
                              " as there is no EPerson 'performer' associated with this task. To associate an EPerson " +
                              "'performer' " +
                              " you should ensure tasks are called via the Curator.curate(Context, ID) method.");
@@ -546,7 +548,7 @@ public class Curator {
                 }
                 statusCode = task.perform(dso);
                 String id = (dso.getHandle() != null) ? dso.getHandle() : "workflow item: " + dso.getID();
-                log.info(logMessage(id));
+                logInfo(logMessage(id));
                 visit(dso);
                 return !suspend(statusCode);
             } catch (IOException ioe) {
@@ -562,7 +564,7 @@ public class Curator {
                     throw new IOException("Context or identifier is null");
                 }
                 statusCode = task.perform(c, id);
-                log.info(logMessage(id));
+                logInfo(logMessage(id));
                 visit(null);
                 return !suspend(statusCode);
             } catch (IOException ioe) {
@@ -604,5 +606,34 @@ public class Curator {
             }
             return mb.toString();
         }
+
+        protected void logInfo(String id) {
+            if (handler == null) {
+                log.info(logMessage(id));
+            } else {
+                handler.logInfo(logMessage(id));
+            }
+        }
+
+    }
+
+    protected void logWarning(String message) {
+        logWarning(message, null);
+    }
+
+    protected void logWarning(String message, Object object) {
+        if (handler == null) {
+            if (object != null) {
+                log.warn(message, object);
+            } else {
+                log.warn(message);
+            }
+        } else {
+            handler.logWarning(message);
+        }
+    }
+
+    public void setLogHandler(DSpaceRunnableHandler handler) {
+        this.handler = handler;
     }
 }

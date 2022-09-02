@@ -190,6 +190,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      */
     private Curator initCurator() throws FileNotFoundException {
         Curator curator = new Curator();
+        curator.setLogHandler(handler);
         OutputStream reporterStream;
         if (null == this.reporter) {
             reporterStream = new NullOutputStream();
