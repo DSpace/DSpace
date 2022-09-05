@@ -194,7 +194,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(PasswordNotValidException.class)
     protected void handlePasswordNotValidException(HttpServletRequest request, HttpServletResponse resp, Exception ex)
         throws IOException {
-        String message = "The new password to set is not valid";
+        String message = "password.error.robust-password";
         sendErrorResponse(request, resp, null, message, HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
