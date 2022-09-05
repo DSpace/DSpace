@@ -73,8 +73,8 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
             }
 
             String newPassword = (String) operation.getValue();
-            if (!validatePasswordService.isPasswordValid(context, newPassword)) {
-                throw new PasswordNotValidException("The new password to set is not valid");
+            if (!validatePasswordService.isPasswordValid(newPassword)) {
+                throw new PasswordNotValidException();
             }
 
             ePersonService.setPassword(eperson, newPassword);

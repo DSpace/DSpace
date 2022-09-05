@@ -7,15 +7,13 @@
  */
 package org.dspace.authorize.service;
 
-import org.dspace.core.Context;
-
 /**
  * Interface for classes that validate a given password with a specific
  * strategy.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-public interface PasswordValidator {
+public interface PasswordValidatorService {
 
     /**
      * Check if the password validator is active.
@@ -25,8 +23,7 @@ public interface PasswordValidator {
     /**
      * This method checks whether the password is valid
      * 
-     * @param context  the DSpace context
      * @param password password to validate
      */
-    public boolean isPasswordValid(Context context, String password);
+    public boolean isPasswordValid(String password);
 }

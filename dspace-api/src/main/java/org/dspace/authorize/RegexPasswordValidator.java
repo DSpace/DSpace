@@ -11,18 +11,17 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.util.regex.Pattern;
 
-import org.dspace.authorize.service.PasswordValidator;
-import org.dspace.core.Context;
+import org.dspace.authorize.service.PasswordValidatorService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link PasswordValidator} that verifies if the given
+ * Implementation of {@link PasswordValidatorService} that verifies if the given
  * passowrd matches the configured pattern.
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-public class RegexPasswordValidator implements PasswordValidator {
+public class RegexPasswordValidator implements PasswordValidatorService {
 
     @Autowired
     private ConfigurationService configurationService;
@@ -33,7 +32,7 @@ public class RegexPasswordValidator implements PasswordValidator {
     }
 
     @Override
-    public boolean isPasswordValid(Context context, String password) {
+    public boolean isPasswordValid(String password) {
         if (!isPasswordValidationEnabled()) {
             return true;
         }

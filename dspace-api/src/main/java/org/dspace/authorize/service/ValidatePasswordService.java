@@ -7,8 +7,6 @@
  */
 package org.dspace.authorize.service;
 
-import org.dspace.core.Context;
-
 /**
  * Services to use during Validating of password.
  *
@@ -20,9 +18,8 @@ public interface ValidatePasswordService {
      * This method checks whether the password is valid based on the configured
      * rules/strategies.
      * 
-     * @param context  the DSpace context
      * @param password password to validate
      */
-    public boolean isPasswordValid(Context context, String password);
+    public boolean isPasswordValid(String password);
 
 }

@@ -9,9 +9,8 @@ package org.dspace.authorize;
 
 import java.util.List;
 
-import org.dspace.authorize.service.PasswordValidator;
+import org.dspace.authorize.service.PasswordValidatorService;
 import org.dspace.authorize.service.ValidatePasswordService;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -22,13 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ValidatePasswordServiceImpl implements ValidatePasswordService {
 
     @Autowired
-    private List<PasswordValidator> validators;
+    private List<PasswordValidatorService> validators;
 
     @Override
-    public boolean isPasswordValid(Context context, String password) {
+    public boolean isPasswordValid(String password) {
         return validators.stream()
             .filter(passwordValidator -> passwordValidator.isPasswordValidationEnabled())
-            .allMatch(passwordValidator -> passwordValidator.isPasswordValid(context, password));
+            .allMatch(passwordValidator -> passwordValidator.isPasswordValid(password));
     }
 
 }
