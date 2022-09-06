@@ -6,7 +6,7 @@ import org.dspace.app.rest.RestResourceController;
 
 public class ClarinLicenseRest extends BaseObjectRest<Integer> {
 
-    public static final String NAME = "license";
+    public static final String NAME = "clarinlicense";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @JsonIgnore

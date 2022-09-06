@@ -1,7 +1,5 @@
 package org.dspace.content.clarin;
 
-import org.dspace.content.Collection;
-import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.core.ReloadableEntity;
 
 import javax.persistence.CascadeType;
@@ -23,7 +21,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "license_definition")
-public class License implements ReloadableEntity<Integer> {
+public class ClarinLicense implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="license_id")
@@ -37,7 +35,7 @@ public class License implements ReloadableEntity<Integer> {
             name = "license_label_extended_mapping",
             joinColumns = @JoinColumn(name = "license_id"),
             inverseJoinColumns = @JoinColumn(name = "label_id"))
-    Set<LicenseLabel> licenseLabels = new HashSet<>();;
+    Set<ClarinLicenseLabel> clarinLicenseLabels = new HashSet<>();;
 
 //    @Column(name = "eperson_id")
 //    private Integer epersonId;
@@ -51,7 +49,7 @@ public class License implements ReloadableEntity<Integer> {
     @Column(name = "required_info")
     private String requiredInfo = null;
 
-    public License() {
+    public ClarinLicense() {
     }
 
     public Integer getId() {
@@ -86,13 +84,13 @@ public class License implements ReloadableEntity<Integer> {
         this.requiredInfo = requiredInfo;
     }
 
-    public List<LicenseLabel> getLicenseLabels() {
-        LicenseLabel[] output = licenseLabels.toArray(new LicenseLabel[] {});
+    public List<ClarinLicenseLabel> getLicenseLabels() {
+        ClarinLicenseLabel[] output = clarinLicenseLabels.toArray(new ClarinLicenseLabel[] {});
         return Arrays.asList(output);
     }
 
-    public void setLicenseLabels(Set<LicenseLabel> licenseLabels) {
-        this.licenseLabels = licenseLabels;
+    public void setLicenseLabels(Set<ClarinLicenseLabel> clarinLicenseLabels) {
+        this.clarinLicenseLabels = clarinLicenseLabels;
     }
 
     @Override

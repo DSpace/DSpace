@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component(ClarinLicenseLabelRest.CATEGORY + "." + ClarinLicenseLabelRest.NAME)
-public class LicenseLabelRestRepository extends DSpaceRestRepository<ClarinLicenseLabelRest, Integer> {
+public class ClarinLicenseLabelRestRepository extends DSpaceRestRepository<ClarinLicenseLabelRest, Integer> {
     @Override
     public ClarinLicenseLabelRest findOne(Context context, Integer integer) {
         return null;

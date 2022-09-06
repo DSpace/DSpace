@@ -1,6 +1,6 @@
 package org.dspace.content.service.clarin;
 
-import org.dspace.content.clarin.License;
+import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.core.Context;
 
 import java.sql.SQLException;
@@ -8,14 +8,14 @@ import java.util.List;
 
 public interface LicenseService {
 
-    License create(Context context, License license) throws SQLException;
+    ClarinLicense create(Context context, ClarinLicense clarinLicense) throws SQLException;
 
-    License find(Context context, int valueId) throws SQLException;
+    ClarinLicense find(Context context, int valueId) throws SQLException;
 
-    List<License> findAll(Context context) throws SQLException;
+    List<ClarinLicense> findAll(Context context) throws SQLException;
 
-    void delete(Context context, License license) throws SQLException;
+    void delete(Context context, ClarinLicense clarinLicense) throws SQLException;
 
-    void update(Context context, License oldLicense, License newLicense) throws SQLException;
+    void update(Context context, ClarinLicense oldClarinLicense, ClarinLicense newClarinLicense) throws SQLException;
 
 }

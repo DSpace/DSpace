@@ -6,32 +6,32 @@ import org.dspace.app.rest.converter.DSpaceConverter;
 import org.dspace.app.rest.model.ClarinLicenseLabelRest;
 import org.dspace.app.rest.model.ClarinLicenseRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.clarin.License;
-import org.dspace.content.clarin.LicenseLabel;
+import org.dspace.content.clarin.ClarinLicense;
+import org.dspace.content.clarin.ClarinLicenseLabel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class LicenseConverter implements DSpaceConverter<License, ClarinLicenseRest> {
+public class ClarinLicenseConverter implements DSpaceConverter<ClarinLicense, ClarinLicenseRest> {
 
     @Autowired
     private ConverterService converter;
 
 
     @Override
-    public ClarinLicenseRest convert(License modelObject, Projection projection) {
+    public ClarinLicenseRest convert(ClarinLicense modelObject, Projection projection) {
         ClarinLicenseRest license = new ClarinLicenseRest();
         license.setProjection(projection);
         license.setId(modelObject.getId());
         license.setConfirmation(modelObject.getConfirmation());
         license.setDefinition(modelObject.getDefinition());
         license.setRequiredInfo(modelObject.getRequiredInfo());
-        List<LicenseLabel> lll = modelObject.getLicenseLabels();
-        LicenseLabel ll = null;
+        List<ClarinLicenseLabel> lll = modelObject.getLicenseLabels();
+        ClarinLicenseLabel ll = null;
         if (CollectionUtils.isEmpty(lll)) {
-            ll = new LicenseLabel();
+            ll = new ClarinLicenseLabel();
         } else {
             ll = lll.get(0);
         }
@@ -42,7 +42,7 @@ public class LicenseConverter implements DSpaceConverter<License, ClarinLicenseR
     }
 
     @Override
-    public Class<License> getModelClass() {
-        return License.class;
+    public Class<ClarinLicense> getModelClass() {
+        return ClarinLicense.class;
     }
 }

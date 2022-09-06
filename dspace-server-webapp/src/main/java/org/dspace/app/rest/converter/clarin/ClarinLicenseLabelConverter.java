@@ -4,18 +4,18 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.DSpaceConverter;
 import org.dspace.app.rest.model.ClarinLicenseLabelRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.clarin.LicenseLabel;
+import org.dspace.content.clarin.ClarinLicenseLabel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LicenseLabelConverter implements DSpaceConverter<LicenseLabel, ClarinLicenseLabelRest> {
+public class ClarinLicenseLabelConverter implements DSpaceConverter<ClarinLicenseLabel, ClarinLicenseLabelRest> {
 
     @Autowired
     private ConverterService converter;
 
     @Override
-    public ClarinLicenseLabelRest convert(LicenseLabel modelObject, Projection projection) {
+    public ClarinLicenseLabelRest convert(ClarinLicenseLabel modelObject, Projection projection) {
         ClarinLicenseLabelRest licenseLabel = new ClarinLicenseLabelRest();
         licenseLabel.setProjection(projection);
         licenseLabel.setId(modelObject.getId());
@@ -26,7 +26,7 @@ public class LicenseLabelConverter implements DSpaceConverter<LicenseLabel, Clar
     }
 
     @Override
-    public Class<LicenseLabel> getModelClass() {
-        return LicenseLabel.class;
+    public Class<ClarinLicenseLabel> getModelClass() {
+        return ClarinLicenseLabel.class;
     }
 }

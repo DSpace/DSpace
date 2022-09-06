@@ -3,15 +3,15 @@ package org.dspace.app.rest.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.content.clarin.License;
+import org.dspace.content.clarin.ClarinLicense;
 
 public class ClarinLicenseLabelRest extends BaseObjectRest<Integer> {
 
-    public static final String NAME = "licenselabel";
+    public static final String NAME = "clarinlicenselabel";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @JsonIgnore
-    private License license;
+    private ClarinLicense clarinLicense;
     private String definition;
     private String title;
     private boolean isExtended;
@@ -19,12 +19,12 @@ public class ClarinLicenseLabelRest extends BaseObjectRest<Integer> {
     public ClarinLicenseLabelRest() {
     }
 
-    public License getLicense() {
-        return license;
+    public ClarinLicense getLicense() {
+        return clarinLicense;
     }
 
-    public void setLicense(License license) {
-        this.license = license;
+    public void setLicense(ClarinLicense clarinLicense) {
+        this.clarinLicense = clarinLicense;
     }
 
     public String getDefinition() {

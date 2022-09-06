@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "license_label")
-public class LicenseLabel {
+public class ClarinLicenseLabel {
 
     @Id
     @Column(name="label_id")
@@ -31,10 +31,10 @@ public class LicenseLabel {
     @Column(name = "is_extended")
     private boolean isExtended = false;
 
-    @ManyToMany(mappedBy = "licenseLabels")
-    List<License> licens = new ArrayList<>();
+    @ManyToMany(mappedBy = "clarinLicenseLabels")
+    List<ClarinLicense> licens = new ArrayList<>();
 
-    public LicenseLabel() {
+    public ClarinLicenseLabel() {
     }
 
     public Integer getId() {
@@ -69,11 +69,11 @@ public class LicenseLabel {
         isExtended = extended;
     }
 
-    public List<License> getLicenses() {
+    public List<ClarinLicense> getLicenses() {
         return licens;
     }
 
-    public void setLicenses(List<License> licens) {
+    public void setLicenses(List<ClarinLicense> licens) {
         this.licens = licens;
     }
 }
