@@ -325,7 +325,7 @@
 					<input-type>date</input-type>
 					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. No debe confundirse con la fecha de entrega o defensa de una tesis, que debe cargarse en el campo Fecha de Presentación. Los valores posibles para este campo son día/mes, mes/año o día/mes/año.</hint>
 					<visibility>submit</visibility>
-					<type-bind>!Objeto Fisico,Objeto de conferencia,Objeto de aprendizaje,Conjunto de datos</type-bind>
+					<type-bind>!Objeto Fisico,Objeto de conferencia,Conjunto de datos</type-bind>
 				</field>
 
 				<!-- Fecha de publicación (solo en el workflow, para todos los tipos de documento) -->
