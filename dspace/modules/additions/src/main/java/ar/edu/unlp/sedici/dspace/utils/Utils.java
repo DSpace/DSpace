@@ -44,7 +44,7 @@ public class Utils {
 			log.error("No se pudo instanciar el Context", e);
 			throw new RuntimeException(e);
 		}
-		String myQuery = "SELECT count(*) / 100 * 100 as total FROM item WHERE in_archive='1' and withdrawn='0'";
+		String myQuery = "SELECT count(*) as total FROM item WHERE in_archive = '1' and withdrawn = '0'";
 
 		TableRow row = DatabaseManager.querySingle(context, myQuery);
 

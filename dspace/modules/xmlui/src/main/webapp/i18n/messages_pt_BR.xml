@@ -2683,7 +2683,7 @@
     <message key="xmlui.discovery.ver_filtros">Ver filtros</message>
 	
 	<message key="sedici.home.buscar_material.title">Material de pesquisa</message>
-	<message key="sedici.home.buscar_material.info_pre">Pesquise entre mais de </message>
+	<message key="sedici.home.buscar_material.info_pre">Pesquise entre os </message>
 	<message key="sedici.home.buscar_material.info_post"> recursos disponíveis no repositório</message>
 	<message key="sedici.home.subir_material.title">Upload de material</message>
 	<message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, para mejorar notoriamente su visibilidad e impacto</message>

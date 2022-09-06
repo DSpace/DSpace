@@ -3127,7 +3127,7 @@ Cuando se usa QDC para los elementos de DSpace se recomienda el uso de crosswalk
 <message key="sedici.EPerson.string-too-long">El campo {0} excedía el máximo de {1} caracteres y fue cortado</message>
 
 <message key="sedici.home.buscar_material.title">Buscar material</message>
-<message key="sedici.home.buscar_material.info_pre">Busque entre los mas de </message>
+<message key="sedici.home.buscar_material.info_pre">Busque entre los </message>
 <message key="sedici.home.buscar_material.info_post"> recursos disponibles en el repositorio</message>
 <message key="sedici.home.subir_material.title">Subir material</message>
 <message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, para mejorar notoriamente su visibilidad e impacto</message>
