@@ -117,11 +117,11 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             boolean isIIIFItem = IIIFSharedUtils.isIIIFItem(item);
             if (isIIIFItem) {
                 if (processItemBundles(context, item)) {
+                    context.uncacheEntity(item);
                     ++processed;
                 }
             }
         }
-        context.uncacheEntity(item);
     }
 
     /**
@@ -138,6 +138,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (Bitstream bit : bitstreams) {
                 done |= processBitstream(context, bit);
+                context.uncacheEntity(bit);
             }
         }
         if (done) {
@@ -199,7 +200,6 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 }
             }
         }
-        context.uncacheEntity(bitstream);
         return processed;
     }
 
