@@ -378,6 +378,13 @@
 						<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure'] "/>
 						<xsl:with-param name="type" select="'date'"/>
 					</xsl:call-template>
+					<xsl:if test="dim:field[@element='date' and @qualifier='issued']">
+						<xsl:call-template name="render-normal-field">
+							<xsl:with-param name="name" select="'date-issued'"/>
+							<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
+							<xsl:with-param name="type" select="'date'"/>
+						</xsl:call-template>
+					</xsl:if>
 				</xsl:when>
 				<xsl:when test="(dim:field[@element='date' and @qualifier='issued']!=dim:field[@element='date' and @qualifier='accessioned'])">
 					<!-- date.exposure row -->
@@ -422,6 +429,13 @@
 						<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure'] "/>
 						<xsl:with-param name="type" select="'date'"/>
 					</xsl:call-template>
+					<xsl:if test="dim:field[@element='date' and @qualifier='issued']">
+						<xsl:call-template name="render-normal-field">
+							<xsl:with-param name="name" select="'date-issued'"/>
+							<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued'] "/>
+							<xsl:with-param name="type" select="'date'"/>
+						</xsl:call-template>
+					</xsl:if>
 				</xsl:when>
 				<xsl:when test="(dim:field[@element='date' and @qualifier='issued']!=dim:field[@element='date' and @qualifier='accessioned'])">
 					<!-- date.exposure row -->
