@@ -29,6 +29,9 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+/**
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public class CaptchaServiceImpl implements CaptchaService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CaptchaServiceImpl.class);
@@ -119,4 +122,5 @@ public class CaptchaServiceImpl implements CaptchaService {
             }
         }
     }
+
 }
