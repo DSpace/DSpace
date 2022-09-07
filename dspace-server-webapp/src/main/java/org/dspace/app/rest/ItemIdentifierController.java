@@ -171,6 +171,8 @@ public class ItemIdentifierController {
                     // We'll return 302 FOUND to indicate it's here and not an error, but no creation was performed
                     httpStatus = HttpStatus.FOUND;
                 }
+            } else {
+                throw new IllegalStateException("No DOI provider is configured");
             }
         } catch (IdentifierNotFoundException e) {
             httpStatus = HttpStatus.NOT_FOUND;
