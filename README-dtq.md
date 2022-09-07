@@ -134,6 +134,8 @@ run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?q
   # Example:
   mvn install -DskipIntegrationTests=false -Dit.test=org.dspace.content.ItemIT.java#dtqExampleTest -Dtest.argLine=-Xmx1024m -DfailsafeJacoco=-XX:MaxPermSize=256m
   # Debug: -Dmaven.failsafe.debug
+  # Skip checking of licensing headers: -Dlicense.skip
+  # Skip checkstyle: -Dcheckstyle.skip
 
   # Run one test method in a specific test class
   mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false

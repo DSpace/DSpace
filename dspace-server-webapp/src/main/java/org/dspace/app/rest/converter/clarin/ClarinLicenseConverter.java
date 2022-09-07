@@ -3,6 +3,8 @@ package org.dspace.app.rest.converter.clarin;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.DSpaceConverter;
+import org.dspace.app.rest.converter.MetadataValueDTOConverter;
+import org.dspace.app.rest.model.ClarinLicenseLabelList;
 import org.dspace.app.rest.model.ClarinLicenseLabelRest;
 import org.dspace.app.rest.model.ClarinLicenseRest;
 import org.dspace.app.rest.projection.Projection;
@@ -19,6 +21,9 @@ public class ClarinLicenseConverter implements DSpaceConverter<ClarinLicense, Cl
     @Autowired
     private ConverterService converter;
 
+    @Autowired
+    private ClarinLicenseLabelListConverter clarinLicenseLabelListConverter;
+
 
     @Override
     public ClarinLicenseRest convert(ClarinLicense modelObject, Projection projection) {
@@ -28,16 +33,17 @@ public class ClarinLicenseConverter implements DSpaceConverter<ClarinLicense, Cl
         license.setConfirmation(modelObject.getConfirmation());
         license.setDefinition(modelObject.getDefinition());
         license.setRequiredInfo(modelObject.getRequiredInfo());
-        List<ClarinLicenseLabel> lll = modelObject.getLicenseLabels();
-        ClarinLicenseLabel ll = null;
-        if (CollectionUtils.isEmpty(lll)) {
-            ll = new ClarinLicenseLabel();
-        } else {
-            ll = lll.get(0);
-        }
-
-        ClarinLicenseLabelRest llr = converter.toRest(ll, projection);
-        license.setLicenseLabel(llr);
+//        List<ClarinLicenseLabel> lll = modelObject.getLicenseLabels();
+//        ClarinLicenseLabel ll = null;
+//        if (CollectionUtils.isEmpty(lll)) {
+//            ll = new ClarinLicenseLabel();
+//        } else {
+//            ll = lll.get(0);
+//        }
+//
+//        ClarinLicenseLabelRest llr = converter.toRest(modelObject.getLicenseLabels(), projection);
+        ClarinLicenseLabelList clarinLicenseLabels = new ClarinLicenseLabelList(modelObject.getLicenseLabels());
+        license.setLicenseLabel(converter.toRest(clarinLicenseLabels, projection));
         return license;
     }
 

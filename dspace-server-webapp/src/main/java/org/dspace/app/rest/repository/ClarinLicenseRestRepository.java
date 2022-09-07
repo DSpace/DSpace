@@ -2,7 +2,7 @@ package org.dspace.app.rest.repository;
 
 import org.dspace.app.rest.model.ClarinLicenseRest;
 import org.dspace.content.clarin.ClarinLicense;
-import org.dspace.content.service.clarin.LicenseService;
+import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,14 +18,14 @@ import java.util.Objects;
 public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLicenseRest, Integer> {
 
     @Autowired
-    LicenseService licenseService;
+    ClarinLicenseService clarinLicenseService;
 
     @Override
     @PreAuthorize("permitAll()")
     public ClarinLicenseRest findOne(Context context, Integer idValue) {
         ClarinLicense clarinLicense = null;
         try {
-            clarinLicense = licenseService.find(context, idValue);
+            clarinLicense = clarinLicenseService.find(context, idValue);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -39,7 +39,7 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
     @Override
     public Page<ClarinLicenseRest> findAll(Context context, Pageable pageable) {
         try {
-            List<ClarinLicense> clarinLicenseList = licenseService.findAll(context);
+            List<ClarinLicense> clarinLicenseList = clarinLicenseService.findAll(context);
             return converter.toRestPage(clarinLicenseList, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

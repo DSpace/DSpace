@@ -17,12 +17,12 @@ ALTER TABLE handle ADD url varchar(2048);
 
 CREATE TABLE license_definition (
     license_id integer NOT NULL,
-    name varchar(256) NOT NULL,
-    definition varchar(256) NOT NULL,
-    eperson_id integer NOT NULL,
-    label_id integer NOT NULL,
-    created_on timestamp NOT NULL,
-    confirmation integer DEFAULT 0 NOT NULL,
+    name varchar(256),
+    definition varchar(256),
+    eperson_id integer,
+    label_id integer,
+    created_on timestamp,
+    confirmation integer DEFAULT 0,
     required_info varchar(64)
 );
 
@@ -53,7 +53,7 @@ ALTER SEQUENCE license_definition_license_id_seq OWNED BY license_definition.lic
 
 CREATE TABLE license_label (
     label_id integer NOT NULL,
-    label varchar(5) NOT NULL,
+    label varchar(5),
     title varchar(180),
     is_extended boolean DEFAULT false
 );
@@ -67,8 +67,8 @@ ALTER TABLE public.license_label OWNER TO dspace;
 
 CREATE TABLE license_label_extended_mapping (
     mapping_id integer NOT NULL,
-    license_id integer NOT NULL,
-    label_id integer NOT NULL
+    license_id integer,
+    label_id integer
 );
 
 ALTER TABLE public.license_label_extended_mapping OWNER TO dspace;
@@ -133,9 +133,9 @@ SELECT pg_catalog.setval('license_label_label_id_seq', 19, true);
 
 CREATE TABLE license_resource_mapping (
     mapping_id integer NOT NULL,
-    bitstream_id integer NOT NULL,
-    license_id integer NOT NULL,
-    active boolean DEFAULT true NOT NULL
+    bitstream_id integer,
+    license_id integer,
+    active boolean DEFAULT true
 );
 
 
@@ -175,9 +175,9 @@ SELECT pg_catalog.setval('license_resource_mapping_mapping_id_seq', 1382, true);
 
 CREATE TABLE license_resource_user_allowance (
     transaction_id integer NOT NULL,
-    eperson_id integer NOT NULL,
-    mapping_id integer NOT NULL,
-    created_on timestamp NOT NULL,
+    eperson_id integer,
+    mapping_id integer,
+    created_on timestamp,
     token char(32)
 );
 

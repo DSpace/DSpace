@@ -74,7 +74,7 @@
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
     <bean class="org.dspace.content.clarin.ClarinLicenseServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinLicenseLabelServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinClarinLicenseLabelServiceImpl"/>
     <bean class="org.dspace.core.NewsServiceImpl">
         <property name="acceptableFilenames">
             <list>

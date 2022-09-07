@@ -1,5 +1,7 @@
 package org.dspace.content.clarin;
 
+import org.dspace.core.ReloadableEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "license_label")
-public class ClarinLicenseLabel {
+public class ClarinLicenseLabel implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="label_id")
@@ -75,5 +77,10 @@ public class ClarinLicenseLabel {
 
     public void setLicenses(List<ClarinLicense> licens) {
         this.licens = licens;
+    }
+
+    @Override
+    public Integer getID() {
+        return id;
     }
 }
