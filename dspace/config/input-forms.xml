@@ -674,7 +674,7 @@
 					<dc-qualifier>ispartof</dc-qualifier>
 					<label>Titulo de la serie o colección</label>
 					<input-type>onebox</input-type>
-					<hint>Titulo y número de la serie o colección en la que el libro fué publicado. Agregar prefijo "Serie: " o "Colección: " según corresponda</hint>
+					<hint>Titulo y número de la serie o colección en la que el libro fué publicado.</hint>
 					<type-bind>Libro</type-bind>
 				</field>
 

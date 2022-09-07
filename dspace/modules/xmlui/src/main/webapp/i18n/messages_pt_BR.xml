@@ -2195,6 +2195,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-book-title">Pertence a um livro</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Evento</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOfSeries">Série</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-ispartof">Série/Coleção</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Revista</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-related-with">Documentos relacionados</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-review-of">E revisão de</message>

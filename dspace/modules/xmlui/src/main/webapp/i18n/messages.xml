@@ -2680,6 +2680,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-reviewed-by">Is reviewed by</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-related-with">Related documents</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOfSeries">Series</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-ispartof">Series/Collection</message>
   
 <!-- Choice authority -->
 <message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Check the value</message>

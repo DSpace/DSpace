@@ -2341,7 +2341,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-book-title">Pertenece al libro</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-related-with">Documentos relacionados</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOfSeries">Serie</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-relation-ispartof">Es parte de</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-ispartof">Serie/Colección</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-record-source">Los datos de este registro se obtuvieron desde </message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subtype">Tipo de documento</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-preview">Vista previa</message>
