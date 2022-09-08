@@ -25,7 +25,7 @@ public class ClarinLicenseLabel implements ReloadableEntity<Integer> {
     private Integer id;
 
     @Column(name = "label")
-    private String definition = null;
+    private String label = null;
 
     @Column(name = "title")
     private String title = null;
@@ -33,8 +33,11 @@ public class ClarinLicenseLabel implements ReloadableEntity<Integer> {
     @Column(name = "is_extended")
     private boolean isExtended = false;
 
+    @Column(name = "icon")
+    private byte[] icon = null;
+
     @ManyToMany(mappedBy = "clarinLicenseLabels")
-    List<ClarinLicense> licens = new ArrayList<>();
+    List<ClarinLicense> licenses = new ArrayList<>();
 
     public ClarinLicenseLabel() {
     }
@@ -47,12 +50,12 @@ public class ClarinLicenseLabel implements ReloadableEntity<Integer> {
         this.id = id;
     }
 
-    public String getDefinition() {
-        return definition;
+    public String getLabel() {
+        return label;
     }
 
-    public void setDefinition(String definition) {
-        this.definition = definition;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getTitle() {
@@ -72,11 +75,19 @@ public class ClarinLicenseLabel implements ReloadableEntity<Integer> {
     }
 
     public List<ClarinLicense> getLicenses() {
-        return licens;
+        return licenses;
     }
 
-    public void setLicenses(List<ClarinLicense> licens) {
-        this.licens = licens;
+    public void setLicenses(List<ClarinLicense> licenses) {
+        this.licenses = licenses;
+    }
+
+    public byte[] getIcon() {
+        return icon;
+    }
+
+    public void setIcon(byte[] icon) {
+        this.icon = icon;
     }
 
     @Override

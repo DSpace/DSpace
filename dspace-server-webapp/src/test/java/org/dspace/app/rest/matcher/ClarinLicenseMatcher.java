@@ -23,9 +23,7 @@ public class ClarinLicenseMatcher {
                 hasJsonPath("$.type", is(ClarinLicenseRest.NAME)),
                 hasJsonPath("$.confirmation", is(clarinLicense.getConfirmation())),
                 hasJsonPath("$.requiredInfo", is(clarinLicense.getRequiredInfo())),
-                hasJsonPath("$._embedded.clarinLicenseLabels", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._links.clarinLicenseLabels.href",
-                        Matchers.containsString("/api/core/clarinlicenses")),
+                hasJsonPath("$.clarinLicenseLabels", Matchers.not(Matchers.empty())),
                 hasJsonPath("$._links.self.href",
                         Matchers.containsString("/api/core/clarinlicenses/" + clarinLicense.getID()))
         );

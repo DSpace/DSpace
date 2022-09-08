@@ -33,17 +33,7 @@ public class ClarinLicenseConverter implements DSpaceConverter<ClarinLicense, Cl
         license.setConfirmation(modelObject.getConfirmation());
         license.setDefinition(modelObject.getDefinition());
         license.setRequiredInfo(modelObject.getRequiredInfo());
-//        List<ClarinLicenseLabel> lll = modelObject.getLicenseLabels();
-//        ClarinLicenseLabel ll = null;
-//        if (CollectionUtils.isEmpty(lll)) {
-//            ll = new ClarinLicenseLabel();
-//        } else {
-//            ll = lll.get(0);
-//        }
-//
-//        ClarinLicenseLabelRest llr = converter.toRest(modelObject.getLicenseLabels(), projection);
-        ClarinLicenseLabelList clarinLicenseLabels = new ClarinLicenseLabelList(modelObject.getLicenseLabels());
-        license.setLicenseLabel(converter.toRest(clarinLicenseLabels, projection));
+        license.setClarinLicenseLabels(modelObject.getLicenseLabels());
         return license;
     }
 

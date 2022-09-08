@@ -20,8 +20,9 @@ public class ClarinLicenseLabelConverter implements DSpaceConverter<ClarinLicens
         licenseLabel.setProjection(projection);
         licenseLabel.setId(modelObject.getId());
         licenseLabel.setTitle(modelObject.getTitle());
-        licenseLabel.setDefinition(modelObject.getDefinition());
+        licenseLabel.setLabel(modelObject.getLabel());
         licenseLabel.setExtended(modelObject.isExtended());
+        licenseLabel.setIcon(modelObject.getIcon());
         return licenseLabel;
     }
 

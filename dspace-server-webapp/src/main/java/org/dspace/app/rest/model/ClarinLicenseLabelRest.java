@@ -8,13 +8,15 @@ import org.dspace.content.clarin.ClarinLicense;
 public class ClarinLicenseLabelRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "clarinlicenselabel";
+    public static final String NAME_PRETTY = "clarinLicenseLabels";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @JsonIgnore
     private ClarinLicense clarinLicense;
-    private String definition;
+    private String label;
     private String title;
     private boolean isExtended;
+    private byte[] icon;
 
     public ClarinLicenseLabelRest() {
     }
@@ -27,12 +29,12 @@ public class ClarinLicenseLabelRest extends BaseObjectRest<Integer> {
         this.clarinLicense = clarinLicense;
     }
 
-    public String getDefinition() {
-        return definition;
+    public String getLabel() {
+        return label;
     }
 
-    public void setDefinition(String definition) {
-        this.definition = definition;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getTitle() {
@@ -49,6 +51,14 @@ public class ClarinLicenseLabelRest extends BaseObjectRest<Integer> {
 
     public void setExtended(boolean extended) {
         isExtended = extended;
+    }
+
+    public byte[] getIcon() {
+        return icon;
+    }
+
+    public void setIcon(byte[] icon) {
+        this.icon = icon;
     }
 
     @Override
