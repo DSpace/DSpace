@@ -189,8 +189,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      * @throws FileNotFoundException If file of command line variable -r reporter is not found
      */
     private Curator initCurator() throws FileNotFoundException {
-        Curator curator = new Curator();
-        curator.setLogHandler(handler);
+        Curator curator = new Curator(handler);
         OutputStream reporterStream;
         if (null == this.reporter) {
             reporterStream = new NullOutputStream();

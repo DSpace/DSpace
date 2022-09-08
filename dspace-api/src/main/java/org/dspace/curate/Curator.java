@@ -9,6 +9,7 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,6 +93,16 @@ public class Curator {
     protected ItemService itemService;
     protected HandleService handleService;
     protected DSpaceRunnableHandler handler;
+
+    /**
+     * constructor that uses an handler for logging
+     * 
+     * @param handler {@code DSpaceRunnableHandler} used to logs infos
+     */
+    public Curator(DSpaceRunnableHandler handler) {
+        this();
+        this.handler = handler;
+    }
 
     /**
      * No-arg constructor
@@ -607,11 +618,11 @@ public class Curator {
             return mb.toString();
         }
 
-        protected void logInfo(String id) {
+        protected void logInfo(String message) {
             if (handler == null) {
-                log.info(logMessage(id));
+                log.info(message);
             } else {
-                handler.logInfo(logMessage(id));
+                handler.logInfo(message);
             }
         }
 
@@ -629,11 +640,11 @@ public class Curator {
                 log.warn(message);
             }
         } else {
-            handler.logWarning(message);
+            if (object != null) {
+                handler.logWarning(MessageFormat.format(message, object));
+            } else {
+                handler.logWarning(message);
+            }
         }
-    }
-
-    public void setLogHandler(DSpaceRunnableHandler handler) {
-        this.handler = handler;
     }
 }
