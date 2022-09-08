@@ -64,12 +64,6 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         "<!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >";
     private List<File> tempFiles = new ArrayList<>();
 
-    /**
-     * We need to force this, because some dependency elsewhere interferes.
-     */
-    private static final String TRANSFORMER_FACTORY_CLASS
-        = "org.apache.xalan.processor.TransformerFactoryImpl";
-
     @Override
     public void internalRun() throws TransformerException {
         if (help) {
@@ -101,8 +95,7 @@ public class SubmissionFormsMigration extends DSpaceRunnable<SubmissionFormsMigr
         Result result = new StreamResult(new File(outputPath));
 
         // Create an instance of TransformerFactory
-        TransformerFactory transformerFactory = TransformerFactory.newInstance(
-            TRANSFORMER_FACTORY_CLASS, null);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
         Transformer trans;
         try {

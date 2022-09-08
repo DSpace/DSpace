@@ -56,7 +56,9 @@ public interface RelationshipMetadataService {
      * This method will retrieve the EntityType String from an item
      * @param item  The Item for which the entityType String will be returned
      * @return      A String value indicating the entityType
+     * @deprecated use {@link org.dspace.content.service.ItemService#getEntityTypeLabel(Item)} instead.
      */
+    @Deprecated
     public String getEntityTypeStringFromMetadata(Item item);
 
 }

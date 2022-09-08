@@ -682,7 +682,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         String schema = "dc";
         String element = "contributor";
-        String qualifier = "author";
+        String qualifier = "editor";
         String lang = Item.ANY;
         String values = "value0";
         String authorities = "auth0";

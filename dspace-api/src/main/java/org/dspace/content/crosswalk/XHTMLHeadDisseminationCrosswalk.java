@@ -90,17 +90,17 @@ public class XHTMLHeadDisseminationCrosswalk
      * Maps DSpace metadata field to name to use in XHTML head element, e.g.
      * dc.creator or dc.description.abstract
      */
-    private Map<String, String> names;
+    private final Map<String, String> names;
 
     /**
      * Maps DSpace metadata field to scheme for that field, if any
      */
-    private Map<String, String> schemes;
+    private final Map<String, String> schemes;
 
     /**
      * Schemas to add -- maps schema.NAME to schema URL
      */
-    private Map<String, String> schemaURLs;
+    private final Map<String, String> schemaURLs;
 
     public XHTMLHeadDisseminationCrosswalk() throws IOException {
         names = new HashMap<>();
@@ -109,17 +109,9 @@ public class XHTMLHeadDisseminationCrosswalk
 
         // Read in configuration
         Properties crosswalkProps = new Properties();
-        FileInputStream fis = new FileInputStream(config);
-        try {
+
+        try (FileInputStream fis = new FileInputStream(config);) {
             crosswalkProps.load(fis);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
         }
 
         Enumeration e = crosswalkProps.keys();

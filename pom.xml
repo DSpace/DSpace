@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.3-SNAPSHOT</version>
+    <version>7.4-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -19,18 +19,19 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.3.18</spring.version>
-        <spring-boot.version>2.6.6</spring-boot.version>
-        <spring-security.version>5.6.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>5.3.20</spring.version>
+        <spring-boot.version>2.6.8</spring-boot.version>
+        <spring-security.version>5.6.5</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.5.Final</hibernate.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.3.3</postgresql.driver.version>
+        <postgresql.driver.version>42.4.1</postgresql.driver.version>
         <solr.client.version>8.11.1</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
-        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.12.3</jackson.version>
+        <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
+        <jackson.version>2.12.6</jackson.version>
+        <jackson-databind.version>2.12.6.1</jackson-databind.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
@@ -157,6 +158,7 @@
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            <arg>-Xpkginfo:always</arg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>
@@ -701,7 +703,7 @@
                                         <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
                                         <!-- JDOM uses this license, but it's essentially just Apache -->
                                         <licenseMerge>Apache Software License, Version 2.0|Similar to Apache License but with the acknowledgment clause removed</licenseMerge>
-                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License</licenseMerge>
+                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License|The BSD 3-Clause License (BSD3)|BSD License 3</licenseMerge>
                                         <!-- DSpace uses a BSD License -->
                                         <licenseMerge>BSD License|DSpace BSD License|DSpace Sourcecode License</licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
@@ -722,7 +724,7 @@
                                         <!-- JBoss Transaction API claims this license, but it is dual licensed with CDDL being one: https://github.com/jboss/jboss-transaction-api_spec -->
                                         <licenseMerge>Common Development and Distribution License (CDDL)|GNU General Public License, Version 2 with the Classpath Exception</licenseMerge>
                                         <licenseMerge>Eclipse Distribution License, Version 1.0|Eclipse Distribution License (EDL), Version 1.0|Eclipse Distribution License - v 1.0|Eclipse Distribution License v. 1.0|EDL 1.0</licenseMerge>
-                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License v1.0|Eclipse Public License, Version 1.0|EPL 2.0</licenseMerge>
+                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License v1.0|Eclipse Public License, Version 1.0|EPL 1.0|EPL 2.0|Eclipse Public License - v 2.0</licenseMerge>
                                         <!-- JUnit claims this license but is actually Eclipse Public License: http://junit.org/license.html -->
                                         <licenseMerge>Eclipse Public License|Common Public License Version 1.0</licenseMerge>
                                         <!-- Jersey is dual licensed as EPL but lists its main license as GPL: https://github.com/eclipse-ee4j/jersey#licensing-and-governance -->
@@ -737,9 +739,9 @@
                                         <licenseMerge>MIT License|(MIT-style) netCDF C library license</licenseMerge>
                                         <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version 2.0|Mozilla Public License, Version 2.0</licenseMerge>
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
-                                        <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0</licenseMerge>
+                                        <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0|MPL 2.0</licenseMerge>
                                         <!-- "concurrent.concurrent" claims this license, but is actually Public Domain: http://mvnrepository.com/artifact/concurrent/concurrent/ -->
-                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems</licenseMerge>
+                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems|Public Domain, per Creative Commons CC0</licenseMerge>
                                         <!-- WTFPL is essentially Public Domain: http://www.wtfpl.net/ ;) -->
                                         <licenseMerge>Public Domain|WTFPL</licenseMerge>
                                     </licenseMerges>
@@ -870,14 +872,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.3-SNAPSHOT</version>
+                       <version>7.4-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.3-SNAPSHOT</version>
+                       <version>7.4-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1028,69 +1030,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.3-SNAPSHOT</version>
+                <version>7.4-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1357,6 +1359,13 @@
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.0</version>
+		<exclusions>
+                    <!-- A later version is brought in by google-oauth-client -->
+                    <exclusion>
+                        <groupId>com.google.code.gson</groupId>
+                        <artifactId>gson</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Required to run Handle Server -->
             <dependency>
@@ -1423,7 +1432,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.7</version>
+                <version>2.8.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1443,7 +1452,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.7</version>
+                <version>3.12.0</version>
             </dependency>
             <!-- NOTE: We don't use commons-logging directly, but many dependencies rely on it.
                  So, we specify the version to use to avoid dependency convergence issues. -->
@@ -1542,16 +1551,13 @@
                 <artifactId>fontbox</artifactId>
                 <version>${pdfbox-version}</version>
             </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>2.7.0</version>
-            </dependency>
+            <!-- Tika and Jena disagree on version of Xerces to use. Select latest -->
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
                 <version>2.12.2</version>
             </dependency>
+            <!-- SWORDv1 and SWORDv2 modules both pull in various versions of xml-apis. Select latest version -->
             <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
@@ -1569,10 +1575,11 @@
                 <artifactId>ojdbc6</artifactId>
                 <version>11.2.0.4.0</version>
             </dependency>
+            <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>oclc-harvester2</artifactId>
-                <version>0.1.12</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -1648,12 +1655,6 @@
                 <version>2.1.210</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.8.6</version>
-                <scope>compile</scope>
-            </dependency>
             <!-- Google Analytics -->
             <dependency>
                 <groupId>com.google.apis</groupId>
@@ -1688,7 +1689,7 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.32.1</version>
+                <version>1.33.3</version>
             </dependency>
 
             <!-- Findbugs annotations -->
@@ -1724,7 +1725,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson-databind.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
