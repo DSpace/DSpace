@@ -13,6 +13,7 @@ import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -1199,6 +1200,960 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // Verify 404 when trying to delete a non-existing bitstream
         getClient(token).perform(delete("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteListOneBitstream() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream")
+                .withDescription("Description")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 after delete
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteListOneOfMultipleBitstreams() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete bitstream1
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 after delete for bitstream1
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isNotFound());
+
+        // check that bitstream2 still exists
+        getClient().perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+
+        // check that bitstream3 still exists
+        getClient().perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+        ;
+    }
+
+    @Test
+    public void deleteListAllBitstreams() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete all bitstreams
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 after delete for bitstream1
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isNotFound());
+
+        // Verify 404 after delete for bitstream2
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isNotFound());
+
+        // Verify 404 after delete for bitstream3
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteListForbidden() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Delete using an unauthorized user
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().isForbidden());
+
+        // Verify the bitstreams are still here
+        getClient().perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                   .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                   .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                   .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteListUnauthorized() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // Delete as anonymous
+        getClient().perform(delete("/api/core/bitstreams")
+                                .contentType(TEXT_URI_LIST)
+                                .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                             + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                             + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream3.getID()))
+                   .andExpect(status().isUnauthorized());
+
+        // Verify the bitstreams are still here
+        getClient().perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                   .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                   .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                   .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteListEmpty() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete with empty list throws 404
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content(""))
+                        .andExpect(status().isNotFound());
+
+        // Verify the bitstreams are still here
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteListNotBitstream() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete with list containing non-Bitstream throws 422
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream3.getID()
+                                                  + " \n http://localhost:8080/server/api/core/items/" + publicItem1.getID()))
+                        .andExpect(status().is(422));
+
+        // Verify the bitstreams are still here
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteListDifferentItems() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. Two public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 1 bitstream to each item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem2, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete with list containing Bitstreams from different items throws 422
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().is(422));
+
+        // Verify the bitstreams are still here
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void deleteListLogo() throws Exception {
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with a logo
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                                          .build();
+
+        // 2. A collection with a logo
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
+                                          .withLogo("logo_collection").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // trying to DELETE parentCommunity logo and collection logo should work
+        // we have to delete them separately otherwise it will throw 422 as they belong to different items
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
+                        .andExpect(status().is(204));
+
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + col.getLogo().getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 after delete for parentCommunity logo
+        getClient(token).perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
+                        .andExpect(status().isNotFound());
+
+        // Verify 404 after delete for collection logo
+        getClient(token).perform(get("/api/core/bitstreams/" + col.getLogo().getID()))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteListMissing() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb"))
+                        .andExpect(status().isNotFound());
+
+        // Verify 404 after failed delete
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb"))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteListOneMissing() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete all bitstreams and a missing bitstream returns 404
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream3.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb"))
+                        .andExpect(status().isNotFound());
+
+        // Verify the bitstreams are still here
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteListOneMissingDifferentItems() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. Two public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 1 bitstream to each item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem2, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete all bitstreams and a missing bitstream returns 404
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb"))
+                        .andExpect(status().isNotFound());
+
+        // Verify the bitstreams are still here
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().isOk());
+
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream2.getID()))
+                        .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void deleteListDeleted() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream")
+                .withDescription("Description")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 when trying to delete a non-existing, already deleted, bitstream
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream.getID()))
+                        .andExpect(status().is(422));
+    }
+
+    @Test
+    public void deleteListOneDeleted() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        // Add 3 bitstreams to the item
+        String bitstreamContent1 = "ThisIsSomeDummyText1";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent1, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream1")
+                .withDescription("Description1")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream2")
+                .withDescription("Description2")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        String bitstreamContent3 = "ThisIsSomeDummyText3";
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent3, CharEncoding.UTF_8)) {
+            bitstream3 = BitstreamBuilder.
+                createBitstream(context, publicItem1, is)
+                .withName("Bitstream3")
+                .withDescription("Description3")
+                .withMimeType("text/plain")
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // Delete bitstream1
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()))
+                        .andExpect(status().is(204));
+
+        // Verify 404 when trying to delete a non-existing, already deleted, bitstream
+        getClient(token).perform(delete("/api/core/bitstreams")
+                                     .contentType(TEXT_URI_LIST)
+                                     .content("http://localhost:8080/server/api/core/bitstreams/" + bitstream1.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream2.getID()
+                                                  + " \n http://localhost:8080/server/api/core/bitstreams/" + bitstream3.getID()))
+                        .andExpect(status().is(422));
     }
 
     @Test
