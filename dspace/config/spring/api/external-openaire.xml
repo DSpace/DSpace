@@ -35,9 +35,7 @@
         <entry key="funderIdentifier" value-ref="openaireFunderIdentifier" />
         <entry key="dcTitle" value-ref="openaireTitle" />
         <entry key="titleAlternative" value-ref="openaireTitleAlternative" />
-        <entry key="dcIdentifier" value-ref="openaireIdentifier" />
         <entry key="coverageSpatial" value-ref="openaireSpatial" />
-        <entry key="dcDescription" value-ref="openaireDescription" />
         <entry key="dcSubject" value-ref="openaireSubject" />
     </util:map>
 
@@ -69,16 +67,8 @@
         <constructor-arg value="dc.title.alternative"/>
     </bean>
 
-    <bean id="openaireIdentifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
-    </bean>
-
     <bean id="openaireSpatial" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.coverage.spatial"/>
-    </bean>
-
-    <bean id="openaireDescription" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.description"/>
     </bean>
 
     <bean id="openaireSubject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
