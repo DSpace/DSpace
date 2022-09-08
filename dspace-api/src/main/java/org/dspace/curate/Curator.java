@@ -618,6 +618,11 @@ public class Curator {
             return mb.toString();
         }
 
+        /**
+         * Proxy method for logging with INFO level
+         * 
+         * @param message that needs to be logged
+         */
         protected void logInfo(String message) {
             if (handler == null) {
                 log.info(message);
@@ -628,10 +633,22 @@ public class Curator {
 
     }
 
+    /**
+     * Proxt method for logging with WARN level
+     * 
+     * @param message
+     */
     protected void logWarning(String message) {
         logWarning(message, null);
     }
 
+    /**
+     * Proxy method for logging with WARN level and a {@code Messageformatter}
+     * that generates the final log.
+     * 
+     * @param message Target message to format or print
+     * @param object  Object to use inside the message, or null
+     */
     protected void logWarning(String message, Object object) {
         if (handler == null) {
             if (object != null) {
