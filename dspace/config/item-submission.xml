@@ -19,8 +19,11 @@
     <submission-map>
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
+        <!-- Customization for LIBDRUM-696 - Commenting out LIBDRUM-347 and
+             LIBDRUM-581 customiations until DSpace 7 implementations are
+             available.
         <name-map collection-handle="1903/11324" submission-name="LibraryAward" />
-        <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" />
+        <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" /> -->
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -207,15 +210,17 @@
         </step-definition>
 
         <!-- Customization for LIBDRUM-347 -->
-        <step-definition id="libraryAwardUploadForm">
+        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
+            <step-definition id="libraryAwardUploadForm">
             <heading>Library Award</heading>
             <processing-class>edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep</processing-class>
             <type>submission-form</type>
-        </step-definition>
+        </step-definition> -->
         <!-- End Customization for LIBDRUM-347 -->
 
         <!-- Customization for LIBDRUM-581 -->
-        <step-definition id="optionalUpload">
+        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
+            <step-definition id="optionalUpload">
             <heading>submit.progressbar.upload</heading>
             <processing-class>org.dspace.submit.step.OptionalUploadStep</processing-class>
             <type>upload</type>
@@ -225,7 +230,7 @@
             <processing-class>org.dspace.submit.step.ConditionalLicenseStep</processing-class>
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
-        </step-definition>
+        </step-definition> -->
         <!-- End Customization for LIBDRUM-581 -->
 
         <step-definition id="sherpaPolicies" mandatory="true">
@@ -282,24 +287,26 @@
 
         <!-- Customization for LIBDRUM-347 -->
         <!--This "LibraryAward" process defines the DEFAULT item submission process -->
-        <submission-process name="LibraryAward">
+        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
+            <submission-process name="LibraryAward">
             <step id="collection"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
             <step id="libraryAwardUploadForm"/>
             <step id="license"/>
-        </submission-process>
+        </submission-process> -->
         <!-- End Customization for LIBDRUM-347 -->
 
         <!-- Customization for LIBDRUM-581 -->
         <!--This "MHHEA_Collection" process defines the DEFAULT item submission process -->
+        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
         <submission-process name="MHHEA_Collection">
             <step id="collection"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
             <step id="optionalUpload"/>
             <step id="conditionalLicense"/>
-        </submission-process>
+        </submission-process> -->
         <!-- End Customization for LIBDRUM-581 -->
 
         <!--

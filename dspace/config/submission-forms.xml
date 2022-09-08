@@ -60,9 +60,25 @@
                     <label>Author</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
+                    <!-- UMD customization for LIBDRUM-675 -->
+                    <required>You must enter an author for this item.</required>
+                    <!-- End customization for LIBDRUM-675 -->
+                </field>
+            </row>
+            <!-- UMD customization for LIBDRUM-675 -->
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>advisor</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Advisor</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the advisor's name (Family name, Given names).</hint>
                     <required></required>
                 </field>
             </row>
+            <!-- End customization for LIBDRUM-675 -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
