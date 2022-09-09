@@ -832,17 +832,7 @@
 		<doi_data xmlns="http://www.crossref.org/schema/4.4.2">
 
 			<doi>
-				<!-- Solo seteo el doi si ya existe alguno en sedici.identifier.other, sino se setea uno nuevo despúes, por afuera del xsl -->
-				<xsl:if
-					test="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='other'
-						and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())]">
-					<xsl:variable name="doi"
-					select="dspace:field[@mdschema='sedici' and @element='identifier' and @qualifier='other'
-						and java:ar.edu.unlp.sedici.dspace.utils.Utils.isDoi(text())]" />
-					<xsl:variable name="doiStartIndex"
-					select="string-length(substring-before($doi,'10.'))+1" />
-					<xsl:value-of select="substring($doi,$doiStartIndex)" />
-				</xsl:if>
+				<!-- No se setea aca el doi, sino que se setea uno nuevo despúes por afuera del xsl en el CrosrefConnector -->
 			</doi>
 
 			<timestamp>
