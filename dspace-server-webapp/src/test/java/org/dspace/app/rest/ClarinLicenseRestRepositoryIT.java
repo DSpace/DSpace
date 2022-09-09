@@ -1,7 +1,11 @@
 package org.dspace.app.rest;
 
+import org.dspace.app.rest.converter.ClarinLicenseConverter;
 import org.dspace.app.rest.matcher.ClarinLicenseLabelMatcher;
 import org.dspace.app.rest.matcher.ClarinLicenseMatcher;
+import org.dspace.app.rest.model.ClarinLicenseLabelRest;
+import org.dspace.app.rest.model.ClarinLicenseRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.ClarinLicenseBuilder;
 import org.dspace.builder.ClarinLicenseLabelBuilder;
@@ -17,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -31,6 +36,9 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     ClarinLicenseLabelService clarinLicenseLabelService;
 
+    @Autowired
+    ClarinLicenseConverter clarinLicenseConverter;
+
     ClarinLicense firstCLicense;
     ClarinLicense secondCLicense;
 
@@ -44,7 +52,7 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
         // create LicenseLabels
         firstCLicenseLabel = ClarinLicenseLabelBuilder.createClarinLicenseLabel(context).build();
         firstCLicenseLabel.setLabel("CC");
-        firstCLicenseLabel.setExtended(false);
+        firstCLicenseLabel.setExtended(true);
         firstCLicenseLabel.setTitle("CLL Title1");
         clarinLicenseLabelService.update(context, firstCLicenseLabel);
 
@@ -69,6 +77,7 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
         HashSet<ClarinLicenseLabel> firstClarinLicenseLabels = new HashSet<>();
         firstClarinLicenseLabels.add(firstCLicenseLabel);
         firstClarinLicenseLabels.add(secondCLicenseLabel);
+        firstClarinLicenseLabels.add(thirdCLicenseLabel);
         firstCLicense.setLicenseLabels(firstClarinLicenseLabels);
         clarinLicenseService.update(context, firstCLicense);
 
@@ -79,6 +88,7 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
         // add ClarinLicenseLabels to the ClarinLicense
         HashSet<ClarinLicenseLabel> secondClarinLicenseLabels = new HashSet<>();
         secondClarinLicenseLabels.add(thirdCLicenseLabel);
+        secondClarinLicenseLabels.add(firstCLicenseLabel);
         secondCLicense.setLicenseLabels(secondClarinLicenseLabels);
         clarinLicenseService.update(context, secondCLicense);
 
@@ -98,7 +108,6 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void findAll() throws Exception {
-        firstCLicense.setDefinition("wrong");
         getClient().perform(get("/api/core/clarinlicenses"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -108,14 +117,15 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$._embedded.clarinlicenses", Matchers.hasItem(
                         ClarinLicenseMatcher.matchClarinLicense(secondCLicense))
                 ))
-                .andExpect(jsonPath("$._embedded.clarinlicenses[0].clarinLicenseLabels", Matchers.hasItem(
-                        ClarinLicenseLabelMatcher.matchClarinLicenseLabel(firstCLicense.getLicenseLabels().get(0)))
+                .andExpect(jsonPath("$._embedded.clarinlicenses[0].clarinLicenseLabel", Matchers.hasItem(
+                        ClarinLicenseLabelMatcher.matchClarinLicenseLabel(firstCLicense.getLicenseLabels().get(2)))
                 ))
-                .andExpect(jsonPath("$._embedded.clarinlicenses[0].clarinLicenseLabels", Matchers.hasItem(
-                        ClarinLicenseLabelMatcher.matchClarinLicenseLabel(firstCLicense.getLicenseLabels().get(1)))
-                ))
-                .andExpect(jsonPath("$._links.self.href",
-                        Matchers.containsString("/api/core/clarinlicenses")))
+                .andExpect(jsonPath("$._embedded.clarinlicenses[0].extendedClarinLicenseLabels", Matchers.hasValue(firstCLicense.getLicenseLabels().get(1))))
+//                .andExpect(jsonPath("$._embedded.clarinlicenses[0].extendedClarinLicenseLabels", Matchers.hasItem(
+//                        ClarinLicenseLabelMatcher.matchClarinLicenseLabel(firstCLicense.getLicenseLabels().get(0)))
+//                ))
+//                .andExpect(jsonPath("$._links.self.href",
+//                        Matchers.containsString("/api/core/clarinlicenses")))
         ;
     }
 

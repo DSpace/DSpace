@@ -8,7 +8,7 @@ import org.dspace.content.clarin.ClarinLicense;
 public class ClarinLicenseLabelRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "clarinlicenselabel";
-    public static final String NAME_PRETTY = "clarinLicenseLabels";
+    public static final String EXTENDED_LABEL_NAME_PRETTY = "extendedClarinLicenseLabels";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @JsonIgnore

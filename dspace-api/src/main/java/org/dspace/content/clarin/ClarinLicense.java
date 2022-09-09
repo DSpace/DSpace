@@ -40,6 +40,9 @@ public class ClarinLicense implements ReloadableEntity<Integer> {
 //    @Column(name = "eperson_id")
 //    private Integer epersonId;
 
+    @Column(name = "name")
+    private String name = null;
+
     @Column(name = "definition")
     private String definition = null;
 
@@ -50,6 +53,18 @@ public class ClarinLicense implements ReloadableEntity<Integer> {
     private String requiredInfo = null;
 
     public ClarinLicense() {
+    }
+
+    public void setClarinLicenseLabels(Set<ClarinLicenseLabel> clarinLicenseLabels) {
+        this.clarinLicenseLabels = clarinLicenseLabels;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Integer getId() {

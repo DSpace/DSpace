@@ -1,4 +1,4 @@
-package org.dspace.app.rest.converter.clarin;
+package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.DSpaceConverter;
@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClarinLicenseLabelConverter implements DSpaceConverter<ClarinLicenseLabel, ClarinLicenseLabelRest> {
-
-    @Autowired
-    private ConverterService converter;
 
     @Override
     public ClarinLicenseLabelRest convert(ClarinLicenseLabel modelObject, Projection projection) {

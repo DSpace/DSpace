@@ -4,13 +4,20 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.DSpaceConverter;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.Collection;
 import org.dspace.content.clarin.ClarinLicenseLabel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@Component
 public class ClarinLicenseRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "clarinlicense";
@@ -20,10 +27,13 @@ public class ClarinLicenseRest extends BaseObjectRest<Integer> {
      * Map of ClarinLicenseLabelRest, it throws error if it is Array List
      */
     @JsonAnySetter
-    private SortedMap<String, List<ClarinLicenseLabelRest>> map = new TreeMap();
+    private SortedMap<String, List<ClarinLicenseLabelRest>> extendedLicenseLabelsMap = new TreeMap();
+    private ClarinLicenseLabelRest clarinLicenseLabel;
+    private String name;
     private String definition;
     private Integer confirmation;
     private String requiredInfo;
+    private Integer bitstreams;
 
     public ClarinLicenseRest() {
     }
@@ -34,8 +44,28 @@ public class ClarinLicenseRest extends BaseObjectRest<Integer> {
      * @return the map of keys to ordered values.
      */
     @JsonAnyGetter
-    public SortedMap<String, List<ClarinLicenseLabelRest>> getMap() {
-        return map;
+    public SortedMap<String, List<ClarinLicenseLabelRest>> getExtendedLicenseLabelsMap() {
+        return extendedLicenseLabelsMap;
+    }
+
+    public void setExtendedLicenseLabelsMap(SortedMap<String, List<ClarinLicenseLabelRest>> extendedLicenseLabelsMap) {
+        this.extendedLicenseLabelsMap = extendedLicenseLabelsMap;
+    }
+
+    public ClarinLicenseLabelRest getClarinLicenseLabel() {
+        return clarinLicenseLabel;
+    }
+
+    public void setClarinLicenseLabel(ClarinLicenseLabelRest clarinLicenseLabel) {
+        this.clarinLicenseLabel = clarinLicenseLabel;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDefinition() {
@@ -62,7 +92,15 @@ public class ClarinLicenseRest extends BaseObjectRest<Integer> {
         this.requiredInfo = requiredInfo;
     }
 
-//    public ClarinLicenseLabelListRest getLicenseLabel() {
+    public Integer getBitstreams() {
+        return bitstreams;
+    }
+
+    public void setBitstreams(Integer bitstreams) {
+        this.bitstreams = bitstreams;
+    }
+
+    //    public ClarinLicenseLabelListRest getLicenseLabel() {
 //        return clarinLicenseLabels;
 //    }
 //
@@ -70,23 +108,6 @@ public class ClarinLicenseRest extends BaseObjectRest<Integer> {
 //        this.clarinLicenseLabels = licenseLabel;
 //    }
 
-    /**
-     * Add ClarinLicenseLabel list to the map
-     * @param values
-     */
-    public void setClarinLicenseLabels(List<ClarinLicenseLabel> values) {
-        List<ClarinLicenseLabelRest> clarinLicenseLabelRestList = new ArrayList<>();
-        for (ClarinLicenseLabel clarinLicenseLabel : values) {
-            ClarinLicenseLabelRest clarinLicenseLabelRest = new ClarinLicenseLabelRest();
-            clarinLicenseLabelRest.setId(clarinLicenseLabel.getId());
-            clarinLicenseLabelRest.setLabel(clarinLicenseLabel.getLabel());
-            clarinLicenseLabelRest.setExtended(clarinLicenseLabel.isExtended());
-            clarinLicenseLabelRest.setTitle(clarinLicenseLabel.getTitle());
-            clarinLicenseLabelRest.setIcon(clarinLicenseLabel.getIcon());
-            clarinLicenseLabelRestList.add(clarinLicenseLabelRest);
-        }
-        map.put(ClarinLicenseLabelRest.NAME_PRETTY, clarinLicenseLabelRestList);
-    }
 
     @Override
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

@@ -19,11 +19,14 @@ public class ClarinLicenseMatcher {
     public static Matcher<? super Object> matchClarinLicense(ClarinLicense clarinLicense) {
         return allOf(
                 hasJsonPath("$.id", is(clarinLicense.getID())),
+                hasJsonPath("$.name", is(clarinLicense.getName())),
                 hasJsonPath("$.definition", is(clarinLicense.getDefinition())),
                 hasJsonPath("$.type", is(ClarinLicenseRest.NAME)),
                 hasJsonPath("$.confirmation", is(clarinLicense.getConfirmation())),
                 hasJsonPath("$.requiredInfo", is(clarinLicense.getRequiredInfo())),
-                hasJsonPath("$.clarinLicenseLabels", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.bitstreams", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.clarinLicenseLabel", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.extendedClarinLicenseLabels", Matchers.not(Matchers.empty())),
                 hasJsonPath("$._links.self.href",
                         Matchers.containsString("/api/core/clarinlicenses/" + clarinLicense.getID()))
         );

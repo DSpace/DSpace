@@ -55,8 +55,8 @@ CREATE TABLE license_label (
     label_id integer NOT NULL,
     label varchar(5),
     title varchar(180),
-    is_extended boolean DEFAULT false,
-    icon bytea
+    icon bytea,
+    is_extended boolean DEFAULT false
 );
 
 
