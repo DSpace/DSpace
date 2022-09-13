@@ -20,10 +20,15 @@
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
         <!-- Customization for LIBDRUM-696 - Commenting out LIBDRUM-347 and
-             LIBDRUM-581 customiations until DSpace 7 implementations are
+             LIBDRUM-581 customizations until DSpace 7 implementations are
              available.
         <name-map collection-handle="1903/11324" submission-name="LibraryAward" />
-        <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" /> -->
+        -->
+
+        <!-- Customization for LIBDRUM-684 - Enable separate submisson process
+             for  "Minority Health and Health Equity Archive" collection -->
+        <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" />
+        <!-- End Customization for LIBDRUM-684 -->
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -297,17 +302,18 @@
         </submission-process> -->
         <!-- End Customization for LIBDRUM-347 -->
 
-        <!-- Customization for LIBDRUM-581 -->
-        <!--This "MHHEA_Collection" process defines the DEFAULT item submission process -->
-        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
+        <!-- Customization for LIBDRUM-684 -->
+        <!--This "MHHEA_Collection" process replaces the DEFAULT item submission
+            process for the "Minority Health and Health Equity Archive"
+            collection -->
         <submission-process name="MHHEA_Collection">
             <step id="collection"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
-            <step id="optionalUpload"/>
-            <step id="conditionalLicense"/>
+            <step id="upload"/>
+            <step id="license"/>
         </submission-process> -->
-        <!-- End Customization for LIBDRUM-581 -->
+        <!-- End Customization for LIBDRUM-684 -->
 
         <!--
         Submission Process for 'Publication' Entities.
