@@ -7,6 +7,12 @@
  */
 package org.dspace.google.client;
 
+/**
+ * Exception thrown by {@link GoogleAnalyticsClient} during the events sending.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class GoogleAnalyticsClientException extends RuntimeException {
 
     private static final long serialVersionUID = -2248100136404696572L;

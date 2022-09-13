@@ -23,6 +23,12 @@ import org.dspace.google.GoogleAnalyticsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of {@link GoogleAnalyticsClient}.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleAnalyticsClientImpl.class);

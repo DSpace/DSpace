@@ -14,6 +14,13 @@ import java.util.stream.Collectors;
 
 import org.dspace.google.GoogleAnalyticsEvent;
 
+/**
+ * Implementation of {@link GoogleAnalyticsClientRequestBuilder} that compose
+ * the request for Universal Analytics (UA).
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class UniversalAnalyticsClientRequestBuilder implements GoogleAnalyticsClientRequestBuilder {
 
     private final String endpointUrl;

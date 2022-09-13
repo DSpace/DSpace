@@ -90,7 +90,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     }
 
     /**
-     * Collected events are sent every minute (configurable period).
+     * Send the collected events to Google Analytics.
      */
     public void sendCollectedEvents() {
 
@@ -116,6 +116,11 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 
     }
 
+    /**
+     * Creates an instance of GoogleAnalyticsEvent from the given usage event.
+     * @param  usageEvent the usage event
+     * @return            the Google Analytics event instance
+     */
     private GoogleAnalyticsEvent createGoogleAnalyticsEvent(UsageEvent usageEvent) {
 
         HttpServletRequest request = usageEvent.getRequest();
@@ -208,6 +213,12 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 
     }
 
+    /**
+     * Returns the first GA_MAX_EVENTS stored in the eventsBuffer with a time minor
+     * that MAX_TIME_SINCE_EVENT. The found events are removed from the buffer.
+     *
+     * @return the events from the buffer
+     */
     private List<GoogleAnalyticsEvent> getEventsFromBufferFilteredByEventTime() {
 
         List<GoogleAnalyticsEvent> events = new ArrayList<>();
@@ -228,6 +239,15 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
         return events;
     }
 
+    /**
+     * Returns the first instance of the GoogleAnalyticsClient that supports the
+     * given analytics key.
+     *
+     * @param  analyticsKey          the analytics key.
+     * @return                       the found client
+     * @throws IllegalStateException if no client is found for the given analytics
+     *                               key
+     */
     private GoogleAnalyticsClient getClientByAnalyticsKey(String analyticsKey) {
         return googleAnalyticsClients.stream()
             .filter(client -> client.isAnalyticsKeySupported(analyticsKey))
@@ -238,4 +258,17 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     private String getGoogleAnalyticsKey() {
         return configurationService.getProperty("google.analytics.key");
     }
+
+    public List<GoogleAnalyticsClient> getGoogleAnalyticsClients() {
+        return googleAnalyticsClients;
+    }
+
+    public void setGoogleAnalyticsClients(List<GoogleAnalyticsClient> googleAnalyticsClients) {
+        this.googleAnalyticsClients = googleAnalyticsClients;
+    }
+
+    public Buffer getEventsBuffer() {
+        return eventsBuffer;
+    }
+
 }

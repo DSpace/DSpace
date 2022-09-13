@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,13 @@ import org.dspace.google.GoogleAnalyticsEvent;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link GoogleAnalyticsClientRequestBuilder} that compose
+ * the request for Google Analytics 4 (GA4).
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClientRequestBuilder {
 
     private final String endpointUrl;
@@ -55,11 +64,7 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
             .map(GoogleAnalytics4EventVO::fromGoogleAnalyticsEvent)
             .forEach(eventsVo::addEvent);
 
-        try {
-            return objectMapper.writeValueAsString(eventsVo);
-        } catch (JsonProcessingException e) {
-            throw new GoogleAnalyticsClientException(e);
-        }
+        return toJsonAsString(eventsVo);
 
     }
 
@@ -70,6 +75,17 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
             .orElseGet(() -> UUID.randomUUID().toString());
     }
 
+    private String toJsonAsString(GoogleAnalytics4EventsVO eventsVo) {
+        try {
+            return objectMapper.writeValueAsString(eventsVo);
+        } catch (JsonProcessingException e) {
+            throw new GoogleAnalyticsClientException(e);
+        }
+    }
+
+    /**
+     * Class that models the json of the events to be write in the body of the GA request.
+     */
     public static class GoogleAnalytics4EventsVO {
 
         @JsonProperty("client_id")
@@ -96,6 +112,9 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
 
     }
 
+    /**
+     * Class that model a single event to be sent to GA.
+     */
     public static class GoogleAnalytics4EventVO {
 
         private final String name = "item";
@@ -124,22 +143,39 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
 
     }
 
+    /**
+     * Class that model the params of a specific event to be sent to GA.
+     *
+     * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+     *
+     */
     public static class GoogleAnalytics4EventParamsVO {
 
         private final String action = "download";
 
         private final String category = "bitstream";
 
+        @JsonInclude(Include.NON_NULL)
         private final long time;
 
+        @JsonInclude(Include.NON_NULL)
+        @JsonProperty("document_title")
         private final String documentTitle;
 
+        @JsonInclude(Include.NON_NULL)
+        @JsonProperty("document_path")
         private final String documentPath;
 
+        @JsonInclude(Include.NON_NULL)
+        @JsonProperty("document_referrer")
         private final String documentReferrer;
 
+        @JsonInclude(Include.NON_NULL)
+        @JsonProperty("user_agent")
         private final String userAgent;
 
+        @JsonInclude(Include.NON_NULL)
+        @JsonProperty("user_ip")
         private final String userIp;
 
         public GoogleAnalytics4EventParamsVO(long time, String documentTitle, String documentPath,

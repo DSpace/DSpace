@@ -11,9 +11,30 @@ import java.util.List;
 
 import org.dspace.google.GoogleAnalyticsEvent;
 
+/**
+ * Interface for classes used by {@link GoogleAnalyticsClient} to define the url
+ * and the body of the request to be sent to Google Analytics.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public interface GoogleAnalyticsClientRequestBuilder {
 
+    /**
+     * Returns the url of the Google Analytics endpoint.
+     *
+     * @param  analyticsKey the Google Analytics key
+     * @return              the endpoint url
+     */
     String getEndpointUrl(String analyticsKey);
 
+    /**
+     * Returns the body of the request to be sent to Google Analytics as string,
+     * based on the given analytics key and events.
+     *
+     * @param  analyticsKey the Google Analytics key
+     * @param  events       the events to be sent
+     * @return              the request body as string
+     */
     String composeRequestBody(String analyticsKey, List<GoogleAnalyticsEvent> events);
 }
