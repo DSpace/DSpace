@@ -246,6 +246,14 @@
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
             <type>sherpaPolicy</type>
         </step-definition>
+
+        <!-- Customization for LIBDRUM-684 -->
+        <step-definition id="MHHEApageone" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <!-- End customization for LIBDRUM-684 -->
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -311,7 +319,7 @@
             collection -->
         <submission-process name="MHHEA_Collection">
             <step id="collection"/>
-            <step id="traditionalpageone"/>
+            <step id="MHHEApageone"/>
             <step id="traditionalpagetwo"/>
             <step id="optionalUpload"/>
             <step id="license"/>
