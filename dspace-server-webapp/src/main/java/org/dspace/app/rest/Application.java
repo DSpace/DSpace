@@ -81,7 +81,7 @@ public class Application extends SpringBootServletInitializer {
         SolrDatabaseResyncCli.runScheduled();
     }
 
-    @Scheduled(cron = "${google.analytics.crontab:0 0/1 * * * ?}")
+    @Scheduled(cron = "${google.analytics.crontab:-}")
     public void sendGoogleAnalyticsEvents() {
         googleAsyncEventListener.sendCollectedEvents();
     }

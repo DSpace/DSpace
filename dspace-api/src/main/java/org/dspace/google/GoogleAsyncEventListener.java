@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,12 +42,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class GoogleAsyncEventListener extends AbstractUsageEventListener {
 
+    // 20 is the event max set by the GA API
+    public static final int GA_MAX_EVENTS = 20;
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int MAX_TIME_SINCE_EVENT = 14400000;
-
-    // 20 is the event max set by the GA API
-    private static final int GA_MAX_EVENTS = 20;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -129,7 +130,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
         String referrer = getReferrer(usageEvent);
         String clientIp = clientInfoService.getClientIp(request);
         String userAgent = request.getHeader("USER-AGENT");
-        String documentPath = request.getRequestURI() + "?" + request.getQueryString();
+        String documentPath = getDocumentPath(request);
         String documentName = getObjectName(usageEvent);
 
         return new GoogleAnalyticsEvent(clientId, clientIp, userAgent, referrer,
@@ -160,6 +161,14 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
         } else {
             return usageEvent.getRequest().getHeader("referer");
         }
+    }
+
+    private String getDocumentPath(HttpServletRequest request) {
+        String documentPath = request.getRequestURI();
+        if (StringUtils.isNotBlank(request.getQueryString())) {
+            documentPath += "?" + request.getQueryString();
+        }
+        return documentPath;
     }
 
     private boolean isNotBitstreamViewEvent(UsageEvent usageEvent) {
@@ -249,10 +258,21 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
      *                               key
      */
     private GoogleAnalyticsClient getClientByAnalyticsKey(String analyticsKey) {
-        return googleAnalyticsClients.stream()
+
+        List<GoogleAnalyticsClient> clients = googleAnalyticsClients.stream()
             .filter(client -> client.isAnalyticsKeySupported(analyticsKey))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No Google Analytics Client found for key " + analyticsKey));
+            .collect(Collectors.toList());
+
+        if (clients.isEmpty()) {
+            throw new IllegalStateException("No Google Analytics Client supports key " + analyticsKey);
+        }
+
+        if (clients.size() > 1) {
+            throw new IllegalStateException("More than one Google Analytics Client supports key " + analyticsKey);
+        }
+
+        return clients.get(0);
+
     }
 
     private String getGoogleAnalyticsKey() {

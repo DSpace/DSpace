@@ -86,4 +86,11 @@ public final class GoogleAnalyticsEvent {
             && Objects.equals(userAgent, other.userAgent) && Objects.equals(userIp, other.userIp);
     }
 
+    @Override
+    public String toString() {
+        return "GoogleAnalyticsEvent [clientId=" + clientId + ", userIp=" + userIp + ", userAgent=" + userAgent
+            + ", documentReferrer=" + documentReferrer + ", documentPath=" + documentPath + ", documentTitle="
+            + documentTitle + ", time=" + time + "]";
+    }
+
 }
