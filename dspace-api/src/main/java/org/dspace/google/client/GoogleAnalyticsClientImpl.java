@@ -37,9 +37,12 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
 
     private final GoogleAnalyticsClientRequestBuilder requestBuilder;
 
+    private final CloseableHttpClient httpclient;
+
     public GoogleAnalyticsClientImpl(String keyPrefix, GoogleAnalyticsClientRequestBuilder requestBuilder) {
         this.keyPrefix = keyPrefix;
         this.requestBuilder = requestBuilder;
+        this.httpclient = HttpClients.createDefault();
     }
 
     @Override
@@ -50,10 +53,14 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
     @Override
     public void sendEvents(String analyticsKey, List<GoogleAnalyticsEvent> events) {
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-
         String endpointUrl = requestBuilder.getEndpointUrl(analyticsKey);
-        String requestBody = requestBuilder.composeRequestBody(analyticsKey, events);
+
+        requestBuilder.composeRequestBodies(analyticsKey, events)
+            .forEach(requestBody -> sendRequest(endpointUrl, requestBody));
+
+    }
+
+    private void sendRequest(String endpointUrl, String requestBody) {
 
         try {
 

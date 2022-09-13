@@ -7,9 +7,11 @@
  */
 package org.dspace.google.client;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -54,9 +56,27 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
     }
 
     @Override
-    public String composeRequestBody(String analyticsKey, List<GoogleAnalyticsEvent> events) {
+    public List<String> composeRequestBodies(String analyticsKey, List<GoogleAnalyticsEvent> events) {
 
-        String clientId = getClientId(events);
+        Map<String, List<GoogleAnalyticsEvent>> eventsGroupedByClientId = groupByClientId(events);
+
+        List<String> requestBodies = new ArrayList<String>();
+
+        for (String clientId : eventsGroupedByClientId.keySet()) {
+            String requestBody = composeRequestBody(analyticsKey, clientId, eventsGroupedByClientId.get(clientId));
+            requestBodies.add(requestBody);
+        }
+
+        return requestBodies;
+
+    }
+
+    private Map<String, List<GoogleAnalyticsEvent>> groupByClientId(List<GoogleAnalyticsEvent> events) {
+        return events.stream()
+            .collect(groupingBy(GoogleAnalyticsEvent::getClientId));
+    }
+
+    private String composeRequestBody(String analyticsKey, String clientId, List<GoogleAnalyticsEvent> events) {
 
         GoogleAnalytics4EventsVO eventsVo = new GoogleAnalytics4EventsVO(clientId);
 
@@ -68,19 +88,16 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
 
     }
 
-    private String getClientId(List<GoogleAnalyticsEvent> events) {
-        return events.stream()
-            .map(GoogleAnalyticsEvent::getClientId)
-            .findFirst()
-            .orElseGet(() -> UUID.randomUUID().toString());
-    }
-
     private String toJsonAsString(GoogleAnalytics4EventsVO eventsVo) {
         try {
             return objectMapper.writeValueAsString(eventsVo);
         } catch (JsonProcessingException e) {
             throw new GoogleAnalyticsClientException(e);
         }
+    }
+
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     /**

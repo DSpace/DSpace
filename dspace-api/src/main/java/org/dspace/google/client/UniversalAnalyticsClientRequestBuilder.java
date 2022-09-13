@@ -35,10 +35,13 @@ public class UniversalAnalyticsClientRequestBuilder implements GoogleAnalyticsCl
     }
 
     @Override
-    public String composeRequestBody(String analyticsKey, List<GoogleAnalyticsEvent> events) {
-        return events.stream()
+    public List<String> composeRequestBodies(String analyticsKey, List<GoogleAnalyticsEvent> events) {
+
+        String requestBody = events.stream()
             .map(event -> formatEvent(analyticsKey, event))
             .collect(Collectors.joining("\n"));
+
+        return List.of(requestBody);
     }
 
     private String formatEvent(String analyticsKey, GoogleAnalyticsEvent event) {

@@ -29,12 +29,12 @@ public interface GoogleAnalyticsClientRequestBuilder {
     String getEndpointUrl(String analyticsKey);
 
     /**
-     * Returns the body of the request to be sent to Google Analytics as string,
+     * Returns the bodies of the requests to be sent to Google Analytics as string,
      * based on the given analytics key and events.
      *
      * @param  analyticsKey the Google Analytics key
      * @param  events       the events to be sent
      * @return              the request body as string
      */
-    String composeRequestBody(String analyticsKey, List<GoogleAnalyticsEvent> events);
+    List<String> composeRequestBodies(String analyticsKey, List<GoogleAnalyticsEvent> events);
 }
