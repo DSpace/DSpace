@@ -223,13 +223,16 @@
         </step-definition> -->
         <!-- End Customization for LIBDRUM-347 -->
 
-        <!-- Customization for LIBDRUM-581 -->
-        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
-            <step-definition id="optionalUpload">
+        <!-- Customization for LIBDRUM-684 -->
+        <step-definition id="optionalUpload">
             <heading>submit.progressbar.upload</heading>
-            <processing-class>org.dspace.submit.step.OptionalUploadStep</processing-class>
+            <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
             <type>upload</type>
         </step-definition>
+        <!-- End Customization for LIBDRUM-684 -->
+
+        <!-- Customization for LIBDRUM-581 -->
+        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
         <step-definition id="conditionalLicense">
             <heading>submit.progressbar.license</heading>
             <processing-class>org.dspace.submit.step.ConditionalLicenseStep</processing-class>
@@ -310,7 +313,7 @@
             <step id="collection"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
-            <step id="upload"/>
+            <step id="optionalUpload"/>
             <step id="license"/>
         </submission-process> -->
         <!-- End Customization for LIBDRUM-684 -->
