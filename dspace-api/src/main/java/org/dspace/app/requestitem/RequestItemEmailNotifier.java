@@ -154,9 +154,9 @@ public class RequestItemEmailNotifier {
         email.setContent("body", message);
         email.setSubject(subject);
         email.addRecipient(ri.getReqEmail());
-        if (ri.isAccept_request()) {
-            // Attach bitstreams.
-            try {
+        // Attach bitstreams.
+        try {
+            if (ri.isAccept_request()) {
                 if (ri.isAllfiles()) {
                     Item item = ri.getItem();
                     List<Bundle> bundles = item.getBundles("ORIGINAL");
@@ -178,12 +178,12 @@ public class RequestItemEmailNotifier {
                             bitstream.getName(),
                             bitstream.getFormat(context).getMIMEType());
                 }
-                email.send();
-            } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
-                LOG.warn(LogHelper.getHeader(context,
-                        "error_mailing_requestItem", e.getMessage()));
-                throw new IOException("Reply not sent:  " + e.getMessage());
             }
+            email.send();
+        } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
+            LOG.warn(LogHelper.getHeader(context,
+                    "error_mailing_requestItem", e.getMessage()));
+            throw new IOException("Reply not sent:  " + e.getMessage());
         }
         LOG.info(LogHelper.getHeader(context,
                 "sent_attach_requestItem", "token={}"), ri.getToken());
