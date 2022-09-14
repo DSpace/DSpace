@@ -18,12 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.exception.PasswordNotValidException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
+import org.dspace.app.rest.exception.PasswordNotValidException;
 import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -127,7 +127,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             eperson.setNetid(epersonRest.getNetid());
             if (epersonRest.getPassword() != null) {
                 if (!validatePasswordService.isPasswordValid(epersonRest.getPassword())) {
-                    throw new PasswordNotValidException("The new password to set is not valid");
+                    throw new PasswordNotValidException();
                 }
                 es.setPassword(eperson, epersonRest.getPassword());
             }

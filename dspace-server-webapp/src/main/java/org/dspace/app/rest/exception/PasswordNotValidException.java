@@ -5,7 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.exception;
+package org.dspace.app.rest.exception;
+
+import org.dspace.core.I18nUtil;
 
 /**
  * This class provides an exception to be used when trying to create an EPerson
@@ -14,14 +16,22 @@ package org.dspace.app.exception;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class PasswordNotValidException extends RuntimeException {
+public class PasswordNotValidException extends UnprocessableEntityException implements TranslatableException {
 
     private static final long serialVersionUID = -4294543847989250566L;
 
-    public PasswordNotValidException() {}
+    public static final String MESSAGE_KEY = "org.dspace.app.rest.exception.PasswordNotValidException.message";
 
-    public PasswordNotValidException(String message) {
-        super(message);
+    public PasswordNotValidException() {
+        super(I18nUtil.getMessage(MESSAGE_KEY));
+    }
+
+    public PasswordNotValidException(Throwable cause) {
+        super(I18nUtil.getMessage(MESSAGE_KEY), cause);
+    }
+
+    public String getMessageKey() {
+        return MESSAGE_KEY;
     }
 
 }

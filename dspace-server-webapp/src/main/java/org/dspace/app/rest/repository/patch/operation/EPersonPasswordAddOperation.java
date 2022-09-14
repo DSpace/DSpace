@@ -11,8 +11,8 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.exception.PasswordNotValidException;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.PasswordNotValidException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
