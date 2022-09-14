@@ -55,7 +55,7 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
 
         String endpointUrl = requestBuilder.getEndpointUrl(analyticsKey);
 
-        requestBuilder.composeRequestBodies(analyticsKey, events)
+        requestBuilder.composeRequestsBody(analyticsKey, events)
             .forEach(requestBody -> sendRequest(endpointUrl, requestBody));
 
     }

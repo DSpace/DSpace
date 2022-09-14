@@ -46,8 +46,8 @@ public class UniversalAnalyticsClientRequestBuilderTest {
     @Test
     public void testComposeRequestBodiesWithoutEvents() {
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", List.of());
-        assertThat(requestBodies, empty());
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of());
+        assertThat(requestsBody, empty());
 
     }
 
@@ -57,10 +57,10 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event = buildEvent("123", "192.168.1.25", "Chrome", "REF",
             "/api/documents/123", "Test publication");
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", List.of(event));
-        assertThat(requestBodies, hasSize(1));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event));
+        assertThat(requestsBody, hasSize(1));
 
-        String requestBody = requestBodies.get(0);
+        String requestBody = requestsBody.get(0);
         assertThat(countMatches(requestBody, "&qt="), is(1));
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
@@ -81,9 +81,9 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event2 = buildEvent("123", "192.168.1.25", "Mozilla Firefox", "REF-2",
             "/api/documents/12345", "Test publication 2");
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", List.of(event1, event2));
-        assertThat(requestBodies, hasSize(1));
-        String requestBody = requestBodies.get(0);
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event1, event2));
+        assertThat(requestsBody, hasSize(1));
+        String requestBody = requestsBody.get(0);
 
         assertThat(countMatches(requestBody, "&qt="), is(2));
 
@@ -110,9 +110,9 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event3 = buildEvent("987", "192.168.1.13", "Postman", null,
             "/api/documents/654", "Test publication 3");
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", of(event1, event2, event3));
-        assertThat(requestBodies, hasSize(1));
-        String requestBody = requestBodies.get(0);
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", of(event1, event2, event3));
+        assertThat(requestsBody, hasSize(1));
+        String requestBody = requestsBody.get(0);
 
         assertThat(countMatches(requestBody, "&qt="), is(3));
 

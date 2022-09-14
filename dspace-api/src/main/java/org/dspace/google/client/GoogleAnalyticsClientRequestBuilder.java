@@ -13,7 +13,7 @@ import org.dspace.google.GoogleAnalyticsEvent;
 
 /**
  * Interface for classes used by {@link GoogleAnalyticsClient} to define the url
- * and the body of the request to be sent to Google Analytics.
+ * and the body of the requests to be sent to Google Analytics.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
@@ -29,12 +29,12 @@ public interface GoogleAnalyticsClientRequestBuilder {
     String getEndpointUrl(String analyticsKey);
 
     /**
-     * Returns the bodies of the requests to be sent to Google Analytics as string,
+     * Returns the body of the requests to be sent to Google Analytics as string,
      * based on the given analytics key and events.
      *
      * @param  analyticsKey the Google Analytics key
      * @param  events       the events to be sent
-     * @return              the request body as string
+     * @return              the requests body as string
      */
-    List<String> composeRequestBodies(String analyticsKey, List<GoogleAnalyticsEvent> events);
+    List<String> composeRequestsBody(String analyticsKey, List<GoogleAnalyticsEvent> events);
 }

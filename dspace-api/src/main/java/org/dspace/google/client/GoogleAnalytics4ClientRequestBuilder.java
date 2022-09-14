@@ -56,18 +56,18 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
     }
 
     @Override
-    public List<String> composeRequestBodies(String analyticsKey, List<GoogleAnalyticsEvent> events) {
+    public List<String> composeRequestsBody(String analyticsKey, List<GoogleAnalyticsEvent> events) {
 
         Map<String, List<GoogleAnalyticsEvent>> eventsGroupedByClientId = groupByClientId(events);
 
-        List<String> requestBodies = new ArrayList<String>();
+        List<String> requestsBody = new ArrayList<String>();
 
         for (String clientId : eventsGroupedByClientId.keySet()) {
             String requestBody = composeRequestBody(analyticsKey, clientId, eventsGroupedByClientId.get(clientId));
-            requestBodies.add(requestBody);
+            requestsBody.add(requestBody);
         }
 
-        return requestBodies;
+        return requestsBody;
 
     }
 

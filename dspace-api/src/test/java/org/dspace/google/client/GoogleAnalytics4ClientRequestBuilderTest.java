@@ -65,8 +65,8 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
     @Test
     public void testComposeRequestBodiesWithoutEvents() {
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", List.of());
-        assertThat(requestBodies, empty());
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of());
+        assertThat(requestsBody, empty());
 
     }
 
@@ -76,10 +76,10 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         GoogleAnalyticsEvent event = buildEvent("123", "192.168.1.25", "Chrome", "REF",
             "/api/documents/123", "Test publication");
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", List.of(event));
-        assertThat(requestBodies, hasSize(1));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event));
+        assertThat(requestsBody, hasSize(1));
 
-        JSONObject requestBody = new JSONObject(requestBodies.get(0));
+        JSONObject requestBody = new JSONObject(requestsBody.get(0));
         assertThat(requestBody.get("client_id"), is("123"));
 
         JSONArray eventsArray = requestBody.getJSONArray("events");
@@ -99,10 +99,10 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         GoogleAnalyticsEvent event2 = buildEvent("123", "192.168.1.25", "Mozilla Firefox", "REF-2",
             "/api/documents/12345", "Test publication 2");
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", List.of(event1, event2));
-        assertThat(requestBodies, hasSize(1));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event1, event2));
+        assertThat(requestsBody, hasSize(1));
 
-        JSONObject requestBody = new JSONObject(requestBodies.get(0));
+        JSONObject requestBody = new JSONObject(requestsBody.get(0));
         assertThat(requestBody.get("client_id"), is("123"));
 
         JSONArray eventsArray = requestBody.getJSONArray("events");
@@ -134,10 +134,10 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         GoogleAnalyticsEvent event3 = buildEvent("987", "192.168.1.13", "Postman", null,
             "/api/documents/654", "Test publication 3");
 
-        List<String> requestBodies = requestBuilder.composeRequestBodies("G-12345", of(event1, event2, event3));
-        assertThat(requestBodies, hasSize(2));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", of(event1, event2, event3));
+        assertThat(requestsBody, hasSize(2));
 
-        JSONObject firstRequestBody = findRequestBodyByClientId(requestBodies, "123");
+        JSONObject firstRequestBody = findRequestBodyByClientId(requestsBody, "123");
         assertThat(firstRequestBody.get("client_id"), is("123"));
 
         JSONArray firstEventsArray = firstRequestBody.getJSONArray("events");
@@ -155,7 +155,7 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
         assertEventJsonHasAttributes(eventJson2, "item", "download", "bitstream", "192.168.1.25",
             "Mozilla Firefox", "REF-2", "/api/documents/12345", "Test publication 2");
 
-        JSONObject secondRequestBody = findRequestBodyByClientId(requestBodies, "987");
+        JSONObject secondRequestBody = findRequestBodyByClientId(requestsBody, "987");
         assertThat(secondRequestBody.get("client_id"), is("987"));
 
         JSONArray secondEventsArray = secondRequestBody.getJSONArray("events");
@@ -182,8 +182,8 @@ public class GoogleAnalytics4ClientRequestBuilderTest {
 
     }
 
-    private JSONObject findRequestBodyByClientId(List<String> requestBodies, String clientId) {
-        for (String requestBody : requestBodies) {
+    private JSONObject findRequestBodyByClientId(List<String> requestsBody, String clientId) {
+        for (String requestBody : requestsBody) {
             JSONObject requestBodyJson = new JSONObject(requestBody);
             if (requestBodyJson.get("client_id").equals(clientId)) {
                 return requestBodyJson;
