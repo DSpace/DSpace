@@ -424,9 +424,12 @@ public class XOAI {
          * deletion policy. Do not set the flag for still invisible embargoed items,
          * because this will override the item.public flag.
          */
+        boolean deleted = false;
+        if (!item.isHidden()) {
+            deleted = (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false));
+        }
+        doc.addField("item.deleted", deleted);
 
-        doc.addField("item.deleted",
-                (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false)));
 
         /*
          * An item that is embargoed will potentially not be harvested by incremental

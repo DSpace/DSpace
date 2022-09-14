@@ -9,6 +9,8 @@
 
             <Format ref="oaidc"/>
             <Format ref="mets"/>
+            <Format ref="cmdi" />
+            <Format ref="olac" />
             <Format ref="xoai"/>
             <Format ref="didl"/>
             <Format ref="dim"/>
@@ -91,6 +93,17 @@
             </Description>
         </Context>
 
+        <Context baseurl="openaire_data" name="OpenAIRE data Context">
+            <!-- <Transformer ref="openaireDataTransformer"/> -->
+            <Filter ref="openaireFilter_clarin"/>
+            <Set ref="openaireDataSet"/>
+            <Format ref="oaidc"/>
+            <Format ref="oai_datacite"/>
+            <Description>
+                This context exports items following the openaire data archive rules.
+            </Description>
+        </Context>
+
     </Contexts>
 
 
@@ -100,6 +113,13 @@
             <XSLT>metadataFormats/oai_dc.xsl</XSLT>
             <Namespace>http://www.openarchives.org/OAI/2.0/oai_dc/</Namespace>
             <SchemaLocation>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</SchemaLocation>
+        </Format>
+        <Format id="cmdi">
+            <Prefix>cmdi</Prefix>
+            <XSLT>metadataFormats/lindat_cmdi.xsl</XSLT>
+            <Namespace>http://www.clarin.eu/cmd/</Namespace>
+            <SchemaLocation>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</SchemaLocation>
+<!--            <Filter ref="ExcludeItemsInComOrCol"/>-->
         </Format>
         <Format id="mets">
             <Prefix>mets</Prefix>
@@ -163,6 +183,12 @@
             <Namespace>http://www.loc.gov/MARC21/slim</Namespace>
             <SchemaLocation>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</SchemaLocation>
         </Format>
+        <Format id="olac">
+            <Prefix>olac</Prefix>
+            <XSLT>metadataFormats/olac.xsl</XSLT>
+            <Namespace>http://www.language-archives.org/OLAC/1.1/olac.xsd</Namespace>
+            <SchemaLocation>http://www.language-archives.org/OLAC/1.1/</SchemaLocation>
+        </Format>
         <Format id="uketd_dc">
             <Prefix>uketd_dc</Prefix>
             <XSLT>metadataFormats/uketd_dc.xsl</XSLT>
@@ -185,6 +211,13 @@
             <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
             <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
         </Format>
+
+        <Format id="oai_datacite">
+            <Prefix>oai_datacite</Prefix>
+            <XSLT>metadataFormats/datacite_openaire.xsl</XSLT>
+            <Namespace>http://schema.datacite.org/oai/oai-1.1/</Namespace>
+            <SchemaLocation>http://schema.datacite.org/oai/oai-1.1/oai.xsd</SchemaLocation>
+        </Format>
     </Formats>
 
     <Transformers>
@@ -201,6 +234,17 @@
 
 
     <Filters>
+        <Filter id="openaireFilter_clarin">
+            <Definition>
+                                <Custom ref="openaireRelationCondition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ExcludeItemsInComOrCol">
+            <Definition>
+                <Custom ref="cmdiExcludedComsOrCols"/>
+            </Definition>
+        </Filter>
+
         <!-- DRIVER filter for records returned by OAI-PMH.
              By default, return an Item record:
                * If a Title & Author field both exist
@@ -209,6 +253,11 @@
                * AND Driver "open access" condition is specified
              This filter is only used in the DRIVER context ([oai]/driver)
         -->
+        <Filter id="ExcludeItemsInComOrCol">
+            <Definition>
+                <Custom ref="cmdiExcludedComsOrCols"/>
+            </Definition>
+        </Filter>
         <Filter id="driverFilter">
             <Definition>
                 <And>
@@ -516,6 +565,12 @@
             </Configuration>
         </CustomCondition>
 
+        <CustomCondition id="cmdiExcludedComsOrCols">
+            <Class>org.dspace.xoai.filter.ColComFilter</Class>
+            <Configuration>
+                <string name="handle">XXX</string>
+            </Configuration>
+        </CustomCondition>
     </Filters>
 
     <Sets>
@@ -528,6 +583,10 @@
             <Spec>openaire</Spec>
             <Name>OpenAIRE</Name>
             <!-- Just an alias -->
+        </Set>
+        <Set id="openaireDataSet">
+            <Spec>openaire_data</Spec>
+            <Name>OpenAIRE_data</Name>
         </Set>
     </Sets>
 </Configuration>
