@@ -161,7 +161,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             throw new UnprocessableEntityException("Not all given items are bitstreams.");
         }
         // check that they're all part of the same Item
-        List<DSpaceObject> items = new ArrayList<>();
+        List<DSpaceObject> parents = new ArrayList<>();
         for (DSpaceObject dso : dsoList) {
             Bitstream bit = bs.find(context, dso.getID());
             DSpaceObject bitstreamParent = bs.getParentObject(context, bit);
@@ -173,10 +173,10 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
                 throw new UnprocessableEntityException("The bitstream with uuid " + bit.getID()
                                                            + " was already deleted");
             } else {
-                items.add(bitstreamParent);
+                parents.add(bitstreamParent);
             }
         }
-        if (items.stream().distinct().count() > 1) {
+        if (parents.stream().distinct().count() > 1) {
             throw new UnprocessableEntityException("Not all given items are part of the same Item.");
         }
         // delete all Bitstreams
