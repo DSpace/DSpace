@@ -9,6 +9,8 @@ package org.dspace.google;
 
 import java.util.Objects;
 
+import org.springframework.util.Assert;
+
 /**
  * This is a dataholder class for an individual event to be sent to Google Analaytics
  *
@@ -24,8 +26,9 @@ public final class GoogleAnalyticsEvent {
     private final String documentTitle;
     private final long time;
 
-    GoogleAnalyticsEvent(String clientId, String userIp, String userAgent, String documentReferrer,
+    public GoogleAnalyticsEvent(String clientId, String userIp, String userAgent, String documentReferrer,
         String documentPath, String documentTitle) {
+        Assert.notNull(clientId, "A client id is required to create a Google Analytics event");
         this.clientId = clientId;
         this.userIp = userIp;
         this.userAgent = userAgent;

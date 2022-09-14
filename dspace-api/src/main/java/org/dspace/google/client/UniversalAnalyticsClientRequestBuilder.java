@@ -7,6 +7,8 @@
  */
 package org.dspace.google.client;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -41,7 +43,7 @@ public class UniversalAnalyticsClientRequestBuilder implements GoogleAnalyticsCl
             .map(event -> formatEvent(analyticsKey, event))
             .collect(Collectors.joining("\n"));
 
-        return List.of(requestBody);
+        return isNotEmpty(requestBody) ? List.of(requestBody) : List.of();
     }
 
     private String formatEvent(String analyticsKey, GoogleAnalyticsEvent event) {
