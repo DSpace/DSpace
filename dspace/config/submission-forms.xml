@@ -231,6 +231,22 @@
             <row>
                 <field>
                     <dc-schema>local</dc-schema>
+                    <dc-element>hiddenButHarvestable</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>Hidden but harvestable</label>
+                    <style>col-sm-4</style>
+                    <input-type value-pairs-name="hidden_list">list</input-type>
+                    <hint>Should item be harvestable thru OAI-PMH but behave like private?</hint>
+                    <required/>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
                     <dc-element>bitstream</dc-element>
                     <dc-qualifier>redirectToURL</dc-qualifier>
                     <repeatable>false</repeatable>
@@ -2016,6 +2032,13 @@
             <pair>
                 <displayed-value>Is a Funding Organization</displayed-value>
                 <stored-value>FundingOrganization</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="hidden_list" dc-term="">
+            <pair>
+                <displayed-value>Hidden</displayed-value>
+                <stored-value>hidden</stored-value>
             </pair>
         </value-pairs>
 

@@ -25,6 +25,12 @@
 
   <dc-type>
     <schema>local</schema>
+    <element>hiddenButHarvestable</element>
+    <scope_note>Should item be harvestable thru OAI-PMH, but behave like private in frontend?</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
     <element>approximateDate</element>
     <qualifier>issued</qualifier>
     <scope_note>Date issued used where the point in time is uncertain; eg. a range.</scope_note>
