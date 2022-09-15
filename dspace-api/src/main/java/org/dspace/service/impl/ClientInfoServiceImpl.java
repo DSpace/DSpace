@@ -206,9 +206,9 @@ public class ClientInfoServiceImpl implements ClientInfoService {
 
     /**
      * Anonymize the given IP address by setting the last specified bytes to 0
-     * @param  ip    the ip address to be anonymize
-     * @param  bytes the number of bytes to be set to 0
-     * @return       the modified ip address
+     * @param  ipAddress the ip address to be anonymize
+     * @param  bytes     the number of bytes to be set to 0
+     * @return           the modified ip address
      */
     private String anonymizeIpAddress(String ipAddress, int bytes) {
 
