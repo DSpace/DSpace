@@ -32,10 +32,10 @@ public abstract class RestAuthorityProvider implements ChoiceAuthority {
 
 	public RestAuthorityProvider() {
 		// Set config properties name prefix
-		this.CHOICES_ENDPOINT_PATH_PREFIX = "choices.endpointPath.";
-		this.CHOICES_FILTER_FIELD_PREFIX = "choices.filterField.";
-		this.CHOICES_ID_FIELD_PREFIX = "choices.idField.";
-		this.CHOICES_AUTH_KEY_PREFIX = "choices.authKeyPrefix.";
+		this.CHOICES_ENDPOINT_PATH_PREFIX = "sedici.choices.endpointPath.";
+		this.CHOICES_FILTER_FIELD_PREFIX = "sedici.choices.filterField.";
+		this.CHOICES_ID_FIELD_PREFIX = "sedici.choices.idField.";
+		this.CHOICES_AUTH_KEY_PREFIX = "sedici.choices.authKeyPrefix.";
 		// Default value for id field
 		this.ID_FIELD = "auth_key";
 		// Default value for text filter field
