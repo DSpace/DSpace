@@ -227,11 +227,6 @@ public class RequestItemRepository
             throw new UnprocessableEntityException("Item request not found");
         }
 
-        // Check for authorized user
-        if (!requestItemAuthorExtractor.isAuthorized(context, ri.getItem())) {
-            throw new AuthorizeException("Not authorized to approve this request");
-        }
-
         // Do not permit updates after a decision has been given.
         Date decisionDate = ri.getDecision_date();
         if (null != decisionDate) {

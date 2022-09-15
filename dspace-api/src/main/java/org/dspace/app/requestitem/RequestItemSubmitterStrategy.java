@@ -8,12 +8,15 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.springframework.lang.NonNull;
 
 /**
  * Basic strategy that looks to the original submitter.
@@ -27,29 +30,31 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
     }
 
     /**
-     * Returns the submitter of an Item as RequestItemAuthor or null if the
-     * Submitter is deleted.
+     * Returns the submitter of an Item as RequestItemAuthor or an empty List if
+     * the Submitter is deleted.
      *
-     * @return The submitter of the item or null if the submitter is deleted
+     * @return The submitter of the item or empty List if the submitter is deleted
      * @throws SQLException if database error
      */
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
-            throws SQLException {
+    @NonNull
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
+        throws SQLException {
         EPerson submitter = item.getSubmitter();
-        RequestItemAuthor author = null;
+        List<RequestItemAuthor> authors = new ArrayList<>(1);
         if (null != submitter) {
-            author = new RequestItemAuthor(
-                    submitter.getFullName(), submitter.getEmail());
+            RequestItemAuthor author = new RequestItemAuthor(
+                submitter.getFullName(), submitter.getEmail());
+            authors.add(author);
         }
-        return author;
+        return authors;
     }
 
     @Override
     public boolean isAuthorized(Context context, Item item) {
-        RequestItemAuthor authorizer;
+            List<RequestItemAuthor> authorizers;
         try {
-            authorizer = getRequestItemAuthor(context, item);
+            authorizers = getRequestItemAuthor(context, item);
         } catch (SQLException ex) {
             LOG.warn("Failed to find an authorizer:  {}", ex::getMessage);
             return false;
@@ -58,6 +63,10 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
         if (null == user) {
             return false;
         }
-        return authorizer.getEmail().equals(user.getEmail());
-    }
+        boolean authorized = false;
+        for (RequestItemAuthor authorizer : authorizers) {
+            authorized |= authorizer.getEmail().equals(user.getEmail());
+        }
+        return authorized;
+}
 }

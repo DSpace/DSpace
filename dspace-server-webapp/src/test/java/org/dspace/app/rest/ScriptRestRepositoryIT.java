@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +43,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Bitstream;
@@ -50,10 +52,12 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.eperson.Group;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ProcessService;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -70,6 +74,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private BitstreamService bitstreamService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Autowired
     private List<ScriptConfiguration> scriptConfigurations;
@@ -519,6 +526,59 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         hasJsonPath("$.nameLong", is("--file"))
                                 )
                         ) ));
+    }
+
+    @Test
+    public void TrackSpecialGroupduringprocessSchedulingTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group specialGroup = GroupBuilder.createGroup(context)
+            .withName("Special Group")
+            .addMember(admin)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        configurationService.setProperty("authentication-password.login.specialgroup", specialGroup.getName());
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+
+        parameters.add(new DSpaceCommandLineParameter("-r", "test"));
+        parameters.add(new DSpaceCommandLineParameter("-i", null));
+
+        List<ParameterValueRest> list = parameters.stream()
+            .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+            .collect(Collectors.toList());
+
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+        List<ProcessStatus> acceptableProcessStatuses = new LinkedList<>();
+        acceptableProcessStatuses.addAll(Arrays.asList(ProcessStatus.SCHEDULED,
+                                                       ProcessStatus.RUNNING,
+                                                       ProcessStatus.COMPLETED));
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        try {
+            getClient(token).perform(post("/api/system/scripts/mock-script/processes")
+                                         .contentType("multipart/form-data")
+                                         .param("properties", new ObjectMapper().writeValueAsString(list)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$", is(ProcessMatcher.matchProcess("mock-script",
+                                                                        String.valueOf(admin.getID()),
+                                                                        parameters, acceptableProcessStatuses))))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
+
+            Process process = processService.find(context, idRef.get());
+            List<Group> groups = process.getGroups();
+            boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(specialGroup.getID()));
+            assertTrue(isPresent);
+
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
     }
 
 

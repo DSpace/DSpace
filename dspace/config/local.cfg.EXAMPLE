@@ -32,16 +32,19 @@
 # Windows note: Please remember to use forward slashes for all paths (e.g. C:/dspace)
 dspace.dir=/dspace
 
-# URL of DSpace backend ('server' webapp). Include port number etc.
+# Public URL of DSpace backend ('server' webapp). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
-# This is where REST API and all enabled server modules (OAI-PMH, SWORD,
-# SWORDv2, RDF, etc) will respond.
+# This is where REST API and all enabled server modules (OAI-PMH, SWORD, SWORDv2, RDF, etc) will respond.
+# NOTE: This URL must be accessible to all DSpace users (should not use 'localhost' in Production)
+# and is usually "synced" with the "rest" section in the DSpace User Interface's config.*.yml.
+# It corresponds to the URL that you would type into your browser to access the REST API.
 dspace.server.url = http://localhost:8080/server
 
-# URL of DSpace frontend (Angular UI). Include port number etc.
+# Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
-# This is used by the backend to provide links in emails, RSS feeds, Sitemaps,
-# etc.
+# This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
+# NOTE: this URL must be accessible to all DSpace users (should not use 'localhost' in Production).
+# It corresponds to the URL that you would type into your browser to access the User Interface.
 dspace.ui.url = http://localhost:4000
 
 # Name of the site
@@ -207,6 +210,9 @@ db.schema = public
 # Shibboleth authentication/authorization. See authentication-shibboleth.cfg for default configuration.
 # Check also the cors settings below
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.ShibAuthentication
+
+# ORCID certificate authentication.
+# plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.OrcidAuthentication
 
 # X.509 certificate authentication. See authentication-x509.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.X509Authentication

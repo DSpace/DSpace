@@ -8,6 +8,8 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
@@ -17,6 +19,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 
 /**
  * RequestItem strategy to allow DSpace support team's help desk to receive
@@ -45,14 +48,17 @@ public class RequestItemHelpdeskStrategy
     }
 
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
+    @NonNull
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
             throws SQLException {
         boolean helpdeskOverridesSubmitter = configurationService
-            .getBooleanProperty(P_HELPDESK_OVERRIDE, false);
-        String helpDeskEmail = configurationService.getProperty(P_MAIL_HELPDESK);
+            .getBooleanProperty("request.item.helpdesk.override", false);
+        String helpDeskEmail = configurationService.getProperty("mail.helpdesk");
 
         if (helpdeskOverridesSubmitter && StringUtils.isNotBlank(helpDeskEmail)) {
-            return getHelpDeskPerson(context, helpDeskEmail);
+            List<RequestItemAuthor> authors = new ArrayList<>(1);
+            authors.add(getHelpDeskPerson(context, helpDeskEmail));
+            return authors;
         } else {
             //Fallback to default logic (author of Item) if helpdesk isn't fully enabled or setup
             return super.getRequestItemAuthor(context, item);

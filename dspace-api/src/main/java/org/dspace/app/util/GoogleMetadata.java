@@ -470,11 +470,7 @@ public class GoogleMetadata {
             parsedOptions.add(parsedFields);
         }
 
-        if (null != parsedOptions) {
-            return parsedOptions;
-        } else {
-            return null;
-        }
+        return parsedOptions;
     }
 
     /**
