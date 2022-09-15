@@ -13,7 +13,6 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.authorization.AuthorizeServiceRestUtil;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
