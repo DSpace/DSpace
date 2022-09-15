@@ -8,9 +8,9 @@
 package org.dspace.app.requestitem;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.builder.AbstractBuilder;
@@ -98,13 +98,13 @@ public class RequestItemHelpdeskStrategyTest
         // Check with help desk enabled.
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "true");
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_MAIL_HELPDESK, HELPDESK_ADDRESS);
-        RequestItemAuthor author = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong author address", HELPDESK_ADDRESS, author.getEmail());
+        List<RequestItemAuthor> authors = instance.getRequestItemAuthor(context, item);
+        assertEquals("Wrong author address", HELPDESK_ADDRESS, authors.get(0).getEmail());
 
         // Check with help desk disabled.
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "false");
-        author = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong author address", AUTHOR_ADDRESS, author.getEmail());
+        authors = instance.getRequestItemAuthor(context, item);
+        assertEquals("Wrong author address", AUTHOR_ADDRESS, authors.get(0).getEmail());
     }
 
     /**
@@ -114,16 +114,5 @@ public class RequestItemHelpdeskStrategyTest
     @Ignore
     @Test
     public void testGetHelpDeskPerson() throws Exception {
-    }
-
-    /**
-     * Silly test of isAuthorized method.
-     */
-    @Test
-    public void testIsAuthorized() {
-        RequestItemHelpdeskStrategy instance = new RequestItemHelpdeskStrategy();
-        instance.configurationService = configurationService;
-        instance.ePersonService = epersonService;
-        assertTrue(instance.isAuthorized(context, item));
     }
 }

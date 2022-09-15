@@ -8,10 +8,9 @@
 package org.dspace.app.requestitem;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.builder.AbstractBuilder;
@@ -89,27 +88,7 @@ public class RequestItemSubmitterStrategyTest
     public void testGetRequestItemAuthor()
             throws Exception {
         RequestItemSubmitterStrategy instance = new RequestItemSubmitterStrategy();
-        RequestItemAuthor author = instance.getRequestItemAuthor(context, item);
-        assertEquals("Wrong author address", AUTHOR_ADDRESS, author.getEmail());
-    }
-
-    /**
-     * Test of isAuthorized method, of class RequestItemSubmitterStrategy.
-     */
-    @Test
-    public void testIsAuthorized() {
-        RequestItemSubmitterStrategy instance = new RequestItemSubmitterStrategy();
-
-        // Test with correct logged-in user.
-        context.setCurrentUser(johnDoe);
-        assertTrue("Should be authorized", instance.isAuthorized(context, item));
-
-        // Test with incorrect logged-in user.
-        context.setCurrentUser(richardRoe);
-        assertFalse("Should not be authorized", instance.isAuthorized(context, item));
-
-        // Test when not logged in.
-        context.setCurrentUser(null);
-        assertFalse("Should not be authorized", instance.isAuthorized(context, item));
+        List<RequestItemAuthor> author = instance.getRequestItemAuthor(context, item);
+        assertEquals("Wrong author address", AUTHOR_ADDRESS, author.get(0).getEmail());
     }
 }

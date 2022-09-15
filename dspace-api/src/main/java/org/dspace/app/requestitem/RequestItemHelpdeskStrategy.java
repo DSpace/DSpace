@@ -91,9 +91,4 @@ public class RequestItemHelpdeskStrategy
             return new RequestItemAuthor(helpdeskName, helpDeskEmail);
         }
     }
-
-    @Override
-    public boolean isAuthorized(Context context, Item item) {
-        return true;
-    }
 }

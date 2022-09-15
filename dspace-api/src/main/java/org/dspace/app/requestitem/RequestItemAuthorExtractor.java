@@ -29,16 +29,7 @@ public interface RequestItemAuthorExtractor {
      * @return Names and email addresses to send the request to.
      * @throws SQLException if database error
      */
-        @NonNull
+    @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
             throws SQLException;
-
-    /**
-     *
-     * @param context current DSpace session.
-     * @param item the requested Item.
-     * @return true if {@link eperson} is authorized to respond to requests for
-     *          {@link item}.
-     */
-    public boolean isAuthorized(Context context, Item item);
 }

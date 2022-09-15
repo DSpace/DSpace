@@ -49,24 +49,4 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
         }
         return authors;
     }
-
-    @Override
-    public boolean isAuthorized(Context context, Item item) {
-            List<RequestItemAuthor> authorizers;
-        try {
-            authorizers = getRequestItemAuthor(context, item);
-        } catch (SQLException ex) {
-            LOG.warn("Failed to find an authorizer:  {}", ex::getMessage);
-            return false;
-        }
-        EPerson user = context.getCurrentUser();
-        if (null == user) {
-            return false;
-        }
-        boolean authorized = false;
-        for (RequestItemAuthor authorizer : authorizers) {
-            authorized |= authorizer.getEmail().equals(user.getEmail());
-        }
-        return authorized;
-}
 }
