@@ -34,17 +34,18 @@ import org.dspace.utils.DSpace;
  */
 public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<ProcessCleaner>> {
 
-
     private ConfigurationService configurationService;
 
     private ProcessService processService;
 
 
-    boolean cleanCompleted = false;
+    private boolean cleanCompleted = false;
 
-    boolean cleanFailed = false;
+    private boolean cleanFailed = false;
 
-    boolean cleanRunning = false;
+    private boolean cleanRunning = false;
+
+    private boolean help = false;
 
     private Integer days;
 
@@ -55,6 +56,7 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.processService = ScriptServiceFactory.getInstance().getProcessService();
 
+        this.help = commandLine.hasOption('h');
         this.cleanFailed = commandLine.hasOption('f');
         this.cleanRunning = commandLine.hasOption('r');
         this.cleanCompleted = commandLine.hasOption('c') || (!cleanFailed && !cleanRunning);
@@ -69,6 +71,11 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
 
     @Override
     public void internalRun() throws Exception {
+
+        if (help) {
+            printHelp();
+            return;
+        }
 
         Context context = new Context();
 

@@ -40,6 +40,8 @@ public class ProcessCleanerConfiguration<T extends ProcessCleaner> extends Scrip
 
             Options options = new Options();
 
+            options.addOption("h", "help", false, "help");
+
             options.addOption("r", "running", false, "delete the process with RUNNING status");
             options.getOption("r").setType(boolean.class);
 
