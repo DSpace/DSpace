@@ -533,29 +533,6 @@ public class RequestItemRepositoryIT
 
         ObjectWriter mapperWriter = new ObjectMapper().writer();
 
-        // Unauthenticated user
-        parameters = Map.of(
-                "acceptRequest", "true",
-                "subject", "subject",
-                "responseMessage", "Request accepted");
-        content = mapperWriter.writeValueAsString(parameters);
-        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
-                .contentType(contentType)
-                .content(content))
-                .andExpect(status().isUnauthorized());
-
-        // Unauthorized user
-        parameters = Map.of(
-                "acceptRequest", "true",
-                "subject", "subject",
-                "responseMessage", "Request accepted");
-        content = mapperWriter.writeValueAsString(parameters);
-        authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
-                .contentType(contentType)
-                .content(content))
-                .andExpect(status().isInternalServerError()); // Should be FORBIDDEN
-
         // Missing acceptRequest
         parameters = Map.of(
                 "subject", "subject",
