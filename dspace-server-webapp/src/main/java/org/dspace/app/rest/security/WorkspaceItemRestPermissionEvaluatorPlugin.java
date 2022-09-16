@@ -62,7 +62,7 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
         WorkspaceItem witem = null;
         try {
             ePerson = context.getCurrentUser();
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
 
             // anonymous user
             if (ePerson == null) {

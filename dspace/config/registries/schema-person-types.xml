@@ -135,5 +135,25 @@
         <qualifier>isni</qualifier>
         <scope_note>International Standard Name Identifier</scope_note>
     </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>country</element>
+        <scope_note>Country in which person lives</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>name</element>
+        <qualifier>translated</qualifier>
+        <scope_note>Full name translation</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>name</element>
+        <qualifier>variant</qualifier>
+        <scope_note>Full name variant</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

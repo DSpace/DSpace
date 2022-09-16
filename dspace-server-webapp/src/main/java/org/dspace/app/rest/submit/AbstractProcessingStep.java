@@ -35,5 +35,4 @@ public abstract class AbstractProcessingStep implements DataProcessingStep {
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-
 }

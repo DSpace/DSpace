@@ -50,7 +50,7 @@ public class ItemMetadataValueRemovePatchOperation extends MetadataValueRemovePa
         if (split.length == 1) {
             deleteValue(context, source.getItem(), split[0], -1);
         } else {
-            Integer toDelete = Integer.parseInt(split[1]);
+            int toDelete = Integer.parseInt(split[1]);
             deleteValue(context, source.getItem(), split[0], toDelete);
         }
     }

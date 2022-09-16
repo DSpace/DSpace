@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -37,6 +38,8 @@ public class IndexEventConsumer implements Consumer {
 
     // collect Items, Collections, Communities that need indexing
     private Set<IndexableObject> objectsToUpdate = new HashSet<>();
+    // collect freshly created Items that need indexing (requires pre-db status)
+    private Set<IndexableObject> createdItemsToUpdate = new HashSet<>();
 
     // unique search IDs to delete
     private Set<String> uniqueIdsToDelete = new HashSet<>();
@@ -65,6 +68,7 @@ public class IndexEventConsumer implements Consumer {
         if (objectsToUpdate == null) {
             objectsToUpdate = new HashSet<>();
             uniqueIdsToDelete = new HashSet<>();
+            createdItemsToUpdate = new HashSet<>();
         }
 
         int st = event.getSubjectType();
@@ -143,6 +147,7 @@ public class IndexEventConsumer implements Consumer {
                         String detail = indexableObjectService.getType() + "-" + event.getSubjectID().toString();
                         uniqueIdsToDelete.add(detail);
                     }
+
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
                 }
                 break;
@@ -162,7 +167,7 @@ public class IndexEventConsumer implements Consumer {
                     // also update the object in order to index mapped/unmapped Items
                     if (subject != null &&
                         subject.getType() == Constants.COLLECTION && object.getType() == Constants.ITEM) {
-                        objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
+                        createdItemsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, object));
                     }
                 }
                 break;
@@ -209,23 +214,11 @@ public class IndexEventConsumer implements Consumer {
             }
             // update the changed Items not deleted because they were on create list
             for (IndexableObject iu : objectsToUpdate) {
-                /* we let all types through here and
-                 * allow the search indexer to make
-                 * decisions on indexing and/or removal
-                 */
-                iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
-                String uniqueIndexID = iu.getUniqueIndexID();
-                if (uniqueIndexID != null) {
-                    try {
-                        indexer.indexContent(ctx, iu, true, false);
-                        log.debug("Indexed "
-                                + iu.getTypeText()
-                                + ", id=" + iu.getID()
-                                + ", unique_id=" + uniqueIndexID);
-                    } catch (Exception e) {
-                        log.error("Failed while indexing object: ", e);
-                    }
-                }
+                indexObject(ctx, iu, false);
+            }
+            // update the created Items with a pre-db status
+            for (IndexableObject iu : createdItemsToUpdate) {
+                indexObject(ctx, iu, true);
             }
         } finally {
             if (!objectsToUpdate.isEmpty() || !uniqueIdsToDelete.isEmpty()) {
@@ -235,6 +228,27 @@ public class IndexEventConsumer implements Consumer {
                 // "free" the resources
                 objectsToUpdate.clear();
                 uniqueIdsToDelete.clear();
+                createdItemsToUpdate.clear();
+            }
+        }
+    }
+
+    private void indexObject(Context ctx, IndexableObject iu, boolean preDb) throws SQLException {
+        /* we let all types through here and
+         * allow the search indexer to make
+         * decisions on indexing and/or removal
+         */
+        iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
+        String uniqueIndexID = iu.getUniqueIndexID();
+        if (uniqueIndexID != null) {
+            try {
+                indexer.indexContent(ctx, iu, true, false, preDb);
+                log.debug("Indexed "
+                        + iu.getTypeText()
+                        + ", id=" + iu.getID()
+                        + ", unique_id=" + uniqueIndexID);
+            } catch (Exception e) {
+                log.error("Failed while indexing object: ", e);
             }
         }
     }

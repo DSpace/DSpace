@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -23,12 +22,12 @@ import org.dspace.eperson.service.EPersonService;
 import org.springframework.util.StopWatch;
 
 /**
+ * A command line tool to verify/test the accuracy and speed gains of
+ * {@link Collection.findAuthorizedOptimized}.
+ * Invocation: {@code dsrun org.dspace.app.util.OptimizeSelectCollection}
  * @author peterdietz
- * A command line tool to verify/test the accuracy and speed gains of Collection.findAuthorizedOptimized()
- * Invocation: dsrun org.dspace.app.util.OptimizeSelectCollection
  */
 public class OptimizeSelectCollection {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(OptimizeSelectCollection.class);
     private static Context context;
 
     private static ArrayList<EPerson> brokenPeople;
@@ -49,7 +48,7 @@ public class OptimizeSelectCollection {
                          "values as the legacy select-collection logic.");
 
         context = new Context();
-        brokenPeople = new ArrayList<EPerson>();
+        brokenPeople = new ArrayList<>();
         int peopleChecked = 0;
         timeSavedMS = 0L;
 
@@ -68,7 +67,7 @@ public class OptimizeSelectCollection {
             }
         }
 
-        if (brokenPeople.size() > 0) {
+        if (!brokenPeople.isEmpty()) {
             System.out.println("NOT DONE YET!!! Some people don't have all their collections.");
             for (EPerson person : brokenPeople) {
                 System.out.println("-- " + person.getEmail());
@@ -90,7 +89,7 @@ public class OptimizeSelectCollection {
         stopWatch.start("findAuthorized");
         List<Collection> collections = collectionService.findAuthorized(context, null, Constants.ADD);
         stopWatch.stop();
-        Long defaultMS = stopWatch.getLastTaskTimeMillis();
+        long defaultMS = stopWatch.getLastTaskTimeMillis();
 
         stopWatch.start("ListingCollections");
         System.out.println("Legacy Find Authorized");
@@ -100,7 +99,7 @@ public class OptimizeSelectCollection {
         stopWatch.start("findAuthorizedOptimized");
         List<Collection> collectionsOptimized = collectionService.findAuthorizedOptimized(context, Constants.ADD);
         stopWatch.stop();
-        Long optimizedMS = stopWatch.getLastTaskTimeMillis();
+        long optimizedMS = stopWatch.getLastTaskTimeMillis();
         timeSavedMS += defaultMS - optimizedMS;
 
 

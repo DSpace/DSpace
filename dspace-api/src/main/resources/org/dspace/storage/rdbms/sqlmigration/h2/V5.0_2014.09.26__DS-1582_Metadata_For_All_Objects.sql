@@ -36,7 +36,7 @@ alter table metadatavalue alter column resource_id set not null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 community_id AS resource_id,
 4 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier is null) AS metadata_field_id,
@@ -47,7 +47,7 @@ FROM community where not introductory_text is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 community_id AS resource_id,
 4 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier = 'abstract') AS metadata_field_id,
@@ -58,7 +58,7 @@ FROM community where not short_description is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 community_id AS resource_id,
 4 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier = 'tableofcontents') AS metadata_field_id,
@@ -69,7 +69,7 @@ FROM community where not side_bar_text is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 community_id AS resource_id,
 4 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'rights' and qualifier is null) AS metadata_field_id,
@@ -80,7 +80,7 @@ FROM community where not copyright_text is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 community_id AS resource_id,
 4 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'title' and qualifier is null) AS metadata_field_id,
@@ -104,7 +104,7 @@ alter table community drop column name;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier is null) AS metadata_field_id,
@@ -115,7 +115,7 @@ FROM collection where not introductory_text is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier = 'abstract') AS metadata_field_id,
@@ -126,7 +126,7 @@ FROM collection where not short_description is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier = 'tableofcontents') AS metadata_field_id,
@@ -137,7 +137,7 @@ FROM collection where not side_bar_text is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'rights' and qualifier is null) AS metadata_field_id,
@@ -148,7 +148,7 @@ FROM collection where not copyright_text is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'title' and qualifier is null) AS metadata_field_id,
@@ -159,7 +159,7 @@ FROM collection where not name is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'provenance' and qualifier is null) AS metadata_field_id,
@@ -170,7 +170,7 @@ FROM collection where not provenance_description is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 collection_id AS resource_id,
 3 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'rights' and qualifier = 'license') AS metadata_field_id,
@@ -194,7 +194,7 @@ alter table collection drop column provenance_description;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 bundle_id AS resource_id,
 1 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'title' and qualifier is null) AS metadata_field_id,
@@ -214,7 +214,7 @@ alter table bundle drop column name;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 bitstream_id AS resource_id,
 0 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'title' and qualifier is null) AS metadata_field_id,
@@ -225,7 +225,7 @@ FROM bitstream where not name is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 bitstream_id AS resource_id,
 0 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'description' and qualifier is null) AS metadata_field_id,
@@ -236,7 +236,7 @@ FROM bitstream where not description is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 bitstream_id AS resource_id,
 0 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'format' and qualifier is null) AS metadata_field_id,
@@ -247,7 +247,7 @@ FROM bitstream where not user_format_description is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 bitstream_id AS resource_id,
 0 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'source' and qualifier is null) AS metadata_field_id,
@@ -269,7 +269,7 @@ alter table bitstream drop column source;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 eperson_group_id AS resource_id,
 6 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='dc') and element = 'title' and qualifier is null) AS metadata_field_id,
@@ -288,7 +288,7 @@ alter table epersongroup drop column name;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 eperson_id AS resource_id,
 7 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='eperson') and element = 'firstname' and qualifier is null) AS metadata_field_id,
@@ -299,7 +299,7 @@ FROM eperson where not firstname is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 eperson_id AS resource_id,
 7 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='eperson') and element = 'lastname' and qualifier is null) AS metadata_field_id,
@@ -310,7 +310,7 @@ FROM eperson where not lastname is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 eperson_id AS resource_id,
 7 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='eperson') and element = 'phone' and qualifier is null) AS metadata_field_id,
@@ -321,7 +321,7 @@ FROM eperson where not phone is null;
 
 INSERT INTO metadatavalue (metadata_value_id, resource_id, resource_type_id, metadata_field_id, text_value, text_lang, place)
 SELECT
-metadatavalue_seq.nextval as metadata_value_id,
+NEXT VALUE FOR metadatavalue_seq as metadata_value_id,
 eperson_id AS resource_id,
 7 AS resource_type_id,
 (select metadata_field_id from metadatafieldregistry where metadata_schema_id=(select metadata_schema_id from metadataschemaregistry where short_id='eperson') and element = 'language' and qualifier is null) AS metadata_field_id,

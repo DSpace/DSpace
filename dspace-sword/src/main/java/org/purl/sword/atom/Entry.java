@@ -215,10 +215,10 @@ public class Entry extends XmlElement implements SwordElementInterface {
      *
      */
     protected void initialise() {
-        authors = new ArrayList<Author>();
-        categories = new ArrayList<Category>();
-        contributors = new ArrayList<Contributor>();
-        links = new ArrayList<Link>();
+        authors = new ArrayList<>();
+        categories = new ArrayList<>();
+        contributors = new ArrayList<>();
+        links = new ArrayList<>();
     }
 
     /**
@@ -226,6 +226,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
      *
      * @return An element that holds the data associated with this object.
      */
+    @Override
     public Element marshall() {
         Element entry = new Element(getQualifiedName(), Namespaces.NS_ATOM);
         entry.addNamespaceDeclaration(Namespaces.PREFIX_SWORD, Namespaces.NS_SWORD);
@@ -297,6 +298,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
      *                             element, or if there is a problem processing the element or any
      *                             subelements.
      */
+    @Override
     public void unmarshall(Element entry)
         throws UnmarshallException {
         unmarshall(entry, null);
@@ -472,8 +474,10 @@ public class Entry extends XmlElement implements SwordElementInterface {
     }
 
     /**
-     *
+     * @param validationContext FIXME: PLEASE DOCUMENT.
+     * @return SWORD validation info.
      */
+    @Override
     public SwordValidationInfo validate(Properties validationContext) {
         return validate(null, validationContext);
     }
@@ -498,7 +502,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
             result.addValidationInfo(new SwordValidationInfo(Id.elementName(),
                                                              SwordValidationInfo.MISSING_ELEMENT_ERROR,
                                                              SwordValidationInfoType.ERROR));
-        } else if (id != null && validateAll) {
+        } else if (validateAll) {
             result.addValidationInfo(id.validate(validationContext));
         }
 
@@ -506,7 +510,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
             result.addValidationInfo(new SwordValidationInfo(Title.elementName(),
                                                              SwordValidationInfo.MISSING_ELEMENT_ERROR,
                                                              SwordValidationInfoType.ERROR));
-        } else if (title != null && validateAll) {
+        } else if (validateAll) {
             result.addValidationInfo(title.validate(validationContext));
         }
 
@@ -514,7 +518,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
             result.addValidationInfo(new SwordValidationInfo(Updated.elementName(),
                                                              SwordValidationInfo.MISSING_ELEMENT_ERROR,
                                                              SwordValidationInfoType.ERROR));
-        } else if (updated != null && validateAll) {
+        } else if (validateAll) {
             result.addValidationInfo(updated.validate(validationContext));
         }
 
@@ -543,7 +547,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
                                                                  " SHOULD contain the URI and version of the server " +
                                                                  "software.",
                                                              SwordValidationInfoType.ERROR));
-        } else if (generator != null && validateAll) {
+        } else if (validateAll) {
             result.addValidationInfo(generator.validate(validationContext));
         }
 
@@ -619,7 +623,7 @@ public class Entry extends XmlElement implements SwordElementInterface {
      * @return An iterator.
      */
     public Iterator<String> getCategories() {
-        ArrayList<String> items = new ArrayList<String>();
+        ArrayList<String> items = new ArrayList<>();
         for (int i = 0; i < categories.size(); i++) {
             items.add(categories.get(i).getContent());
         }
