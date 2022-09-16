@@ -218,7 +218,7 @@ public class RequestItemRepository
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
