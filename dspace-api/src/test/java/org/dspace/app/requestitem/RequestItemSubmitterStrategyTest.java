@@ -35,10 +35,8 @@ import org.junit.Test;
 public class RequestItemSubmitterStrategyTest
         extends AbstractUnitTest {
     private static final String AUTHOR_ADDRESS = "john.doe@example.com";
-    private static final String NON_AUTHOR_ADDRESS = "richard.roe@example.com";
 
     private static EPerson johnDoe;
-    private static EPerson richardRoe;
 
     private Item item;
 
@@ -53,10 +51,6 @@ public class RequestItemSubmitterStrategyTest
                 .withEmail(AUTHOR_ADDRESS)
                 .withNameInMetadata("John", "Doe")
                 .build();
-        richardRoe = EPersonBuilder.createEPerson(ctx)
-                .withEmail(NON_AUTHOR_ADDRESS)
-                .withNameInMetadata("Richard", "Roe")
-                .build();
         ctx.restoreAuthSystemState();
         ctx.complete();
     }
@@ -68,7 +62,6 @@ public class RequestItemSubmitterStrategyTest
 
     @Before
     public void setUp() {
-        context = new Context();
         context = new Context();
         context.setCurrentUser(johnDoe);
         context.turnOffAuthorisationSystem();
