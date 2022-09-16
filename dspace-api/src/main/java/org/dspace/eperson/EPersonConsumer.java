@@ -16,7 +16,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.event.Consumer;
@@ -96,10 +96,10 @@ public class EPersonConsumer implements Consumer {
 
                             adminEmail.send();
 
-                            log.info(LogManager.getHeader(context, "registerion_alert", "user="
+                            log.info(LogHelper.getHeader(context, "registerion_alert", "user="
                                 + eperson.getEmail()));
                         } catch (MessagingException me) {
-                            log.warn(LogManager.getHeader(context,
+                            log.warn(LogHelper.getHeader(context,
                                                           "error_emailing_administrator", ""), me);
                         }
                     }

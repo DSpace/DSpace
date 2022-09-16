@@ -21,7 +21,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.MetadataFieldMatcher;
@@ -967,9 +970,13 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void findAllPaginationTest() throws Exception {
-
-        // Determine number of metadata fields from database
-        int numberOfMdFields = ContentServiceFactory.getInstance().getMetadataFieldService().findAll(context).size();
+        List<MetadataField> alphabeticMdFields =
+            ContentServiceFactory.getInstance()
+                                 .getMetadataFieldService()
+                                 .findAll(context).stream()
+                                 .sorted(Comparator.comparing(mdf -> mdf.toString('.')))
+                                 .collect(Collectors.toList());
+        int numberOfMdFields = alphabeticMdFields.size();
 
         // If we return 3 fields per page, determine number of pages we expect
         int pageSize = 3;
@@ -983,9 +990,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(content().contentType(contentType))
                    // Metadata fields are returned alphabetically. So, look for the first 3 alphabetically
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","datePublished", null),
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework", "editor", null),
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework", "keywords", null)
+                              MetadataFieldMatcher.matchMetadataField(alphabeticMdFields.get(0)),
+                              MetadataFieldMatcher.matchMetadataField(alphabeticMdFields.get(1)),
+                              MetadataFieldMatcher.matchMetadataField(alphabeticMdFields.get(2))
                               )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                            Matchers.containsString("/api/core/metadatafields?"),
@@ -1012,9 +1019,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(content().contentType(contentType))
                    // Metadata fields are returned alphabetically. So, look for the next 3 alphabetically
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativework","publisher", null),
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("creativeworkseries", "issn", null),
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("dc", "contributor", null)
+                              MetadataFieldMatcher.matchMetadataField(alphabeticMdFields.get(3)),
+                              MetadataFieldMatcher.matchMetadataField(alphabeticMdFields.get(4)),
+                              MetadataFieldMatcher.matchMetadataField(alphabeticMdFields.get(5))
                               )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                            Matchers.containsString("/api/core/metadatafields?"),

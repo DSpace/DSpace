@@ -117,8 +117,7 @@ public class SitemapRestController {
                                              HttpServletRequest request) throws SQLException, IOException {
         // Pipe the bits
         try (InputStream is = new FileInputStream(foundSitemapFile)) {
-            HttpHeadersInitializer sender = HttpHeadersInitializer
-                .fromInputStream(is)
+            HttpHeadersInitializer sender = new HttpHeadersInitializer()
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(foundSitemapFile.getName())
                 .withLength(foundSitemapFile.length())

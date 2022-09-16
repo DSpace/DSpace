@@ -66,7 +66,7 @@ public class ScriptProcessesController {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
-        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
+        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getHttpServletRequest());
         ProcessRest processRest = scriptRestRepository.startProcess(context, scriptName, files);
         ProcessResource processResource = converter.toResource(processRest);
         context.complete();

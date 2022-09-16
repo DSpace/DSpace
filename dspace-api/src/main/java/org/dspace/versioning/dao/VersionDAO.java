@@ -36,12 +36,28 @@ public interface VersionDAO extends GenericDAO<Version> {
      *
      * @param context        The relevant DSpace Context.
      * @param versionHistory version history
+     * @param offset         the position of the first result to return
+     * @param limit          paging limit
      * @return all versions of an version history that have items assigned.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
+    public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory, int offset, int limit)
         throws SQLException;
 
     public int getNextVersionNumber(Context c, VersionHistory vh) throws SQLException;
+
+    /**
+     * This method count versions of an version history that have items
+     * assigned. We do not delete versions to keep version numbers stable. To
+     * remove a version we set the item, date, summary and eperson null. This
+     * method returns only versions that aren't soft deleted and have items
+     * assigned.
+     * 
+     * @param context          The relevant DSpace Context.
+     * @param versionHistory   Version history
+     * @return                 Total versions of an version history that have items assigned.
+     * @throws SQLException    If database error
+     */
+    public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException;
 
 }

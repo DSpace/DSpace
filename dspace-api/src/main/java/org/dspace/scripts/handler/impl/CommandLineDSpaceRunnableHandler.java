@@ -85,6 +85,12 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     @Override
+    public void logError(String message, Throwable throwable) {
+        System.err.println(message);
+        log.error(message, throwable);
+    }
+
+    @Override
     public void printHelp(Options options, String name) {
         if (options != null) {
             HelpFormatter formatter = new HelpFormatter();

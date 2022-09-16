@@ -61,7 +61,7 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = context.getCurrentUser();
         try {
             UUID dsoId = UUID.fromString(targetId.toString());

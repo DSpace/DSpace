@@ -57,7 +57,7 @@ public class PackageParameters extends Properties {
             } else if (v.length == 1) {
                 result.setProperty(name, v[0]);
             } else {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < v.length; ++i) {
                     if (i > 0) {
                         sb.append(SEPARATOR);

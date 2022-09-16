@@ -124,7 +124,7 @@ public interface CreativeCommonsService {
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
-     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it
+     * @deprecated the bitstream with the license in the textual format it
      * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     @Deprecated

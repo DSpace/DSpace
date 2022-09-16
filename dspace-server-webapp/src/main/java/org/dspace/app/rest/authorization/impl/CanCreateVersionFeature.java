@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -45,21 +46,33 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
     private ItemService itemService;
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (object instanceof ItemRest) {
+            if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+                return false;
+            }
             EPerson currentUser = context.getCurrentUser();
             if (Objects.isNull(currentUser)) {
                 return false;
             }
-            if (authorizeService.isAdmin(context)) {
-                return true;
+            Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
+            if (Objects.nonNull(item)) {
+                // The property versioning.block.entity is used to disable versioning for items with EntityType
+                boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
+                boolean hasEntityType = StringUtils.isNotBlank(itemService.
+                                        getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
+                if (isBlockEntity && hasEntityType) {
+                    return false;
+                }
+                if (authorizeService.isAdmin(context, item)) {
+                    return true;
+                }
+                if (configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion")) {
+                    EPerson submitter = item.getSubmitter();
+                    return Objects.nonNull(submitter) && currentUser.getID().equals(submitter.getID());
+                }
             }
-            if (configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion")) {
-                Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
-                EPerson submitter = item.getSubmitter();
-                return Objects.nonNull(submitter) && currentUser.getID().equals(submitter.getID());
-            }
-
         }
         return false;
     }

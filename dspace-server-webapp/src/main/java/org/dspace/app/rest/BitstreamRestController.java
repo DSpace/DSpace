@@ -38,6 +38,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
@@ -108,6 +109,8 @@ public class BitstreamRestController {
         Context context = ContextUtil.obtainContext(request);
 
         Bitstream bit = bitstreamService.find(context, uuid);
+        EPerson currentUser = context.getCurrentUser();
+
         if (bit == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -117,8 +120,6 @@ public class BitstreamRestController {
         BitstreamFormat format = bit.getFormat(context);
         String mimetype = format.getMIMEType();
         String name = getBitstreamName(bit, format);
-
-        Pair<InputStream, Long> bitstreamTuple = getBitstreamInputStreamAndSize(context, bit);
 
         if (StringUtils.isBlank(request.getHeader("Range"))) {
             //We only log a download request when serving a request without Range header. This is because
@@ -131,18 +132,24 @@ public class BitstreamRestController {
                     bit));
         }
 
-        // Pipe the bits
-        InputStream is = bitstreamTuple.getLeft();
         try {
-            HttpHeadersInitializer httpHeadersInitializer = HttpHeadersInitializer
-                    .fromInputStream(is)
-                    .withBufferSize(BUFFER_SIZE)
-                    .withFileName(name)
-                    .withLength(bitstreamTuple.getRight())
-                    .withChecksum(bit.getChecksum())
-                    .withMimetype(mimetype)
-                    .with(request)
-                    .with(response);
+            long filesize;
+            if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
+                final Pair<InputStream, Long> citedDocument = citationDocumentService.makeCitedDocument(context, bit);
+                filesize = citedDocument.getRight();
+                citedDocument.getLeft().close();
+            } else {
+                filesize = bit.getSizeBytes();
+            }
+
+            HttpHeadersInitializer httpHeadersInitializer = new HttpHeadersInitializer()
+                .withBufferSize(BUFFER_SIZE)
+                .withFileName(name)
+                .withLength(filesize)
+                .withChecksum(bit.getChecksum())
+                .withMimetype(mimetype)
+                .with(request)
+                .with(response);
 
             if (lastModified != null) {
                 httpHeadersInitializer.withLastModified(lastModified);
@@ -150,13 +157,15 @@ public class BitstreamRestController {
 
             //Determine if we need to send the file as a download or if the browser can open it inline
             long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
-            if (dispositionThreshold >= 0 && bitstreamTuple.getRight() > dispositionThreshold) {
+            if (dispositionThreshold >= 0 && filesize > dispositionThreshold) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
 
+
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource =
-                new org.dspace.app.rest.utils.BitstreamResource(is, name, uuid, bit.getSizeBytes());
+                new org.dspace.app.rest.utils.BitstreamResource(
+                    bit, name, uuid, filesize, currentUser != null ? currentUser.getID() : null);
 
             //We have all the data we need, close the connection to the database so that it doesn't stay open during
             //download/streaming
@@ -171,32 +180,10 @@ public class BitstreamRestController {
         } catch (ClientAbortException ex) {
             log.debug("Client aborted the request before the download was completed. " +
                           "Client is probably switching to a Range request.", ex);
+        } catch (Exception e) {
+            throw e;
         }
         return null;
-    }
-
-    private Pair<InputStream, Long> getBitstreamInputStreamAndSize(Context context, Bitstream bit)
-        throws SQLException, IOException, AuthorizeException {
-
-        if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
-            return generateBitstreamWithCitation(context, bit);
-        } else {
-            return Pair.of(bitstreamService.retrieve(context, bit),bit.getSizeBytes());
-        }
-    }
-
-    private Pair<InputStream, Long> generateBitstreamWithCitation(Context context, Bitstream bitstream)
-        throws SQLException, IOException, AuthorizeException {
-        //Create the cited document
-        Pair<InputStream, Long> citationDocument = citationDocumentService.makeCitedDocument(context, bitstream);
-        if (citationDocument.getLeft() == null) {
-            log.error("CitedDocument was null");
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("CitedDocument was ok, has size " + citationDocument.getRight());
-            }
-        }
-        return citationDocument;
     }
 
     private String getBitstreamName(Bitstream bit, BitstreamFormat format) {

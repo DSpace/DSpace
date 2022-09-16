@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -54,7 +54,7 @@ public class ClaimAction extends UserSelectionAction {
                                      .createPoolTasks(context, wfItem, allroleMembers, owningStep, getParent());
             alertUsersOnActivation(context, wfItem, allroleMembers);
         } else {
-            log.info(LogManager.getHeader(context, "warning while activating claim action",
+            log.info(LogHelper.getHeader(context, "warning while activating claim action",
                                           "No group or person was found for the following roleid: " + getParent()
                                               .getStep().getRole().getId()));
         }
@@ -96,7 +96,7 @@ public class ClaimAction extends UserSelectionAction {
                     xmlWorkflowService.getMyDSpaceLink()
             );
         } catch (MessagingException e) {
-            log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
+            log.info(LogHelper.getHeader(c, "error emailing user(s) for claimed task",
                     "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
         }
     }
@@ -113,7 +113,7 @@ public class ClaimAction extends UserSelectionAction {
             }
 
         } else {
-            log.info(LogManager.getHeader(c, "warning while activating claim action",
+            log.info(LogHelper.getHeader(c, "warning while activating claim action",
                                           "No group or person was found for the following roleid: " + getParent()
                                               .getStep().getId()));
         }

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+    log4j2-test.xml
+
+    Simple log4j configuration file used for our Integration Test environment.
+
+    Its goal is to simply output logs console, which will send those logs to failsafe-reports (or similar)
+-->
+<Configuration strict='true'
+               xmlns='http://logging.apache.org/log4j/2.0/config'>
+    <Appenders>
+        <Appender name='A1' type='Console'>
+            <Layout type='PatternLayout' pattern='%d %-5p %c @ %m%n'/>
+        </Appender>
+    </Appenders>
+
+    <Loggers>
+        <!-- DSpace packages should log at INFO level. For debugging tests, this may be changed to DEBUG -->
+        <Logger name="org.dspace" level="INFO" />
+        <!-- Uncomment below to enable DEBUG logging for just the REST API -->
+        <!--<Logger name="org.dspace.app.rest" level="DEBUG" />-->
+
+        <!-- Default is that all classes only log warnings or errors -->
+        <Root level='WARN'>
+            <AppenderRef ref='A1'/>
+        </Root>
+    </Loggers>
+</Configuration>

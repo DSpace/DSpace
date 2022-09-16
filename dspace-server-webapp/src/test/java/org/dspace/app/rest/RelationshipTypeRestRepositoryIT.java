@@ -254,5 +254,72 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     }
 
+    @Test
+    public void findByEntityTypePublicationTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                              "isProjectOfPublication", "isPublicationOfProject"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                              "isOrgUnitOfPublication", "isPublicationOfOrgUnit"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                "isAuthorOfPublication", "isPublicationOfAuthor"),
+                           RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                    "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
+                           )))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void findByEntityTypeMissingParamTest() throws Exception {
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByEntityTypeInvalidEntityTypeTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "WrongEntityType"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByEntityTypePublicationPaginationTest() throws Exception {
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication")
+                   .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                   "isAuthorOfPublication", "isPublicationOfAuthor"),
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                 "isProjectOfPublication", "isPublicationOfProject"),
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                 "isOrgUnitOfPublication", "isPublicationOfOrgUnit")
+                              )))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient().perform(get("/api/core/relationshiptypes/search/byEntityType")
+                   .param("type", "Publication")
+                   .param("page", "1")
+                   .param("size", "3"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                                   "isAuthorOfPublication", "isPublicationOfAuthor"),
+                              RelationshipTypeMatcher.matchExplicitRestrictedRelationshipTypeValues(
+                                       "isPublicationOfJournalIssue", "isJournalIssueOfPublication")
+                              )))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
 
 }

@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.io.IOException;
+import javax.inject.Named;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
@@ -18,13 +19,14 @@ import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Bean containing the SolrClient for the search core
+ * Bean containing the SolrClient for the search core.
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class SolrSearchCore {
@@ -34,6 +36,8 @@ public class SolrSearchCore {
     protected IndexingService indexingService;
     @Autowired
     protected ConfigurationService configurationService;
+    @Autowired @Named("solrHttpConnectionPoolService")
+    protected HttpConnectionPoolService httpConnectionPoolService;
 
     /**
      *  SolrServer for processing indexing events.
@@ -79,7 +83,9 @@ public class SolrSearchCore {
                 .getBooleanProperty("discovery.solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService).build();
+                    HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
+                            .withHttpClient(httpConnectionPoolService.getClient())
+                            .build();
 
                     solrServer.setBaseURL(solrService);
                     solrServer.setUseMultiPartPost(true);

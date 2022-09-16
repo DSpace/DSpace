@@ -24,7 +24,7 @@ import org.dspace.xmlworkflow.storedcomponents.dao.PoolTaskDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the PoolTask object.
- * This class is responsible for all database calls for the PoolTask object and is autowired by spring
+ * This class is responsible for all database calls for the PoolTask object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -77,7 +77,7 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
                                        criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.ePerson), ePerson)
                    )
         );
-        return uniqueResult(context, criteriaQuery, false, PoolTask.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, PoolTask.class);
     }
 
     @Override
@@ -92,6 +92,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
                                        criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.group), group)
                    )
         );
-        return uniqueResult(context, criteriaQuery, false, PoolTask.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, PoolTask.class);
     }
 }

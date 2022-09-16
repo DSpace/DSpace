@@ -174,4 +174,9 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
         }
         relationshipTypeDAO.delete(context, relationshipType);
     }
+
+    @Override
+    public int countByEntityType(Context context, EntityType entityType) throws SQLException {
+        return relationshipTypeDAO.countByEntityType(context, entityType);
+    }
 }

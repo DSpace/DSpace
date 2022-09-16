@@ -8,10 +8,11 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -250,7 +251,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
         List<Relationship> rightRelationships = findByItemAndRelationshipType(context, itemToProcess, relationshipType,
                                                                               isLeft);
-        if (maxCardinality != null && rightRelationships.size() >= maxCardinality) {
+        if (rightRelationships.size() >= maxCardinality) {
             return false;
         }
         return true;
@@ -266,6 +267,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         return StringUtils.equals(leftEntityType, entityTypeToProcess.getLabel());
     }
 
+    @Override
     public Relationship find(Context context, int id) throws SQLException {
         Relationship relationship = relationshipDAO.findByID(context, Relationship.class, id);
         return relationship;
@@ -339,7 +341,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void delete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException {
-        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+        log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
@@ -356,7 +358,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public void forceDelete(Context context, Relationship relationship, boolean copyToLeftItem, boolean copyToRightItem)
         throws SQLException, AuthorizeException {
-        log.info(org.dspace.core.LogManager.getHeader(context, "delete_relationship",
+        log.info(org.dspace.core.LogHelper.getHeader(context, "delete_relationship",
                                                       "relationship_id=" + relationship.getID() + "&" +
                                                           "copyMetadataValuesToLeftItem=" + copyToLeftItem + "&" +
                                                           "copyMetadataValuesToRightItem=" + copyToRightItem));
@@ -407,7 +409,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             // Set a limit on the total depth of relationships to traverse during a relationship change
             int maxDepth = configurationService.getIntProperty("relationship.update.relateditems.maxdepth", 5);
             // This is the list containing all items which will have changes to their virtual metadata
-            List<Item> itemsToUpdate = new LinkedList<>();
+            List<Item> itemsToUpdate = new ArrayList<>();
             itemsToUpdate.add(relationship.getLeftItem());
             itemsToUpdate.add(relationship.getRightItem());
 
@@ -706,5 +708,20 @@ public class RelationshipServiceImpl implements RelationshipService {
     public int countByTypeName(Context context, String typeName)
             throws SQLException {
         return relationshipDAO.countByTypeName(context, typeName);
+    }
+
+    @Override
+    public List<Relationship> findByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
+            RelationshipType relationshipType, List<UUID> items, boolean isLeft,
+            int offset, int limit) throws SQLException {
+        return relationshipDAO
+               .findByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft, offset,limit);
+    }
+
+    @Override
+    public int countByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
+           RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException {
+        return relationshipDAO
+               .countByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft);
     }
 }

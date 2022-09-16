@@ -236,8 +236,6 @@
         </property>
         <property name="moreLikeThisConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
                 <property name="similarityMetadataFields">
                     <list>
                         <value>dc.title</value>
@@ -377,8 +375,6 @@
         </property>
         <property name="moreLikeThisConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
                 <property name="similarityMetadataFields">
                     <list>
                         <value>dc.title</value>
@@ -519,8 +515,6 @@
         </property>
         <property name="moreLikeThisConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
-                <!--When altering this list also alter the "xmlui.Discovery.RelatedItems.help" key as it describes
-                the metadata fields below-->
                 <property name="similarityMetadataFields">
                     <list>
                         <value>dc.title</value>

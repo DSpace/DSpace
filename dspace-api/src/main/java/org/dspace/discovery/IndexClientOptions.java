@@ -17,7 +17,7 @@ import org.apache.commons.cli.Options;
 public enum IndexClientOptions {
     REMOVE,
     CLEAN,
-    FORCECLEAN,
+    DELETE,
     BUILD,
     BUILDANDSPELLCHECK,
     OPTIMIZE,
@@ -41,11 +41,9 @@ public enum IndexClientOptions {
         } else if (commandLine.hasOption("r")) {
             return IndexClientOptions.REMOVE;
         } else if (commandLine.hasOption("c")) {
-            if (commandLine.hasOption("f")) {
-                return IndexClientOptions.FORCECLEAN;
-            } else {
-                return IndexClientOptions.CLEAN;
-            }
+            return IndexClientOptions.CLEAN;
+        } else if (commandLine.hasOption("d")) {
+            return IndexClientOptions.DELETE;
         } else if (commandLine.hasOption("b")) {
             if (commandLine.hasOption("s")) {
                 return IndexClientOptions.BUILDANDSPELLCHECK;
@@ -83,6 +81,9 @@ public enum IndexClientOptions {
         options.addOption("c", "clean", false,
                           "clean existing index removing any documents that no longer exist in the db");
         options.getOption("c").setType(boolean.class);
+        options.addOption("d", "delete", false,
+                "delete all records from existing index");
+        options.getOption("d").setType(boolean.class);
         options.addOption("b", "build", false, "(re)build index, wiping out current one if it exists");
         options.getOption("b").setType(boolean.class);
         options.addOption("s", "spellchecker", false, "Rebuild the spellchecker, can be combined with -b and -f.");

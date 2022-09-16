@@ -76,6 +76,8 @@ public class QDCCrosswalkTest
 
     @Before
     public void setUp() {
+        // make sure that the config properties set in @BeforeClass are picked up
+        QDCCrosswalk.initStatic();
     }
 
     @After

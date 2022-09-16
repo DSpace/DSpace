@@ -46,7 +46,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     @Column(name = "metadata_value_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metadatavalue_seq")
     @SequenceGenerator(name = "metadatavalue_seq", sequenceName = "metadatavalue_seq", allocationSize = 1)
-    private Integer id;
+    private final Integer id;
 
     /**
      * The primary key for the metadata value
@@ -104,6 +104,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      *
      * @return metadata value ID
      */
+    @Override
     public Integer getID() {
         return id;
     }
@@ -249,10 +250,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
         if (!this.getID().equals(other.getID())) {
             return false;
         }
-        if (!this.getDSpaceObject().getID().equals(other.getDSpaceObject().getID())) {
-            return false;
-        }
-        return true;
+        return this.getDSpaceObject().getID().equals(other.getDSpaceObject().getID());
     }
 
     @Override

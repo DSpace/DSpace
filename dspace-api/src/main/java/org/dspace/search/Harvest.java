@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
@@ -43,7 +42,6 @@ import org.dspace.handle.service.HandleService;
  * withdrawn within a particular range of dates.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public class Harvest {
     /**
@@ -129,7 +127,7 @@ public class Harvest {
         // several smaller operations (e.g. for OAI resumption tokens.)
         discoverQuery.setSortField("search.resourceid", DiscoverQuery.SORT_ORDER.asc);
 
-        List<HarvestedItemInfo> infoObjects = new LinkedList<HarvestedItemInfo>();
+        List<HarvestedItemInfo> infoObjects = new ArrayList<>();
 
         // Count of items read from the record set that match the selection criteria.
         // Note : Until 'index > offset' the records are not added to the output set.
@@ -155,7 +153,7 @@ public class Harvest {
 
                 if (collections) {
                     // Add collections data
-                    fillCollections(context, itemInfo);
+                    fillCollections(itemInfo);
                 }
 
                 if (items) {
@@ -163,7 +161,7 @@ public class Harvest {
                     itemInfo.item = itemService.find(context, itemInfo.itemID);
                 }
 
-                if ((nonAnon) || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn)) {
+                if (nonAnon || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn)) {
                     index++;
                     if (index > offset) {
                         infoObjects.add(itemInfo);
@@ -221,7 +219,7 @@ public class Harvest {
 
         // Get the sets
         if (collections) {
-            fillCollections(context, itemInfo);
+            fillCollections(itemInfo);
         }
 
         return itemInfo;
@@ -230,12 +228,10 @@ public class Harvest {
     /**
      * Fill out the containers field of the HarvestedItemInfo object
      *
-     * @param context  DSpace context
      * @param itemInfo HarvestedItemInfo object to fill out
      * @throws SQLException if database error
      */
-    private static void fillCollections(Context context,
-                                        HarvestedItemInfo itemInfo) throws SQLException {
+    private static void fillCollections(HarvestedItemInfo itemInfo) throws SQLException {
         // Get the collection Handles from DB
         List<Collection> collections = itemInfo.item.getCollections();
         itemInfo.collectionHandles = new ArrayList<>();

@@ -44,17 +44,16 @@ import org.jdom.xpath.XPath;
 /**
  * ORE ingestion crosswalk
  * <p>
- * Processes an Atom-encoded ORE resource map and attemps to interpret it as a DSpace item
+ * Processes an Atom-encoded ORE resource map and attempts to interpret it as a DSpace item.
  *
  * @author Alexey Maslov
- * @version $Revision: 1 $
  */
 public class OREIngestionCrosswalk
     implements IngestionCrosswalk {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OREDisseminationCrosswalk.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /* Namespaces */
     public static final Namespace ATOM_NS =
@@ -149,7 +148,7 @@ public class OREIngestionCrosswalk
                 xpathDesc.addNamespace(RDF_NS);
                 desc = (Element) xpathDesc.selectSingleNode(doc);
             } catch (JDOMException e) {
-                e.printStackTrace();
+                log.warn("Could not find description for {}", href, e);
             }
 
             if (desc != null && desc.getChild("type", RDF_NS).getAttributeValue("resource", RDF_NS)
