@@ -69,9 +69,8 @@ public class XmlWorkflowManager {
         removeUserItemPolicies(context, myitem, myitem.getSubmitter());
         grantSubmitterReadPolicies(context, myitem);
 
-    	// Decides if the alert email should be sent 
-    	if(!shouldSendAlert(context, wfi, null))
-    		noEMail.put(myitem.getID(), Boolean.TRUE);
+    	// Alert email should not be sent
+        noEMail.put(myitem.getID(), Boolean.TRUE);
         
     	context.turnOffAuthorisationSystem();
         Step firstStep = wf.getFirstStep();
@@ -208,7 +207,7 @@ public class XmlWorkflowManager {
      * @return whether the mail should be sent or not
      * @throws SQLException
      */
-    public static boolean shouldSendAlert(Context context, XmlWorkflowItem wfi, EPerson eperson) throws SQLException {
+    public static boolean shouldSendAlertToSubmitter(Context context, XmlWorkflowItem wfi, EPerson eperson) throws SQLException {
     	// Checks the ADMIN privilege on target collection for the scpeficied eperson or the current users if eperson is null
     	if(eperson == null) {
     		return !AuthorizeManager.isAdmin(context, wfi.getCollection());
@@ -590,7 +589,7 @@ public class XmlWorkflowManager {
         InstallItem.installItem(c, wfi);
 
 	        //Notify only when it is needed
-	        if(shouldSendAlert(c, wfi, wfi.getSubmitter()))
+	        if(shouldSendAlertToSubmitter(c, wfi, wfi.getSubmitter()))
 	        	notifyOfArchive(c, item, collection);
         }
 
