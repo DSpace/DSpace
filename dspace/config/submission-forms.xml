@@ -1451,6 +1451,7 @@
                     DOI:10.13016/yhab-ufvn.
                   </hint>
                   <required></required>
+                  <regex>^(https*|DOI):(\/\/)*.*</regex>
                 </field>
             </row>
             <!-- End customization for LIBDRUM-684 -->
