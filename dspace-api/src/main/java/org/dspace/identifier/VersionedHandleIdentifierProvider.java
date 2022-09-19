@@ -28,6 +28,7 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.handle.service.HandleClarinService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -67,6 +68,9 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     @Autowired(required = true)
     private HandleService handleService;
+
+    @Autowired(required = true)
+    private HandleClarinService handleClarinService;
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
