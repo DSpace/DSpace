@@ -20,6 +20,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.handle.hdlresolver.HdlResolverDTO;
 import org.dspace.handle.hdlresolver.HdlResolverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
+@ConditionalOnProperty("handle.remote-resolver.enabled")
 @RequestMapping(path = "/{hdlService:hdlResolver|resolve|listhandles|listprefixes}/")
 public class HdlResolverRestController {
     static final String HDL_RESOLVER = "/hdlResolver/";
