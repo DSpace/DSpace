@@ -17,11 +17,11 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The {@link ScriptConfiguration} for the {@link ItemImport} script
+ * The {@link ScriptConfiguration} for the {@link ItemImportCLI} script
  * 
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemImportScriptConfiguration<T extends ItemImportCLI> extends ScriptConfiguration<T> {
+public class ItemImportCLIScriptConfiguration<T extends ItemImportCLI> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -60,14 +60,20 @@ public class ItemImportScriptConfiguration<T extends ItemImportCLI> extends Scri
         options.addOption(Option.builder("d").longOpt("delete")
                 .desc("delete items listed in mapfile")
                 .hasArg(false).required(false).build());
+        options.addOption(Option.builder("s").longOpt("source")
+                .desc("source of items (directory)")
+                .hasArg().required().build());
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("name of zip file")
-                .hasArg().required().build());
+                .hasArg().required(false).build());
         options.addOption(Option.builder("c").longOpt("collection")
                 .desc("destination collection(s) Handle or database ID")
                 .hasArg().required(false).build());
         options.addOption(Option.builder("m").longOpt("mapfile")
                 .desc("mapfile items in mapfile")
+                .hasArg().required().build());
+        options.addOption(Option.builder("e").longOpt("eperson")
+                .desc("email of eperson doing importing")
                 .hasArg().required().build());
         options.addOption(Option.builder("w").longOpt("workflow")
                 .desc("send submission through collection's workflow")

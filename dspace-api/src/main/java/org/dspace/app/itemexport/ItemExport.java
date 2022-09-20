@@ -49,20 +49,20 @@ import org.dspace.utils.DSpace;
  * @author David Little
  * @author Jay Paz
  */
-public class ItemExportCLITool extends DSpaceRunnable<ItemExportScriptConfiguration> {
+public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
 
-    private String typeString = null;
-    private String destDirName = null;
-    private String idString = null;
-    private int seqStart = -1;
-    private int type = -1;
-    private Item item = null;
-    private Collection collection = null;
-    private boolean migrate = false;
-    private boolean zip = false;
-    private String zipFileName = "";
-    private boolean excludeBitstreams = false;
-    private boolean help = false;
+    protected String typeString = null;
+    protected String destDirName = null;
+    protected String idString = null;
+    protected int seqStart = -1;
+    protected int type = -1;
+    protected Item item = null;
+    protected Collection collection = null;
+    protected boolean migrate = false;
+    protected boolean zip = false;
+    protected String zipFileName = "";
+    protected boolean excludeBitstreams = false;
+    protected boolean help = false;
 
     protected static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -174,7 +174,7 @@ public class ItemExportCLITool extends DSpaceRunnable<ItemExportScriptConfigurat
                     || (collection.getType() != Constants.COLLECTION)) {
                     collection = null;
                 }
-            } else if (idString != null) {
+            } else {
                 collection = collectionService.find(context, UUID.fromString(idString));
             }
 

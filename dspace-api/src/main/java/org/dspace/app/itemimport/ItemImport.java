@@ -47,28 +47,30 @@ import org.dspace.utils.DSpace;
  * Modified by David Little, UCSD Libraries 12/21/04 to
  * allow the registration of files (bitstreams) into DSpace.
  */
-public class ItemImportCLITool extends DSpaceRunnable<ItemImportScriptConfiguration> {
+public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
 
-    private boolean template = false;
-    private String command = null;
-    private String sourcedir = null;
-    private String mapfile = null;
-    private String eperson = null;
-    private String[] collections = null;
-    private boolean isTest = false;
-    private boolean isResume = false;
-    private boolean useWorkflow = false;
-    private boolean useWorkflowSendEmail = false;
-    private boolean isQuiet = false;
-    private boolean commandLineCollections = false;
-    private boolean zip = false;
-    private String zipfilename = null;
-    private boolean help = false;
+    protected boolean template = false;
+    protected String command = null;
+    protected String sourcedir = null;
+    protected String mapfile = null;
+    protected String eperson = null;
+    protected String[] collections = null;
+    protected boolean isTest = false;
+    protected boolean isResume = false;
+    protected boolean useWorkflow = false;
+    protected boolean useWorkflowSendEmail = false;
+    protected boolean isQuiet = false;
+    protected boolean commandLineCollections = false;
+    protected boolean zip = false;
+    protected String zipfilename = null;
+    protected boolean help = false;
 
-    private static final CollectionService collectionService = ContentServiceFactory.getInstance()
-                                                                                    .getCollectionService();
-    private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected static final CollectionService collectionService =
+            ContentServiceFactory.getInstance().getCollectionService();
+    protected static final EPersonService epersonService =
+            EPersonServiceFactory.getInstance().getEPersonService();
+    protected static final HandleService handleService =
+            HandleServiceFactory.getInstance().getHandleService();
 
     @Override
     public ItemImportScriptConfiguration getScriptConfiguration() {

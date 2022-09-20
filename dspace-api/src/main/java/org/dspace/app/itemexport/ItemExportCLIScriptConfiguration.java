@@ -17,11 +17,11 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The {@link ScriptConfiguration} for the {@link ItemExport} script
+ * The {@link ScriptConfiguration} for the {@link ItemExportCLI} script
  * 
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportScriptConfiguration<T extends ItemExportCLI> extends ScriptConfiguration<T> {
+public class ItemExportCLIScriptConfiguration<T extends ItemExportCLI> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -57,9 +57,15 @@ public class ItemExportScriptConfiguration<T extends ItemExportCLI> extends Scri
         options.addOption(Option.builder("i").longOpt("id")
                 .desc("ID or handle of thing to export")
                 .hasArg().required().build());
+        options.addOption(Option.builder("d").longOpt("dest")
+                .desc("destination where you want items to go")
+                .hasArg().required().build());
         options.addOption(Option.builder("n").longOpt("number")
                 .desc("sequence number to begin exporting items with")
-                .hasArg().required(false).build());
+                .hasArg().required().build());
+        options.addOption(Option.builder("z").longOpt("zip")
+                .desc("export as zip file (specify filename e.g. export.zip)")
+                .hasArg().required().build());
         options.addOption(Option.builder("m").longOpt("migrate")
                 .desc("export for migration (remove handle and metadata that will be re-created in new system)")
                 .hasArg(false).required(false).build());

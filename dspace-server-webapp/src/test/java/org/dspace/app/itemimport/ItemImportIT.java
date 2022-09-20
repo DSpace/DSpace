@@ -56,7 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemImportCLIToolIT extends AbstractEntityIntegrationTest {
+public class ItemImportIT extends AbstractEntityIntegrationTest {
 
     private static final String publicationTitle = "A Tale of Two Cities";
     private static final String personTitle = "Person Test";

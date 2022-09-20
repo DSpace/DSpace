@@ -51,7 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportCLIToolIT extends AbstractControllerIntegrationTest {
+public class ItemExportIT extends AbstractControllerIntegrationTest {
 
     private static final String title = "A Tale of Two Cities";
     private static final String dateIssued = "1990";
