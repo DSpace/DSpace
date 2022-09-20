@@ -129,7 +129,7 @@ public class ItemExportCLI extends ItemExport {
                     || (collection.getType() != Constants.COLLECTION)) {
                     collection = null;
                 }
-            } else if (idString != null) {
+            } else {
                 collection = collectionService.find(context, UUID.fromString(idString));
             }
 

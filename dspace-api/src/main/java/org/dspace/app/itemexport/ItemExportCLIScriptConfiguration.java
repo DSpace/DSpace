@@ -7,45 +7,16 @@
  */
 package org.dspace.app.itemexport;
 
-import java.sql.SQLException;
-
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link ItemExportCLI} script
  * 
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportCLIScriptConfiguration<T extends ItemExportCLI> extends ScriptConfiguration<T> {
-
-    @Autowired
-    private AuthorizeService authorizeService;
-
-    private Class<T> dspaceRunnableClass;
-
-    @Override
-    public Class<T> getDspaceRunnableClass() {
-        return dspaceRunnableClass;
-    }
-
-    @Override
-    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
-        this.dspaceRunnableClass = dspaceRunnableClass;
-    }
-
-    @Override
-    public boolean isAllowedToExecute(final Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
-        }
-    }
+public class ItemExportCLIScriptConfiguration extends ItemExportScriptConfiguration<ItemExportCLI> {
 
     @Override
     public Options getOptions() {
@@ -65,7 +36,7 @@ public class ItemExportCLIScriptConfiguration<T extends ItemExportCLI> extends S
                 .hasArg().required().build());
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("export as zip file (specify filename e.g. export.zip)")
-                .hasArg().required().build());
+                .hasArg().required(false).build());
         options.addOption(Option.builder("m").longOpt("migrate")
                 .desc("export for migration (remove handle and metadata that will be re-created in new system)")
                 .hasArg(false).required(false).build());
