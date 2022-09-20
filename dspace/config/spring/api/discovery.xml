@@ -488,6 +488,8 @@
         <property name="metadataFields">
             <list>
                 <value>dc.date.issued</value>
+                <value>dc.date.created</value>
+                <value>sedici.date.exposure</value>
             </list>
         </property>
         <property name="type" value="date"/>
