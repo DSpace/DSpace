@@ -3141,7 +3141,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void patchChangePasswordWithWrongChallenge() throws Exception {
+    public void patchChangePasswordWithWrongCurrentPassword() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -3166,7 +3166,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void patchChangePasswordWithNoChallenge() throws Exception {
+    public void patchChangePasswordWithNoCurrentPassword() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -3189,14 +3189,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isForbidden());
     }
 
-    private String buildPasswordAddOperationPatchBody(String password, String challenge) {
+    private String buildPasswordAddOperationPatchBody(String password, String currentPassword) {
 
         Map<String, String> value = new HashMap<>();
         if (password != null) {
-            value.put("password", password);
+            value.put("new_password", password);
         }
-        if (challenge != null) {
-            value.put("challenge", challenge);
+        if (currentPassword != null) {
+            value.put("current_password", currentPassword);
         }
 
         return getPatchContent(List.of(new AddOperation("/password", value)));

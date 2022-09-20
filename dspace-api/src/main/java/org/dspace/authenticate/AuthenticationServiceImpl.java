@@ -209,11 +209,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean canChangePassword(Context context, EPerson ePerson, String challenge) {
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
 
         for (AuthenticationMethod method : getAuthenticationMethodStack()) {
             if (method.getName().equals(context.getAuthenticationMethod())) {
-                return method.canChangePassword(context, ePerson, challenge);
+                return method.canChangePassword(context, ePerson, currentPassword);
             }
         }
 

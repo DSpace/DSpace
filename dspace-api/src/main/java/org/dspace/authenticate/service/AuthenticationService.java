@@ -178,10 +178,15 @@ public interface AuthenticationService {
     public String getAuthenticationMethod(Context context, HttpServletRequest request);
 
     /**
-     * @param context The DSpace context
-     * @param challenge The current password of the user
-     * @return true if challenge matches with current password
+     * Check if the given current password is valid to change the password of the
+     * given ePerson.
+     *
+     * @param  context         The DSpace context
+     * @param  ePerson         the ePerson related to the password change
+     * @param  currentPassword The current password to check
+     * @return                 true if the provided password matches with current
+     *                         password
      */
-    public boolean canChangePassword(Context context, EPerson ePerson, String challenge);
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword);
 
 }

@@ -269,10 +269,10 @@ public class PasswordAuthentication
     }
 
     @Override
-    public boolean canChangePassword(Context context, EPerson ePerson, String challenge) {
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
         if (context == null || ePerson == null) {
             return false;
         }
-        return ePersonService.checkPassword(context, ePerson, challenge);
+        return ePersonService.checkPassword(context, ePerson, currentPassword);
     }
 }

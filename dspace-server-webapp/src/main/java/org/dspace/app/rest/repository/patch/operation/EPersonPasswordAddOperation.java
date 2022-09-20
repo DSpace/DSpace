@@ -10,11 +10,12 @@ package org.dspace.app.rest.repository.patch.operation;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.InvalidPasswordChallengeException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.exception.WrongCurrentPasswordException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.util.AuthorizeUtil;
@@ -31,13 +32,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for EPerson password patches. This Add Operation will add a new password the an eperson if it had
- * no password before, or will replace the existing password with the new value.
+ * Implementation for EPerson password patches. This Add Operation will add a
+ * new password the an eperson if it had no password before, or will replace the
+ * existing password with the new value.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/epersons/eperson/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "add", "path": "
- * /password", "value": {"password": "newpassword", "challenge": "currentpassword"}]'
+ * /password", "value": {"new_password": "newpassword", "current_password": "currentpassword"}]'
  * </code>
  */
 @Component
@@ -70,7 +72,7 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
 
         PasswordVO passwordVO = parseOperationValue(operation);
 
-        String newPassword = passwordVO.getPassword()
+        String newPassword = passwordVO.getNewPassword()
             .orElseThrow(() -> new DSpaceBadRequestException("No password provided"));
 
         EPerson eperson = (EPerson) object;
@@ -83,7 +85,7 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
         if (StringUtils.isNotBlank(token)) {
             verifyAndDeleteToken(context, eperson, token, operation);
         } else if (eperson.hasPasswordSet()) {
-            verifyChallenge(context, eperson, passwordVO);
+            verifyCurrentPassword(context, eperson, passwordVO);
         }
 
         ePersonService.setPassword(eperson, newPassword);
@@ -123,14 +125,14 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
         }
     }
 
-    private void verifyChallenge(Context context, EPerson eperson, PasswordVO passwordVO) {
+    private void verifyCurrentPassword(Context context, EPerson eperson, PasswordVO passwordVO) {
 
-        String challenge = passwordVO.getChallenge()
-            .orElseThrow(() -> new InvalidPasswordChallengeException("No challenge provided"));
+        String currentPassword = passwordVO.getCurrentPassword()
+            .orElseThrow(() -> new WrongCurrentPasswordException("No current password provided"));
 
-        boolean canChangePassword = authenticationService.canChangePassword(context, eperson, challenge);
+        boolean canChangePassword = authenticationService.canChangePassword(context, eperson, currentPassword);
         if (!canChangePassword) {
-            throw new InvalidPasswordChallengeException("The provided challenge is not valid");
+            throw new WrongCurrentPasswordException("The provided password is wrong");
         }
 
     }
@@ -142,32 +144,34 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
     }
 
     /**
-     * Value object that stores the new password to set and the challange to verify.
-     * This object models the value of the operation.
+     * Value object that stores the new password to set and the current password to
+     * verify. This object models the value of the operation.
      *
      * @author Luca Giamminonni (luca.giamminonni at 4science.it)
      *
      */
     public static class PasswordVO {
 
-        private String password;
+        @JsonProperty("new_password")
+        private String newPassword;
 
-        private String challenge;
+        @JsonProperty("current_password")
+        private String currentPassword;
 
-        public Optional<String> getPassword() {
-            return Optional.ofNullable(password);
+        public Optional<String> getNewPassword() {
+            return Optional.ofNullable(newPassword);
         }
 
-        public void setPassword(String password) {
-            this.password = password;
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
         }
 
-        public Optional<String> getChallenge() {
-            return Optional.ofNullable(challenge);
+        public Optional<String> getCurrentPassword() {
+            return Optional.ofNullable(currentPassword);
         }
 
-        public void setChallenge(String challenge) {
-            this.challenge = challenge;
+        public void setCurrentPassword(String currentPassword) {
+            this.currentPassword = currentPassword;
         }
 
     }
