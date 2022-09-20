@@ -75,6 +75,12 @@ public class S3BitStoreService implements BitStoreService {
      */
     private AmazonS3 s3Service = null;
 
+    /**
+     * S3 transfer manager
+     * this is reused between put calls to use less resources for multiple uploads
+     */
+    private TransferManager tm = null;
+
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
     public S3BitStoreService() {
@@ -128,6 +134,11 @@ public class S3BitStoreService implements BitStoreService {
         }
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
+
+        tm = TransferManagerBuilder.standard()
+                                   .withAlwaysCalculateMultipartMd5(true)
+                                   .withS3Client(s3Service)
+                                   .build();
     }
 
 
@@ -183,12 +194,6 @@ public class S3BitStoreService implements BitStoreService {
             // The ETag may or may not be and MD5 digest of the object data.
             // Therefore, we precalculate before uploading
             String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
-
-            TransferManager tm = TransferManagerBuilder.standard()
-                    .withAlwaysCalculateMultipartMd5(true)
-                    .withS3Client(s3Service)
-                    .build();
-
 
             Upload upload = tm.upload(bucketName, key, scratchFile);
 
