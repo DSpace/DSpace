@@ -30,7 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to interact with a pool task only if it is in his list.
+ * An authenticated user is allowed to interact with a pool task only if it is in their list.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -64,7 +64,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
             if (ePerson == null) {
                 return false;
             }
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
 
             PoolTask poolTask = poolTaskService.find(context, dsoId);
             // If the pool task is null then we give permission so we can throw another status code instead

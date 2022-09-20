@@ -70,11 +70,24 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
                 keyValueItem.setKey(entry.getValue().getType().getValue());
                 keyValueItem.setValue(entry.getKey().getValue());
                 keyValues.add(keyValueItem);
+                PlainMetadataKeyValueItem typeItem = new PlainMetadataKeyValueItem();
+                typeItem.setKey("type");
+                typeItem.setValue(entry.getValue().getType().getValue());
+                keyValues.add(typeItem);
                 if (entry.getValue().getFields() != null) {
                     for (Entry<Key,Value> subentry : entry.getValue().getFields().entrySet()) {
                         PlainMetadataKeyValueItem innerItem = new PlainMetadataKeyValueItem();
-                        innerItem.setKey(subentry.getKey().getValue());
-                        innerItem.setValue(subentry.getValue().toUserString());
+                        innerItem.setKey(subentry.getKey().getValue().toLowerCase());
+                        String latexString = subentry.getValue().toUserString();
+                        try {
+                            org.jbibtex.LaTeXParser laTeXParser = new org.jbibtex.LaTeXParser();
+                            List<org.jbibtex.LaTeXObject> latexObjects = laTeXParser.parse(latexString);
+                            org.jbibtex.LaTeXPrinter laTeXPrinter = new org.jbibtex.LaTeXPrinter();
+                            String plainTextString = laTeXPrinter.print(latexObjects);
+                            innerItem.setValue(plainTextString.replaceAll("\n", " "));
+                        } catch (ParseException e) {
+                            innerItem.setValue(latexString);
+                        }
                         keyValues.add(innerItem);
                     }
                 }

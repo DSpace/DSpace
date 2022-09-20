@@ -417,9 +417,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String title = site.getName();
         String url = site.getURL();
 
-        if (identifier_uri != null) {
-            metadata.add(createDCValue("identifier.uri", null, identifier_uri));
-        }
+        metadata.add(createDCValue("identifier.uri", null, identifier_uri));
 
         //FIXME: adding two URIs for now (site handle and URL), in case site isn't using handles
         if (url != null) {
@@ -466,9 +464,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("description", "tableofcontents", description_table));
         }
 
-        if (identifier_uri != null) {
-            metadata.add(createDCValue("identifier.uri", null, identifier_uri));
-        }
+        metadata.add(createDCValue("identifier.uri", null, identifier_uri));
 
         if (rights != null) {
             metadata.add(createDCValue("rights", null, rights));
@@ -520,9 +516,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("description", "tableofcontents", description_table));
         }
 
-        if (identifier_uri != null) {
-            metadata.add(createDCValue("identifier", "uri", identifier_uri));
-        }
+        metadata.add(createDCValue("identifier", "uri", identifier_uri));
 
         if (provenance != null) {
             metadata.add(createDCValue("provenance", null, provenance));

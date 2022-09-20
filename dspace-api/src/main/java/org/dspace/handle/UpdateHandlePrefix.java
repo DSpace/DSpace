@@ -126,7 +126,7 @@ public class UpdateHandlePrefix {
                         );
 
                     } catch (SQLException sqle) {
-                        if ((context != null) && (context.isValid())) {
+                        if (context.isValid()) {
                             context.abort();
                             context = null;
                         }

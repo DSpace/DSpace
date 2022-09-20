@@ -395,7 +395,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(epersonToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
                                .andExpect(status().isForbidden());
 
-        // Verify an unprivilegd user can access information about himself/herself
+        // Verify an unprivileged user can access their own information
         getClient(epersonToken).perform(get("/api/eperson/epersons/" + eperson.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))

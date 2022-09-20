@@ -25,6 +25,12 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -324,27 +330,37 @@ public class S3BitStoreService implements BitStoreService {
      * @throws Exception generic exception
      */
     public static void main(String[] args) throws Exception {
-        //TODO use proper CLI, or refactor to be a unit test. Can't mock this without keys though.
+        //TODO Perhaps refactor to be a unit test. Can't mock this without keys though.
 
         // parse command line
-        String assetFile = null;
-        String accessKey = null;
-        String secretKey = null;
+        Options options = new Options();
+        Option option;
 
-        for (int i = 0; i < args.length; i += 2) {
-            if (args[i].startsWith("-a")) {
-                accessKey = args[i + 1];
-            } else if (args[i].startsWith("-s")) {
-                secretKey = args[i + 1];
-            } else if (args[i].startsWith("-f")) {
-                assetFile = args[i + 1];
-            }
-        }
+        option = Option.builder("a").desc("access key").hasArg().required().build();
+        options.addOption(option);
 
-        if (accessKey == null || secretKey == null || assetFile == null) {
-            System.out.println("Missing arguments - exiting");
+        option = Option.builder("s").desc("secret key").hasArg().required().build();
+        options.addOption(option);
+
+        option = Option.builder("f").desc("asset file name").hasArg().required().build();
+        options.addOption(option);
+
+        DefaultParser parser = new DefaultParser();
+
+        CommandLine command;
+        try {
+            command = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            new HelpFormatter().printHelp(
+                    S3BitStoreService.class.getSimpleName() + "options", options);
             return;
         }
+
+        String accessKey = command.getOptionValue("a");
+        String secretKey = command.getOptionValue("s");
+        String assetFile = command.getOptionValue("f");
+
         S3BitStoreService store = new S3BitStoreService();
 
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
