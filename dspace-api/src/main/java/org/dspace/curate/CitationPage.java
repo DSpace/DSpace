@@ -70,7 +70,8 @@ public class CitationPage extends AbstractCurationTask {
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
+            .getResourcePolicyService();
 
     private Map<String,Bitstream> displayMap = new HashMap<String,Bitstream>();
 
@@ -268,11 +269,11 @@ public class CitationPage extends AbstractCurationTask {
     private void clonePolicies(Context context, DSpaceObject source,DSpaceObject target)
             throws SQLException, AuthorizeException {
         resourcePolicyService.removeAllPolicies(context, target);
-        for(ResourcePolicy rp: source.getResourcePolicies()) {
-	        ResourcePolicy newPolicy = resourcePolicyService.clone(context, rp);
-	        newPolicy.setdSpaceObject(target);
-	        newPolicy.setAction(rp.getAction());
-	        resourcePolicyService.update(context, newPolicy);
+        for (ResourcePolicy rp: source.getResourcePolicies()) {
+            ResourcePolicy newPolicy = resourcePolicyService.clone(context, rp);
+            newPolicy.setdSpaceObject(target);
+            newPolicy.setAction(rp.getAction());
+            resourcePolicyService.update(context, newPolicy);
         }
 
     }
