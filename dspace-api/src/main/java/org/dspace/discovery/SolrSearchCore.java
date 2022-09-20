@@ -21,7 +21,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.service.impl.HttpConnectionPoolService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -75,14 +74,13 @@ public class SolrSearchCore {
      */
     protected void initSolr() {
         if (solr == null) {
-            String solrService = DSpaceServicesFactory.getInstance().getConfigurationService()
-                                                      .getProperty("discovery.search.server");
+            String solrService = configurationService.getProperty("discovery.search.server");
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
             if (urlValidator.isValid(solrService) || configurationService
                 .getBooleanProperty("discovery.solr.url.validation.enabled", true)) {
                 try {
-                    log.debug("Solr URL: " + solrService);
+                    log.debug("Solr URL: {}", solrService);
                     HttpSolrClient solrServer = new HttpSolrClient.Builder(solrService)
                             .withHttpClient(httpConnectionPoolService.getClient())
                             .build();
@@ -103,10 +101,13 @@ public class SolrSearchCore {
 
                     solr = solrServer;
                 } catch (SolrServerException | IOException e) {
-                    log.error("Error while initializing solr server", e);
+                    log.error("Error while initializing solr server {}",
+                            solrService, e);
+                    throw new RuntimeException("Failed to contact Solr at " + solrService
+                            + " :  " + e.getMessage());
                 }
             } else {
-                log.error("Error while initializing solr, invalid url: " + solrService);
+                log.error("Error while initializing solr, invalid url: {}", solrService);
             }
         }
     }
