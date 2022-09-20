@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-api</artifactId>
@@ -14,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.3-SNAPSHOT</version>
+        <version>7.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -550,16 +548,10 @@
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
-        <!-- Codebase at https://github.com/OCLC-Research/oaiharvester2/ -->
+        <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
-        </dependency>
-        <!-- Xalan is REQUIRED by 'oclc-harvester2' listed above (OAI harvesting fails without it).
-             Please do NOT use Xalan in DSpace codebase as it is not well maintained. -->
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -602,7 +594,7 @@
         <dependency>
             <groupId>org.jbibtex</groupId>
             <artifactId>jbibtex</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -803,7 +795,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.116</version>
+            <version>1.12.261</version>
         </dependency>
 
         <dependency>
@@ -852,7 +844,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.2</version>
+            <version>5.6</version>
         </dependency>
 
         <!-- Email templating -->

@@ -18,6 +18,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.checker.service.ChecksumHistoryService;
@@ -57,13 +58,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * be notified of BitstreamStorageManager actions.</p>
  *
  * @author Peter Breton, Robert Tansley, David Little, Nathan Sarr
- * @version $Revision$
  */
 public class BitstreamStorageServiceImpl implements BitstreamStorageService, InitializingBean {
     /**
      * log4j log
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamStorageServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
@@ -73,7 +73,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     /**
      * asset stores
      */
-    private Map<Integer, BitStoreService> stores = new HashMap<Integer, BitStoreService>();
+    private Map<Integer, BitStoreService> stores = new HashMap<>();
 
     /**
      * The index of the asset store to use for new bitstreams
@@ -222,11 +222,10 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
     @Override
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException {
-        Context context = null;
+        Context context = new Context(Context.Mode.BATCH_EDIT);
         int commitCounter = 0;
 
         try {
-            context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
 
             List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context);
@@ -321,9 +320,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
             context.abort();
             throw sqle;
         } finally {
-            if (context != null) {
-                context.restoreAuthSystemState();
-            }
+            context.restoreAuthSystemState();
         }
     }
 
@@ -386,11 +383,12 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
+    @Override
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld,
                         Integer batchCommitSize) throws IOException, SQLException, AuthorizeException {
         //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old
         Iterator<Bitstream> allBitstreamsInSource = bitstreamService.findByStoreNumber(context, assetstoreSource);
-        Integer processedCounter = 0;
+        int processedCounter = 0;
 
         while (allBitstreamsInSource.hasNext()) {
             Bitstream bitstream = allBitstreamsInSource.next();
@@ -424,6 +422,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 "] completed. " + processedCounter + " objects were transferred.");
     }
 
+    @Override
     public void printStores(Context context) {
         try {
 

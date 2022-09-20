@@ -86,23 +86,23 @@ public class OrderFormat {
             }
 
             // No delegates found, so apply defaults
-            if (type.equalsIgnoreCase(OrderFormat.AUTHOR) && authorDelegate != null) {
+            if (type.equalsIgnoreCase(OrderFormat.AUTHOR)) {
                 return authorDelegate.makeSortString(value, language);
             }
 
-            if (type.equalsIgnoreCase(OrderFormat.TITLE) && titleDelegate != null) {
+            if (type.equalsIgnoreCase(OrderFormat.TITLE)) {
                 return titleDelegate.makeSortString(value, language);
             }
 
-            if (type.equalsIgnoreCase(OrderFormat.TEXT) && textDelegate != null) {
+            if (type.equalsIgnoreCase(OrderFormat.TEXT)) {
                 return textDelegate.makeSortString(value, language);
             }
 
-            if (type.equalsIgnoreCase(OrderFormat.DATE) && dateDelegate != null) {
+            if (type.equalsIgnoreCase(OrderFormat.DATE)) {
                 return dateDelegate.makeSortString(value, language);
             }
 
-            if (type.equalsIgnoreCase(OrderFormat.AUTHORITY) && authorityDelegate != null) {
+            if (type.equalsIgnoreCase(OrderFormat.AUTHORITY)) {
                 return authorityDelegate.makeSortString(value, language);
             }
         }
