@@ -59,7 +59,7 @@ public class LicenseUtils {
      * {6} the eperson object that will be formatted using the appropriate
      * LicenseArgumentFormatter plugin (if defined)<br>
      * {x} any addition argument supplied wrapped in the
-     * LicenseArgumentFormatter based on his type (map key)
+     * LicenseArgumentFormatter based on its type (map key)
      *
      * @param locale         Formatter locale
      * @param collection     collection to get license from

@@ -136,7 +136,7 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
     protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig,
                                         EPerson user) throws SQLException, AuthorizeException, IOException {
         if (claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null) {
-            workflowRequirementsService.addClaimedUser(c, wfi, step, c.getCurrentUser());
+            workflowRequirementsService.addClaimedUser(c, wfi, step, user);
             XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .createOwnedTask(c, wfi, step, actionConfig, user);
         }

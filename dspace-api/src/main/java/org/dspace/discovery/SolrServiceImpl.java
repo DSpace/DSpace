@@ -979,7 +979,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             // if we found stale objects we can decide to skip execution of the remaining code to improve performance
             boolean skipLoadingResponse = false;
             // use zombieDocs to collect stale found objects
-            List<String> zombieDocs = new ArrayList<String>();
+            List<String> zombieDocs = new ArrayList<>();
             QueryResponse solrQueryResponse = solrSearchCore.getSolr().query(solrQuery,
                           solrSearchCore.REQUEST_METHOD);
             if (solrQueryResponse != null) {
@@ -1033,12 +1033,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                 //We need to remove all the "_hl" appendix strings from our keys
                                 Map<String, List<String>> resultMap = new HashMap<>();
                                 for (String key : highlightedFields.keySet()) {
-                                    List<String> highlightOriginalValue = highlightedFields.get(key);
-                                    List<String[]> resultHighlightOriginalValue = new ArrayList<>();
-                                    for (String highlightValue : highlightOriginalValue) {
-                                        String[] splitted = highlightValue.split("###");
-                                        resultHighlightOriginalValue.add(splitted);
-                                    }
                                     resultMap.put(key.substring(0, key.lastIndexOf("_hl")), highlightedFields.get(key));
                                 }
 
@@ -1054,7 +1048,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             // If any stale entries are found in the current page of results,
             // we remove those stale entries and rerun the same query again.
             // Otherwise, the query is valid and the results are returned.
-            if (zombieDocs.size() != 0) {
+            if (!zombieDocs.isEmpty()) {
                 log.info("Cleaning " + zombieDocs.size() + " stale objects from Discovery Index");
                 log.info("ZombieDocs ");
                 zombieDocs.forEach(log::info);

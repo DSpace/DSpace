@@ -79,7 +79,7 @@ public class CollectionDepositor extends Depositor {
         if (!(dso instanceof Collection)) {
             throw new DSpaceSWORDException(
                 "You tried to initialise the collection depositor with something" +
-                    "other than a collection object");
+                    " other than a collection object");
         }
 
         this.collection = (Collection) dso;

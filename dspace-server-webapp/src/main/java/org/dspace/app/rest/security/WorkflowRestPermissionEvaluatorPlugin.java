@@ -31,7 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to interact with workflow item only if they belong to a task that she own or could
+ * An authenticated user is allowed to interact with workflow item only if they belong to a task that they own or could
  * claim.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
@@ -75,7 +75,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
             if (ePerson == null) {
                 return false;
             }
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
             XmlWorkflowItem workflowItem = workflowItemService.find(context, dsoId);
             // submitter can see their inprogress submission
             if (ePerson.equals(workflowItem.getSubmitter())) {
