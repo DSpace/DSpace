@@ -7,23 +7,23 @@
  */
 package org.dspace.app.rest.repository.patch.operation;
 
-import static org.dspace.app.profile.OrcidProfileDisconnectionMode.ADMIN_AND_OWNER;
-import static org.dspace.app.profile.OrcidProfileDisconnectionMode.DISABLED;
-import static org.dspace.app.profile.OrcidProfileDisconnectionMode.ONLY_ADMIN;
-import static org.dspace.app.profile.OrcidProfileDisconnectionMode.ONLY_OWNER;
+import static org.dspace.profile.OrcidProfileDisconnectionMode.ADMIN_AND_OWNER;
+import static org.dspace.profile.OrcidProfileDisconnectionMode.DISABLED;
+import static org.dspace.profile.OrcidProfileDisconnectionMode.ONLY_ADMIN;
+import static org.dspace.profile.OrcidProfileDisconnectionMode.ONLY_OWNER;
 
 import java.sql.SQLException;
 
-import org.dspace.app.orcid.service.OrcidSynchronizationService;
-import org.dspace.app.profile.OrcidProfileDisconnectionMode;
-import org.dspace.app.profile.ResearcherProfile;
-import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.orcid.service.OrcidSynchronizationService;
+import org.dspace.profile.OrcidProfileDisconnectionMode;
+import org.dspace.profile.ResearcherProfile;
+import org.dspace.profile.service.ResearcherProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
