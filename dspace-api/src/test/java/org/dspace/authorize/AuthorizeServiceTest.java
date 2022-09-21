@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Created by pbecker as he wanted to write a test against DS-3572.
+ * Created by pbecker to write a test against DS-3572.
  * This definitely needs to be extended, but it's at least a start.
  */
 public class AuthorizeServiceTest extends AbstractUnitTest {
@@ -80,7 +80,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
         }
 
         try {
-            // eperson1 should be able to write as he is member of a group that has write permissions
+            // eperson1 should be able to write as it is a member of a group that has write permissions
             Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.WRITE, true));
             // person2 shouldn't have write access
             Assert.assertFalse(authorizeService.authorizeActionBoolean(context, eperson2, dso, Constants.WRITE, true));

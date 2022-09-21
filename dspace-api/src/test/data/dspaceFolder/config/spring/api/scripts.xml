@@ -64,7 +64,12 @@
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
-    
+
+    <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
+        <property name="description" value="Cleanup all the old processes in the specified state"/>
+        <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
+    </bean>
+
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />

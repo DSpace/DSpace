@@ -21,7 +21,7 @@ import org.springframework.hateoas.Link;
  * This Projection will allow us to specify how many levels deep we're going to embed resources onto the requested
  * HalResource.
  * The projection is used by using the name combined with the embedLevelDepth parameter to specify how deep the embeds
- * have to go. There is an upperlimit in place for this, which is specified on the bean through the maxEmbed property
+ * have to go. There is an upper limit in place for this, which is specified on the bean through the maxEmbed property.
  */
 public class SpecificLevelProjection extends AbstractProjection {
 
@@ -55,7 +55,7 @@ public class SpecificLevelProjection extends AbstractProjection {
             throw new MissingParameterException("The embedLevelDepth parameter needs to be specified" +
                                                    " for this Projection");
         }
-        Integer embedLevelDepth = Integer.parseInt(embedLevelDepthString);
+        int embedLevelDepth = Integer.parseInt(embedLevelDepthString);
         if (embedLevelDepth > maxEmbed) {
             throw new IllegalArgumentException("The embedLevelDepth may not exceed the configured max: " + maxEmbed);
         }

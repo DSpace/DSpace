@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.curate;
+package org.dspace.ctask.general;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,6 +18,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -26,6 +29,10 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
+import org.dspace.curate.AbstractCurationTask;
+import org.dspace.curate.Curator;
+import org.dspace.curate.Distributive;
+import org.dspace.curate.Mutative;
 import org.dspace.disseminate.factory.DisseminateServiceFactory;
 import org.dspace.disseminate.service.CitationDocumentService;
 
@@ -67,6 +74,10 @@ public class CitationPage extends AbstractCurationTask {
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
+            .getResourcePolicyService();
+
+    private Map<String,Bitstream> displayMap = new HashMap<String,Bitstream>();
 
     /**
      * {@inheritDoc}
@@ -95,13 +106,17 @@ public class CitationPage extends AbstractCurationTask {
     protected void performItem(Item item) throws SQLException {
         //Determine if the DISPLAY bundle exits. If not, create it.
         List<Bundle> dBundles = itemService.getBundles(item, CitationPage.DISPLAY_BUNDLE_NAME);
+        Bundle original = itemService.getBundles(item, "ORIGINAL").get(0);
         Bundle dBundle = null;
         if (dBundles == null || dBundles.isEmpty()) {
             try {
                 dBundle = bundleService.create(Curator.curationContext(), item, CitationPage.DISPLAY_BUNDLE_NAME);
+                // don't inherit now otherwise they will be copied over the moved bitstreams
+                resourcePolicyService.removeAllPolicies(Curator.curationContext(), dBundle);
             } catch (AuthorizeException e) {
-                log.error("User not authroized to create bundle on item \""
-                              + item.getName() + "\": " + e.getMessage());
+                log.error("User not authroized to create bundle on item \"{}\": {}",
+                        item::getName, e::getMessage);
+                return;
             }
         } else {
             dBundle = dBundles.get(0);
@@ -109,7 +124,6 @@ public class CitationPage extends AbstractCurationTask {
 
         //Create a map of the bitstreams in the displayBundle. This is used to
         //check if the bundle being cited is already in the display bundle.
-        Map<String, Bitstream> displayMap = new HashMap<>();
         for (Bitstream bs : dBundle.getBitstreams()) {
             displayMap.put(bs.getName(), bs);
         }
@@ -120,13 +134,15 @@ public class CitationPage extends AbstractCurationTask {
         List<Bundle> pBundles = itemService.getBundles(item, CitationPage.PRESERVATION_BUNDLE_NAME);
         Bundle pBundle = null;
         List<Bundle> bundles = new ArrayList<>();
-        if (pBundles != null && pBundles.size() > 0) {
+        if (pBundles != null && !pBundles.isEmpty()) {
             pBundle = pBundles.get(0);
             bundles.addAll(itemService.getBundles(item, "ORIGINAL"));
             bundles.addAll(pBundles);
         } else {
             try {
                 pBundle = bundleService.create(Curator.curationContext(), item, CitationPage.PRESERVATION_BUNDLE_NAME);
+                // don't inherit now otherwise they will be copied over the moved bitstreams
+                resourcePolicyService.removeAllPolicies(Curator.curationContext(), pBundle);
             } catch (AuthorizeException e) {
                 log.error("User not authroized to create bundle on item \""
                               + item.getName() + "\": " + e.getMessage());
@@ -159,7 +175,10 @@ public class CitationPage extends AbstractCurationTask {
                                 citationDocument.makeCitedDocument(Curator.curationContext(), bitstream).getLeft());
                         //Add the cited document to the approiate bundle
                         this.addCitedPageToItem(citedInputStream, bundle, pBundle,
-                                                dBundle, displayMap, item, bitstream);
+                                                dBundle, item, bitstream);
+                        // now set the policies of the preservation and display bundle
+                        clonePolicies(Curator.curationContext(), original, pBundle);
+                        clonePolicies(Curator.curationContext(), original, dBundle);
                     } catch (Exception e) {
                         //Could be many things, but nothing that should be
                         //expected.
@@ -202,8 +221,6 @@ public class CitationPage extends AbstractCurationTask {
      * @param pBundle The preservation bundle. The original document should be
      * put in here if it is not already.
      * @param dBundle The display bundle. The cited document gets put in here.
-     * @param displayMap The map of bitstream names to bitstreams in the display
-     *                   bundle.
      * @param item       The item containing the bundles being used.
      * @param bitstream  The original source bitstream.
      * @throws SQLException       if database error
@@ -211,7 +228,7 @@ public class CitationPage extends AbstractCurationTask {
      * @throws IOException        if IO error
      */
     protected void addCitedPageToItem(InputStream citedDoc, Bundle bundle, Bundle pBundle,
-                                      Bundle dBundle, Map<String,Bitstream> displayMap, Item item,
+                                      Bundle dBundle, Item item,
                                       Bitstream bitstream) throws SQLException, AuthorizeException, IOException {
         //If we are modifying a file that is not in the
         //preservation bundle then we have to move it there.
@@ -239,7 +256,8 @@ public class CitationPage extends AbstractCurationTask {
         citedBitstream.setName(context, bitstream.getName());
         bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
         citedBitstream.setDescription(context, bitstream.getDescription());
-
+        displayMap.put(bitstream.getName(), citedBitstream);
+        clonePolicies(context, bitstream, citedBitstream);
         this.resBuilder.append(" Added ")
                 .append(citedBitstream.getName())
                 .append(" to the ")
@@ -250,5 +268,17 @@ public class CitationPage extends AbstractCurationTask {
         //database.
         itemService.update(context, item);
         this.status = Curator.CURATE_SUCCESS;
+    }
+
+    private void clonePolicies(Context context, DSpaceObject source,DSpaceObject target)
+            throws SQLException, AuthorizeException {
+        resourcePolicyService.removeAllPolicies(context, target);
+        for (ResourcePolicy rp: source.getResourcePolicies()) {
+            ResourcePolicy newPolicy = resourcePolicyService.clone(context, rp);
+            newPolicy.setdSpaceObject(target);
+            newPolicy.setAction(rp.getAction());
+            resourcePolicyService.update(context, newPolicy);
+        }
+
     }
 }
