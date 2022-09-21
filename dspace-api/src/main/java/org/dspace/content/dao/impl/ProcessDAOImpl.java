@@ -7,7 +7,10 @@
  */
 package org.dspace.content.dao.impl;
 
+import static org.dspace.scripts.Process_.CREATION_TIME;
+
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -146,6 +150,23 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
     }
 
+
+    @Override
+    public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
+        Date date) throws SQLException {
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+
+        Predicate creationTimeLessThanGivenDate = criteriaBuilder.lessThan(processRoot.get(CREATION_TIME), date);
+        Predicate statusIn = processRoot.get(Process_.PROCESS_STATUS).in(statuses);
+        criteriaQuery.where(criteriaBuilder.and(creationTimeLessThanGivenDate, statusIn));
+
+        return list(context, criteriaQuery, false, Process.class, -1, -1);
+    }
 
 }
 
