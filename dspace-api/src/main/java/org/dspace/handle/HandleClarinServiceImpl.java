@@ -34,12 +34,14 @@ import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.handle.dao.HandleClarinDAO;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.external.HandleRest;
 import org.dspace.handle.service.HandleClarinService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Additional service implementation for the Handle object in Clarin-DSpace.
@@ -55,10 +57,11 @@ public class HandleClarinServiceImpl implements HandleClarinService {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldServiceImpl.class);
 
     @Autowired(required = true)
-    protected SiteService siteService;
+    protected HandleDAO handleDAO;
 
     @Autowired(required = true)
-    protected HandleDAO handleDAO;
+    protected HandleClarinDAO handleClarinDAO;
+    protected SiteService siteService;
 
     @Autowired(required = true)
     protected HandleService handleService;
@@ -88,6 +91,11 @@ public class HandleClarinServiceImpl implements HandleClarinService {
     }
 
     @Override
+    public List<Handle> findAll(Context context, String sortingColumn, int maxResult, int offset) throws SQLException {
+        return handleClarinDAO.findAll(context, sortingColumn,  maxResult, offset);
+    }
+
+    @Override
     public List<Handle> findAll(Context context) throws SQLException {
         return handleDAO.findAll(context, Handle.class);
     }
@@ -110,6 +118,7 @@ public class HandleClarinServiceImpl implements HandleClarinService {
             throw new AuthorizeException(
                     "Only administrators may modify the handle registry");
         }
+
         String handleId;
         //Do we want to generate the new handleId or use entered handleStr by user?
         if (Objects.nonNull(handleStr)) {
@@ -121,6 +130,7 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         }
 
         Handle handle = handleDAO.create(context, new Handle());
+
         log.debug("Created new external Handle with handle " + handleId);
 
         //set handle and url in created handle
@@ -328,16 +338,17 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         //set handle
         handleObject.setHandle(newHandle);
         //if it is internal handle, do nothing with url
-        if (Objects.isNull(newUrl)) {
-            throw new RuntimeException("Cannot change handle and url of handle object.");
+        if (Objects.nonNull(newUrl)) {
+            //set url only if is not empty
+            //when you add null to String, it converts null to "null"
+            if (!(ObjectUtils.isEmpty(newUrl)) && !(StringUtils.isBlank(newUrl)) &&
+                    !newUrl.equals("null")) {
+                handleObject.setUrl(newUrl);
+            } else {
+                throw new RuntimeException("Cannot change handle and url of handle object " +
+                        "- the url has wrong value: 'null' or is blank");
+            }
         }
-
-        //set url only if is not empty
-        //when you add null to String, it converts null to "null"
-        if (StringUtils.isBlank(newUrl) || StringUtils.equals(newUrl, "null")) {
-            throw new RuntimeException("Cannot change handle and url of handle object.");
-        }
-        handleObject.setUrl(newUrl);
 
         this.save(context, handleObject);
         log.info(LogHelper.getHeader(context, "Set handle and url of handle object.",
