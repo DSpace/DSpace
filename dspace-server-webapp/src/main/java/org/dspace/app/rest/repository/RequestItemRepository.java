@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -72,7 +73,7 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
-    @Autowired(required = true)
+    @Resource(name = "requestItemAuthorExtractor")
     protected RequestItemAuthorExtractor requestItemAuthorExtractor;
 
     @Autowired(required = true)

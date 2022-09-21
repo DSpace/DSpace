@@ -6,21 +6,22 @@
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-2.5.xsd"
-    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource"
+    default-lazy-init="true">
 
     <description>
         Strategies for determining who receives Request Copy emails.
-        A copy request "strategy" class produces a list of addresses to which a
-        request email should be sent.  Each strategy gets its addresses from a
-        different source.  Select the one that meets your need, or use the
-        CombiningRequestItemStrategy to meld the lists from two or more other
-        strategies.
+        A copy request "strategy" class produces a list of addresses
+        to which a request email should be sent.  Each strategy gets
+        its addresses from a different source.  Select the one that
+        meets your need, or use the CombiningRequestItemStrategy to
+        meld the lists from two or more other strategies.
     </description>
 
     <context:annotation-config /> <!-- allows us to use Spring annotations in beans -->
 
     <!-- Select the implementation to be used. -->
-    <alias alias='org.dspace.app.requestitem.RequestItemAuthorExtractor'
+    <alias alias='requestItemAuthorExtractor'
            name='org.dspace.app.requestitem.RequestItemMetadataStrategy'/>
 
     <!-- Get recipients from an item metadata field. -->
@@ -28,13 +29,12 @@
           id="org.dspace.app.requestitem.RequestItemMetadataStrategy"
           autowire-candidate="true">
         <!-- 
-            Uncomment these properties if you want lookup in metadata the email
-            and the name of the author to contact for request copy.
+            Uncomment these properties if you want lookup in metadata
+            the email and the name of the author to contact for request copy.
             If you don't configure that or if the requested item doesn't have
             these metadata, the submitter data are used as fail over.
         -->
         <!--
-
             <property name="emailMetadata"
                       value="schema.element.qualifier" />
             <property name="fullNameMetadata"
@@ -43,30 +43,36 @@
     </bean>
 
     <!-- HelpDesk to instead get RequestItem emails-->
-    <!--
     <bean class="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
-          id="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"/>
-    -->
+          id="org.dspace.app.requestitem.RequestItemHelpdeskStrategy"
+          autowire-candidate="true"/>
 
-    <!-- Send request emails to administrators of an Item's owning Collection. -->
-    <!--
     <bean class='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'
-          id='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'/>
-    -->
+          id='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'
+          autowire-candidate="true">
+        <description>
+          Send request emails to administrators of an Item's owning
+          Collection.
+        </description>
+    </bean>
 
-    <!-- Execute multiple strategies and concatenate their lists of recipients.
-         Mail will go to all members of the combined list. -->
-    <!--
     <bean class='org.dspace.app.requestitem.CombiningRequestItemStrategy'
           id='org.dspace.app.requestitem.CombiningRequestItemStrategy'
-          autowire='no'>
+          autowire-candidate="true">
+        <description>
+          Execute multiple strategies and concatenate their lists of
+          recipients.  Mail will go to all members of the combined list.
+        </description>
         <constructor-arg>
-            <description>A list of references to RequestItemAuthorExtractor beans</description>
+            <description>
+              A list of RequestItemAuthorExtractor beans
+            </description>
             <list>
+              <!-- Example:
                 <ref bean='org.dspace.app.requestitem.RequestItemMetadataStrategy'/>
                 <ref bean='org.dspace.app.requestitem.CollectionAdministratorsRequestItemStrategy'/>
+              -->
             </list>
         </constructor-arg>
     </bean>
-    -->
 </beans>

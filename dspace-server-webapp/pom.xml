@@ -569,6 +569,10 @@
             <version>2.0.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
