@@ -49,8 +49,6 @@ public class IIIFUtils {
     // The DSpace bundle for other content related to item.
     protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
 
-    private static final String OMIT_FROM_TOC_BUNDLE = "iiif";
-
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
 
