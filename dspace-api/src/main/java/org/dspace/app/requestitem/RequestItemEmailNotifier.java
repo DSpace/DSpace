@@ -220,8 +220,13 @@ public class RequestItemEmailNotifier {
         message.addArgument(bitstreamName);          // {0} bitstream name or "all"
         message.addArgument(item.getHandle());       // {1} Item handle
         message.addArgument(ri.getToken());          // {2} Request token
-        message.addArgument(approver.getFullName()); // {3} Approver's name
-        message.addArgument(approver.getEmail());    // {4} Approver's address
+        if (approver != null) {
+            message.addArgument(approver.getFullName()); // {3} Approver's name
+            message.addArgument(approver.getEmail());    // {4} Approver's address
+        } else {
+            message.addArgument("anonymous approver");                           // [3] Approver's name
+            message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address
+        }
 
         // Who gets this message?
         String recipient;

@@ -518,6 +518,33 @@ public class RequestItemRepositoryIT
     }
 
     @Test
+    public void testPutUnauthenticated()
+            throws Exception {
+        System.out.println("put unauthenticated request");
+        RequestItem itemRequest = RequestItemBuilder
+                .createRequestItem(context, item, bitstream)
+                .build();
+
+        Map<String, String> parameters;
+        String content;
+
+        ObjectWriter mapperWriter = new ObjectMapper().writer();
+
+        // Unauthenticated user should be allowed.
+        parameters = Map.of(
+                "acceptRequest", "true",
+                "subject", "put unauthenticated",
+                "responseMessage", "Request accepted",
+                "suggestOpenAccess", "false");
+
+        content = mapperWriter.writeValueAsString(parameters);
+        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
+                .contentType(contentType)
+                .content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void testPutBadRequest()
             throws Exception {
         System.out.println("put bad requests");
@@ -532,29 +559,6 @@ public class RequestItemRepositoryIT
         String content;
 
         ObjectWriter mapperWriter = new ObjectMapper().writer();
-
-        // Unauthenticated user
-        parameters = Map.of(
-                "acceptRequest", "true",
-                "subject", "subject",
-                "responseMessage", "Request accepted");
-        content = mapperWriter.writeValueAsString(parameters);
-        getClient().perform(put(URI_ROOT + '/' + itemRequest.getToken())
-                .contentType(contentType)
-                .content(content))
-                .andExpect(status().isUnauthorized());
-
-        // Unauthorized user
-        parameters = Map.of(
-                "acceptRequest", "true",
-                "subject", "subject",
-                "responseMessage", "Request accepted");
-        content = mapperWriter.writeValueAsString(parameters);
-        authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(put(URI_ROOT + '/' + itemRequest.getToken())
-                .contentType(contentType)
-                .content(content))
-                .andExpect(status().isInternalServerError()); // Should be FORBIDDEN
 
         // Missing acceptRequest
         parameters = Map.of(
