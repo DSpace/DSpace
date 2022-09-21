@@ -153,7 +153,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String token = getAuthToken(admin.getEmail(), password);
 
         AuthorizationFeature canChangePasswordFeature = authorizationFeatureService.find(CanChangePasswordFeature.NAME);
-        adminRest = ePersonConverter.convert(admin, DefaultProjection.DEFAULT);
+        adminRest = ePersonConverter.convert(context.reloadEntity(admin), DefaultProjection.DEFAULT);
         authorization = new Authorization(admin, canChangePasswordFeature, adminRest);
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
