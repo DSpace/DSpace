@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -17,7 +15,6 @@ import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.statistics.util.DummyHttpServletRequest;
@@ -218,7 +215,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         // called.
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo queryLdap(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) {
                 return new LdapInfo(strUid, null);
             }
         };
@@ -275,7 +272,7 @@ class MockLdap implements Ldap {
     public static MockLdap userFound() {
       return new MockLdap() {
         @Override
-        public LdapInfo queryLdap(String strUid) throws NamingException {
+        public LdapInfo queryLdap(String strUid) {
           return new LdapInfo(strUid, null);
         }
       };
@@ -288,7 +285,7 @@ class MockLdap implements Ldap {
     }
 
     @Override
-    public LdapInfo queryLdap(String strUid) throws NamingException {
+    public LdapInfo queryLdap(String strUid) {
         return null;
     }
 

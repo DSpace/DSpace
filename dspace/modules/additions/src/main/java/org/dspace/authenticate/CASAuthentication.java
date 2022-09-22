@@ -164,15 +164,6 @@ public class CASAuthentication implements AuthenticationMethod {
         return netid;
     }
 
-    protected LdapInfo getLdapUser(Ldap ldap, String netid) {
-        try {
-            return ldap.queryLdap(netid);
-        } catch (NamingException ne) {
-            log.error("LDAP NamingException for '" + netid + "'", ne);
-            return null;
-        }
-    }
-
     /**
      * CAS authentication.
      *
@@ -213,7 +204,7 @@ public class CASAuthentication implements AuthenticationMethod {
             }
 
             // Check directory
-            LdapInfo ldapInfo = getLdapUser(ldap, netid);
+            LdapInfo ldapInfo = ldap.queryLdap(netid);
             if (ldapInfo == null) {
                 log.error("Unknown directory id " + netid);
                 return NO_SUCH_USER;

@@ -1,9 +1,5 @@
 package edu.umd.lib.dspace.authenticate;
 
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-
-import org.dspace.eperson.EPerson;
 import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
 
 /**
@@ -16,7 +12,7 @@ public interface Ldap extends AutoCloseable {
      *
      * @param strUid the LDAP user id to retrieve
      */
-    public LdapInfo queryLdap(String strUid) throws NamingException;
+    public LdapInfo queryLdap(String strUid);
 
     /**
      * Close the ldap connection

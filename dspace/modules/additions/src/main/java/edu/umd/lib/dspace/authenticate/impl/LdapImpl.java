@@ -80,60 +80,64 @@ public class LdapImpl implements Ldap {
      * @param strUid the LDAP user id to retrieve
      */
     @Override
-    public LdapInfo queryLdap(String strUid) throws NamingException {
-        if (ctx == null) {
-            return null;
-        }
+    public LdapInfo queryLdap(String strUid) {
+        try {
+            if (ctx == null) {
+                return null;
+            }
 
-        this.strUid = strUid;
-        String strFilter = "uid=" + strUid;
+            this.strUid = strUid;
+            String strFilter = "uid=" + strUid;
 
-        // Setup the search controls
-        SearchControls sc =  new SearchControls();
-        sc.setReturningAttributes(strRequestAttributes);
-        sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            // Setup the search controls
+            SearchControls sc =  new SearchControls();
+            sc.setReturningAttributes(strRequestAttributes);
+            sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-        // Search
-        NamingEnumeration entries = ctx.search("", strFilter, sc);
+            // Search
+            NamingEnumeration entries = ctx.search("", strFilter, sc);
 
-        // Make sure we got something
-        if (entries == null) {
-            log.warn(LogHelper.getHeader(context,
-                                          "null returned on ctx.search for " + strFilter,
-                                          ""));
-            return null;
-        }
+            // Make sure we got something
+            if (entries == null) {
+                log.warn(LogHelper.getHeader(context,
+                                              "null returned on ctx.search for " + strFilter,
+                                              ""));
+                return null;
+            }
 
-        // Check for a match
-        if (!entries.hasMore()) {
+            // Check for a match
+            if (!entries.hasMore()) {
+                log.debug(LogHelper.getHeader(context,
+                                              "no matching entries for " + strFilter,
+                                              ""));
+                return null;
+            }
+
+
+            // Get entry
+            entry = (SearchResult)entries.next();
             log.debug(LogHelper.getHeader(context,
-                                          "no matching entries for " + strFilter,
+                                          "matching entry for " + strUid + ": " + entry.getName(),
                                           ""));
-            return null;
-        }
+            LdapInfo ldapInfo = new LdapInfo(strUid, entry);
 
+            // Check for another match
+            if (entries.hasMore()) {
+                entry = null;
+                log.warn(LogHelper.getHeader(context,
+                                              "multiple matching entries for " + strFilter,
+                                              ""));
+                return null;
+            }
 
-        // Get entry
-        entry = (SearchResult)entries.next();
-        log.debug(LogHelper.getHeader(context,
-                                      "matching entry for " + strUid + ": " + entry.getName(),
-                                      ""));
-        LdapInfo ldapInfo = new LdapInfo(strUid, entry);
-
-        // Check for another match
-        if (entries.hasMore()) {
-            entry = null;
-            log.warn(LogHelper.getHeader(context,
-                                          "multiple matching entries for " + strFilter,
+            log.debug(LogHelper.getHeader(context,
+                                          "ldap entry:\n" + entry,
                                           ""));
-            return null;
+            return ldapInfo;
+        } catch(NamingException ne) {
+            log.error("LDAP NamingException for '" + strUid + "'", ne);
         }
-
-        log.debug(LogHelper.getHeader(context,
-                                      "ldap entry:\n" + entry,
-                                      ""));
-
-        return ldapInfo;
+        return null;
     }
 
     /**
