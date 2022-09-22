@@ -79,7 +79,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         Ldap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo checkUid(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) throws NamingException {
               return new LdapInfo(strUid, null);
             }
         };
@@ -114,7 +114,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         Ldap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo checkUid(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) throws NamingException {
               return new LdapInfo(strUid, null);
             }
         };
@@ -149,7 +149,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo checkUid(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) throws NamingException {
               return new LdapInfo(strUid, null);
             }
         };
@@ -179,7 +179,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo checkUid(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) throws NamingException {
               return new LdapInfo(strUid, null);
             }
         };
@@ -209,7 +209,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         Ldap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo checkUid(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) throws NamingException {
               return new LdapInfo(strUid, null);
             }
         };
@@ -243,7 +243,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         // called.
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public LdapInfo checkUid(String strUid) throws NamingException {
+            public LdapInfo queryLdap(String strUid) throws NamingException {
                 return new LdapInfo(strUid, null);
             }
 
@@ -306,7 +306,7 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     public boolean registerEPersonCalled = false;
 
     @Override
-    public LdapInfo checkUid(String strUid) throws NamingException {
+    public LdapInfo queryLdap(String strUid) throws NamingException {
         return null;
     }
 

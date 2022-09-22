@@ -107,12 +107,14 @@ public class LdapImpl implements Ldap {
     }
 
 
-    /*************************************************************** checkUid */
     /**
-     * Check if a user supplied uid is valid.
+     * Queries LDAP for the given username, returning an LdapInfo object if
+     * found, otherwise null is returned.
+     *
+     * @param strUid the LDAP user id to retrieve
      */
     @Override
-    public LdapInfo checkUid(String strUid) throws NamingException {
+    public LdapInfo queryLdap(String strUid) throws NamingException {
         if (ctx == null) {
             return null;
         }

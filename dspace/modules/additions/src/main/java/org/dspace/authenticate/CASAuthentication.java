@@ -165,7 +165,7 @@ public class CASAuthentication implements AuthenticationMethod {
 
     protected LdapInfo getLdapUser(Ldap ldap, String netid) {
         try {
-            return ldap.checkUid(netid);
+            return ldap.queryLdap(netid);
         } catch (NamingException ne) {
             log.error("LDAP NamingException for '" + netid + "'", ne);
             return null;

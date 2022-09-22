@@ -22,7 +22,13 @@ public interface Ldap {
      * Check if a user supplied uid is valid.
      */
 
-    public LdapInfo checkUid(String strUid) throws NamingException;
+    /**
+     * Queries LDAP for the given username, returning an LdapInfo object if
+     * found, otherwise null is returned.
+     *
+     * @param strUid the LDAP user id to retrieve
+     */
+    public LdapInfo queryLdap(String strUid) throws NamingException;
 
     /**
      * Close the ldap connection
