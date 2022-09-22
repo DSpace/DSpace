@@ -122,6 +122,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 context.uncacheEntity(item);
             }
         }
+        context.uncacheEntity(item);
     }
 
     /**
@@ -200,6 +201,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 }
             }
         }
+        context.uncacheEntity(bitstream);
         return processed;
     }
 
