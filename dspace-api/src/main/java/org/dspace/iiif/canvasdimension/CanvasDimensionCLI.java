@@ -223,9 +223,6 @@ public class CanvasDimensionCLI {
             context.commit();
         }
 
-        // Always print summary to standard out.
-        System.out.println(processed + " IIIF items were processed.");
-
         Date endTime = new Date();
         System.out.println("Started: " + startTime.getTime());
         System.out.println("Ended: " + endTime.getTime());
@@ -233,6 +230,8 @@ public class CanvasDimensionCLI {
             "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
                 .getTime() - startTime.getTime()) + " msecs)");
 
+        // Always print summary to standard out.
+        System.out.println(processed + " IIIF items were processed.");
     }
 
 }
