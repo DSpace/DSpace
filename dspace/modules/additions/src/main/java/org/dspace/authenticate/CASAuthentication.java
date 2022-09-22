@@ -180,16 +180,10 @@ public class CASAuthentication implements AuthenticationMethod {
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
             throws SQLException {
-        Ldap ldap = null;
-        try {
-            ldap = new LdapImpl(context);
+        try (Ldap ldap = new LdapImpl(context)) {
             return authenticate(context, username, password, realm, request, ldap);
         } catch (Exception e) {
             log.error("Unexpected exception caught", e);
-        } finally {
-            if (ldap != null) {
-                ldap.close();
-            }
         }
 
         return BAD_ARGS;

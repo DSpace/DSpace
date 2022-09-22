@@ -159,14 +159,6 @@ public class LdapImpl implements Ldap {
     }
 
     /**
-     * Close the ldap connection
-     */
-    @Override
-    public void finalize() {
-        close();
-    }
-
-    /**
      * Registers an EPerson, using the information in the given LdapInfo
      * object.
      */

@@ -273,7 +273,7 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
         return;
     }
 }
-class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
+class MockLdap implements Ldap {
     // Convenience method returning MockLdap instance that returns an LdapInfo
     // object, indicating that the user was found in LDAP.
     public static MockLdap userFound() {
@@ -306,9 +306,5 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     @Override
     public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
         return null;
-    }
-
-    @Override
-    public void finalize() {
     }
 }
