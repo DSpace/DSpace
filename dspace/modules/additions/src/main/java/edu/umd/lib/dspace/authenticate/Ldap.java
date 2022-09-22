@@ -48,9 +48,4 @@ public interface Ldap {
      * Register this ldap user as an EPerson
      */
     public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception;
-
-    /**
-     * Reset the context. We lost it after every request.
-     */
-    public void setContext(org.dspace.core.Context context);
 }

@@ -331,10 +331,6 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     }
 
     @Override
-    public void setContext(Context context) {
-    }
-
-    @Override
     public void finalize() {
     }
 }

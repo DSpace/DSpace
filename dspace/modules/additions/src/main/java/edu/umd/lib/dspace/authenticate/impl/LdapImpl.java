@@ -342,15 +342,6 @@ public class LdapImpl implements Ldap {
         }
     }
 
-    /*********************************************************** setContext */
-    /**
-     * Reset the context.  We lost it after every request.
-     */
-    @Override
-    public void setContext(org.dspace.core.Context context) {
-        this.context = context;
-    }
-
     @Override
     public String toString() {
         if (entry == null) {
