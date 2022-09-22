@@ -53,6 +53,11 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
     @Override
     public void sendEvents(String analyticsKey, List<GoogleAnalyticsEvent> events) {
 
+        if (!isAnalyticsKeySupported(analyticsKey)) {
+            throw new IllegalArgumentException("The given analytics key " + analyticsKey
+                + " is not supported. A key with prefix " + keyPrefix + " is required");
+        }
+
         String endpointUrl = requestBuilder.getEndpointUrl(analyticsKey);
 
         requestBuilder.composeRequestsBody(analyticsKey, events)
@@ -101,6 +106,14 @@ public class GoogleAnalyticsClientImpl implements GoogleAnalyticsClient {
             LOGGER.error("An error occurs getting the response content", e);
             return "Generic error";
         }
+    }
+
+    public String getKeyPrefix() {
+        return keyPrefix;
+    }
+
+    public GoogleAnalyticsClientRequestBuilder getRequestBuilder() {
+        return requestBuilder;
     }
 
 }

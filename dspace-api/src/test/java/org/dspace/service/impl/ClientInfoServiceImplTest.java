@@ -234,28 +234,28 @@ public class ClientInfoServiceImplTest extends AbstractDSpaceTest {
 
         try {
 
-            configurationService.setProperty("ip-anonymation.bytes", 1);
+            configurationService.setProperty("client.ip-anonymization.parts", 1);
 
             assertEquals("192.168.1.0", clientInfoService.getClientIp(remoteIp, null));
 
-            configurationService.setProperty("ip-anonymation.bytes", 2);
+            configurationService.setProperty("client.ip-anonymization.parts", 2);
 
             assertEquals("192.168.0.0", clientInfoService.getClientIp(remoteIp, null));
 
-            configurationService.setProperty("ip-anonymation.bytes", 3);
+            configurationService.setProperty("client.ip-anonymization.parts", 3);
 
             assertEquals("192.0.0.0", clientInfoService.getClientIp(remoteIp, null));
 
-            configurationService.setProperty("ip-anonymation.bytes", 4);
+            configurationService.setProperty("client.ip-anonymization.parts", 4);
 
             assertEquals("0.0.0.0", clientInfoService.getClientIp(remoteIp, null));
 
-            configurationService.setProperty("ip-anonymation.bytes", 5);
+            configurationService.setProperty("client.ip-anonymization.parts", 5);
 
             assertEquals("192.168.1.25", clientInfoService.getClientIp(remoteIp, null));
 
         } finally {
-            configurationService.setProperty("ip-anonymation.bytes", 0);
+            configurationService.setProperty("client.ip-anonymization.parts", 0);
         }
 
     }

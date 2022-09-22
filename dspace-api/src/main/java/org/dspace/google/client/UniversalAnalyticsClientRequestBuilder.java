@@ -7,6 +7,7 @@
  */
 package org.dspace.google.client;
 
+import static org.apache.commons.lang.StringUtils.startsWith;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.net.URLEncoder;
@@ -38,6 +39,10 @@ public class UniversalAnalyticsClientRequestBuilder implements GoogleAnalyticsCl
 
     @Override
     public List<String> composeRequestsBody(String analyticsKey, List<GoogleAnalyticsEvent> events) {
+
+        if (!startsWith(analyticsKey, "UA-")) {
+            throw new IllegalArgumentException("Only keys with UA- prefix are supported");
+        }
 
         String requestBody = events.stream()
             .map(event -> formatEvent(analyticsKey, event))

@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class UniversalAnalyticsClientRequestBuilderTest {
     @Test
     public void testGetEndpointUrl() {
 
-        String endpointUrl = requestBuilder.getEndpointUrl("G-12345");
+        String endpointUrl = requestBuilder.getEndpointUrl("UA-12345");
         assertThat(endpointUrl, is("https://google-analytics/test"));
 
     }
@@ -46,8 +47,19 @@ public class UniversalAnalyticsClientRequestBuilderTest {
     @Test
     public void testComposeRequestBodiesWithoutEvents() {
 
-        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of());
+        List<String> requestsBody = requestBuilder.composeRequestsBody("UA-12345", List.of());
         assertThat(requestsBody, empty());
+
+    }
+
+    @Test
+    public void testComposeRequestBodiesWithNotSupportedKey() {
+
+        GoogleAnalyticsEvent event = buildEvent("123", "192.168.1.25", "Chrome", "REF",
+            "/api/documents/123", "Test publication");
+
+        assertThrows("Only keys with G- prefix are supported",
+            IllegalArgumentException.class, () -> requestBuilder.composeRequestsBody("G-12345", List.of(event)));
 
     }
 
@@ -57,7 +69,7 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event = buildEvent("123", "192.168.1.25", "Chrome", "REF",
             "/api/documents/123", "Test publication");
 
-        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("UA-12345", List.of(event));
         assertThat(requestsBody, hasSize(1));
 
         String requestBody = requestsBody.get(0);
@@ -65,7 +77,7 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = "v=1&tid=G-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
+        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
             + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));
@@ -81,7 +93,7 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event2 = buildEvent("123", "192.168.1.25", "Mozilla Firefox", "REF-2",
             "/api/documents/12345", "Test publication 2");
 
-        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", List.of(event1, event2));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("UA-12345", List.of(event1, event2));
         assertThat(requestsBody, hasSize(1));
         String requestBody = requestsBody.get(0);
 
@@ -89,9 +101,9 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = "v=1&tid=G-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
+        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
             + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item\n"
-            + "v=1&tid=G-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
+            + "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
             + "&dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));
@@ -110,7 +122,7 @@ public class UniversalAnalyticsClientRequestBuilderTest {
         GoogleAnalyticsEvent event3 = buildEvent("987", "192.168.1.13", "Postman", null,
             "/api/documents/654", "Test publication 3");
 
-        List<String> requestsBody = requestBuilder.composeRequestsBody("G-12345", of(event1, event2, event3));
+        List<String> requestsBody = requestBuilder.composeRequestsBody("UA-12345", of(event1, event2, event3));
         assertThat(requestsBody, hasSize(1));
         String requestBody = requestsBody.get(0);
 
@@ -118,11 +130,11 @@ public class UniversalAnalyticsClientRequestBuilderTest {
 
         String requestBodyWithoutTime = removeAllTimeSections(requestBody);
 
-        String expectedRequestBodyWithoutTime = "v=1&tid=G-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
+        String expectedRequestBodyWithoutTime = "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Chrome&dr=REF"
             + "&dp=%2Fapi%2Fdocuments%2F123&dt=Test+publication&ec=bitstream&ea=download&el=item\n"
-            + "v=1&tid=G-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
+            + "v=1&tid=UA-12345&cid=123&t=event&uip=192.168.1.25&ua=Mozilla+Firefox&dr=REF-2"
             + "&dp=%2Fapi%2Fdocuments%2F12345&dt=Test+publication+2&ec=bitstream&ea=download&el=item\n"
-            + "v=1&tid=G-12345&cid=987&t=event&uip=192.168.1.13&ua=Postman&dr="
+            + "v=1&tid=UA-12345&cid=987&t=event&uip=192.168.1.13&ua=Postman&dr="
             + "&dp=%2Fapi%2Fdocuments%2F654&dt=Test+publication+3&ec=bitstream&ea=download&el=item";
 
         assertThat(requestBodyWithoutTime, is(expectedRequestBodyWithoutTime));

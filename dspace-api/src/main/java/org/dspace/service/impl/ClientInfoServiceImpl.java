@@ -231,7 +231,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     }
 
     private int getIpAnonymizationBytes() {
-        return configurationService.getIntProperty("ip-anonymation.bytes", 0);
+        return configurationService.getIntProperty("client.ip-anonymization.parts", 0);
     }
 
     private boolean isIPv4Address(String ipAddress) {

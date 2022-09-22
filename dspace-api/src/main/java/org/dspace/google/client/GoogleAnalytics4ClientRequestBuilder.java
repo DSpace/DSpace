@@ -8,6 +8,7 @@
 package org.dspace.google.client;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.apache.commons.lang.StringUtils.startsWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,10 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
     @Override
     public String getEndpointUrl(String analyticsKey) {
 
+        if (!startsWith(analyticsKey, "G-")) {
+            throw new IllegalArgumentException("Only keys with G- prefix are supported");
+        }
+
         String apiSecret = configurationService.getProperty("google.analytics.api-secret");
         if (StringUtils.isBlank(apiSecret)) {
             throw new GoogleAnalyticsClientException("The API secret must be configured to sent GA4 events");
@@ -63,7 +68,7 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
         List<String> requestsBody = new ArrayList<String>();
 
         for (String clientId : eventsGroupedByClientId.keySet()) {
-            String requestBody = composeRequestBody(analyticsKey, clientId, eventsGroupedByClientId.get(clientId));
+            String requestBody = composeRequestBody(clientId, eventsGroupedByClientId.get(clientId));
             requestsBody.add(requestBody);
         }
 
@@ -76,7 +81,7 @@ public class GoogleAnalytics4ClientRequestBuilder implements GoogleAnalyticsClie
             .collect(groupingBy(GoogleAnalyticsEvent::getClientId));
     }
 
-    private String composeRequestBody(String analyticsKey, String clientId, List<GoogleAnalyticsEvent> events) {
+    private String composeRequestBody(String clientId, List<GoogleAnalyticsEvent> events) {
 
         GoogleAnalytics4EventsVO eventsVo = new GoogleAnalytics4EventsVO(clientId);
 
