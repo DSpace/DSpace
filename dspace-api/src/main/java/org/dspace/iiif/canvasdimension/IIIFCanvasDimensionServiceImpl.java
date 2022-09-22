@@ -117,9 +117,9 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             boolean isIIIFItem = IIIFSharedUtils.isIIIFItem(item);
             if (isIIIFItem) {
                 if (processItemBundles(context, item)) {
-                    context.uncacheEntity(item);
                     ++processed;
                 }
+                context.uncacheEntity(item);
             }
         }
     }
