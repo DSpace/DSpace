@@ -324,48 +324,8 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     }
 
     @Override
-    public List<String> getAttributeAll(String strName) throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getAttribute(String strName) throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getEmail() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getPhone() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getFirstName() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getLastName() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public List<String> getUnits() throws NamingException {
-        return null;
-    }
-
-    @Override
     public List<Group> getGroups() throws NamingException, SQLException {
         return null;
-    }
-
-    @Override
-    public boolean isFaculty() throws NamingException {
-        return false;
     }
 
     @Override

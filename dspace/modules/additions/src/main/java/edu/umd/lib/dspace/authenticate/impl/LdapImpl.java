@@ -270,8 +270,7 @@ public class LdapImpl implements Ldap {
     /**
      * get all instances of an attribute.
      */
-    @Override
-    public List<String> getAttributeAll(String strName) throws NamingException {
+    private List<String> getAttributeAll(String strName) throws NamingException {
         List<String> attributes = new ArrayList<>();
 
         if (entry != null) {
@@ -294,8 +293,7 @@ public class LdapImpl implements Ldap {
     /**
      * get an attribute (first instance).
      */
-    @Override
-    public String getAttribute(String strName) throws NamingException {
+    private String getAttribute(String strName) throws NamingException {
         List l = getAttributeAll(strName);
 
         if (l.size() > 0) {
@@ -309,8 +307,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's email address
      */
-    @Override
-    public String getEmail() throws NamingException {
+    private String getEmail() throws NamingException {
         return getAttribute("mail");
     }
 
@@ -318,8 +315,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's phone
      */
-    @Override
-    public String getPhone() throws NamingException {
+    private String getPhone() throws NamingException {
         return getAttribute("telephonenumber");
     }
 
@@ -327,8 +323,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's first name
      */
-    @Override
-    public String getFirstName() throws NamingException {
+    private String getFirstName() throws NamingException {
         return getAttribute("givenname");
     }
 
@@ -336,8 +331,7 @@ public class LdapImpl implements Ldap {
     /**
      * user's last name
      */
-    @Override
-    public String getLastName() throws NamingException {
+    private String getLastName() throws NamingException {
         return getAttribute("sn");
     }
 
@@ -345,8 +339,7 @@ public class LdapImpl implements Ldap {
     /**
      * organization units
      */
-    @Override
-    public List<String> getUnits() throws NamingException {
+    private List<String> getUnits() throws NamingException {
         return getAttributeAll("ou");
     }
 
@@ -375,8 +368,7 @@ public class LdapImpl implements Ldap {
     /**
      * is the user CP faculty with an acceptable status?
      */
-    @Override
-    public boolean isFaculty() throws NamingException {
+    private boolean isFaculty() throws NamingException {
         if (strUid.equals("tstusr2")) {
             return true;
         }

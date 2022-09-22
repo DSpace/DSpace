@@ -43,49 +43,9 @@ public interface Ldap {
     public void finalize();
 
     /**
-     * get all instances of an attribute.
-     */
-    public List<String> getAttributeAll(String strName) throws NamingException;
-
-    /**
-     * get an attribute (first instance).
-     */
-    public String getAttribute(String strName) throws NamingException;
-
-    /**
-     * user's email address
-     */
-    public String getEmail() throws NamingException;
-
-    /**
-     * user's phone
-     */
-    public String getPhone() throws NamingException;
-
-    /**
-     * user's first name
-     */
-    public String getFirstName() throws NamingException;
-
-    /**
-     * user's last name
-     */
-    public String getLastName() throws NamingException;
-
-    /**
-     * organization units
-     */
-    public List<String> getUnits() throws NamingException;
-
-    /**
      * Groups mapped by the Units for faculty.
      */
     public List<Group> getGroups() throws NamingException, java.sql.SQLException;
-
-    /**
-     * is the user CP faculty with an acceptable status?
-     */
-    public boolean isFaculty() throws NamingException;
 
     /**
      * Register this ldap user as an EPerson
