@@ -57,14 +57,8 @@ public class ItemExportScriptConfiguration<T extends ItemExport> extends ScriptC
         options.addOption(Option.builder("i").longOpt("id")
                 .desc("ID or handle of thing to export")
                 .hasArg().required().build());
-        options.addOption(Option.builder("d").longOpt("dest")
-                .desc("destination where you want items to go")
-                .hasArg().required().build());
         options.addOption(Option.builder("n").longOpt("number")
                 .desc("sequence number to begin exporting items with")
-                .hasArg().required().build());
-        options.addOption(Option.builder("z").longOpt("zip")
-                .desc("export as zip file (specify filename e.g. export.zip)")
                 .hasArg().required(false).build());
         options.addOption(Option.builder("m").longOpt("migrate")
                 .desc("export for migration (remove handle and metadata that will be re-created in new system)")

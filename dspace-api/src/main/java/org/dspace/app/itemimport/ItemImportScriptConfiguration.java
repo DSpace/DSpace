@@ -7,6 +7,7 @@
  */
 package org.dspace.app.itemimport;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Option;
@@ -60,21 +61,17 @@ public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptC
         options.addOption(Option.builder("d").longOpt("delete")
                 .desc("delete items listed in mapfile")
                 .hasArg(false).required(false).build());
-        options.addOption(Option.builder("s").longOpt("source")
-                .desc("source of items (directory)")
-                .hasArg().required(false).build());
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("name of zip file")
-                .hasArg().required(false).build());
+                .type(InputStream.class)
+                .hasArg().required().build());
         options.addOption(Option.builder("c").longOpt("collection")
                 .desc("destination collection(s) Handle or database ID")
                 .hasArg().required(false).build());
         options.addOption(Option.builder("m").longOpt("mapfile")
                 .desc("mapfile items in mapfile")
-                .hasArg().required().build());
-        options.addOption(Option.builder("e").longOpt("eperson")
-                .desc("email of eperson doing importing")
-                .hasArg().required().build());
+                .type(InputStream.class)
+                .hasArg().required(false).build());
         options.addOption(Option.builder("w").longOpt("workflow")
                 .desc("send submission through collection's workflow")
                 .hasArg(false).required(false).build());

@@ -7,8 +7,10 @@
  */
 package org.dspace.app.itemexport;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +25,9 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
@@ -51,6 +56,9 @@ import org.dspace.utils.DSpace;
  */
 public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
 
+    public static String ZIP_NAME = "exportSAFZip";
+    public static String ZIP_OUTPUT = "saf-export.zip";
+
     protected String typeString = null;
     protected String destDirName = null;
     protected String idString = null;
@@ -67,6 +75,10 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     protected static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final EPersonService epersonService =
+            EPersonServiceFactory.getInstance().getEPersonService();
+    protected static ItemExportService itemExportService = ItemExportServiceFactory.getInstance()
+            .getItemExportService();
 
     @Override
     public ItemExportScriptConfiguration getScriptConfiguration() {
@@ -92,21 +104,11 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
             idString = commandLine.getOptionValue('i');
         }
 
-        if (commandLine.hasOption('d')) { // dest
-            destDirName = commandLine.getOptionValue('d');
-        }
-
-        if (commandLine.hasOption('n')) { // number
-            seqStart = Integer.parseInt(commandLine.getOptionValue('n'));
-        }
+        setNumber();
+        setZip();
 
         if (commandLine.hasOption('m')) { // number
             migrate = true;
-        }
-
-        if (commandLine.hasOption('z')) {
-            zip = true;
-            zipFileName = commandLine.getOptionValue('z');
         }
 
         if (commandLine.hasOption('x')) {
@@ -118,33 +120,14 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
-            handler.logInfo("full collection: ItemExport -t COLLECTION -i ID -d dest -n number");
-            handler.logInfo("single item: ItemExport -t ITEM -i ID -d dest -n number");
             return;
         }
 
-        // validation
-        if (type == -1) {
-            handler.logError("The type must be either COLLECTION or ITEM (run with -h flag for details)");
-            throw new UnsupportedOperationException("The type must be either COLLECTION or ITEM");
-        }
+        setDestDirName();
 
-        if (destDirName == null) {
-            handler.logError("The destination directory must be set (run with -h flag for details)");
-            throw new UnsupportedOperationException("The destination directory must be set");
-        }
+        validate();
 
-        if (seqStart == -1) {
-            handler.logError("The sequence start number must be set (run with -h flag for details)");
-            throw new UnsupportedOperationException("The sequence start number must be set");
-        }
-
-        if (idString == null) {
-            handler.logError("The ID must be set to either a database ID or a handle (run with -h flag for details)");
-            throw new UnsupportedOperationException("The ID must be set to either a database ID or a handle");
-        }
-
-        Context context = new Context(Context.Mode.READ_ONLY);
+        Context context = new Context();
         context.turnOffAuthorisationSystem();
 
         if (type == Constants.ITEM) {
@@ -184,40 +167,91 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
             }
         }
 
-        ItemExportService itemExportService = ItemExportServiceFactory.getInstance()
-                .getItemExportService();
         try {
-            if (zip) {
-                Iterator<Item> items;
-                if (item != null) {
-                    List<Item> myItems = new ArrayList<>();
-                    myItems.add(item);
-                    items = myItems.iterator();
-                } else {
-                    handler.logInfo("Exporting from collection: " + idString);
-                    items = itemService.findByCollection(context, collection);
-                }
-                itemExportService.exportAsZip(context, items, destDirName, zipFileName,
-                        seqStart, migrate, excludeBitstreams);
-            } else {
-                if (item != null) {
-                    // it's only a single item
-                    itemExportService
-                        .exportItem(context, Collections.singletonList(item).iterator(), destDirName,
-                                seqStart, migrate, excludeBitstreams);
-                } else {
-                    handler.logInfo("Exporting from collection: " + idString);
-
-                    // it's a collection, so do a bunch of items
-                    Iterator<Item> i = itemService.findByCollection(context, collection);
-                    itemExportService.exportItem(context, i, destDirName, seqStart, migrate, excludeBitstreams);
-                }
-            }
-
+            process(context);
             context.complete();
         } catch (Exception e) {
             context.abort();
             throw new Exception(e);
         }
+    }
+
+    /**
+     * Validate the options
+     */
+    protected void validate() {
+        if (type == -1) {
+            handler.logError("The type must be either COLLECTION or ITEM (run with -h flag for details)");
+            throw new UnsupportedOperationException("The type must be either COLLECTION or ITEM");
+        }
+
+        if (idString == null) {
+            handler.logError("The ID must be set to either a database ID or a handle (run with -h flag for details)");
+            throw new UnsupportedOperationException("The ID must be set to either a database ID or a handle");
+        }
+    }
+
+    /**
+     * Process the export
+     * @param context
+     * @throws Exception
+     */
+    protected void process(Context context) throws Exception {
+        setEPerson(context);
+
+        Iterator<Item> items;
+        if (item != null) {
+            List<Item> myItems = new ArrayList<>();
+            myItems.add(item);
+            items = myItems.iterator();
+        } else {
+            handler.logInfo("Exporting from collection: " + idString);
+            items = itemService.findByCollection(context, collection);
+        }
+        itemExportService.exportAsZip(context, items, destDirName, zipFileName,
+                seqStart, migrate, excludeBitstreams);
+
+        // write input stream on handler
+        handler.writeFilestream(context, zipFileName,
+                new FileInputStream(
+                        new File(destDirName + System.getProperty("file.separator") + zipFileName)),
+                ZIP_NAME);
+    }
+
+    /**
+     * Set the destination directory option
+     */
+    protected void setDestDirName() throws Exception {
+        destDirName = itemExportService.getExportWorkDirectory();
+    }
+
+    /**
+     * Set the zip option
+     */
+    protected void setZip() {
+        zip = true;
+        zipFileName = ZIP_OUTPUT;
+    }
+
+    /**
+     * Set the number option
+     */
+    protected void setNumber() {
+        seqStart = 1;
+        if (commandLine.hasOption('n')) { // number
+            seqStart = Integer.parseInt(commandLine.getOptionValue('n'));
+        }
+    }
+
+    private void setEPerson(Context context) throws SQLException {
+        EPerson myEPerson = epersonService.find(context, this.getEpersonIdentifier());
+
+        // check eperson
+        if (myEPerson == null) {
+            handler.logError("EPerson cannot be found: " + this.getEpersonIdentifier());
+            throw new UnsupportedOperationException("EPerson cannot be found: " + this.getEpersonIdentifier());
+        }
+
+        context.setCurrentUser(myEPerson);
     }
 }

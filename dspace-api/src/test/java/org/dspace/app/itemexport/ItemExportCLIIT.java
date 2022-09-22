@@ -7,80 +7,50 @@
  */
 package org.dspace.app.itemexport;
 
-import static com.jayway.jsonpath.JsonPath.read;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
-import org.dspace.app.rest.matcher.ProcessMatcher;
-import org.dspace.app.rest.model.ParameterValueRest;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
-import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.ProcessStatus;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
-import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.dspace.scripts.Process;
-import org.dspace.scripts.service.ProcessService;
-import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Basic integration testing for the SAF Export feature via UI {@link ItemExport}.
+ * Basic integration testing for the SAF Export feature via CLI {@link ItemExportCLI}.
  * https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
  *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public class ItemExportIT extends AbstractControllerIntegrationTest {
+public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
 
     private static final String title = "A Tale of Two Cities";
     private static final String dateIssued = "1990";
     private static final String titleAlternative = "J'aime les Printemps";
 
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private CollectionService collectionService;
-    @Autowired
-    private ConfigurationService configurationService;
-    @Autowired
-    private ProcessService processService;
-    @Autowired
-    private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private Collection collection;
     private Path tempDir;
 
     @Before
-    @Override
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -93,14 +63,12 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         tempDir = Files.createTempDirectory("safExportTest");
-        configurationService.setProperty("org.dspace.app.itemexport.work.dir", tempDir.toString());
     }
 
     @After
     @Override
     public void destroy() throws Exception {
         PathUtils.deleteDirectory(tempDir);
-        configurationService.reloadConfig();
         super.destroy();
     }
 
@@ -120,12 +88,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "COLLECTION"));
-        parameters.add(new DSpaceCommandLineParameter("-i", collection.getHandle()));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "COLLECTION",
+                "-i", collection.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        perfomExportScript(args);
 
-        checkCollection();
+        checkDir();
     }
 
     @Test
@@ -139,12 +106,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "ITEM"));
-        parameters.add(new DSpaceCommandLineParameter("-i", item.getHandle()));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        perfomExportScript(args);
 
-        checkItem(item);
+        checkDir();
     }
 
     @Test
@@ -166,12 +132,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "ITEM"));
-        parameters.add(new DSpaceCommandLineParameter("-i", item.getHandle()));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        perfomExportScript(args);
 
-        checkItem(item);
+        checkDir();
     }
 
     @Test
@@ -186,12 +151,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "ITEM"));
-        parameters.add(new DSpaceCommandLineParameter("-i", item.getHandle()));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        perfomExportScript(args);
 
-        checkItem(item);
+        checkDir();
     }
 
     @Test
@@ -210,15 +174,14 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "COLLECTION"));
-        parameters.add(new DSpaceCommandLineParameter("-i", collection.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-m", ""));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "COLLECTION",
+                "-i", collection.getHandle(), "-d", tempDir.toString(), "-n", "1", "-m" };
+        perfomExportScript(args);
 
-        checkCollection();
-        checkItem(item1);
-        checkItem(item2);
+        checkDir();
+        checkCollectionMigration();
+        checkItemMigration(item1);
+        checkItemMigration(item2);
     }
 
     @Test
@@ -232,13 +195,12 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "ITEM"));
-        parameters.add(new DSpaceCommandLineParameter("-i", item.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-m", ""));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1", "-m" };
+        perfomExportScript(args);
 
-        checkItem(item);
+        checkDir();
+        checkItemMigration(item);
     }
 
     @Test
@@ -260,13 +222,12 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "ITEM"));
-        parameters.add(new DSpaceCommandLineParameter("-i", item.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-m", ""));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1", "-m" };
+        perfomExportScript(args);
 
-        checkItem(item);
+        checkDir();
+        checkItemMigration(item);
     }
 
     @Test
@@ -281,73 +242,41 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-t", "ITEM"));
-        parameters.add(new DSpaceCommandLineParameter("-i", item.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-m", ""));
-        perfomExportScript(parameters);
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1", "-m" };
+        perfomExportScript(args);
 
-        checkItem(item);
+        checkDir();
+        checkItemMigration(item);
     }
 
     /**
-     * Check collection exists
+     * Check created export directory
      * @throws Exception
      */
-    private void checkCollection() throws Exception {
+    private void checkDir() throws Exception {
+        assertTrue(Files.list(tempDir).findAny().isPresent());
+    }
+
+    /**
+     * Check migration of collection
+     * @throws Exception
+     */
+    private void checkCollectionMigration() throws Exception {
         assertNotNull(collectionService.find(context, collection.getID()));
     }
 
     /**
-     * Check item exists
+     * Check migration of item
      * @param item
      * @throws Exception
      */
-    private void checkItem(Item item) throws Exception {
+    private void checkItemMigration(Item item) throws Exception {
         assertNotNull(itemService.find(context, item.getID()));
     }
 
-    private void perfomExportScript(LinkedList<DSpaceCommandLineParameter> parameters)
+    private void perfomExportScript(String[] args)
             throws Exception {
-        Process process = null;
-
-        List<ParameterValueRest> list = parameters.stream()
-                .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
-                        .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
-                .collect(Collectors.toList());
-
-        try {
-            AtomicReference<Integer> idRef = new AtomicReference<>();
-            String token = getAuthToken(admin.getEmail(), password);
-
-            getClient(token)
-                .perform(multipart("/api/system/scripts/export/processes")
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
-                .andExpect(status().isAccepted())
-                .andExpect(jsonPath("$", is(
-                        ProcessMatcher.matchProcess("export",
-                                String.valueOf(admin.getID()), parameters,
-                                ProcessStatus.COMPLETED))))
-                .andDo(result -> idRef
-                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
-
-            process = processService.find(context, idRef.get());
-            checkProcess(process);
-        } finally {
-            ProcessBuilder.deleteProcess(process.getID());
-        }
-    }
-
-    private void checkProcess(Process process) {
-        assertNotNull(process.getBitstreams());
-        assertEquals(2, process.getBitstreams().size());
-        assertEquals(1,
-                process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".log"))
-                .count());
-        assertEquals(1,
-                process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".zip"))
-                .count());
+        runDSpaceScript(args);
     }
 }

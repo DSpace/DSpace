@@ -8,16 +8,23 @@
 package org.dspace.app.itemimport;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -49,6 +56,10 @@ import org.dspace.utils.DSpace;
  */
 public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
 
+    public static String TEMP_DIR = "importSAF";
+    public static String MAPFILE_FILENAME = "mapfile";
+    public static String MAPFILE_BITSTREAM_TYPE = "importSAFMapfile";
+
     protected boolean template = false;
     protected String command = null;
     protected String sourcedir = null;
@@ -64,6 +75,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected String zipfilename = null;
     protected boolean help = false;
+    private InputStream mapfileInputStream = null;
 
     protected static final CollectionService collectionService =
             ContentServiceFactory.getInstance().getCollectionService();
@@ -114,14 +126,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             sourcedir = commandLine.getOptionValue('s');
         }
 
-        if (commandLine.hasOption('m')) { // mapfile
-            mapfile = commandLine.getOptionValue('m');
-        }
-
-        if (commandLine.hasOption('e')) { // eperson
-            eperson = commandLine.getOptionValue('e');
-        }
-
         if (commandLine.hasOption('c')) { // collections
             collections = commandLine.getOptionValues('c');
             commandLineCollections = true;
@@ -138,85 +142,24 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             isQuiet = true;
         }
 
-        if (commandLine.hasOption('z')) {
-            zip = true;
-            zipfilename = commandLine.getOptionValue('z');
-        }
+        setZip();
     }
 
     @Override
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
-            handler.logInfo("adding items: ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
-            handler.logInfo("adding items from zip file: ItemImport -a -e eperson -c collection -s sourcedir "
-                    + "-z filename.zip -m mapfile");
-            handler.logInfo("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
-            handler.logInfo("deleting items: ItemImport -d -e eperson -m mapfile");
-            handler.logInfo("If multiple collections are specified, the first collection will be the one "
-                    + "that owns the item.");
             return;
-        }
-
-        // validation
-        // can only resume for adds
-        if (isResume && !"add".equals(command)) {
-            handler.logError("Resume option only works with the --add command (run with -h flag for details)");
-            throw new UnsupportedOperationException("Resume option only works with the --add command");
-        }
-
-        File myFile = new File(mapfile);
-
-        if (!isResume && "add".equals(command) && myFile.exists()) {
-            handler.logError("The mapfile " + mapfile + " already exists. "
-                    + "Either delete it or use --resume if attempting to resume an aborted import. "
-                    + "(run with -h flag for details)");
-            throw new UnsupportedOperationException("The mapfile " + mapfile + " already exists");
-        }
-
-        if (command == null) {
-            handler.logError("Must run with either add, replace, or remove (run with -h flag for details)");
-            throw new UnsupportedOperationException("Must run with either add, replace, or remove");
-        } else if ("add".equals(command) || "replace".equals(command)) {
-            if (sourcedir == null) {
-                handler.logError("A source directory containing items must be set (run with -h flag for details)");
-                throw new UnsupportedOperationException("A source directory containing items must be set");
-            }
-
-            if (mapfile == null) {
-                handler.logError(
-                        "A map file to hold importing results must be specified (run with -h flag for details)");
-                throw new UnsupportedOperationException("A map file to hold importing results must be specified");
-            }
-        } else if ("delete".equals(command)) {
-            if (mapfile == null) {
-                handler.logError("A map file must be specified (run with -h flag for details)");
-                throw new UnsupportedOperationException("A map file must be specified");
-            }
-        }
-
-        if (eperson == null) {
-            handler.logError("An eperson to do the importing must be specified (run with -h flag for details)");
-            throw new UnsupportedOperationException("An eperson to do the importing must be specified");
         }
 
         Date startTime = new Date();
         Context context = new Context(Context.Mode.BATCH_EDIT);
 
-        // check eperson
-        EPerson myEPerson = null;
-        if (StringUtils.contains(eperson, '@')) {
-            // @ sign, must be an email
-            myEPerson = epersonService.findByEmail(context, eperson);
-        } else {
-            myEPerson = epersonService.find(context, UUID.fromString(eperson));
-        }
+        setMapFile();
 
-        if (myEPerson == null) {
-            handler.logError("EPerson cannot be found: " + eperson + " (run with -h flag for details)");
-            throw new UnsupportedOperationException("EPerson cannot be found: " + eperson);
-        }
-        context.setCurrentUser(myEPerson);
+        validate(context);
+
+        setEPerson(context);
 
         // check collection
         List<Collection> mycollections = null;
@@ -270,20 +213,11 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             itemImportService.setQuiet(isQuiet);
 
             try {
-                // If this is a zip archive, unzip it first
-                if (zip) {
-                    sourcedir = itemImportService.unzip(sourcedir, zipfilename);
-                }
-
                 context.turnOffAuthorisationSystem();
 
-                if ("add".equals(command)) {
-                    itemImportService.addItems(context, mycollections, sourcedir, mapfile, template);
-                } else if ("replace".equals(command)) {
-                    itemImportService.replaceItems(context, mycollections, sourcedir, mapfile, template);
-                } else if ("delete".equals(command)) {
-                    itemImportService.deleteItems(context, mapfile);
-                }
+                readZip(context, itemImportService);
+
+                process(context, itemImportService, mycollections);
 
                 // complete all transactions
                 context.complete();
@@ -320,5 +254,127 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
                     .getTime() - startTime.getTime()) + " msecs)");
         }
+    }
+
+    /**
+     * Validate the options
+     * @param context
+     */
+    protected void validate(Context context) {
+        if (command == null) {
+            handler.logError("Must run with either add, replace, or remove (run with -h flag for details)");
+            throw new UnsupportedOperationException("Must run with either add, replace, or remove");
+        }
+
+        // can only resume for adds
+        if (isResume && !"add".equals(command)) {
+            handler.logError("Resume option only works with the --add command (run with -h flag for details)");
+            throw new UnsupportedOperationException("Resume option only works with the --add command");
+        }
+
+        if (isResume && mapfileInputStream == null) {
+            handler.logError("The mapfile " + mapfile + " does not exist. ");
+            throw new UnsupportedOperationException("The mapfile " + mapfile + " does not exist");
+        }
+    }
+
+    /**
+     * Process the import
+     * @param context
+     * @param itemImportService
+     * @param collections
+     * @throws Exception
+     */
+    protected void process(Context context, ItemImportService itemImportService,
+            List<Collection> collections) throws Exception {
+        readMapfile(context);
+
+        if ("add".equals(command)) {
+            itemImportService.addItems(context, collections, sourcedir, mapfile, template);
+        } else if ("replace".equals(command)) {
+            itemImportService.replaceItems(context, collections, sourcedir, mapfile, template);
+        } else if ("delete".equals(command)) {
+            itemImportService.deleteItems(context, mapfile);
+        }
+
+        // write input stream on handler
+        if (mapfileInputStream == null) {
+            mapfileInputStream = new FileInputStream(mapfile);
+            mapfile = Path.of(mapfile).getFileName().toString();
+        }
+        handler.writeFilestream(context, mapfile, mapfileInputStream, MAPFILE_BITSTREAM_TYPE);
+    }
+
+    /**
+     * Read the ZIP archive in SAF format
+     * @param context
+     * @param itemImportService
+     * @throws Exception
+     */
+    protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
+        Optional<InputStream> optionalFileStream = handler.getFileStream(context, zipfilename);
+        if (optionalFileStream.isPresent()) {
+            File tempFile = File.createTempFile(zipfilename, "temp");
+            tempFile.deleteOnExit();
+            FileUtils.copyInputStreamToFile(optionalFileStream.get(), tempFile);
+            sourcedir = itemImportService.unzip(tempFile);
+        } else {
+            throw new IllegalArgumentException(
+                    "Error reading file, the file couldn't be found for filename: " + zipfilename);
+        }
+    }
+
+    /**
+     * Read the mapfile
+     * @param context
+     */
+    protected void readMapfile(Context context) {
+        if (isResume) {
+            try {
+                Optional<InputStream> optionalFileStream = handler.getFileStream(context, mapfile);
+                if (optionalFileStream.isPresent()) {
+                    mapfileInputStream = optionalFileStream.get();
+                }
+            } catch (IOException | AuthorizeException e) {
+                throw new UnsupportedOperationException("The mapfile does not exist");
+            }
+        }
+    }
+
+    /**
+     * Set the mapfile option
+     * @throws IOException
+     */
+    protected void setMapFile() throws IOException {
+        if (isResume && commandLine.hasOption('m')) {
+            mapfile = commandLine.getOptionValue('m');
+        } else {
+            mapfile = Files.createTempDirectory("TEMP_DIR").toString() + File.separator + MAPFILE_FILENAME;
+        }
+    }
+
+    /**
+     * Set the zip option
+     */
+    protected void setZip() {
+        zip = true;
+        zipfilename = commandLine.getOptionValue('z');
+    }
+
+    /**
+     * Set the eperson in the context
+     * @param context
+     * @throws SQLException
+     */
+    protected void setEPerson(Context context) throws SQLException {
+        EPerson myEPerson = epersonService.find(context, this.getEpersonIdentifier());
+
+        // check eperson
+        if (myEPerson == null) {
+            handler.logError("EPerson cannot be found: " + this.getEpersonIdentifier());
+            throw new UnsupportedOperationException("EPerson cannot be found: " + this.getEpersonIdentifier());
+        }
+
+        context.setCurrentUser(myEPerson);
     }
 }
