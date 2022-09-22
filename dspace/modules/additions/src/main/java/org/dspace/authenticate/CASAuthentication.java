@@ -20,6 +20,7 @@ import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -234,7 +235,7 @@ public class CASAuthentication implements AuthenticationMethod {
             // Register New User, if necessary
             if (eperson == null) {
                 if (canSelfRegister(context, request, netid)) {
-                    eperson = ldap.registerEPerson(netid, ldapInfo, request);
+                    eperson = registerEPerson(netid, context, ldapInfo, request);
 
                     context.setCurrentUser(eperson);
                 } else {
@@ -382,5 +383,54 @@ public class CASAuthentication implements AuthenticationMethod {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Registers an EPerson, using the information in the given LdapInfo
+     * object.
+     */
+    protected EPerson registerEPerson(String uid, Context context, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
+        // Turn off authorizations to create a new user
+        context.turnOffAuthorisationSystem();
+
+        try {
+            // Create a new eperson
+            EPerson eperson = ePersonService.create(context);
+
+            String strFirstName = ldapInfo.getFirstName();
+            if (strFirstName == null) {
+                strFirstName = "??";
+            }
+
+            String strLastName = ldapInfo.getLastName();
+            if (strLastName == null) {
+                strLastName = "??";
+            }
+
+            String strPhone = ldapInfo.getPhone();
+            if (strPhone == null) {
+                strPhone = "??";
+            }
+
+            eperson.setNetid(uid);
+            eperson.setEmail(uid + "@umd.edu");
+            eperson.setFirstName(context, strFirstName);
+            eperson.setLastName(context, strLastName);
+            ePersonService.setMetadataSingleValue(context, eperson, EPersonService.MD_PHONE, null, strPhone);
+            eperson.setCanLogIn(true);
+            eperson.setRequireCertificate(false);
+
+            AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
+            ePersonService.update(context, eperson);
+            context.dispatchEvents();
+
+            log.info("CASAuthentication::registerEPerson: create_um_eperson eperson_id="
+                     + eperson.getID() +", uid=" + uid);
+
+            return eperson;
+        } finally {
+            // Turn authorizations back on.
+            context.restoreAuthSystemState();
+        }
     }
 }

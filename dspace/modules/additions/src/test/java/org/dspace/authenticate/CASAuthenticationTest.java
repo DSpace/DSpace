@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.statistics.util.DummyHttpServletRequest;
@@ -199,7 +201,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
-        CASAuthentication stubCas = new CASAuthentication() {
+        MockCASAuthentication stubCas = new MockCASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
@@ -219,12 +221,6 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             public LdapInfo queryLdap(String strUid) throws NamingException {
                 return new LdapInfo(strUid, null);
             }
-
-            @Override
-            public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
-                registerEPersonCalled = true;
-                return eperson;
-            }
         };
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
@@ -233,7 +229,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                 AuthenticationMethod.SUCCESS, response);
 
         // Verify that Ldap.registerPerson was called
-        assertTrue("Ldap.registerEPerson was not called", mockLdap.registerEPersonCalled);
+        assertTrue("Ldap.registerEPerson was not called", stubCas.registerEPersonCalled);
     }
 }
 
@@ -291,8 +287,6 @@ class MockLdap implements Ldap {
       return new MockLdap();
     }
 
-    public boolean registerEPersonCalled = false;
-
     @Override
     public LdapInfo queryLdap(String strUid) throws NamingException {
         return null;
@@ -300,11 +294,15 @@ class MockLdap implements Ldap {
 
     @Override
     public void close() {
-
     }
+}
 
-    @Override
-    public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
-        return null;
-    }
+class MockCASAuthentication extends CASAuthentication {
+  public boolean registerEPersonCalled = false;
+
+  @Override
+  protected EPerson registerEPerson(String uid, Context context, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
+    registerEPersonCalled = true;
+    return super.registerEPerson(uid, context, ldapInfo, request);
+  }
 }

@@ -13,16 +13,11 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-import javax.servlet.http.HttpServletRequest;
 
 import edu.umd.lib.dspace.authenticate.Ldap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.core.LogHelper;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -45,8 +40,6 @@ public class LdapImpl implements Ldap {
 
     private final static ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
-
-    private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Configures the LDAP connection, based on configuration and environment
@@ -155,58 +148,6 @@ public class LdapImpl implements Ldap {
             } catch (NamingException e) {
                 // Do nothing
             }
-        }
-    }
-
-    /**
-     * Registers an EPerson, using the information in the given LdapInfo
-     * object.
-     */
-    @Override
-    public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
-        // Turn off authorizations to create a new user
-        context.turnOffAuthorisationSystem();
-
-        try {
-            // Create a new eperson
-            EPerson eperson = epersonService.create(context);
-
-            String strFirstName = ldapInfo.getFirstName();
-            if (strFirstName == null) {
-                strFirstName = "??";
-            }
-
-            String strLastName = ldapInfo.getLastName();
-            if (strLastName == null) {
-                strLastName = "??";
-            }
-
-            String strPhone = ldapInfo.getPhone();
-            if (strPhone == null) {
-                strPhone = "??";
-            }
-
-            eperson.setNetid(uid);
-            eperson.setEmail(uid + "@umd.edu");
-            eperson.setFirstName(context, strFirstName);
-            eperson.setLastName(context, strLastName);
-            epersonService.setMetadataSingleValue(context, eperson, EPersonService.MD_PHONE, null, strPhone);
-            eperson.setCanLogIn(true);
-            eperson.setRequireCertificate(false);
-
-            AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
-            epersonService.update(context, eperson);
-            context.dispatchEvents();
-
-            log.info(LogHelper.getHeader(context,
-                                         "create_um_eperson",
-                                         "eperson_id=" + eperson.getID() +
-                                         ", uid=" + strUid));
-
-            return eperson;
-        } finally {
-            // Turn authorizations back on.
-            context.restoreAuthSystemState();
         }
     }
 

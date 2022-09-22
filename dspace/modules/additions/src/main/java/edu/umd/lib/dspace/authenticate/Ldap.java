@@ -23,10 +23,4 @@ public interface Ldap extends AutoCloseable {
      */
     @Override
     public void close();
-
-    /**
-     * Registers an EPerson, using the information in the given LdapInfo
-     * object.
-     */
-    public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception;
 }
