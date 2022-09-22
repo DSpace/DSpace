@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.lib.dspace.authenticate.Ldap;
+import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -77,8 +79,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         Ldap mockLdap = new MockLdap() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return false;
+            public LdapInfo checkUid(String strUid) throws NamingException {
+              return new LdapInfo(strUid, null);
             }
         };
 
@@ -112,8 +114,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         Ldap mockLdap = new MockLdap() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
+            public LdapInfo checkUid(String strUid) throws NamingException {
+              return new LdapInfo(strUid, null);
             }
         };
 
@@ -147,8 +149,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
+            public LdapInfo checkUid(String strUid) throws NamingException {
+              return new LdapInfo(strUid, null);
             }
         };
 
@@ -177,8 +179,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
+            public LdapInfo checkUid(String strUid) throws NamingException {
+              return new LdapInfo(strUid, null);
             }
         };
 
@@ -207,8 +209,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         Ldap mockLdap = new MockLdap() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
+            public LdapInfo checkUid(String strUid) throws NamingException {
+              return new LdapInfo(strUid, null);
             }
         };
 
@@ -241,12 +243,12 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         // called.
         MockLdap mockLdap = new MockLdap() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
+            public LdapInfo checkUid(String strUid) throws NamingException {
+                return new LdapInfo(strUid, null);
             }
 
             @Override
-            public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
+            public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
                 registerEPersonCalled = true;
                 return eperson;
             }
@@ -304,8 +306,8 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     public boolean registerEPersonCalled = false;
 
     @Override
-    public boolean checkUid(String strUid) throws NamingException {
-        return false;
+    public LdapInfo checkUid(String strUid) throws NamingException {
+        return null;
     }
 
     @Override
@@ -324,12 +326,7 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     }
 
     @Override
-    public List<Group> getGroups() throws NamingException, SQLException {
-        return null;
-    }
-
-    @Override
-    public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
+    public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
         return null;
     }
 

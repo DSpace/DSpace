@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
+import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
+
 /**
  * Interface used with Ldap to provide authorizations for CAS authentication.
  */
@@ -20,7 +22,7 @@ public interface Ldap {
      * Check if a user supplied uid is valid.
      */
 
-    public boolean checkUid(String strUid) throws NamingException;
+    public LdapInfo checkUid(String strUid) throws NamingException;
 
     /**
      * Check if a user supplied password is valid.
@@ -43,14 +45,9 @@ public interface Ldap {
     public void finalize();
 
     /**
-     * Groups mapped by the Units for faculty.
-     */
-    public List<Group> getGroups() throws NamingException, java.sql.SQLException;
-
-    /**
      * Register this ldap user as an EPerson
      */
-    public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception;
+    public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception;
 
     /**
      * Reset the context. We lost it after every request.

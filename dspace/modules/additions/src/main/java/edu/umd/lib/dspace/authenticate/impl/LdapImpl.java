@@ -112,9 +112,9 @@ public class LdapImpl implements Ldap {
      * Check if a user supplied uid is valid.
      */
     @Override
-    public boolean checkUid(String strUid) throws NamingException {
+    public LdapInfo checkUid(String strUid) throws NamingException {
         if (ctx == null) {
-            return false;
+            return null;
         }
 
         this.strUid = strUid;
@@ -133,7 +133,7 @@ public class LdapImpl implements Ldap {
             log.warn(LogHelper.getHeader(context,
                                           "null returned on ctx.search for " + strFilter,
                                           ""));
-            return false;
+            return null;
         }
 
         // Check for a match
@@ -141,14 +141,16 @@ public class LdapImpl implements Ldap {
             log.debug(LogHelper.getHeader(context,
                                           "no matching entries for " + strFilter,
                                           ""));
-            return false;
+            return null;
         }
+
 
         // Get entry
         entry = (SearchResult)entries.next();
         log.debug(LogHelper.getHeader(context,
                                       "matching entry for " + strUid + ": " + entry.getName(),
                                       ""));
+        LdapInfo ldapInfo = new LdapInfo(strUid, entry);
 
         // Check for another match
         if (entries.hasMore()) {
@@ -156,14 +158,14 @@ public class LdapImpl implements Ldap {
             log.warn(LogHelper.getHeader(context,
                                           "multiple matching entries for " + strFilter,
                                           ""));
-            return false;
+            return null;
         }
 
         log.debug(LogHelper.getHeader(context,
                                       "ldap entry:\n" + entry,
                                       ""));
 
-        return true;
+        return ldapInfo;
     }
 
     /********************************************************** checkPassword */
@@ -266,155 +268,34 @@ public class LdapImpl implements Ldap {
         close();
     }
 
-    /****************************************************** getAttributeAll */
-    /**
-     * get all instances of an attribute.
-     */
-    private List<String> getAttributeAll(String strName) throws NamingException {
-        List<String> attributes = new ArrayList<>();
+    // /************************************************************* getGroups */
+    // /**
+    //  * Groups mapped by the Units for faculty.
+    //  */
+    // @Override
+    // public List<Group> getGroups() throws NamingException, java.sql.SQLException {
+    //     HashSet<Group> ret = new HashSet();
 
-        if (entry != null) {
-            Attributes as = entry.getAttributes();
-            Attribute a = as.get(strName);
+    //     for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
+    //         String strUnit = (String) i.next();
 
-            if (a != null) {
-                NamingEnumeration e = a.getAll();
+    //         Unit unit = unitService.findByName(context, strUnit);
 
-                while (e.hasMore()) {
-                    attributes.add((String)e.next());
-                }
-            }
-        }
+    //         if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
+    //             ret.addAll(unit.getGroups());
+    //         }
+    //     }
 
-        return attributes;
-    }
+    //     return new ArrayList<Group>(ret);
+    // }
 
-    /********************************************************* getAttribute */
-    /**
-     * get an attribute (first instance).
-     */
-    private String getAttribute(String strName) throws NamingException {
-        List l = getAttributeAll(strName);
-
-        if (l.size() > 0) {
-            return (String)l.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    /************************************************************* getEmail */
-    /**
-     * user's email address
-     */
-    private String getEmail() throws NamingException {
-        return getAttribute("mail");
-    }
-
-    /************************************************************* getPhone */
-    /**
-     * user's phone
-     */
-    private String getPhone() throws NamingException {
-        return getAttribute("telephonenumber");
-    }
-
-    /********************************************************* getFirstName */
-    /**
-     * user's first name
-     */
-    private String getFirstName() throws NamingException {
-        return getAttribute("givenname");
-    }
-
-    /********************************************************** getLastName */
-    /**
-     * user's last name
-     */
-    private String getLastName() throws NamingException {
-        return getAttribute("sn");
-    }
-
-    /************************************************************** getUnits */
-    /**
-     * organization units
-     */
-    private List<String> getUnits() throws NamingException {
-        return getAttributeAll("ou");
-    }
-
-    /************************************************************* getGroups */
-    /**
-     * Groups mapped by the Units for faculty.
-     */
-    @Override
-    public List<Group> getGroups() throws NamingException, java.sql.SQLException {
-        HashSet<Group> ret = new HashSet();
-
-        for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
-            String strUnit = (String) i.next();
-
-            Unit unit = unitService.findByName(context, strUnit);
-
-            if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
-                ret.addAll(unit.getGroups());
-            }
-        }
-
-        return new ArrayList<Group>(ret);
-    }
-
-    /************************************************************ isFaculty */
-    /**
-     * is the user CP faculty with an acceptable status?
-     */
-    private boolean isFaculty() throws NamingException {
-        if (strUid.equals("tstusr2")) {
-            return true;
-        }
-
-        List l = getAttributeAll("umappointment");
-
-        if (l != null) {
-            Iterator i = l.iterator();
-
-            while (i.hasNext()) {
-                String strAppt = (String)i.next();
-                String strInst = strAppt.substring(0,2);
-                String strCat = strAppt.substring(24,26);
-                String strStatus = strAppt.substring(27,28);
-
-                if ((strCat.equals("01") ||
-                     strCat.equals("02") ||
-                     strCat.equals("03") ||
-                     strCat.equals("15") ||
-                     strCat.equals("25") ||
-                     strCat.equals("36") ||
-                     strCat.equals("37") ||
-                     strCat.equals("EA"))
-                    &&
-                    (strStatus.equals("A") ||
-                      strStatus.equals("E") ||
-                      strStatus.equals("N") ||
-                      strStatus.equals("Q") ||
-                      strStatus.equals("T") ||
-                      strStatus.equals("F"))
-                    &&
-                    strInst.equals("01")) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     /****************************************************** registerEPerson */
     /**
      * Register this ldap user as an EPerson
      */
     @Override
-    public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
+    public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
         // Turn off authorizations to create a new user
         context.turnOffAuthorisationSystem();
 
@@ -422,17 +303,17 @@ public class LdapImpl implements Ldap {
             // Create a new eperson
             EPerson eperson = epersonService.create(context);
 
-            String strFirstName = getFirstName();
+            String strFirstName = ldapInfo.getFirstName();
             if (strFirstName == null) {
                 strFirstName = "??";
             }
 
-            String strLastName = getLastName();
+            String strLastName = ldapInfo.getLastName();
             if (strLastName == null) {
                 strLastName = "??";
             }
 
-            String strPhone = getPhone();
+            String strPhone = ldapInfo.getPhone();
             if (strPhone == null) {
                 strPhone = "??";
             }
