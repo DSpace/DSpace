@@ -305,6 +305,12 @@ public class ProcessServiceImpl implements ProcessService {
         tempFile.delete();
     }
 
+    @Override
+    public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
+        Date date) throws SQLException {
+        return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
+    }
+
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         StringBuilder sb = new StringBuilder();

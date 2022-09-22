@@ -72,28 +72,48 @@ public class RequestItemEmailNotifier {
     static public void sendRequest(Context context, RequestItem ri, String responseLink)
             throws IOException, SQLException {
         // Who is making this request?
-        RequestItemAuthor author = requestItemAuthorExtractor
+        List<RequestItemAuthor> authors = requestItemAuthorExtractor
                 .getRequestItemAuthor(context, ri.getItem());
-        String authorEmail = author.getEmail();
-        String authorName = author.getFullName();
 
         // Build an email to the approver.
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
                 "request_item.author"));
-        email.addRecipient(authorEmail);
+        for (RequestItemAuthor author : authors) {
+            email.addRecipient(author.getEmail());
+        }
         email.setReplyTo(ri.getReqEmail()); // Requester's address
+
         email.addArgument(ri.getReqName()); // {0} Requester's name
+
         email.addArgument(ri.getReqEmail()); // {1} Requester's address
+
         email.addArgument(ri.isAllfiles() // {2} All bitstreams or just one?
             ? I18nUtil.getMessage("itemRequest.all") : ri.getBitstream().getName());
-        email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle()));
+
+        email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {3}
+
         email.addArgument(ri.getItem().getName()); // {4} requested item's title
+
         email.addArgument(ri.getReqMessage()); // {5} message from requester
+
         email.addArgument(responseLink); // {6} Link back to DSpace for action
-        email.addArgument(authorName); // {7} corresponding author name
-        email.addArgument(authorEmail); // {8} corresponding author email
-        email.addArgument(configurationService.getProperty("dspace.name"));
-        email.addArgument(configurationService.getProperty("mail.helpdesk"));
+
+        StringBuilder names = new StringBuilder();
+        StringBuilder addresses = new StringBuilder();
+        for (RequestItemAuthor author : authors) {
+            if (names.length() > 0) {
+                names.append("; ");
+                addresses.append("; ");
+            }
+            names.append(author.getFullName());
+            addresses.append(author.getEmail());
+        }
+        email.addArgument(names.toString()); // {7} corresponding author name
+        email.addArgument(addresses.toString()); // {8} corresponding author email
+
+        email.addArgument(configurationService.getProperty("dspace.name")); // {9}
+
+        email.addArgument(configurationService.getProperty("mail.helpdesk")); // {10}
 
         // Send the email.
         try {

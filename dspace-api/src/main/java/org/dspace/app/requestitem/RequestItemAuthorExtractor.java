@@ -8,26 +8,28 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.springframework.lang.NonNull;
 
 /**
- * Interface to abstract the strategy for select the author to contact for
- * request copy
+ * Interface to abstract the strategy for selecting the author to contact for
+ * request copy.
  *
  * @author Andrea Bollini
  */
 public interface RequestItemAuthorExtractor {
-
     /**
-     * Retrieve the auhtor to contact for a request copy of the give item.
+     * Retrieve the author to contact for requesting a copy of the given item.
      *
      * @param context DSpace context object
      * @param item item to request
-     * @return An object containing name an email address to send the request to
-     *         or null if no valid email address was found.
+     * @return Names and email addresses to send the request to.
      * @throws SQLException if database error
      */
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException;
+    @NonNull
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
+        throws SQLException;
 }
