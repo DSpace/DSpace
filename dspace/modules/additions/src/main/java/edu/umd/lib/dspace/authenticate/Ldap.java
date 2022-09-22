@@ -25,16 +25,6 @@ public interface Ldap {
     public LdapInfo checkUid(String strUid) throws NamingException;
 
     /**
-     * Check if a user supplied password is valid.
-     */
-    public boolean checkPassword(String strPassword) throws NamingException;
-
-    /**
-     * Check for an admin user override.
-     */
-    public boolean checkAdmin(String strLdapPassword);
-
-    /**
      * Close the ldap connection
      */
     public void close();

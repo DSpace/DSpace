@@ -311,16 +311,6 @@ class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
     }
 
     @Override
-    public boolean checkPassword(String strPassword) throws NamingException {
-        return false;
-    }
-
-    @Override
-    public boolean checkAdmin(String strLdapPassword) {
-        return false;
-    }
-
-    @Override
     public void close() {
 
     }
