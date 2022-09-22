@@ -305,14 +305,6 @@ public class CASAuthentication implements AuthenticationMethod {
         return stv.getUser();
     }
 
-    /**
-     * Add code here to extract user details email, firstname, lastname from
-     * LDAP or database etc
-     */
-    public void registerUser(String netid) throws ClassNotFoundException, SQLException {
-        // add your code here
-    }
-
     /*
      * Returns URL to which to redirect to obtain credentials (either password
      * prompt or e.g. HTTPS port for client cert.); null means no redirect.
