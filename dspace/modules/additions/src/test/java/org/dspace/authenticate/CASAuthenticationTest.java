@@ -266,22 +266,23 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
         return;
     }
 }
+
 class MockLdap implements Ldap {
     // Convenience method returning MockLdap instance that returns an LdapInfo
     // object, indicating that the user was found in LDAP.
     public static MockLdap userFound() {
-      return new MockLdap() {
-        @Override
-        public LdapInfo queryLdap(String strUid) {
-          return new LdapInfo(strUid, null);
-        }
-      };
+        return new MockLdap() {
+            @Override
+            public LdapInfo queryLdap(String strUid) {
+                return new LdapInfo(strUid, null);
+            }
+        };
     }
 
     // Convenience method returning MockLdap instance always indicates the
     // user was not found in LDAP.
     public static MockLdap userNotFound() {
-      return new MockLdap();
+        return new MockLdap();
     }
 
     @Override
@@ -295,11 +296,12 @@ class MockLdap implements Ldap {
 }
 
 class MockCASAuthentication extends CASAuthentication {
-  public boolean registerEPersonCalled = false;
+    public boolean registerEPersonCalled = false;
 
-  @Override
-  protected EPerson registerEPerson(String uid, Context context, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
-    registerEPersonCalled = true;
-    return super.registerEPerson(uid, context, ldapInfo, request);
-  }
+    @Override
+    protected EPerson registerEPerson(String uid, Context context, LdapInfo ldapInfo, HttpServletRequest request)
+            throws Exception {
+        registerEPersonCalled = true;
+        return super.registerEPerson(uid, context, ldapInfo, request);
+    }
 }
