@@ -5,16 +5,10 @@
 
 package edu.umd.lib.dspace.authenticate.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
@@ -27,23 +21,14 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.Unit;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
-import org.dspace.eperson.service.UnitService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
-/*********************************************************************
- Use Ldap to provide authorizations for CAS authentication.
-
- @author  Ben Wallberg
-
-*********************************************************************/
-
-
+/**
+ * Implementation of the LDAP interface.
+ */
 public class LdapImpl implements Ldap {
 
     /** log4j category */
@@ -63,21 +48,9 @@ public class LdapImpl implements Ldap {
 
     private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-    private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-
-    // Begin UMD Customization
-    private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
-    // End UMD Customization
-
     /**
-     * Wild card for Dublin Core metadata qualifiers/languages
-     */
-    public static final String ANY = "*";
-
-
-    /******************************************************************* Ldap */
-    /**
-     * Create an ldap connection
+     * Configures the LDAP connection, based on configuration and environment
+     * variables.
      */
     public LdapImpl(org.dspace.core.Context context) throws NamingException {
         this.context = context;
@@ -170,7 +143,6 @@ public class LdapImpl implements Ldap {
         return ldapInfo;
     }
 
-    /***************************************************************** close */
     /**
      * Close the ldap connection
      */
@@ -186,7 +158,6 @@ public class LdapImpl implements Ldap {
         }
     }
 
-    /************************************************************** finalize */
     /**
      * Close the ldap connection
      */
@@ -195,31 +166,9 @@ public class LdapImpl implements Ldap {
         close();
     }
 
-    // /************************************************************* getGroups */
-    // /**
-    //  * Groups mapped by the Units for faculty.
-    //  */
-    // @Override
-    // public List<Group> getGroups() throws NamingException, java.sql.SQLException {
-    //     HashSet<Group> ret = new HashSet();
-
-    //     for (Iterator i = getUnits().iterator(); i.hasNext(); ) {
-    //         String strUnit = (String) i.next();
-
-    //         Unit unit = unitService.findByName(context, strUnit);
-
-    //         if (unit != null && (!unit.getFacultyOnly() || isFaculty())) {
-    //             ret.addAll(unit.getGroups());
-    //         }
-    //     }
-
-    //     return new ArrayList<Group>(ret);
-    // }
-
-
-    /****************************************************** registerEPerson */
     /**
-     * Register this ldap user as an EPerson
+     * Registers an EPerson, using the information in the given LdapInfo
+     * object.
      */
     @Override
     public EPerson registerEPerson(String uid, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
