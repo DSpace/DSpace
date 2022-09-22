@@ -39,6 +39,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.harvest.Harvest"/>
     </bean>
     
+    <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerConfiguration" primary="true">
+        <property name="description" value="Cleanup all the old processes in the specified state"/>
+        <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleaner"/>
+    </bean>
+    
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
