@@ -77,12 +77,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = new MockLdap() {
-            @Override
-            public LdapInfo queryLdap(String strUid) throws NamingException {
-              return new LdapInfo(strUid, null);
-            }
-        };
+        Ldap mockLdap = MockLdap.userNotFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -112,12 +107,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = new MockLdap() {
-            @Override
-            public LdapInfo queryLdap(String strUid) throws NamingException {
-              return new LdapInfo(strUid, null);
-            }
-        };
+        Ldap mockLdap = MockLdap.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -147,12 +137,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        MockLdap mockLdap = new MockLdap() {
-            @Override
-            public LdapInfo queryLdap(String strUid) throws NamingException {
-              return new LdapInfo(strUid, null);
-            }
-        };
+        Ldap mockLdap = MockLdap.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -177,12 +162,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        MockLdap mockLdap = new MockLdap() {
-            @Override
-            public LdapInfo queryLdap(String strUid) throws NamingException {
-              return new LdapInfo(strUid, null);
-            }
-        };
+        Ldap mockLdap = MockLdap.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -207,12 +187,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = new MockLdap() {
-            @Override
-            public LdapInfo queryLdap(String strUid) throws NamingException {
-              return new LdapInfo(strUid, null);
-            }
-        };
+        Ldap mockLdap = MockLdap.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -300,8 +275,23 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
         return;
     }
 }
-
 class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
+    // Convenience method returning MockLdap instance that returns an LdapInfo
+    // object, indicating that the user was found in LDAP.
+    public static MockLdap userFound() {
+      return new MockLdap() {
+        @Override
+        public LdapInfo queryLdap(String strUid) throws NamingException {
+          return new LdapInfo(strUid, null);
+        }
+      };
+    }
+
+    // Convenience method returning MockLdap instance always indicates the
+    // user was not found in LDAP.
+    public static MockLdap userNotFound() {
+      return new MockLdap();
+    }
 
     public boolean registerEPersonCalled = false;
 
