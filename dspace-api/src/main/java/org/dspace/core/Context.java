@@ -718,7 +718,7 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Restore the user bound to the context and his special groups
+     * Restore the user bound to the context and their special groups
      *
      * @throws IllegalStateException if no switch was performed before
      */

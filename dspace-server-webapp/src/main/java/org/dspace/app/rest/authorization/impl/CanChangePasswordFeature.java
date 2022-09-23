@@ -18,11 +18,11 @@ import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
 /**
- * The canChangePassword feature. It can be used to verify if the user can change his password.
+ * The canChangePassword feature. It can be used to verify if the user can change their password.
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CanChangePasswordFeature.NAME,
-        description = "It can be used to verify if the user can change his password")
+        description = "It can be used to verify if the user can change their password")
 public class CanChangePasswordFeature implements AuthorizationFeature {
 
     public static final String NAME = "canChangePassword";

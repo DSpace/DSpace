@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.PasswordNotValidException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.exception.WrongCurrentPasswordException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
@@ -21,6 +22,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.ValidatePasswordService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -61,6 +63,9 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
     private AccountService accountService;
 
     @Autowired
+    private ValidatePasswordService validatePasswordService;
+
+    @Autowired
     private AuthenticationService authenticationService;
 
     @Override
@@ -79,6 +84,10 @@ public class EPersonPasswordAddOperation<R> extends PatchOperation<R> {
         if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
             throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
                                                     eperson.getEmail());
+        }
+
+        if (!validatePasswordService.isPasswordValid(newPassword)) {
+            throw new PasswordNotValidException();
         }
 
         String token = requestService.getCurrentRequest().getHttpServletRequest().getParameter("token");

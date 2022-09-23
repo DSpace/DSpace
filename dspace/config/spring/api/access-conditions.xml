@@ -3,10 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
-	
+
 	<bean id="uploadConfigurationDefault" class="org.dspace.submit.model.UploadConfiguration">
-		<property name="name" value="upload"></property>
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+		<property name="name" value="upload"/>
 		<property name="metadata" value="bitstream-metadata" />
         <property name="options">
             <list>
@@ -18,7 +17,7 @@
             </list>
         </property>
     </bean>
-  
+
     <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
         <property name="name" value="openaccess"/>
@@ -31,26 +30,25 @@
         <property name="hasStartDate" value="false"/>
         <property name="hasEndDate" value="true"/>
         <property name="endDateLimit" value="+6MONTHS"/>
-    </bean> 
+    </bean>
     <bean id="embargoed" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
         <property name="name" value="embargo"/>
         <property name="hasStartDate" value="true"/>
         <property name="startDateLimit" value="+36MONTHS"/>
         <property name="hasEndDate" value="false"/>
-        
-    </bean> 
+    </bean>
     <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Administrator"/>
         <property name="name" value="administrator"/>
         <property name="hasStartDate" value="false"/>
-        <property name="hasEndDate" value="false"/>       
+        <property name="hasEndDate" value="false"/>
     </bean>
 <!--     <bean id="networkAdministration" class="org.dspace.submit.model.AccessConditionOption">
     	<property name="groupName" value="INSTITUTIONAL_NETWORK"/>
         <property name="name" value="networkAdministration"/>
         <property name="hasStartDate" value="false"/>
-        <property name="hasEndDate" value="false"/>                
+        <property name="hasEndDate" value="false"/>
     </bean> -->
 
     <bean id="uploadConfigurationService" class="org.dspace.submit.model.UploadConfigurationService">
