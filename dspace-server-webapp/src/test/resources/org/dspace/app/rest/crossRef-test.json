@@ -1,0 +1,309 @@
+{
+    "status": "ok",
+    "message-type": "work-list",
+    "message-version": "1.0.0",
+    "message": {
+        "facets": {},
+        "total-results": 10,
+        "items": [
+            {
+                "indexed": {
+                    "date-parts": [
+                        [
+                            2021,
+                            12,
+                            22
+                        ]
+                    ],
+                    "date-time": "2021-12-22T10:58:16Z",
+                    "timestamp": 1640170696598
+                },
+                "reference-count": 0,
+                "publisher": "Petro Mohyla Black Sea National University",
+                "issue": "2",
+                "content-domain": {
+                    "domain": [],
+                    "crossmark-restriction": false
+                },
+                "short-container-title": [
+                    "Ukr. ž. med. bìol. sportu"
+                ],
+                "published-print": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                },
+                "DOI": "10.26693/jmbs01.02.184",
+                "type": "journal-article",
+                "created": {
+                    "date-parts": [
+                        [
+                            2017,
+                            9,
+                            7
+                        ]
+                    ],
+                    "date-time": "2017-09-07T13:30:46Z",
+                    "timestamp": 1504791046000
+                },
+                "page": "184-187",
+                "source": "Crossref",
+                "is-referenced-by-count": 0,
+                "title": [
+                    "State of Awareness of Freshers’ Groups Chortkiv State Medical College of Prevention of Iodine Deficiency Diseases"
+                ],
+                "prefix": "10.26693",
+                "volume": "1",
+                "author": [
+                    {
+                        "given": "L.V.",
+                        "family": "Senyuk",
+                        "sequence": "first",
+                        "affiliation": []
+                    },
+                    {
+                        "name": "Chortkiv State Medical College 7, Gogola St., Chortkiv, Ternopil region 48500, Ukraine",
+                        "sequence": "first",
+                        "affiliation": []
+                    }
+                ],
+                "member": "11225",
+                "published-online": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                },
+                "container-title": [
+                    "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu"
+                ],
+                "original-title": [
+                    "СТАН ОБІЗНАНОСТІ СТУДЕНТІВ НОВОНАБРАНИХ ГРУП ЧОРТКІВСЬКОГО ДЕРЖАВНОГО МЕДИЧНОГО КОЛЕДЖУ З ПИТАНЬ ПРОФІЛАКТИКИ ЙОДОДЕФІЦИТНИХ ЗАХВОРЮВАНЬ"
+                ],
+                "deposited": {
+                    "date-parts": [
+                        [
+                            2017,
+                            9,
+                            8
+                        ]
+                    ],
+                    "date-time": "2017-09-08T10:14:53Z",
+                    "timestamp": 1504865693000
+                },
+                "score": 22.728952,
+                "issued": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                },
+                "references-count": 0,
+                "journal-issue": {
+                    "issue": "2",
+                    "published-online": {
+                        "date-parts": [
+                            [
+                                2016,
+                                5,
+                                19
+                            ]
+                        ]
+                    },
+                    "published-print": {
+                        "date-parts": [
+                            [
+                                2016,
+                                5,
+                                19
+                            ]
+                        ]
+                    }
+                },
+                "URL": "http://dx.doi.org/10.26693/jmbs01.02.184",
+                "ISSN": [
+                    "2415-3060"
+                ],
+                "issn-type": [
+                    {
+                        "value": "2415-3060",
+                        "type": "print"
+                    }
+                ],
+                "published": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                }
+            },
+            {
+                "indexed": {
+                    "date-parts": [
+                        [
+                            2022,
+                            3,
+                            29
+                        ]
+                    ],
+                    "date-time": "2022-03-29T13:04:48Z",
+                    "timestamp": 1648559088439
+                },
+                "reference-count": 0,
+                "publisher": "Petro Mohyla Black Sea National University",
+                "issue": "2",
+                "content-domain": {
+                    "domain": [],
+                    "crossmark-restriction": false
+                },
+                "short-container-title": [
+                    "Ukr. ž. med. bìol. sportu"
+                ],
+                "published-print": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                },
+                "DOI": "10.26693/jmbs01.02.105",
+                "type": "journal-article",
+                "created": {
+                    "date-parts": [
+                        [
+                            2017,
+                            9,
+                            1
+                        ]
+                    ],
+                    "date-time": "2017-09-01T10:04:04Z",
+                    "timestamp": 1504260244000
+                },
+                "page": "105-108",
+                "source": "Crossref",
+                "is-referenced-by-count": 0,
+                "title": [
+                    "Ischemic Heart Disease and Role of Nurse of Cardiology Department"
+                ],
+                "prefix": "10.26693",
+                "volume": "1",
+                "author": [
+                    {
+                        "given": "K. І.",
+                        "family": "Kozak",
+                        "sequence": "first",
+                        "affiliation": []
+                    },
+                    {
+                        "name": "Chortkiv State Medical College 7, Gogola St., Chortkiv, Ternopil region 48500, Ukraine",
+                        "sequence": "first",
+                        "affiliation": []
+                    }
+                ],
+                "member": "11225",
+                "published-online": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                },
+                "container-title": [
+                    "Ukraïnsʹkij žurnal medicini, bìologìï ta sportu"
+                ],
+                "original-title": [
+                    "ІШЕМІЧНА ХВОРОБА СЕРЦЯ ТА РОЛЬ МЕДИЧНОЇ СЕСТРИ КАРДІОЛОГІЧНОГО ВІДДІЛЕННЯ"
+                ],
+                "deposited": {
+                    "date-parts": [
+                        [
+                            2017,
+                            9,
+                            2
+                        ]
+                    ],
+                    "date-time": "2017-09-02T12:36:15Z",
+                    "timestamp": 1504355775000
+                },
+                "score": 18.263277,
+                "resource": {
+                    "primary": {
+                        "URL": "http://en.jmbs.com.ua/archive/1/2/105"
+                    }
+                },
+                "issued": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                },
+                "references-count": 0,
+                "journal-issue": {
+                    "issue": "2",
+                    "published-online": {
+                        "date-parts": [
+                            [
+                                2016,
+                                5,
+                                19
+                            ]
+                        ]
+                    },
+                    "published-print": {
+                        "date-parts": [
+                            [
+                                2016,
+                                5,
+                                19
+                            ]
+                        ]
+                    }
+                },
+                "URL": "http://dx.doi.org/10.26693/jmbs01.02.105",
+                "ISSN": [
+                    "2415-3060"
+                ],
+                "issn-type": [
+                    {
+                        "value": "2415-3060",
+                        "type": "print"
+                    }
+                ],
+                "published": {
+                    "date-parts": [
+                        [
+                            2016,
+                            5,
+                            19
+                        ]
+                    ]
+                }
+            }
+        ],
+        "items-per-page": 2,
+        "query": {
+            "start-index": 0,
+            "search-terms": "chortkiv"
+        }
+    }
+}

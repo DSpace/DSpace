@@ -10,12 +10,15 @@ package org.dspace.app.sherpa.v2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -33,7 +36,10 @@ import org.json.JSONTokener;
  * @author Kim Shepherd
  *
  */
-public class SHERPAResponse {
+public class SHERPAResponse implements Serializable {
+
+    private static final long serialVersionUID = 2732963970169240597L;
+
     // Is this response to be treated as an error?
     private boolean error;
 
@@ -51,6 +57,9 @@ public class SHERPAResponse {
 
     // SHERPA URI (the human page version of this API response)
     private String uri;
+
+    @JsonIgnore
+    private Date retrievalTime = new Date();
 
     // Format enum - currently only JSON is supported
     public enum SHERPAFormat {
@@ -70,6 +79,11 @@ public class SHERPAResponse {
             parseJSON(input);
         }
     }
+
+    /**
+     * Create an empty SHERPAResponse representation
+     */
+    public SHERPAResponse() {}
 
     /**
      * Parse the SHERPA v2 API JSON and construct Romeo policy data for display
@@ -479,6 +493,12 @@ public class SHERPAResponse {
         }
         permittedVersion.setLicenses(sherpaLicenses);
 
+        if (permitted.has("embargo")) {
+            JSONObject embargo = permitted.getJSONObject("embargo");
+            SHERPAEmbargo SHERPAEmbargo = new SHERPAEmbargo(embargo.getInt("amount"), embargo.getString("units"));
+            permittedVersion.setEmbargo(SHERPAEmbargo);
+        }
+
         return permittedVersion;
     }
 
@@ -541,5 +561,9 @@ public class SHERPAResponse {
 
     public SHERPASystemMetadata getMetadata() {
         return metadata;
+    }
+
+    public Date getRetrievalTime() {
+        return retrievalTime;
     }
 }

@@ -17,13 +17,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.2.1-drum-0-SNAPSHOT</version>
+      <version>7.3-drum-0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
    <properties>
-      <!-- This is the path to the root [dspace-src] directory. -->
-      <root.basedir>${basedir}/../../..</root.basedir>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
    </properties>
 
    <build>
@@ -112,12 +112,10 @@
          </activation>
          <build>
             <plugins>
-               <!--
-                   Unit Testing setup: This plugin unzips the
+               <!-- Unit Testing setup: This plugin unzips the
                    'testEnvironment-additions.zip' file (created by dspace-parent POM), into
-                   the 'target/testing/' folder, to create a test install of DSpace,
-                   against which Tests can be run.
-               -->
+                   the 'target/testing/' folder, to create a test
+                   install of DSpace, against which Tests can be run. -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <configuration>
@@ -183,12 +181,10 @@
          </activation>
          <build>
             <plugins>
-               <!--
-                   Integration Testing setup: This plugin unzips the
-                   'testEnvironment-additions.zip' file (created by dspace-parent POM), into
-                   the 'target/testing/' folder, to create a test install of DSpace,
-                   against which Tests can be run.
-               -->
+               <!-- Integration Testing setup: This plugin unzips the
+                    'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                    the 'target/testing/' folder, to essentially create a test
+                    install of DSpace, against which Tests can be run. -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <configuration>
@@ -252,18 +248,18 @@
          <artifactId>dspace-api</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-api</artifactId>
-         <type>test-jar</type>
-         <scope>test</scope>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-api</artifactId>
+          <type>test-jar</type>
+          <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-services</artifactId>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-services</artifactId>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
@@ -290,16 +286,45 @@
                <groupId>javax.servlet</groupId>
                <artifactId>servlet-api</artifactId>
             </exclusion>
+          </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj</artifactId>
+         <version>${solr.client.version}</version>
+      </dependency>
+      <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
+      <!-- The following Solr / Lucene dependencies also support integration tests -->
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-core</artifactId>
+         <version>${solr.client.version}</version>
+         <scope>test</scope>
+         <exclusions>
+            <!-- Newer version brought in by opencsv -->
+            <exclusion>
+               <groupId>org.apache.commons</groupId>
+               <artifactId>commons-text</artifactId>
+            </exclusion>
+            <!-- Newer Jetty version brought in via Parent POM -->
+            <exclusion>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-http</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-io</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.eclipse.jetty</groupId>
+               <artifactId>jetty-util</artifactId>
+            </exclusion>
          </exclusions>
       </dependency>
       <dependency>
          <groupId>org.marc4j</groupId>
          <artifactId>marc4j</artifactId>
          <version>2.9.2</version>
-      </dependency>
-      <dependency>
-         <groupId>org.apache.lucene</groupId>
-         <artifactId>lucene-core</artifactId>
       </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>
@@ -316,11 +341,6 @@
          <artifactId>lucene-analyzers-stempel</artifactId>
          <scope>test</scope>
       </dependency>
-      <dependency>
-         <groupId>org.apache.xmlbeans</groupId>
-         <artifactId>xmlbeans</artifactId>
-      </dependency>
-
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
@@ -341,7 +361,71 @@
          <artifactId>mockito-inline</artifactId>
          <scope>test</scope>
       </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-test</artifactId>
+         <scope>test</scope>
+      </dependency>
 
+      <!-- UMD Customization: LIBDRUM-695
+          The following dependencies are required by the CNRI Handle Server,
+          but are excluded in the "cnri-servlet-container" dependency in
+          the "dspace-api/pom/xml" file.
+
+          As of DSpace 7.3, no other dependencies used by DSpace require
+          these dependencies as "compile" dependencies. They are being added
+          here so that they will be available to the CNRI Handle Server when
+          run in the "handle-server" container as part of the "drum-0"
+          Kubernetes pod.
+
+          The continued need for these dependencies should be re-evaluated
+          when new DSpace releases are made.
+
+          Note: These dependencies are using the Jetty version defined by
+          DSpace, not the version specified by the "cnri-servlet-container"
+          dependency.
+      -->
+      <dependency>
+         <groupId>org.eclipse.jetty</groupId>
+         <artifactId>jetty-alpn-java-server</artifactId>
+         <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty</groupId>
+           <artifactId>jetty-deploy</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty</groupId>
+           <artifactId>jetty-servlet</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty</groupId>
+           <artifactId>jetty-servlets</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty</groupId>
+           <artifactId>jetty-webapp</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty</groupId>
+           <artifactId>jetty-xml</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty.http2</groupId>
+           <artifactId>http2-common</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+           <groupId>org.eclipse.jetty.http2</groupId>
+           <artifactId>http2-server</artifactId>
+           <version>${jetty.version}</version>
+      </dependency>
+      <!-- END UMD Customization: LIBDRUM-695 -->
    </dependencies>
 
 </project>

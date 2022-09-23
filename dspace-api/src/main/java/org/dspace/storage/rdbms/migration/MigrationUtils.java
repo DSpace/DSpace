@@ -86,10 +86,11 @@ public class MigrationUtils {
                 cascade = true;
                 break;
             case "h2":
-                // In H2, constraints are listed in the "information_schema.constraints" table
+                // In H2, column constraints are listed in the "INFORMATION_SCHEMA.KEY_COLUMN_USAGE" table
                 constraintNameSQL = "SELECT DISTINCT CONSTRAINT_NAME " +
-                    "FROM information_schema.constraints " +
-                    "WHERE table_name = ? AND column_list = ?";
+                    "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+                    "WHERE TABLE_NAME = ? AND COLUMN_NAME = ?";
+                cascade = true;
                 break;
             default:
                 throw new SQLException("DBMS " + dbtype + " is unsupported in this migration.");

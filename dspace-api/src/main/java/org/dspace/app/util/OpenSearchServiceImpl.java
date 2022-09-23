@@ -16,10 +16,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
-import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
-import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
-import com.sun.syndication.io.FeedException;
+import com.rometools.modules.opensearch.OpenSearchModule;
+import com.rometools.modules.opensearch.entity.OSQuery;
+import com.rometools.modules.opensearch.impl.OpenSearchModuleImpl;
+import com.rometools.rome.io.FeedException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.content.DSpaceObject;
@@ -29,11 +29,11 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.output.DOMOutputter;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.output.DOMOutputter;
+import org.jdom2.output.XMLOutputter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
@@ -192,7 +192,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
      * @param scope - null for the entire repository, or a collection/community handle
      * @return Service Document
      */
-    protected org.jdom.Document getServiceDocument(String scope) {
+    protected org.jdom2.Document getServiceDocument(String scope) {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         Namespace ns = Namespace.getNamespace(osNs);
@@ -245,7 +245,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
             url.setAttribute("template", template.toString());
             root.addContent(url);
         }
-        return new org.jdom.Document(root);
+        return new org.jdom2.Document(root);
     }
 
     /**
@@ -255,7 +255,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
      * @return W3C Document object
      * @throws IOException if IO error
      */
-    protected Document jDomToW3(org.jdom.Document jdomDoc) throws IOException {
+    protected Document jDomToW3(org.jdom2.Document jdomDoc) throws IOException {
         DOMOutputter domOut = new DOMOutputter();
         try {
             return domOut.output(jdomDoc);

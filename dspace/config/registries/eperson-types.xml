@@ -38,4 +38,17 @@
         <scope_note>Metadata field used for the language</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>eperson</schema>
+        <element>orcid</element>
+        <scope_note>Metadata field used for the ORCID id</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>eperson</schema>
+        <element>orcid</element>
+        <qualifier>scope</qualifier>
+        <scope_note>Metadata field used for the granted ORCID scopes</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

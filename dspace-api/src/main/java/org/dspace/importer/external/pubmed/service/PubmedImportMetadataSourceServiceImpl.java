@@ -14,31 +14,34 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import com.google.common.io.CharStreams;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMXMLBuilderFactory;
-import org.apache.axiom.om.OMXMLParserWrapper;
-import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.FileSource;
 import org.dspace.importer.external.service.components.QuerySource;
-import org.jaxen.JaxenException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying PubMed Central
@@ -46,20 +49,23 @@ import org.jaxen.JaxenException;
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<Element>
     implements QuerySource, FileSource {
 
-    private String baseAddress;
+    private String urlFetch;
+    private String urlSearch;
 
-    // it is protected so that subclass can mock it for testing
-    protected WebTarget pubmedWebTarget;
+    private int attempt = 3;
 
     private List<String> supportedExtensions;
+
+    @Autowired
+    private LiveImportClient liveImportClient;
 
     /**
      * Set the file extensions supported by this metadata service
      * 
-     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by this service
+     * @param supportedExtensions the file extensions (xml,txt,...) supported by this service
      */
     public void setSupportedExtensions(List<String> supportedExtensions) {
         this.supportedExtensions = supportedExtensions;
@@ -185,29 +191,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
      * @throws Exception on generic exception
      */
     @Override
-    public void init() throws Exception {
-        Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(baseAddress);
-        pubmedWebTarget = webTarget.queryParam("db", "pubmed");
-    }
-
-    /**
-     * Return the baseAddress set to this object
-     *
-     * @return The String object that represents the baseAddress of this object
-     */
-    public String getBaseAddress() {
-        return baseAddress;
-    }
-
-    /**
-     * Set the baseAddress to this object
-     *
-     * @param baseAddress The String object that represents the baseAddress of this object
-     */
-    public void setBaseAddress(String baseAddress) {
-        this.baseAddress = baseAddress;
-    }
+    public void init() throws Exception {}
 
     private class GetNbRecords implements Callable<Integer> {
 
@@ -224,36 +208,43 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public Integer call() throws Exception {
-            WebTarget getRecordIdsTarget = pubmedWebTarget
-                .queryParam("term", query.getParameterAsClass("query", String.class));
+            URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            uriBuilder.addParameter("db", "pubmed");
+            uriBuilder.addParameter("term", query.getParameterAsClass("query", String.class));
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
 
-            getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
 
-            Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-
-            Response response = invocationBuilder.get();
-
-            String responseString = response.readEntity(String.class);
-
-            String count = getSingleElementValue(responseString, "Count");
-
-            return Integer.parseInt(count);
+            return Integer.parseInt(getSingleElementValue(response, "Count"));
         }
     }
 
-
     private String getSingleElementValue(String src, String elementName) {
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(src));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
         String value = null;
+
         try {
-            xpath = new AXIOMXPath("//" + elementName);
-            List<OMElement> recordsList = xpath.selectNodes(element);
-            if (!recordsList.isEmpty()) {
-                value = recordsList.get(0).getText();
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(src));
+            Element root = document.getRootElement();
+
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("//" + elementName, Filters.element());
+
+            Element record = xpath.evaluateFirst(root);
+            if (record != null) {
+                value = record.getText();
             }
-        } catch (JaxenException e) {
+        } catch (JDOMException | IOException e) {
             value = null;
         }
         return value;
@@ -280,43 +271,63 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer count = query.getParameterAsClass("count", Integer.class);
 
-            if (count == null || count < 0) {
+            if (Objects.isNull(count) || count < 0) {
                 count = 10;
             }
 
-            if (start == null || start < 0) {
+            if (Objects.isNull(start) || start < 0) {
                 start = 0;
             }
 
             List<ImportRecord> records = new LinkedList<ImportRecord>();
 
-            WebTarget getRecordIdsTarget = pubmedWebTarget.queryParam("term", queryString);
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("retstart", start);
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("retmax", count);
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("usehistory", "y");
-            getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
+            URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            uriBuilder.addParameter("db", "pubmed");
+            uriBuilder.addParameter("retstart", start.toString());
+            uriBuilder.addParameter("retmax", count.toString());
+            uriBuilder.addParameter("usehistory", "y");
+            uriBuilder.addParameter("term", queryString);
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
 
-            Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
 
-            Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
+            String queryKey = getSingleElementValue(response, "QueryKey");
+            String webEnv = getSingleElementValue(response, "WebEnv");
 
-            String queryKey = getSingleElementValue(responseString, "QueryKey");
-            String webEnv = getSingleElementValue(responseString, "WebEnv");
+            URIBuilder uriBuilder2 = new URIBuilder(urlFetch);
+            uriBuilder2.addParameter("db", "pubmed");
+            uriBuilder2.addParameter("retstart", start.toString());
+            uriBuilder2.addParameter("retmax", count.toString());
+            uriBuilder2.addParameter("WebEnv", webEnv);
+            uriBuilder2.addParameter("query_key", queryKey);
+            uriBuilder2.addParameter("retmode", "xml");
+            Map<String, Map<String, String>> params2 = new HashMap<String, Map<String,String>>();
+            String response2 = StringUtils.EMPTY;
+            countAttempt = 0;
+            while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
+                countAttempt++;
+                response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+            }
 
-            WebTarget getRecordsTarget = pubmedWebTarget.queryParam("WebEnv", webEnv);
-            getRecordsTarget = getRecordsTarget.queryParam("query_key", queryKey);
-            getRecordsTarget = getRecordsTarget.queryParam("retmode", "xml");
-            getRecordsTarget = getRecordsTarget.path("efetch.fcgi");
-            getRecordsTarget = getRecordsTarget.queryParam("retmax", count);
-            getRecordsTarget = getRecordsTarget.queryParam("retstart", start);
+            if (StringUtils.isBlank(response2)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder2.toString());
+            }
 
-            invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-            response = invocationBuilder.get();
+            List<Element> elements = splitToRecords(response2);
 
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
-
-            for (OMElement record : omElements) {
+            for (Element record : elements) {
                 records.add(transformSourceRecords(record));
             }
 
@@ -324,15 +335,18 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
     }
 
-    private List<OMElement> splitToRecords(String recordsSrc) {
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
+    private List<Element> splitToRecords(String recordsSrc) {
         try {
-            xpath = new AXIOMXPath("//PubmedArticle");
-            List<OMElement> recordsList = xpath.selectNodes(element);
+            SAXBuilder saxBuilder = new SAXBuilder();
+            Document document = saxBuilder.build(new StringReader(recordsSrc));
+            Element root = document.getRootElement();
+
+            XPathExpression<Element> xpath =
+                XPathFactory.instance().compile("//PubmedArticle", Filters.element());
+
+            List<Element> recordsList = xpath.evaluate(root);
             return recordsList;
-        } catch (JaxenException e) {
+        } catch (JDOMException | IOException e) {
             return null;
         }
     }
@@ -352,23 +366,29 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public ImportRecord call() throws Exception {
-            String id = query.getParameterAsClass("id", String.class);
 
-            WebTarget getRecordTarget = pubmedWebTarget.queryParam("id", id);
-            getRecordTarget = getRecordTarget.queryParam("retmode", "xml");
-            getRecordTarget = getRecordTarget.path("efetch.fcgi");
+            URIBuilder uriBuilder = new URIBuilder(urlFetch);
+            uriBuilder.addParameter("db", "pubmed");
+            uriBuilder.addParameter("retmode", "xml");
+            uriBuilder.addParameter("id", query.getParameterAsClass("id", String.class));
 
-            Invocation.Builder invocationBuilder = getRecordTarget.request(MediaType.TEXT_PLAIN_TYPE);
-
-            Response response = invocationBuilder.get();
-
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
-
-            if (omElements.size() == 0) {
-                return null;
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             }
 
-            return transformSourceRecords(omElements.get(0));
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
+
+            List<Element> elements = splitToRecords(response);
+
+            return elements.isEmpty() ? null : transformSourceRecords(elements.get(0));
         }
     }
 
@@ -387,40 +407,57 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         @Override
         public Collection<ImportRecord> call() throws Exception {
 
-            WebTarget getRecordIdsTarget = pubmedWebTarget
-                .queryParam("term", query.getParameterAsClass("term", String.class));
-            getRecordIdsTarget = getRecordIdsTarget
-                .queryParam("field", query.getParameterAsClass("field", String.class));
-            getRecordIdsTarget = getRecordIdsTarget.queryParam("usehistory", "y");
-            getRecordIdsTarget = getRecordIdsTarget.path("esearch.fcgi");
+            URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            uriBuilder.addParameter("db", "pubmed");
+            uriBuilder.addParameter("usehistory", "y");
+            uriBuilder.addParameter("term", query.getParameterAsClass("term", String.class));
+            uriBuilder.addParameter("field", query.getParameterAsClass("field", String.class));
 
-            Invocation.Builder invocationBuilder = getRecordIdsTarget.request(MediaType.TEXT_PLAIN_TYPE);
+            Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
+            String response = StringUtils.EMPTY;
+            int countAttempt = 0;
+            while (StringUtils.isBlank(response) && countAttempt <= attempt) {
+                countAttempt++;
+                response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+            }
 
-            Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
+            if (StringUtils.isBlank(response)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder.toString());
+            }
 
-            String queryKey = getSingleElementValue(responseString, "QueryKey");
-            String webEnv = getSingleElementValue(responseString, "WebEnv");
+            String webEnv = getSingleElementValue(response, "WebEnv");
+            String queryKey = getSingleElementValue(response, "QueryKey");
 
-            WebTarget getRecordsTarget = pubmedWebTarget.queryParam("WebEnv", webEnv);
-            getRecordsTarget = getRecordsTarget.queryParam("query_key", queryKey);
-            getRecordsTarget = getRecordsTarget.queryParam("retmode", "xml");
-            getRecordsTarget = getRecordsTarget.path("efetch.fcgi");
+            URIBuilder uriBuilder2 = new URIBuilder(urlFetch);
+            uriBuilder2.addParameter("db", "pubmed");
+            uriBuilder2.addParameter("retmode", "xml");
+            uriBuilder2.addParameter("WebEnv", webEnv);
+            uriBuilder2.addParameter("query_key", queryKey);
 
-            invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
-            response = invocationBuilder.get();
+            Map<String, Map<String, String>> params2 = new HashMap<String, Map<String,String>>();
+            String response2 = StringUtils.EMPTY;
+            countAttempt = 0;
+            while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
+                countAttempt++;
+                response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+            }
 
-            String xml = response.readEntity(String.class);
-            return parseXMLString(xml);
+            if (StringUtils.isBlank(response2)) {
+                throw new RuntimeException("After " + attempt
+                        + " attempts to contact the PubMed service, a correct answer could not be received."
+                        + " The request was made with this URL:" + uriBuilder2.toString());
+            }
+
+            return parseXMLString(response2);
         }
     }
 
-
     @Override
     public List<ImportRecord> getRecords(InputStream inputStream) throws FileSourceException {
-        String xml = null;
         try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
-            xml = CharStreams.toString(reader);
+            String xml = CharStreams.toString(reader);
             return parseXMLString(xml);
         } catch (IOException e) {
             throw new FileSourceException ("Cannot read XML from InputStream", e);
@@ -441,10 +478,27 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private List<ImportRecord> parseXMLString(String xml) {
         List<ImportRecord> records = new LinkedList<ImportRecord>();
-        List<OMElement> omElements = splitToRecords(xml);
-        for (OMElement record : omElements) {
+        List<Element> elements = splitToRecords(xml);
+        for (Element record : elements) {
             records.add(transformSourceRecords(record));
         }
         return records;
     }
+
+    public String getUrlFetch() {
+        return urlFetch;
+    }
+
+    public void setUrlFetch(String urlFetch) {
+        this.urlFetch = urlFetch;
+    }
+
+    public String getUrlSearch() {
+        return urlSearch;
+    }
+
+    public void setUrlSearch(String urlSearch) {
+        this.urlSearch = urlSearch;
+    }
+
 }
