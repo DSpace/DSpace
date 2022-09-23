@@ -9,10 +9,12 @@ package org.dspace.app.itemimport;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.file.PathUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -29,6 +31,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,16 +45,20 @@ import org.junit.Test;
  */
 public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
 
+    private static final String ZIP_NAME = "saf.zip";
     private static final String publicationTitle = "A Tale of Two Cities";
     private static final String personTitle = "Person Test";
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private Collection collection;
     private Path tempDir;
+    private Path workDir;
 
     @Before
-    public void setup() throws Exception {
+    @Override
+    public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -70,12 +78,20 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
 
         tempDir = Files.createTempDirectory("safImportTest");
+        File file = new File(configurationService.getProperty("org.dspace.app.batchitemimport.work.dir"));
+        if (!file.exists()) {
+            Files.createDirectory(Path.of(file.getAbsolutePath()));
+        }
+        workDir = Path.of(file.getAbsolutePath());
     }
 
     @After
     @Override
     public void destroy() throws Exception {
         PathUtils.deleteDirectory(tempDir);
+        for (Path path : Files.list(workDir).collect(Collectors.toList())) {
+            PathUtils.delete(path);
+        }
         super.destroy();
     }
 
@@ -201,10 +217,10 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     public void importItemByZipSafWithBitstreams() throws Exception {
         // use simple SAF in zip format
         Files.copy(getClass().getResourceAsStream("saf-bitstreams.zip"),
-                Path.of(tempDir.toString() + "/saf.zip"));
+                Path.of(tempDir.toString() + "/" + ZIP_NAME));
 
         String[] args = new String[] { "import", "-a", "-e", admin.getEmail(), "-c", collection.getID().toString(),
-                "-s", tempDir.toString(), "-z", "saf.zip", "-m", tempDir.toString() + "/mapfile.out" };
+                "-s", tempDir.toString(), "-z", ZIP_NAME, "-m", tempDir.toString() + "/mapfile.out" };
         perfomImportScript(args);
 
         checkMetadata();
@@ -227,10 +243,10 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         // use simple SAF in zip format
         Files.copy(getClass().getResourceAsStream("saf-relationships.zip"),
-                Path.of(tempDir.toString() + "/saf.zip"));
+                Path.of(tempDir.toString() + "/" + ZIP_NAME));
 
         String[] args = new String[] { "import", "-a", "-p", "-e", admin.getEmail(),
-                "-c", collection.getID().toString(), "-s", tempDir.toString(), "-z", "saf.zip",
+                "-c", collection.getID().toString(), "-s", tempDir.toString(), "-z", ZIP_NAME,
                 "-m", tempDir.toString() + "/mapfile.out" };
         perfomImportScript(args);
 

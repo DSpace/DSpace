@@ -9,6 +9,9 @@ package org.dspace.app.itemexport;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.file.PathUtils;
 import org.dspace.app.itemexport.factory.ItemExportServiceFactory;
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Collection;
@@ -56,8 +60,9 @@ import org.dspace.utils.DSpace;
  */
 public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
 
-    public static String ZIP_NAME = "exportSAFZip";
-    public static String ZIP_OUTPUT = "saf-export.zip";
+    public static final String TEMP_DIR = "exportSAF";
+    public static final String ZIP_NAME = "exportSAFZip";
+    public static final String ZIP_OUTPUT = "saf-export.zip";
 
     protected String typeString = null;
     protected String destDirName = null;
@@ -77,8 +82,6 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     protected static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected static final EPersonService epersonService =
             EPersonServiceFactory.getInstance().getEPersonService();
-    protected static ItemExportService itemExportService = ItemExportServiceFactory.getInstance()
-            .getItemExportService();
 
     @Override
     public ItemExportScriptConfiguration getScriptConfiguration() {
@@ -123,8 +126,6 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
             return;
         }
 
-        setDestDirName();
-
         validate();
 
         Context context = new Context();
@@ -167,8 +168,11 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
             }
         }
 
+        ItemExportService itemExportService = ItemExportServiceFactory.getInstance()
+                .getItemExportService();
         try {
-            process(context);
+            itemExportService.setHandler(handler);
+            process(context, itemExportService);
             context.complete();
         } catch (Exception e) {
             context.abort();
@@ -196,8 +200,9 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
      * @param context
      * @throws Exception
      */
-    protected void process(Context context) throws Exception {
+    protected void process(Context context, ItemExportService itemExportService) throws Exception {
         setEPerson(context);
+        setDestDirName(context);
 
         Iterator<Item> items;
         if (item != null) {
@@ -211,18 +216,20 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
         itemExportService.exportAsZip(context, items, destDirName, zipFileName,
                 seqStart, migrate, excludeBitstreams);
 
-        // write input stream on handler
-        handler.writeFilestream(context, zipFileName,
-                new FileInputStream(
-                        new File(destDirName + System.getProperty("file.separator") + zipFileName)),
-                ZIP_NAME);
+        File zip = new File(destDirName + System.getProperty("file.separator") + zipFileName);
+        try (InputStream is = new FileInputStream(zip)) {
+            // write input stream on handler
+            handler.writeFilestream(context, zipFileName, is, ZIP_NAME);
+        } finally {
+            PathUtils.deleteDirectory(Path.of(destDirName));
+        }
     }
 
     /**
      * Set the destination directory option
      */
-    protected void setDestDirName() throws Exception {
-        destDirName = itemExportService.getExportWorkDirectory();
+    protected void setDestDirName(Context context) throws Exception {
+        destDirName = Files.createTempDirectory(TEMP_DIR).toString();
     }
 
     /**

@@ -57,6 +57,7 @@ import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -101,11 +102,12 @@ public class ItemExportServiceImpl implements ItemExportService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
-
     /**
      * log4j logger
      */
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger();
+
+    private DSpaceRunnableHandler handler;
 
     protected ItemExportServiceImpl() {
 
@@ -130,7 +132,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             }
         }
 
-        System.out.println("Beginning export");
+        logInfo("Beginning export");
 
         while (i.hasNext()) {
             if (SUBDIR_LIMIT > 0 && ++counter == SUBDIR_LIMIT) {
@@ -143,7 +145,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
             }
 
-            System.out.println("Exporting item to " + mySequenceNumber);
+            logInfo("Exporting item to " + mySequenceNumber);
             Item item = i.next();
             exportItem(c, item, fullPath, mySequenceNumber, migrate, excludeBitstreams);
             c.uncacheEntity(item);
@@ -159,7 +161,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             // now create a subdirectory
             File itemDir = new File(destDir + "/" + seqStart);
 
-            System.out.println("Exporting Item " + myItem.getID() +
+            logInfo("Exporting Item " + myItem.getID() +
                                    (myItem.getHandle() != null ? ", handle " + myItem.getHandle() : "") +
                                    " to " + itemDir);
 
@@ -230,7 +232,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         File outFile = new File(destDir, filename);
 
-        System.out.println("Attempting to create file " + outFile);
+        logInfo("Attempting to create file " + outFile);
 
         if (outFile.createNewFile()) {
             BufferedOutputStream out = new BufferedOutputStream(
@@ -431,7 +433,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                             File fdirs = new File(destDir + File.separator
                                                       + dirs);
                             if (!fdirs.exists() && !fdirs.mkdirs()) {
-                                log.error("Unable to create destination directory");
+                                logError("Unable to create destination directory");
                             }
                         }
 
@@ -488,12 +490,12 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         File wkDir = new File(workDir);
         if (!wkDir.exists() && !wkDir.mkdirs()) {
-            log.error("Unable to create working direcory");
+            logError("Unable to create working direcory");
         }
 
         File dnDir = new File(destDirName);
         if (!dnDir.exists() && !dnDir.mkdirs()) {
-            log.error("Unable to create destination directory");
+            logError("Unable to create destination directory");
         }
 
         // export the items using normal export method
@@ -676,7 +678,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         String downloadDir = getExportDownloadDirectory(eperson);
                         File dnDir = new File(downloadDir);
                         if (!dnDir.exists() && !dnDir.mkdirs()) {
-                            log.error("Unable to create download directory");
+                            logError("Unable to create download directory");
                         }
 
                         Iterator<String> iter = itemsMap.keySet().iterator();
@@ -695,7 +697,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
                             File wkDir = new File(workDir);
                             if (!wkDir.exists() && !wkDir.mkdirs()) {
-                                log.error("Unable to create working directory");
+                                logError("Unable to create working directory");
                             }
 
 
@@ -914,7 +916,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             for (File file : files) {
                 if (file.lastModified() < now.getTimeInMillis()) {
                     if (!file.delete()) {
-                        log.error("Unable to delete export file");
+                        logError("Unable to delete export file");
                     }
                 }
             }
@@ -938,7 +940,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 for (File file : files) {
                     if (file.lastModified() < now.getTimeInMillis()) {
                         if (!file.delete()) {
-                            log.error("Unable to delete old files");
+                            logError("Unable to delete old files");
                         }
                     }
                 }
@@ -946,7 +948,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 // If the directory is now empty then we delete it too.
                 if (dir.listFiles().length == 0) {
                     if (!dir.delete()) {
-                        log.error("Unable to delete directory");
+                        logError("Unable to delete directory");
                     }
                 }
             }
@@ -967,14 +969,14 @@ public class ItemExportServiceImpl implements ItemExportService {
 
             email.send();
         } catch (Exception e) {
-            log.warn(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
+            logWarn(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of export"), e);
         }
     }
 
     @Override
     public void emailErrorMessage(EPerson eperson, String error)
         throws MessagingException {
-        log.warn("An error occurred during item export, the user will be notified. " + error);
+        logWarn("An error occurred during item export, the user will be notified. " + error);
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
@@ -984,7 +986,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
             email.send();
         } catch (Exception e) {
-            log.warn("error during item export error notification", e);
+            logWarn("error during item export error notification", e);
         }
     }
 
@@ -999,7 +1001,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             }
             File targetFile = new File(tempFileName);
             if (!targetFile.createNewFile()) {
-                log.warn("Target file already exists: " + targetFile.getName());
+                logWarn("Target file already exists: " + targetFile.getName());
             }
 
             FileOutputStream fos = new FileOutputStream(tempFileName);
@@ -1015,7 +1017,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
             deleteDirectory(cpFile);
             if (!targetFile.renameTo(new File(target))) {
-                log.error("Unable to rename file");
+                logError("Unable to rename file");
             }
         } finally {
             if (cpZipOutputStream != null) {
@@ -1088,13 +1090,73 @@ public class ItemExportServiceImpl implements ItemExportService {
                     deleteDirectory(file);
                 } else {
                     if (!file.delete()) {
-                        log.error("Unable to delete file: " + file.getName());
+                        logError("Unable to delete file: " + file.getName());
                     }
                 }
             }
         }
 
         return (path.delete());
+    }
+
+    @Override
+    public void setHandler(DSpaceRunnableHandler handler) {
+        this.handler = handler;
+    }
+
+    private void logInfo(String message) {
+        logInfo(message, null);
+    }
+
+    private void logInfo(String message, Exception e) {
+        if (handler != null) {
+            handler.logInfo(message);
+            return;
+        }
+
+        if (e != null) {
+            log.info(message, e);
+        } else {
+            log.info(message);
+        }
+    }
+
+    private void logWarn(String message) {
+        logWarn(message, null);
+    }
+
+    private void logWarn(String message, Exception e) {
+        if (handler != null) {
+            handler.logWarning(message);
+            return;
+        }
+
+        if (e != null) {
+            log.warn(message, e);
+        } else {
+            log.warn(message);
+        }
+    }
+
+    private void logError(String message) {
+        logError(message, null);
+    }
+
+    private void logError(String message, Exception e) {
+        if (handler != null) {
+            if (e != null) {
+                handler.logError(message, e);
+            } else {
+                handler.logError(message);
+            }
+            return;
+        }
+
+        if (e != null) {
+            log.error(message, e);
+        } else {
+            log.error(message);
+        }
     }
 
 }

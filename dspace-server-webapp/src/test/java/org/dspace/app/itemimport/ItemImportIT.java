@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -80,7 +81,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
     private Collection collection;
-    private Path tempDir;
+    private Path workDir;
 
     @Before
     @Override
@@ -96,15 +97,19 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        tempDir = Files.createTempDirectory("safImportTest");
-        configurationService.setProperty("org.dspace.app.itemexport.work.dir", tempDir.toString());
+        File file = new File(configurationService.getProperty("org.dspace.app.batchitemimport.work.dir"));
+        if (!file.exists()) {
+            Files.createDirectory(Path.of(file.getAbsolutePath()));
+        }
+        workDir = Path.of(file.getAbsolutePath());
     }
 
     @After
     @Override
     public void destroy() throws Exception {
-        PathUtils.deleteDirectory(tempDir);
-        configurationService.reloadConfig();
+        for (Path path : Files.list(workDir).collect(Collectors.toList())) {
+            PathUtils.delete(path);
+        }
         super.destroy();
     }
 

@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.authorize.AuthorizeException;
@@ -75,7 +75,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected String zipfilename = null;
     protected boolean help = false;
-    private InputStream mapfileInputStream = null;
 
     protected static final CollectionService collectionService =
             ContentServiceFactory.getInstance().getCollectionService();
@@ -120,10 +119,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
 
         if (commandLine.hasOption('p')) {
             template = true;
-        }
-
-        if (commandLine.hasOption('s')) { // source
-            sourcedir = commandLine.getOptionValue('s');
         }
 
         if (commandLine.hasOption('c')) { // collections
@@ -211,6 +206,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             itemImportService.setUseWorkflow(useWorkflow);
             itemImportService.setUseWorkflowSendEmail(useWorkflowSendEmail);
             itemImportService.setQuiet(isQuiet);
+            itemImportService.setHandler(handler);
 
             try {
                 context.turnOffAuthorisationSystem();
@@ -225,22 +221,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 context.abort();
                 throw new Exception(
                     "Error committing changes to database: " + e.getMessage() + ", aborting most recent changes", e);
-            }
-
-            // Delete the unzipped file
-            try {
-                if (zip) {
-                    System.gc();
-                    handler.logInfo(
-                        "Deleting temporary zip directory: "
-                        + itemImportService.getTempWorkDirFile().getAbsolutePath());
-                    itemImportService.cleanupZipTemp();
-                }
-            } catch (IOException ex) {
-                handler.logError("Unable to delete temporary zip archive location: "
-                        + itemImportService.getTempWorkDirFile().getAbsolutePath());
-                throw new IOException("Unable to delete temporary zip archive location: "
-                        + itemImportService.getTempWorkDirFile().getAbsolutePath(), ex);
             }
 
             if (isTest) {
@@ -272,9 +252,9 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             throw new UnsupportedOperationException("Resume option only works with the --add command");
         }
 
-        if (isResume && mapfileInputStream == null) {
-            handler.logError("The mapfile " + mapfile + " does not exist. ");
-            throw new UnsupportedOperationException("The mapfile " + mapfile + " does not exist");
+        if (isResume && StringUtils.isBlank(mapfile)) {
+            handler.logError("The mapfile does not exist. ");
+            throw new UnsupportedOperationException("The mapfile does not exist");
         }
     }
 
@@ -298,11 +278,12 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
         }
 
         // write input stream on handler
-        if (mapfileInputStream == null) {
-            mapfileInputStream = new FileInputStream(mapfile);
-            mapfile = Path.of(mapfile).getFileName().toString();
+        File mapFile = new File(mapfile);
+        try (InputStream mapfileInputStream = new FileInputStream(mapFile)) {
+            handler.writeFilestream(context, MAPFILE_FILENAME, mapfileInputStream, MAPFILE_BITSTREAM_TYPE);
+        } finally {
+            mapFile.delete();
         }
-        handler.writeFilestream(context, mapfile, mapfileInputStream, MAPFILE_BITSTREAM_TYPE);
     }
 
     /**
@@ -317,7 +298,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             File tempFile = File.createTempFile(zipfilename, "temp");
             tempFile.deleteOnExit();
             FileUtils.copyInputStreamToFile(optionalFileStream.get(), tempFile);
-            sourcedir = itemImportService.unzip(tempFile);
+            sourcedir = itemImportService.unzip(tempFile,
+                    Files.createTempDirectory(TEMP_DIR + context.getCurrentUser().getID()).toString());
         } else {
             throw new IllegalArgumentException(
                     "Error reading file, the file couldn't be found for filename: " + zipfilename);
@@ -333,7 +315,10 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             try {
                 Optional<InputStream> optionalFileStream = handler.getFileStream(context, mapfile);
                 if (optionalFileStream.isPresent()) {
-                    mapfileInputStream = optionalFileStream.get();
+                    File tempFile = File.createTempFile(mapfile, "temp");
+                    tempFile.deleteOnExit();
+                    FileUtils.copyInputStreamToFile(optionalFileStream.get(), tempFile);
+                    mapfile = tempFile.getAbsolutePath();
                 }
             } catch (IOException | AuthorizeException e) {
                 throw new UnsupportedOperationException("The mapfile does not exist");
@@ -349,7 +334,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
         if (isResume && commandLine.hasOption('m')) {
             mapfile = commandLine.getOptionValue('m');
         } else {
-            mapfile = Files.createTempDirectory("TEMP_DIR").toString() + File.separator + MAPFILE_FILENAME;
+            mapfile = Files.createTempFile(MAPFILE_FILENAME, "temp").toString();
         }
     }
 

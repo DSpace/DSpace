@@ -109,6 +109,10 @@ public class ItemImportCLI extends ItemImport {
 
     @Override
     protected void setZip() {
+        if (commandLine.hasOption('s')) { // source
+            sourcedir = commandLine.getOptionValue('s');
+        }
+
         if (commandLine.hasOption('z')) {
             zip = true;
             zipfilename = commandLine.getOptionValue('z');

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -27,6 +28,8 @@ public class ItemExportCLI extends ItemExport {
     protected void validate() {
         super.validate();
 
+        setDestDirName();
+
         if (destDirName == null) {
             handler.logError("The destination directory must be set (run with -h flag for details)");
             throw new UnsupportedOperationException("The destination directory must be set");
@@ -39,7 +42,7 @@ public class ItemExportCLI extends ItemExport {
     }
 
     @Override
-    protected void process(Context context) throws Exception {
+    protected void process(Context context, ItemExportService itemExportService) throws Exception {
         if (zip) {
             Iterator<Item> items;
             if (item != null) {
@@ -68,7 +71,6 @@ public class ItemExportCLI extends ItemExport {
         }
     }
 
-    @Override
     protected void setDestDirName() {
         if (commandLine.hasOption('d')) { // dest
             destDirName = commandLine.getOptionValue('d');
