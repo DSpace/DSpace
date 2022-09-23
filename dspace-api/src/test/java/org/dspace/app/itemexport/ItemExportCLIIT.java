@@ -111,6 +111,29 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void exportZipCollection() throws Exception {
+        // create items
+        context.turnOffAuthorisationSystem();
+        Item item1 = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .withMetadata("dc", "title", "alternative", titleAlternative)
+                .build();
+        Item item2 = ItemBuilder.createItem(context, collection)
+                .withTitle(title + " 2")
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .withMetadata("dc", "title", "alternative", titleAlternative)
+                .build();
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] { "export", "-t", "COLLECTION",
+                "-i", collection.getHandle(), "-d", tempDir.toString(), "-z", "saf-export.zip", "-n", "1" };
+        perfomExportScript(args);
+
+        checkDir();
+    }
+
+    @Test
     public void exportItemWithMetadataOnly() throws Exception {
         // create item
         context.turnOffAuthorisationSystem();
@@ -168,6 +191,32 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
 
         String[] args = new String[] { "export", "-t", "ITEM",
                 "-i", item.getHandle(), "-d", tempDir.toString(), "-n", "1" };
+        perfomExportScript(args);
+
+        checkDir();
+    }
+
+    @Test
+    public void exportZipItemWithBitstreams() throws Exception {
+        // create item
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "date", "issued", dateIssued)
+                .withMetadata("dc", "title", "alternative", titleAlternative)
+                .build();
+        // create bitstream
+        String bitstreamContent = "TEST TEST TEST";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        String[] args = new String[] { "export", "-t", "ITEM",
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-z", "saf-export.zip", "-n", "1" };
         perfomExportScript(args);
 
         checkDir();

@@ -1051,7 +1051,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 }
                 String strAbsPath = cpFile.getPath();
                 String strZipEntryName = strAbsPath.substring(strSource
-                                                                  .length() + 1, strAbsPath.length());
+                                                                  .length(), strAbsPath.length());
 
                 // byte[] b = new byte[ (int)(cpFile.length()) ];
 
