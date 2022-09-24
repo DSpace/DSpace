@@ -62,7 +62,8 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
 
     public static final String TEMP_DIR = "exportSAF";
     public static final String ZIP_NAME = "exportSAFZip";
-    public static final String ZIP_OUTPUT = "saf-export.zip";
+    public static final String ZIP_FILENAME = "saf-export";
+    public static final String ZIP_EXT = "zip";
 
     protected String typeString = null;
     protected String destDirName = null;
@@ -108,7 +109,6 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
         }
 
         setNumber();
-        setZip();
 
         if (commandLine.hasOption('m')) { // number
             migrate = true;
@@ -203,6 +203,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     protected void process(Context context, ItemExportService itemExportService) throws Exception {
         setEPerson(context);
         setDestDirName(context);
+        setZip(context);
 
         Iterator<Item> items;
         if (item != null) {
@@ -219,7 +220,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
         File zip = new File(destDirName + System.getProperty("file.separator") + zipFileName);
         try (InputStream is = new FileInputStream(zip)) {
             // write input stream on handler
-            handler.writeFilestream(context, zipFileName, is, ZIP_NAME);
+            handler.writeFilestream(context, ZIP_FILENAME + "." + ZIP_EXT, is, ZIP_NAME);
         } finally {
             PathUtils.deleteDirectory(Path.of(destDirName));
         }
@@ -229,15 +230,15 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
      * Set the destination directory option
      */
     protected void setDestDirName(Context context) throws Exception {
-        destDirName = Files.createTempDirectory(TEMP_DIR).toString();
+        destDirName = Files.createTempDirectory(TEMP_DIR + "-").toString();
     }
 
     /**
      * Set the zip option
      */
-    protected void setZip() {
+    protected void setZip(Context context) {
         zip = true;
-        zipFileName = ZIP_OUTPUT;
+        zipFileName = ZIP_FILENAME + "-" + context.getCurrentUser().getID() + "." + ZIP_EXT;
     }
 
     /**

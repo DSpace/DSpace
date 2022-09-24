@@ -78,7 +78,7 @@ public class ItemExportCLI extends ItemExport {
     }
 
     @Override
-    protected void setZip() {
+    protected void setZip(Context context) {
         if (commandLine.hasOption('z')) {
             zip = true;
             zipFileName = commandLine.getOptionValue('z');
