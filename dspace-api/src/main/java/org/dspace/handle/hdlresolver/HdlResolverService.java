@@ -7,6 +7,8 @@
  */
 package org.dspace.handle.hdlresolver;
 
+import java.util.List;
+
 import org.dspace.core.Context;
 
 /**
@@ -14,6 +16,10 @@ import org.dspace.core.Context;
  * resolution to handle URI and vice-versa.
  * 
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.it)
+ *
+ */
+/**
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  *
  */
 public interface HdlResolverService {
@@ -36,5 +42,28 @@ public interface HdlResolverService {
      * @return URL found or null
      */
     String resolveToURL(Context context, HdlResolverDTO hdlResolver);
+
+    /**
+     * List all available prefixes for this installation
+     * 
+     * @return `List<String>` of Handle prefixes
+     */
+    List<String> listPrefixes();
+
+    /**
+     * List all available handles with `prefix`
+     * 
+     * @param context DSpace context
+     * @param prefix prefix to search
+     * @return `List<String>` of handles
+     */
+    List<String> listHandles(Context context, String prefix);
+
+    /**
+     * Verifies status of handle controller
+     * 
+     * @return `true` if enabled, `false` otherwise
+     */
+    boolean isListhandlesEnabled();
 
 }

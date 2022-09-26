@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This controller is public and is useful for handle resolving,
- * wheter a target handle identifier will be resolved into the
+ * whether a target handle identifier will be resolved into the
  * corresponding URL (if found), otherwise will respond a null string.
  * 
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.it)
@@ -38,9 +38,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnProperty("handle.remote-resolver.enabled")
-@RequestMapping(path = "/{hdlService:hdlResolver|resolve|listhandles|listprefixes}/")
+@RequestMapping(path = "/{hdlService:hdlresolver|resolve|listhandles|listprefixes}/")
 public class HdlResolverRestController {
-    static final String HDL_RESOLVER = "/hdlResolver/";
+    static final String HDL_RESOLVER = "/hdlresolver/";
     static final String RESOLVE = "/resolve/";
     static final String LISTHANDLES = "/listhandles/";
     static final String LISTPREFIXES = "/listprefixes/";
@@ -50,6 +50,22 @@ public class HdlResolverRestController {
     @Autowired
     private HdlResolverService hdlResolverService;
 
+    @GetMapping(
+        value = "**",
+        produces = "application/json;charset=UTF-8"
+    )
+    public ResponseEntity<String> handleController(HttpServletRequest request, @PathVariable String hdlService) {
+        if (HDL_RESOLVER.contains(hdlService) || RESOLVE.contains(hdlService)) {
+            return resolveHandle(request, hdlService);
+        } else if (LISTHANDLES.contains(hdlService)) {
+            return this.listHandles(request, request.getRequestURI().substring(LISTHANDLES.length()));
+        } else if (LISTPREFIXES.contains(hdlService)) {
+            return this.listPrefixes(request);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     /**
      * REST GET Method used to find and retrieve the URL of a target Handle. It
      * should return only one item, if found, else a null body value.
@@ -58,34 +74,87 @@ public class HdlResolverRestController {
      * in path isn't valid.
      * </br>
      * The response type will be (<code>application/json;charset=UTF-8</code>)
-     * a string representing an array-like list of handlers:
+     * a string representing an array-like list of handles:
      * </br>
      * Example:
      *      <ul>
-     *          <li>Request: GET - http://{dspace.url}/hdlResolver/handleIdExample/1</li>
+     *          <li>Request: GET - http://{dspace.url}/hdlresolver/handleIdExample/1</li>
      *          <li>Response: 200 - ["http://localhost/handle/hanldeIdExample1"]
      *      </ul>
      * 
-     * @param request HttpServletRequest
-     * @return One element List or <code>null</code> with status 200
-     *         <code>HttpStatus.OK</code> or <code>HttpStatus.BAD_REQUEST</code> 400
-     *         error
+     * @param request {@code HttpServletRequest}
+     * @return One element List or <code>null</code> with status 200 - <code>HttpStatus.OK</code>
+     *         or 400 - <code>HttpStatus.BAD_REQUEST</code> error
      */
-    @GetMapping(
-        value = "**",
-        produces = "application/json;charset=UTF-8"
-    )
-    public ResponseEntity<String> getHandleUrlResolver(HttpServletRequest request, @PathVariable String hdlService) {
+    public ResponseEntity<String> resolveHandle(HttpServletRequest request, String hdlService) {
         HdlResolverDTO handleResolver =
-               this.hdlResolverService.resolveBy(
-                       request.getRequestURI(),
-                       MessageFormat.format("{0}/{1}/", request.getContextPath(), hdlService)
-               );
+                this.hdlResolverService.resolveBy(
+                        request.getRequestURI(),
+                        MessageFormat.format("{0}/{1}/", request.getContextPath(), hdlService)
+                );
         if (!handleResolver.isValid()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             return new ResponseEntity<>(this.resolveToURL(request, handleResolver), HttpStatus.OK);
         }
+    }
+
+    /**
+     * REST GET Method used to list all available prefixes for handles. It
+     * should return a list of prefixes, at least the default one.
+     * </br>
+     * The response type will be (<code>application/json;charset=UTF-8</code>)
+     * a string representing an array-like list of handles:
+     * </br>
+     * Example:
+     *      <ul>
+     *          <li>Request: GET - http://{dspace.url}/listprefixes</li>
+     *          <li>Response: 200 - ["123456789","prefix1","prefix2"]
+     *      </ul>
+     * 
+     * @param request {@code HttpServletRequest}
+     * @return List of valid prefixes with status 200 <code>HttpStatus.OK</code>
+     */
+    public ResponseEntity<String> listPrefixes(HttpServletRequest request) {
+        return new ResponseEntity<>(this.mapAsJson(this.hdlResolverService.listPrefixes()), HttpStatus.OK);
+    }
+
+    /**
+     * REST GET Method used to list all available handles starting with target prefix.
+     * It should return a list of handles.
+     * </br>
+     * If the controller is disabled `handle.hide.listhandles = true`,
+     * then 400 - <code>HttpStatus.NOT_FOUND</code> is returned.
+     * </br>
+     * If the requested prefix is blank,
+     * then 404 - <code>HttpStatus.BAD_REQUEST</code> is returned.
+     * </br>
+     * The response type will be (<code>application/json;charset=UTF-8</code>)
+     * a string representing an array-like list of handles:
+     * </br>
+     * Example:
+     *      <ul>
+     *          <li>Request: GET - http://{dspace.url}/listhandles/prefix</li>
+     *          <li>Response: 200 - ["prefix/zero","prefix1/one","prefix2/two"]
+     *      </ul>
+     * 
+     * @param request {@code HttpServletRequest}
+     * @param prefix {@code String} representing the prefix that will be searched
+     * @return List of valid prefixes with status 200 <code>HttpStatus.OK</code>
+     *         or status 400 <code>HttpStatus.NOT_FOUND</code> if disabled by properties
+     *         or status 404 <code>HttpStatus.BAD_REQUEST</code> if blank prefix is requested.
+     */
+    public ResponseEntity<String> listHandles(HttpServletRequest request, @PathVariable String prefix) {
+        if (!this.hdlResolverService.isListhandlesEnabled()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (StringUtils.isBlank(prefix)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(
+            this.mapAsJson(this.hdlResolverService.listHandles(ContextUtil.obtainContext(request), prefix)),
+            HttpStatus.OK
+        );
     }
 
     /**
@@ -96,12 +165,22 @@ public class HdlResolverRestController {
      * @return One element list using String if found, else null String.
      */
     private String resolveToURL(HttpServletRequest request, HdlResolverDTO handleResolver) {
+        return mapAsJson(this.hdlResolverService.resolveToURL(ContextUtil.obtainContext(request), handleResolver));
+    }
+
+    protected String mapAsJson(final String resolvedUrl) {
         String json = "null";
-        final String resolvedUrl = this.hdlResolverService.resolveToURL(ContextUtil.obtainContext(request),
-                handleResolver);
         if (StringUtils.isNotEmpty(resolvedUrl)) {
+            json = mapAsJson(List.of(resolvedUrl));
+        }
+        return json;
+    }
+
+    protected String mapAsJson(final List<String> jsonList) {
+        String json = "null";
+        if (jsonList != null && !jsonList.isEmpty()) {
             try {
-                json = new ObjectMapper().writeValueAsString(List.of(resolvedUrl));
+                json = new ObjectMapper().writeValueAsString(jsonList);
             } catch (JsonProcessingException e) {
                 log.error("Error during conversion of response!", e);
             }
