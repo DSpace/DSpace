@@ -148,5 +148,8 @@
     <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
     <bean class="org.dspace.authorize.RegexPasswordValidator" />
 
+    <!-- Deduplication Service -->
+    <bean class="org.dspace.deduplication.DeduplicationServiceImpl"/>
+
 </beans>
 

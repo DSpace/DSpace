@@ -34,4 +34,7 @@
     
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
 
+    <!-- Deduplication service -->
+    <bean class="org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl" id="org.dspace.app.deduplication.service.DedupService"/>
+
 </beans>
