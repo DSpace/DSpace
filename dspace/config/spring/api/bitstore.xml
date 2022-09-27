@@ -5,7 +5,6 @@
 
     <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
         <property name="incoming" value="${assetstore.index.primary}"/>
-        <property name="secondary" value="${assetstore.index.secondary}"/>
         <property name="stores">
             <map>
                 <entry key="0" value-ref="localStore"/>

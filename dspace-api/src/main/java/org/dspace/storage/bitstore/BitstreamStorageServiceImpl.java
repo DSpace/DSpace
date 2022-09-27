@@ -75,8 +75,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      */
     private Map<Integer, BitStoreService> stores = new HashMap<Integer, BitStoreService>();
 
-    private int secondary;
-
     /**
      * The index of the asset store to use for new bitstreams
      */
@@ -104,37 +102,21 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public UUID store(Context context, Bitstream bitstream, InputStream is) throws SQLException, IOException {
         // Create internal ID
         String id = Utils.generateKey();
-        int storeNumber = incoming;
-
-        bitstream.setDeleted(true);
-        bitstream.setInternalId(id);
-
-        BitStoreService store = null;
-        try {
-            store = this.getStore(incoming);
-        } catch (IOException e) {
-            if (store == null) {
-                store = this.getStore(secondary);
-                storeNumber = secondary;
-                log.warn(
-                        "Using the secondary with index: " + storeNumber +
-                        ", for storing the bitstream: " + id,
-                        e
-                );
-            }
-        }
-        //For efficiencies sake, PUT is responsible for setting bitstream size_bytes, checksum, and checksum_algorithm
-        store.put(bitstream, is);
-        //bitstream.setSizeBytes(file.length());
-        //bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
-        //bitstream.setChecksumAlgorithm("MD5");
-
         /*
          * Set the store number of the new bitstream If you want to use some
          * other method of working out where to put a new bitstream, here's
          * where it should go
          */
-        bitstream.setStoreNumber(storeNumber);
+        bitstream.setStoreNumber(incoming);
+        bitstream.setDeleted(true);
+        bitstream.setInternalId(id);
+
+        BitStoreService store = this.getStore(incoming);
+        //For efficiencies sake, PUT is responsible for setting bitstream size_bytes, checksum, and checksum_algorithm
+        store.put(bitstream, is);
+        //bitstream.setSizeBytes(file.length());
+        //bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
+        //bitstream.setChecksumAlgorithm("MD5");
 
         bitstream.setDeleted(false);
         try {
@@ -459,14 +441,6 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         } catch (SQLException e) {
             log.error(e);
         }
-    }
-
-    public int getSecondary() {
-        return secondary;
-    }
-
-    public void setSecondary(int secondary) {
-        this.secondary = secondary;
     }
 
     public int getIncoming() {
