@@ -202,6 +202,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 logError("Cannot create batch import directory! " + tempWorkDir);
             }
         }
+        // clean work dir path from duplicate separators
+        tempWorkDir = StringUtils.replace(tempWorkDir, File.separator + File.separator, File.separator);
     }
 
     // File listing filter to look for metadata files
