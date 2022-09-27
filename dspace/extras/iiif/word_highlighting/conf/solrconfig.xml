@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+
+    <dataDir>${solr.data.dir:}</dataDir>
+    <codecFactory class="solr.SchemaCodecFactory"/>
+    <directoryFactory name="DirectoryFactory"
+                      class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
+    <schemaFactory class="ClassicIndexSchemaFactory"></schemaFactory>
+
+    <!-- Controls what version of Lucene various components of Solr
+         adhere to.  Generally, you want to use the latest version to
+         get all bug fixes and improvements. It is highly recommended
+         that you fully re-index after changing this setting as it can
+         affect both how text is indexed and queried.
+    -->
+    <luceneMatchVersion>8.8.1</luceneMatchVersion>
+
+    <lib dir="./lib" regex=".*\.jar" />
+    <lib dir='${solr.install.dir}/contrib/analysis-extras/lib/'
+         regex='icu4j-.*\.jar'/>
+    <lib dir='${solr.install.dir}/contrib/analysis-extras/lucene-libs/'
+         regex='lucene-analyzers-icu-.*\.jar'/>
+
+    <!-- Settings for how updates are done internally -->
+    <updateHandler class="solr.DirectUpdateHandler2">
+        <!-- How often should commits be done automatically -->
+        <autoCommit>
+            <maxDocs>10000</maxDocs> <!--Commit every 10.000 documents-->
+            <maxTime>${solr.autoCommit.maxTime:10000}</maxTime> <!--Default commit every 10 seconds-->
+            <openSearcher>true</openSearcher>
+        </autoCommit>
+
+        <autoSoftCommit>
+            <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
+        </autoSoftCommit>
+    </updateHandler>
+
+    <searchComponent class="de.digitalcollections.solrocr.solr.OcrHighlightComponent"
+                     name="ocrHighlight" />
+
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <arr name="components">
+            <str>query</str>
+            <str>ocrHighlight</str>
+            <str>highlight</str>
+        </arr>
+    </requestHandler>
+
+</config>
