@@ -43,6 +43,8 @@ public class ItemExportCLI extends ItemExport {
 
     @Override
     protected void process(Context context, ItemExportService itemExportService) throws Exception {
+        setZip(context);
+
         if (zip) {
             Iterator<Item> items;
             if (item != null) {

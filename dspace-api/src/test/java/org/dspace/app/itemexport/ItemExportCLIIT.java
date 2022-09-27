@@ -7,6 +7,7 @@
  */
 package org.dspace.app.itemexport;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -44,6 +46,7 @@ import org.junit.Test;
  */
 public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
 
+    private static final String zipFileName = "saf-export.zip";
     private static final String title = "A Tale of Two Cities";
     private static final String dateIssued = "1990";
     private static final String titleAlternative = "J'aime les Printemps";
@@ -127,10 +130,11 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
 
         String[] args = new String[] { "export", "-t", "COLLECTION",
-                "-i", collection.getHandle(), "-d", tempDir.toString(), "-z", "saf-export.zip", "-n", "1" };
+                "-i", collection.getHandle(), "-d", tempDir.toString(), "-z", zipFileName, "-n", "1" };
         perfomExportScript(args);
 
         checkDir();
+        checkZip(zipFileName);
     }
 
     @Test
@@ -216,10 +220,11 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
 
         String[] args = new String[] { "export", "-t", "ITEM",
-                "-i", item.getHandle(), "-d", tempDir.toString(), "-z", "saf-export.zip", "-n", "1" };
+                "-i", item.getHandle(), "-d", tempDir.toString(), "-z", zipFileName, "-n", "1" };
         perfomExportScript(args);
 
         checkDir();
+        checkZip(zipFileName);
     }
 
     @Test
@@ -320,6 +325,18 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
      */
     private void checkDir() throws Exception {
         assertTrue(Files.list(tempDir).findAny().isPresent());
+    }
+
+    /**
+     * Check created export zip
+     * @param zipFileName
+     * @throws Exception
+     */
+    private void checkZip(String zipFileName) throws Exception {
+        assertEquals(1,
+                Files.list(tempDir)
+                .filter(b -> StringUtils.equals(b.getFileName().toString(), zipFileName))
+                .count());
     }
 
     /**
