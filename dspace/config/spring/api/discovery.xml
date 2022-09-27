@@ -203,6 +203,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>(search.resourcetype:Item AND latestVersion:true) OR search.resourcetype:Collection OR search.resourcetype:Community</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1094,6 +1095,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Publication</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1226,6 +1228,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Person</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -1342,6 +1345,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Project</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--Default result per page  -->
@@ -1459,6 +1463,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:OrgUnit</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1583,6 +1588,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:JournalIssue</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1702,6 +1708,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:JournalVolume</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -1820,6 +1827,7 @@
             <list>
                 <!--Only find items, communities and collections-->
                 <value>search.resourcetype:Item AND latestVersion:true AND entityType_keyword:Journal</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--The configuration for the recent submissions-->
@@ -2046,6 +2054,7 @@
                 <!--Only find items into claimable collection defined in cfg-->
                 <value>search.resourcetype:Item</value>
                 <value>search.entitytype:${researcher-profile.entity-type:Person}</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
         <!--Default result per page  -->
