@@ -78,7 +78,7 @@ public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptC
         options.addOption(Option.builder("n").longOpt("notify")
                 .desc("if sending submissions through the workflow, send notification emails")
                 .hasArg(false).required(false).build());
-        options.addOption(Option.builder("t").longOpt("test")
+        options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("p").longOpt("template")

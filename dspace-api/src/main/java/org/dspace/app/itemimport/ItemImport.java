@@ -114,7 +114,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             }
         }
 
-        if (commandLine.hasOption('t')) {
+        if (commandLine.hasOption('v')) {
             isTest = true;
             handler.logInfo("**Test Run** - not actually importing items.");
         }
