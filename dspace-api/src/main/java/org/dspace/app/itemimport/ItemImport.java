@@ -12,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +21,6 @@ import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.file.PathUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
@@ -77,8 +75,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected String zipfilename = null;
     protected boolean help = false;
-    private String tempDir = null;
-    private File tempFile = null;
+    private File workDir = null;
+    private File workFile = null;
 
     protected static final CollectionService collectionService =
             ContentServiceFactory.getInstance().getCollectionService();
@@ -287,8 +285,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             handler.writeFilestream(context, MAPFILE_FILENAME, mapfileInputStream, MAPFILE_BITSTREAM_TYPE);
         } finally {
             mapFile.delete();
-            tempFile.delete();
-            PathUtils.deleteDirectory(Path.of(tempDir));
+            workFile.delete();
+            workDir.delete();
         }
     }
 
@@ -301,10 +299,11 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         Optional<InputStream> optionalFileStream = handler.getFileStream(context, zipfilename);
         if (optionalFileStream.isPresent()) {
-            tempFile = File.createTempFile(zipfilename + "-", "");
-            FileUtils.copyInputStreamToFile(optionalFileStream.get(), tempFile);
-            tempDir = Files.createTempDirectory(TEMP_DIR + "-").toString();
-            sourcedir = itemImportService.unzip(tempFile, tempDir);
+            workFile = new File(itemImportService.getTempWorkDir() + File.separator
+                    + zipfilename + "-" + context.getCurrentUser().getID());
+            FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
+            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
+            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
         } else {
             throw new IllegalArgumentException(
                     "Error reading file, the file couldn't be found for filename: " + zipfilename);

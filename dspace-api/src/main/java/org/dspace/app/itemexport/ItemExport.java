@@ -10,7 +10,6 @@ package org.dspace.app.itemexport;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -202,7 +201,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
      */
     protected void process(Context context, ItemExportService itemExportService) throws Exception {
         setEPerson(context);
-        setDestDirName(context);
+        setDestDirName(context, itemExportService);
         setZip(context);
 
         Iterator<Item> items;
@@ -229,8 +228,8 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     /**
      * Set the destination directory option
      */
-    protected void setDestDirName(Context context) throws Exception {
-        destDirName = Files.createTempDirectory(TEMP_DIR + "-").toString();
+    protected void setDestDirName(Context context, ItemExportService itemExportService) throws Exception {
+        destDirName = itemExportService.getExportWorkDirectory() + File.separator + TEMP_DIR;
     }
 
     /**
