@@ -36,6 +36,8 @@ public abstract class BaseBitStoreService implements BitStoreService {
     protected static final String CHECKSUM = "checksum";
     protected static final String SIZE_BYTES = "size_bytes";
 
+    protected boolean initialized = false;
+
     // These settings control the way an identifier is hashed into
     // directory and file names
     //
@@ -171,6 +173,11 @@ public abstract class BaseBitStoreService implements BitStoreService {
             log.error("about( FilePath: " + file.getAbsolutePath() + ", Map: " + attrs.toString() + ")", e);
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return this.initialized;
     }
 
     private byte[] generateChecksumFrom(File file) throws FileNotFoundException, IOException {

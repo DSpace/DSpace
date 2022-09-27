@@ -4,11 +4,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
 
     <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
-        <property name="incoming" value="0"/>
+        <property name="incoming" value="${assetstore.index.primary}"/>
+        <property name="secondary" value="${assetstore.index.secondary}"/>
         <property name="stores">
             <map>
-                <entry key="0" value-ref="${assetstore.storename.primary}"/>
-                <!--<entry key="1" value-ref="s3Store"/>-->
+                <entry key="0" value-ref="localStore"/>
+                <entry key="1" value-ref="s3Store"/>
             </map>
         </property>
     </bean>
@@ -17,7 +18,8 @@
         <property name="baseDir" value="${assetstore.dir}"/>
     </bean>
 
-    <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">
+    <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton" lazy-init="true">
+        <property name="enabled" value="${assetstore.s3.enabled}"/>
         <!-- AWS Security credentials, with policies for specified bucket -->
         <property name="awsAccessKey" value="${assetstore.s3.awsAccessKey}"/>
         <property name="awsSecretKey" value="${assetstore.s3.awsSecretKey}"/>

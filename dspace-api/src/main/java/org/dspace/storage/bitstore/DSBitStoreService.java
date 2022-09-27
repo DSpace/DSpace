@@ -50,6 +50,7 @@ public class DSBitStoreService extends BaseBitStoreService {
     public void init() {
         // the config string contains just the asset store directory path
         //set baseDir?
+        this.initialized = true;
     }
 
     /**

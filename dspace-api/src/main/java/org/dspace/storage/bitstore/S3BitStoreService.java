@@ -78,6 +78,8 @@ public class S3BitStoreService extends BaseBitStoreService {
     protected static final int digitsPerLevel = 2;
     protected static final int directoryLevels = 3;
 
+    private boolean enabled = false;
+
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
@@ -130,6 +132,11 @@ public class S3BitStoreService extends BaseBitStoreService {
         this.s3Service = s3Service;
     }
 
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
     /**
      * Initialize the asset store
      * S3 Requires:
@@ -139,53 +146,63 @@ public class S3BitStoreService extends BaseBitStoreService {
      */
     @Override
     public void init() throws IOException {
-        if (StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
-            log.warn("Use local defined S3 credentials");
-            // region
-            Regions regions = Regions.DEFAULT_REGION;
-            if (StringUtils.isNotBlank(awsRegionName)) {
-                try {
-                    regions = Regions.fromName(awsRegionName);
-                } catch (IllegalArgumentException e) {
-                    log.warn("Invalid aws_region: " + awsRegionName);
-                }
-            }
-            // init client
-            s3Service = FunctionalUtils.getDefaultOrBuild(
-                    this.s3Service,
-                    amazonClientBuilderBy(
-                            regions,
-                            new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
-                    )
-            );
-            log.warn("S3 Region set to: " + regions.getName());
-        } else {
-            log.info("Using a IAM role or aws environment credentials");
-            s3Service = FunctionalUtils.getDefaultOrBuild(
-                    this.s3Service,
-                    AmazonS3ClientBuilder::defaultClient
-            );
-        }
 
-        // bucket name
-        if (StringUtils.isEmpty(bucketName)) {
-            // get hostname of DSpace UI to use to name bucket
-            String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
-            bucketName = DEFAULT_BUCKET_PREFIX + hostname;
-            log.warn("S3 BucketName is not configured, setting default: " + bucketName);
+        if (this.isInitialized()) {
+            return;
         }
 
         try {
-            if (!s3Service.doesBucketExist(bucketName)) {
-                s3Service.createBucket(bucketName);
-                log.info("Creating new S3 Bucket: " + bucketName);
+            if (StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
+                log.warn("Use local defined S3 credentials");
+                // region
+                Regions regions = Regions.DEFAULT_REGION;
+                if (StringUtils.isNotBlank(awsRegionName)) {
+                    try {
+                        regions = Regions.fromName(awsRegionName);
+                    } catch (IllegalArgumentException e) {
+                        log.warn("Invalid aws_region: " + awsRegionName);
+                    }
+                }
+                // init client
+                s3Service = FunctionalUtils.getDefaultOrBuild(
+                        this.s3Service,
+                        amazonClientBuilderBy(
+                                regions,
+                                new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey())
+                                )
+                        );
+                log.warn("S3 Region set to: " + regions.getName());
+            } else {
+                log.info("Using a IAM role or aws environment credentials");
+                s3Service = FunctionalUtils.getDefaultOrBuild(
+                        this.s3Service,
+                        AmazonS3ClientBuilder::defaultClient
+                        );
             }
-        } catch (AmazonClientException e) {
-            log.error(e);
-            throw new IOException(e);
+
+            // bucket name
+            if (StringUtils.isEmpty(bucketName)) {
+                // get hostname of DSpace UI to use to name bucket
+                String hostname = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
+                bucketName = DEFAULT_BUCKET_PREFIX + hostname;
+                log.warn("S3 BucketName is not configured, setting default: " + bucketName);
+            }
+
+            try {
+                if (!s3Service.doesBucketExist(bucketName)) {
+                    s3Service.createBucket(bucketName);
+                    log.info("Creating new S3 Bucket: " + bucketName);
+                }
+            } catch (AmazonClientException e) {
+                throw new IOException(e);
+            }
+            this.initialized = true;
+            log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
+        } catch (Exception e) {
+            this.initialized = false;
+            log.error("Can't initialize this store!", e);
         }
 
-        log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
     }
 
 
@@ -385,6 +402,10 @@ public class S3BitStoreService extends BaseBitStoreService {
         }
 
         return sIntermediatePath + sInternalId;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getAwsAccessKey() {
