@@ -158,7 +158,6 @@ public class ManifestService extends AbstractResourceService {
         if (guessCanvasDimension) {
             canvasService.guessCanvasDimensions(bundles);
         }
-        // canvasService.setDefaultCanvasDimensions();
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;
             if (bundles.size() > 1) {
