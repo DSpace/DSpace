@@ -193,6 +193,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpStatus.BAD_REQUEST.value());
     }
 
+    @ExceptionHandler({WrongCurrentPasswordException.class})
+    protected void handleInvalidPasswordException(HttpServletRequest request, HttpServletResponse response,
+                                               Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_FORBIDDEN);
+    }
+
     @ExceptionHandler(InvalidReCaptchaException.class)
     protected void handleInvalidCaptchaTokenRequestException(HttpServletRequest request, HttpServletResponse response,
                                                                                       Exception ex) throws IOException {

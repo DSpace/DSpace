@@ -119,6 +119,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
                 if (processItemBundles(context, item)) {
                     ++processed;
                 }
+                context.uncacheEntity(item);
             }
         }
     }
@@ -137,6 +138,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (Bitstream bit : bitstreams) {
                 done |= processBitstream(context, bit);
+                context.uncacheEntity(bit);
             }
         }
         if (done) {
