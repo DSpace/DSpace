@@ -33,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    private RegistrationDataDAO registrationDataDAO;
+    protected RegistrationDataDAO registrationDataDAO;
 
     @Autowired
-    private ConfigurationService configurationService;
+    protected ConfigurationService configurationService;
 
     @Test
     public void findByTokenTestExistingUserTest() throws Exception {
@@ -95,7 +95,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     private void createTokenForEmail(String email) throws Exception {
-        List<RegistrationData> registrationDatas;
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(email);
@@ -179,6 +178,38 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                 registrationDataDAO.delete(context, registrationData);
             }
         }
+    }
+
+    @Test
+    public void registrationFlowWithNoHeaderCaptchaTokenTest() throws Exception {
+        configurationService.setProperty("registration.verification.enabled", "true");
+
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+
+        // when reCAPTCHA enabled and request doesn't contain "X-Recaptcha-Token” header
+        getClient().perform(post("/api/eperson/registrations")
+                   .content(mapper.writeValueAsBytes(registrationRest))
+                   .contentType(contentType))
+                   .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void registrationFlowWithInvalidCaptchaTokenTest() throws Exception {
+        configurationService.setProperty("registration.verification.enabled", "true");
+
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+
+        String captchaToken = "invalid-captcha-Token";
+        // when reCAPTCHA enabled and request contains Invalid "X-Recaptcha-Token” header
+        getClient().perform(post("/api/eperson/registrations")
+                   .header("X-Recaptcha-Token", captchaToken)
+                   .content(mapper.writeValueAsBytes(registrationRest))
+                   .contentType(contentType))
+                   .andExpect(status().isForbidden());
     }
 
 }
