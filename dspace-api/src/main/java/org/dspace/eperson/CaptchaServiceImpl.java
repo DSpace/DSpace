@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 
@@ -23,6 +24,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
@@ -30,31 +32,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 /**
+ * Basic services implementation for the Captcha.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class CaptchaServiceImpl implements CaptchaService {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CaptchaServiceImpl.class);
-    @Autowired
-    private ConfigurationService configurationService;
+    private static final Logger log = LogManager.getLogger(CaptchaServiceImpl.class);
+
+    private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
     private CaptchaSettings captchaSettings;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @PostConstruct
     private void init() {
         captchaSettings = new CaptchaSettings();
-        captchaSettings.setSite(
-            configurationService.getProperty("google.recaptcha.key.site"));
-        captchaSettings.setSecret(
-            configurationService.getProperty("google.recaptcha.key.secret"));
+        captchaSettings.setSite(configurationService.getProperty("google.recaptcha.key.site"));
+        captchaSettings.setSecret(configurationService.getProperty("google.recaptcha.key.secret"));
+        captchaSettings.setSiteVerify(configurationService.getProperty("google.recaptcha.site-verify"));
+        captchaSettings.setCaptchaVersion(configurationService.getProperty("google.recaptcha.version", "v2"));
         captchaSettings.setThreshold(Float.parseFloat(
-            configurationService.getProperty("google.recaptcha.key.threshold", "0.5")));
-        captchaSettings.setSiteVerify(
-            configurationService.getProperty("google.recaptcha.site-verify"));
-        captchaSettings.setCaptchaVersion(
-            configurationService.getProperty("google.recaptcha.version", "v2"));
+                                     configurationService.getProperty("google.recaptcha.key.threshold", "0.5")));
     }
 
     @Override
@@ -84,15 +85,14 @@ public class CaptchaServiceImpl implements CaptchaService {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpResponse httpResponse;
         GoogleResponse googleResponse;
+        final ObjectMapper objectMapper = new ObjectMapper();
         try {
             httpResponse = httpClient.execute(httpPost);
-            googleResponse =
-                objectMapper.readValue(httpResponse.getEntity().getContent(), GoogleResponse.class);
+            googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), GoogleResponse.class);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException("Error during verify google recaptcha site", e);
         }
-
         validateGoogleResponse(googleResponse, action);
     }
 
@@ -101,25 +101,20 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     private void validateGoogleResponse(GoogleResponse googleResponse, String action) {
-
-        if (googleResponse == null) {
+        if (Objects.isNull(googleResponse)) {
             log.error("google response : {}", (Object) null);
             throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         }
 
-        if ("v2".equals(captchaSettings.getCaptchaVersion())) {
-            if (!googleResponse.isSuccess()) {
-                log.error("google response success: {}", googleResponse.isSuccess());
-                throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
-            }
-        } else {
-            if (!googleResponse.isSuccess() || !googleResponse.getAction().equals(action)
-                || googleResponse.getScore() < captchaSettings.getThreshold()) {
-                log.error("google response success: {}", googleResponse.isSuccess());
-                log.error("google response action: {}", googleResponse.getAction());
-                log.error("google response score: {}", googleResponse.getScore());
-                throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
-            }
+        if ("v2".equals(captchaSettings.getCaptchaVersion()) && !googleResponse.isSuccess()) {
+            log.error("google response success: {}", googleResponse.isSuccess());
+            throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
+        } else if (!googleResponse.isSuccess() || !googleResponse.getAction().equals(action)
+                   || googleResponse.getScore() < captchaSettings.getThreshold()) {
+            log.error("google response success: {}", googleResponse.isSuccess());
+            log.error("google response action: {}", googleResponse.getAction());
+            log.error("google response score: {}", googleResponse.getScore());
+            throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         }
     }
 
