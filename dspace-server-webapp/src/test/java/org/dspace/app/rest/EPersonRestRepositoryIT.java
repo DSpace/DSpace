@@ -195,6 +195,41 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void testCreateWithInvalidPassword() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        accountService.sendRegistrationInfo(context, "test@fake-email.com");
+        String token = registrationDataService.findByEmail(context, "test@fake-email.com").getToken();
+        context.restoreAuthSystemState();
+
+        String ePersonData = "{" +
+            "   \"metadata\":{" +
+            "      \"eperson.firstname\":[{\"value\":\"John\"}]," +
+            "      \"eperson.lastname\":[{\"value\":\"Doe\"}]" +
+            "   }," +
+            "   \"email\":\"test@fake-email.com\"," +
+            "   \"password\":\"1234\"," +
+            "   \"type\":\"eperson\"" +
+            "}";
+
+        try {
+
+            getClient().perform(post("/api/eperson/epersons")
+                .content(ePersonData)
+                .contentType(contentType)
+                .param("token", token))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(status().reason(is("New password is invalid. "
+                    + "Valid passwords must be at least 8 characters long!")));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, token);
+            context.restoreAuthSystemState();
+        }
+
+    }
+
+    @Test
     public void findAllTest() throws Exception {
         context.turnOffAuthorisationSystem();
 

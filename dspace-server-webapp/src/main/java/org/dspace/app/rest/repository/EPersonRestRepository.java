@@ -207,8 +207,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             }
         }
         String password = epersonRest.getPassword();
-        if (!accountService.verifyPasswordStructure(password)) {
-            throw new DSpaceBadRequestException("The given password is invalid");
+        if (StringUtils.isBlank(password)) {
+            throw new DSpaceBadRequestException("A password is required");
         }
     }
 
