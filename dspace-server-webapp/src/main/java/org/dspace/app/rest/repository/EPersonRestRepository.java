@@ -206,6 +206,10 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                 throw new EPersonNameNotProvidedException();
             }
         }
+        String password = epersonRest.getPassword();
+        if (StringUtils.isBlank(password)) {
+            throw new DSpaceBadRequestException("A password is required");
+        }
     }
 
     @Override
