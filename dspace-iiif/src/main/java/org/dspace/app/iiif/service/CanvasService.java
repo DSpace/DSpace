@@ -9,7 +9,6 @@ package org.dspace.app.iiif.service;
 
 import static org.dspace.app.iiif.service.utils.IIIFUtils.METADATA_IMAGE_WIDTH;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -85,20 +84,14 @@ public class CanvasService extends AbstractResourceService {
      * using the IIIF image service. Called once for each manifest.
      * @param bundles IIIF bundles for this item
      */
-    protected void guessCanvasDimensions(List<Bundle> bundles, Context context) {
+    protected void guessCanvasDimensions(Context context, List<Bundle> bundles) {
         // prevent redundant updates.
         boolean dimensionUpdated = false;
 
         for (Bundle bundle : bundles) {
             if (!dimensionUpdated) {
                 for (Bitstream bitstream : bundle.getBitstreams()) {
-                    boolean isImage = false;
-                    try {
-                        isImage = bitstream.getFormat(context).getMIMEType().contains("image/");
-                    } catch (SQLException e) {
-                        log.warn("Error reading the bitstream format: " + e.getMessage());
-                    }
-                    if (isImage) {
+                    if (utils.isIIIFBitstream(context, bitstream)) {
                         // check for width dimension
                         if (!utils.hasWidthMetadata(bitstream)) {
                             // get the dimensions of the image.
