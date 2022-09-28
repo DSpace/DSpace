@@ -166,4 +166,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         }
         return registrationRest;
     }
+
+    public void setCaptchaService(CaptchaService captchaService) {
+        this.captchaService = captchaService;
+    }
+
 }

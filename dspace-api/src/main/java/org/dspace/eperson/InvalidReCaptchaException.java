@@ -7,6 +7,12 @@
  */
 package org.dspace.eperson;
 
+/**
+ * This class provides an exception to be used when trying to register a new EPerson
+ * and Captcha validations failed.
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public class InvalidReCaptchaException extends RuntimeException {
 
     private static final long serialVersionUID = -5328794674744121744L;

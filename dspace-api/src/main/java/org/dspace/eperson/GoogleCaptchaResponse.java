@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "hostname",
     "error-codes"
 })
-public class GoogleResponse {
+public class GoogleCaptchaResponse {
 
     @JsonProperty("success")
     private boolean success;

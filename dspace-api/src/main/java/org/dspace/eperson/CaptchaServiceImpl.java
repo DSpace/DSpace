@@ -84,11 +84,11 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpResponse httpResponse;
-        GoogleResponse googleResponse;
+        GoogleCaptchaResponse googleResponse;
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             httpResponse = httpClient.execute(httpPost);
-            googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), GoogleResponse.class);
+            googleResponse = objectMapper.readValue(httpResponse.getEntity().getContent(), GoogleCaptchaResponse.class);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException("Error during verify google recaptcha site", e);
@@ -100,20 +100,19 @@ public class CaptchaServiceImpl implements CaptchaService {
         return StringUtils.hasLength(response) && RESPONSE_PATTERN.matcher(response).matches();
     }
 
-    private void validateGoogleResponse(GoogleResponse googleResponse, String action) {
+    private void validateGoogleResponse(GoogleCaptchaResponse googleResponse, String action) {
         if (Objects.isNull(googleResponse)) {
-            log.error("google response : {}", (Object) null);
+            log.error("Google reCaptcha response was empty. ReCaptcha could not be validated.");
             throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         }
 
         if ("v2".equals(captchaSettings.getCaptchaVersion()) && !googleResponse.isSuccess()) {
-            log.error("google response success: {}", googleResponse.isSuccess());
+            log.error("Google reCaptcha v2 returned an unsuccessful response. ReCaptcha was not validated.");
             throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         } else if (!googleResponse.isSuccess() || !googleResponse.getAction().equals(action)
                    || googleResponse.getScore() < captchaSettings.getThreshold()) {
-            log.error("google response success: {}", googleResponse.isSuccess());
-            log.error("google response action: {}", googleResponse.getAction());
-            log.error("google response score: {}", googleResponse.getScore());
+            log.error("Google reCaptcha v2 returned an unsuccessful response with action {} and score {}."
+                    + " ReCaptcha was not validated.");
             throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         }
     }
