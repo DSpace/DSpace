@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -28,11 +29,15 @@ public class ScriptMatcher {
     }
 
     public static Matcher<? super Object> matchMockScript(Options options) {
+        // Set the to be compared option to the expected boolean type
+        Option i = options.getOption("i");
+        i.setType(boolean.class);
+
         return allOf(
             matchScript("mock-script", "Mocking a script for testing purposes"),
             hasJsonPath("$.parameters", Matchers.containsInAnyOrder(
                 ParameterMatcher.matchParameter(options.getOption("r")),
-                ParameterMatcher.matchParameter(options.getOption("i")),
+                ParameterMatcher.matchParameter(i),
                 ParameterMatcher.matchParameter(options.getOption("f"))
             ))
         );

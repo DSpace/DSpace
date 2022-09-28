@@ -31,6 +31,7 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
         BrowseIndexRest bir = new BrowseIndexRest();
         bir.setProjection(projection);
         bir.setId(obj.getName());
+        bir.setDataType(obj.getDataType());
         bir.setOrder(obj.getDefaultOrder());
         bir.setMetadataBrowse(obj.isMetadataIndex());
         List<String> metadataList = new ArrayList<String>();

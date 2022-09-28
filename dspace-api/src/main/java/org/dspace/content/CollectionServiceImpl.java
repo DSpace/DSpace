@@ -1010,7 +1010,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();
             String escapedQuery = ClientUtils.escapeQueryChars(q);
-            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            buildQuery.append("(").append(escapedQuery).append(" OR ").append(escapedQuery).append("*").append(")");
             discoverQuery.setQuery(buildQuery.toString());
         }
         DiscoverResult resp = searchService.search(context, discoverQuery);

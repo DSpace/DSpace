@@ -13,6 +13,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Component;
 public class PoolTaskConverter
     implements IndexableObjectConverter<PoolTask, org.dspace.app.rest.model.PoolTaskRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 

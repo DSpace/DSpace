@@ -45,7 +45,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * Find all groups ordered by the specified metadata fields ascending
      *
      * @param context            The DSpace context
-     * @param sortMetadataFields The metadata fields to sort on
+     * @param metadataSortFields The metadata fields to sort on
      * @param pageSize           how many results return
      * @param offset             the position of the first result to return
      * @return A list of all groups, ordered by metadata fields

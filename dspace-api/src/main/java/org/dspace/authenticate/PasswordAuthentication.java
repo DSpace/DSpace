@@ -22,6 +22,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -50,6 +51,11 @@ public class PasswordAuthentication
      * log4j category
      */
     private static final Logger log = LogManager.getLogger();
+
+    private static final String PASSWORD_AUTHENTICATED = "password.authenticated";
+
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
 
 
     /**
@@ -216,6 +222,9 @@ public class PasswordAuthentication
                                             .checkPassword(context, eperson, password)) {
                 // login is ok if password matches:
                 context.setCurrentUser(eperson);
+                if (request != null) {
+                    request.setAttribute(PASSWORD_AUTHENTICATED, true);
+                }
                 log.info(LogHelper.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
             } else {
@@ -246,5 +255,24 @@ public class PasswordAuthentication
     @Override
     public String getName() {
         return "password";
+    }
+
+
+    @Override
+    public boolean isUsed(final Context context, final HttpServletRequest request) {
+        if (request != null &&
+                context.getCurrentUser() != null &&
+                request.getAttribute(PASSWORD_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+        if (context == null || ePerson == null) {
+            return false;
+        }
+        return ePersonService.checkPassword(context, ePerson, currentPassword);
     }
 }

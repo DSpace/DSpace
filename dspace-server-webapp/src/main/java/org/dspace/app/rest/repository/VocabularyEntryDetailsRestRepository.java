@@ -56,7 +56,7 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + VocabularyRest.CATEGORY + "/" + VocabularyEntryDetailsRest.PLURAL_NAME + "/search",
+                Link.of("/api/" + VocabularyRest.CATEGORY + "/" + VocabularyEntryDetailsRest.PLURAL_NAME + "/search",
                         VocabularyEntryDetailsRest.PLURAL_NAME + "-search")));
     }
 

@@ -10,7 +10,7 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
+import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 public class BitstreamResourcePolicyRemovePatchOperation
-             extends RemovePatchOperation<UploadBitstreamAccessConditionDTO> {
+             extends RemovePatchOperation<AccessConditionDTO> {
 
     @Autowired
     ItemService itemService;
@@ -65,7 +65,7 @@ public class BitstreamResourcePolicyRemovePatchOperation
                                                                                    ResourcePolicy.TYPE_CUSTOM);
                         int index = 0;
                         for (ResourcePolicy policy : policies) {
-                            Integer toDelete = Integer.parseInt(rpIdx);
+                            int toDelete = Integer.parseInt(rpIdx);
                             if (index == toDelete) {
                                 b.getResourcePolicies().remove(policy);
                                 bitstream = b;
@@ -84,12 +84,12 @@ public class BitstreamResourcePolicyRemovePatchOperation
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO[]> getArrayClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO[].class;
+    protected Class<AccessConditionDTO[]> getArrayClassForEvaluation() {
+        return AccessConditionDTO[].class;
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO> getClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO.class;
+    protected Class<AccessConditionDTO> getClassForEvaluation() {
+        return AccessConditionDTO.class;
     }
 }

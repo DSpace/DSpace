@@ -21,6 +21,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -111,7 +112,21 @@ public interface ItemService
      * @return an iterator over the items in the archive.
      * @throws SQLException if database error
      */
+    @Deprecated
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException;
+
+    /**
+     * Find all items that are:
+     * - NOT in the workspace
+     * - NOT in the workflow
+     * - NOT a template item for e.g. a collection
+     *
+     * This implies that the result also contains older versions of items and withdrawn items.
+     * @param context the DSpace context.
+     * @return iterator over all regular items.
+     * @throws SQLException if database error.
+     */
+    public Iterator<Item> findAllRegularItems(Context context) throws SQLException;
 
     /**
      * Find all the items in the archive by a given submitter. The order is
@@ -472,10 +487,40 @@ public interface ItemService
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
         throws java.sql.SQLException, AuthorizeException;
 
+    /**
+     * Adjust the Bundle and Bitstream policies to reflect what have been defined
+     * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
+     * policies are removed and the policies defined at the item and collection
+     * level are copied and inherited as appropriate. Custom selected Item policies
+     * are copied to the bundle/bitstream only if no explicit custom policies were
+     * already applied to the bundle/bitstream. Collection's policies are inherited
+     * if there are no other policies defined or if the append mode is defined by
+     * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
+     * 
+     * @param context             DSpace context object
+     * @param item                Item to adjust policies on
+     * @param collection          Collection
+     * @throws SQLException       If database error
+     * @throws AuthorizeException If authorization error
+     */
     public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException;
 
 
+    /**
+     * Adjust the Item's policies to reflect what have been defined during the
+     * submission/workflow. The temporary SUBMISSION and WORKFLOW policies are
+     * removed and the default policies defined at the collection level are
+     * inherited as appropriate. Collection's policies are inherited if there are no
+     * other policies defined or if the append mode is defined by the configuration
+     * via the core.authorization.installitem.inheritance-read.append-mode property
+     * 
+     * @param context              DSpace context object
+     * @param item                 Item to adjust policies on
+     * @param collection           Collection
+     * @throws SQLException        If database error
+     * @throws AuthorizeException  If authorization error
+     */
     public void adjustItemPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException;
 
@@ -550,6 +595,37 @@ public interface ItemService
     public boolean canCreateNewVersion(Context context, Item item) throws SQLException;
 
     /**
+     * Returns an iterator of in archive items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY
+     *
+     * @param context   DSpace context object
+     * @param schema    metadata field schema
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Iterator<Item> findArchivedByMetadataField(Context context, String schema,
+                                                      String element, String qualifier,
+                                                      String value) throws SQLException, AuthorizeException;
+
+    /**
+     * Returns an iterator of in archive items possessing the passed metadata field, or only
+     * those matching the passed value, if value is not Item.ANY
+     *
+     * @param context   DSpace context object
+     * @param metadataField    metadata
+     * @param value     field value or Item.ANY to match any value
+     * @return an iterator over the items matching that authority value
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+            throws SQLException, AuthorizeException;
+
+    /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
@@ -588,7 +664,7 @@ public interface ItemService
      */
     public Iterator<Item> findByAuthorityValue(Context context,
                                                String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
 
     public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)
@@ -752,5 +828,20 @@ public interface ItemService
      */
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier,
                                            String lang, boolean enableVirtualMetadata);
+
+    /**
+     * Retrieve the label of the entity type of the given item.
+     * @param item the item.
+     * @return the label of the entity type, taken from the item metadata, or null if not found.
+     */
+    public String getEntityTypeLabel(Item item);
+
+    /**
+     * Retrieve the entity type of the given item.
+     * @param context the DSpace context.
+     * @param item the item.
+     * @return the entity type of the given item, or null if not found.
+     */
+    public EntityType getEntityType(Context context, Item item) throws SQLException;
 
 }

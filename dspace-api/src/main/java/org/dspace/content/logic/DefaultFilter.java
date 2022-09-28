@@ -7,7 +7,8 @@
  */
 package org.dspace.content.logic;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -21,7 +22,7 @@ import org.dspace.core.Context;
  */
 public class DefaultFilter implements Filter {
     private LogicalStatement statement;
-    private static Logger log = Logger.getLogger(Filter.class);
+    private final static Logger log = LogManager.getLogger();
 
     /**
      * Set statement from Spring configuration in item-filters.xml

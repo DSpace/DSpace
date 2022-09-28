@@ -139,7 +139,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
 
         // If our IPTable is not empty, log the trusted proxies and return it
         if (!ipTable.isEmpty()) {
-            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable.toSet().toString());
+            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable);
             return ipTable;
         } else {
             return null;

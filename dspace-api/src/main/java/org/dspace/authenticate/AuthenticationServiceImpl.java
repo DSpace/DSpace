@@ -193,4 +193,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Iterator<AuthenticationMethod> authenticationMethodIterator() {
         return getAuthenticationMethodStack().iterator();
     }
+
+    @Override
+    public String getAuthenticationMethod(final Context context, final HttpServletRequest request) {
+        final Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationMethodIterator();
+
+        while (authenticationMethodIterator.hasNext()) {
+            final AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
+            if (authenticationMethod.isUsed(context, request)) {
+                return authenticationMethod.getName();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
+            if (method.getName().equals(context.getAuthenticationMethod())) {
+                return method.canChangePassword(context, ePerson, currentPassword);
+            }
+        }
+
+        return false;
+    }
 }

@@ -10,7 +10,8 @@ package org.dspace.content.logic.condition;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -26,7 +27,7 @@ import org.dspace.core.Context;
  * @version $Revision$
  */
 public class InCommunityCondition extends AbstractCondition {
-    private static Logger log = Logger.getLogger(InCommunityCondition.class);
+    private final static Logger log = LogManager.getLogger();
 
     /**
      * Return true if item is in one of the specified collections

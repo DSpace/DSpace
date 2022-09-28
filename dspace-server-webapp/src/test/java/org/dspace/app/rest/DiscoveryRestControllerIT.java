@@ -56,6 +56,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.eperson.EPerson;
@@ -77,6 +78,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     MetadataAuthorityService metadataAuthorityService;
 
+    @Autowired
+    ChoiceAuthorityService choiceAuthorityService;
 
     @Test
     public void rootDiscoverTest() throws Exception {
@@ -200,6 +203,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
 
         metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
 
         //Turn off the authorization system, otherwise we can't make the objects
         context.turnOffAuthorisationSystem();
@@ -281,6 +285,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
         metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
 
     }
 
@@ -1442,6 +1447,29 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test"))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test:"))
+                .andExpect(status().isUnprocessableEntity());
+
+    }
+
+
+    @Test
+    public void discoverSearchObjectsTestWithInvalidSolrQuery() throws Exception {
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test"))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "test:"))
+                .andExpect(status().isUnprocessableEntity());
+
     }
 
 
@@ -3910,7 +3938,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "OR"))
 
-                   .andExpect(status().isBadRequest())
+                   .andExpect(status().isUnprocessableEntity())
         ;
 
     }
@@ -4137,7 +4165,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
         //** WHEN **
-        // each submitter, including the administrator should see only her submission
+        // each submitter, including the administrator should see only their submission
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -4431,8 +4459,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
 
         // admin should see two pool items and a claimed task,
-        // one pool item from the submitter and one from herself
-        // because the admin is in the reviewer group for step 1, not because she is an admin
+        // one pool item from the submitter and one from the admin
+        // because the admin is in the reviewer group for step 1, not because they are an admin
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -4655,7 +4683,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer1 should not see pool items, as he is not an administrator
+        // reviewer1 should not see pool items, as it is not an administrator
         getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -4673,7 +4701,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
 
         // admin should see three pool items and a claimed task
-        // one pool item from the submitter and two from herself
+        // one pool item from the submitter and two from the admin
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -4727,7 +4755,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer2 should not see pool items, as he is not an administrator
+        // reviewer2 should not see pool items, as it is not an administrator
         getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK

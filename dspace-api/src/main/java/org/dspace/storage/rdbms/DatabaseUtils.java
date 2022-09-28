@@ -406,6 +406,12 @@ public class DatabaseUtils {
         DatabaseMetaData meta = connection.getMetaData();
         String dbType = getDbType(connection);
         System.out.println("\nDatabase Type: " + dbType);
+        if (dbType.equals(DBMS_ORACLE)) {
+            System.out.println("====================================");
+            System.out.println("WARNING: Oracle support is deprecated!");
+            System.out.println("See https://github.com/DSpace/DSpace/issues/8214");
+            System.out.println("=====================================");
+        }
         System.out.println("Database URL: " + meta.getURL());
         System.out.println("Database Schema: " + getSchemaName(connection));
         System.out.println("Database Username: " + meta.getUserName());
@@ -538,6 +544,10 @@ public class DatabaseUtils {
             // Migration scripts are based on DBMS Keyword (see full path below)
             String dbType = getDbType(connection);
             connection.close();
+
+            if (dbType.equals(DBMS_ORACLE)) {
+                log.warn("ORACLE SUPPORT IS DEPRECATED! See https://github.com/DSpace/DSpace/issues/8214");
+            }
 
             // Determine location(s) where Flyway will load all DB migrations
             ArrayList<String> scriptLocations = new ArrayList<>();
@@ -1327,7 +1337,7 @@ public class DatabaseUtils {
 
                         // Reindex Discovery completely
                         // Force clean all content
-                        this.indexer.cleanIndex(true);
+                        this.indexer.deleteIndex();
                         // Recreate the entire index (overwriting existing one)
                         this.indexer.createIndex(context);
                         // Rebuild spell checker (which is based on index)

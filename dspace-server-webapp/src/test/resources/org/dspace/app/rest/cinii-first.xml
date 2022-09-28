@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns="https://cir.nii.ac.jp/schema/1.0/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
+         xmlns:datacite="https://schema.datacite.org/meta/kernel-4/"
+         xmlns:ndl="http://ndl.go.jp/dcndl/terms/"
+         xmlns:cinii="http://ci.nii.ac.jp/ns/1.0/"
+         xmlns:jpcoar="https://github.com/JPCOAR/schema/blob/master/1.0/">
+    <Article rdf:about="https://cir.nii.ac.jp/crid/1010572092222310146.rdf">
+        <resourceType>学術雑誌論文(journal article)</resourceType>
+        <dc:title xml:lang="ja">Understanding the impact of mandatory accrual accounting on management practices: Interpretation of Japanese local governments’ behavior</dc:title>
+        <publication rdf:parseType="Resource">
+            <prism:publicationName xml:lang="ja">International Review of Administration Science</prism:publicationName>
+            <prism:publicationDate>2023</prism:publicationDate>
+            <prism:volume>89(2)</prism:volume>
+            <jointInternationalResearch>true</jointInternationalResearch>
+        </publication>
+        <reviewed>true</reviewed>
+        <project>
+            <Project rdf:about="https://cir.nii.ac.jp/crid/1040000782003163520">
+                <projectIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/KAKEN">18K12893</projectIdentifier>
+                <projectIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/URI">https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-18K12893/</projectIdentifier>
+                <notation xml:lang="ja">予算設定者による公会計情報の活用：質問紙実験と実証分析の混合研究</notation>
+                <notation xml:lang="en">accrual accounting for local government budgeteers: Evidence from Experimental and Empirical Study</notation>
+            </Project>
+        </project>
+        <dataSourceIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/KAKEN">PRODUCT-23613691</dataSourceIdentifier>
+    </Article>
+</rdf:RDF>

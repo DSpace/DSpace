@@ -34,7 +34,8 @@ public class DiscoverFacetsConverter {
 
     private static final Logger log = LogManager.getLogger(DiscoverFacetsConverter.class);
 
-    private final DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
+    @Autowired
+    private DiscoverFacetValueConverter facetValueConverter;
 
     @Autowired
     private SearchService searchService;

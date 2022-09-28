@@ -19,20 +19,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 
-import ORG.oclc.oai.harvester2.verb.Identify;
-import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.DOMBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.input.DOMBuilder;
+import org.oclc.oai.harvester2.verb.Identify;
+import org.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
@@ -198,7 +198,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         // First, see if we can contact the target server at all.
         try {
             new Identify(oaiSource);
-        } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
+        } catch (IOException | ParserConfigurationException | XPathExpressionException | SAXException ex) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached.");
             return errorSet;
         }
@@ -216,7 +216,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
         try {
             OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, OAIHarvester.getORENamespace().getURI());
             DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
-        } catch (IOException | ParserConfigurationException | TransformerException | SAXException ex) {
+        } catch (IOException | ParserConfigurationException | XPathExpressionException | SAXException ex) {
             errorSet.add(OAI_ADDRESS_ERROR
                 + ": OAI did not respond to ListMetadataFormats query  ("
                 + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; "
@@ -260,7 +260,8 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
                     }
                 }
             }
-        } catch (IOException | ParserConfigurationException | TransformerException | DOMException | SAXException e) {
+        } catch (IOException | ParserConfigurationException | XPathExpressionException | DOMException |
+                 SAXException e) {
             errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
             return errorSet;
         } catch (RuntimeException re) {

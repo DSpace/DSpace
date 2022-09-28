@@ -11,40 +11,45 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Give Maven 1GB of memory to work with
-      # Suppress all Maven "downloading" messages in Travis logs (see https://stackoverflow.com/a/35653426)
-      # This also slightly speeds builds, as there is less logging
-      MAVEN_OPTS: "-Xmx1024M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+      MAVEN_OPTS: "-Xmx1024M"
     strategy:
       # Create a matrix of two separate configurations for Unit vs Integration Tests
       # This will ensure those tasks are run in parallel
+      # Also specify version of Java to use (this can allow us to optionally run tests on multiple JDKs in future)
       matrix:
         include:
           # NOTE: Unit Tests include deprecated REST API v6 (as it has unit tests)
+          #  - surefire.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
           - type: "Unit Tests"
-            mvnflags: "-DskipUnitTests=false -Pdspace-rest"
+            java: 11
+            mvnflags: "-DskipUnitTests=false -Pdspace-rest -Dsurefire.rerunFailingTestsCount=2"
             resultsdir: "**/target/surefire-reports/**"
           # NOTE: ITs skip all code validation checks, as they are already done by Unit Test job.
           #  - enforcer.skip     => Skip maven-enforcer-plugin rules
           #  - checkstyle.skip   => Skip all checkstyle checks by maven-checkstyle-plugin
           #  - license.skip      => Skip all license header checks by license-maven-plugin
           #  - xml.skip          => Skip all XML/XSLT validation by xml-maven-plugin
+          #  - failsafe.rerunFailingTestsCount => try again for flakey tests, and keep track of/report on number of retries
           - type: "Integration Tests"
-            mvnflags: "-DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+            java: 11
+            mvnflags: "-DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true -Dfailsafe.rerunFailingTestsCount=2"
             resultsdir: "**/target/failsafe-reports/**"
       # Do NOT exit immediately if one matrix job fails
       # This ensures ITs continue running even if Unit Tests fail, or visa versa
       fail-fast: false
+    name: Run ${{ matrix.type }}
     # These are the actual CI steps to perform per job
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       # https://github.com/actions/setup-java
-      - name: Install JDK 11
-        uses: actions/setup-java@v1
+      - name: Install JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
@@ -60,7 +65,7 @@ jobs:
       - name: Run Maven ${{ matrix.type }}
         env:
           TEST_FLAGS: ${{ matrix.mvnflags }}
-        run: mvn install -B -V -P-assembly -Pcoverage-report $TEST_FLAGS
+        run: mvn --no-transfer-progress -V install -P-assembly -Pcoverage-report $TEST_FLAGS
 
       # If previous step failed, save results of tests to downloadable artifact for this job
       # (This artifact is downloadable at the bottom of any job's summary page)
@@ -70,8 +75,7 @@ jobs:
         with:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
-          retention-days: 7
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2

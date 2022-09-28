@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.2-SNAPSHOT</version>
+        <version>7.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -334,17 +334,46 @@
     </profiles>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-ehcache</artifactId>
+            <artifactId>hibernate-core</artifactId>
+                <exclusions>
+                    <!-- Newer version pulled in via Jersey below -->
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for sherpa service. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
             <exclusions>
-                <!-- Newer version pulled in via Jersey below -->
                 <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -358,7 +387,7 @@
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
+            <version>1.0.2.Final</version>
         </dependency>
 
         <dependency>
@@ -379,7 +408,7 @@
                     <groupId>org.ow2.asm</groupId>
                     <artifactId>asm-commons</artifactId>
                 </exclusion>
-                <!-- Newer version of Bouncycastle brought in via solr-cell -->
+                <!-- Newer version of Bouncycastle brought in via Tika -->
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcpkix-jdk15on</artifactId>
@@ -481,8 +510,8 @@
             <artifactId>commons-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -505,7 +534,7 @@
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
+            <artifactId>jdom2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -516,21 +545,10 @@
             <artifactId>fontbox</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
+        <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
@@ -558,13 +576,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <!-- Different version provided by hibernate-ehcache -->
-                <exclusion>
-                    <groupId>net.bytebuddy</groupId>
-                    <artifactId>byte-buddy</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -573,41 +584,38 @@
         </dependency>
         <!-- Used for RSS / ATOM syndication feeds -->
         <dependency>
-            <groupId>org.rometools</groupId>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rometools</groupId>
             <artifactId>rome-modules</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jbibtex</groupId>
             <artifactId>jbibtex</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+        </dependency>
 
+        <!-- SolrJ is used to communicate with Solr throughout the dspace-api -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
             <version>${solr.client.version}</version>
-            <exclusions>
-                <!-- Newer Jetty version brought in via Parent POM -->
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <!-- Solr Core is needed for Integration Tests (to run a MockSolrServer)     -->
+        <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
         <!-- The following Solr / Lucene dependencies also support integration tests -->
         <dependency>
             <groupId>org.apache.solr</groupId>
@@ -636,37 +644,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-cell</artifactId>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-                <!-- Newer Jetty version brought in via Parent POM -->
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-        </dependency>
-        <!-- Used for full-text indexing with Solr -->
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -683,9 +662,15 @@
             <artifactId>lucene-analyzers-stempel</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Tika is used to extract full text from documents in order to index in Solr -->
         <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers-standard-package</artifactId>
         </dependency>
 
         <dependency>
@@ -707,13 +692,6 @@
             <groupId>com.coverity.security</groupId>
             <artifactId>coverity-escapers</artifactId>
             <version>1.1.1</version>
-        </dependency>
-
-        <!--  Gson: Java to Json conversion -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -743,7 +721,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>6.5.7</version>
+            <version>8.4.4</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -799,44 +777,6 @@
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- Apache Axiom -->
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-            <version>${axiom.version}</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <version>${axiom.version}</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Jersey / JAX-RS client (javax.ws.rs.*) dependencies needed to integrate with external sources/services -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -855,7 +795,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.116</version>
+            <version>1.12.261</version>
         </dependency>
 
         <dependency>
@@ -892,25 +832,30 @@
             <version>20180130</version>
         </dependency>
 
+        <!-- Useful for testing command-line tools -->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Used for Solr core export/import -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.2</version>
+            <version>5.6</version>
         </dependency>
 
         <!-- Email templating -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -928,12 +873,87 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <version>1.19.0</version>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-junit-rule</artifactId>
+            <version>5.11.2</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Exclude snakeyaml to avoid conflicts with: spring-boot-starter-cache -->
+            	<exclusion>
+            		<groupId>org.yaml</groupId>
+            		<artifactId>snakeyaml</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
-
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+          <!-- for mockserver -->
+          <!-- Solve dependency convergence issues related to
+               'mockserver-junit-rule' by selecting the versions we want to use. -->
+          <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.9</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.3</version>
+          </dependency>
+          <dependency>
+              <groupId>org.xmlunit</groupId>
+              <artifactId>xmlunit-core</artifactId>
+              <version>2.8.0</version>
+              <scope>test</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.github.java-json-tools</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>2.2.14</version>
+          </dependency>
+          <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
+          </dependency>
+          <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>1.6.2</version>
+          </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

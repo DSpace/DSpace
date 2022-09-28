@@ -5,6 +5,8 @@
 
     <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
 
+    <bean class="org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl"/>
+
     <bean class="org.dspace.external.provider.impl.SHERPAv2JournalISSNDataProvider" init-method="init">
         <property name="sherpaService">
             <bean class="org.dspace.app.sherpa.SHERPAService">
@@ -52,10 +54,10 @@
     </bean>
     <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
         <property name="sourceIdentifier" value="orcid"/>
-        <property name="orcidUrl" value="${orcid.url}" />
-        <property name="clientId" value="${orcid.clientid}" />
-        <property name="clientSecret" value="${orcid.clientsecret}" />
-        <property name="OAUTHUrl" value="${orcid.oauth.url}" />
+        <property name="orcidUrl" value="${orcid.domain-url}" />
+        <property name="clientId" value="${orcid.application-client-id}" />
+        <property name="clientSecret" value="${orcid.application-client-secret}" />
+        <property name="OAUTHUrl" value="${orcid.token-url}" />
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
         <property name="supportedEntityTypes">
             <list>
@@ -65,7 +67,7 @@
     </bean>
 
     <bean id="orcidRestConnector" class="org.dspace.external.OrcidRestConnector">
-        <constructor-arg value="${orcid.api.url}"/>
+        <constructor-arg value="${orcid.api-url}"/>
     </bean>
 
     <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
@@ -91,6 +93,123 @@
             </list>
         </property>
     </bean>
+    
+    <bean id="orcidPublicationDataProvider" class="org.dspace.external.provider.impl.OrcidPublicationDataProvider">
+        <property name="sourceIdentifier" value="orcidWorks"/>
+        <property name="fieldMapping" ref="orcidPublicationDataProviderFieldMapping"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="crossRefLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="CrossRefImportService"/>
+        <property name="sourceIdentifier" value="crossref"/>
+        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScopusImportService"/>
+        <property name="sourceIdentifier" value="scopus"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="pubmedEULiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="PubmedEuropeImportService"/>
+        <property name="sourceIdentifier" value="pubmedeu"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="ciniiLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="CiniiImportService"/>
+        <property name="sourceIdentifier" value="cinii"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="epoLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="EpoImportService"/>
+        <property name="sourceIdentifier" value="epo"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="vufindLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="vufindImportService"/>
+        <property name="sourceIdentifier" value="vufind"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="adsLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ADSImportService"/>
+        <property name="sourceIdentifier" value="ads"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="scieloLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScieloImportService"/>
+        <property name="sourceIdentifier" value="scielo"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="wosLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="WosImportService"/>
+        <property name="sourceIdentifier" value="wos"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>
-

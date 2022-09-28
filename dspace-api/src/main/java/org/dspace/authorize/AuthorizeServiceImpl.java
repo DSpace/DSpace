@@ -7,6 +7,9 @@
  */
 package org.dspace.authorize;
 
+import static org.dspace.app.util.AuthorizeUtil.canCollectionAdminManageAccounts;
+import static org.dspace.app.util.AuthorizeUtil.canCommunityAdminManageAccounts;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -508,9 +511,10 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         List<ResourcePolicy> policies = getPolicies(c, src);
 
         //Only inherit non-ADMIN policies (since ADMIN policies are automatically inherited)
+        //and non-custom policies as these are manually applied when appropriate
         List<ResourcePolicy> nonAdminPolicies = new ArrayList<>();
         for (ResourcePolicy rp : policies) {
-            if (rp.getAction() != Constants.ADMIN) {
+            if (rp.getAction() != Constants.ADMIN && !StringUtils.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)) {
                 nonAdminPolicies.add(rp);
             }
         }
@@ -897,6 +901,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                                               IndexableCollection.TYPE,
             null, null);
         return discoverResult.getTotalSearchResults();
+    }
+
+    @Override
+    public boolean isAccountManager(Context context) {
+        try {
+            return (canCommunityAdminManageAccounts() && isCommunityAdmin(context)
+                || canCollectionAdminManageAccounts() && isCollectionAdmin(context));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean performCheck(Context context, String query) throws SQLException {

@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -72,7 +78,7 @@ public class ClientOptions {
     private String filename = null;
 
     /**
-     * Filetype.
+     * File type.
      */
     private String filetype = null;
 
@@ -117,17 +123,18 @@ public class ClientOptions {
     /**
      * Logger.
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClientOptions.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * List of multiple destination items. Used if the mode is set to multipost.
      */
-    private List<PostDestination> multiPost = new ArrayList<PostDestination>();
+    private final List<PostDestination> multiPost = new ArrayList<>();
 
     /**
      * Pattern string to extract the data from a destination parameter in multipost mode.
      */
-    private static final Pattern multiPattern = Pattern.compile("(.*?)(\\[(.*?)\\]) {0,1}(:(.*)) {0,1}@(http://.*)");
+    private static final Pattern MULTI_PATTERN
+            = Pattern.compile("(.*?)(\\[(.*?)\\]) {0,1}(:(.*)) {0,1}@(http://.*)");
 
     /**
      * Flag that indicates if the GUI mode has been set. This is
@@ -148,128 +155,122 @@ public class ClientOptions {
      * @return True if the options were parsed successfully.
      */
     public boolean parseOptions(String[] args) {
+        Options options = new Options();
+        options.addOption(Option.builder().longOpt("md5").build())
+                .addOption(Option.builder().longOpt("noOp").build())
+                .addOption(Option.builder().longOpt("verbose").build())
+                .addOption(Option.builder().longOpt("cmd").build())
+                .addOption(Option.builder().longOpt("gui").build())
+                .addOption(Option.builder().longOpt("help").build())
+                .addOption(Option.builder().longOpt("nocapture").build());
+
+        Option option;
+
+        option = Option.builder().longOpt("host").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("port").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder("u").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder("p").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("href").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder("t").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("file").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("filetype").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("slug").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("onBehalfOf").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("formatNamespace").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("checksumError").build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("dest").hasArg().build();
+        options.addOption(option);
+
+        DefaultParser parser = new DefaultParser();
+        CommandLine command;
         try {
-            // iterate over the args
-            for (int i = 0; i < args.length; i++) {
-                if ("-md5".equals(args[i])) {
-                    md5 = true;
+            command = parser.parse(options, args);
+        } catch (ParseException ex) {
+            log.error(ex.getMessage());
+            return false;
+        }
+
+        if (command.hasOption("help")) {
+            return false; // force the calling code to display the usage information.
+        }
+        md5 = command.hasOption("md5");
+        noOp = command.hasOption("noOp");
+        verbose = command.hasOption("verbose");
+        if (command.hasOption("cmd")) {
+            guiMode = false;
+        }
+        if (command.hasOption("gui")) {
+            guiMode = true;
+        }
+        proxyHost = command.getOptionValue("host");
+        if (command.hasOption("port")) {
+            proxyPort = Integer.parseInt(command.getOptionValue("port"));
+        }
+        username = command.getOptionValue("u");
+        password = command.getOptionValue("p");
+        href = command.getOptionValue("href");
+        accessType = command.getOptionValue("t");
+        filename = command.getOptionValue("file");
+        filetype = command.getOptionValue("filetype");
+        slug = command.getOptionValue("slug");
+        onBehalfOf = command.getOptionValue("onBehalfOf");
+        formatNamespace = command.getOptionValue("formatNamespace");
+        checksumError = command.hasOption("checksumError");
+        noCapture = command.hasOption("nocapture");
+        if (command.hasOption("dest")) {
+            String dest = command.getOptionValue("dest");
+            Matcher m = MULTI_PATTERN.matcher(dest);
+            if (!m.matches()) {
+                log.debug("Error with dest parameter. Ignoring value: {}", dest);
+            } else {
+                int numGroups = m.groupCount();
+                for (int g = 0; g <= numGroups; g++) {
+                    log.debug("Group ({}) is: {}", g, m.group(g));
                 }
 
-                if ("-noOp".equals(args[i])) {
-                    noOp = true;
-                }
+                String group_username = m.group(1);
+                String group_onBehalfOf = m.group(3);
+                String group_password = m.group(5);
+                String group_url = m.group(6);
+                PostDestination destination = new PostDestination(group_url,
+                        group_username, group_password, group_onBehalfOf);
 
-                if ("-verbose".equals(args[i])) {
-                    verbose = true;
-                }
-
-                if ("-cmd".equals(args[i])) {
-                    guiMode = false;
-                }
-
-                if ("-gui".equals(args[i])) {
-                    guiMode = true;
-                }
-
-                if ("-host".equals(args[i])) {
-                    i++;
-                    proxyHost = args[i];
-                }
-
-                if ("-port".equals(args[i])) {
-                    i++;
-                    proxyPort = Integer.parseInt(args[i]);
-                }
-
-                if ("-u".equals(args[i])) {
-                    i++;
-                    username = args[i];
-                }
-
-                if ("-p".equals(args[i])) {
-                    i++;
-                    password = args[i];
-                }
-
-                if ("-href".equals(args[i])) {
-                    i++;
-                    href = args[i];
-                }
-
-                if ("-help".equals(args[i])) {
-                    // force the calling code to display the usage information
-                    return false;
-                }
-
-                if ("-t".equals(args[i])) {
-                    i++;
-                    accessType = args[i];
-                }
-
-                if ("-file".equals(args[i])) {
-                    i++;
-                    filename = args[i];
-                }
-
-                if ("-filetype".equals(args[i])) {
-                    i++;
-                    filetype = args[i];
-                }
-
-                if ("-slug".equals(args[i])) {
-                    i++;
-                    slug = args[i];
-                }
-
-                if ("-onBehalfOf".equals(args[i])) {
-                    i++;
-                    onBehalfOf = args[i];
-                }
-
-                if ("-formatNamespace".equals(args[i])) {
-                    i++;
-                    formatNamespace = args[i];
-                }
-
-                if ("-checksumError".equals(args[i])) {
-                    i++;
-                    checksumError = true;
-                }
-
-                if ("-dest".equals(args[i])) {
-                    i++;
-                    Matcher m = multiPattern.matcher(args[i]);
-                    if (!m.matches()) {
-                        log.debug("Error with dest parameter. Ignoring value: " + args[i]);
-                    } else {
-                        int numGroups = m.groupCount();
-                        for (int g = 0; g <= numGroups; g++) {
-                            log.debug("Group (" + g + ") is: " + m.group(g));
-                        }
-
-                        String username = m.group(1);
-                        String onBehalfOf = m.group(3);
-                        String password = m.group(5);
-                        String url = m.group(6);
-                        PostDestination destination = new PostDestination(url, username, password, onBehalfOf);
-
-                        multiPost.add(destination);
-                    }
-                }
-
-                if ("-nocapture".equals(args[i])) {
-                    i++;
-                    noCapture = true;
-                }
+                multiPost.add(destination);
             }
+        }
 
+        try {
             // apply any settings
             if (href == null && "service".equals(accessType)) {
                 log.error("No href specified.");
                 return false;
             }
 
-            if (multiPost.size() == 0 && "multipost".equals(accessType)) {
+            if (multiPost.isEmpty() && "multipost".equals(accessType)) {
                 log.error("No destinations specified");
                 return false;
             }

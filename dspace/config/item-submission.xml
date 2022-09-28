@@ -149,6 +149,13 @@
 	        <type>cclicense</type>
         </step-definition>
 
+		<!-- This optional step may allow the user to select access conditions on the item -->
+        <step-definition id="itemAccessConditions">
+            <heading>submit.progressbar.accessCondition</heading>
+            <processing-class>org.dspace.app.rest.submit.step.AccessConditionStep</processing-class>
+            <type>accessCondition</type>
+        </step-definition>
+
         <!-- This optional step may enrich the current submission using information extracted
              from uploaded files or metadata.  -->
         <!-- Please note that this step will be triggered only when a request is performed,
@@ -196,6 +203,12 @@
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type>
         </step-definition>
+
+        <step-definition id="sherpaPolicies" mandatory="true">
+            <heading>submit.progressbar.sherpapolicy</heading>
+            <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
+            <type>sherpaPolicy</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -225,8 +238,15 @@
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
 
+            <!-- Uncomment this step to allow the user to embargo or access restrict the entire item -->
+            <!-- <step id="itemAccessConditions"/> -->
+
+            <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
+            <!-- <step id="sherpaPolicies"/> -->
+
             <!--Step will be to Upload the item -->
             <step id="upload"/>
+
             <!-- <step id="extractionstep"/> -->
 
             <!-- Uncomment this step to allow the user to select a Creative Commons License -->

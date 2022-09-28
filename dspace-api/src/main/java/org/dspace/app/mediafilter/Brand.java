@@ -21,10 +21,10 @@ import java.awt.image.BufferedImage;
  */
 
 public class Brand {
-    private int brandWidth;
-    private int brandHeight;
-    private Font font;
-    private int xOffset;
+    private final int brandWidth;
+    private final int brandHeight;
+    private final Font font;
+    private final int xOffset;
 
     /**
      * Constructor to set up footer image attributes.
@@ -92,7 +92,7 @@ public class Brand {
      * do the text placements and preparatory work for the brand image generation
      *
      * @param brandImage a BufferedImage object where the image is created
-     * @param identifier and Identifier object describing what text is to be placed in what
+     * @param brandText  an Identifier object describing what text is to be placed in what
      *                   position within the brand
      */
     private void drawImage(BufferedImage brandImage,

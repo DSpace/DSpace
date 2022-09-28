@@ -10,6 +10,7 @@ package org.dspace.core;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -91,12 +92,17 @@ public class Context implements AutoCloseable {
     /**
      * Group IDs of special groups user is a member of
      */
-    private List<UUID> specialGroups;
+    private Set<UUID> specialGroups;
 
     /**
      * Temporary store for the specialGroups when the current user is temporary switched
      */
-    private List<UUID> specialGroupsPreviousState;
+    private Set<UUID> specialGroupsPreviousState;
+
+    /**
+     * The currently used authentication method
+     */
+    private String authenticationMethod;
 
     /**
      * Content events
@@ -111,7 +117,7 @@ public class Context implements AutoCloseable {
     /**
      * Context mode
      */
-    private Mode mode = Mode.READ_WRITE;
+    private Mode mode;
 
     /**
      * Cache that is only used the context is in READ_ONLY mode
@@ -129,7 +135,6 @@ public class Context implements AutoCloseable {
     }
 
     protected Context(EventService eventService, DBConnection dbConnection) {
-        this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
@@ -141,7 +146,6 @@ public class Context implements AutoCloseable {
      * No user is authenticated.
      */
     public Context() {
-        this.mode = Mode.READ_WRITE;
         init();
     }
 
@@ -180,11 +184,15 @@ public class Context implements AutoCloseable {
         extraLogInfo = "";
         ignoreAuth = false;
 
-        specialGroups = new ArrayList<>();
+        specialGroups = new HashSet<>();
 
         authStateChangeHistory = new ConcurrentLinkedDeque<>();
         authStateClassCallHistory = new ConcurrentLinkedDeque<>();
-        setMode(this.mode);
+
+        if (this.mode != null) {
+            setMode(this.mode);
+        }
+
     }
 
     /**
@@ -531,6 +539,36 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Rollback the current transaction with the database, without persisting any
+     * pending changes. The database connection is not closed and can be reused
+     * afterwards.
+     *
+     * <b>WARNING: After calling this method all previously fetched entities are
+     * "detached" (pending changes are not tracked anymore). You have to reload all
+     * entities you still want to work with manually after this method call (see
+     * {@link Context#reloadEntity(ReloadableEntity)}).</b>
+     *
+     * @throws SQLException When rollbacking the transaction in the database fails.
+     */
+    public void rollback() throws SQLException {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if (!isValid()) {
+            log.info("rollback() was called on a closed Context object. No changes to abort.");
+            return;
+        }
+
+        try {
+            // Rollback ONLY if we have a database transaction, and it is NOT Read Only
+            if (!isReadOnly() && isTransactionAlive()) {
+                dbConnection.rollback();
+                reloadContextBoundEntities();
+            }
+        } finally {
+            events = null;
+        }
+    }
+
+    /**
      * Close the context, without committing any of the changes performed using
      * this context. The database connection is freed. No exception is thrown if
      * there is an error freeing the database connection, since this method may
@@ -650,6 +688,15 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * Get a set of all of the special groups uuids that current user is a member of.
+     *
+     * @return list of special groups uuids
+     */
+    public Set<UUID> getSpecialGroupUuids() {
+        return CollectionUtils.isEmpty(specialGroups) ? Set.of() : specialGroups;
+    }
+
+    /**
      * Temporary change the user bound to the context, empty the special groups that
      * are retained to allow subsequent restore
      *
@@ -666,12 +713,12 @@ public class Context implements AutoCloseable {
 
         currentUserPreviousState = currentUser;
         specialGroupsPreviousState = specialGroups;
-        specialGroups = new ArrayList<>();
+        specialGroups = new HashSet<>();
         currentUser = newUser;
     }
 
     /**
-     * Restore the user bound to the context and his special groups
+     * Restore the user bound to the context and their special groups
      *
      * @throws IllegalStateException if no switch was performed before
      */
@@ -773,7 +820,7 @@ public class Context implements AutoCloseable {
      * @return The current mode
      */
     public Mode getCurrentMode() {
-        return mode;
+        return mode != null ? mode : Mode.READ_WRITE;
     }
 
     /**
@@ -890,4 +937,18 @@ public class Context implements AutoCloseable {
         currentUser = reloadEntity(currentUser);
     }
 
+    public String getAuthenticationMethod() {
+        return authenticationMethod;
+    }
+
+    public void setAuthenticationMethod(final String authenticationMethod) {
+        this.authenticationMethod = authenticationMethod;
+    }
+
+    /**
+     * Check if the user of the context is switched.
+     */
+    public boolean isContextUserSwitched() {
+        return currentUserPreviousState != null;
+    }
 }

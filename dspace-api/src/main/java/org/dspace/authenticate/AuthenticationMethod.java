@@ -216,4 +216,23 @@ public interface AuthenticationMethod {
      * @return The authentication method name
      */
     public String getName();
+
+    /**
+     * Get whether the authentication method is being used.
+     * @param context   The DSpace context
+     * @param request   The current request
+     * @return whether the authentication method is being used.
+     */
+    public boolean isUsed(Context context, HttpServletRequest request);
+
+    /**
+     * Check if the given current password is valid to change the password of the
+     * given ePerson
+     * @param  context         The DSpace context
+     * @param  ePerson         the ePerson related to the password change
+     * @param  currentPassword The current password to check
+     * @return                 true if the provided password matches with current
+     *                         password
+     */
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword);
 }
