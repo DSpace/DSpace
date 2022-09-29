@@ -269,7 +269,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
+    public void delete(Context context, Bitstream bitstream) throws IOException, SQLException, AuthorizeException {
 
         // changed to a check on delete
         // Check authorisation
@@ -288,6 +288,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         final List<Bundle> bundles = bitstream.getBundles();
         for (Bundle bundle : bundles) {
             bundle.removeBitstream(bitstream);
+            //Remove the bundle when there are no remaining bitstreams
+            List<Bitstream> bitstreams = bundle.getBitstreams();
+            if (CollectionUtils.isEmpty(bitstreams))
+            {
+                bundleService.delete(context, bundle);
+            }
         }
 
         //Remove all bundles from the bitstream object, clearing the connection in 2 ways
