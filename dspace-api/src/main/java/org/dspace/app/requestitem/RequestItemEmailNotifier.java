@@ -178,8 +178,16 @@ public class RequestItemEmailNotifier {
                             bitstream.getName(),
                             bitstream.getFormat(context).getMIMEType());
                 }
+                email.send();
+            } else {
+                boolean sendRejectEmail = configurationService
+                    .getBooleanProperty("request.item.reject.email", true);
+                // Not all sites want the "refusal" to be sent back to the requester via
+                // email. However, by default, the rejection email is sent back.
+                if (sendRejectEmail) {
+                    email.send();
+                }
             }
-            email.send();
         } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
             LOG.warn(LogHelper.getHeader(context,
                     "error_mailing_requestItem", e.getMessage()));
