@@ -273,7 +273,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     // Customization to support finding top level community by CommunityGroup
     // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
     public int getGroupID() {
-      return this.groupId;
+      return this.groupId != null ? this.groupId.intValue() : -1;
     }
 
     public void setGroupID(int groupId) {

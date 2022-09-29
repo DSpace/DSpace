@@ -2924,4 +2924,8 @@
         <property name="defaultSortOrder" value="desc"/>
     </bean>
 
+    <!-- Begin UMD Customization for LIBDRUM-664 -->
+    <bean id="SolrServiceCommunityGroupIndexingPlugin" class="org.dspace.discovery.SolrServiceCommunityGroupIndexingPlugin" scope="prototype"/>
+    <!-- End UMD Customization for LIBDRUM-664 -->
+
 </beans>
