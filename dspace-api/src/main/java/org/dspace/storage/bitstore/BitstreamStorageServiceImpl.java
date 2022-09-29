@@ -92,7 +92,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Override
     public void afterPropertiesSet() throws Exception {
         for (Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {
-            storeEntry.getValue().init();
+            if (storeEntry.getValue().isEnabled() && !storeEntry.getValue().isInitialized()) {
+                storeEntry.getValue().init();
+            }
         }
     }
 
@@ -100,19 +102,18 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public UUID store(Context context, Bitstream bitstream, InputStream is) throws SQLException, IOException {
         // Create internal ID
         String id = Utils.generateKey();
-
-        bitstream.setDeleted(true);
-        bitstream.setInternalId(id);
-
         /*
          * Set the store number of the new bitstream If you want to use some
          * other method of working out where to put a new bitstream, here's
          * where it should go
          */
         bitstream.setStoreNumber(incoming);
+        bitstream.setDeleted(true);
+        bitstream.setInternalId(id);
 
+        BitStoreService store = this.getStore(incoming);
         //For efficiencies sake, PUT is responsible for setting bitstream size_bytes, checksum, and checksum_algorithm
-        stores.get(incoming).put(bitstream, is);
+        store.put(bitstream, is);
         //bitstream.setSizeBytes(file.length());
         //bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
         //bitstream.setChecksumAlgorithm("MD5");
@@ -169,7 +170,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         wantedMetadata.put("checksum", null);
         wantedMetadata.put("checksum_algorithm", null);
 
-        Map receivedMetadata = stores.get(assetstore).about(bitstream, wantedMetadata);
+        Map receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
         if (MapUtils.isEmpty(receivedMetadata)) {
             String message = "Not able to register bitstream:" + bitstream.getID() + " at path: " + bitstreamPath;
             log.error(message);
@@ -204,7 +205,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         wantedMetadata.put("checksum", null);
         wantedMetadata.put("checksum_algorithm", null);
 
-        Map receivedMetadata = stores.get(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+        Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
         return receivedMetadata;
     }
 
@@ -217,7 +218,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public InputStream retrieve(Context context, Bitstream bitstream)
         throws SQLException, IOException {
         Integer storeNumber = bitstream.getStoreNumber();
-        return stores.get(storeNumber).get(bitstream);
+        return this.getStore(storeNumber).get(bitstream);
     }
 
     @Override
@@ -234,7 +235,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 Map wantedMetadata = new HashMap();
                 wantedMetadata.put("size_bytes", null);
                 wantedMetadata.put("modified", null);
-                Map receivedMetadata = stores.get(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+                Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
 
 
                 // Make sure entries which do not exist are removed
@@ -284,7 +285,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on
                 // another place
                 if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
-                    stores.get(bitstream.getStoreNumber()).remove(bitstream);
+                    this.getStore(bitstream.getStoreNumber()).remove(bitstream);
 
                     String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
                     if (log.isDebugEnabled()) {
@@ -329,7 +330,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public Long getLastModified(Bitstream bitstream) throws IOException {
         Map attrs = new HashMap();
         attrs.put("modified", null);
-        attrs = stores.get(bitstream.getStoreNumber()).about(bitstream, attrs);
+        attrs = this.getStore(bitstream.getStoreNumber()).about(bitstream, attrs);
         if (attrs == null || !attrs.containsKey("modified")) {
             return null;
         }
@@ -398,13 +399,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 .getName() + ", SizeBytes:" + bitstream.getSizeBytes());
 
             InputStream inputStream = retrieve(context, bitstream);
-            stores.get(assetstoreDestination).put(bitstream, inputStream);
+            this.getStore(assetstoreDestination).put(bitstream, inputStream);
             bitstream.setStoreNumber(assetstoreDestination);
             bitstreamService.update(context, bitstream);
 
             if (deleteOld) {
                 log.info("Removing bitstream:" + bitstream.getID() + " from assetstore[" + assetstoreSource + "]");
-                stores.get(assetstoreSource).remove(bitstream);
+                this.getStore(assetstoreSource).remove(bitstream);
             }
 
             processedCounter++;
@@ -428,9 +429,12 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
             for (Integer storeNumber : stores.keySet()) {
                 long countBitstreams = bitstreamService.countByStoreNumber(context, storeNumber);
-                System.out.println("store[" + storeNumber + "] == " + stores.get(storeNumber).getClass()
-                                                                            .getSimpleName() + ", which has " +
-                                       countBitstreams + " bitstreams.");
+                BitStoreService store = this.stores.get(storeNumber);
+                System.out.println(
+                    "store[" + storeNumber + "] == " + store.getClass().getSimpleName() +
+                    ", which has initialized-status: " + store.isInitialized() +
+                    ", and has: " + countBitstreams + " bitstreams."
+                );
             }
             System.out.println("Incoming assetstore is store[" + incoming + "]");
         } catch (SQLException e) {
@@ -474,4 +478,13 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         // Less than one hour old
         return (now - lastModified) < (1 * 60 * 1000);
     }
+
+    protected BitStoreService getStore(int position) throws IOException {
+        BitStoreService bitStoreService = this.stores.get(position);
+        if (!bitStoreService.isInitialized()) {
+            bitStoreService.init();
+        }
+        return bitStoreService;
+    }
+
 }
