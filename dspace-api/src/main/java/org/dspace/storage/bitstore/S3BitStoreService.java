@@ -47,6 +47,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
+import org.dspace.util.FunctionalUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -215,8 +216,6 @@ public class S3BitStoreService extends BaseBitStoreService {
             log.error("Can't initialize this store!", e);
         }
 
-        }
-
         log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
 
         tm = TransferManagerBuilder.standard()
@@ -224,7 +223,6 @@ public class S3BitStoreService extends BaseBitStoreService {
                                    .withS3Client(s3Service)
                                    .build();
     }
-
 
     /**
      * Return an identifier unique to this asset store instance
@@ -537,7 +535,7 @@ public class S3BitStoreService extends BaseBitStoreService {
         //Bucketname should be lowercase
         store.bucketName = DEFAULT_BUCKET_PREFIX + hostname + ".s3test";
         store.s3Service.createBucket(store.bucketName);
-/* Broken in DSpace 6 TODO Refactor
+        /* Broken in DSpace 6 TODO Refactor
         // time everything, todo, swtich to caliper
         long start = System.currentTimeMillis();
         // Case 1: store a file
