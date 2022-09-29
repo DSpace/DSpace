@@ -111,7 +111,8 @@ public class CaptchaServiceImpl implements CaptchaService {
             throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         } else if (!googleResponse.isSuccess() || !googleResponse.getAction().equals(action)
                    || googleResponse.getScore() < captchaSettings.getThreshold()) {
-            log.error("Google reCaptcha v2 returned an unsuccessful response with action {} and score {}."
+            log.error("Google reCaptcha v3 returned an unsuccessful response with"
+                    + " action {" + googleResponse.getAction() + "} and score {" + googleResponse.getScore() + "}."
                     + " ReCaptcha was not validated.");
             throw new InvalidReCaptchaException("reCaptcha was not successfully validated");
         }

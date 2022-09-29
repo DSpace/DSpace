@@ -39,6 +39,7 @@ public class GoogleCaptchaResponse {
 
     @JsonProperty("score")
     private float score;
+
     @JsonProperty("action")
     private String action;
 
