@@ -29,6 +29,7 @@ import org.dspace.app.rest.matcher.RegistrationMatcher;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.repository.RegistrationRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.eperson.CaptchaServiceImpl;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.dao.RegistrationDataDAO;
@@ -41,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    private CaptchaService captchaService;
+    private CaptchaServiceImpl captchaService;
     @Autowired
     private RegistrationDataDAO registrationDataDAO;
     @Autowired
@@ -193,7 +194,10 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void registrationFlowWithNoHeaderCaptchaTokenTest() throws Exception {
-        configurationService.setProperty("registration.verification.enabled", "true");
+        String originVerification = configurationService.getProperty("registration.verification.enabled");
+        String originSecret = configurationService.getProperty("google.recaptcha.key.secret");
+        String originVresion = configurationService.getProperty("google.recaptcha.version");
+        reloadCaptchaProperties("true", "test-secret", "v2");
 
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
@@ -204,11 +208,16 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
                    .andExpect(status().isForbidden());
+
+        reloadCaptchaProperties(originVerification, originSecret, originVresion);
     }
 
     @Test
     public void registrationFlowWithInvalidCaptchaTokenTest() throws Exception {
-        configurationService.setProperty("registration.verification.enabled", "true");
+        String originVerification = configurationService.getProperty("registration.verification.enabled");
+        String originSecret = configurationService.getProperty("google.recaptcha.key.secret");
+        String originVresion = configurationService.getProperty("google.recaptcha.version");
+        reloadCaptchaProperties("true", "test-secret", "v2");
 
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
@@ -221,11 +230,16 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
                    .andExpect(status().isForbidden());
+
+        reloadCaptchaProperties(originVerification, originSecret, originVresion);
     }
 
     @Test
     public void registrationFlowWithValidCaptchaTokenTest() throws Exception {
-        configurationService.setProperty("registration.verification.enabled", "true");
+        String originVerification = configurationService.getProperty("registration.verification.enabled");
+        String originSecret = configurationService.getProperty("google.recaptcha.key.secret");
+        String originVresion = configurationService.getProperty("google.recaptcha.version");
+        reloadCaptchaProperties("true", "test-secret", "v2");
 
         String captchaToken = "123456";
         String captchaToken1 = "12345676866";
@@ -296,7 +310,15 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                 RegistrationData registrationData = iterator.next();
                 registrationDataDAO.delete(context, registrationData);
             }
+            reloadCaptchaProperties(originVerification, originSecret, originVresion);
         }
+    }
+
+    private void reloadCaptchaProperties(String verification, String secret, String version) {
+        configurationService.setProperty("registration.verification.enabled", verification);
+        configurationService.setProperty("google.recaptcha.key.secret", secret);
+        configurationService.setProperty("google.recaptcha.version", version);
+        captchaService.init();
     }
 
 }

@@ -48,7 +48,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     private ConfigurationService configurationService;
 
     @PostConstruct
-    private void init() {
+    public void init() {
         captchaSettings = new CaptchaSettings();
         captchaSettings.setSite(configurationService.getProperty("google.recaptcha.key.site"));
         captchaSettings.setSecret(configurationService.getProperty("google.recaptcha.key.secret"));
