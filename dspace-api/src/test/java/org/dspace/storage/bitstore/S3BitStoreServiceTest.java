@@ -28,9 +28,13 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.Upload;
+import com.amazonaws.services.s3.transfer.model.UploadResult;
 import org.apache.commons.io.FileUtils;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Bitstream;
+import org.dspace.curate.Utils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,11 +58,14 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
     private AmazonS3Client s3Service;
 
     @Mock
+    private TransferManager tm;
+
+    @Mock
     private Bitstream bitstream;
 
     @Before
     public void setUp() throws Exception {
-        this.s3BitStoreService = new S3BitStoreService(s3Service);
+        this.s3BitStoreService = new S3BitStoreService(s3Service, tm);
     }
 
     private Supplier<AmazonS3> mockedServiceSupplier() {
@@ -360,21 +367,27 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
         File file = Mockito.mock(File.class);
         InputStream in = Mockito.mock(InputStream.class);
         PutObjectResult putObjectResult = Mockito.mock(PutObjectResult.class);
-        String mockedTag = "MockedTag";
-        when(putObjectResult.getETag()).thenReturn(mockedTag);
+        Upload upload = Mockito.mock(Upload.class);
+        UploadResult uploadResult = Mockito.mock(UploadResult.class);
+        when(upload.waitForUploadResult()).thenReturn(uploadResult);
+        String mockedTag = "1a7771d5fdd7bfdfc84033c70b1ba555";
         when(file.length()).thenReturn(8L);
         try (MockedStatic<File> fileMock = Mockito.mockStatic(File.class)) {
             try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
+                try (MockedStatic<Utils> curateUtils = Mockito.mockStatic(Utils.class)) {
+                    curateUtils.when(() -> Utils.checksum((File) ArgumentMatchers.any(), ArgumentMatchers.any()))
+                            .thenReturn(mockedTag);
 
                 fileMock
                     .when(() -> File.createTempFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
                     .thenReturn(file);
 
-                when(this.s3Service.putObject(ArgumentMatchers.any(PutObjectRequest.class)))
-                        .thenReturn(putObjectResult);
+                when(this.tm.upload(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+                        .thenReturn(upload);
 
                 this.s3BitStoreService.init();
                 this.s3BitStoreService.put(bitstream, in);
+                }
             }
 
         }
@@ -387,12 +400,10 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
                 ArgumentMatchers.eq(mockedTag)
          );
 
-        verify(this.s3Service, Mockito.times(1)).putObject(
-                ArgumentMatchers.argThat(
-                        req -> bucketName.equals(req.getBucketName()) &&
-                               bitStreamId.equals(req.getKey()) &&
-                               req.getFile().equals(file)
-                )
+        verify(this.tm, Mockito.times(1)).upload(
+            ArgumentMatchers.eq(bucketName),
+            ArgumentMatchers.eq(bitStreamId),
+            ArgumentMatchers.eq(file)
          );
 
         verify(file, Mockito.times(1)).delete();
@@ -410,7 +421,6 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
 
         File file = Mockito.mock(File.class);
         InputStream in = Mockito.mock(InputStream.class);
-        when(file.exists()).thenReturn(true);
         try (MockedStatic<File> fileMock = Mockito.mockStatic(File.class)) {
             try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
                 fileUtilsMock
@@ -421,7 +431,7 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
                     .thenReturn(file);
 
                 this.s3BitStoreService.init();
-                assertThrows(IOException.class,() -> this.s3BitStoreService.put(bitstream, in));
+                assertThrows(IOException.class, () -> this.s3BitStoreService.put(bitstream, in));
             }
 
         }

@@ -141,8 +141,9 @@ public class S3BitStoreService extends BaseBitStoreService {
      *
      * @param s3Service mocked AmazonS3 service
      */
-    protected S3BitStoreService(AmazonS3 s3Service) {
+    protected S3BitStoreService(AmazonS3 s3Service, TransferManager tm) {
         this.s3Service = s3Service;
+        this.tm = tm;
     }
 
     @Override
@@ -218,10 +219,10 @@ public class S3BitStoreService extends BaseBitStoreService {
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + bucketName);
 
-        tm = TransferManagerBuilder.standard()
-                                   .withAlwaysCalculateMultipartMd5(true)
-                                   .withS3Client(s3Service)
-                                   .build();
+        tm = FunctionalUtils.getDefaultOrBuild(tm, () -> TransferManagerBuilder.standard()
+                                                               .withAlwaysCalculateMultipartMd5(true)
+                                                               .withS3Client(s3Service)
+                                                               .build());
     }
 
     /**
@@ -284,8 +285,6 @@ public class S3BitStoreService extends BaseBitStoreService {
             bitstream.setSizeBytes(contentLength);
             bitstream.setChecksum(localChecksum);
             bitstream.setChecksumAlgorithm(CSA);
-
-            scratchFile.delete();
 
         } catch (AmazonClientException | IOException | InterruptedException e) {
             log.error("put(" + bitstream.getInternalId() + ", is)", e);
