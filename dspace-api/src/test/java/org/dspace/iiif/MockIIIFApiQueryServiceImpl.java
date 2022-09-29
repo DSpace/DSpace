@@ -9,6 +9,10 @@ package org.dspace.iiif;
 
 import org.dspace.content.Bitstream;
 
+/**
+ * Mock for the IIIFApiQueryService.
+ * @author Michael Spalti (mspalti at willamette.edu)
+ */
 public class MockIIIFApiQueryServiceImpl extends IIIFApiQueryServiceImpl {
     public int[] getImageDimensions(Bitstream bitstream) {
         return new int[]{64, 64};
