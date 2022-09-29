@@ -22,6 +22,7 @@ import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli;
 import org.dspace.app.util.DSpaceContextListener;
+import org.dspace.google.GoogleAsyncEventListener;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,9 @@ public class Application extends SpringBootServletInitializer {
     @Autowired
     private ApplicationConfig configuration;
 
+    @Autowired
+    private GoogleAsyncEventListener googleAsyncEventListener;
+
     @Scheduled(cron = "${sitemap.cron:-}")
     public void generateSitemap() throws IOException, SQLException {
         GenerateSitemaps.generateSitemapsScheduled();
@@ -75,6 +79,11 @@ public class Application extends SpringBootServletInitializer {
     @Scheduled(cron = "${solr-database-resync.cron:-}")
     public void solrDatabaseResync() throws Exception {
         SolrDatabaseResyncCli.runScheduled();
+    }
+
+    @Scheduled(cron = "${google.analytics.cron:-}")
+    public void sendGoogleAnalyticsEvents() {
+        googleAsyncEventListener.sendCollectedEvents();
     }
 
     /**
