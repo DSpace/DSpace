@@ -96,7 +96,10 @@ public class ItemImportCLI extends ItemImport {
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         // If this is a zip archive, unzip it first
         if (zip) {
-            sourcedir = itemImportService.unzip(sourcedir, zipfilename);
+            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                    + File.separator + context.getCurrentUser().getID());
+            sourcedir = itemImportService.unzip(
+                    new File(sourcedir + File.separator + zipfilename), workDir.getAbsolutePath());
         }
     }
 

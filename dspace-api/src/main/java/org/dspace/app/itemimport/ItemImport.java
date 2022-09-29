@@ -75,7 +75,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected String zipfilename = null;
     protected boolean help = false;
-    private File workDir = null;
+    protected File workDir = null;
     private File workFile = null;
 
     protected static final CollectionService collectionService =
@@ -229,6 +229,12 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 handler.logInfo("***End of Test Run***");
             }
         } finally {
+            // clean work dir
+            if (zip) {
+                FileUtils.deleteDirectory(new File(sourcedir));
+                FileUtils.deleteDirectory(workDir);
+            }
+
             Date endTime = new Date();
             handler.logInfo("Started: " + startTime.getTime());
             handler.logInfo("Ended: " + endTime.getTime());
@@ -286,7 +292,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
         } finally {
             mapFile.delete();
             workFile.delete();
-            workDir.delete();
         }
     }
 
