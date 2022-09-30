@@ -9,6 +9,7 @@ package org.dspace.app.rest.hdlresolver;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * This controller is public and is useful for handle resolving,
  * whether a target handle identifier will be resolved into the
  * corresponding URL (if found), otherwise will respond a null string.
- * 
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.it)
  *
  */
@@ -58,7 +59,13 @@ public class HdlResolverRestController {
         if (HDL_RESOLVER.contains(hdlService) || RESOLVE.contains(hdlService)) {
             return resolveHandle(request, hdlService);
         } else if (LISTHANDLES.contains(hdlService)) {
-            return this.listHandles(request, request.getRequestURI().substring(LISTHANDLES.length()));
+            return this.listHandles(
+                    request,
+                    Optional.ofNullable(request.getRequestURI().split(LISTHANDLES))
+                        .filter(split -> split.length > 1)
+                        .map(splitted -> splitted[1])
+                        .orElse(null)
+            );
         } else if (LISTPREFIXES.contains(hdlService)) {
             return this.listPrefixes(request);
         } else {
@@ -81,7 +88,7 @@ public class HdlResolverRestController {
      *          <li>Request: GET - http://{dspace.url}/hdlresolver/handleIdExample/1</li>
      *          <li>Response: 200 - ["http://localhost/handle/hanldeIdExample1"]
      *      </ul>
-     * 
+     *
      * @param request {@code HttpServletRequest}
      * @return One element List or <code>null</code> with status 200 - <code>HttpStatus.OK</code>
      *         or 400 - <code>HttpStatus.BAD_REQUEST</code> error
@@ -111,7 +118,7 @@ public class HdlResolverRestController {
      *          <li>Request: GET - http://{dspace.url}/listprefixes</li>
      *          <li>Response: 200 - ["123456789","prefix1","prefix2"]
      *      </ul>
-     * 
+     *
      * @param request {@code HttpServletRequest}
      * @return List of valid prefixes with status 200 <code>HttpStatus.OK</code>
      */
@@ -137,7 +144,7 @@ public class HdlResolverRestController {
      *          <li>Request: GET - http://{dspace.url}/listhandles/prefix</li>
      *          <li>Response: 200 - ["prefix/zero","prefix1/one","prefix2/two"]
      *      </ul>
-     * 
+     *
      * @param request {@code HttpServletRequest}
      * @param prefix {@code String} representing the prefix that will be searched
      * @return List of valid prefixes with status 200 <code>HttpStatus.OK</code>
@@ -159,7 +166,7 @@ public class HdlResolverRestController {
 
     /**
      * Maps the handle to a correct response.
-     * 
+     *
      * @param request        HttpServletRequest
      * @param handleResolver HdlResolverDTO - Handle resolver
      * @return One element list using String if found, else null String.
