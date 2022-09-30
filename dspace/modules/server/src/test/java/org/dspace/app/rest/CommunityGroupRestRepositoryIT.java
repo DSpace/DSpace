@@ -96,10 +96,8 @@ public class CommunityGroupRestRepositoryIT extends AbstractControllerIntegratio
         @Test
         public void findAllTest() throws Exception {
 
-                String token = getAuthToken(admin.getEmail(), password);
-
                 // When we call the root endpoint
-                getClient(token).perform(get("/api/communitygroups"))
+                getClient().perform(get("/api/core/communitygroups"))
                                 // The status has to be 200 OK
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(contentType))
@@ -121,7 +119,8 @@ public class CommunityGroupRestRepositoryIT extends AbstractControllerIntegratio
 
                 // Check the communities in faculty communitygroup
                 getClient(token).perform(
-                                get("/api/communitygroups/" + String.valueOf(CommunityGroup.FACULTY) + "/communities"))
+                                get("/api/core/communitygroups/" + String.valueOf(CommunityGroup.FACULTY)
+                                                + "/communities"))
                                 // The status has to be 200 OK
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(contentType))
@@ -133,7 +132,7 @@ public class CommunityGroupRestRepositoryIT extends AbstractControllerIntegratio
 
                 // Check the communities in um communitygroup
                 getClient(token).perform(
-                                get("/api/communitygroups/" + String.valueOf(CommunityGroup.UM) + "/communities"))
+                                get("/api/core/communitygroups/" + String.valueOf(CommunityGroup.UM) + "/communities"))
                                 // The status has to be 200 OK
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(contentType))
