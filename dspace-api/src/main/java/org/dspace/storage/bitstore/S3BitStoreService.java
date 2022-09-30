@@ -15,6 +15,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 import javax.validation.constraints.NotNull;
 
@@ -32,7 +33,9 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.Download;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -238,9 +241,20 @@ public class S3BitStoreService extends BaseBitStoreService {
     public InputStream get(Bitstream bitstream) throws IOException {
         String key = getFullKey(bitstream.getInternalId());
         try {
-            S3Object object = s3Service.getObject(new GetObjectRequest(bucketName, key));
-            return (object != null) ? object.getObjectContent() : null;
-        } catch (AmazonClientException e) {
+            File tempFile = File.createTempFile("s3-disk-copy-" + UUID.randomUUID(), "temp");
+            tempFile.deleteOnExit();
+
+            GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
+
+            TransferManager transferManager = TransferManagerBuilder.standard()
+                .withS3Client(s3Service)
+                .build();
+
+            Download download = transferManager.download(getObjectRequest, tempFile);
+            download.waitForCompletion();
+
+            return new DeleteOnCloseFileInputStream(tempFile);
+        } catch (AmazonClientException | InterruptedException e) {
             log.error("get(" + key + ")", e);
             throw new IOException(e);
         }
