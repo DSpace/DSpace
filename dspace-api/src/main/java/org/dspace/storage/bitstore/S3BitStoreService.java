@@ -334,32 +334,25 @@ public class S3BitStoreService extends BaseBitStoreService {
                 if (attrs.containsKey("size_bytes")) {
                     attrs.put("size_bytes", objectMetadata.getContentLength());
                 }
-                if (attrs.containsKey("checksum")) {
-                    String eTag = objectMetadata.getETag();
-                    if (trustS3Etag && isMD5Checksum(eTag)) {
-                        attrs.put("checksum", eTag);
-                    } else {
-                        try (
-                                InputStream in = get(bitstream);
-                                // Read through a digest input stream that will work out the MD5
-                                DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
-                        ) {
-                            in.close();
-                            byte[] md5Digest = dis.getMessageDigest().digest();
-                            String md5Base64 = Base64.encodeBase64String(md5Digest);
-                            attrs.put("checksum", md5Base64);
-                        } catch (NoSuchAlgorithmException nsae) {
-                            // Should never happen
-                            log.warn("Caught NoSuchAlgorithmException", nsae);
-                        }
-                    }
-                    attrs.put("checksum_algorithm", CSA);
-                }
                 if (attrs.containsKey("modified")) {
                     attrs.put("modified", String.valueOf(objectMetadata.getLastModified().getTime()));
                 }
-                return attrs;
             }
+            try (
+                InputStream in = get(bitstream);
+                // Read through a digest input stream that will work out the MD5
+                DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
+            ) {
+                in.close();
+                byte[] md5Digest = dis.getMessageDigest().digest();
+                String md5Base64 = Base64.encodeBase64String(md5Digest);
+                attrs.put("checksum", md5Base64);
+                attrs.put("checksum_algorithm", CSA);
+            } catch (NoSuchAlgorithmException nsae) {
+                // Should never happen
+                log.warn("Caught NoSuchAlgorithmException", nsae);
+            }
+            return attrs;
         } catch (AmazonS3Exception e) {
             if (e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 return null;
