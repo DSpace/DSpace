@@ -23,7 +23,6 @@
         <property name="awsAccessKey" value="${assetstore.s3.awsAccessKey}"/>
         <property name="awsSecretKey" value="${assetstore.s3.awsSecretKey}"/>
         <property name="useRelativePath" value="${assetstore.s3.useRelativePath}"/>
-        <property name="trustS3Etag" value="${assetstore.s3.trustS3Etag}"/>
 
         <!-- S3 bucket name to store assets in. example: longsight-dspace-auk -->
         <property name="bucketName" value="${assetstore.s3.bucketName}"/>
