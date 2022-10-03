@@ -34,6 +34,7 @@ public class LdapServiceImpl implements LdapService {
     private String strUid = null;
     private SearchResult entry = null;
 
+    // The list of LDAP attributes to return as part of the SearchResult
     private static final String[] strRequestAttributes =
     new String[]{"givenname", "sn", "mail", "umfaculty", "telephonenumber",
                  "ou", "umappointment"};
@@ -72,7 +73,6 @@ public class LdapServiceImpl implements LdapService {
         ctx = new InitialDirContext(env);
     }
 
-
     /**
      * Queries LDAP for the given username, returning an Ldap object if found,
      * otherwise null is returned.
@@ -95,7 +95,7 @@ public class LdapServiceImpl implements LdapService {
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
             // Search
-            NamingEnumeration entries = ctx.search("", strFilter, sc);
+            NamingEnumeration<SearchResult> entries = ctx.search("", strFilter, sc);
 
             // Make sure we got something
             if (entries == null) {
@@ -119,7 +119,7 @@ public class LdapServiceImpl implements LdapService {
             log.debug(LogHelper.getHeader(context,
                                           "matching entry for " + strUid + ": " + entry.getName(),
                                           ""));
-            Ldap ldapInfo = new Ldap(strUid, entry);
+            Ldap ldap = new Ldap(strUid, entry);
 
             // Check for another match
             if (entries.hasMore()) {
@@ -133,7 +133,7 @@ public class LdapServiceImpl implements LdapService {
             log.debug(LogHelper.getHeader(context,
                                           "ldap entry:\n" + entry,
                                           ""));
-            return ldapInfo;
+            return ldap;
         } catch(NamingException ne) {
             log.error("LDAP NamingException for '" + strUid + "'", ne);
         }

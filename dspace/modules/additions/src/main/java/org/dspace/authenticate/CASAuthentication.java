@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -95,10 +94,9 @@ public class CASAuthentication implements AuthenticationMethod {
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
         try {
-            Ldap ldapInfo = (Ldap) request.getSession().getAttribute(CAS_LDAP);
-            if (ldapInfo != null) {
-//                ldap.setContext(context);
-                List<Group> groups = ldapInfo.getGroups(context);
+            Ldap ldap = (Ldap) request.getSession().getAttribute(CAS_LDAP);
+            if (ldap != null) {
+                List<Group> groups = ldap.getGroups(context);
 
                 Group CASGroup = groupService.findByName(context, "CAS Authenticated");
                 if (CASGroup == null) {
@@ -182,7 +180,7 @@ public class CASAuthentication implements AuthenticationMethod {
     }
 
     protected int authenticate(Context context, String username, String password, String realm,
-            HttpServletRequest request, LdapService ldap) {
+            HttpServletRequest request, LdapService ldapService) {
         final String ticket = request.getParameter("ticket");
         log.info(getHeader(context, "login", " ticket: " + ticket));
 
@@ -204,14 +202,14 @@ public class CASAuthentication implements AuthenticationMethod {
             }
 
             // Check directory
-            Ldap ldapInfo = ldap.queryLdap(netid);
-            if (ldapInfo == null) {
+            Ldap ldap = ldapService.queryLdap(netid);
+            if (ldap == null) {
                 log.error("Unknown directory id " + netid);
                 return NO_SUCH_USER;
             }
 
             // Save the ldap object in the session
-            request.getSession().setAttribute(CAS_LDAP, ldapInfo);
+            request.getSession().setAttribute(CAS_LDAP, ldap);
 
             log.info("netid = " + netid);
 
@@ -226,7 +224,7 @@ public class CASAuthentication implements AuthenticationMethod {
             // Register New User, if necessary
             if (eperson == null) {
                 if (canSelfRegister(context, request, netid)) {
-                    eperson = registerEPerson(netid, context, ldapInfo, request);
+                    eperson = registerEPerson(netid, context, ldap, request);
 
                     context.setCurrentUser(eperson);
                 } else {
@@ -371,7 +369,7 @@ public class CASAuthentication implements AuthenticationMethod {
     /**
      * Registers an EPerson, using the information in the given Ldap object.
      */
-    protected EPerson registerEPerson(String uid, Context context, Ldap ldapInfo, HttpServletRequest request) throws Exception {
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request) throws Exception {
         // Turn off authorizations to create a new user
         context.turnOffAuthorisationSystem();
 
@@ -379,17 +377,17 @@ public class CASAuthentication implements AuthenticationMethod {
             // Create a new eperson
             EPerson eperson = ePersonService.create(context);
 
-            String strFirstName = ldapInfo.getFirstName();
+            String strFirstName = ldap.getFirstName();
             if (strFirstName == null) {
                 strFirstName = "??";
             }
 
-            String strLastName = ldapInfo.getLastName();
+            String strLastName = ldap.getLastName();
             if (strLastName == null) {
                 strLastName = "??";
             }
 
-            String strPhone = ldapInfo.getPhone();
+            String strPhone = ldap.getPhone();
             if (strPhone == null) {
                 strPhone = "??";
             }

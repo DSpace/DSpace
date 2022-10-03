@@ -26,14 +26,26 @@ public class Ldap {
 
     private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
 
+    /**
+     * Constructs an Ldap object from the given parameters
+     *
+     * @param strUid the LDAP user id
+     * @param entry the LDAP SearchResult containing information about the user.
+     */
     public Ldap(String strUid, SearchResult entry) {
         this.strUid = strUid;
         this.entry = entry;
     }
 
-    /****************************************************** getAttributeAll */
     /**
-     * get all instances of an attribute.
+     * Return a (possible empty) List of Strings representing the values for the
+     * attribute
+     *
+     * @return a (possibly empty) List of Strings representing the values for the
+     * attribute
+     * @param strName the name of the attribute to return
+     * @throws NamingException if an error is encountered while retrieving the
+     * values.
      */
     public List<String> getAttributeAll(String strName) throws NamingException {
         List<String> attributes = new ArrayList<>();
@@ -43,7 +55,7 @@ public class Ldap {
             Attribute a = as.get(strName);
 
             if (a != null) {
-                NamingEnumeration e = a.getAll();
+                NamingEnumeration<?> e = a.getAll();
 
                 while (e.hasMore()) {
                     attributes.add((String) e.next());
@@ -54,12 +66,18 @@ public class Ldap {
         return attributes;
     }
 
-    /********************************************************* getAttribute */
     /**
-     * get an attribute (first instance).
+     * Returns the first value for the given attribute, or null if no value
+     * is found.
+     *
+     * @param strName the name of the attribute
+     * @return the first value for the given attribute, or null if no value
+     * is found.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public String getAttribute(String strName) throws NamingException {
-        List l = getAttributeAll(strName);
+        List<String> l = getAttributeAll(strName);
 
         if (l.size() > 0) {
             return (String) l.get(0);
@@ -68,59 +86,89 @@ public class Ldap {
         }
     }
 
-    /************************************************************* getEmail */
     /**
-     * user's email address
+     * Returns the user's email address attribute ("mail") from LDAP, or null
+     * if no value is found.
+     *
+     * @return the user's email address attribute ("mail") from LDAP, or null
+     * if no value is found.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public String getEmail() throws NamingException {
         return getAttribute("mail");
     }
 
-    /************************************************************* getPhone */
     /**
-     * user's phone
+     * Returns the user's telephone attribute ("telephonenumber") from LDAP, or
+     * null if no value is found.
+     *
+     * @return the user's telephone attribute ("telephonenumber") from LDAP, or
+     * null if no value is found.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public String getPhone() throws NamingException {
         return getAttribute("telephonenumber");
     }
 
-    /********************************************************* getFirstName */
     /**
-     * user's first name
+     * Returns the user's first name attribute ("givenname") from LDAP, or
+     * null if no value is found.
+     *
+     * @return the user's first name attribute ("givenname") from LDAP, or
+     * null if no value is found.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public String getFirstName() throws NamingException {
         return getAttribute("givenname");
     }
 
-    /********************************************************** getLastName */
     /**
-     * user's last name
+     * Returns the user's last name attribute ("sn") from LDAP, or null if no
+     * value is found.
+     *
+     * @return the user's last name attribute ("sn") from LDAP, or null if no
+     * value is found.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public String getLastName() throws NamingException {
         return getAttribute("sn");
     }
 
-    /************************************************************** getUnits */
     /**
-     * organization units
+     * Returns a (possibly empty) List of the user's organization units ("ou")
+     * from LDAP.
+     *
+     * @return a (possibly empty) List of the user's organization units ("ou")
+     * from LDAP.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public List<String> getUnits() throws NamingException {
         return getAttributeAll("ou");
     }
 
-    /************************************************************ isFaculty */
     /**
-     * is the user CP faculty with an acceptable status?
+     * Returns true if the user is College Park faculty with an acceptable
+     * status, false otherwise.
+     *
+     * @return true if the user is College Park faculty with an acceptable
+     * status, false otherwise.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
      */
     public boolean isFaculty() throws NamingException {
         if (strUid.equals("tstusr2")) {
             return true;
         }
 
-        List l = getAttributeAll("umappointment");
+        List<String> l = getAttributeAll("umappointment");
 
         if (l != null) {
-            Iterator i = l.iterator();
+            Iterator<String> i = l.iterator();
 
             while (i.hasNext()) {
                 String strAppt = (String) i.next();
@@ -153,15 +201,23 @@ public class Ldap {
         return false;
     }
 
-    /************************************************************* getGroups */
     /**
-     * Groups mapped by the Units for faculty.
+     * Returns a (possibly empty) List of Groups derived from the Units
+     * the user belongs to.
+     *
+     * @param context the DSpace context
+     * @return a (possibly empty) List of Groups derived from the Units
+     * the user belongs to.
+     * @throws NamingException if an error is encountered while retrieving the
+     * value.
+     * @throws SQLException if an error occurs retrieving information from the
+     * database.
      */
     public List<Group> getGroups(Context context) throws NamingException, java.sql.SQLException {
-        HashSet<Group> ret = new HashSet();
+        HashSet<Group> ret = new HashSet<>();
 
-        for (Iterator i = getUnits().iterator(); i.hasNext();) {
-            String strUnit = (String) i.next();
+        for (Iterator<String> i = getUnits().iterator(); i.hasNext();) {
+            String strUnit = i.next();
 
             Unit unit = unitService.findByName(context, strUnit);
 

@@ -3,7 +3,9 @@ package edu.umd.lib.dspace.authenticate;
 import edu.umd.lib.dspace.authenticate.impl.Ldap;
 
 /**
- * Interface used with Ldap to provide authorizations for CAS authentication.
+ * Interface used to query LDAP for information about a single user.
+ *
+ * Used in conjunction with CAS authentication to provide authorizations.
  */
 public interface LdapService extends AutoCloseable {
     /**

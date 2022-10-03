@@ -74,9 +74,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        LdapService mockLdap = MockLdapService.userNotFound();
+        LdapService mockLdapService = MockLdapService.userNotFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -104,9 +104,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        LdapService mockLdap = MockLdapService.userFound();
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -134,9 +134,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        LdapService mockLdap = MockLdapService.userFound();
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.CERT_REQUIRED",
                 AuthenticationMethod.CERT_REQUIRED, response);
@@ -159,9 +159,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        LdapService mockLdap = MockLdapService.userFound();
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.BAD_ARGS",
                 AuthenticationMethod.BAD_ARGS, response);
@@ -184,9 +184,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        LdapService mockLdap = MockLdapService.userFound();
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
@@ -213,14 +213,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         // Set up MockLdapService so we can verify that the "registerEPerson"
         // method was called.
-        MockLdapService mockLdap = new MockLdapService() {
+        MockLdapService mockLdapService = new MockLdapService() {
             @Override
             public Ldap queryLdap(String strUid) {
                 return new Ldap(strUid, null);
             }
         };
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
@@ -268,8 +268,8 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
 }
 
 class MockLdapService implements LdapService {
-    // Convenience method returning MockLdap instance that returns an Ldap
-    // object, indicating that the user was found in LDAP.
+    // Convenience method returning MockLdapService instance that returns an
+    // Ldap object, indicating that the user was found in LDAP.
     public static MockLdapService userFound() {
         return new MockLdapService() {
             @Override
@@ -279,8 +279,8 @@ class MockLdapService implements LdapService {
         };
     }
 
-    // Convenience method returning MockLdap instance always indicates the
-    // user was not found in LDAP.
+    // Convenience method returning MockLdapService instance that always
+    // indicates the user was not found in LDAP.
     public static MockLdapService userNotFound() {
         return new MockLdapService();
     }
@@ -299,9 +299,9 @@ class MockCASAuthentication extends CASAuthentication {
     public boolean registerEPersonCalled = false;
 
     @Override
-    protected EPerson registerEPerson(String uid, Context context, Ldap ldapInfo, HttpServletRequest request)
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request)
             throws Exception {
         registerEPersonCalled = true;
-        return super.registerEPerson(uid, context, ldapInfo, request);
+        return super.registerEPerson(uid, context, ldap, request);
     }
 }
