@@ -12,8 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.lib.dspace.authenticate.Ldap;
-import edu.umd.lib.dspace.authenticate.impl.LdapImpl;
+import edu.umd.lib.dspace.authenticate.LdapService;
+import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
 import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
 import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 import edu.yale.its.tp.cas.client.ServiceTicketValidator;
@@ -172,7 +172,7 @@ public class CASAuthentication implements AuthenticationMethod {
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
             throws SQLException {
-        try (Ldap ldap = new LdapImpl(context)) {
+        try (LdapService ldap = new LdapServiceImpl(context)) {
             return authenticate(context, username, password, realm, request, ldap);
         } catch (Exception e) {
             log.error("Unexpected exception caught", e);
@@ -182,7 +182,7 @@ public class CASAuthentication implements AuthenticationMethod {
     }
 
     protected int authenticate(Context context, String username, String password, String realm,
-            HttpServletRequest request, Ldap ldap) {
+            HttpServletRequest request, LdapService ldap) {
         final String ticket = request.getParameter("ticket");
         log.info(getHeader(context, "login", " ticket: " + ticket));
 

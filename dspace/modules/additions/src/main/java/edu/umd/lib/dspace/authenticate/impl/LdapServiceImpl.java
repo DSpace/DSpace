@@ -14,7 +14,7 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import edu.umd.lib.dspace.authenticate.Ldap;
+import edu.umd.lib.dspace.authenticate.LdapService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.LogHelper;
@@ -22,12 +22,12 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Implementation of the LDAP interface.
+ * Implementation of the LdapService interface.
  */
-public class LdapImpl implements Ldap {
+public class LdapServiceImpl implements LdapService {
 
     /** log4j category */
-    private static Logger log = LogManager.getLogger(LdapImpl.class);
+    private static Logger log = LogManager.getLogger(LdapServiceImpl.class);
 
     private org.dspace.core.Context context = null;
     private DirContext ctx = null;
@@ -45,7 +45,7 @@ public class LdapImpl implements Ldap {
      * Configures the LDAP connection, based on configuration and environment
      * variables.
      */
-    public LdapImpl(org.dspace.core.Context context) throws NamingException {
+    public LdapServiceImpl(org.dspace.core.Context context) throws NamingException {
         this.context = context;
 
         String strUrl = configurationService.getProperty("drum.ldap.url");

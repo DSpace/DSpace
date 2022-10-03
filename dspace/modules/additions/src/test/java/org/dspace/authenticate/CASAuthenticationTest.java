@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import edu.umd.lib.dspace.authenticate.Ldap;
+import edu.umd.lib.dspace.authenticate.LdapService;
 import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
 
 import org.dspace.AbstractUnitTest;
@@ -74,7 +74,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = MockLdap.userNotFound();
+        LdapService mockLdap = MockLdapService.userNotFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -104,7 +104,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = MockLdap.userFound();
+        LdapService mockLdap = MockLdapService.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -134,7 +134,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = MockLdap.userFound();
+        LdapService mockLdap = MockLdapService.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -159,7 +159,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = MockLdap.userFound();
+        LdapService mockLdap = MockLdapService.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -184,7 +184,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = MockLdap.userFound();
+        LdapService mockLdap = MockLdapService.userFound();
 
         int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
 
@@ -211,9 +211,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        // Set up MockLdap so we can verify that the "registerEPerson" method was
-        // called.
-        MockLdap mockLdap = new MockLdap() {
+        // Set up MockLdapService so we can verify that the "registerEPerson"
+        // method was called.
+        MockLdapService mockLdap = new MockLdapService() {
             @Override
             public LdapInfo queryLdap(String strUid) {
                 return new LdapInfo(strUid, null);
@@ -267,11 +267,11 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
     }
 }
 
-class MockLdap implements Ldap {
+class MockLdapService implements LdapService {
     // Convenience method returning MockLdap instance that returns an LdapInfo
     // object, indicating that the user was found in LDAP.
-    public static MockLdap userFound() {
-        return new MockLdap() {
+    public static MockLdapService userFound() {
+        return new MockLdapService() {
             @Override
             public LdapInfo queryLdap(String strUid) {
                 return new LdapInfo(strUid, null);
@@ -281,8 +281,8 @@ class MockLdap implements Ldap {
 
     // Convenience method returning MockLdap instance always indicates the
     // user was not found in LDAP.
-    public static MockLdap userNotFound() {
-        return new MockLdap();
+    public static MockLdapService userNotFound() {
+        return new MockLdapService();
     }
 
     @Override

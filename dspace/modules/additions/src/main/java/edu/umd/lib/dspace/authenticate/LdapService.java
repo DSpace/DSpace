@@ -5,7 +5,7 @@ import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
 /**
  * Interface used with Ldap to provide authorizations for CAS authentication.
  */
-public interface Ldap extends AutoCloseable {
+public interface LdapService extends AutoCloseable {
     /**
      * Queries LDAP for the given username, returning an LdapInfo object if
      * found, otherwise null is returned.
