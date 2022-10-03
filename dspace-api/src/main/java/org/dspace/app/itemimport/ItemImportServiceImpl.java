@@ -105,6 +105,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
@@ -135,6 +136,8 @@ import org.xml.sax.SAXException;
  */
 public class ItemImportServiceImpl implements ItemImportService, InitializingBean {
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemImportServiceImpl.class);
+
+    private DSpaceRunnableHandler handler;
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -194,11 +197,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         if (!tempWorkDirFile.exists()) {
             boolean success = tempWorkDirFile.mkdir();
             if (success) {
-                log.info("Created org.dspace.app.batchitemimport.work.dir of: " + tempWorkDir);
+                logInfo("Created org.dspace.app.batchitemimport.work.dir of: " + tempWorkDir);
             } else {
-                log.error("Cannot create batch import directory! " + tempWorkDir);
+                logError("Cannot create batch import directory! " + tempWorkDir);
             }
         }
+        // clean work dir path from duplicate separators
+        tempWorkDir = StringUtils.replace(tempWorkDir, File.separator + File.separator, File.separator);
     }
 
     // File listing filter to look for metadata files
@@ -224,9 +229,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         try {
             addItems(c, mycollections, sourceDir, mapFile, template);
         } catch (Exception addException) {
-            log.error("AddItems encountered an error, will try to revert. Error: " + addException.getMessage());
+            logError("AddItems encountered an error, will try to revert. Error: " + addException.getMessage());
             deleteItems(c, mapFile);
-            log.info("Attempted to delete partial (errored) import");
+            logInfo("Attempted to delete partial (errored) import");
             throw addException;
         }
     }
@@ -244,10 +249,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             itemFolderMap = new HashMap<>();
 
-            System.out.println("Adding items from directory: " + sourceDir);
-            log.debug("Adding items from directory: " + sourceDir);
-            System.out.println("Generating mapfile: " + mapFile);
-            log.debug("Generating mapfile: " + mapFile);
+            logDebug("Adding items from directory: " + sourceDir);
+            logDebug("Generating mapfile: " + mapFile);
 
             boolean directoryFileCollections = false;
             if (mycollections == null) {
@@ -279,7 +282,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             for (int i = 0; i < dircontents.length; i++) {
                 if (skipItems.containsKey(dircontents[i])) {
-                    System.out.println("Skipping import of " + dircontents[i]);
+                    logInfo("Skipping import of " + dircontents[i]);
 
                     //we still need the item in the map for relationship linking
                     String skippedHandle = skipItems.get(dircontents[i]);
@@ -293,13 +296,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         try {
                             List<Collection> cols = processCollectionFile(c, path, "collections");
                             if (cols == null) {
-                                System.out
-                                    .println("No collections specified for item " + dircontents[i] + ". Skipping.");
+                                logError("No collections specified for item " + dircontents[i] + ". Skipping.");
                                 continue;
                             }
                             clist = cols;
                         } catch (IllegalArgumentException e) {
-                            System.out.println(e.getMessage() + " Skipping.");
+                            logError(e.getMessage() + " Skipping.");
                             continue;
                         }
                     } else {
@@ -311,7 +313,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     itemFolderMap.put(dircontents[i], item);
 
                     c.uncacheEntity(item);
-                    System.out.println(i + " " + dircontents[i]);
+                    logInfo(i + " " + dircontents[i]);
                 }
             }
 
@@ -353,7 +355,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     for (String itemIdentifier : identifierList) {
 
                         if (isTest) {
-                            System.out.println("\tAdding relationship (type: " + relationshipType +
+                            logInfo("\tAdding relationship (type: " + relationshipType +
                                 ") from " + folderName + " to " + itemIdentifier);
                             continue;
                         }
@@ -364,48 +366,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             throw new Exception("Could not find item for " + itemIdentifier);
                         }
 
-                        //get entity type of entity and item
-                        String itemEntityType = getEntityType(item);
-                        String relatedEntityType = getEntityType(relationItem);
-
-                        //find matching relationship type
-                        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
-                            c, relationshipType);
-                        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
-                            relTypes, relatedEntityType, itemEntityType, relationshipType);
-
-                        if (foundRelationshipType == null) {
-                            throw new Exception("No Relationship type found for:\n" +
-                                "Target type: " + relatedEntityType + "\n" +
-                                "Origin referer type: " + itemEntityType + "\n" +
-                                "with typeName: " + relationshipType
-                            );
-                        }
-
-                        boolean left = false;
-                        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(relationshipType)) {
-                            left = true;
-                        }
-
-                        // Placeholder items for relation placing
-                        Item leftItem = null;
-                        Item rightItem = null;
-                        if (left) {
-                            leftItem = item;
-                            rightItem = relationItem;
-                        } else {
-                            leftItem = relationItem;
-                            rightItem = item;
-                        }
-
-                        // Create the relationship
-                        Relationship persistedRelationship =
-                            relationshipService.create(c, leftItem, rightItem, foundRelationshipType, -1, -1);
-                        // relationshipService.update(c, persistedRelationship);
-
-                        System.out.println("\tAdded relationship (type: " + relationshipType + ") from " +
-                            leftItem.getHandle() + " to " + rightItem.getHandle());
-
+                        addRelationship(c, item, relationItem, relationshipType);
                     }
 
                 }
@@ -417,12 +378,67 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     /**
+     * Add relationship.
+     * @param c the context
+     * @param item the item
+     * @param relationItem the related item
+     * @param relationshipType the relation type name
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    protected void addRelationship(Context c, Item item, Item relationItem, String relationshipType)
+            throws SQLException, AuthorizeException {
+        // get entity type of entity and item
+        String itemEntityType = getEntityType(item);
+        String relatedEntityType = getEntityType(relationItem);
+
+        // find matching relationship type
+        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
+            c, relationshipType);
+        RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
+            relTypes, relatedEntityType, itemEntityType, relationshipType);
+
+        if (foundRelationshipType == null) {
+            throw new IllegalArgumentException("No Relationship type found for:\n" +
+                "Target type: " + relatedEntityType + "\n" +
+                "Origin referer type: " + itemEntityType + "\n" +
+                "with typeName: " + relationshipType
+            );
+        }
+
+        boolean left = false;
+        if (foundRelationshipType.getLeftwardType().equalsIgnoreCase(relationshipType)) {
+            left = true;
+        }
+
+        // placeholder items for relation placing
+        Item leftItem = null;
+        Item rightItem = null;
+        if (left) {
+            leftItem = item;
+            rightItem = relationItem;
+        } else {
+            leftItem = relationItem;
+            rightItem = item;
+        }
+
+        // Create the relationship, appending to the end
+        Relationship persistedRelationship = relationshipService.create(
+            c, leftItem, rightItem, foundRelationshipType, -1, -1
+        );
+        relationshipService.update(c, persistedRelationship);
+
+        logInfo("\tAdded relationship (type: " + relationshipType + ") from " +
+            leftItem.getHandle() + " to " + rightItem.getHandle());
+    }
+
+    /**
      * Get the item's entity type from meta.
      * 
      * @param item
      * @return
      */
-    protected String getEntityType(Item item) throws Exception {
+    protected String getEntityType(Item item) {
         return itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY).get(0).getValue();
     }
 
@@ -451,7 +467,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         if (file.exists()) {
 
-            System.out.println("\tProcessing relationships file: " + filename);
+            logInfo("\tProcessing relationships file: " + filename);
 
             BufferedReader br = null;
             try {
@@ -492,13 +508,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
 
             } catch (FileNotFoundException e) {
-                System.out.println("\tNo relationships file found.");
+                logWarn("\tNo relationships file found.");
             } finally {
                 if (br != null) {
                     try {
                         br.close();
                     } catch (IOException e) {
-                        System.out.println("Non-critical problem releasing resources.");
+                        logError("Non-critical problem releasing resources.");
                     }
                 }
             }
@@ -542,17 +558,32 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             }
 
-        } else if (itemIdentifier.indexOf('/') != -1) {
-            //resolve by handle
-            return (Item) handleService.resolveToObject(c, itemIdentifier);
-
-        } else {
-            //try to resolve by UUID
-            return itemService.findByIdOrLegacyId(c, itemIdentifier);
         }
 
-        return null;
+        // resolve item by handle or UUID
+        return resolveItem(c, itemIdentifier);
 
+    }
+
+    /**
+     * Resolve an item identifier.
+     * 
+     * @param c Context
+     * @param itemIdentifier The identifier string found in the import file (handle or UUID)
+     * @return Item if found, or null.
+     * @throws SQLException
+     * @throws IllegalStateException
+     * @throws Exception
+     */
+    protected Item resolveItem(Context c, String itemIdentifier)
+            throws IllegalStateException, SQLException {
+        if (itemIdentifier.indexOf('/') != -1) {
+            // resolve by handle
+            return (Item) handleService.resolveToObject(c, itemIdentifier);
+        }
+
+        // resolve by UUID
+        return itemService.findByIdOrLegacyId(c, itemIdentifier);
     }
 
     /**
@@ -623,7 +654,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Item oldItem = null;
 
             if (oldHandle.indexOf('/') != -1) {
-                System.out.println("\tReplacing:  " + oldHandle);
+                logInfo("\tReplacing:  " + oldHandle);
 
                 // add new item, locate old one
                 oldItem = (Item) handleService.resolveToObject(c, oldHandle);
@@ -656,7 +687,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     @Override
     public void deleteItems(Context c, String mapFile) throws Exception {
-        System.out.println("Deleting items listed in mapfile: " + mapFile);
+        logInfo("Deleting items listed in mapfile: " + mapFile);
 
         // read in the mapfile
         Map<String, String> myhash = readMapFile(mapFile);
@@ -669,12 +700,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             if (itemID.indexOf('/') != -1) {
                 String myhandle = itemID;
-                System.out.println("Deleting item " + myhandle);
+                logInfo("Deleting item " + myhandle);
                 deleteItem(c, myhandle);
             } else {
                 // it's an ID
                 Item myitem = itemService.findByIdOrLegacyId(c, itemID);
-                System.out.println("Deleting item " + itemID);
+                logInfo("Deleting item " + itemID);
                 deleteItem(c, myitem);
                 c.uncacheEntity(myitem);
             }
@@ -697,8 +728,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                            String itemname, PrintWriter mapOut, boolean template) throws Exception {
         String mapOutputString = null;
 
-        System.out.println("Adding item from directory " + itemname);
-        log.debug("adding item from directory " + itemname);
+        logDebug("adding item from directory " + itemname);
 
         // create workspace item
         Item myitem = null;
@@ -745,7 +775,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     installItemService.installItem(c, wi, myhandle);
                 } catch (Exception e) {
                     workspaceItemService.deleteAll(c, wi);
-                    log.error("Exception after install item, try to revert...", e);
+                    logError("Exception after install item, try to revert...", e);
                     throw e;
                 }
 
@@ -757,7 +787,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             // set permissions if specified in contents file
             if (options.size() > 0) {
-                System.out.println("Processing options");
+                logInfo("Processing options");
                 processOptions(c, myitem, options);
             }
         }
@@ -808,7 +838,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         Item myitem = (Item) handleService.resolveToObject(c, myhandle);
 
         if (myitem == null) {
-            System.out.println("Error - cannot locate item - already deleted?");
+            logError("Error - cannot locate item - already deleted?");
         } else {
             deleteItem(c, myitem);
             c.uncacheEntity(myitem);
@@ -896,7 +926,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         NodeList dcNodes = (NodeList) xPath.compile("/dublin_core/dcvalue").evaluate(document, XPathConstants.NODESET);
 
         if (!isQuiet) {
-            System.out.println("\tLoading dublin core from " + filename);
+            logInfo("\tLoading dublin core from " + filename);
         }
 
         // Add each one as a new format to the registry
@@ -926,7 +956,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         if (!isQuiet) {
-            System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
+            logInfo("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
                                    + " Value: " + value);
         }
 
@@ -935,20 +965,28 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
         // only add metadata if it is no test and there is an actual value
         if (!isTest && !value.equals("")) {
-            itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
+                Item relationItem = resolveItem(c, value);
+                if (relationItem == null) {
+                    throw new IllegalArgumentException("No item found with id=" + value);
+                }
+                addRelationship(c, i, relationItem, element);
+            } else {
+                itemService.addMetadata(c, i, schema, element, qualifier, language, value);
+            }
         } else {
             // If we're just test the import, let's check that the actual metadata field exists.
             MetadataSchema foundSchema = metadataSchemaService.find(c, schema);
 
             if (foundSchema == null) {
-                System.out.println("ERROR: schema '" + schema + "' was not found in the registry.");
+                logError("ERROR: schema '" + schema + "' was not found in the registry.");
                 return;
             }
 
             MetadataField foundField = metadataFieldService.findByElement(c, foundSchema, element, qualifier);
 
             if (foundField == null) {
-                System.out.println(
+                logError(
                     "ERROR: Metadata field: '" + schema + "." + element + "." + qualifier + "' was not found in the " +
                         "registry.");
                 return;
@@ -975,7 +1013,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         File file = new File(path + File.separatorChar + filename);
         ArrayList<Collection> collections = new ArrayList<>();
         List<Collection> result = null;
-        System.out.println("Processing collections file: " + filename);
+        logInfo("Processing collections file: " + filename);
 
         if (file.exists()) {
             BufferedReader br = null;
@@ -1002,13 +1040,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                 result = collections;
             } catch (FileNotFoundException e) {
-                System.out.println("No collections file found.");
+                logWarn("No collections file found.");
             } finally {
                 if (br != null) {
                     try {
                         br.close();
                     } catch (IOException e) {
-                        System.out.println("Non-critical problem releasing resources.");
+                        logError("Non-critical problem releasing resources.");
                     }
                 }
             }
@@ -1030,7 +1068,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         File file = new File(path + File.separatorChar + filename);
         String result = null;
 
-        System.out.println("Processing handle file: " + filename);
+        logInfo("Processing handle file: " + filename);
         if (file.exists()) {
             BufferedReader is = null;
             try {
@@ -1039,14 +1077,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 // result gets contents of file, or null
                 result = is.readLine();
 
-                System.out.println("read handle: '" + result + "'");
+                logInfo("read handle: '" + result + "'");
 
             } catch (FileNotFoundException e) {
                 // probably no handle file, just return null
-                System.out.println("It appears there is no handle file -- generating one");
+                logWarn("It appears there is no handle file -- generating one");
             } catch (IOException e) {
                 // probably no handle file, just return null
-                System.out.println("It appears there is no handle file -- generating one");
+                logWarn("It appears there is no handle file -- generating one");
             } finally {
                 if (is != null) {
                     try {
@@ -1058,7 +1096,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             }
         } else {
             // probably no handle file, just return null
-            System.out.println("It appears there is no handle file -- generating one");
+            logWarn("It appears there is no handle file -- generating one");
         }
 
         return result;
@@ -1085,7 +1123,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         String line = "";
         List<String> options = new ArrayList<>();
 
-        System.out.println("\tProcessing contents file: " + contentsFile);
+        logInfo("\tProcessing contents file: " + contentsFile);
 
         if (contentsFile.exists()) {
             BufferedReader is = null;
@@ -1132,8 +1170,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             }
                         } // while
                         if (iAssetstore == -1 || sFilePath == null) {
-                            System.out.println("\tERROR: invalid contents file line");
-                            System.out.println("\t\tSkipping line: "
+                            logError("\tERROR: invalid contents file line");
+                            logInfo("\t\tSkipping line: "
                                 + sRegistrationLine);
                             continue;
                         }
@@ -1157,7 +1195,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         }
 
                         registerBitstream(c, i, iAssetstore, sFilePath, sBundle, sDescription);
-                        System.out.println("\tRegistering Bitstream: " + sFilePath
+                        logInfo("\tRegistering Bitstream: " + sFilePath
                             + "\tAssetstore: " + iAssetstore
                             + "\tBundle: " + sBundle
                             + "\tDescription: " + sDescription);
@@ -1169,7 +1207,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     if (bitstreamEndIndex == -1) {
                         // no extra info
                         processContentFileEntry(c, i, path, line, null, false);
-                        System.out.println("\tBitstream: " + line);
+                        logInfo("\tBitstream: " + line);
                     } else {
 
                         String bitstreamName = line.substring(0, bitstreamEndIndex);
@@ -1281,17 +1319,17 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                                 + bundleMarker.length(), bEndIndex).trim();
 
                             processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
-                            System.out.println("\tBitstream: " + bitstreamName +
+                            logInfo("\tBitstream: " + bitstreamName +
                                 "\tBundle: " + bundleName +
                                 primaryStr);
                         } else {
                             processContentFileEntry(c, i, path, bitstreamName, null, primary);
-                            System.out.println("\tBitstream: " + bitstreamName + primaryStr);
+                            logInfo("\tBitstream: " + bitstreamName + primaryStr);
                         }
 
                         if (permissionsExist || descriptionExists || labelExists || heightExists
                             || widthExists || tocExists) {
-                            System.out.println("Gathering options.");
+                            logInfo("Gathering options.");
                             String extraInfo = bitstreamName;
 
                             if (permissionsExist) {
@@ -1338,12 +1376,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             String[] dirListing = dir.list();
             for (String fileName : dirListing) {
                 if (!"dublin_core.xml".equals(fileName) && !fileName.equals("handle") && !metadataFileFilter
-                    .accept(dir, fileName)) {
+                    .accept(dir, fileName) && !"collections".equals(fileName) && !"relationships".equals(fileName)) {
                     throw new FileNotFoundException("No contents file found");
                 }
             }
 
-            System.out.println("No contents file found - but only metadata files found. Assuming metadata only.");
+            logInfo("No contents file found - but only metadata files found. Assuming metadata only.");
         }
 
         return options;
@@ -1505,9 +1543,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      */
     protected void processOptions(Context c, Item myItem, List<String> options)
         throws SQLException, AuthorizeException {
-        System.out.println("Processing options.");
+        logInfo("Processing options.");
         for (String line : options) {
-            System.out.println("\tprocessing " + line);
+            logInfo("\tprocessing " + line);
 
             boolean permissionsExist = false;
             boolean descriptionExists = false;
@@ -1624,7 +1662,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 try {
                     myGroup = groupService.findByName(c, groupName);
                 } catch (SQLException sqle) {
-                    System.out.println("SQL Exception finding group name: "
+                    logError("SQL Exception finding group name: "
                         + groupName);
                     // do nothing, will check for null group later
                 }
@@ -1683,25 +1721,23 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             if (null == bs) {
                 // this should never happen
-                System.out.printf("\tdefault permissions set for %s%n",
-                    bitstreamName);
+                logInfo("\tdefault permissions set for " + bitstreamName);
             } else {
                 if (permissionsExist) {
                     if (myGroup == null) {
-                        System.out.println("\t" + groupName
+                        logInfo("\t" + groupName
                             + " not found, permissions set to default");
                     } else if (actionID == -1) {
-                        System.out
-                            .println("\tinvalid permissions flag, permissions set to default");
+                        logInfo("\tinvalid permissions flag, permissions set to default");
                     } else {
-                        System.out.println("\tSetting special permissions for "
+                        logInfo("\tSetting special permissions for "
                             + bitstreamName);
                         setPermission(c, myGroup, actionID, bs);
                     }
                 }
 
                 if (descriptionExists) {
-                    System.out.println("\tSetting description for "
+                    logInfo("\tSetting description for "
                         + bitstreamName);
                     bs.setDescription(c, thisDescription);
                     updateRequired = true;
@@ -1710,7 +1746,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 if (labelExists) {
                     MetadataField metadataField = metadataFieldService
                         .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_LABEL_ELEMENT, null);
-                    System.out.println("\tSetting label to " + thisLabel + " in element "
+                    logInfo("\tSetting label to " + thisLabel + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisLabel);
                     updateRequired = true;
@@ -1720,7 +1756,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     MetadataField metadataField = metadataFieldService
                         .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
                             METADATA_IIIF_HEIGHT_QUALIFIER);
-                    System.out.println("\tSetting height to " + thisHeight + " in element "
+                    logInfo("\tSetting height to " + thisHeight + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisHeight);
                     updateRequired = true;
@@ -1729,7 +1765,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     MetadataField metadataField = metadataFieldService
                         .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
                             METADATA_IIIF_WIDTH_QUALIFIER);
-                    System.out.println("\tSetting width to " + thisWidth + " in element "
+                    logInfo("\tSetting width to " + thisWidth + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisWidth);
                     updateRequired = true;
@@ -1737,7 +1773,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 if (tocExists) {
                     MetadataField metadataField = metadataFieldService
                         .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_TOC_ELEMENT, null);
-                    System.out.println("\tSetting toc to " + thisToc + " in element "
+                    logInfo("\tSetting toc to " + thisToc + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisToc);
                     updateRequired = true;
@@ -1776,9 +1812,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             resourcePolicyService.update(c, rp);
         } else {
             if (actionID == Constants.READ) {
-                System.out.println("\t\tpermissions: READ for " + g.getName());
+                logInfo("\t\tpermissions: READ for " + g.getName());
             } else if (actionID == Constants.WRITE) {
-                System.out.println("\t\tpermissions: WRITE for " + g.getName());
+                logInfo("\t\tpermissions: WRITE for " + g.getName());
             }
         }
 
@@ -1859,7 +1895,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     deleteDirectory(files[i]);
                 } else {
                     if (!files[i].delete()) {
-                        log.error("Unable to delete file: " + files[i].getName());
+                        logError("Unable to delete file: " + files[i].getName());
                     }
                 }
             }
@@ -1879,7 +1915,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // 2
         // does the zip file exist and can we write to the temp directory
         if (!zipfile.canRead()) {
-            log.error("Zip file '" + zipfile.getAbsolutePath() + "' does not exist, or is not readable.");
+            logError("Zip file '" + zipfile.getAbsolutePath() + "' does not exist, or is not readable.");
         }
 
         String destinationDir = destDir;
@@ -1889,13 +1925,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         File tempdir = new File(destinationDir);
         if (!tempdir.isDirectory()) {
-            log.error("'" + configurationService.getProperty("org.dspace.app.itemexport.work.dir") +
-                          "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+            logError("'" + configurationService.getProperty("org.dspace.app.batchitemimport.work.dir") +
+                          "' as defined by the key 'org.dspace.app.batchitemimport.work.dir' in dspace.cfg " +
                           "is not a valid directory");
         }
 
         if (!tempdir.exists() && !tempdir.mkdirs()) {
-            log.error("Unable to create temporary directory: " + tempdir.getAbsolutePath());
+            logError("Unable to create temporary directory: " + tempdir.getAbsolutePath());
         }
         String sourcedir = destinationDir + System.getProperty("file.separator") + zipfile.getName();
         String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + System
@@ -1907,71 +1943,71 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         ZipFile zf = new ZipFile(zipfile);
         ZipEntry entry;
         Enumeration<? extends ZipEntry> entries = zf.entries();
-        while (entries.hasMoreElements()) {
-            entry = entries.nextElement();
-            if (entry.isDirectory()) {
-                if (!new File(zipDir + entry.getName()).mkdirs()) {
-                    log.error("Unable to create contents directory: " + zipDir + entry.getName());
-                }
-            } else {
-                String entryName = entry.getName();
-                File outFile = new File(zipDir + entryName);
-                // Verify that this file will be extracted into our zipDir (and not somewhere else!)
-                if (!outFile.toPath().normalize().startsWith(zipDir)) {
-                    throw new IOException("Bad zip entry: '" + entryName
-                                              + "' in file '" + zipfile.getAbsolutePath() + "'!"
-                                              + " Cannot process this file.");
-                } else {
-                    System.out.println("Extracting file: " + entryName);
-                    log.info("Extracting file: " + entryName);
-
-                    int index = entryName.lastIndexOf('/');
-                    if (index == -1) {
-                        // Was it created on Windows instead?
-                        index = entryName.lastIndexOf('\\');
+        try {
+            while (entries.hasMoreElements()) {
+                entry = entries.nextElement();
+                if (entry.isDirectory()) {
+                    if (!new File(zipDir + entry.getName()).mkdirs()) {
+                        logError("Unable to create contents directory: " + zipDir + entry.getName());
                     }
-                    if (index > 0) {
-                        File dir = new File(zipDir + entryName.substring(0, index));
-                        if (!dir.exists() && !dir.mkdirs()) {
-                            log.error("Unable to create directory: " + dir.getAbsolutePath());
+                } else {
+                    String entryName = entry.getName();
+                    File outFile = new File(zipDir + entryName);
+                    // Verify that this file will be extracted into our zipDir (and not somewhere else!)
+                    if (!outFile.toPath().normalize().startsWith(zipDir)) {
+                        throw new IOException("Bad zip entry: '" + entryName
+                                                  + "' in file '" + zipfile.getAbsolutePath() + "'!"
+                                                  + " Cannot process this file.");
+                    } else {
+                        logInfo("Extracting file: " + entryName);
+
+                        int index = entryName.lastIndexOf('/');
+                        if (index == -1) {
+                            // Was it created on Windows instead?
+                            index = entryName.lastIndexOf('\\');
                         }
+                        if (index > 0) {
+                            File dir = new File(zipDir + entryName.substring(0, index));
+                            if (!dir.exists() && !dir.mkdirs()) {
+                                logError("Unable to create directory: " + dir.getAbsolutePath());
+                            }
 
-                        //Entries could have too many directories, and we need to adjust the sourcedir
-                        // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
-                        //            SimpleArchiveFormat / item2 / contents|dublin_core|...
-                        // or
-                        // file2.zip (item1 / contents|dublin_core|...
-                        //            item2 / contents|dublin_core|...
+                            //Entries could have too many directories, and we need to adjust the sourcedir
+                            // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                            //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                            // or
+                            // file2.zip (item1 / contents|dublin_core|...
+                            //            item2 / contents|dublin_core|...
 
-                        //regex supports either windows or *nix file paths
-                        String[] entryChunks = entryName.split("/|\\\\");
-                        if (entryChunks.length > 2) {
-                            if (StringUtils.equals(sourceDirForZip, sourcedir)) {
-                                sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                            //regex supports either windows or *nix file paths
+                            String[] entryChunks = entryName.split("/|\\\\");
+                            if (entryChunks.length > 2) {
+                                if (StringUtils.equals(sourceDirForZip, sourcedir)) {
+                                    sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                                }
                             }
                         }
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        InputStream in = zf.getInputStream(entry);
+                        BufferedOutputStream out = new BufferedOutputStream(
+                            new FileOutputStream(outFile));
+                        while ((len = in.read(buffer)) >= 0) {
+                            out.write(buffer, 0, len);
+                        }
+                        in.close();
+                        out.close();
                     }
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    InputStream in = zf.getInputStream(entry);
-                    BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(outFile));
-                    while ((len = in.read(buffer)) >= 0) {
-                        out.write(buffer, 0, len);
-                    }
-                    in.close();
-                    out.close();
                 }
             }
+        } finally {
+            //Close zip file
+            zf.close();
         }
-
-        //Close zip file
-        zf.close();
 
         if (!StringUtils.equals(sourceDirForZip, sourcedir)) {
             sourcedir = sourceDirForZip;
-            System.out.println("Set sourceDir using path inside of Zip: " + sourcedir);
-            log.info("Set sourceDir using path inside of Zip: " + sourcedir);
+            logInfo("Set sourceDir using path inside of Zip: " + sourcedir);
         }
 
         return sourcedir;
@@ -2021,7 +2057,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         final String theFilePath = filepath;
         final String theInputType = inputType;
         final String theResumeDir = resumeDir;
-        final boolean useTemplateItem = template;
 
         Thread go = new Thread() {
             @Override
@@ -2061,7 +2096,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     if (!importDirFile.exists()) {
                         boolean success = importDirFile.mkdirs();
                         if (!success) {
-                            log.info("Cannot create batch import directory!");
+                            logInfo("Cannot create batch import directory!");
                             throw new Exception("Cannot create batch import directory!");
                         }
                     }
@@ -2193,14 +2228,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             email.send();
         } catch (Exception e) {
-            log.warn(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
+            logError(LogHelper.getHeader(context, "emailSuccessMessage", "cannot notify user of import"), e);
         }
     }
 
     @Override
     public void emailErrorMessage(EPerson eperson, String error)
         throws MessagingException {
-        log.warn("An error occurred during item import, the user will be notified. " + error);
+        logError("An error occurred during item import, the user will be notified. " + error);
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
@@ -2210,7 +2245,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             email.send();
         } catch (Exception e) {
-            log.warn("error during item import error notification", e);
+            logError("error during item import error notification", e);
         }
     }
 
@@ -2288,18 +2323,17 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                                           + tempDirFile.getAbsolutePath()
                                           + " could not be created.");
             } else {
-                log.debug("Created directory " + tempDirFile.getAbsolutePath());
+                logDebug("Created directory " + tempDirFile.getAbsolutePath());
             }
         } else {
-            log.debug("Work directory exists:  " + tempDirFile.getAbsolutePath());
+            logDebug("Work directory exists:  " + tempDirFile.getAbsolutePath());
         }
         return tempDirFile;
     }
 
     @Override
     public void cleanupZipTemp() {
-        System.out.println("Deleting temporary zip directory: " + tempWorkDir);
-        log.debug("Deleting temporary zip directory: " + tempWorkDir);
+        logDebug("Deleting temporary zip directory: " + tempWorkDir);
         deleteDirectory(new File(tempWorkDir));
     }
 
@@ -2326,6 +2360,83 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Override
     public void setQuiet(boolean isQuiet) {
         this.isQuiet = isQuiet;
+    }
+
+    @Override
+    public void setHandler(DSpaceRunnableHandler handler) {
+        this.handler = handler;
+    }
+
+    private void logInfo(String message) {
+        logInfo(message, null);
+    }
+
+    private void logInfo(String message, Exception e) {
+        if (handler != null) {
+            handler.logInfo(message);
+            return;
+        }
+
+        if (e != null) {
+            log.info(message, e);
+        } else {
+            log.info(message);
+        }
+    }
+
+    private void logDebug(String message) {
+        logDebug(message, null);
+    }
+
+    private void logDebug(String message, Exception e) {
+        if (handler != null) {
+            handler.logDebug(message);
+            return;
+        }
+
+        if (e != null) {
+            log.debug(message, e);
+        } else {
+            log.debug(message);
+        }
+    }
+
+    private void logWarn(String message) {
+        logWarn(message, null);
+    }
+
+    private void logWarn(String message, Exception e) {
+        if (handler != null) {
+            handler.logWarning(message);
+            return;
+        }
+
+        if (e != null) {
+            log.warn(message, e);
+        } else {
+            log.warn(message);
+        }
+    }
+
+    private void logError(String message) {
+        logError(message, null);
+    }
+
+    private void logError(String message, Exception e) {
+        if (handler != null) {
+            if (e != null) {
+                handler.logError(message, e);
+            } else {
+                handler.logError(message);
+            }
+            return;
+        }
+
+        if (e != null) {
+            log.error(message, e);
+        } else {
+            log.error(message);
+        }
     }
 
 }

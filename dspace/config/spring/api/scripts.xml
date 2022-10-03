@@ -70,4 +70,14 @@
         <property name="description" value="Update the database status of Items in solr"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
     </bean>
+
+    <bean id="import" class="org.dspace.app.itemimport.ItemImportCLIScriptConfiguration" primary="true">
+        <property name="description" value="Batch Import from Simple Archive Format (SAF)" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemimport.ItemImportCLI"/>
+    </bean>
+
+    <bean id="export" class="org.dspace.app.itemexport.ItemExportCLIScriptConfiguration" primary="true">
+        <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExportCLI"/>
+    </bean>
 </beans>
