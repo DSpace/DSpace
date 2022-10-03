@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import edu.umd.lib.dspace.authenticate.LdapService;
-import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
+import edu.umd.lib.dspace.authenticate.impl.Ldap;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
@@ -215,8 +215,8 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         // method was called.
         MockLdapService mockLdap = new MockLdapService() {
             @Override
-            public LdapInfo queryLdap(String strUid) {
-                return new LdapInfo(strUid, null);
+            public Ldap queryLdap(String strUid) {
+                return new Ldap(strUid, null);
             }
         };
 
@@ -268,13 +268,13 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
 }
 
 class MockLdapService implements LdapService {
-    // Convenience method returning MockLdap instance that returns an LdapInfo
+    // Convenience method returning MockLdap instance that returns an Ldap
     // object, indicating that the user was found in LDAP.
     public static MockLdapService userFound() {
         return new MockLdapService() {
             @Override
-            public LdapInfo queryLdap(String strUid) {
-                return new LdapInfo(strUid, null);
+            public Ldap queryLdap(String strUid) {
+                return new Ldap(strUid, null);
             }
         };
     }
@@ -286,7 +286,7 @@ class MockLdapService implements LdapService {
     }
 
     @Override
-    public LdapInfo queryLdap(String strUid) {
+    public Ldap queryLdap(String strUid) {
         return null;
     }
 
@@ -299,7 +299,7 @@ class MockCASAuthentication extends CASAuthentication {
     public boolean registerEPersonCalled = false;
 
     @Override
-    protected EPerson registerEPerson(String uid, Context context, LdapInfo ldapInfo, HttpServletRequest request)
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldapInfo, HttpServletRequest request)
             throws Exception {
         registerEPersonCalled = true;
         return super.registerEPerson(uid, context, ldapInfo, request);

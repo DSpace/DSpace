@@ -17,15 +17,16 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.UnitService;
 import org.dspace.core.Context;
 
-public class LdapInfo {
+/**
+ * Class representing an LDAP result for a particular user
+ */
+public class Ldap {
     private String strUid;
     private SearchResult entry;
 
-    // Begin UMD Customization
     private final static UnitService unitService = EPersonServiceFactory.getInstance().getUnitService();
-    // End UMD Customization
 
-    public LdapInfo(String strUid, SearchResult entry) {
+    public Ldap(String strUid, SearchResult entry) {
         this.strUid = strUid;
         this.entry = entry;
     }

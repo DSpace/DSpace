@@ -74,13 +74,13 @@ public class LdapServiceImpl implements LdapService {
 
 
     /**
-     * Queries LDAP for the given username, returning an LdapInfo object if
-     * found, otherwise null is returned.
+     * Queries LDAP for the given username, returning an Ldap object if found,
+     * otherwise null is returned.
      *
      * @param strUid the LDAP user id to retrieve
      */
     @Override
-    public LdapInfo queryLdap(String strUid) {
+    public Ldap queryLdap(String strUid) {
         try {
             if (ctx == null) {
                 return null;
@@ -119,7 +119,7 @@ public class LdapServiceImpl implements LdapService {
             log.debug(LogHelper.getHeader(context,
                                           "matching entry for " + strUid + ": " + entry.getName(),
                                           ""));
-            LdapInfo ldapInfo = new LdapInfo(strUid, entry);
+            Ldap ldapInfo = new Ldap(strUid, entry);
 
             // Check for another match
             if (entries.hasMore()) {

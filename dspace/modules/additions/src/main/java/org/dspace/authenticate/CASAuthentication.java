@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.lib.dspace.authenticate.LdapService;
 import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
-import edu.umd.lib.dspace.authenticate.impl.LdapInfo;
+import edu.umd.lib.dspace.authenticate.impl.Ldap;
 import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 import org.apache.commons.lang3.StringUtils;
@@ -95,7 +95,7 @@ public class CASAuthentication implements AuthenticationMethod {
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
         try {
-            LdapInfo ldapInfo = (LdapInfo) request.getSession().getAttribute(CAS_LDAP);
+            Ldap ldapInfo = (Ldap) request.getSession().getAttribute(CAS_LDAP);
             if (ldapInfo != null) {
 //                ldap.setContext(context);
                 List<Group> groups = ldapInfo.getGroups(context);
@@ -204,7 +204,7 @@ public class CASAuthentication implements AuthenticationMethod {
             }
 
             // Check directory
-            LdapInfo ldapInfo = ldap.queryLdap(netid);
+            Ldap ldapInfo = ldap.queryLdap(netid);
             if (ldapInfo == null) {
                 log.error("Unknown directory id " + netid);
                 return NO_SUCH_USER;
@@ -369,10 +369,9 @@ public class CASAuthentication implements AuthenticationMethod {
     }
 
     /**
-     * Registers an EPerson, using the information in the given LdapInfo
-     * object.
+     * Registers an EPerson, using the information in the given Ldap object.
      */
-    protected EPerson registerEPerson(String uid, Context context, LdapInfo ldapInfo, HttpServletRequest request) throws Exception {
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldapInfo, HttpServletRequest request) throws Exception {
         // Turn off authorizations to create a new user
         context.turnOffAuthorisationSystem();
 
