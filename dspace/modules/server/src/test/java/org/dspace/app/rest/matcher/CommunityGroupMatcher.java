@@ -27,7 +27,7 @@ public class CommunityGroupMatcher {
         return allOf(
                 hasJsonPath("$.id", is(id)),
                 hasJsonPath("$.type", is("communitygroup")),
-                hasJsonPath("$._links.self.href", containsString("/api/eperson/communitygroups/")),
+                hasJsonPath("$._links.self.href", containsString("/api/core/communitygroups/" + String.valueOf(id))),
                 hasJsonPath("$._links.communities.href", endsWith("/communities")));
     }
 
