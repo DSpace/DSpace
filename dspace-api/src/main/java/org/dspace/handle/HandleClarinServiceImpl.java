@@ -41,7 +41,6 @@ import org.dspace.handle.service.HandleClarinService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Additional service implementation for the Handle object in Clarin-DSpace.
@@ -120,21 +119,31 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         }
 
         String handleId;
-        //Do we want to generate the new handleId or use entered handleStr by user?
-        if (Objects.nonNull(handleStr)) {
-            //we use handleStr entered by use
+        // Do we want to generate the new handleId or use entered handleStr?
+        if (!(StringUtils.isBlank(handleStr))) {
+            // We use handleStr entered by use
             handleId = handleStr;
         } else {
-            //we generate new handleId
+            // We generate new handleId
             handleId = createId(context);
         }
 
         Handle handle = handleDAO.create(context, new Handle());
 
-        log.debug("Created new external Handle with handle " + handleId);
+        // Set handleId
+        handle.setHandle(handleId);
 
-        //set handle and url in created handle
-        setHandleAndUrlOfHandleObject(context, handle, handleStr, url);
+        // When you add null to String, it converts null to "null"
+        if (!(StringUtils.isBlank(url)) && !Objects.equals(url,"null")) {
+            handle.setUrl(url);
+        } else {
+            throw new RuntimeException("Cannot change url of handle object " +
+                    "- the url has wrong value: 'null' or is blank");
+        }
+
+        this.save(context, handle);
+
+        log.debug("Created new external Handle with handle " + handleId);
 
         return handle;
     }
@@ -146,7 +155,7 @@ public class HandleClarinServiceImpl implements HandleClarinService {
             throw new AuthorizeException(
                     "Only administrators may modify the handle registry");
         }
-        //delete handle
+        // Delete handle
         handleDAO.delete(context, handle);
         log.info(LogHelper.getHeader(context, "delete_handle",
                 "handle_id=" + handle.getID()));
@@ -159,7 +168,7 @@ public class HandleClarinServiceImpl implements HandleClarinService {
             throw new AuthorizeException(
                     "Only administrators may modify the handle registry");
         }
-        //save handle
+        // Save handle
         handleDAO.save(context, handle);
         log.info(LogHelper.getHeader(context, "save_handle",
                 "handle_id=" + handle.getID()
@@ -176,8 +185,28 @@ public class HandleClarinServiceImpl implements HandleClarinService {
             throw new AuthorizeException(
                     "Only administrators may modify the handle registry");
         }
-        //set handle and url in handle
-        setHandleAndUrlOfHandleObject(context, handleObject, newHandle, newUrl);
+
+        // Set handle only if it is not empty
+        if (!(StringUtils.isBlank(newHandle))) {
+            handleObject.setHandle(newHandle);
+        } else {
+            throw new RuntimeException("Cannot change handle of handle object " +
+                    "- the handle is empty");
+        }
+
+        // Set url only if it is external handle
+        if (!isInternalResource(handleObject)) {
+            // When you add null to String, it converts null to "null"
+            if (!(StringUtils.isBlank(newUrl)) && !Objects.equals(newUrl,"null")) {
+                handleObject.setUrl(newUrl);
+            } else {
+                throw new RuntimeException("Cannot change url of handle object " +
+                        "- the url has wrong value: 'null' or is blank");
+            }
+        }
+
+        this.save(context, handleObject);
+
         log.info(LogHelper.getHeader(context, "update_handle",
                 "handle_id=" + handleObject.getID()));
     }
@@ -190,17 +219,17 @@ public class HandleClarinServiceImpl implements HandleClarinService {
             throw new AuthorizeException(
                     "Only administrators may modify the handle registry");
         }
-        //control, if are new and old prefix entered
+        // Control, if are new and old prefix entered
         if (StringUtils.isBlank(newPrefix) || StringUtils.isBlank(oldPrefix)) {
             throw new NullPointerException("Cannot set prefix. Required fields are empty.");
         }
-        //get handle prefix
+        // Get handle prefix
         String prefix = handleService.getPrefix();
-        //set prefix only if not equal to old prefix
-        if (prefix.equals(oldPrefix)) {
-            //return value says if set prefix was successful
+        // Set prefix only if not equal to old prefix
+        if (Objects.equals(prefix, oldPrefix)) {
+            // Return value says if set prefix was successful
             if (!(configurationService.setProperty("handle.prefix", newPrefix))) {
-                //prefix has not changed
+                // Prefix has not changed
                 throw new RuntimeException("error while trying to set handle prefix");
             }
         } else {
@@ -214,13 +243,13 @@ public class HandleClarinServiceImpl implements HandleClarinService {
     /* Created for LINDAT/CLARIAH-CZ (UFAL) */
     @Override
     public boolean isInternalResource(Handle handle) {
-        //in internal handle is not entered url
+        // In internal handle is not entered url
         return (Objects.isNull(handle.getUrl()) || handle.getUrl().isEmpty());
     }
 
     @Override
     public String resolveToURL(Context context, String handleStr) throws SQLException {
-        //handle is not entered
+        // Handle is not entered
         if (Objects.isNull(handleStr)) {
             throw new IllegalArgumentException("Handle is null");
         }
@@ -228,24 +257,26 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         // <UFAL>
         handleStr = stripPartIdentifier(handleStr);
 
-        //find handle
+        // Find handle
         Handle handle = handleDAO.findByHandle(context, handleStr);
-
-        //handle was not find
+        //Handle was not find
         if (Objects.isNull(handle)) {
             return null;
         }
 
         String url;
         if (isInternalResource(handle)) {
-            //internal handle
-            //create url for internal handle
+            // Internal handle
+            // Create url for internal handle
             url = configurationService.getProperty("dspace.ui.url")
                     + "/handle/" + handleStr;
         } else {
-            //external handle
+            // External handle
             url = handle.getUrl();
         }
+        String partIdentifier = extractPartIdentifier(handleStr);
+        url = appendPartIdentifierToUrl(url, partIdentifier);
+
         log.debug("Resolved {} to {}", handle, url);
 
         return url;
@@ -256,19 +287,19 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         Handle foundHandle = findByHandle(context, handle);
 
         if (Objects.isNull(foundHandle)) {
-            //If this is the Site-wide Handle, return Site object
-            if (handle.equals(configurationService.getProperty("handle.prefix") + "/0")) {
+            // If this is the Site-wide Handle, return Site object
+            if (Objects.equals(handle, configurationService.getProperty("handle.prefix") + "/0")) {
                 return siteService.findSite(context);
             }
-            //Otherwise, return null (i.e. handle not found in DB)
+            // Otherwise, return null (i.e. handle not found in DB)
             return null;
         }
 
-        // check if handle was allocated previously, but is currently not
-        // associated with a DSpaceObject
+        // Check if handle was allocated previously, but is currently not
+        // Associated with a DSpaceObject
         // (this may occur when 'unbindHandle()' is called for an obj that was removed)
         if (Objects.isNull(foundHandle.getResourceTypeId()) || Objects.isNull(foundHandle.getDSpaceObject())) {
-            //if handle has been unbound, just return null (as this will result in a PageNotFound)
+            // If handle has been unbound, just return null (as this will result in a PageNotFound)
             return null;
         }
 
@@ -321,40 +352,6 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
     }
 
-    /**
-     * Set handle and url of handle object.
-     * It is not possible to change internal handle to external handle or
-     * external handle to internal handle.
-     *
-     * @param context       DSpace context object
-     * @param handleObject       handle object
-     * @param newHandle     new string handle
-     * @param newUrl     new url
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
-     */
-    private void setHandleAndUrlOfHandleObject(Context context, Handle handleObject, String newHandle,
-                                           String newUrl) throws SQLException, AuthorizeException {
-        //set handle
-        handleObject.setHandle(newHandle);
-        //if it is internal handle, do nothing with url
-        if (Objects.nonNull(newUrl)) {
-            //set url only if is not empty
-            //when you add null to String, it converts null to "null"
-            if (!(ObjectUtils.isEmpty(newUrl)) && !(StringUtils.isBlank(newUrl)) &&
-                    !newUrl.equals("null")) {
-                handleObject.setUrl(newUrl);
-            } else {
-                throw new RuntimeException("Cannot change handle and url of handle object " +
-                        "- the url has wrong value: 'null' or is blank");
-            }
-        }
-
-        this.save(context, handleObject);
-        log.info(LogHelper.getHeader(context, "Set handle and url of handle object.",
-                "handle_id=" + handleObject.getID()));
-    }
-
     @Override
     public List<org.dspace.handle.external.Handle> convertHandleWithMagicToExternalHandle(List<Handle> magicHandles) {
         List<org.dspace.handle.external.Handle> externalHandles = new ArrayList<>();
@@ -394,6 +391,9 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         return prefix + PREFIX_DELIMITER + suffix;
     }
 
+    /**
+     * Split handle by prefix delimiter
+     */
     @Override
     public String[] splitHandle(String handle) {
         if (Objects.nonNull(handle)) {
@@ -436,7 +436,7 @@ public class HandleClarinServiceImpl implements HandleClarinService {
      * @param handle The handle with optional part identifier
      * @return The handle without the part identifier
      */
-    private static String stripPartIdentifier(String handle) {
+    private String stripPartIdentifier(String handle) {
         if (Objects.isNull(handle)) {
             return null;
         }
@@ -449,5 +449,45 @@ public class HandleClarinServiceImpl implements HandleClarinService {
             baseHandle = handle;
         }
         return baseHandle;
+    }
+
+    /**
+     * Extracts the part identifier from the handle
+     *
+     * @param handle The handle with optional part identifier
+     * @return part identifier or null
+     */
+    private String extractPartIdentifier(String handle) {
+        // <UFAL>
+        if (Objects.isNull(handle)) {
+            return null;
+        }
+        String partIdentifier = null;
+        int pos = handle.indexOf(PART_IDENTIFIER_DELIMITER);
+        if (pos >= 0) {
+            partIdentifier = handle.substring(pos + 1);
+        }
+        return partIdentifier;
+    }
+
+    /**
+     * Appends the partIdentifier as parameters to the given URL
+     *
+     * @param url The URL
+     * @param partIdentifier  Part identifier (can be null or empty)
+     * @return Final URL with part identifier appended as parameters to the given URL
+     */
+    private static String appendPartIdentifierToUrl(String url, String partIdentifier) {
+        // <UFAL>
+        String finalUrl = url;
+        if (Objects.isNull(finalUrl) || StringUtils.isBlank(partIdentifier)) {
+            return finalUrl;
+        }
+        if (finalUrl.contains("?")) {
+            finalUrl += '&' + partIdentifier;
+        } else {
+            finalUrl += '?' + partIdentifier;
+        }
+        return finalUrl;
     }
 }
