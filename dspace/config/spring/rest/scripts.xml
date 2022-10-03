@@ -53,4 +53,14 @@
         <property name="description" value="export metadata from a discovery search" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearch" />
     </bean>
+
+    <bean id="import" class="org.dspace.app.itemimport.ItemImportScriptConfiguration" primary="true">
+        <property name="description" value="Batch Import from Simple Archive Format (SAF)" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemimport.ItemImport"/>
+    </bean>
+
+    <bean id="export" class="org.dspace.app.itemexport.ItemExportScriptConfiguration" primary="true">
+        <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExport"/>
+    </bean>
 </beans>
