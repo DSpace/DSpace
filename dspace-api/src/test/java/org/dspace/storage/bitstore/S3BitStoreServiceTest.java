@@ -9,32 +9,35 @@ package org.dspace.storage.bitstore;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.amazonaws.services.s3.transfer.model.UploadResult;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Bitstream;
-import org.dspace.curate.Utils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +45,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 
 
 
@@ -158,49 +162,17 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
     @Test
     public void givenBucketBitStreamIdInputStreamWhenRetrievingFromS3ThenUsesBucketBitStreamId() throws IOException {
         String bucketName = "BucketTest";
-        String bitStreamId = "BitStreamId";
         this.s3BitStoreService.setBucketName(bucketName);
         this.s3BitStoreService.setUseRelativePath(false);
-        when(bitstream.getInternalId()).thenReturn(bitStreamId);
-
-        S3Object object = Mockito.mock(S3Object.class);
-        S3ObjectInputStream inputStream = Mockito.mock(S3ObjectInputStream.class);
-        when(object.getObjectContent()).thenReturn(inputStream);
-        when(this.s3Service.getObject(ArgumentMatchers.any(GetObjectRequest.class))).thenReturn(object);
-
         this.s3BitStoreService.init();
-        assertThat(this.s3BitStoreService.get(bitstream), Matchers.equalTo(inputStream));
 
-        verify(this.s3Service).getObject(
-                ArgumentMatchers.argThat(
-                    request ->
-                    bucketName.contentEquals(request.getBucketName()) &&
-                    bitStreamId.contentEquals(request.getKey())
-                )
-        );
+        Download download = mock(Download.class);
 
-    }
+        when(tm.download(any(GetObjectRequest.class), any(File.class)))
+            .thenAnswer(invocation -> writeIntoFile(download, invocation, "Test file content"));
 
-    @Test
-    public void givenBucketBitStreamIdWhenNothingFoundOnS3ThenReturnsNull() throws IOException {
-        String bucketName = "BucketTest";
-        String bitStreamId = "BitStreamId";
-        this.s3BitStoreService.setBucketName(bucketName);
-        this.s3BitStoreService.setUseRelativePath(false);
-        when(bitstream.getInternalId()).thenReturn(bitStreamId);
-
-        when(this.s3Service.getObject(ArgumentMatchers.any(GetObjectRequest.class))).thenReturn(null);
-
-        this.s3BitStoreService.init();
-        assertThat(this.s3BitStoreService.get(bitstream), Matchers.nullValue());
-
-        verify(this.s3Service).getObject(
-                ArgumentMatchers.argThat(
-                        request ->
-                        bucketName.contentEquals(request.getBucketName()) &&
-                        bitStreamId.contentEquals(request.getKey())
-                )
-         );
+        InputStream inputStream = this.s3BitStoreService.get(bitstream);
+        assertThat(IOUtils.toString(inputStream, Charset.defaultCharset()), is("Test file content"));
 
     }
 
@@ -214,23 +186,14 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
         this.s3BitStoreService.setSubfolder(subfolder);
         when(bitstream.getInternalId()).thenReturn(bitStreamId);
 
-        S3Object object = Mockito.mock(S3Object.class);
-        S3ObjectInputStream inputStream = Mockito.mock(S3ObjectInputStream.class);
-        when(object.getObjectContent()).thenReturn(inputStream);
-        when(this.s3Service.getObject(ArgumentMatchers.any(GetObjectRequest.class))).thenReturn(object);
+        Download download = mock(Download.class);
+
+        when(tm.download(any(GetObjectRequest.class), any(File.class)))
+            .thenAnswer(invocation -> writeIntoFile(download, invocation, "Test file content"));
 
         this.s3BitStoreService.init();
-        assertThat(this.s3BitStoreService.get(bitstream), Matchers.equalTo(inputStream));
-
-        verify(this.s3Service).getObject(
-                ArgumentMatchers.argThat(
-                    request ->
-                    bucketName.equals(request.getBucketName()) &&
-                    request.getKey().startsWith(subfolder) &&
-                    request.getKey().contains(bitStreamId) &&
-                    !request.getKey().contains(File.separator + File.separator)
-                )
-        );
+        InputStream inputStream = this.s3BitStoreService.get(bitstream);
+        assertThat(IOUtils.toString(inputStream, Charset.defaultCharset()), is("Test file content"));
 
     }
 
@@ -364,86 +327,39 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
         this.s3BitStoreService.setUseRelativePath(false);
         when(bitstream.getInternalId()).thenReturn(bitStreamId);
 
-        File file = Mockito.mock(File.class);
-        InputStream in = Mockito.mock(InputStream.class);
-        PutObjectResult putObjectResult = Mockito.mock(PutObjectResult.class);
+        InputStream in = IOUtils.toInputStream("Test file content", Charset.defaultCharset());
+
         Upload upload = Mockito.mock(Upload.class);
         UploadResult uploadResult = Mockito.mock(UploadResult.class);
         when(upload.waitForUploadResult()).thenReturn(uploadResult);
-        String mockedTag = "1a7771d5fdd7bfdfc84033c70b1ba555";
-        when(file.length()).thenReturn(8L);
-        try (MockedStatic<File> fileMock = Mockito.mockStatic(File.class)) {
-            try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
-                try (MockedStatic<Utils> curateUtils = Mockito.mockStatic(Utils.class)) {
-                    curateUtils.when(() -> Utils.checksum((File) ArgumentMatchers.any(), ArgumentMatchers.any()))
-                            .thenReturn(mockedTag);
 
-                fileMock
-                    .when(() -> File.createTempFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
-                    .thenReturn(file);
+        when(this.tm.upload(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+            .thenReturn(upload);
 
-                when(this.tm.upload(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-                        .thenReturn(upload);
+        this.s3BitStoreService.init();
+        this.s3BitStoreService.put(bitstream, in);
 
-                this.s3BitStoreService.init();
-                this.s3BitStoreService.put(bitstream, in);
-                }
-            }
+        verify(this.bitstream).setSizeBytes(17);
+        verify(this.bitstream, times(2)).getInternalId();
+        verify(this.bitstream).setChecksum("ac79653edeb65ab5563585f2d5f14fe9");
+        verify(this.bitstream).setChecksumAlgorithm(org.dspace.storage.bitstore.S3BitStoreService.CSA);
+        verify(this.tm).upload(eq(bucketName), eq(bitStreamId), any(File.class));
 
-        }
-
-        verify(this.bitstream, Mockito.times(1)).setSizeBytes(
-                ArgumentMatchers.eq(8L)
-         );
-
-        verify(this.bitstream, Mockito.times(1)).setChecksum(
-                ArgumentMatchers.eq(mockedTag)
-         );
-
-        verify(this.tm, Mockito.times(1)).upload(
-            ArgumentMatchers.eq(bucketName),
-            ArgumentMatchers.eq(bitStreamId),
-            ArgumentMatchers.eq(file)
-         );
-
-        verify(file, Mockito.times(1)).delete();
+        verifyNoMoreInteractions(this.bitstream, this.tm);
 
     }
 
-    @Test
-    public void givenBitStreamWhenCallingPutFileCopyingThrowsIOExceptionPutThenFileIsRemovedAndStreamClosed()
-            throws Exception {
-        String bucketName = "BucketTest";
-        String bitStreamId = "BitStreamId";
-        this.s3BitStoreService.setBucketName(bucketName);
-        this.s3BitStoreService.setUseRelativePath(false);
-        when(bitstream.getInternalId()).thenReturn(bitStreamId);
+    private Download writeIntoFile(Download download, InvocationOnMock invocation, String content) {
 
-        File file = Mockito.mock(File.class);
-        InputStream in = Mockito.mock(InputStream.class);
-        try (MockedStatic<File> fileMock = Mockito.mockStatic(File.class)) {
-            try (MockedStatic<FileUtils> fileUtilsMock = Mockito.mockStatic(FileUtils.class)) {
-                fileUtilsMock
-                    .when(() -> FileUtils.copyInputStreamToFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
-                    .thenThrow(IOException.class);
-                fileMock
-                    .when(() -> File.createTempFile(ArgumentMatchers.any(), ArgumentMatchers.any()))
-                    .thenReturn(file);
+        File file = invocation.getArgument(1, File.class);
 
-                this.s3BitStoreService.init();
-                assertThrows(IOException.class, () -> this.s3BitStoreService.put(bitstream, in));
-            }
-
+        try {
+            FileUtils.write(file, content, Charset.defaultCharset());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        verify(this.bitstream, Mockito.never()).setSizeBytes(ArgumentMatchers.any(Long.class));
-
-        verify(this.bitstream, Mockito.never()).setChecksum(ArgumentMatchers.any(String.class));
-
-        verify(this.s3Service, Mockito.never()).putObject(ArgumentMatchers.any(PutObjectRequest.class));
-
-        verify(file, Mockito.times(1)).delete();
-
+        return download;
     }
 
     private int computeSlashes(String internalId) {

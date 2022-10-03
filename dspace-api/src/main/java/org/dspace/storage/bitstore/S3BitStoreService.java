@@ -75,7 +75,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     /**
      * Checksum algorithm
      */
-    private static final String CSA = "MD5";
+    static final String CSA = "MD5";
 
     // These settings control the way an identifier is hashed into
     // directory and file names
