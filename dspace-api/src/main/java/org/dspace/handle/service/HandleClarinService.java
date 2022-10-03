@@ -145,7 +145,6 @@ public interface HandleClarinService {
      * @throws SQLException If a database error occurs
      */
     public String resolveToURL(Context context, String handleStr) throws SQLException;
-
     /**
      * Return the object which handle maps to (Item, Collection, Community), or null. This is the object
      * itself, not a URL which points to it.
