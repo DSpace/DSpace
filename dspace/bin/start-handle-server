@@ -22,7 +22,7 @@ HANDLEDIR=`$BINDIR/dspace dsprop --property handle.dir`
 LOGDIR=$DSPACEDIR/log
 
 # Get the JARs in $DSPACEDIR/lib
-JARS="$DSPACEDIR/lib/*"
+JARS=`$BINDIR/dspace classpath`
 
 # Class path for DSpace will be:
 #   Any existing classpath
