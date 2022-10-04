@@ -100,7 +100,7 @@
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
     <bean class="org.dspace.eperson.SupervisorServiceImpl"/>
-
+    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
