@@ -101,16 +101,18 @@ public interface HandleService {
         throws SQLException, IllegalStateException;
 
     /**
-     * Creates a handle entry, but with a handle supplied by the caller (new
-     * Handle not generated)
+     * Creates a handle entry, but with a handle supplied by the caller (new Handle
+     * not generated)
      *
      * @param context        DSpace context
      * @param dso            DSpaceObject
      * @param suppliedHandle existing handle value
      * @param force          FIXME: currently unused
      * @return the Handle
-     * @throws SQLException          An exception that provides information on a database access error or other errors.
-     * @throws IllegalStateException if specified handle is already in use by another object
+     * @throws SQLException          An exception that provides information on a
+     *                               database access error or other errors.
+     * @throws IllegalStateException if specified handle is already in use by
+     *                               another object
      */
     public String createHandle(Context context, DSpaceObject dso, String suppliedHandle, boolean force)
         throws SQLException, IllegalStateException;
@@ -190,4 +192,12 @@ public interface HandleService {
      * @return
      */
     String parseHandle(String identifier);
+
+    /**
+     * Gets the additional prefixes used for handles,
+     * mapped in configuration file.
+     * 
+     * @return `String[]` array of prefixes
+     */
+    String[] getAdditionalPrefixes();
 }
