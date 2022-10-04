@@ -172,7 +172,7 @@ public class HandleClarinDAOImplTest extends AbstractUnitTest {
     public void findAllHandles() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        List<Handle> receivedHandles = handleClarinDAO.findAll(context, null, 10, 0);
+        List<Handle> receivedHandles = handleClarinDAO.findAll(context, null);
 
         assertEquals(receivedHandles.size(), 7);
         assertEquals(receivedHandles.get(3).getHandle(), HANDLE_PREFIX + "/" + SUFFIX_1);
@@ -186,7 +186,7 @@ public class HandleClarinDAOImplTest extends AbstractUnitTest {
     public void findHandlesByHandle() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        List<Handle> receivedHandles = handleClarinDAO.findAll(context, HANDLE_SORTING_COLUMN_DEF, 10, 0);
+        List<Handle> receivedHandles = handleClarinDAO.findAll(context, HANDLE_SORTING_COLUMN_DEF);
 
         assertEquals(receivedHandles.size(), 1);
         assertEquals(receivedHandles.get(0).getHandle(), HANDLE_PREFIX + "/" + SUFFIX_3);
@@ -198,7 +198,7 @@ public class HandleClarinDAOImplTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         assertNotNull(this.externalHandle);
 
-        List<Handle> receivedHandles = handleClarinDAO.findAll(context, EXTERNAL_HANDLE_SORTING_COLUMN_DEF, 10, 0);
+        List<Handle> receivedHandles = handleClarinDAO.findAll(context, EXTERNAL_HANDLE_SORTING_COLUMN_DEF);
 
         assertEquals(receivedHandles.size(), 1);
         assertEquals(receivedHandles.get(0).getHandle(), HANDLE_PREFIX + "/" + SUFFIX_EXTERNAL);
@@ -211,7 +211,7 @@ public class HandleClarinDAOImplTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         assertNotNull(this.externalHandle);
 
-        List<Handle> receivedHandles = handleClarinDAO.findAll(context, INTERNAL_HANDLE_SORTING_COLUMN_DEF, 10, 0);
+        List<Handle> receivedHandles = handleClarinDAO.findAll(context, INTERNAL_HANDLE_SORTING_COLUMN_DEF);
 
         assertEquals(receivedHandles.size(), 6);
         context.restoreAuthSystemState();
@@ -223,7 +223,7 @@ public class HandleClarinDAOImplTest extends AbstractUnitTest {
         assertNotNull(this.externalHandle);
 
         List<Handle> receivedHandles =
-                handleClarinDAO.findAll(context, RESOURCE_TYPE_HANDLE_ITEM_SORTING_COLUMN_DEF, 10, 0);
+                handleClarinDAO.findAll(context, RESOURCE_TYPE_HANDLE_ITEM_SORTING_COLUMN_DEF);
 
         assertEquals(receivedHandles.size(), 3);
         context.restoreAuthSystemState();
@@ -235,7 +235,7 @@ public class HandleClarinDAOImplTest extends AbstractUnitTest {
         assertNotNull(this.externalHandle);
 
         List<Handle> receivedHandles =
-                handleClarinDAO.findAll(context, RESOURCE_TYPE_HANDLE_COLLECTION_SORTING_COLUMN_DEF, 10, 0);
+                handleClarinDAO.findAll(context, RESOURCE_TYPE_HANDLE_COLLECTION_SORTING_COLUMN_DEF);
 
         assertEquals(receivedHandles.size(), 1);
         context.restoreAuthSystemState();

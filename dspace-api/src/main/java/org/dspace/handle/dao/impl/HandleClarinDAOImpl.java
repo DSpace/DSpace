@@ -45,7 +45,7 @@ public class HandleClarinDAOImpl extends AbstractHibernateDAO<Handle> implements
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleClarinDAOImpl.class);
 
     @Override
-    public List<Handle> findAll(Context context, String sortingColumnDef, int maxResult, int offset)
+    public List<Handle> findAll(Context context, String sortingColumnDef)
             throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Handle.class);
@@ -54,7 +54,7 @@ public class HandleClarinDAOImpl extends AbstractHibernateDAO<Handle> implements
 
         // If the sortingColumnDef is null return all Handles
         if (Objects.isNull(sortingColumnDef)) {
-            return executeCriteriaQuery(context, criteriaQuery, false, maxResult, offset);
+            return executeCriteriaQuery(context, criteriaQuery, false, -1, -1);
         }
 
         // load sortingColumn
@@ -63,7 +63,7 @@ public class HandleClarinDAOImpl extends AbstractHibernateDAO<Handle> implements
         int sortingValueIndex = 1;
         String[] sortingColumnDefAsList = sortingColumnDef.split(":");
         if (ArrayUtils.isEmpty(sortingColumnDefAsList) || sortingColumnDefAsList.length < 2) {
-            return executeCriteriaQuery(context, criteriaQuery, false, maxResult, offset);
+            return executeCriteriaQuery(context, criteriaQuery, false, -1, -1);
         }
 
         String sortingValue = sortingColumnDefAsList[sortingValueIndex];
@@ -97,6 +97,6 @@ public class HandleClarinDAOImpl extends AbstractHibernateDAO<Handle> implements
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(handleRoot.get(Handle_.handle)));
 
-        return list(context, criteriaQuery, false, Handle.class, maxResult, offset);
+        return list(context, criteriaQuery, false, Handle.class, -1, -1);
     }
 }

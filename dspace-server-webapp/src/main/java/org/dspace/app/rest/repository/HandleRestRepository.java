@@ -109,10 +109,8 @@ public class HandleRestRepository extends  DSpaceRestRepository<HandleRest, Inte
                 sortingColumnDefinition = pageable.getSort().stream().iterator().next().getProperty();
             }
 
-            Long offset = pageable.getOffset();
             // List of all founded handles
-            List<Handle> handles = handleClarinService.findAll(context, sortingColumnDefinition,
-                    pageable.getPageSize(), offset.intValue());
+            List<Handle> handles = handleClarinService.findAll(context, sortingColumnDefinition);
             // Convert handles to page of handle rest
             return converter.toRestPage(handles, pageable, utils.obtainProjection());
         } catch (SQLException e) {

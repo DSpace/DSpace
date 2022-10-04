@@ -90,8 +90,8 @@ public class HandleClarinServiceImpl implements HandleClarinService {
     }
 
     @Override
-    public List<Handle> findAll(Context context, String sortingColumn, int maxResult, int offset) throws SQLException {
-        return handleClarinDAO.findAll(context, sortingColumn,  maxResult, offset);
+    public List<Handle> findAll(Context context, String sortingColumn) throws SQLException {
+        return handleClarinDAO.findAll(context, sortingColumn);
     }
 
     @Override
