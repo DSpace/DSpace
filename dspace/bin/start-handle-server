@@ -10,7 +10,8 @@
 # Unix shell script for starting Handle server.  WARNING this assumes any
 # previously running Handle servers have been terminated.
 
-# Assume that this script is in the bin subdirectory of the DSpace installation directory.
+# Assume that this script is in the bin subdirectory of the DSpace
+# installation directory.
 BINDIR=`dirname $0`
 
 # Read parameters from DSpace config
@@ -20,19 +21,6 @@ HANDLEDIR=`$BINDIR/dspace dsprop --property handle.dir`
 # Assume log directory is a subdirectory of DSPACEDIR.
 # If you want your handle server logs stored elsewhere, change this value
 LOGDIR=$DSPACEDIR/log
-
-# Get the JARs in $DSPACEDIR/lib
-JARS=`$BINDIR/dspace classpath`
-
-# Class path for DSpace will be:
-#   Any existing classpath
-#   The JARs (lib/*.jar)
-#   The configuration directory
-if [ "$CLASSPATH" = "" ]; then
-  FULLPATH=$JARS:$DSPACEDIR/config
-else
-  FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
-fi
 
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
@@ -46,7 +34,7 @@ rm -f $HANDLEDIR/txns/lock
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
 # does not support more than one JVM writing to the same rolling log.
-nohup java $JAVA_OPTS -classpath $FULLPATH \
+nohup java $JAVA_OPTS -classpath `$BINDIR/dspace classpath` \
     -Ddspace.log.init.disable=true \
     -Dlog4j.configuration=log4j-handle-plugin.properties \
     net.handle.server.Main $HANDLEDIR \
