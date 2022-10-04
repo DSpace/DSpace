@@ -31,8 +31,8 @@ REM Assume log directory is a subdirectory of DSPACEDIR.
 REM If you want your handle server logs stored elsewhere, change this value
 set LOGDIR=%DSPACEDIR%/log
 
-REM Build a CLASSPATH including all classes in oai webapp, all libraries in [dspace]/lib and the config folder.
-set DSPACE_CLASSPATH=%CLASSPATH%;%DSPACEDIR%\config;%DSPACEDIR%\webapps\oai\WEB-INF\classes\;%DSPACEDIR%\lib\*
+REM Build a CLASSPATH including all libraries in [dspace]/lib and the config folder.
+set DSPACE_CLASSPATH=%CLASSPATH%;%DSPACEDIR%\config;%DSPACEDIR%\lib\*
 
 REM If JAVA_OPTS specified, use those options
 REM Otherwise, default Java to using 256MB of memory
