@@ -21,6 +21,9 @@ public class LdapRest extends DSpaceObjectRest {
     private String name;
     private List<GroupRest> groups;
 
+    private List<UnitRest> matchedUnits;
+    private List<String> unmatchedUnits;
+
     @Override
     public String getCategory() {
         return CATEGORY;
@@ -106,5 +109,21 @@ public class LdapRest extends DSpaceObjectRest {
 
     public List<GroupRest> getGroups() {
         return groups;
+    }
+
+    public void setMatchedUnits(List<UnitRest> unitList) {
+        this.matchedUnits = unitList;
+    }
+
+    public List<UnitRest> getMatchedUnits() {
+        return matchedUnits;
+    }
+
+    public void setUnmatchedUnits(List<String> unmatchedUnitsList) {
+        this.unmatchedUnits = unmatchedUnitsList;
+    }
+
+    public List<String> getUnmatchedUnits() {
+        return this.unmatchedUnits;
     }
 }

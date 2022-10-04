@@ -147,9 +147,46 @@ public class Ldap {
      * @throws NamingException if an error is encountered while retrieving the
      * value.
      */
-    public List<String> getUnits() throws NamingException {
+    protected List<String> getLdapOrganizationalUnits() throws NamingException {
         return getAttributeAll("ou");
     }
+
+    /**
+     * Returns a List of Units in DSpace that match the LDAP organizational
+     * units of the user
+     */
+    public List<Unit> getMatchedUnits(Context context) throws NamingException, java.sql.SQLException {
+        List<Unit> units = new ArrayList<>();
+        for (Iterator<String> i = getLdapOrganizationalUnits().iterator(); i.hasNext();) {
+            String strUnit = (String) i.next();
+
+            Unit unit = unitService.findByName(context, strUnit);
+
+            if (unit != null) {
+                units.add(unit);
+            }
+        }
+        return units;
+    }
+
+    /**
+     * Returns a List of String representing the LDAP organizational units for
+     * the user that do not have a corresponding DSpace Unit.
+     */
+    public List<String> getUnmatchedUnits(Context context) throws NamingException, java.sql.SQLException {
+        List<String> additionalUnits = new ArrayList<>();
+        for (Iterator<String> i = getLdapOrganizationalUnits().iterator(); i.hasNext();) {
+            String strUnit = (String) i.next();
+
+            Unit unit = unitService.findByName(context, strUnit);
+
+            if (unit == null) {
+                additionalUnits.add(strUnit);
+            }
+        }
+        return additionalUnits;
+    }
+
 
     /**
      * Returns true if the user is College Park faculty with an acceptable
@@ -216,7 +253,7 @@ public class Ldap {
     public List<Group> getGroups(Context context) throws NamingException, java.sql.SQLException {
         HashSet<Group> ret = new HashSet<>();
 
-        for (Iterator<String> i = getUnits().iterator(); i.hasNext();) {
+        for (Iterator<String> i = getLdapOrganizationalUnits().iterator(); i.hasNext();) {
             String strUnit = i.next();
 
             Unit unit = unitService.findByName(context, strUnit);
