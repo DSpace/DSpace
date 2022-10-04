@@ -5,17 +5,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import edu.umd.lib.dspace.authenticate.Ldap;
+import edu.umd.lib.dspace.authenticate.LdapService;
+import edu.umd.lib.dspace.authenticate.impl.Ldap;
+
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.statistics.util.DummyHttpServletRequest;
@@ -75,14 +74,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = new MockLdap() {
-            @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return false;
-            }
-        };
+        LdapService mockLdapService = MockLdapService.userNotFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -110,14 +104,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = new MockLdap() {
-            @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
-            }
-        };
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -145,14 +134,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        MockLdap mockLdap = new MockLdap() {
-            @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
-            }
-        };
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.CERT_REQUIRED",
                 AuthenticationMethod.CERT_REQUIRED, response);
@@ -175,14 +159,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        MockLdap mockLdap = new MockLdap() {
-            @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
-            }
-        };
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.BAD_ARGS",
                 AuthenticationMethod.BAD_ARGS, response);
@@ -205,14 +184,9 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        Ldap mockLdap = new MockLdap() {
-            @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
-            }
-        };
+        LdapService mockLdapService = MockLdapService.userFound();
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
@@ -224,7 +198,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
 
-        CASAuthentication stubCas = new CASAuthentication() {
+        MockCASAuthentication stubCas = new MockCASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
@@ -237,28 +211,22 @@ public class CASAuthenticationTest extends AbstractUnitTest {
             }
         };
 
-        // Set up MockLdap so we can verify that the "registerEPerson" method was
-        // called.
-        MockLdap mockLdap = new MockLdap() {
+        // Set up MockLdapService so we can verify that the "registerEPerson"
+        // method was called.
+        MockLdapService mockLdapService = new MockLdapService() {
             @Override
-            public boolean checkUid(String strUid) throws NamingException {
-                return true;
-            }
-
-            @Override
-            public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
-                registerEPersonCalled = true;
-                return eperson;
+            public Ldap queryLdap(String strUid) {
+                return new Ldap(strUid, null);
             }
         };
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdap);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
 
         // Verify that Ldap.registerPerson was called
-        assertTrue("Ldap.registerEPerson was not called", mockLdap.registerEPersonCalled);
+        assertTrue("Ldap.registerEPerson was not called", stubCas.registerEPersonCalled);
     }
 }
 
@@ -299,85 +267,41 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
     }
 }
 
-class MockLdap implements edu.umd.lib.dspace.authenticate.Ldap {
+class MockLdapService implements LdapService {
+    // Convenience method returning MockLdapService instance that returns an
+    // Ldap object, indicating that the user was found in LDAP.
+    public static MockLdapService userFound() {
+        return new MockLdapService() {
+            @Override
+            public Ldap queryLdap(String strUid) {
+                return new Ldap(strUid, null);
+            }
+        };
+    }
 
-    public boolean registerEPersonCalled = false;
-
-    @Override
-    public boolean checkUid(String strUid) throws NamingException {
-        return false;
+    // Convenience method returning MockLdapService instance that always
+    // indicates the user was not found in LDAP.
+    public static MockLdapService userNotFound() {
+        return new MockLdapService();
     }
 
     @Override
-    public boolean checkPassword(String strPassword) throws NamingException {
-        return false;
-    }
-
-    @Override
-    public boolean checkAdmin(String strLdapPassword) {
-        return false;
+    public Ldap queryLdap(String strUid) {
+        return null;
     }
 
     @Override
     public void close() {
-
     }
+}
+
+class MockCASAuthentication extends CASAuthentication {
+    public boolean registerEPersonCalled = false;
 
     @Override
-    public List<String> getAttributeAll(String strName) throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getAttribute(String strName) throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getEmail() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getPhone() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getFirstName() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public String getLastName() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public List<String> getUnits() throws NamingException {
-        return null;
-    }
-
-    @Override
-    public List<Group> getGroups() throws NamingException, SQLException {
-        return null;
-    }
-
-    @Override
-    public boolean isFaculty() throws NamingException {
-        return false;
-    }
-
-    @Override
-    public EPerson registerEPerson(String uid, HttpServletRequest request) throws Exception {
-        return null;
-    }
-
-    @Override
-    public void setContext(Context context) {
-    }
-
-    @Override
-    public void finalize() {
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request)
+            throws Exception {
+        registerEPersonCalled = true;
+        return super.registerEPerson(uid, context, ldap, request);
     }
 }

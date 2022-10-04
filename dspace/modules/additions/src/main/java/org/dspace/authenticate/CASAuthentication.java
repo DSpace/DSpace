@@ -7,18 +7,19 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.umd.lib.dspace.authenticate.Ldap;
-import edu.umd.lib.dspace.authenticate.impl.LdapImpl;
+import edu.umd.lib.dspace.authenticate.LdapService;
+import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
+import edu.umd.lib.dspace.authenticate.impl.Ldap;
 import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -95,8 +96,7 @@ public class CASAuthentication implements AuthenticationMethod {
         try {
             Ldap ldap = (Ldap) request.getSession().getAttribute(CAS_LDAP);
             if (ldap != null) {
-                ldap.setContext(context);
-                List<Group> groups = ldap.getGroups();
+                List<Group> groups = ldap.getGroups(context);
 
                 Group CASGroup = groupService.findByName(context, "CAS Authenticated");
                 if (CASGroup == null) {
@@ -162,15 +162,6 @@ public class CASAuthentication implements AuthenticationMethod {
         return netid;
     }
 
-    protected boolean isLdapUser(Ldap ldap, String netid) {
-        try {
-            return ldap.checkUid(netid);
-        } catch (NamingException ne) {
-            log.error("LDAP NamingException for '" + netid + "'", ne);
-            return false;
-        }
-    }
-
     /**
      * CAS authentication.
      *
@@ -179,23 +170,17 @@ public class CASAuthentication implements AuthenticationMethod {
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
             throws SQLException {
-        Ldap ldap = null;
-        try {
-            ldap = new LdapImpl(context);
+        try (LdapService ldap = new LdapServiceImpl(context)) {
             return authenticate(context, username, password, realm, request, ldap);
         } catch (Exception e) {
             log.error("Unexpected exception caught", e);
-        } finally {
-            if (ldap != null) {
-                ldap.close();
-            }
         }
 
         return BAD_ARGS;
     }
 
     protected int authenticate(Context context, String username, String password, String realm,
-            HttpServletRequest request, Ldap ldap) {
+            HttpServletRequest request, LdapService ldapService) {
         final String ticket = request.getParameter("ticket");
         log.info(getHeader(context, "login", " ticket: " + ticket));
 
@@ -217,7 +202,8 @@ public class CASAuthentication implements AuthenticationMethod {
             }
 
             // Check directory
-            if (!isLdapUser(ldap, netid)) {
+            Ldap ldap = ldapService.queryLdap(netid);
+            if (ldap == null) {
                 log.error("Unknown directory id " + netid);
                 return NO_SUCH_USER;
             }
@@ -238,7 +224,7 @@ public class CASAuthentication implements AuthenticationMethod {
             // Register New User, if necessary
             if (eperson == null) {
                 if (canSelfRegister(context, request, netid)) {
-                    eperson = ldap.registerEPerson(netid, request);
+                    eperson = registerEPerson(netid, context, ldap, request);
 
                     context.setCurrentUser(eperson);
                 } else {
@@ -306,14 +292,6 @@ public class CASAuthentication implements AuthenticationMethod {
             return null;
         }
         return stv.getUser();
-    }
-
-    /**
-     * Add code here to extract user details email, firstname, lastname from
-     * LDAP or database etc
-     */
-    public void registerUser(String netid) throws ClassNotFoundException, SQLException {
-        // add your code here
     }
 
     /*
@@ -386,5 +364,53 @@ public class CASAuthentication implements AuthenticationMethod {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Registers an EPerson, using the information in the given Ldap object.
+     */
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request) throws Exception {
+        // Turn off authorizations to create a new user
+        context.turnOffAuthorisationSystem();
+
+        try {
+            // Create a new eperson
+            EPerson eperson = ePersonService.create(context);
+
+            String strFirstName = ldap.getFirstName();
+            if (strFirstName == null) {
+                strFirstName = "??";
+            }
+
+            String strLastName = ldap.getLastName();
+            if (strLastName == null) {
+                strLastName = "??";
+            }
+
+            String strPhone = ldap.getPhone();
+            if (strPhone == null) {
+                strPhone = "??";
+            }
+
+            eperson.setNetid(uid);
+            eperson.setEmail(uid + "@umd.edu");
+            eperson.setFirstName(context, strFirstName);
+            eperson.setLastName(context, strLastName);
+            ePersonService.setMetadataSingleValue(context, eperson, EPersonService.MD_PHONE, null, strPhone);
+            eperson.setCanLogIn(true);
+            eperson.setRequireCertificate(false);
+
+            AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
+            ePersonService.update(context, eperson);
+            context.dispatchEvents();
+
+            log.info("CASAuthentication::registerEPerson: create_um_eperson eperson_id="
+                     + eperson.getID() +", uid=" + uid);
+
+            return eperson;
+        } finally {
+            // Turn authorizations back on.
+            context.restoreAuthSystemState();
+        }
     }
 }
