@@ -7,18 +7,32 @@
  */
 package org.dspace.content;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.*;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
-import java.util.*;
 
 /**
  * Class representing a community
@@ -26,20 +40,15 @@ import java.util.*;
  * The community's metadata (name, introductory text etc.) is loaded into'
  * memory. Changes to this metadata are only reflected in the database after
  * <code>update</code> is called.
- * 
+ *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
-@Table(name="community")
+@Table(name = "community")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
-{
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(Community.class);
-
-    @Column(name="community_id", insertable = false, updatable = false)
+public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
+    @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
     // Begin UMD Customization
@@ -49,33 +58,29 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "community2community",
-            joinColumns = {@JoinColumn(name = "parent_comm_id") },
-            inverseJoinColumns = {@JoinColumn(name = "child_comm_id") }
+        name = "community2community",
+        joinColumns = {@JoinColumn(name = "parent_comm_id")},
+        inverseJoinColumns = {@JoinColumn(name = "child_comm_id")}
     )
-    private Set<Community> subCommunities = new HashSet<>();
+    private final Set<Community> subCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
-    private Set<Community> parentCommunities = new HashSet<>();
+    private final Set<Community> parentCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
-    private Set<Collection> collections = new HashSet<>();
+    private final Set<Collection> collections = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "admin")
     /** The default group of administrators */
     private Group admins;
 
-    /** The logo bitstream */
+    /**
+     * The logo bitstream
+     */
     @OneToOne
     @JoinColumn(name = "logo_bitstream_id")
     private Bitstream logo = null;
-
-    // Keys for accessing Community metadata
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    public static final String SHORT_DESCRIPTION = "short_description";
-    public static final String SIDEBAR_TEXT = "side_bar_text";
 
     @Transient
     protected transient CommunityService communityService;
@@ -85,21 +90,27 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      * {@link org.dspace.content.service.CommunityService#create(Community, Context)}
      * or
      * {@link org.dspace.content.service.CommunityService#create(Community, Context, String)}
-     *
      */
-    protected Community()
-    {
+    protected Community() {
 
     }
 
-    void addSubCommunity(Community subCommunity)
-    {
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
+    protected Community(UUID uuid) {
+        this.predefinedUUID = uuid;
+    }
+
+    void addSubCommunity(Community subCommunity) {
         subCommunities.add(subCommunity);
         setModified();
     }
 
-    void removeSubCommunity(Community subCommunity)
-    {
+    public void removeSubCommunity(Community subCommunity) {
         subCommunities.remove(subCommunity);
         setModified();
     }
@@ -107,11 +118,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Get the logo for the community. <code>null</code> is return if the
      * community does not have a logo.
-     * 
+     *
      * @return the logo of the community, or <code>null</code>
      */
-    public Bitstream getLogo()
-    {
+    public Bitstream getLogo() {
         return logo;
     }
 
@@ -127,12 +137,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      * <P>
      * The default group of administrators for community 100 is the one called
      * <code>community_100_admin</code>.
-     * 
+     *
      * @return group of administrators, or <code>null</code> if there is no
-     *         default group.
+     * default group.
      */
-    public Group getAdministrators()
-    {
+    public Group getAdministrators() {
         return admins;
     }
 
@@ -144,25 +153,22 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Get the collections in this community. Throws an SQLException because
      * creating a community object won't load in all collections.
-     * 
+     *
      * @return array of Collection objects
      */
-    public List<Collection> getCollections()
-    {
+    public List<Collection> getCollections() {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
-        Collection[] output = collections.toArray(new Collection[]{});
+        Collection[] output = collections.toArray(new Collection[] {});
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
 
-    void addCollection(Collection collection)
-    {
+    void addCollection(Collection collection) {
         collections.add(collection);
     }
 
-    void removeCollection(Collection collection)
-    {
+    void removeCollection(Collection collection) {
         collections.remove(collection);
     }
 
@@ -170,14 +176,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      * Get the immediate sub-communities of this community. Throws an
      * SQLException because creating a community object won't load in all
      * collections.
-     * 
+     *
      * @return array of Community objects
      */
-    public List<Community> getSubcommunities()
-    {
+    public List<Community> getSubcommunities() {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
-        Community[] output = subCommunities.toArray(new Community[]{});
+        Community[] output = subCommunities.toArray(new Community[] {});
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
@@ -185,14 +190,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Return the parent community of this community, or null if the community
      * is top-level
-     * 
+     *
      * @return the immediate parent community, or null if top-level
      */
-    public List<Community> getParentCommunities()
-    {
+    public List<Community> getParentCommunities() {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
-        Community[] output = parentCommunities.toArray(new Community[]{});
+        Community[] output = parentCommunities.toArray(new Community[] {});
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
@@ -201,12 +205,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         parentCommunities.add(parentCommunity);
     }
 
-    void clearParentCommunities(){
+    void clearParentCommunities() {
         parentCommunities.clear();
     }
 
-    public void removeParentCommunity(Community parentCommunity)
-    {
+    public void removeParentCommunity(Community parentCommunity) {
         parentCommunities.remove(parentCommunity);
         setModified();
     }
@@ -214,53 +217,43 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Return <code>true</code> if <code>other</code> is the same Community
      * as this object, <code>false</code> otherwise
-     * 
-     * @param other
-     *            object to compare to
-     * 
+     *
+     * @param other object to compare to
      * @return <code>true</code> if object passed in represents the same
-     *         community as this object
+     * community as this object
      */
     @Override
-    public boolean equals(Object other)
-    {
-        if (other == null)
-        {
+    public boolean equals(Object other) {
+        if (!(other instanceof Community)) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
-        if (this.getClass() != objClass)
-        {
+        if (this.getClass() != objClass) {
             return false;
         }
         final Community otherCommunity = (Community) other;
-        if (!this.getID().equals(otherCommunity.getID() ))
-        {
-            return false;
-        }
-
-        return true;
+        return this.getID().equals(otherCommunity.getID());
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return new HashCodeBuilder().append(getID()).toHashCode();
     }
 
     /**
      * return type found in Constants
+     *
      * @return Community type
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.COMMUNITY;
     }
 
     @Override
     public String getName() {
-        String value = getCommunityService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        String value = getCommunityService()
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -270,8 +263,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     private CommunityService getCommunityService() {
-        if(communityService == null)
-        {
+        if (communityService == null) {
             communityService = ContentServiceFactory.getInstance().getCommunityService();
         }
         return communityService;
@@ -281,7 +273,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     // Customization to support finding top level community by CommunityGroup
     // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
     public int getGroupID() {
-      return this.groupId;
+      return this.groupId != null ? this.groupId.intValue() : -1;
     }
 
     public void setGroupID(int groupId) {
@@ -289,4 +281,5 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
       setModified();
     }
     // End UMD Customization
+
 }

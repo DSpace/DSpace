@@ -120,8 +120,8 @@
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <!-- Begin UMD Customization -->
-    <!-- <bean class="org.dspace.content.EtdUnitServiceImpl"/>
-    <bean class="org.dspace.content.CommunityGroupServiceImpl"/>  -->
+    <!-- <bean class="org.dspace.content.EtdUnitServiceImpl"/> -->
+    <bean class="org.dspace.content.CommunityGroupServiceImpl"/>
     <bean class="org.dspace.eperson.UnitServiceImpl"/>
     <!-- End UMD Customization -->
 
