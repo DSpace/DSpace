@@ -72,13 +72,18 @@ public class OidcClientImpl implements OidcClient {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "CommentedOutCode"})
     public Map<String, Object> getUserInfo(String accessToken) throws OidcClientException {
 
+        //OKTA mandates a POST request to this end-point, just to make life interesting.
+        /*
         HttpUriRequest httpUriRequest = RequestBuilder.get(getUserInfoEndpointUrl())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
-
+        */
+        HttpUriRequest httpUriRequest = RequestBuilder.post(getUserInfoEndpointUrl())
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .build();
         return executeAndParseJson(httpUriRequest, Map.class);
     }
 
