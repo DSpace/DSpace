@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import edu.umd.lib.dspace.authenticate.LdapService;
 import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
 import edu.umd.lib.dspace.authenticate.impl.Ldap;
+import org.dspace.app.rest.model.UnitRest;
 
 /**
  * Link repository for the direct Ldap subresource of an individual eperson.
@@ -84,6 +85,12 @@ public class EPersonLdapLinkRepository extends AbstractDSpaceRestRepository
                 List<GroupRest> groupList = ldap.getGroups(context).stream()
                     .map(g -> (GroupRest) converter.toRest(g, projection)).collect(Collectors.toList());
                 ldapRest.setGroups(groupList);
+
+                List<UnitRest> matchedUnitsList = ldap.getMatchedUnits(context).stream()
+                    .map(u -> (UnitRest) converter.toRest(u, projection)).collect(Collectors.toList());
+                ldapRest.setMatchedUnits(matchedUnitsList);
+
+                ldapRest.setUnmatchedUnits(ldap.getUnmatchedUnits(context));
 
                 return ldapRest;
             } catch (NamingException ne) {
