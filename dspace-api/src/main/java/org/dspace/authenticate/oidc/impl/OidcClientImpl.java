@@ -12,6 +12,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -72,13 +73,33 @@ public class OidcClientImpl implements OidcClient {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "CommentedOutCode"})
     public Map<String, Object> getUserInfo(String accessToken) throws OidcClientException {
-
+        /*
         HttpUriRequest httpUriRequest = RequestBuilder.get(getUserInfoEndpointUrl())
             .addHeader("Authorization", "Bearer " + accessToken)
             .build();
+        HttpUriRequest httpUriRequest = RequestBuilder.post(getUserInfoEndpointUrl())
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .setEntity(new UrlEncodedFormEntity(okta_client_details, Charset.defaultCharset()))
+                .build();
 
+         */
+        //OKTA mandates a POST request to this end-point, just to make life interesting.
+        // Authorization: Basic ${Base64(<client_id>:<client_secret>)}
+        // Body: Token AccessToken, token_type_hint = access_token
+        String client_details = getClientId() + ":" + getClientSecret();
+        String b64_client_details = Base64.getEncoder().encodeToString(client_details.getBytes());
+        List<NameValuePair> okta_token_details = new ArrayList<>();
+        okta_token_details.add(new BasicNameValuePair("token", accessToken));
+        okta_token_details.add(new BasicNameValuePair("token_type_hint", "access_token"));
+        HttpUriRequest httpUriRequest = RequestBuilder.post(getUserInfoEndpointUrl())
+                .addHeader("Authorization", "Basic " + b64_client_details)
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Accept", "application/json")
+                .setEntity(new UrlEncodedFormEntity(okta_token_details, Charset.defaultCharset()))
+                .build();
         return executeAndParseJson(httpUriRequest, Map.class);
     }
 
