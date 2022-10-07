@@ -453,7 +453,7 @@ public class ItemsResource extends Resource
 
             // add bitstream to specified bundle
             if (bundleName == null) {
-                bundleName = "ORIGINAL";
+                bundleName = org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
             }
             for (Bundle existingBundle : bundles)
             {
