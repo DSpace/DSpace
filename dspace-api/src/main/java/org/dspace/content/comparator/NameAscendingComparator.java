@@ -27,6 +27,9 @@ public class NameAscendingComparator implements Comparator<DSpaceObject> {
             String name1 = StringUtils.trimToEmpty(dso1.getName());
             String name2 = StringUtils.trimToEmpty(dso2.getName());
 
+            name1 = StringUtils.stripAccents(name1);
+            name2 = StringUtils.stripAccents(name2);
+
             //When two DSO's have the same name, use their UUID to put them in an order
             if (name1.equals(name2)) {
                 return ObjectUtils.compare(dso1.getID(), dso2.getID());
