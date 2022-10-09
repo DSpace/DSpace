@@ -92,4 +92,12 @@ public class NameAscendingComparatorTest {
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }
+
+    @Test
+    public void testCompareWithDiacritics() throws Exception {
+        when(dso1.getName()).thenReturn("á");
+        when(dso2.getName()).thenReturn("b");
+
+        assertTrue(comparator.compare(dso1, dso2) < 0);
+    }
 }
