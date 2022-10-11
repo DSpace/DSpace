@@ -137,6 +137,15 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 op.profile(srgb_profile);
             }
         }
+        // Sharpen the thumbnail with an unsharp mask operator. Accordi-
+        // to the ImageMagick docs, the radius should be larger than the
+        // sigma, or we can use a radius of 0 to have ImageMagick select
+        // a suitable radius. Here we only override the default sigma of
+        // 1.0 with 0.5, which seems to have a good effect.
+        //
+        // See: https://imagemagick.org/script/command-line-options.php#unsharp
+        // See: https://im4java.sourceforge.net/api/org/im4java/core/IMOps.html#unsharp()
+        op.unsharp(0.0,0.5);
         op.addImage(f2.getAbsolutePath());
         if (verbose) {
             System.out.println("IM Image Param: " + op);
