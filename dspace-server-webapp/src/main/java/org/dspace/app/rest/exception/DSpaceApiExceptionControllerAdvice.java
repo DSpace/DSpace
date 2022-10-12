@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.exception;
 
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIBUTE;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.orcid.exception.OrcidValidationException;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.TypeMismatchException;
@@ -163,6 +165,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         EPersonNameNotProvidedException.class,
         GroupNameNotProvidedException.class,
         GroupHasPendingWorkflowTasksException.class,
+        PasswordNotValidException.class,
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {
@@ -188,6 +191,18 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, null,
                           "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler({WrongCurrentPasswordException.class})
+    protected void handleInvalidPasswordException(HttpServletRequest request, HttpServletResponse response,
+                                               Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidReCaptchaException.class)
+    protected void handleInvalidCaptchaTokenRequestException(HttpServletRequest request, HttpServletResponse response,
+                                                                                      Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, "Invalid captcha token", SC_FORBIDDEN);
     }
 
     @Override

@@ -36,31 +36,28 @@ dspace.hostname = localhost
 dspace.baseUrl = http://localhost:8080
 dspace.url = ${dspace.baseUrl}
 
-# URL of DSpace backend ('server' webapp). Include port number etc.
+# Public URL of DSpace backend ('server' webapp). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
-# This is where REST API and all enabled server modules (OAI-PMH, SWORD,
-# SWORDv2, RDF, etc) will respond.
+# This is where REST API and all enabled server modules (OAI-PMH, SWORD, SWORDv2, RDF, etc) will respond.
+# NOTE: This URL must be accessible to all DSpace users (should not use 'localhost' in Production)
+# and is usually "synced" with the "rest" section in the DSpace User Interface's config.*.yml.
+# It corresponds to the URL that you would type into your browser to access the REST API.
 dspace.server.url = ${dspace.baseUrl}/server
 
-# URL of DSpace frontend (Angular UI). Include port number etc.
+# Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
-# This is used by the backend to provide links in emails, RSS feeds, Sitemaps,
-# etc.
+# This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
+# NOTE: this URL must be accessible to all DSpace users (should not use 'localhost' in Production).
+# It corresponds to the URL that you would type into your browser to access the User Interface.
 dspace.ui.url = http://localhost:4000
 
 # Name of the site
 dspace.name = Digital Repository at the University of Maryland (DRUM)
 
-# assetstore.dir, look at DSPACE/config/spring/api/bitstore.xml for more options
-# default is ${dspace.dir}/assetstore, uncomment and modify if you need to use a different path
-#assetstore.dir = ${dspace.dir}/assetstore
-assetstore.dir = ${dspace.dir}/assetstore
-assetstore.dir.1 = ${dspace.dir}/assetstore1
-assetstore.dir.2 = ${dspace.dir}/assetstore2
-assetstore.dir.3 = ${dspace.dir}/assetstore3
-assetstore.dir.4 = ${dspace.dir}/assetstore4
-
-assetstore.incoming = 0
+# Assetstore configurations have moved to config/modules/assetstore.cfg
+# and config/spring/api/bitstore.xml.
+# Additional storage options (e.g. Amazon S3) are available in `assetstore.cfg`
+# assetstore.dir = ${dspace.dir}/assetstore
 
 # Default language for metadata values
 #default.language = en_US

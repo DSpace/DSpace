@@ -294,4 +294,9 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         return false;
     }
 
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+        return false;
+    }
+
 }
