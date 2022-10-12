@@ -94,7 +94,7 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
     }
 
     public CommunityBuilder addParentCommunity(final Context context, final Community parent)
-            throws SQLException, AuthorizeException {
+        throws SQLException, AuthorizeException {
         communityService.addSubcommunity(context, parent, community);
         return this;
     }
@@ -115,18 +115,17 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     @Override
     public void cleanup() throws Exception {
-        try (Context c = new Context()) {
+       try (Context c = new Context()) {
             c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
-            // Ensure object and any related objects are reloaded before checking to see
-            // what needs cleanup
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             community = c.reloadEntity(community);
             if (community != null) {
                 deleteAdminGroup(c);
                 delete(c, community);
                 c.complete();
             }
-        }
+       }
     }
 
     private void deleteAdminGroup(Context c) throws SQLException, AuthorizeException, IOException {
@@ -144,7 +143,6 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     /**
      * Delete the Test Community referred to by the given UUID
-     * 
      * @param uuid UUID of Test Community to delete
      * @throws SQLException
      * @throws IOException

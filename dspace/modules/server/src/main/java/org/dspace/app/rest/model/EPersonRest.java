@@ -127,4 +127,5 @@ public class EPersonRest extends DSpaceObjectRest {
     public Class getController() {
         return RestResourceController.class;
     }
+
 }
