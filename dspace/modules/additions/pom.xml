@@ -353,66 +353,6 @@
          <artifactId>spring-test</artifactId>
          <scope>test</scope>
       </dependency>
-
-      <!-- UMD Customization: LIBDRUM-695
-          The following dependencies are required by the CNRI Handle Server,
-          but are excluded in the "cnri-servlet-container" dependency in
-          the "dspace-api/pom/xml" file.
-
-          As of DSpace 7.3, no other dependencies used by DSpace require
-          these dependencies as "compile" dependencies. They are being added
-          here so that they will be available to the CNRI Handle Server when
-          run in the "handle-server" container as part of the "drum-0"
-          Kubernetes pod.
-
-          The continued need for these dependencies should be re-evaluated
-          when new DSpace releases are made.
-
-          Note: These dependencies are using the Jetty version defined by
-          DSpace, not the version specified by the "cnri-servlet-container"
-          dependency.
-      -->
-      <dependency>
-         <groupId>org.eclipse.jetty</groupId>
-         <artifactId>jetty-alpn-java-server</artifactId>
-         <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-deploy</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-servlet</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-servlets</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-webapp</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty</groupId>
-           <artifactId>jetty-xml</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty.http2</groupId>
-           <artifactId>http2-common</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-           <groupId>org.eclipse.jetty.http2</groupId>
-           <artifactId>http2-server</artifactId>
-           <version>${jetty.version}</version>
-      </dependency>
-      <!-- END UMD Customization: LIBDRUM-695 -->
    </dependencies>
 
 </project>
