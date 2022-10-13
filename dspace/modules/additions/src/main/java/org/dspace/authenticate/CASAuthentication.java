@@ -366,6 +366,11 @@ public class CASAuthentication implements AuthenticationMethod {
         return false;
     }
 
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+      return false;
+    }
+
     /**
      * Registers an EPerson, using the information in the given Ldap object.
      */
