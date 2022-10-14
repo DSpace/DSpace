@@ -59,6 +59,16 @@ dspace.name = Digital Repository at the University of Maryland (DRUM)
 # Additional storage options (e.g. Amazon S3) are available in `assetstore.cfg`
 # assetstore.dir = ${dspace.dir}/assetstore
 
+# UMD Customization - Overriding assetstore.dir and assetstore.index.primary
+# properties here, to avoid having to modify config/modules/assetstore.cfg
+assetstore.dir.1 = ${dspace.dir}/assetstore1
+assetstore.dir.2 = ${dspace.dir}/assetstore2
+assetstore.dir.3 = ${dspace.dir}/assetstore3
+assetstore.dir.4 = ${dspace.dir}/assetstore4
+
+assetstore.index.primary = 0
+# End UMD Customization
+
 # Default language for metadata values
 #default.language = en_US
 
