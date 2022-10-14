@@ -7,12 +7,14 @@
         <property name="incoming" value="${assetstore.index.primary}"/>
         <property name="stores">
             <map>
+                <!-- UMD Customization -->
                 <entry key="0" value-ref="localStore"/>
+                <!--<entry key="1" value-ref="s3Store"/>-->
                 <entry key="1" value-ref="localStore1"/>
                 <entry key="2" value-ref="localStore2"/>
                 <entry key="3" value-ref="localStore3"/>
                 <entry key="4" value-ref="localStore4"/>
-                <!--<entry key="1" value-ref="s3Store"/>-->
+                <!-- End UMD Customization -->
             </map>
         </property>
     </bean>
@@ -21,6 +23,7 @@
         <property name="baseDir" value="${assetstore.dir}"/>
     </bean>
 
+    <!-- UMD Customization -->
     <bean name="localStore1" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
         <property name="baseDir" value="${assetstore.dir.1}"/>
     </bean>
@@ -36,6 +39,7 @@
     <bean name="localStore4" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
         <property name="baseDir" value="${assetstore.dir.4}"/>
     </bean>
+    <!-- End UMD Customization -->
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton" lazy-init="true">
         <property name="enabled" value="${assetstore.s3.enabled}"/>
