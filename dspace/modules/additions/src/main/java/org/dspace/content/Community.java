@@ -27,6 +27,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CommunityGroupService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -84,6 +85,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Transient
     protected transient CommunityService communityService;
+
+    // UMD Customization for LIBDRUM-701
+    @Transient
+    protected transient CommunityGroupService communityGroupService;
+    // End UMD Customization for LIBDRUM-701
 
     /**
      * Protected constructor, create object using:
@@ -279,6 +285,25 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     public void setGroupID(int groupId) {
       this.groupId = groupId;
       setModified();
+    }
+
+    // UMD Customization for LIBDRUM-701
+    private CommunityGroupService getCommunityGroupService() {
+        if (communityGroupService == null) {
+            communityGroupService = ContentServiceFactory.getInstance().getCommunityGroupService();
+        }
+        return communityGroupService;
+    }
+
+    public CommunityGroup getCommunityGroup() {
+        if (this.groupId != null) {
+            return getCommunityGroupService().find(getGroupID());
+        }
+        return null;
+    }
+
+    public void setCommunityGroup(CommunityGroup communityGroup) {
+        this.groupId = communityGroup.getID();
     }
     // End UMD Customization
 

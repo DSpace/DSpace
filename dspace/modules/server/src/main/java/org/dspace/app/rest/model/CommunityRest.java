@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
                 @LinkRest(name = CommunityRest.LOGO, method = "getLogo"),
                 @LinkRest(name = CommunityRest.SUBCOMMUNITIES, method = "getSubcommunities"),
                 @LinkRest(name = CommunityRest.PARENT_COMMUNITY, method = "getParentCommunity"),
+                @LinkRest(name = CommunityRest.COMMUNITY_GROUP, method = "getCommunityGroup"), // UMD Customization for LIBDRUM-701
                 @LinkRest(name = CommunityRest.ADMIN_GROUP, method = "getAdminGroup")
 })
 public class CommunityRest extends DSpaceObjectRest {
@@ -31,6 +32,9 @@ public class CommunityRest extends DSpaceObjectRest {
         public static final String SUBCOMMUNITIES = "subcommunities";
         public static final String PARENT_COMMUNITY = "parentCommunity";
         public static final String ADMIN_GROUP = "adminGroup";
+        // UMD Customization for LIBDRUM-701
+        public static final String COMMUNITY_GROUP = "communityGroup";
+        // End UMD Customization for LIBDRUM-701
 
         @Override
         public String getCategory() {
