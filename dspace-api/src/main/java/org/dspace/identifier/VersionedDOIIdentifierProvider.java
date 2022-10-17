@@ -261,7 +261,6 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
             doiService.update(context, doi);
             return doi.getDoi();
         }
-        assert (previousVersionDOI != null);
 
         String identifier = getBareDOI(previousVersionDOI);
 

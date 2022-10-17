@@ -92,6 +92,9 @@ public interface IdentifierService {
         throws AuthorizeException, SQLException, IdentifierException;
 
     /**
+     * Used to register newly-minted identifiers.  Each provider is responsible
+     * for creating the appropriate identifier.  All providers are interrogated.
+     *
      * @param context The relevant DSpace Context.
      * @param dso     DSpace object to be registered
      * @throws AuthorizeException  if authorization error
@@ -101,7 +104,7 @@ public interface IdentifierService {
     void register(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
     /**
-     * Used to Register a specific Identifier (for example a Handle, hdl:1234.5/6)
+     * Used to Register a specific Identifier (for example a Handle, hdl:1234.5/6).
      * The provider is responsible for detecting and processing the appropriate
      * identifier.  All Providers are interrogated.  Multiple providers
      * can process the same identifier.

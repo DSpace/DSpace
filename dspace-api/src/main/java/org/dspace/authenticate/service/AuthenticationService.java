@@ -177,4 +177,16 @@ public interface AuthenticationService {
      */
     public String getAuthenticationMethod(Context context, HttpServletRequest request);
 
+    /**
+     * Check if the given current password is valid to change the password of the
+     * given ePerson.
+     *
+     * @param  context         The DSpace context
+     * @param  ePerson         the ePerson related to the password change
+     * @param  currentPassword The current password to check
+     * @return                 true if the provided password matches with current
+     *                         password
+     */
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword);
+
 }

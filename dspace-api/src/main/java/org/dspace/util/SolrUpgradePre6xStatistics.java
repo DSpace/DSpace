@@ -240,8 +240,8 @@ public class SolrUpgradePre6xStatistics {
     /**
      * Print a status message appended with the processing time for the operation
      *
-     * @param header
-     *            Message to display
+     * @param numProcessed
+     *            count of records processed so far.
      * @param fromStart
      *            if true, report on processing time since the start of the program
      */

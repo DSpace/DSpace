@@ -39,10 +39,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase {
 
     private String subject1 = "subject1";
@@ -55,12 +53,14 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private Collection collection;
     private Logger logger = Logger.getLogger(MetadataExportSearchIT.class);
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private SearchService searchService = SearchUtils.getSearchService();
+    private SearchService searchService;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
+
+        searchService = SearchUtils.getSearchService();
 
         // dummy search so that the SearchService gets called in a test context first
         DiscoverQuery query = new DiscoverQuery();

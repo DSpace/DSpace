@@ -5,8 +5,7 @@
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<bean id="uploadConfigurationDefault" class="org.dspace.submit.model.UploadConfiguration">
-		<property name="name" value="upload"></property>
-		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+		<property name="name" value="upload"/>
 		<property name="metadata" value="bitstream-metadata" />
         <property name="options">
             <list>
@@ -21,8 +20,7 @@
 
   <!-- Customization for LIBDRUM-684 -->
   <bean id="uploadConfigurationOptional" class="org.dspace.submit.model.UploadConfiguration">
-    <property name="name" value="upload"></property>
-    <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    <property name="name" value="upload"/>
     <property name="metadata" value="bitstream-metadata" />
     <property name="options">
       <list>
@@ -56,7 +54,6 @@
         <property name="hasStartDate" value="true"/>
         <property name="startDateLimit" value="+36MONTHS"/>
         <property name="hasEndDate" value="false"/>
-
     </bean>
     <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Administrator"/>

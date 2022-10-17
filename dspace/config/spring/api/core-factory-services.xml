@@ -44,6 +44,8 @@
 
     <bean id="versionServiceFactory" class="org.dspace.versioning.factory.VersionServiceFactoryImpl"/>
 
+    <bean id="validationPasswordFactory" class="org.dspace.passwordvalidation.factory.PasswordValidationFactoryImpl"/>
+
     <!--Configurable workflow services -->
     <bean id="workflowServiceFactory" class="org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactoryImpl"/>
 

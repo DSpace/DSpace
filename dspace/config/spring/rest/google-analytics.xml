@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+    <bean id="gaClient" class="org.dspace.google.client.GoogleAnalyticsClientImpl">
+        <constructor-arg name="keyPrefix" value="G-" />
+        <constructor-arg name="requestBuilder" ref="gaClientRequestBuilder" />     
+    </bean>
+
+    <bean id="uaClient" class="org.dspace.google.client.GoogleAnalyticsClientImpl">
+        <constructor-arg name="keyPrefix" value="UA-" />
+        <constructor-arg name="requestBuilder" ref="uaClientRequestBuilder" />
+    </bean>
+    
+    <bean id="uaClientRequestBuilder" class="org.dspace.google.client.UniversalAnalyticsClientRequestBuilder">
+        <constructor-arg name="endpointUrl" value="https://www.google-analytics.com/batch" />
+    </bean>
+    
+    <bean id="gaClientRequestBuilder" class="org.dspace.google.client.GoogleAnalytics4ClientRequestBuilder" >
+        <constructor-arg name="endpointUrl" value="https://www.google-analytics.com/mp/collect" />
+    </bean>
+
+</beans>

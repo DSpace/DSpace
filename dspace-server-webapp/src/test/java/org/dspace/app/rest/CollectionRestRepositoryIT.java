@@ -2678,7 +2678,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String token = getAuthToken(topLevelCommunityAAdmin.getEmail(), password);
 
-        // Verify the community admin gets all the communities he's admin for
+        // Verify the community admin gets all the communities they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2723,7 +2723,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(subCommunityAAdmin.getEmail(), password);
 
-        // Verify the subcommunity admin gets all the communities he's admin for
+        // Verify the subcommunity admin gets all the communities they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2769,7 +2769,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(collectionAAdmin.getEmail(), password);
 
-        // Verify the collection admin gets all the communities he's admin for
+        // Verify the collection admin gets all the communities they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2908,7 +2908,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Verify an ePerson in a subgroup of a community admin group gets all the collections he's admin for
+        // Verify an ePerson in a subgroup of a community admin group gets all the collections they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2964,7 +2964,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Verify an ePerson in a subgroup of a subcommunity admin group gets all the collections he's admin for
+        // Verify an ePerson in a subgroup of a subcommunity admin group gets all the collections they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -3020,7 +3020,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Verify an ePerson in a subgroup of a collection admin group gets all the collections he's admin for
+        // Verify an ePerson in a subgroup of a collection admin group gets all the collections they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
