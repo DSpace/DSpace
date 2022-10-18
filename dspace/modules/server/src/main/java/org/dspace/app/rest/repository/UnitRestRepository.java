@@ -65,6 +65,7 @@ public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRes
         try {
             unit = unitService.create(context);
             unit.setName(unitRest.getName());
+            unit.setFacultyOnly(unitRest.isFacultyOnly());
             unitService.update(context, unit);
             metadataConverter.setMetadata(context, unit, unitRest.getMetadata());
         } catch (SQLException excSQL) {
