@@ -21,6 +21,7 @@ import org.dspace.curate.Curator;
 import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -75,5 +76,12 @@ public class CreateMissingIdentifiersIT
                 curator.getResult(TASK_NAME));
         assertEquals("Curation should fail", Curator.CURATE_ERROR,
                 curator.getStatus(TASK_NAME));
+    }
+
+    @Override
+    @After
+    public void destroy() throws Exception {
+        super.destroy();
+        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
     }
 }
