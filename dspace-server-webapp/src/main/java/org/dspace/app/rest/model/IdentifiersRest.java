@@ -21,8 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class IdentifiersRest implements RestModel {
 
     // Set names used in component wiring
-    public static final String NAME = "identifier";
-    public static final String PLURAL_NAME = "identifiers";
+    public static final String NAME = "identifiers";
     private List<IdentifierRest> identifiers;
 
     // Empty constructor

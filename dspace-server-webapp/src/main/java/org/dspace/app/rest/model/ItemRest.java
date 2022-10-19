@@ -26,7 +26,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
                 method = "getBundles"
         ),
         @LinkRest(
-                name = ItemRest.IDENTIFIERS
+                name = ItemRest.IDENTIFIERS,
+                method = "getIdentifiers"
         ),
         @LinkRest(
                 name = ItemRest.MAPPED_COLLECTIONS,

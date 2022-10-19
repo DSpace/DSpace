@@ -112,7 +112,6 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
 
         DOIService doiService = IdentifierServiceFactory.getInstance().getDOIService();
 
-        //** GIVEN **
         //1. A community-collection structure with one parent community and two collections.
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -126,13 +125,18 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
                 .withAuthor("Smith, Donald")
                 .build();
 
+        String doiString = "10.5072/dspace-identifier-test-" + publicItem1.getID();
+
         // Use the DOI service to directly manipulate the DOI on this object so that we can predict and
         // test values via the REST request
         DOI doi = doiService.findDOIByDSpaceObject(context, publicItem1);
-        String doiString = "10.5072/dspace-identifier-test";
-        doi.setDoi(doiString);
-        doi.setStatus(DOIIdentifierProvider.IS_REGISTERED);
-        doiService.update(context, doi);
+        if (doi == null) {
+            doi.setDoi(doiString);
+            doi.setStatus(DOIIdentifierProvider.IS_REGISTERED);
+            doiService.update(context, doi);
+        }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 

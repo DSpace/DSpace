@@ -59,7 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/" + ItemRest.CATEGORY + "/" + ItemRest.PLURAL_NAME + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID
-        + "/" + IdentifiersRest.PLURAL_NAME)
+        + "/" + IdentifiersRest.NAME)
 public class ItemIdentifierController {
 
     @Autowired
@@ -82,46 +82,6 @@ public class ItemIdentifierController {
 
     @Autowired
     Utils utils;
-
-    /**
-     * Get list of identifiers associated with this item, along with type (eg doi, handle)
-     * and status (eg PENDING, REGISTERED)
-     *
-     * @param uuid
-     * @param request
-     * @param response
-     * @return
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public IdentifiersRest get(@PathVariable UUID uuid, HttpServletRequest request,
-                                          HttpServletResponse response)
-            throws SQLException, AuthorizeException {
-        Context context = ContextUtil.obtainContext(request);
-        Item item = itemService.find(context, uuid);
-        if (item == null) {
-            throw new ResourceNotFoundException("Could not find item with id " + uuid);
-        }
-        IdentifiersRest identifiersRest = new IdentifiersRest();
-        List<IdentifierRest> identifierRestList = new ArrayList<>();
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
-        String handle = HandleServiceFactory.getInstance().getHandleService().findHandle(context, item);
-        try {
-            if (doi != null) {
-                String doiUrl = doiService.DOIToExternalForm(doi.getDoi());
-                IdentifierRest identifierRest = new IdentifierRest(doiUrl, "doi", String.valueOf(doi.getStatus()));
-                identifierRestList.add(identifierRest);
-            }
-            if (handle != null) {
-                identifierRestList.add(new IdentifierRest(handle, "handle", null));
-            }
-        } catch (IdentifierException e) {
-            throw new IllegalStateException("Failed to register identifier: " + e.getMessage());
-        }
-        identifiersRest.setIdentifiers(identifierRestList);
-        return identifiersRest;
-    }
 
     /**
      * Queue a new, pending or minted DOI for registration for a given item. Requires administrative privilege.
