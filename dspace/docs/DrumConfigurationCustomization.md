@@ -53,6 +53,15 @@ should be placed in:
 * dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-services.xml
 * dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
 
+### bitstore.xml
+
+The "dspace/config/spring/api/bitstore.xml" file has been customized to
+support multiple asset directories. To support the "dspace-api" tests,
+the "stock" DSpace "dspace/config/spring/api/bitstore.xml" file should be
+placed in
+
+* dspace-api/src/test/data/dspaceFolder/config/spring/api/bitstore.xml
+
 ### discovery.xml
 
 The "dspace/config/spring/api/discovery.xml" file has been modified from the
