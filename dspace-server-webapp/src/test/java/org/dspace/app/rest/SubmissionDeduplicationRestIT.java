@@ -56,8 +56,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for testing Deduplication operations
- * 
+ *
  * @author fcadili (francecso.cadili at 4science.it)
+ * @author Kim Shepherd
  *
  */
 public class SubmissionDeduplicationRestIT extends AbstractControllerIntegrationTest {
@@ -1017,7 +1018,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
          * "org.hibernate.LazyInitializationException: failed to lazily initialize a
          * collection of role: org.dspace.content.DSpaceObject.metadata, could not
          * initialize proxy - no Session" is generated.
-         * 
+         *
          * Workaround: Set fetch type of DSpaceObject.metadata to EAGER.
          */
         pdf.close();
@@ -1465,7 +1466,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
          * "org.hibernate.LazyInitializationException: failed to lazily initialize a
          * collection of role: org.dspace.content.DSpaceObject.metadata, could not
          * initialize proxy - no Session" is generated.
-         * 
+         *
          * Workaround: Set fetch type of DSpaceObject.metadata to EAGER.
          */
         pdf.close();
@@ -1655,35 +1656,26 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         Item item = createItem("Test publication", collection);
         String itemId = item.getID().toString();
 
-        WorkflowItem workflowItem = createWorkflowItem("Test publication", collection);
+        WorkflowItem workflowItem = createWorkflowItem("Test NOT publication", collection);
 
         context.restoreAuthSystemState();
 
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         getClient(submitterToken).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections['detect-duplicate'].matches", aMapWithSize(1)))
-            .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + itemId + "'].matchObject.id", is(itemId)))
-            .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + itemId + "']"
-                + ".workflowDecision").doesNotExist());
+            .andExpect(jsonPath("$.sections['detect-duplicate'].matches").doesNotHaveJsonPath());
     }
 
     @Test
     public void workflowDuplicationWithSameDoiButDifferentCommunityTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Community communityA = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                               .withName("Community A").build();
-
-        Community communityB = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                               .withName("Community B").build();
-
-        Collection collectionOfComA = CollectionBuilder.createCollection(context, communityA)
+        Collection collectionOfComA = CollectionBuilder.createCollection(context, parentCommunity)
                                                        .withEntityType("Publication")
                                                        .withSubmitterGroup(submitter)
                                                        .withName("Collection Of Community A").build();
 
-        Collection collectionOfComB = CollectionBuilder.createCollection(context, communityB)
+        Collection collectionOfComB = CollectionBuilder.createCollection(context, parentCommunity)
                                                        .withEntityType("Publication")
                                                        .withSubmitterGroup(submitter)
                                                        .withWorkflowGroup("reviewer", editor)
@@ -1692,17 +1684,18 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         // Create a public archived item with a DOI
         Item item = ItemBuilder.createItem(context, collectionOfComA)
                                .withTitle("Test Item")
-                               .withDoiIdentifier("10.1000/182")
+                               .withDoiIdentifier("10.1000/50182")
                                .build();
-        context.restoreAuthSystemState();
 
         // Submit workflow item as submitter user with the same DOI
         context.setCurrentUser(submitter);
         WorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collectionOfComB)
                 .withTitle("Test WorkflowItem").withSubmitter(submitter)
-                .withDoiIdentifier("10.1000/182").build();
+                .withDoiIdentifier("10.1000/50182").build();
 
-        getClient(getAuthToken(submitter.getEmail(), password)).perform(get("/api/workflow/workflowitems/"
+        context.restoreAuthSystemState();
+
+        getClient(getAuthToken(editor.getEmail(), password)).perform(get("/api/workflow/workflowitems/"
                         + workflowItem.getID()))
                          .andExpect(status().isOk())
                          .andExpect(jsonPath("$.sections['detect-duplicate']", aMapWithSize(1)))
