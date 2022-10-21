@@ -17,7 +17,7 @@ jobs:
       if: (contains(github.event.issue.labels.*.name, 'needs triage') || join(github.event.issue.labels.*.name) == '')
       uses: actions/add-to-project@v0.3.0
       # Note, the authentication token below is an ORG level Secret. 
-      # It must be created/recreated manually via a personal access token with "public_repo" and "admin:org" permissions
+      # It must be created/recreated manually via a personal access token with admin:org, project, public_repo permissions
       # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token
       # This is necessary because the "DSpace Backlog" project is an org level project (i.e. not repo specific)
       with:
