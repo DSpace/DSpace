@@ -1,0 +1,59 @@
+# DSpace CodeQL code scanning configuration for GitHub
+# https://docs.github.com/en/code-security/code-scanning
+#
+# NOTE: Code scanning must be run separate from our default build.yml
+# because CodeQL requires a fresh build with all tests *disabled*.
+name: "Code Scanning"
+
+# Run this code scan for all pushes / PRs to main branch. Also run once a week.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    # Don't run if PR is only updating static documentation
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.txt'
+  schedule:
+    - cron: "37 0 * * 1"
+
+jobs:
+  analyze:
+    name: Analyze Code
+    runs-on: ubuntu-latest
+    # Limit permissions of this GitHub action. Can only write to security-events
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # https://github.com/actions/setup-java
+      - name: Install JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: 'temurin'
+
+      # Initializes the CodeQL tools for scanning.
+      # https://github.com/github/codeql-action
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          # Codescan Javascript as well since a few JS files exist in REST API's interface
+          languages: java, javascript
+
+      # Autobuild attempts to build any compiled languages
+      # NOTE: Based on testing, this autobuild process works well for DSpace. A custom
+      # DSpace build w/caching (like in build.yml) was about the same speed as autobuild.
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      # Perform GitHub Code Scanning.
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
