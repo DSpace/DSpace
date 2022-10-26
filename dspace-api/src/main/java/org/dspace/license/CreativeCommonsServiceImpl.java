@@ -430,9 +430,10 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     }
 
-    private void addLicenseField(Context context, Item item, String field, String value) throws SQLException {
+    private void addLicenseField(Context context, Item item, String field, String language, String value)
+        throws SQLException {
         String[] params = splitField(field);
-        itemService.addMetadata(context, item, params[0], params[1], params[2], params[3], value);
+        itemService.addMetadata(context, item, params[0], params[1], params[2], language, value);
 
     }
 
@@ -688,12 +689,12 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         String uriField = getCCField("uri");
         String nameField = getCCField("name");
 
-        addLicenseField(context, item, uriField, licenseUri);
+        addLicenseField(context, item, uriField, null, licenseUri);
         if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
             setLicenseRDF(context, item, fetchLicenseRDF(doc));
         }
         if (configurationService.getBooleanProperty("cc.submit.setname")) {
-            addLicenseField(context, item, nameField, licenseName);
+            addLicenseField(context, item, nameField, "en", licenseName);
         }
     }
 
