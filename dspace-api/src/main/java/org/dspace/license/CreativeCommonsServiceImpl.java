@@ -605,7 +605,10 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             }
         }
 
-        updateJurisdiction(fullParamMap);
+        // Replace the jurisdiction unless default value is set to none
+        if (!"none".equals(jurisdiction)) {
+            updateJurisdiction(fullParamMap);
+        }
 
         return fullParamMap;
     }
