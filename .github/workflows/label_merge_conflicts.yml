@@ -13,6 +13,8 @@ on:
 
 jobs:
   triage:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
     permissions:
       issues: write
