@@ -119,6 +119,19 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         f2.deleteOnExit();
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
+
+        // Optionally override ImageMagick's default density of 72 DPI to use a
+        // "supersample" when creating the PDF thumbnail. Note that I prefer to
+        // use the getProperty() method here instead of getIntPropert() because
+        // the latter always returns an integer (0 in the case it's not set). I
+        // would prefer to keep ImageMagick's default to itself rather than for
+        // us to set one. Also note that the density option *must* come before
+        // we open the input file.
+        String density = configurationService.getProperty(PRE + ".density");
+        if (density != null) {
+            op.density(Integer.valueOf(density));
+        }
+
         String s = "[" + page + "]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
