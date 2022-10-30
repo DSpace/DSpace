@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -89,7 +90,7 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
         // Get the doi we minted and queued for registration
         DOI doi = doiService.findDOIByDSpaceObject(context, publicItem1);
         // The DOI should not be null
-        Assert.assertNotNull(doi);
+        assertNotNull(doi);
         // The DOI status should be TO_BE_REGISTERED
         Assert.assertEquals(DOIIdentifierProvider.TO_BE_REGISTERED, doi.getStatus());
 
@@ -130,20 +131,24 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
         // Use the DOI service to directly manipulate the DOI on this object so that we can predict and
         // test values via the REST request
         DOI doi = doiService.findDOIByDSpaceObject(context, publicItem1);
-        if (doi == null) {
-            doi.setDoi(doiString);
-            doi.setStatus(DOIIdentifierProvider.IS_REGISTERED);
-            doiService.update(context, doi);
-        }
+
+        // Assert non-null DOI, since we should be minting them automatically here
+        assertNotNull(doi);
+
+        // Set specific string and state we expect to get back from a REST request
+        doi.setDoi(doiString);
+        doi.setStatus(DOIIdentifierProvider.IS_REGISTERED);
+        doiService.update(context, doi);
 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Get identifiers for this item - we expect a 200 OK response and the type of identifier
+        // Get identifiers for this item - we expect a 200 OK response and the type of the resource is plural
+        // "identifiers"
         getClient(token).perform(get("/api/core/items/" +
                         publicItem1.getID().toString() + "/identifiers"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.type").value("identifier"));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.type").value("identifiers"));
 
         // Expect an array of identifiers
         getClient(token).perform(get("/api/core/items/" +
