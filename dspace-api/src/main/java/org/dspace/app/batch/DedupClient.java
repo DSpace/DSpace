@@ -34,7 +34,7 @@ import org.dspace.utils.DSpace;
 
 /**
  * CLI Tool used to populate the deduplication index of solr dedup core.
- * 
+ *
  * Usage: ./dspace index-deduplication [-chfueto[r <item handle/uuid>]]
  */
 public class DedupClient {
@@ -130,15 +130,13 @@ public class DedupClient {
                 indexer.indexContent(context, item, line.hasOption("f"));
             }
         } else if (line.hasOption('e')) {
-            try {
-                String filename = line.getOptionValue('e');
-                FileInputStream fstream = new FileInputStream(filename);
-                // Get the object of DataInputStream
+            // Load streams and reader as "try with resources" so that they're always closed correctly
+            try (FileInputStream fstream = new FileInputStream(line.getOptionValue('e'));
                 DataInputStream in = new DataInputStream(fstream);
                 BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                ) {
                 String strLine;
                 // Read File Line By Line
-
                 UUID item_id = null;
                 List<UUID> ids = new ArrayList<UUID>();
 
@@ -146,8 +144,6 @@ public class DedupClient {
                     item_id = UUID.fromString(strLine.trim());
                     ids.add(item_id);
                 }
-
-                in.close();
                 indexer.indexContent(context, ids, line.hasOption("f"));
             } catch (Exception e) {
                 log.error("Error: " + e.getMessage());
