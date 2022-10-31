@@ -6,6 +6,9 @@ name: Build
 # Run this Build for all pushes / PRs to current branch
 on: [push, pull_request]
 
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   tests:
     runs-on: ubuntu-latest
