@@ -187,10 +187,12 @@ public class DedupEventConsumer implements Consumer {
                         break superext;
                     }
                 }
-                for (MetadataValue mdValue : mdValues) {
-                    if (!cachedMdValues.contains(mdValue.getValue())) {
-                        rebuildCache = true;
-                        break superext;
+                if (mdValues != null) {
+                    for (MetadataValue mdValue : mdValues) {
+                        if (!cachedMdValues.contains(mdValue.getValue())) {
+                            rebuildCache = true;
+                            break superext;
+                        }
                     }
                 }
             }

@@ -153,7 +153,7 @@ public class MD5ValueSignature implements Signature {
             String temp = StringUtils.EMPTY;
             String entityType = StringUtils.EMPTY;
             String result = value;
-            if (StringUtils.isEmpty(value)) {
+            if (StringUtils.isEmpty(value) && item != null) {
                 if (StringUtils.isNotEmpty(prefix)) {
                     result = prefix + item.getID();
                 } else {
@@ -200,8 +200,11 @@ public class MD5ValueSignature implements Signature {
                 }
             }
             return (temp + entityType + norm).trim();
-        } else {
+        } else if (item != null) {
             return "item:" + item.getID();
+        } else {
+            // Item and value are both null? Return null
+            return null;
         }
     }
 

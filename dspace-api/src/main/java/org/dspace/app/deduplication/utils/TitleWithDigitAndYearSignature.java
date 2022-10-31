@@ -52,8 +52,11 @@ public class TitleWithDigitAndYearSignature extends MD5ValueSignature {
                 return temp + " " + norm;
             }
             return norm;
-        } else {
+        } else if (item != null) {
             return "item:" + item.getID();
+        } else {
+            // Return null if there is no item or value
+            return null;
         }
 
     }
