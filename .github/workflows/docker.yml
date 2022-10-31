@@ -12,6 +12,9 @@ on:
       - 'dspace-**'
   pull_request:
 
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   docker:
     # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
