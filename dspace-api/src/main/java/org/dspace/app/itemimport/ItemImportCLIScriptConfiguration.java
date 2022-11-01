@@ -55,6 +55,9 @@ public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfigurat
         options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
                 .hasArg(false).required(false).build());
+        options.addOption(Option.builder("x").longOpt("exclude_content")
+                .desc("do not load or expect content bitstreams")
+                .hasArg(false).required(false).build());
         options.addOption(Option.builder("p").longOpt("template")
                 .desc("apply template")
                 .hasArg(false).required(false).build());
