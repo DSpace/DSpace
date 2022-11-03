@@ -36,7 +36,7 @@ public class RegexPatternUtils {
      * Computes a pattern starting from a regex definition with flags that
      * uses the standard format: <code>/{regex}/{flags}</code>.
      * If it's a valid regex a non-null {@code Pattern} will be retrieved,
-     * an exception will be thrown otherwise.
+     * a {@link PatternSyntaxException} exception will be thrown otherwise.
      *
      * @param regex with format <code>/{regex}/{flags}</code>
      * @return {@code Pattern} regex pattern instance
