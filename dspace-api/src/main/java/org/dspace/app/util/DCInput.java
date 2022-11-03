@@ -7,9 +7,12 @@
  */
 package org.dspace.app.util;
 
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
@@ -236,6 +239,21 @@ public class DCInput {
             }
         }
 
+    }
+
+    public String extractRegex(Map<String, String> fieldMap) {
+        String regex = fieldMap.get("regex");
+        Pattern generatedPattern = null;
+        if (regex != null) {
+            try {
+                generatedPattern = RegexPatternUtils.computePattern(regex);
+            } catch (PatternSyntaxException e) {
+                log.warn("The regex field of input {} with value {} is invalid!", this.label, regex);
+            }
+        }
+        return Optional.ofNullable(generatedPattern)
+                .map(pattern -> regex)
+                .orElse(null);
     }
 
     /**
@@ -547,7 +565,7 @@ public class DCInput {
         if (StringUtils.isNotBlank(value)) {
             try {
                 if (StringUtils.isNotBlank(regex)) {
-                    Pattern pattern = Pattern.compile(regex);
+                    Pattern pattern = RegexPatternUtils.computePattern(regex);
                     if (!pattern.matcher(value).matches()) {
                         return false;
                     }
