@@ -7,8 +7,6 @@
  */
 package org.dspace.app.util;
 
-import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -194,7 +192,7 @@ public class DCInput {
         repeatable = "true".equalsIgnoreCase(repStr)
             || "yes".equalsIgnoreCase(repStr);
         String nameVariantsString = fieldMap.get("name-variants");
-        nameVariants = (StringUtils.isNotBlank(nameVariantsString)) ?
+        nameVariants = StringUtils.isNotBlank(nameVariantsString) ?
                 nameVariantsString.equalsIgnoreCase("true") : false;
         label = fieldMap.get("label");
         inputType = fieldMap.get("input-type");
@@ -206,7 +204,7 @@ public class DCInput {
         }
         hint = fieldMap.get("hint");
         warning = fieldMap.get("required");
-        required = (warning != null && warning.length() > 0);
+        required = warning != null && warning.length() > 0;
         visibility = fieldMap.get("visibility");
         readOnly = fieldMap.get("readonly");
         vocabulary = fieldMap.get("vocabulary");
@@ -266,7 +264,7 @@ public class DCInput {
      * @return whether the input should be displayed or not
      */
     public boolean isVisible(String scope) {
-        return (visibility == null || visibility.equals(scope));
+        return visibility == null || visibility.equals(scope);
     }
 
     /**
@@ -399,7 +397,7 @@ public class DCInput {
 
     /**
      * Get the style for this form field
-     * 
+     *
      * @return the style
      */
     public String getStyle() {
