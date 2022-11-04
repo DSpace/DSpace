@@ -208,7 +208,7 @@ public class DCInput {
         visibility = fieldMap.get("visibility");
         readOnly = fieldMap.get("readonly");
         vocabulary = fieldMap.get("vocabulary");
-        regex = fieldMap.get("regex");
+        regex = extractRegexField(fieldMap);
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
             || "yes".equalsIgnoreCase(closedVocabularyStr);
@@ -239,7 +239,7 @@ public class DCInput {
 
     }
 
-    public String extractRegex(Map<String, String> fieldMap) {
+    private String extractRegexField(Map<String, String> fieldMap) {
         String regex = fieldMap.get("regex");
         Pattern generatedPattern = null;
         if (regex != null) {
