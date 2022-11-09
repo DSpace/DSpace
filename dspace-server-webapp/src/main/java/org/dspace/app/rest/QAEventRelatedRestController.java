@@ -42,12 +42,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This RestController will take care to manipulate the related item eventually associated with a qa event
- * "/api/integration/qaevents/{qaeventid}/related"
+ * This RestController will take care to manipulate the related item eventually
+ * associated with a qa event
+ * "/api/integration/qualityassuranceevents/{qaeventid}/related"
  */
 @RestController
-@RequestMapping("/api/" + QAEventRest.CATEGORY + "/qaevents" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG
-    + "/related")
+@RequestMapping("/api/" + QAEventRest.CATEGORY + "/qualityassuranceevents"
+    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/related")
 public class QAEventRelatedRestController {
 
     @Autowired

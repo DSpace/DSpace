@@ -60,7 +60,7 @@ public class QAEventMatcher {
                     hasJsonPath("$._links.target.href", Matchers.endsWith(event.getEventId() + "/target")),
                     hasJsonPath("$._links.related.href", Matchers.endsWith(event.getEventId() + "/related")),
                     hasJsonPath("$._links.topic.href", Matchers.endsWith(event.getEventId() + "/topic")),
-                    hasJsonPath("$.type", is("qaevent")));
+                    hasJsonPath("$.type", is("qualityassuranceevent")));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

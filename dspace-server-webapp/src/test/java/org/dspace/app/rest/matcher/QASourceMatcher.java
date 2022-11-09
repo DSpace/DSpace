@@ -26,7 +26,7 @@ public class QASourceMatcher {
 
     public static Matcher<? super Object> matchQASourceEntry(String key, int totalEvents) {
         return allOf(
-            hasJsonPath("$.type", is("qasource")),
+            hasJsonPath("$.type", is("qualityassurancesource")),
             hasJsonPath("$.id", is(key)),
             hasJsonPath("$.totalEvents", is(totalEvents))
         );
@@ -35,7 +35,7 @@ public class QASourceMatcher {
 
     public static Matcher<? super Object> matchQASourceEntry(String key) {
         return allOf(
-            hasJsonPath("$.type", is("qasource")),
+            hasJsonPath("$.type", is("qualityassurancesource")),
             hasJsonPath("$.id", is(key))
         );
     }

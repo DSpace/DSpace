@@ -80,10 +80,10 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qasources"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qasources", contains(
+            .andExpect(jsonPath("$._embedded.qualityassurancesources", contains(
                 matchQASourceEntry("openaire", 3),
                 matchQASourceEntry("test-source", 2),
                 matchQASourceEntry("test-source-2", 0))))
@@ -103,7 +103,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/integration/qasources"))
+        getClient(token).perform(get("/api/integration/qualityassurancesources"))
             .andExpect(status().isForbidden());
 
     }
@@ -118,7 +118,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/integration/qasources"))
+        getClient().perform(get("/api/integration/qualityassurancesources"))
             .andExpect(status().isUnauthorized());
 
     }
@@ -138,22 +138,22 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qasources/openaire"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources/openaire"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$", matchQASourceEntry("openaire", 3)));
 
-        getClient(authToken).perform(get("/api/integration/qasources/test-source"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources/test-source"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$", matchQASourceEntry("test-source", 2)));
 
-        getClient(authToken).perform(get("/api/integration/qasources/test-source-2"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources/test-source-2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$", matchQASourceEntry("test-source-2", 0)));
 
-        getClient(authToken).perform(get("/api/integration/qasources/unknown-test-source"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources/unknown-test-source"))
             .andExpect(status().isNotFound());
 
     }
@@ -169,7 +169,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/integration/qasources/openaire"))
+        getClient(token).perform(get("/api/integration/qualityassurancesources/openaire"))
             .andExpect(status().isForbidden());
 
     }
@@ -184,7 +184,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/integration/qasources/openaire"))
+        getClient().perform(get("/api/integration/qualityassurancesources/openaire"))
             .andExpect(status().isUnauthorized());
 
     }

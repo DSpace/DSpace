@@ -26,7 +26,7 @@ import org.dspace.app.rest.RestResourceController;
 public class QAEventRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = -5001130073350654793L;
-    public static final String NAME = "qaevent";
+    public static final String NAME = "qualityassuranceevent";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
     public static final String TOPIC = "topic";

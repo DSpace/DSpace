@@ -21,7 +21,7 @@ public class QATopicRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = -7455358581579629244L;
 
-    public static final String NAME = "qatopic";
+    public static final String NAME = "qualityassurancetopic";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
     private String id;

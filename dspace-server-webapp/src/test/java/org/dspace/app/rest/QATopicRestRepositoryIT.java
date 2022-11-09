@@ -59,9 +59,9 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics")).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics")).andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.qatopics",
+                .andExpect(jsonPath("$._embedded.qualityassurancetopics",
                         Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 2),
                                 QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1),
                                 QATopicMatcher.matchQATopicEntry("ENRICH/MORE/PID", 1))))
@@ -71,13 +71,13 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllUnauthorizedTest() throws Exception {
-        getClient().perform(get("/api/integration/qatopics")).andExpect(status().isUnauthorized());
+        getClient().perform(get("/api/integration/qualityassurancetopics")).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findAllForbiddenTest() throws Exception {
         String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics")).andExpect(status().isForbidden());
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics")).andExpect(status().isForbidden());
     }
 
     @Test
@@ -104,16 +104,19 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics").param("size", "2"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics").param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.qatopics", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(3)));
-        getClient(authToken).perform(get("/api/integration/qatopics").param("size", "2").param("page", "1"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.qatopics", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(3)));
+        getClient(authToken)
+            .perform(get("/api/integration/qualityassurancetopics")
+                .param("size", "2")
+                .param("page", "1"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.hasSize(1)))
+            .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(3)));
     }
 
     @Test
@@ -139,9 +142,9 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics/ENRICH!MISSING!PID"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/ENRICH!MISSING!PID"))
                 .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 2)));
-        getClient(authToken).perform(get("/api/integration/qatopics/ENRICH!MISSING!ABSTRACT"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/ENRICH!MISSING!ABSTRACT"))
                 .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1)));
     }
 
@@ -155,8 +158,9 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
                 .withTopic("ENRICH/MISSING/PID").build();
         context.restoreAuthSystemState();
-        getClient().perform(get("/api/integration/qatopics/ENRICH!MISSING!PID")).andExpect(status().isUnauthorized());
-        getClient().perform(get("/api/integration/qatopics/ENRICH!MISSING!ABSTRACT"))
+        getClient().perform(get("/api/integration/qualityassurancetopics/ENRICH!MISSING!PID"))
+            .andExpect(status().isUnauthorized());
+        getClient().perform(get("/api/integration/qualityassurancetopics/ENRICH!MISSING!ABSTRACT"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -171,9 +175,9 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTopic("ENRICH/MISSING/PID").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics/ENRICH!MISSING!PID"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/ENRICH!MISSING!PID"))
             .andExpect(status().isForbidden());
-        getClient(authToken).perform(get("/api/integration/qatopics/ENRICH!MISSING!ABSTRACT"))
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/ENRICH!MISSING!ABSTRACT"))
             .andExpect(status().isForbidden());
     }
 
@@ -214,28 +218,28 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics/search/bySource")
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "openaire"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qatopics",
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
                 Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 2),
                     QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1),
                     QATopicMatcher.matchQATopicEntry("ENRICH/MORE/PID", 1))))
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(3)));
-        getClient(authToken).perform(get("/api/integration/qatopics/search/bySource")
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "test-source"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qatopics",
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
                 Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("TEST/TOPIC/2", 1),
                     QATopicMatcher.matchQATopicEntry("TEST/TOPIC", 2))))
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
-        getClient(authToken).perform(get("/api/integration/qatopics/search/bySource")
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "test-source-2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qatopics").doesNotExist())
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics").doesNotExist())
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
@@ -249,7 +253,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
             .withTopic("ENRICH/MISSING/PID").build();
         context.restoreAuthSystemState();
-        getClient().perform(get("/api/integration/qatopics/search/bySource")
+        getClient().perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "openaire"))
             .andExpect(status().isUnauthorized());
     }
@@ -265,7 +269,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withTopic("ENRICH/MISSING/PID").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qatopics/search/bySource")
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "openaire"))
             .andExpect(status().isForbidden());
     }
