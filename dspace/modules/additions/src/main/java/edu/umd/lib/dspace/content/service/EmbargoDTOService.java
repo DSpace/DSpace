@@ -18,9 +18,9 @@ public interface EmbargoDTOService {
 
   /**
    * Return the list of embargoes.
-   * 
+   *
    * @return embargoList List of EmbargoDTO object
    */
   public List<EmbargoDTO> getEmbargoList(Context context) throws SQLException;
-  
+
 }

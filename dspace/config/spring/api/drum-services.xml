@@ -7,6 +7,6 @@
     <!-- ******************** -->
     <!-- Service declarations -->
     <!-- ******************** -->
-    <!-- <bean class="edu.umd.lib.dspace.content.EmbargoDTOServiceImpl"/> -->
+    <bean class="edu.umd.lib.dspace.content.EmbargoDTOServiceImpl"/>
 
 </beans>
