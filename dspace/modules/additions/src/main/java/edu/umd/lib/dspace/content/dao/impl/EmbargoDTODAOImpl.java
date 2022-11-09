@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.Query;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DateType;
 import org.hibernate.type.PostgresUUIDType;
@@ -40,20 +40,21 @@ public class EmbargoDTODAOImpl extends AbstractHibernateDAO<Object> implements E
           + "b2b1.bitstream_id=bs.uuid AND bs.uuid=rp.dspace_object AND (rp.end_date > CURRENT_DATE "
           + "OR rp.end_date IS NULL) AND rp.epersongroup_id = g.uuid AND "
           + "g.uuid = mv.dspace_object_id AND mv.text_value = :groupName";
-    
+
     protected EmbargoDTODAOImpl() {
       super();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<EmbargoDTO> getEmbargoDTOList(Context context, int titleId, int advisorId, int authorId,
         int departmentId, int typeId, String groupName) throws SQLException {
 
         log.debug("Getting Embargo List with params titleId: {}, advisorId: {}, authorId: {}, " +
                 "departmentId: {}, typeId: {}, groupName: {}", titleId, advisorId,
                 authorId, departmentId, typeId, groupName);
-        
-        Query sqlQuery = createSQLQuery(context, sql)
+
+        Query<EmbargoDTO> sqlQuery = (Query<EmbargoDTO>) createSQLQuery(context, sql)
                 .addScalar("handle", StringType.INSTANCE)
                 .addScalar("itemId", PostgresUUIDType.INSTANCE)
                 .addScalar("bitstreamId", PostgresUUIDType.INSTANCE)
@@ -74,7 +75,7 @@ public class EmbargoDTODAOImpl extends AbstractHibernateDAO<Object> implements E
         return (List<EmbargoDTO>) sqlQuery.list();
     }
 
-    private SQLQuery createSQLQuery(Context context, String query) throws SQLException {
+    private NativeQuery createSQLQuery(Context context, String query) throws SQLException {
         return getHibernateSession(context).createSQLQuery(query);
     }
 }
