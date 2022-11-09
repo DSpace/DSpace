@@ -16,6 +16,6 @@ public abstract class DrumServiceFactory {
 
     public static DrumServiceFactory getInstance()
     {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("drumServiceFactory", DrumServiceFactory.class);
+      return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("drumServiceFactory", DrumServiceFactory.class);
     }
 }

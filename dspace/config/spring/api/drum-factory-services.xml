@@ -7,6 +7,6 @@
     <!-- ******************** -->
     <!-- Factory declarations -->
     <!-- ******************** -->
-    <!-- <bean id="drumServiceFactory" class="edu.umd.lib.dspace.content.factory.DrumServiceFactoryImpl"/> -->
+    <bean id="drumServiceFactory" class="edu.umd.lib.dspace.content.factory.DrumServiceFactoryImpl"/>
 
 </beans>

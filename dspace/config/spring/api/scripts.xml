@@ -22,7 +22,7 @@
         <property name="description" value="export metadata from a discovery search" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
     </bean>
-    
+
     <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
         <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
@@ -50,7 +50,7 @@
         <property name="description" value="Manage the OAI-PMH harvesting of external collections"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.harvest.HarvestCli"/>
     </bean>
-        
+
     <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
         <property name="description" value="Cleanup all the old processes in the specified state"/>
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
@@ -60,12 +60,12 @@
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
     </bean>
-    
+
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
-    
+
     <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
         <property name="description" value="Update the database status of Items in solr"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
@@ -80,4 +80,11 @@
         <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExportCLI"/>
     </bean>
+
+    <!-- UMD Customization -->
+    <bean id="embargo-list-export" class="edu.umd.lib.dspace.content.EmbargoListExportCliScriptConfiguration">
+        <property name="description" value="Export list of embargoed items" />
+        <property name="dspaceRunnableClass" value="edu.umd.lib.dspace.content.EmbargoListExportCli"/>
+    </bean>
+    <!-- End UMD Customization -->
 </beans>
