@@ -420,13 +420,13 @@ public class S3BitStoreService extends BaseBitStoreService {
      * @param sInternalId
      * @return Computed Relative path
      */
-    private String getRelativePath(String sInternalId) {
+    public String getRelativePath(String sInternalId) {
         BitstreamStorageService bitstreamStorageService = StorageServiceFactory.getInstance()
                 .getBitstreamStorageService();
 
         String sIntermediatePath = StringUtils.EMPTY;
         if (bitstreamStorageService.isRegisteredBitstream(sInternalId)) {
-            sInternalId = sInternalId.substring(2);
+            sInternalId = sInternalId.substring(REGISTERED_FLAG.length());
         } else {
             sInternalId = sanitizeIdentifier(sInternalId);
             sIntermediatePath = getIntermediatePath(sInternalId);
