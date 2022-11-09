@@ -718,7 +718,7 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Restore the user bound to the context and his special groups
+     * Restore the user bound to the context and their special groups
      *
      * @throws IllegalStateException if no switch was performed before
      */
@@ -943,5 +943,12 @@ public class Context implements AutoCloseable {
 
     public void setAuthenticationMethod(final String authenticationMethod) {
         this.authenticationMethod = authenticationMethod;
+    }
+
+    /**
+     * Check if the user of the context is switched.
+     */
+    public boolean isContextUserSwitched() {
+        return currentUserPreviousState != null;
     }
 }

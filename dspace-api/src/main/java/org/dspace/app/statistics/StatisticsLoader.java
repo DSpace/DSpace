@@ -324,11 +324,7 @@ public class StatisticsLoader {
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
         File reportDir = new File(configurationService.getProperty("log.report.dir"));
-        if (reportDir != null) {
-            return reportDir.listFiles(new AnalysisAndReportFilter());
-        }
-
-        return null;
+        return reportDir.listFiles(new AnalysisAndReportFilter());
     }
 
     /**

@@ -207,4 +207,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return null;
     }
+
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+
+        for (AuthenticationMethod method : getAuthenticationMethodStack()) {
+            if (method.getName().equals(context.getAuthenticationMethod())) {
+                return method.canChangePassword(context, ePerson, currentPassword);
+            }
+        }
+
+        return false;
+    }
 }

@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.4-SNAPSHOT</version>
+        <version>7.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -417,39 +417,6 @@
                     <groupId>org.bouncycastle</groupId>
                     <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
-                <!-- Newer version of Jetty in our parent POM & via Solr -->
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-alpn-java-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-deploy</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-servlets</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-webapp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-xml</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.http2</groupId>
-                    <artifactId>http2-common</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.http2</groupId>
-                    <artifactId>http2-server</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <!-- Jetty is needed to run Handle Server -->
@@ -548,16 +515,10 @@
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
-        <!-- Codebase at https://github.com/OCLC-Research/oaiharvester2/ -->
+        <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
-        </dependency>
-        <!-- Xalan is REQUIRED by 'oclc-harvester2' listed above (OAI harvesting fails without it).
-             Please do NOT use Xalan in DSpace codebase as it is not well maintained. -->
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -600,7 +561,7 @@
         <dependency>
             <groupId>org.jbibtex</groupId>
             <artifactId>jbibtex</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.20</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -633,19 +594,6 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-text</artifactId>
-                </exclusion>
-                <!-- Newer Jetty version brought in via Parent POM -->
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-http</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-util</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -801,7 +749,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.116</version>
+            <version>1.12.261</version>
         </dependency>
 
         <dependency>
@@ -850,7 +798,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.2</version>
+            <version>5.6</version>
         </dependency>
 
         <!-- Email templating -->

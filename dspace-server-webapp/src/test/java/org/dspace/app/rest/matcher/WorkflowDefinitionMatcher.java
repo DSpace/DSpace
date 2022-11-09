@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -59,6 +60,20 @@ public class WorkflowDefinitionMatcher {
                 hasJsonPath("$.metadata", Matchers.allOf(
                         MetadataMatcher.matchMetadata("dc.title", name)
                 ))
+        );
+    }
+
+    /**
+     * Verifies that the content of the `json` matches
+     * the detail of the steps
+     * Actually we can checks only the identifier to assure they are the same.
+     * 
+     * @param step target step of the workflow
+     * @return Matcher
+     */
+    public static Matcher<? super Object> matchStep(Step step) {
+        return allOf(
+                hasJsonPath("$.id", is(step.getId()))
         );
     }
 }

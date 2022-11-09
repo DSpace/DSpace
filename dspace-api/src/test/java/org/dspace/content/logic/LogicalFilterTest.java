@@ -408,6 +408,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
 
         // Create condition to match pattern on dc.title metadata
         Condition condition = new MetadataValuesMatchCondition();
+        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
         Map<String, Object> parameters = new HashMap<>();
         // Match on the dc.title field
         parameters.put("field", "dc.title");
@@ -461,6 +462,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
         // Instantiate new filter for testing this condition
         DefaultFilter filter = new DefaultFilter();
         Condition condition = new InCollectionCondition();
+        condition.setItemService(ContentServiceFactory.getInstance().getItemService());
         Map<String, Object> parameters = new HashMap<>();
 
         // Add collectionOne handle to the collections parameter - ie. we are testing to see if the item is

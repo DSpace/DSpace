@@ -37,9 +37,9 @@ public class BitstreamResourcePolicyUtils {
      * This function applies the resource policies.
      *
      * @param context               The relevant DSpace Context.
-     * @param uploadConfig          The configured UploadConfiguration
+     * @param uploadConfiguration   The configured UploadConfiguration
      * @param obj                   The applicable DSpace object whose policies should be determined
-     * @param newAccessCondition    The access condition containing the details for the desired policies
+     * @param newAccessConditions   The access condition containing the details for the desired policies
      * @throws SQLException         If a database error occurs
      * @throws AuthorizeException   If the user is not authorized
      * @throws ParseException       If parse error
@@ -61,8 +61,7 @@ public class BitstreamResourcePolicyUtils {
 
     /**
      * Based on the given name, find the resource policy to apply on the given DSpace object
-     * This function applies the resource policies.
-     * The description, start date and end date are applied as well
+     * This function applies the resource policies.The description, start date and end date are applied as well
      *
      * @param context               The relevant DSpace Context.
      * @param uploadConfiguration   The configured UploadConfiguration

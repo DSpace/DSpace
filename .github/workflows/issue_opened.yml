@@ -5,25 +5,22 @@ on:
   issues:
     types: [opened]
 
+permissions: {}
 jobs:
   automation:
     runs-on: ubuntu-latest
     steps:
     # Add the new issue to a project board, if it needs triage
-    # See https://github.com/marketplace/actions/create-project-card-action
-    - name: Add issue to project board
+    # See https://github.com/actions/add-to-project
+    - name: Add issue to triage board
       # Only add to project board if issue is flagged as "needs triage" or has no labels
       # NOTE: By default we flag new issues as "needs triage" in our issue template
       if: (contains(github.event.issue.labels.*.name, 'needs triage') || join(github.event.issue.labels.*.name) == '')
-      uses: technote-space/create-project-card-action@v1
+      uses: actions/add-to-project@v0.3.0
       # Note, the authentication token below is an ORG level Secret. 
-      # It must be created/recreated manually via a personal access token with "public_repo" and "admin:org" permissions
+      # It must be created/recreated manually via a personal access token with admin:org, project, public_repo permissions
       # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token
       # This is necessary because the "DSpace Backlog" project is an org level project (i.e. not repo specific)
       with:
-        GITHUB_TOKEN: ${{ secrets.ORG_PROJECT_TOKEN }}
-        PROJECT: DSpace Backlog
-        COLUMN: Triage
-        CHECK_ORG_PROJECT: true
-      # Ignore errors.
-      continue-on-error: true
+        github-token: ${{ secrets.TRIAGE_PROJECT_TOKEN }}
+        project-url: https://github.com/orgs/DSpace/projects/24
