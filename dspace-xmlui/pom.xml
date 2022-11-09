@@ -92,6 +92,14 @@
                     <groupId>xml-apis</groupId>
                     <artifactId>xml-apis</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.cnri</groupId>
+                    <artifactId>cnri-servlet-container</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

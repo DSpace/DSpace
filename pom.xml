@@ -28,6 +28,7 @@
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.22.1</jersey.version>
         <java.version>1.7</java.version>
+        <jetty.version>9.4.15.v20190215</jetty.version>
         <postgresql.driver.version>42.2.1</postgresql.driver.version>
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
@@ -1098,9 +1099,26 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.dspace</groupId>
+                <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
-                <version>6.2</version>
+                <version>9.3.0</version>
+            </dependency>
+            <!-- Required to run Handle Server -->
+            <dependency>
+                <groupId>net.cnri</groupId>
+                <artifactId>cnri-servlet-container</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1229,9 +1247,14 @@
             </dependency>
             <dependency>
 	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcprov-jdk15</artifactId>
-	        <version>1.46</version>
+	        <artifactId>bcprov-jdk15on</artifactId>
+	        <version>1.70</version>
 	    </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>1.70</version>
+            </dependency>
 	    <dependency>
 	        <groupId>org.bouncycastle</groupId>
 	        <artifactId>bcmail-jdk15</artifactId>
@@ -1611,6 +1634,10 @@
         <repository>
             <id>restlet-mirror</id>
             <url>https://maven.restlet.talend.com</url>
+        </repository>
+        <repository>
+            <id>handle.net</id>
+            <url>https://handle.net/maven</url>
         </repository>
     </repositories>
 
