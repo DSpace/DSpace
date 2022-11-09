@@ -30,7 +30,7 @@ import net.handle.hdllib.HandleStorage;
 import net.handle.hdllib.HandleValue;
 import net.handle.hdllib.ScanCallback;
 import net.handle.hdllib.Util;
-import net.handle.util.StreamTable;
+import net.cnri.util.StreamTable;;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

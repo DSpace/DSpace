@@ -1,46 +1,13 @@
 #!/bin/sh
-
 ###########################################################################
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
 #
-# make-handle-config
-#
-# Version: $Revision$
-#
-# Date: $Date$
-#
-# Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are
-# met:
-#
-# - Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
-#
-# - Redistributions in binary form must reproduce the above copyright
-# notice, this list of conditions and the following disclaimer in the
-# documentation and/or other materials provided with the distribution.
-#
-# - Neither the name of the DSpace Foundation nor the names of its
-# contributors may be used to endorse or promote products derived from
-# this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-# DAMAGE.
-#
+# http://www.dspace.org/license/
 ###########################################################################
-
-# Shell script for writing a simple barebones configuration file for the
+# 'make-handle-config' script
+# Unix shell script for writing a simple barebones configuration file for the
 # Handle server, with default options, unencrypted keys and connected
 # to the DSpace Handle plugin code.
 
@@ -49,25 +16,33 @@ BINDIR=`dirname $0`
 
 echo "Writing simple Handle server configuration"
 
-# Read parameters from DSpace config
-dshostname=`$BINDIR/dspace dsprop -property dspace.hostname`
+# Read server URL from DSpace config
+dsurl=`$BINDIR/dspace dsprop --property dspace.server.url`
+# Parse hostname from URL
+dshostname=`echo $dsurl | awk -F/ '{ print $3; exit }'`
+# Determine IP address from hostname
+dshostip=`host $dshostname | awk '/has address/ { print $4; exit }'`
+if [ "$dshostip" = "127.0.0.1" ]; then
+  # Just use default. SimpleSetup will fail when trying to bind to localhost addresses.
+  dshostip=""
+fi
 dsname=`$BINDIR/dspace dsprop -property dspace.name`
-handle=`$BINDIR/dspace dsprop -property handle.prefix`
+handle=`$BINDIR/dspace dsprop -property lr.pid.community.configurations | perl -e 'while(<>) { for my $l (split /[,;]/) { my ($k,$v) = split /=/, $l, 2; $v =~ s/^\s*//; $v =~ s/\s*$//; push @prefixes, split /\|/, $v if $k =~ /^\s*prefix\s*$/; }} print pop @prefixes'`
 handledir=`$BINDIR/dspace dsprop -property handle.dir`
 tempfile=/tmp/handleconfig$$
 contactemail=`$BINDIR/dspace dsprop -property mail.admin`
 
 # Write the options to a file we can pipe into the setup tool
-echo "1" >$tempfile   # 1 = non-caching server, 2 = caching server
-echo "" >>$tempfile   # Primary server?  Default = y (n = mirror server)
-echo $dshostname >>$tempfile   # IP address
+echo "" >$tempfile   # Primary server?  Default = y (n = mirror server)
+echo "" >>$tempfile   # Dual-stack (IPv4 and IPv6)? (default=n)
+echo $dshostip >>$tempfile   # IP address
+echo "" >>$tempfile   # DBind address (default=same as IP)
 echo "" >>$tempfile   # Port to listen to (default=2641)
 echo "" >>$tempfile   # Port for HTTP i/f to listen to (default=8000)
-echo "" >>$tempfile   # Log all accesses?  ("y" or "n", default=n)
-echo "" >>$tempfile   # Rotate logs? (defulat=No)
+echo "n" >>$tempfile   # Log all accesses?  ("y" or "n", default=y)
 echo "" >>$tempfile   # Version/serial no. of site (default=1)
 echo $dsname Handle Server >>$tempfile  # Server description
-echo $dsname >>$tempfile # Server desriptive name
+echo $dsname >>$tempfile # Server descriptive name
 echo "" >>$tempfile   # Contact name (default=none)
 echo "" >>$tempfile   # Contact telephone (default=none)
 echo $contactemail >>$tempfile   # Contact email
@@ -78,14 +53,14 @@ echo "n" >>$tempfile  # Do not encrypt admin private key
                       # OR do not overwrite old admin private key
 
 # Now run Handle server config tool, and pipe our config in
-$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null
+$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null 2>&1
 
 # Remove temp file
 rm -f $tempfile
 
 # Now update server configuration (config.dct) with our handle prefix and the
 # DSpace Handle plugin
-sed 's/YOUR_NAMING_AUTHORITY/'$handle'/' <$handledir/config.dct >$tempfile
+sed 's/YOUR_PREFIX/'$handle'/' <$handledir/config.dct >$tempfile
 
 # Remove original config file - will replace
 rm -f $handledir/config.dct
@@ -94,7 +69,7 @@ rm -f $handledir/config.dct
 # server_config section:
 #   "storage_type" = "CUSTOM"
 #   "storage_class" = "org.dspace.handle.HandlePlugin"
-awk '/.*/ {print $0} /"server_config" = {/ {printf "\"storage_type\" = \"CUSTOM\"\n\"storage_class\" = \"org.dspace.handle.HandlePlugin\"\n\n",$0}' <$tempfile >$handledir/config.dct
+awk '/.*/ {print $0} /"server_config" = {/ {printf "\"storage_type\" = \"CUSTOM\"\n\"storage_class\" = \"org.dspace.handle.HandlePlugin\"\n\"enable_txn_queue\" = \"no\"\n\n",$0}' <$tempfile >$handledir/config.dct
 
 
 #sed 's/"server_config" = {/"server_config" = {\n"storage_type" = "CUSTOM"\n"storage_class" = "org.dspace.handle.HandlePlugin"/'  <$tempfile >$handledir/config.dct
