@@ -489,7 +489,8 @@
             <list>
                 <value>dc.date.issued</value>
                 <value>dc.date.created</value>
-                <value>sedici.date.exposure</value>
+                <!--Comento el exposure para resolver el ticket #8431 link: http://trac.prebi.unlp.edu.ar/issues/8431-->
+                <!--<value>sedici.date.exposure</value>-->
             </list>
         </property>
         <property name="type" value="date"/>
