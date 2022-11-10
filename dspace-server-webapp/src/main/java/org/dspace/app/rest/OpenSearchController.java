@@ -148,13 +148,15 @@ public class OpenSearchController {
                 DiscoveryConfiguration discoveryConfiguration =
                     searchConfigurationService.getDiscoveryConfiguration("");
                 if (discoveryConfiguration != null) {
-                    DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
+                    DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration
+                        .getSearchSortConfiguration();
                     if (searchSortConfiguration != null) {
                         DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration
                             .getSortFieldConfiguration(sort);
                         if (sortFieldConfiguration != null) {
                             String sortField = searchService
-                                .toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+                                .toSortFieldIndex(sortFieldConfiguration.getMetadataField(),
+                                sortFieldConfiguration.getType());
 
                             if (sortDirection != null && sortDirection.equals("DESC")) {
                                 queryArgs.setSortField(sortField, SORT_ORDER.desc);
