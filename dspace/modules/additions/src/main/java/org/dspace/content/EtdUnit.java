@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -103,6 +104,11 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
         }
 
         return (getID() == ((EtdUnit) other).getID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getID());
     }
 
     @Override

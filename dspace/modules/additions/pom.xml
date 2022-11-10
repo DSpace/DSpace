@@ -278,6 +278,29 @@
          </exclusions>
       </dependency>
       <dependency>
+         <groupId>edu.umd.lib</groupId>
+         <artifactId>lib-util</artifactId>
+         <version>1.0</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi-ooxml-schemas</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi-ooxml</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi-scratchpad</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
          <groupId>cas</groupId>
          <artifactId>casclient</artifactId>
          <version>2.1.1</version>

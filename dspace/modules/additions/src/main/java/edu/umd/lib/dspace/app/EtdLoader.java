@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -35,7 +36,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.InvalidXPathException;
@@ -62,6 +63,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -73,7 +75,6 @@ import org.dspace.content.service.EtdUnitService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -129,10 +130,9 @@ import edu.umd.lims.util.ErrorHandling;
  * @author Ben Wallberg
  *********************************************************************/
 
-public class EtdLoader
-{
+public class EtdLoader {
 
-    private static Logger log = Logger.getLogger(EtdLoader.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdLoader.class);
 
     final static int MAX_WORD_COUNT = 4;
 
@@ -167,32 +167,38 @@ public class EtdLoader
     static Pattern pZipEntry = Pattern
             .compile(".*_umd_0117._(\\d+)(.pdf|_DATA.xml)");
 
-    
-    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    
+    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+            .getConfigurationService();
+
     private final static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
-    private final static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    
+    private final static CollectionService collectionService = ContentServiceFactory.getInstance()
+            .getCollectionService();
+
     private final static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    
+
     private final static BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-    
+
     private final static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
-    private final static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    private final static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
+            .getBitstreamFormatService();
 
-    private final static WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    private final static WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
+            .getWorkspaceItemService();
 
-    private final static InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    private final static InstallItemService installItemService = ContentServiceFactory.getInstance()
+            .getInstallItemService();
 
     private final static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     private final static GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-    private final static ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+    private final static ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
+            .getResourcePolicyService();
 
-    private final static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final static AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance()
+            .getAuthorizeService();
 
     protected static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
 
@@ -201,11 +207,9 @@ public class EtdLoader
      * Command line interface.
      */
 
-    public static void main(String args[]) throws Exception
-    {
+    public static void main(String args[]) throws Exception {
 
-        try
-        {
+        try {
 
             // Properties
             Properties props = System.getProperties();
@@ -238,16 +242,14 @@ public class EtdLoader
                     strDspace + "/config/load/etd2marc.xsl")));
 
             // open the marc output file
-            if (strMarcFile != null)
-            {
+            if (strMarcFile != null) {
                 FileOutputStream fos = new FileOutputStream(new File(
                         strMarcFile), true);
                 marcwriter = new MarcStreamWriter(fos, "UTF-8");
             }
 
             // open the csv output file
-            if (strCsvFile != null)
-            {
+            if (strCsvFile != null) {
                 FileOutputStream fos = new FileOutputStream(strCsvFile, true);
                 OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                 csvwriter = new PrintWriter(osw);
@@ -256,25 +258,21 @@ public class EtdLoader
             // Get DSpace values
             Context context = new Context();
 
-            if (strCollection == null)
-            {
+            if (strCollection == null) {
                 throw new Exception("drum.etdloader.collection not set");
             }
             etdcollection = collectionService.find(context,
                     UUIDUtils.fromString(strCollection));
-            if (etdcollection == null)
-            {
+            if (etdcollection == null) {
                 throw new Exception("Unable to find etdloader.collection: "
                         + strCollection);
             }
 
-            if (strEPerson == null)
-            {
+            if (strEPerson == null) {
                 throw new Exception("drum.etdloader.eperson not set");
             }
             etdeperson = epersonService.findByEmail(context, strEPerson);
-            if (etdeperson == null)
-            {
+            if (etdeperson == null) {
                 throw new Exception("Unable to find etdloader.eperson: "
                         + strEPerson);
             }
@@ -287,14 +285,12 @@ public class EtdLoader
             log.info("Found " + map.size() + " item(s)");
 
             // Process each entry
-            for (Iterator i = map.keySet().iterator(); i.hasNext();)
-            {
+            for (Iterator i = map.keySet().iterator(); i.hasNext();) {
                 String strItem = (String) i.next();
 
                 lRead++;
 
-                if (strSingleItem == null || strSingleItem.equals(strItem))
-                {
+                if (strSingleItem == null || strSingleItem.equals(strItem)) {
                     loadItem(zip, strItem, (List) map.get(strItem));
                 }
             }
@@ -302,32 +298,22 @@ public class EtdLoader
             context.complete();
         }
 
-        catch (Exception e)
-        {
+        catch (Exception e) {
             log.error("Uncaught exception: " + ErrorHandling.getStackTrace(e));
         }
 
-        finally
-        {
-            if (marcwriter != null)
-            {
-                try
-                {
+        finally {
+            if (marcwriter != null) {
+                try {
                     marcwriter.close();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                 }
             }
 
-            if (csvwriter != null)
-            {
-                try
-                {
+            if (csvwriter != null) {
+                try {
                     csvwriter.close();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                 }
             }
 
@@ -343,23 +329,21 @@ public class EtdLoader
      */
 
     public static void addBitstreams(Context context, Item item, ZipFile zip,
-            List files) throws Exception
-    {
+            List files) throws Exception {
 
         // Get the ORIGINAL bundle which contains public bitstreams
         Bundle originalBundle = getBundle(context, item, "ORIGINAL");
-        // Get the METADATA bundle 
+        // Get the METADATA bundle
         Bundle metaBundle = getBundle(context, item, "METADATA");
 
-        // Add the Proquest ETD metadata XML to the METADATA bundle 
+        // Add the Proquest ETD metadata XML to the METADATA bundle
         String strFileName = (String) files.get(0);
         ZipEntry ze = (ZipEntry) files.get(1);
         createBitstream(context, metaBundle, strFileName, zip.getInputStream(ze));
 
-        // Add the content bitstreams to ORIGINAL bundle 
+        // Add the content bitstreams to ORIGINAL bundle
         // Loop through the files
-        for (int i = 2; i < files.size(); i += 2)
-        {
+        for (int i = 2; i < files.size(); i += 2) {
             strFileName = (String) files.get(i);
             ze = (ZipEntry) files.get(i + 1);
 
@@ -368,24 +352,21 @@ public class EtdLoader
     }
 
     public static Bundle getBundle(Context context, Item item, String type) throws Exception {
-      List<Bundle> bundles = itemService.getBundles(item, type);
-      Bundle bundle = null;
+        List<Bundle> bundles = itemService.getBundles(item, type);
+        Bundle bundle = null;
 
-      if (bundles.isEmpty())
-      {
-          bundle = bundleService.create(context, item, type);
-      }
-      else
-      {
-          bundle = bundles.get(0);
-      }
-      return bundle;
+        if (bundles.isEmpty()) {
+            bundle = bundleService.create(context, item, type);
+        } else {
+            bundle = bundles.get(0);
+        }
+        return bundle;
     }
 
     public static void createBitstream(Context context, Bundle bundle, String name, InputStream stream)
-      throws Exception {
+            throws Exception {
         log.debug("Adding bitstream for " + name);
-      
+
         // Create the bitstream
         Bitstream bs = bitstreamService.create(context, bundle, stream);
         bs.setName(context, name);
@@ -404,8 +385,7 @@ public class EtdLoader
      */
 
     public static void addDC(Context context, Item item, Document meta)
-            throws Exception
-    {
+            throws Exception {
 
         // Transform to dublin core
         DocumentSource source = new DocumentSource(meta);
@@ -415,15 +395,13 @@ public class EtdLoader
 
         Document dc = result.getDocument();
 
-        if (log.isDebugEnabled())
-        {
+        if (log.isDebugEnabled()) {
             log.debug("dublin core:\n" + toString(dc));
         }
 
         // Loop through the elements
         List l = getXPath("/dublin_core/dcvalue").selectNodes(dc);
-        for (Iterator i = l.iterator(); i.hasNext();)
-        {
+        for (Iterator i = l.iterator(); i.hasNext();) {
             Node ndc = (Node) i.next();
 
             String value = ndc.getText();
@@ -438,12 +416,12 @@ public class EtdLoader
             n = getXPath("@language").selectSingleNode(ndc);
             String language = ((n == null || n.getText().equals("none")) ? null
                     : n.getText());
-            if (language == null)
-            {
+            if (language == null) {
                 language = configurationService.getProperty("default.language");
             }
 
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, element, qualifier, language, value);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), element, qualifier, language,
+                    value);
             log.debug(element + ":" + qualifier + ":" + language + ":" + value);
         }
     }
@@ -458,26 +436,21 @@ public class EtdLoader
     static Group anongroup = null;
 
     public static void addEmbargo(Context context, Item item, String strEmbargo)
-            throws Exception
-    {
+            throws Exception {
 
         log.debug("Adding embargo policies");
 
         // Get groups
-        if (anongroup == null)
-        {
+        if (anongroup == null) {
             anongroup = groupService.findByName(context, "Anonymous");
-            if (anongroup == null)
-            {
+            if (anongroup == null) {
                 throw new Exception("Unable to find Anonymous group");
             }
         }
 
-        if (etdgroup == null)
-        {
+        if (etdgroup == null) {
             etdgroup = groupService.findByName(context, "ETD Embargo");
-            if (etdgroup == null)
-            {
+            if (etdgroup == null) {
                 throw new Exception("Unable to find ETD Embargo group");
             }
         }
@@ -486,16 +459,13 @@ public class EtdLoader
         List lPolicies = new ArrayList();
         ResourcePolicy rp = null;
 
-        if (strEmbargo.equals("never"))
-        {
+        if (strEmbargo.equals("never")) {
             log.info("Embargoed forever");
             rp = resourcePolicyService.create(context);
             rp.setAction(Constants.READ);
             rp.setGroup(etdgroup);
             lPolicies.add(rp);
-        }
-        else
-        {
+        } else {
             Date date = format.parse(strEmbargo);
             log.info("Embargoed until " + date);
 
@@ -517,8 +487,7 @@ public class EtdLoader
         Bundle bundle = bundles.get(0);
 
         List<Bitstream> bs = bundle.getBitstreams();
-        for (Bitstream bitstream : bs)
-        {
+        for (Bitstream bitstream : bs) {
             // Set the policies
             authorizeService.removeAllPolicies(context, bitstream);
             authorizeService.addPolicies(context, lPolicies, bitstream);
@@ -531,15 +500,15 @@ public class EtdLoader
      */
 
     private static void checkTitle(Context c, Item item, Set sCollections)
-            throws Exception
-    {
+            throws Exception {
 
         // Get the title(s)
-        List<MetadataValue> metadataValues = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        List<MetadataValue> metadataValues = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title",
+                null,
+                Item.ANY);
 
         // Process each title
-        for (MetadataValue metadataValue : metadataValues)
-        {
+        for (MetadataValue metadataValue : metadataValues) {
 
             // Get normalized title
             String title = OrderFormat.makeSortString(metadataValue.getValue(),
@@ -562,8 +531,7 @@ public class EtdLoader
 
             StringBuilder searchTerm = new StringBuilder();
 
-            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT && wordCount < words.length); wordCount++)
-            {
+            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT && wordCount < words.length); wordCount++) {
                 searchTerm = searchTerm.append(words[wordCount]);
                 searchTerm = searchTerm.append(" ");
             }
@@ -572,12 +540,9 @@ public class EtdLoader
 
             int index = title.indexOf(" ", 1);
 
-            if (searchTerm.length() > 0)
-            {
+            if (searchTerm.length() > 0) {
                 searchTitle = searchTerm.toString().trim();
-            }
-            else
-            {
+            } else {
                 searchTitle = title.substring(0, index);
             }
 
@@ -599,8 +564,7 @@ public class EtdLoader
 
             int biItemCount = 0;
 
-            for (Iterator j = binfo.getResults().iterator(); j.hasNext();)
-            {
+            for (Iterator j = binfo.getResults().iterator(); j.hasNext();) {
                 Item bitem = (Item) j.next();
 
                 // Get normalized title for browse item
@@ -620,15 +584,13 @@ public class EtdLoader
                 log.debug("Browsed Items Count: " + biItemCount);
 
                 // Check for the match
-                if (title.equals(btitle) && item.getID() != bitem.getID())
-                {
+                if (title.equals(btitle) && item.getID() != bitem.getID()) {
                     log.debug("Duplicate title: " + title);
 
                     // Get the list of collections for the loaded item
                     StringBuffer sbCollections = new StringBuffer();
                     sbCollections.append(etdcollection.getName());
-                    for (Iterator ic = sCollections.iterator(); ic.hasNext();)
-                    {
+                    for (Iterator ic = sCollections.iterator(); ic.hasNext();) {
                         Collection coll = (Collection) ic.next();
                         sbCollections.append(", ");
                         sbCollections.append(coll.getName());
@@ -637,20 +599,15 @@ public class EtdLoader
                     // Get the email recipient
                     String email = configurationService
                             .getProperty("drum.mail.duplicate_title");
-                    if (email == null)
-                    {
+                    if (email == null) {
                         email = configurationService.getProperty("mail.admin");
                     }
 
-                    try
-                    {
-                        if (email != null)
-                        {
+                    try {
+                        if (email != null) {
                             // Send the email
-                            Email bean = ConfigurationManager.getEmail(I18nUtil
-                                    .getEmailFilename(
-                                            I18nUtil.getDefaultLocale(),
-                                            "duplicate_title"));
+                            Email bean = Email
+                                    .getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "duplicate_title"));
                             bean.addRecipient(email);
                             bean.addArgument(title);
                             bean.addArgument("" + item.getID());
@@ -658,9 +615,7 @@ public class EtdLoader
                             bean.addArgument(sbCollections.toString());
                             bean.send();
                         }
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         log.error("Cannot send email about detected duplicate title: "
                                 + title + "\n" + ErrorHandling.getStackTrace(e));
                     }
@@ -677,11 +632,9 @@ public class EtdLoader
      */
 
     public static void createMarc(Document meta, String strHandle, List files)
-            throws Exception
-    {
+            throws Exception {
 
-        if (marcwriter != null)
-        {
+        if (marcwriter != null) {
             log.debug("Creating marc");
 
             // Convert etd metadata to marc xml
@@ -711,11 +664,9 @@ public class EtdLoader
      * Add an entry in the CSV files for this item: title, author, handle
      */
 
-    public static void createCsv(Item item, String strHandle) throws Exception
-    {
+    public static void createCsv(Item item, String strHandle) throws Exception {
 
-        if (csvwriter != null)
-        {
+        if (csvwriter != null) {
             log.debug("Creating CSV");
 
             // Build the line
@@ -724,12 +675,11 @@ public class EtdLoader
             sb.append('"');
 
             // Get the title(s)
-            List<MetadataValue> titles = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            List<MetadataValue> titles = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "title", null,
+                    Item.ANY);
 
-            for (int i = 0; i < titles.size(); i++)
-            {
-                if (i > 0)
-                {
+            for (int i = 0; i < titles.size(); i++) {
+                if (i > 0) {
                     sb.append("; ");
                 }
 
@@ -739,12 +689,11 @@ public class EtdLoader
             sb.append("\",\"");
 
             // Get the author(s)
-            List<MetadataValue> authors = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "contributor", "author", Item.ANY);
+            List<MetadataValue> authors = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(), "contributor",
+                    "author", Item.ANY);
 
-            for (int i = 0; i < authors.size(); i++)
-            {
-                if (i > 0)
-                {
+            for (int i = 0; i < authors.size(); i++) {
+                if (i > 0) {
                     sb.append("; ");
                 }
 
@@ -769,8 +718,7 @@ public class EtdLoader
      */
 
     public static Set<Collection> getCollections(Context context, Document meta)
-            throws Exception
-    {
+            throws Exception {
         Set<Collection> collections = new HashSet<>();
 
         log.debug("Looking for mapped collections");
@@ -778,8 +726,7 @@ public class EtdLoader
         List l = getXPath(
                 "/DISS_submission/DISS_description/DISS_institution/DISS_inst_contact")
                 .selectNodes(meta);
-        for (Iterator i = l.iterator(); i.hasNext();)
-        {
+        for (Iterator i = l.iterator(); i.hasNext();) {
 
             Node n = (Node) i.next();
             String strDepartment = n.getText().trim().replaceAll(" +", " ");
@@ -788,14 +735,11 @@ public class EtdLoader
 
             EtdUnit etdunit = etdunitService.findByName(context, strDepartment);
 
-            if (etdunit == null)
-            {
+            if (etdunit == null) {
                 log.error("Unable to lookup mapped collection: "
                         + strDepartment);
 
-            }
-            else
-            {
+            } else {
                 collections.addAll(etdunit.getCollections());
             }
         }
@@ -807,29 +751,23 @@ public class EtdLoader
      * Get embargo information.
      */
 
-    public static String getEmbargo(Document meta)
-    {
+    public static String getEmbargo(Document meta) {
         String strEmbargo = null;
 
         Node n = getXPath(
                 "/DISS_submission/DISS_restriction/DISS_sales_restriction[@code=\"1\"]")
                 .selectSingleNode(meta);
 
-        if (n != null)
-        {
+        if (n != null) {
             Node n2 = getXPath("@remove").selectSingleNode(n);
-            if (n2 != null && !"".equals(n2.getText()))
-            {
+            if (n2 != null && !"".equals(n2.getText())) {
                 strEmbargo = n2.getText();
-            }
-            else
-            {
+            } else {
                 strEmbargo = "never";
             }
         }
 
-        if (strEmbargo != null)
-        {
+        if (strEmbargo != null) {
             log.debug("Item is embargoed; remove restrictions " + strEmbargo);
         }
 
@@ -838,43 +776,31 @@ public class EtdLoader
 
     /********************************************************** getFileTypes */
     /**
-   */
+    */
 
-    public static String getFileTypes(List files) throws IOException
-    {
+    public static String getFileTypes(List files) throws IOException {
 
         HashSet h = new HashSet();
 
         // Loop through the files, extracting extensions
-        for (int i = 2; i < files.size(); i += 2)
-        {
+        for (int i = 2; i < files.size(); i += 2) {
             String strFileName = (String) files.get(i);
 
             int n = strFileName.lastIndexOf('.');
-            if (n > -1)
-            {
+            if (n > -1) {
                 h.add(strFileName.substring(n + 1).trim().toLowerCase());
             }
         }
 
-        if (h.contains("mp3"))
-        {
+        if (h.contains("mp3")) {
             return "Text and audio.";
-        }
-        else if (h.contains("jpg"))
-        {
+        } else if (h.contains("jpg")) {
             return "Text and images.";
-        }
-        else if (h.contains("xls"))
-        {
+        } else if (h.contains("xls")) {
             return "Text and spreadsheet.";
-        }
-        else if (h.contains("wav"))
-        {
+        } else if (h.contains("wav")) {
             return "Text and video.";
-        }
-        else
-        {
+        } else {
             return "Text.";
         }
     }
@@ -884,18 +810,14 @@ public class EtdLoader
      * Get a compiled XPath object for the expression. Cache.
      */
 
-    private static XPath getXPath(String strXPath) throws InvalidXPathException
-    {
+    private static XPath getXPath(String strXPath) throws InvalidXPathException {
 
         XPath xpath = null;
 
-        if (mXPath.containsKey(strXPath))
-        {
+        if (mXPath.containsKey(strXPath)) {
             xpath = (XPath) mXPath.get(strXPath);
 
-        }
-        else
-        {
+        } else {
             xpath = df.createXPath(strXPath);
             xpath.setNamespaceURIs(namespace);
             mXPath.put(strXPath, xpath);
@@ -909,15 +831,13 @@ public class EtdLoader
      * Load one item into DSpace.
      */
 
-    public static void loadItem(ZipFile zip, String strItem, List files)
-    {
+    public static void loadItem(ZipFile zip, String strItem, List files) {
         log.info("=====================================\n" + "Loading item "
                 + strItem + ": " + ((files.size() / 2) - 1) + " bitstream(s)");
 
         Context context = null;
 
-        try
-        {
+        try {
             // Setup the context
             context = new Context();
             context.setCurrentUser(etdeperson);
@@ -927,8 +847,7 @@ public class EtdLoader
             ZipEntry ze = (ZipEntry) files.get(1);
             Document meta = reader
                     .read(new InputSource(zip.getInputStream(ze)));
-            if (log.isDebugEnabled())
-            {
+            if (log.isDebugEnabled()) {
                 log.debug("ETD metadata:\n" + toString(meta));
             }
 
@@ -954,8 +873,7 @@ public class EtdLoader
 
             // Add embargo
             String strEmbargo = getEmbargo(meta);
-            if (strEmbargo != null)
-            {
+            if (strEmbargo != null) {
                 addEmbargo(context, item, strEmbargo);
                 lEmbargo++;
             }
@@ -975,8 +893,7 @@ public class EtdLoader
             checkTitle(context, item, sCollections);
 
             // Report missing collections
-            if (sCollections.size() == 0)
-            {
+            if (sCollections.size() == 0) {
                 reportCollections(context, item);
             }
 
@@ -987,26 +904,19 @@ public class EtdLoader
             createCsv(item, strHandle);
         }
 
-        catch (Exception e)
-        {
+        catch (Exception e) {
             log.error("Error loading item " + strItem + ": "
                     + ErrorHandling.getStackTrace(e));
-            if (context != null)
-            {
+            if (context != null) {
                 context.abort();
             }
         }
 
-        finally
-        {
-            if (context != null)
-            {
-                try
-                {
+        finally {
+            if (context != null) {
+                try {
                     context.complete();
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                 }
             }
         }
@@ -1020,8 +930,7 @@ public class EtdLoader
      * pdf. Note that each zip file now contains only one ETD item.
      */
 
-    public static Map readItems(ZipFile zip)
-    {
+    public static Map readItems(ZipFile zip) {
 
         String strItem = null;
 
@@ -1034,16 +943,14 @@ public class EtdLoader
         log.info("Reading " + zip.size() + " zip file entries");
 
         // Loop through the entries
-        for (Enumeration e = zip.entries(); e.hasMoreElements();)
-        {
+        for (Enumeration e = zip.entries(); e.hasMoreElements();) {
             ZipEntry ze = (ZipEntry) e.nextElement();
             String strName = ze.getName();
 
             log.debug("zip entry: " + strName);
 
             // skip directories
-            if (ze.isDirectory())
-            {
+            if (ze.isDirectory()) {
                 continue;
             }
 
@@ -1053,33 +960,28 @@ public class EtdLoader
             String strFileName = s[s.length - 1];
 
             Matcher m = pZipEntry.matcher(s[0]);
-            if (m.matches())
-            {
+            if (m.matches()) {
 
                 // Get the item number
-                if (strItem == null)
-                {
+                if (strItem == null) {
                     strItem = m.group(1);
 
                     log.debug("item number is " + strItem);
                 }
 
                 // Put the file in the right position
-                if (strFileName.endsWith("_DATA.xml"))
-                {
+                if (strFileName.endsWith("_DATA.xml")) {
                     lmap.set(0, strFileName);
                     lmap.set(1, ze);
                 }
 
-                else if (strFileName.endsWith(".pdf"))
-                {
+                else if (strFileName.endsWith(".pdf")) {
                     lmap.set(2, strFileName);
                     lmap.set(3, ze);
                 }
             }
 
-            else
-            {
+            else {
                 lmap.add(strFileName);
                 lmap.add(ze);
             }
@@ -1097,24 +999,20 @@ public class EtdLoader
      */
 
     public static void reportCollections(Context context, Item item)
-            throws Exception
-    {
+            throws Exception {
         // Get the title(s)
-        String strTitle= itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        String strTitle = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(), "title", null,
+                Item.ANY);
 
         // Get the email recipient
         String email = configurationService.getProperty("drum.mail.etd.recipient");
-        if (email == null)
-        {
+        if (email == null) {
             email = configurationService.getProperty("mail.admin");
         }
 
-        if (email != null)
-        {
+        if (email != null) {
             // Send the email
-            Email bean = ConfigurationManager.getEmail(I18nUtil
-                    .getEmailFilename(I18nUtil.getDefaultLocale(),
-                            "etd_collections"));
+            Email bean = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "etd_collections"));
             bean.addRecipient(email);
             bean.addArgument(strTitle);
             bean.addArgument("" + item.getID());
@@ -1130,21 +1028,20 @@ public class EtdLoader
      */
 
     private static void reportItem(Context c, Item item, String strHandle,
-            Set sCollections) throws Exception
-    {
+            Set sCollections) throws Exception {
 
         StringBuffer sb = new StringBuffer();
 
         sb.append("Item loaded: " + strHandle + "\n");
 
         // Title
-        String title = itemService.getMetadataFirstValue(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        String title = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.DC.getName(), "title", null,
+                Item.ANY);
         sb.append("  Title: " + title + "\n");
 
         // Collections
         sb.append("  Collection: " + etdcollection.getName() + "\n");
-        for (Iterator ic = sCollections.iterator(); ic.hasNext();)
-        {
+        for (Iterator ic = sCollections.iterator(); ic.hasNext();) {
             Collection coll = (Collection) ic.next();
             sb.append("  Collection: " + coll.getName() + "\n");
         }
@@ -1157,8 +1054,7 @@ public class EtdLoader
      * Get string representation of xml Document.
      */
 
-    public static String toString(Document doc) throws java.io.IOException
-    {
+    public static String toString(Document doc) throws java.io.IOException {
         StringWriter sw = new StringWriter();
         OutputFormat format = OutputFormat.createPrettyPrint();
         XMLWriter writer = new XMLWriter(sw, format);

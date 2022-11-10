@@ -15,9 +15,20 @@ import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowItem;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,20 +42,18 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "workspaceitem")
-public class WorkspaceItem implements InProgressSubmission, Serializable, ReloadableEntity<Integer>
-{
+public class WorkspaceItem implements InProgressSubmission, Serializable, ReloadableEntity<Integer> {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="workspaceitem_seq")
-    @SequenceGenerator(name="workspaceitem_seq", sequenceName="workspaceitem_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "workspaceitem_seq")
+    @SequenceGenerator(name = "workspaceitem_seq", sequenceName = "workspaceitem_seq", allocationSize = 1)
     private Integer workspaceItemId;
 
     /** The item this workspace object pertains to */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
-
 
     /** The collection the item is being submitted to */
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,9 +63,8 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     // Begin UMD Customization
     // To support mapping multiple collection
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "collection2workspaceitem", 
-               joinColumns = { @JoinColumn(name = "workspace_item_id") },
-               inverseJoinColumns = { @JoinColumn(name = "collection_id") })
+    @JoinTable(name = "collection2workspaceitem", joinColumns = {
+            @JoinColumn(name = "workspace_item_id") }, inverseJoinColumns = { @JoinColumn(name = "collection_id") })
     private Set<Collection> mappedCollections = new HashSet<>();
     // End UMD Customization
 
@@ -81,11 +89,8 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     private Integer pageReached = -1;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "epersongroup2workspaceitem",
-            joinColumns = {@JoinColumn(name = "workspace_item_id") },
-            inverseJoinColumns = {@JoinColumn(name = "eperson_group_id") }
-    )
+    @JoinTable(name = "epersongroup2workspaceitem", joinColumns = {
+            @JoinColumn(name = "workspace_item_id") }, inverseJoinColumns = { @JoinColumn(name = "eperson_group_id") })
     private final List<Group> supervisorGroups = new ArrayList<>();
 
     /**
@@ -95,8 +100,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * {@link org.dspace.content.service.WorkspaceItemService#create(Context, WorkflowItem)}
      *
      */
-    protected WorkspaceItem()
-    {
+    protected WorkspaceItem() {
 
     }
 
@@ -106,8 +110,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * @return the internal identifier
      */
     @Override
-    public Integer getID()
-    {
+    public Integer getID() {
         return workspaceItemId;
     }
 
@@ -116,8 +119,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * 
      * @return the value of the stage reached column
      */
-    public int getStageReached()
-    {
+    public int getStageReached() {
         return stageReached;
     }
 
@@ -125,10 +127,9 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * Set the value of the stage reached column
      * 
      * @param v
-     *            the value of the stage reached column
+     *          the value of the stage reached column
      */
-    public void setStageReached(int v)
-    {
+    public void setStageReached(int v) {
         stageReached = v;
     }
 
@@ -138,8 +139,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * 
      * @return the value of the page reached column
      */
-    public int getPageReached()
-    {
+    public int getPageReached() {
         return pageReached;
     }
 
@@ -148,10 +148,9 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * reached within a stage/step)
      * 
      * @param v
-     *            the value of the page reached column
+     *          the value of the page reached column
      */
-    public void setPageReached(int v)
-    {
+    public void setPageReached(int v) {
         pageReached = v;
     }
 
@@ -163,18 +162,15 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-        {
+        if (this == o) {
             return true;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-        if (getClass() != objClass)
-        {
+        if (getClass() != objClass) {
             return false;
         }
-        final WorkspaceItem that = (WorkspaceItem)o;
-        if (this.getID() != that.getID())
-        {
+        final WorkspaceItem that = (WorkspaceItem) o;
+        if (this.getID() != that.getID()) {
             return false;
         }
 
@@ -182,15 +178,13 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return new HashCodeBuilder().append(getID()).toHashCode();
     }
 
     // InProgressSubmission methods
     @Override
-    public Item getItem()
-    {
+    public Item getItem() {
         return item;
     }
 
@@ -199,8 +193,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     }
 
     @Override
-    public Collection getCollection()
-    {
+    public Collection getCollection() {
         return collection;
     }
 
@@ -209,58 +202,49 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     }
 
     @Override
-    public EPerson getSubmitter() throws SQLException
-    {
+    public EPerson getSubmitter() {
         return item.getSubmitter();
     }
 
     @Override
-    public boolean hasMultipleFiles()
-    {
+    public boolean hasMultipleFiles() {
         return multipleFiles;
     }
 
     @Override
-    public void setMultipleFiles(boolean b)
-    {
+    public void setMultipleFiles(boolean b) {
         multipleFiles = b;
     }
 
     @Override
-    public boolean hasMultipleTitles()
-    {
+    public boolean hasMultipleTitles() {
         return multipleTitles;
     }
 
     @Override
-    public void setMultipleTitles(boolean b)
-    {
+    public void setMultipleTitles(boolean b) {
         multipleTitles = b;
     }
 
     // Customization for LIBDRUM-628
     @Override
-    public boolean isDataset()
-    {
+    public boolean isDataset() {
         return isDataset;
     }
 
     @Override
-    public void setDataset(boolean b)
-    {
+    public void setDataset(boolean b) {
         isDataset = b;
     }
     // End customization for LIBDRUM-628
 
     @Override
-    public boolean isPublishedBefore()
-    {
+    public boolean isPublishedBefore() {
         return publishedBefore;
     }
 
     @Override
-    public void setPublishedBefore(boolean b)
-    {
+    public void setPublishedBefore(boolean b) {
         publishedBefore = b;
     }
 
@@ -268,31 +252,28 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
         return supervisorGroups;
     }
 
-    void removeSupervisorGroup(Group group)
-    {
+    void removeSupervisorGroup(Group group) {
         supervisorGroups.remove(group);
     }
 
-    void addSupervisorGroup(Group group)
-    {
+    void addSupervisorGroup(Group group) {
         supervisorGroups.add(group);
     }
 
     // Begin UMD Customization
     @Override
-    public List<Collection> getMappedCollections()
-    {
+    public List<Collection> getMappedCollections() {
         return new ArrayList<>(mappedCollections);
     }
 
     @Override
     public void addMappedCollections(List<Collection> collection) {
-      this.mappedCollections.addAll(collection);
+        this.mappedCollections.addAll(collection);
     }
 
     @Override
     public void removeMappedCollections() {
-      this.mappedCollections.clear();
+        this.mappedCollections.clear();
     }
     // End UMD Customization
 }
