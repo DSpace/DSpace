@@ -10,86 +10,88 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.persistence.Query;
+
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
 import org.dspace.content.dao.EtdUnitDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
- * Hibernate implementation of the Database Access Object interface class for the EtdUnit object.
- * This class is responsible for all database calls for the EtdUnit object and is autowired by spring
+ * Hibernate implementation of the Database Access Object interface class for
+ * the EtdUnit object.
+ * This class is responsible for all database calls for the EtdUnit object and
+ * is autowired by spring
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
  */
-public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements EtdUnitDAO
-{
-    protected EtdUnitDAOImpl()
-    {
-        super();
+public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements EtdUnitDAO {
+  protected EtdUnitDAOImpl() {
+    super();
+  }
+
+  @Override
+  public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException {
+    Query query = createQuery(context,
+        "from Etdunit where (from Collection c where c.uuid = :collection_uuid) in elements(collection)");
+    query.setParameter("collection_uuid", collection.getID());
+    query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+    return list(query);
+  }
+
+  @Override
+  public EtdUnit findByName(Context context, String name) throws SQLException {
+    Query query = createQuery(context,
+        "SELECT eu from Etdunit eu " +
+            "where eu.name = :name ");
+
+    query.setParameter("name", name);
+    query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+    return singleResult(query);
+  }
+
+  @Override
+  public List<EtdUnit> searchByName(Context context, String nameQuery, int offset, int limit) throws SQLException {
+    Query query = createQuery(context,
+        "SELECT eu FROM Etdunit eu WHERE lower(eu.name) LIKE lower(:name)");
+    query.setParameter("name", "%" + StringUtils.trimToEmpty(nameQuery) + "%");
+
+    if (0 <= offset) {
+      query.setFirstResult(offset);
+    }
+    if (0 <= limit) {
+      query.setMaxResults(limit);
     }
 
-    @Override
-    public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException {
-      Criteria criteria = createCriteria(context, EtdUnit.class);
-      criteria.setFetchMode("Collection", FetchMode.JOIN)
-              .add(Restrictions.eq("id", collection.getID()));
-      return list(criteria);
-    }
+    return list(query);
+  }
 
-    @Override
-    public EtdUnit findByName(Context context, String name) throws SQLException {
-      Criteria criteria = createCriteria(context, EtdUnit.class);
-      criteria.add(Restrictions.eq("name", name))
-              .setFirstResult(0)
-              .setMaxResults(1);
-      List<EtdUnit> etdunits = list(criteria);
-      if (etdunits.isEmpty()) {
-        return null;
-      }
-      return etdunits.get(0);
-    }
+  @Override
+  public int searchByNameResultCount(Context context, String nameQuery) throws SQLException {
+    Query query = createQuery(context,
+        "SELECT count(*) FROM Etdunit eu WHERE lower(eu.name) LIKE lower(:name)");
+    query.setParameter("name", "%" + nameQuery + "%");
 
-    @Override
-    public List<EtdUnit> searchByName(Context context, String query, int offset, int limit) throws SQLException {
-      Criteria criteria = searchByNameCriteria(context, query);
-      if (offset > 0) {
-        criteria.setFirstResult(offset);
-      }
-      if (limit > 0) {
-        criteria.setMaxResults(limit);
-      }
+    return count(query);
+  }
 
-      return list(criteria);
-    }
+  @Override
+  public List<EtdUnit> findAllSortedByName(Context context) throws SQLException {
+    Query query = createQuery(context,
+        "SELECT eu FROM Etdunit eu ORDER BY eu.name ASC");
+    query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-    @Override
-    public int searchByNameResultCount(Context context, String query) throws SQLException {
-      return count(searchByNameCriteria(context, query));
-    }
+    return list(query);
+  }
 
-    @Override
-    public List<EtdUnit> findAllSortedByName(Context context) throws SQLException
-    {
-      Criteria criteria = createCriteria(context, EtdUnit.class);
-      criteria.addOrder(Order.asc("name.value"));
-      return list(criteria);
-    }
+  @Override
+  public int countRows(Context context) throws SQLException {
+    return count(createQuery(context, "SELECT count(*) FROM EtdUnit"));
+  }
 
-    @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM EtdUnit"));
-    }
-
-    private Criteria searchByNameCriteria(Context context, String query) throws SQLException {
-      Criteria criteria = createCriteria(context, EtdUnit.class);
-      criteria.add(Restrictions.like("name", query, MatchMode.ANYWHERE));
-      return criteria;
-    }
 }

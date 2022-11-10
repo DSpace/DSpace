@@ -7,13 +7,11 @@
  */
 package org.dspace.content;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.dspace.core.Context;
-import org.dspace.core.ReloadableEntity;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.workflow.WorkflowItem;
-import org.hibernate.proxy.HibernateProxyHelper;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,21 +26,24 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.workflow.WorkflowItem;
+import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
  * Class representing an item in the process of being submitted by a user
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
 @Entity
 @Table(name = "workspaceitem")
-public class WorkspaceItem implements InProgressSubmission, Serializable, ReloadableEntity<Integer> {
+public class WorkspaceItem
+    implements InProgressSubmission, Serializable {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)
@@ -50,12 +51,17 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     @SequenceGenerator(name = "workspaceitem_seq", sequenceName = "workspaceitem_seq", allocationSize = 1)
     private Integer workspaceItemId;
 
-    /** The item this workspace object pertains to */
+    /**
+     * The item this workspace object pertains to
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    /** The collection the item is being submitted to */
+
+    /**
+     * The collection the item is being submitted to
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
     private Collection collection;
@@ -89,8 +95,11 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     private Integer pageReached = -1;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "epersongroup2workspaceitem", joinColumns = {
-            @JoinColumn(name = "workspace_item_id") }, inverseJoinColumns = { @JoinColumn(name = "eperson_group_id") })
+    @JoinTable(
+        name = "epersongroup2workspaceitem",
+        joinColumns = {@JoinColumn(name = "workspace_item_id")},
+        inverseJoinColumns = {@JoinColumn(name = "eperson_group_id")}
+    )
     private final List<Group> supervisorGroups = new ArrayList<>();
 
     /**
@@ -98,7 +107,6 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
      * {@link org.dspace.content.service.WorkspaceItemService#create(Context, Collection, boolean)}
      * or
      * {@link org.dspace.content.service.WorkspaceItemService#create(Context, WorkflowItem)}
-     *
      */
     protected WorkspaceItem() {
 
@@ -106,7 +114,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
 
     /**
      * Get the internal ID of this workspace item
-     * 
+     *
      * @return the internal identifier
      */
     @Override
@@ -116,7 +124,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
 
     /**
      * Get the value of the stage reached column
-     * 
+     *
      * @return the value of the stage reached column
      */
     public int getStageReached() {
@@ -125,9 +133,8 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
 
     /**
      * Set the value of the stage reached column
-     * 
-     * @param v
-     *          the value of the stage reached column
+     *
+     * @param v the value of the stage reached column
      */
     public void setStageReached(int v) {
         stageReached = v;
@@ -136,7 +143,7 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     /**
      * Get the value of the page reached column (which represents the page
      * reached within a stage/step)
-     * 
+     *
      * @return the value of the page reached column
      */
     public int getPageReached() {
@@ -146,9 +153,8 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
     /**
      * Set the value of the page reached column (which represents the page
      * reached within a stage/step)
-     * 
-     * @param v
-     *          the value of the page reached column
+     *
+     * @param v the value of the page reached column
      */
     public void setPageReached(int v) {
         pageReached = v;
@@ -166,11 +172,11 @@ public class WorkspaceItem implements InProgressSubmission, Serializable, Reload
             return true;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final WorkspaceItem that = (WorkspaceItem) o;
-        if (this.getID() != that.getID()) {
+        if (!this.getID().equals(that.getID())) {
             return false;
         }
 
