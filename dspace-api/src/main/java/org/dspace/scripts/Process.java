@@ -225,15 +225,15 @@ public class Process implements ReloadableEntity<Integer> {
     }
 
     /**
-     * This method sets the special groups associated with the Process.
+     * This method will return the special groups associated with the Process.
      */
     public List<Group> getGroups() {
         return groups;
     }
 
     /**
-     * This method will return special groups associated with the Process.
-     * @return The special groups of this process.
+     * This method sets the special groups associated with the Process.
+     * @param groups  The special groups of this process.
      */
     public void setGroups(List<Group> groups) {
         this.groups = groups;
