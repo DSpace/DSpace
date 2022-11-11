@@ -144,13 +144,11 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     /**
      * This constructor is used for test purpose.
-     * In this way is possible to use a mocked instance of AmazonS3
      *
-     * @param s3Service mocked AmazonS3 service
+     * @param s3Service AmazonS3 service
      */
-    protected S3BitStoreService(AmazonS3 s3Service, TransferManager tm) {
+    protected S3BitStoreService(AmazonS3 s3Service) {
         this.s3Service = s3Service;
-        this.tm = tm;
     }
 
     @Override
