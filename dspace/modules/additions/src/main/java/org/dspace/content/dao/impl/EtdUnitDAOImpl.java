@@ -36,7 +36,7 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   @Override
   public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException {
     Query query = createQuery(context,
-        "from Etdunit where (from Collection c where c.uuid = :collection_uuid) in elements(collection)");
+        "from EtdUnit where (from Collection c where c.uuid = :collection_uuid) in elements(collection)");
     query.setParameter("collection_uuid", collection.getID());
     query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
@@ -46,7 +46,7 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   @Override
   public EtdUnit findByName(Context context, String name) throws SQLException {
     Query query = createQuery(context,
-        "SELECT eu from Etdunit eu " +
+        "SELECT eu from EtdUnit eu " +
             "where eu.name = :name ");
 
     query.setParameter("name", name);
@@ -58,7 +58,7 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   @Override
   public List<EtdUnit> searchByName(Context context, String nameQuery, int offset, int limit) throws SQLException {
     Query query = createQuery(context,
-        "SELECT eu FROM Etdunit eu WHERE lower(eu.name) LIKE lower(:name)");
+        "SELECT eu FROM EtdUnit eu WHERE lower(eu.name) LIKE lower(:name)");
     query.setParameter("name", "%" + StringUtils.trimToEmpty(nameQuery) + "%");
 
     if (0 <= offset) {
@@ -74,7 +74,7 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   @Override
   public int searchByNameResultCount(Context context, String nameQuery) throws SQLException {
     Query query = createQuery(context,
-        "SELECT count(*) FROM Etdunit eu WHERE lower(eu.name) LIKE lower(:name)");
+        "SELECT count(*) FROM EtdUnit eu WHERE lower(eu.name) LIKE lower(:name)");
     query.setParameter("name", "%" + nameQuery + "%");
 
     return count(query);
@@ -83,7 +83,7 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   @Override
   public List<EtdUnit> findAllSortedByName(Context context) throws SQLException {
     Query query = createQuery(context,
-        "SELECT eu FROM Etdunit eu ORDER BY eu.name ASC");
+        "SELECT eu FROM EtdUnit eu ORDER BY eu.name ASC");
     query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
     return list(query);
