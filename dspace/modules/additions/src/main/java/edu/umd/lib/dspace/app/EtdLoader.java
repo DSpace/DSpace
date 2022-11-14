@@ -94,8 +94,6 @@ import org.marc4j.MarcStreamWriter;
 import org.marc4j.MarcXmlReader;
 import org.marc4j.marc.Record;
 import org.xml.sax.InputSource;
-
-import edu.umd.lims.util.ErrorHandling;
 // SQL
 // IO
 // XML
@@ -299,7 +297,7 @@ public class EtdLoader {
         }
 
         catch (Exception e) {
-            log.error("Uncaught exception: " + ErrorHandling.getStackTrace(e));
+            log.error("Uncaught exception: " + e.getMessage());
         }
 
         finally {
@@ -617,7 +615,7 @@ public class EtdLoader {
                         }
                     } catch (Exception e) {
                         log.error("Cannot send email about detected duplicate title: "
-                                + title + "\n" + ErrorHandling.getStackTrace(e));
+                                + title + "\n" + e.getMessage());
                     }
 
                     return;
@@ -906,7 +904,7 @@ public class EtdLoader {
 
         catch (Exception e) {
             log.error("Error loading item " + strItem + ": "
-                    + ErrorHandling.getStackTrace(e));
+                    + e.getMessage());
             if (context != null) {
                 context.abort();
             }
