@@ -318,13 +318,6 @@
             <groupId>net.handle</groupId>
             <artifactId>handle</artifactId>
             <version>9.3.0</version>
-            <exclusions>
-                <!-- A later version is brought in by google-oauth-client -->
-                <exclusion>
-                    <groupId>com.google.code.gson</groupId>
-                    <artifactId>gson</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>net.cnri</groupId>

@@ -23,7 +23,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        
+        <gson.version>2.8.1</gson.version>
         <!--  See https://github.com/DSpace/DSpace/issues/7250 for a discussion of the version of jackson that is needed -->
         <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.22.1</jersey.version>
@@ -1425,7 +1425,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.8.1</version>
+                <version>${gson.version}</version>
                 <scope>compile</scope>
             </dependency>
             <!-- Google Analytics -->
