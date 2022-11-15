@@ -655,6 +655,16 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>1.4.0</version>
+            <exclusions>
+              <exclusion>
+                  <groupId>org.ow2.asm</groupId>
+                  <artifactId>asm</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.ow2.asm</groupId>
+                  <artifactId>asm-commons</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -766,6 +776,13 @@
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
+            <exclusions>
+                <!-- newer version pulled in by jetty server-->
+                <exclusion>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- S3 -->
         <dependency>
