@@ -15,14 +15,19 @@ import edu.umd.lib.dspace.content.EmbargoDTO;
 import edu.umd.lib.dspace.content.service.EmbargoDTOService;
 
 import org.dspace.core.Context;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
-public class EmbargoRestController {
+public class EmbargoRestController implements InitializingBean {
   @Autowired
   private EmbargoDTOService embargoService;
+
+  @Autowired
+  DiscoverableEndpointsService discoverableEndpointsService;
 
   @PreAuthorize("hasAuthority('ADMIN')")
   @RequestMapping("/api/embargo-list")
@@ -31,5 +36,11 @@ public class EmbargoRestController {
     List<EmbargoDTO> embargoes = embargoService.getEmbargoList(context);
 
     return embargoes;
+  }
+
+  @Override
+  public void afterPropertiesSet() {
+      List<Link> links = List.of(Link.of("/api/embargo-list", "embargo-list"));
+      discoverableEndpointsService.register(this, links);
   }
 }
