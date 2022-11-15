@@ -51,6 +51,12 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>net.cnri</groupId>
+               <artifactId>cnri-servlet-container</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
