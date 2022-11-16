@@ -76,6 +76,7 @@ awk '/.*/ {print $0} /"server_config" = {/ {printf "\"storage_type\" = \"CUSTOM\
 #sed 's/"server_config" = {/"server_config" = {\n"storage_type" = "CUSTOM"\n"storage_class" = "org.dspace.handle.HandlePlugin"/'  <$tempfile >$handledir/config.dct
 
 
+#awk 'NR==1 {printf "%s\n\"storage_type\" = \"CUSTOM\"\n\"storage_class\" = \"org.dspace.handle.HandlePlugin\"\n\n",$0} NR!=1 {print $0}' <$tempfile >$handledir/config.dct
 
 # Remove temp file
 rm -f $tempfile
