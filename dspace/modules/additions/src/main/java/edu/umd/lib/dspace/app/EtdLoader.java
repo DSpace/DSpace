@@ -79,6 +79,12 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -199,6 +205,8 @@ public class EtdLoader {
             .getAuthorizeService();
 
     protected static EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
+
+    private final static SearchService searchService = SearchUtils.getSearchService();
 
     /***************************************************************** main */
     /**
@@ -520,11 +528,6 @@ public class EtdLoader {
             BrowseIndex bi = BrowseIndex.getBrowseIndex("title");
             log.debug("Browse Index Title Count" + bi.getMetadataCount());
 
-            BrowserScope scope = new BrowserScope(c);
-
-            scope.setBrowseIndex(bi);
-            scope.setResultsPerPage(10);
-
             String[] words = title.trim().split(" ");
 
             StringBuilder searchTerm = new StringBuilder();
@@ -549,78 +552,86 @@ public class EtdLoader {
             log.debug("Search Title " + searchTitle + "Search Title Length: "
                     + searchTitle.length());
 
-            scope.setStartsWith(searchTitle);
+            int offset = 0;
+            int resultRows = 100;
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.setQuery("dc.title: " + searchTitle + "*");
+            discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+            discoverQuery.setStart(offset);
+            discoverQuery.setMaxResults(resultRows);
+            DiscoverResult resp = searchService.search(c, discoverQuery);
+            long totalResults = resp.getTotalSearchResults();
 
-            BrowseEngine be = new BrowseEngine(c);
-            BrowseInfo binfo = be.browse(scope);
-
-            log.debug("Browse Info Result Item Count: "
-                    + binfo.getResultCount() + ": Total count : = "
-                    + binfo.getTotal());
-
-            log.debug("Sort Option: " + binfo.getSortOption().getName());
+            log.debug("Browse Info Result Item Count: " + totalResults);
 
             int biItemCount = 0;
 
-            for (Iterator j = binfo.getResults().iterator(); j.hasNext();) {
-                Item bitem = (Item) j.next();
-
-                // Get normalized title for browse item
-                String btitle = OrderFormat.makeSortString(bitem.getName(),
-                        null, OrderFormat.TITLE);
-
-                log.debug("Current Loaded Title: " + title + "; Title ID: "
-                        + item.getID() + "; Title Name:" + item.getName()
-                        + "; Search title " + searchTitle);
-
-                log.debug("Browsed Title: " + btitle + ";Browsed Title ID: "
-                        + bitem.getID() + "; Browsed Title Name:"
-                        + bitem.getName());
-
-                biItemCount = biItemCount + 1;
-
-                log.debug("Browsed Items Count: " + biItemCount);
-
-                // Check for the match
-                if (title.equals(btitle) && item.getID() != bitem.getID()) {
-                    log.debug("Duplicate title: " + title);
-
-                    // Get the list of collections for the loaded item
-                    StringBuffer sbCollections = new StringBuffer();
-                    sbCollections.append(etdcollection.getName());
-                    for (Iterator ic = sCollections.iterator(); ic.hasNext();) {
-                        Collection coll = (Collection) ic.next();
-                        sbCollections.append(", ");
-                        sbCollections.append(coll.getName());
-                    }
-
-                    // Get the email recipient
-                    String email = configurationService
-                            .getProperty("drum.mail.duplicate_title");
-                    if (email == null) {
-                        email = configurationService.getProperty("mail.admin");
-                    }
-
-                    try {
-                        if (email != null) {
-                            // Send the email
-                            Email bean = Email
-                                    .getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "duplicate_title"));
-                            bean.addRecipient(email);
-                            bean.addArgument(title);
-                            bean.addArgument("" + item.getID());
-                            bean.addArgument(handleService.findHandle(c, item));
-                            bean.addArgument(sbCollections.toString());
-                            bean.send();
-                        }
-                    } catch (Exception e) {
-                        log.error("Cannot send email about detected duplicate title: "
-                                + title + "\n" + e.getMessage());
-                    }
-
-                    return;
+            do {
+                if (offset > 0) {
+                    discoverQuery.setStart(offset);
+                    resp = searchService.search(c, discoverQuery);
                 }
-            }
+                for (IndexableObject solrItem : resp.getIndexableObjects()) {
+                    Item si = ((IndexableItem) solrItem).getIndexedObject();
+
+                    // Get normalized title for browse item
+                    String btitle = OrderFormat.makeSortString(si.getName(),
+                            null, OrderFormat.TITLE);
+
+                    log.debug("Current Loaded Title: " + title + "; Title ID: "
+                            + item.getID() + "; Title Name:" + item.getName()
+                            + "; Search title " + searchTitle);
+
+                    log.debug("Browsed Title: " + btitle + ";Browsed Title ID: "
+                            + si.getID() + "; Browsed Title Name:"
+                            + si.getName());
+
+                    biItemCount = biItemCount + 1;
+
+                    log.debug("Browsed Items Count: " + biItemCount);
+
+                    // Check for the match
+                    if (title.equals(btitle) && !item.getID().equals(si.getID())) {
+                        log.debug("Duplicate title: " + title);
+
+                        // Get the list of collections for the loaded item
+                        StringBuffer sbCollections = new StringBuffer();
+                        sbCollections.append(etdcollection.getName());
+                        for (Iterator ic = sCollections.iterator(); ic.hasNext();) {
+                            Collection coll = (Collection) ic.next();
+                            sbCollections.append(", ");
+                            sbCollections.append(coll.getName());
+                        }
+
+                        // Get the email recipient
+                        String email = configurationService
+                                .getProperty("drum.mail.duplicate_title");
+                        if (email == null) {
+                            email = configurationService.getProperty("mail.admin");
+                        }
+
+                        try {
+                            if (email != null) {
+                                // Send the email
+                                Email bean = Email
+                                        .getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "duplicate_title"));
+                                bean.addRecipient(email);
+                                bean.addArgument(title);
+                                bean.addArgument("" + item.getID());
+                                bean.addArgument(handleService.findHandle(c, item));
+                                bean.addArgument(sbCollections.toString());
+                                bean.send();
+                            }
+                        } catch (Exception e) {
+                            log.error("Cannot send email about detected duplicate title: "
+                                    + title + "\n" + e.getMessage());
+                        }
+
+                        return;
+                    }
+                }
+                offset += 1;
+            } while ((offset * resultRows) < totalResults);
         }
     }
 
