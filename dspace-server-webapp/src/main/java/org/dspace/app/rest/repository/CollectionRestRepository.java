@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +46,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -185,6 +187,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
+            Collections.sort(collections,  new NameAscendingComparator());
             int tot = cs.countCollectionsWithSubmit(q, context, com);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
@@ -200,6 +203,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
+            Collections.sort(collections,  new NameAscendingComparator());
             int tot = cs.countCollectionsWithSubmit(q, context, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
@@ -216,6 +220,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = authorizeService.findAdminAuthorizedCollection(context, query,
                 Math.toIntExact(pageable.getOffset()),
                 Math.toIntExact(pageable.getPageSize()));
+            Collections.sort(collections,  new NameAscendingComparator());
             long tot = authorizeService.countAdminAuthorizedCollection(context, query);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SearchServiceException | SQLException e) {
@@ -248,6 +253,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(query, context, null, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
+            Collections.sort(collections,  new NameAscendingComparator());
             int tot = cs.countCollectionsWithSubmit(query, context, null, entityTypeLabel);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
@@ -285,6 +291,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(query, context, community, entityTypeLabel,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getPageSize()));
+            Collections.sort(collections,  new NameAscendingComparator());
             int total = cs.countCollectionsWithSubmit(query, context, community, entityTypeLabel);
             return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
