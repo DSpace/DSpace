@@ -25,6 +25,8 @@ the [DRUM 7 Docker Development Environment](Drum7DockerDevelopmentEnvironment.md
 
 ## XML File Changes
 
+### Modifying existing DSpace configuration files
+
 The "dspace/config" directory contains XML files such as:
 
 * dspace/config/hibernate.cfg.xml
@@ -53,7 +55,7 @@ should be placed in:
 * dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-services.xml
 * dspace/modules/additions/src/test/data/dspaceFolder/config/spring/api/core-dao-services.xml
 
-### bitstore.xml
+#### bitstore.xml
 
 The "dspace/config/spring/api/bitstore.xml" file has been customized to
 support multiple asset directories. To support the "dspace-api" tests,
@@ -62,13 +64,32 @@ placed in
 
 * dspace-api/src/test/data/dspaceFolder/config/spring/api/bitstore.xml
 
-### discovery.xml
+#### discovery.xml
 
 The "dspace/config/spring/api/discovery.xml" file has been modified from the
 stock DSpace version. The support the "dspace-server-webapp" tests, the
 "stock" DSpace "dspace/config/spring/api/discovery.xml" file should be placed in
 
 * dspace-server-webapp/src/test/data/dspaceFolder/config/spring/api/discovery.xml
+
+### New DRUM-specific XML Files
+
+The addition of DRUM-specific configuration files to the "dspace/config"
+directory that reference DRUM-specific Java files will also cause the
+unit/integration tests in the stock DSpace modules (such as "dspace-api") to
+fail.
+
+New DRUM-specific configuration files added to the "dspace/config" directory
+should have a "drum-" prefix, for example:
+
+* config/spring/api/drum-dao-services.xml
+* config/spring/api/drum-factory-services.xml
+* config/spring/api/drum-services.xml
+
+Using the "drum-" prefix allows the configuration files to be automatically
+filtered out by the "testEnvironment" task in the
+"src/main/assembly/testEnvironment.xml" assembly file that Maven uses to
+build the configuration for the stock unit/integration tests.
 
 ## Database Schema Changes
 
