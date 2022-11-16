@@ -17,7 +17,7 @@ public class EmbargoDTO {
     private String author;
     private String department;
     private String type;
-    private Date endDate; 
+    private Date endDate;
 
     public EmbargoDTO() {
     }

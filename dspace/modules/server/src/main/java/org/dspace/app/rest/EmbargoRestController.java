@@ -5,7 +5,6 @@ import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import java.sql.SQLException;
 import java.util.List;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,26 +20,29 @@ import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * REST/HAL Browser endpoint for retrieving a list of embargoed items.
+ */
 @RestController
 public class EmbargoRestController implements InitializingBean {
-  @Autowired
-  private EmbargoDTOService embargoService;
+    @Autowired
+    private EmbargoDTOService embargoService;
 
-  @Autowired
-  DiscoverableEndpointsService discoverableEndpointsService;
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
-  @PreAuthorize("hasAuthority('ADMIN')")
-  @RequestMapping("/api/embargo-list")
-  public List<EmbargoDTO> embargoList(HttpServletResponse response, HttpServletRequest request) throws SQLException {
-    Context context = obtainContext(request);
-    List<EmbargoDTO> embargoes = embargoService.getEmbargoList(context);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping("/api/embargo-list")
+    public List<EmbargoDTO> embargoList(HttpServletResponse response, HttpServletRequest request) throws SQLException {
+        Context context = obtainContext(request);
+        List<EmbargoDTO> embargoes = embargoService.getEmbargoList(context);
 
-    return embargoes;
-  }
+        return embargoes;
+    }
 
-  @Override
-  public void afterPropertiesSet() {
-      List<Link> links = List.of(Link.of("/api/embargo-list", "embargo-list"));
-      discoverableEndpointsService.register(this, links);
-  }
+    @Override
+    public void afterPropertiesSet() {
+        List<Link> links = List.of(Link.of("/api/embargo-list", "embargo-list"));
+        discoverableEndpointsService.register(this, links);
+    }
 }

@@ -74,11 +74,11 @@
                         </includes>
                         <!-- UMD Customization -->
                         <!-- Exclude any "drum-*" configuration files, as these
-                             files contain are UMD DRUM-specific configuration
-                             that will cause the stock dspace-api
+                             files contain UMD DRUM-specific configuration
+                             that will cause the stock DSpace
                              unit/integration tests to fail -->
                         <excludes>
-                          <exclude>config/**/drum-*</exclude>
+                            <exclude>config/**/drum-*</exclude>
                         </excludes>
                         <!-- End UMD Customization -->
                     </fileSet>
