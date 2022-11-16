@@ -3,9 +3,11 @@ package edu.umd.lib.dspace.content;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
@@ -16,14 +18,14 @@ import edu.umd.lib.dspace.content.service.EmbargoDTOService;
 
 public class EmbargoDTOServiceImpl implements EmbargoDTOService {
 
-    private static Logger log = Logger.getLogger(EmbargoDTOServiceImpl.class);
-    
+    private static Logger log = LogManager.getLogger(EmbargoDTOServiceImpl.class);
+
     @Autowired(required = true)
     protected EmbargoDTODAO embargoDTODAO;
-    
+
     @Autowired(required = true)
     protected MetadataFieldService metadataFieldService;
-    
+
     @Autowired(required = true)
     protected MetadataSchemaService metadataSchemaService;
 
@@ -49,18 +51,17 @@ public class EmbargoDTOServiceImpl implements EmbargoDTOService {
             departmentId = getDCFieldID(context, "contributor", "department");
             typeId = getDCFieldID(context, "type", null);
             groupName = "ETD Embargo";
-            
+
             fieldsInitialized = true;
-        log.debug("Initializing metadata field IDs!");
+            log.debug("Initializing metadata field IDs!");
         } else {
             log.debug("Metadata field IDs initialized already!");
         }
-        
         return embargoDTODAO.getEmbargoDTOList(context, titleId, advisorId, authorId, departmentId, typeId, groupName);
     }
-  
+
     private int getDCFieldID(Context context, String element, String qualifier) throws SQLException {
-        MetadataField field = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, element, qualifier);
+        MetadataField field = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(), element, qualifier);
         if (field == null) {
             return -1;
         }

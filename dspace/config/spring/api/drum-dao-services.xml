@@ -7,6 +7,6 @@
     <!-- **************** -->
     <!-- DAO declarations -->
     <!-- **************** -->
-    <!-- <bean class="edu.umd.lib.dspace.content.dao.impl.EmbargoDTODAOImpl"/> -->
+    <bean class="edu.umd.lib.dspace.content.dao.impl.EmbargoDTODAOImpl"/>
 
 </beans>
