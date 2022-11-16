@@ -15,7 +15,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -47,22 +46,16 @@ import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowserScope;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -137,8 +130,6 @@ import org.xml.sax.InputSource;
 public class EtdLoader {
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdLoader.class);
-
-    final static int MAX_WORD_COUNT = 4;
 
     static long lRead = 0;
 
@@ -517,45 +508,17 @@ public class EtdLoader {
         for (MetadataValue metadataValue : metadataValues) {
 
             // Get normalized title
-            String title = OrderFormat.makeSortString(metadataValue.getValue(),
+            String searchTitle = OrderFormat.makeSortString(metadataValue.getValue(),
                     metadataValue.getLanguage(), OrderFormat.TITLE);
 
-            log.debug("checking for duplicate title: " + title);
+            log.debug("checking for duplicate title: " + searchTitle);
 
-            log.debug("Title Length: " + title.length());
-
-            // Execute browse, with one result
-            BrowseIndex bi = BrowseIndex.getBrowseIndex("title");
-            log.debug("Browse Index Title Count" + bi.getMetadataCount());
-
-            String[] words = title.trim().split(" ");
-
-            StringBuilder searchTerm = new StringBuilder();
-
-            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT && wordCount < words.length); wordCount++) {
-                searchTerm = searchTerm.append(words[wordCount]);
-                searchTerm = searchTerm.append(" ");
-            }
-
-            String searchTitle = "";
-
-            int index = title.indexOf(" ", 1);
-
-            if (searchTerm.length() > 0) {
-                searchTitle = searchTerm.toString().trim();
-            } else {
-                searchTitle = title.substring(0, index);
-            }
-
-            log.debug("Search Term: " + searchTerm.toString().trim()
-                    + "Search Term Length" + searchTerm.length());
-            log.debug("Search Title " + searchTitle + "Search Title Length: "
-                    + searchTitle.length());
+            log.debug("Title Length: " + searchTitle.length());
 
             int offset = 0;
             int resultRows = 100;
             DiscoverQuery discoverQuery = new DiscoverQuery();
-            discoverQuery.setQuery("dc.title: " + searchTitle + "*");
+            discoverQuery.setQuery("dc.title: \"" + searchTitle + "\"");
             discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
             discoverQuery.setStart(offset);
             discoverQuery.setMaxResults(resultRows);
@@ -564,7 +527,7 @@ public class EtdLoader {
 
             log.debug("Browse Info Result Item Count: " + totalResults);
 
-            int biItemCount = 0;
+            int siItemCount = 0;
 
             do {
                 if (offset > 0) {
@@ -575,24 +538,23 @@ public class EtdLoader {
                     Item si = ((IndexableItem) solrItem).getIndexedObject();
 
                     // Get normalized title for browse item
-                    String btitle = OrderFormat.makeSortString(si.getName(),
+                    String stitle = OrderFormat.makeSortString(si.getName(),
                             null, OrderFormat.TITLE);
 
-                    log.debug("Current Loaded Title: " + title + "; Title ID: "
-                            + item.getID() + "; Title Name:" + item.getName()
-                            + "; Search title " + searchTitle);
+                    log.debug("Current Loaded Title: " + searchTitle + "; Title ID: "
+                            + item.getID() + "; Title Name:" + item.getName());
 
-                    log.debug("Browsed Title: " + btitle + ";Browsed Title ID: "
+                    log.debug("Solr Item Title: " + stitle + ";Browsed Title ID: "
                             + si.getID() + "; Browsed Title Name:"
                             + si.getName());
 
-                    biItemCount = biItemCount + 1;
+                    siItemCount = siItemCount + 1;
 
-                    log.debug("Browsed Items Count: " + biItemCount);
+                    log.debug("Result Item Count: " + siItemCount);
 
                     // Check for the match
-                    if (title.equals(btitle) && !item.getID().equals(si.getID())) {
-                        log.debug("Duplicate title: " + title);
+                    if (searchTitle.equals(stitle) && !item.getID().equals(si.getID())) {
+                        log.debug("Duplicate title: " + searchTitle);
 
                         // Get the list of collections for the loaded item
                         StringBuffer sbCollections = new StringBuffer();
@@ -616,7 +578,7 @@ public class EtdLoader {
                                 Email bean = Email
                                         .getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "duplicate_title"));
                                 bean.addRecipient(email);
-                                bean.addArgument(title);
+                                bean.addArgument(searchTitle);
                                 bean.addArgument("" + item.getID());
                                 bean.addArgument(handleService.findHandle(c, item));
                                 bean.addArgument(sbCollections.toString());
@@ -624,7 +586,7 @@ public class EtdLoader {
                             }
                         } catch (Exception e) {
                             log.error("Cannot send email about detected duplicate title: "
-                                    + title + "\n" + e.getMessage());
+                                    + searchTitle + "\n" + e.getMessage());
                         }
 
                         return;
