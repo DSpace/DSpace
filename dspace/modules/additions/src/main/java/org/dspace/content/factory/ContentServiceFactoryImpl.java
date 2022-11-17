@@ -21,6 +21,7 @@ import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.EtdUnitService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -186,13 +187,13 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
 
     // Begin UMD Customization
     // Add EtdUnitService to the factory
-    // @Autowired(required = true)
-    // private EtdUnitService etdunitService;
+    @Autowired(required = true)
+    private EtdUnitService etdunitService;
 
-    // @Override
-    // public EtdUnitService getEtdUnitService() {
-    //     return etdunitService;
-    // }
+    @Override
+    public EtdUnitService getEtdUnitService() {
+        return etdunitService;
+    }
 
     // Add CommunityGroup to the factory
     @Autowired(required = true)

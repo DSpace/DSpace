@@ -23,6 +23,7 @@ import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.EtdUnitService;
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -152,7 +153,7 @@ public abstract class ContentServiceFactory {
     }
 
     // Begin UMD Customization
-    // public abstract EtdUnitService getEtdUnitService();
+    public abstract EtdUnitService getEtdUnitService();
     public abstract CommunityGroupService getCommunityGroupService();
     // End UMD Customization
 

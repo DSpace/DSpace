@@ -278,6 +278,11 @@
          </exclusions>
       </dependency>
       <dependency>
+         <groupId>dom4j</groupId>
+         <artifactId>dom4j</artifactId>
+         <version>1.6.1</version>
+      </dependency>
+      <dependency>
          <groupId>cas</groupId>
          <artifactId>casclient</artifactId>
          <version>2.1.1</version>

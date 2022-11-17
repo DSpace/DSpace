@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.EtdUnitDAO;
@@ -26,7 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the EtdUnit object.
- * This class is responsible for all business logic calls for the EtdUnit object and is autowired by spring.
+ * This class is responsible for all business logic calls for the EtdUnit object
+ * and is autowired by spring.
  * This class should never be accessed directly.
  *
  * @author mohideen at umd.edu
@@ -34,15 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> implements EtdUnitService {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(EtdUnitServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdUnitServiceImpl.class);
 
     @Autowired(required = true)
     protected EtdUnitDAO etdunitDAO;
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
-    protected EtdUnitServiceImpl()
-    {
+    protected EtdUnitServiceImpl() {
         super();
 
     }
@@ -71,7 +71,7 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
     @Override
     public EtdUnit findByName(Context context, String name) throws SQLException {
-      return etdunitDAO.findByName(context, name);
+        return etdunitDAO.findByName(context, name);
     }
 
     @Override
@@ -81,25 +81,24 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
     @Override
     public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException {
-      return etdunitDAO.findAllByCollection(context, collection);
+        return etdunitDAO.findAllByCollection(context, collection);
     }
 
     @Override
     public List<EtdUnit> search(Context context, String query) throws SQLException {
-      return search(context, query, -1, -1);
+        return search(context, query, -1, -1);
     }
 
     @Override
     public List<EtdUnit> search(Context context, String query, int offset, int limit) throws SQLException {
-      return etdunitDAO.searchByName(context, query, offset, limit);
+        return etdunitDAO.searchByName(context, query, offset, limit);
     }
 
     @Override
     public int searchResultCount(Context context, String query) throws SQLException {
-      return etdunitDAO.searchByNameResultCount(context, query);
+        return etdunitDAO.searchByNameResultCount(context, query);
     }
 
-    
     @Override
     public void update(Context context, EtdUnit etdunit) throws SQLException, AuthorizeException {
         // Authorize
@@ -111,55 +110,53 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         super.update(context, etdunit);
 
         etdunitDAO.save(context, etdunit);
-        if (etdunit.isModified())
-        {
+        if (etdunit.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT, etdunit.getID(), etdunit.getName()));
             etdunit.clearModified();
         }
         etdunit.clearDetails();
     }
 
-   
     @Override
     public List<Collection> getAllCollections(Context context, EtdUnit etdunit) throws SQLException {
         return etdunit.getCollections();
     }
-    
+
     @Override
-    public void addCollection(Context context, EtdUnit etdunit, Collection collection) throws SQLException, AuthorizeException {
-         // Authorize
+    public void addCollection(Context context, EtdUnit etdunit, Collection collection)
+            throws SQLException, AuthorizeException {
+        // Authorize
         canEdit(context);
 
         log.info(LogHelper.getHeader(context, "add_collection",
                 "etdunit_id=" + etdunit.getID() + ",collection_id=" + collection.getID()));
 
         etdunit.addCollection(collection);
-        
+
         context.addEvent(new Event(Event.ADD, Constants.ETDUNIT, etdunit.getID(),
-        Constants.COLLECTION, collection.getID(), etdunit.getName()));
+                Constants.COLLECTION, collection.getID(), etdunit.getName()));
     }
 
-
     @Override
-    public void removeCollection(Context context, EtdUnit etdunit, Collection collection) throws SQLException, AuthorizeException {
-         // Authorize
+    public void removeCollection(Context context, EtdUnit etdunit, Collection collection)
+            throws SQLException, AuthorizeException {
+        // Authorize
         canEdit(context);
 
         log.info(LogHelper.getHeader(context, "add_collection",
                 "etdunit_id=" + etdunit.getID() + ",collection_id=" + collection.getID()));
 
         etdunit.removeCollection(collection);
-        
+
         context.addEvent(new Event(Event.REMOVE, Constants.ETDUNIT, etdunit.getID(),
-        Constants.COLLECTION, collection.getID(), etdunit.getName()));
+                Constants.COLLECTION, collection.getID(), etdunit.getName()));
     }
 
     @Override
     public boolean isMember(EtdUnit etdunit, Collection collection) {
-      return etdunit.isMember(collection);
+        return etdunit.isMember(collection);
     }
 
-   
     @Override
     public void delete(Context context, EtdUnit etdunit) throws SQLException, AuthorizeException, IOException {
         // Authorize
@@ -185,18 +182,13 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         return Constants.ETDUNIT;
     }
 
-
-
     @Override
     public boolean canEditBoolean(Context context) throws SQLException {
-        try
-        {
+        try {
             canEdit(context);
 
             return true;
-        }
-        catch (AuthorizeException e)
-        {
+        } catch (AuthorizeException e) {
             return false;
         }
     }
@@ -204,15 +196,14 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
     @Override
     public void canEdit(Context context) throws AuthorizeException, SQLException {
         // Check authorisation
-        if (!(authorizeService.isAdmin(context)))
-        {
+        if (!(authorizeService.isAdmin(context))) {
             throw new AuthorizeException("Only administrators can create or modify etdunits and its associations");
         }
     }
 
     @Override
     public void updateLastModified(Context context, EtdUnit etdunit) {
-        //Also fire a modified event since the etdunit HAS been modified
+        // Also fire a modified event since the etdunit HAS been modified
         context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT,
                 etdunit.getID(), etdunit.getName()));
 
@@ -220,12 +211,9 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
     @Override
     public EtdUnit findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if(StringUtils.isNumeric(id))
-        {
+        if (StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
-        }
-        else
-        {
+        } else {
             return find(context, UUID.fromString(id));
         }
     }
