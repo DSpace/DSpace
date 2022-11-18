@@ -184,7 +184,7 @@ mvn install
 ## DSpace Scripts and Email Setup
 
 DSpace scripts (such as [../bin/load-etd](../bin/load-etd)) may send email as
-part of their operation. The development Docker images do not, by themselves
+part of their operation. The development Docker images do not, by themselves,
 support running the DSpace scripts or sending emails.
 
 The following changes enable the DSpace scripts to be run in the "dspace"
