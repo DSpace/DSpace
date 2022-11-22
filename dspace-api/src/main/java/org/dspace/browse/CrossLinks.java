@@ -59,23 +59,7 @@ public class CrossLinks {
      * @return true/false
      */
     public boolean hasLink(String metadata) {
-        // Resolve wildcards properly, eg. dc.subject.other matches a configuration for dc.subject.*
-        for (String key : links.keySet()) {
-            if (null != key && key.endsWith(".*")) {
-                // A substring of length-1, also substracting the wildcard should work as a "startsWith"
-                // check for the field eg. dc.subject.* -> dc.subject is the start of dc.subject.other
-                if (null != metadata && metadata.startsWith(key.substring(0, key.length()-1 - ".*".length()))) {
-                   return true;
-                }
-            } else {
-                // Exact match, if the key field has no .* wildcard
-                if (links.containsKey(metadata)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return findLinkType(metadata) != null;
     }
 
     /**
@@ -118,7 +102,7 @@ public class CrossLinks {
             if (null != key && key.endsWith(".*")) {
                 // A substring of length-1, also substracting the wildcard should work as a "startsWith"
                 // check for the field eg. dc.subject.* -> dc.subject is the start of dc.subject.other
-                if (null != metadata && metadata.startsWith(key.substring(0, key.length()-1 - ".*".length()))) {
+                if (null != metadata && metadata.startsWith(key.substring(0, key.length() - 1 - ".*".length()))) {
                     return links.get(key);
                 }
             } else {
