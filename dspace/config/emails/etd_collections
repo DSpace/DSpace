@@ -1,7 +1,8 @@
-Subject: DRUM: incoming etd is missing mapped collection(s)
+## Email sent by DRUM when a mapped collection is not found
+#set($subject = 'DRUM: incoming etd is missing mapped collection(s)')
 Unable to map DISS_inst_contact to additional collection(s).
 
-title:      {0}
-id:         {1}
-handle:     {2}
-collection: {3}
+title:      ${params[0]}
+id:         ${params[1]}
+handle:     ${params[2]}
+collection: ${params[3]}

@@ -1,8 +1,9 @@
-Subject: DRUM: duplicate title detected
+## Email sent by DRUM when a duplicate title is detected on ETD load
+#set($subject = 'DRUM: duplicate title detected')
 The following record was loaded using a batch loader and one or more items
 already in the system have the same title.
 
-title:      {0}
-id:         {1}
-handle:     {2}
-collection: {3}
+title:      ${params[0]}
+id:         ${params[1]}
+handle:     ${params[2]}
+collection: ${params[3]}

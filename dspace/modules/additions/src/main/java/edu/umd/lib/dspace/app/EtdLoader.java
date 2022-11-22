@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006 The University of Maryland. All Rights Reserved.
- * 
+ *
  */
 
 package edu.umd.lib.dspace.app;
@@ -105,7 +105,7 @@ import org.xml.sax.InputSource;
 
 /*********************************************************************
  * ETD Loader. Algorithm:
- * 
+ *
  * <pre>
  *    get params
  *    get properties
@@ -123,7 +123,7 @@ import org.xml.sax.InputSource;
  *      if duplicate title send email notice
  *      if no mapped collections send email notice
  * </pre>
- * 
+ *
  * @author Ben Wallberg
  *********************************************************************/
 
@@ -296,7 +296,7 @@ public class EtdLoader {
         }
 
         catch (Exception e) {
-            log.error("Uncaught exception: " + e.getMessage());
+            log.error("Uncaught exception: " + e.getMessage(), e);
         }
 
         finally {
@@ -565,6 +565,12 @@ public class EtdLoader {
                             sbCollections.append(coll.getName());
                         }
 
+                        String handle = handleService.findHandle(c, item);
+                        String collection = sbCollections.toString();
+                        String itemId = "" + item.getID();
+                        log.warn("Duplicate title: title: '{}', id: '{}', handle: '{}', collection: '{}'",
+                            searchTitle, itemId, handle, collection);
+
                         // Get the email recipient
                         String email = configurationService
                                 .getProperty("drum.mail.duplicate_title");
@@ -579,9 +585,9 @@ public class EtdLoader {
                                         .getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "duplicate_title"));
                                 bean.addRecipient(email);
                                 bean.addArgument(searchTitle);
-                                bean.addArgument("" + item.getID());
-                                bean.addArgument(handleService.findHandle(c, item));
-                                bean.addArgument(sbCollections.toString());
+                                bean.addArgument(itemId);
+                                bean.addArgument(handle);
+                                bean.addArgument(collection);
                                 bean.send();
                             }
                         } catch (Exception e) {
