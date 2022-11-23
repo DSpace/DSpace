@@ -23,4 +23,4 @@ _This checklist provides a reminder of what we are going to look for when review
 - [ ] My PR includes Javadoc for _all new (or modified) public methods and classes_. It also includes Javadoc for large or complex private methods.
 - [ ] My PR passes all tests and includes new/updated Unit or Integration Tests based on the [Code Testing Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Testing+Guide).
 - [ ] If my PR includes new, third-party dependencies (in any `pom.xml`), I've made sure their licenses align with the [DSpace BSD License](https://github.com/DSpace/DSpace/blob/main/LICENSE) based on the [Licensing of Contributions](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-LicensingofContributions) documentation.
-- [ ] If my PR modifies the REST API, I've linked to the REST Contract page (or open PR) related to this change.
+- [ ] If my PR modifies the REST API, I've opened a separate [REST Contract](https://github.com/DSpace/RestContract/blob/main/README.md) PR related to this change.
