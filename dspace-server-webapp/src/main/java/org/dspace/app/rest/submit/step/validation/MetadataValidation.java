@@ -83,7 +83,10 @@ public class MetadataValidation extends AbstractValidation {
                     }
 
                 } else {
-                    fieldsName.add(input.getFieldName());
+                    String fieldName = input.getFieldName();
+                    if (fieldName != null) {
+                        fieldsName.add(fieldName);
+                    }
                 }
 
                 for (String fieldName : fieldsName) {

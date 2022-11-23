@@ -415,7 +415,9 @@ public final class Utils {
      * @return metadata field key
      */
     public static String standardize(String schema, String element, String qualifier, String separator) {
-        if (StringUtils.isBlank(qualifier)) {
+        if (StringUtils.isBlank(element)) {
+            return null;
+        } else if (StringUtils.isBlank(qualifier)) {
             return schema + separator + element;
         } else {
             return schema + separator + element + separator + qualifier;

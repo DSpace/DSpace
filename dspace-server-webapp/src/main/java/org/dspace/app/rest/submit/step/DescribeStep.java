@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +31,11 @@ import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.RelationshipMetadataService;
+import org.dspace.content.RelationshipMetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 
@@ -44,6 +51,9 @@ public class DescribeStep extends AbstractProcessingStep {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DescribeStep.class);
 
     private DCInputsReader inputReader;
+
+    private RelationshipMetadataService relationshipMetadataService =
+        ContentServiceFactory.getInstance().getRelationshipMetadataService();
 
     public DescribeStep() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
@@ -73,7 +83,10 @@ public class DescribeStep extends AbstractProcessingStep {
                         fieldsName.add(input.getFieldName() + "." + (String) qualifier);
                     }
                 } else {
-                    fieldsName.add(input.getFieldName());
+                    String fieldName = input.getFieldName();
+                    if (fieldName != null) {
+                        fieldsName.add(fieldName);
+                    }
                 }
 
 
@@ -105,6 +118,26 @@ public class DescribeStep extends AbstractProcessingStep {
                                                        md.getMetadataField().getElement(),
                                                        md.getMetadataField().getQualifier(),
                                                        "."), listDto);
+                        }
+                    }
+                }
+
+                if (input.isRelationshipField() && isBlank(input.getFieldName())) {
+                    Item item = obj.getItem();
+                    String key = "relationship." + input.getRelationshipType();
+                    if (isEmpty(data.getMetadata().get(key))) {
+                        data.getMetadata().put(key, new ArrayList<>());
+                    }
+                    for (RelationshipMetadataValue metadataValue :
+                        relationshipMetadataService.getRelationshipMetadata(item, true)) {
+                        if (metadataValue.getMetadataField().getElement().equals(input.getRelationshipType())) {
+                            MetadataValueRest dto = new MetadataValueRest();
+                            dto.setAuthority(metadataValue.getAuthority());
+                            dto.setConfidence(metadataValue.getConfidence());
+                            dto.setLanguage(metadataValue.getLanguage());
+                            dto.setPlace(metadataValue.getPlace());
+                            dto.setValue(metadataValue.getValue());
+                            data.getMetadata().get(key).add(dto);
                         }
                     }
                 }

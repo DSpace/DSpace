@@ -9,6 +9,7 @@ package org.dspace.app.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Utils;
@@ -121,7 +122,7 @@ public class DCInputSet {
                     }
                 } else {
                     String fullName = field.getFieldName();
-                    if (fullName.equals(fieldName)) {
+                    if (Objects.equals(fullName, fieldName)) {
                         return true;
                     }
                 }
