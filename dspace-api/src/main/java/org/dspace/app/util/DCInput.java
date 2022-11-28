@@ -132,9 +132,14 @@ public class DCInput {
     private boolean closedVocabulary = false;
 
     /**
-     * the regex to comply with, null if nothing
+     * the regex in ECMAScript standard format, usable also by rests.
      */
     private String regex = null;
+
+    /**
+     * the computed pattern, null if nothing
+     */
+    private Pattern pattern = null;
 
     /**
      * allowed document types
@@ -179,7 +184,7 @@ public class DCInput {
 
         //check if the input have a language tag
         language = Boolean.valueOf(fieldMap.get("language"));
-        valueLanguageList = new ArrayList();
+        valueLanguageList = new ArrayList<>();
         if (language) {
             String languageNameTmp = fieldMap.get("value-pairs-name");
             if (StringUtils.isBlank(languageNameTmp)) {
@@ -208,13 +213,13 @@ public class DCInput {
         visibility = fieldMap.get("visibility");
         readOnly = fieldMap.get("readonly");
         vocabulary = fieldMap.get("vocabulary");
-        regex = extractRegexField(fieldMap);
+        this.initRegex(fieldMap.get("regex"));
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
             || "yes".equalsIgnoreCase(closedVocabularyStr);
 
         // parsing of the <type-bind> element (using the colon as split separator)
-        typeBind = new ArrayList<>();
+        typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if (typeBindDef != null && typeBindDef.trim().length() > 0) {
             String[] types = typeBindDef.split(",");
@@ -239,19 +244,20 @@ public class DCInput {
 
     }
 
-    private String extractRegexField(Map<String, String> fieldMap) {
-        String regex = fieldMap.get("regex");
-        Pattern generatedPattern = null;
+    protected void initRegex(String regex) {
+        this.regex = null;
+        this.pattern = null;
         if (regex != null) {
             try {
-                generatedPattern = RegexPatternUtils.computePattern(regex);
+                Optional.ofNullable(RegexPatternUtils.computePattern(regex))
+                    .ifPresent(pattern -> {
+                        this.pattern = pattern;
+                        this.regex = regex;
+                    });
             } catch (PatternSyntaxException e) {
                 log.warn("The regex field of input {} with value {} is invalid!", this.label, regex);
             }
         }
-        return Optional.ofNullable(generatedPattern)
-                .map(pattern -> regex)
-                .orElse(null);
     }
 
     /**
@@ -528,8 +534,12 @@ public class DCInput {
         return visibility;
     }
 
+    public Pattern getPattern() {
+        return this.pattern;
+    }
+
     public String getRegex() {
-        return regex;
+        return this.regex;
     }
 
     public String getFieldName() {
@@ -562,8 +572,7 @@ public class DCInput {
     public boolean validate(String value) {
         if (StringUtils.isNotBlank(value)) {
             try {
-                if (StringUtils.isNotBlank(regex)) {
-                    Pattern pattern = RegexPatternUtils.computePattern(regex);
+                if (this.pattern != null) {
                     if (!pattern.matcher(value).matches()) {
                         return false;
                     }
@@ -573,7 +582,6 @@ public class DCInput {
             }
 
         }
-
         return true;
     }
 
