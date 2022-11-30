@@ -36,7 +36,7 @@ public class ImageAnnotationService extends AbstractResourceService {
      */
     public AnnotationListGenerator getImageAnnotations(Bitstream bitstream) {
         AnnotationListGenerator list =  new AnnotationListGenerator();
-        list.setIdentifier(IIIF_ANNOTATIONS_ENDPOINT + bitstream.getID() + "/annotation/list");
+        list.setIdentifier(IIIF_ANNOTATIONS_ENDPOINT + bitstream.getID() + "/list/annotation");
         return list;
     }
 

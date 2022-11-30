@@ -105,7 +105,7 @@ public class IIIFController {
      * @param id DSpace Bitstream uuid
      * @return Annotation List
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}/annotation/list")
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}/list/annotation")
     public String findAnnotations(@PathVariable UUID id) {
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getImageAnnotations(context, id);
