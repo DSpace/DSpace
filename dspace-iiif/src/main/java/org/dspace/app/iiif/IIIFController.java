@@ -46,7 +46,7 @@ public class IIIFController {
      * Called with GET to retrieve the manifest for a single DSpace item.
      *
      * @param id DSpace Item uuid
-     * @return manifest as JSON
+     * @return Manifest
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest")
     public String findOne(@PathVariable UUID id) {
@@ -68,7 +68,7 @@ public class IIIFController {
      *
      * @param id DSpace Item uuid
      * @param query query terms
-     * @return AnnotationList as JSON
+     * @return Annotation List
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/search")
     public String searchInManifest(@PathVariable UUID id,
@@ -86,12 +86,29 @@ public class IIIFController {
      * scope is the entire manifest (or DSpace Item).
      *
      * @param id DSpace Item uuid
-     * @return AnnotationList as JSON
+     * @return Annotation List
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/seeAlso")
     public String findSeeAlsoList(@PathVariable UUID id) {
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getSeeAlsoAnnotations(context, id);
+    }
+
+    /**
+     * Return the IIIF image annotation lists for a bitstream. Annotation Lists are separate resources
+     * that should be dereferenced  when encountered. They are collections of annotations, where
+     * each annotation targets the Canvas or part thereof. The separation from the manifest representation is
+     * intended to allow clients to quickly display the images to the user, and then populate the display with
+     * further content and commentary when the user navigates to a particular canvas. In DSpace, annotation lists
+     * are stored in the "iiif.image.annotations" bitstream metadata field.
+     *
+     * @param id DSpace Bitstream uuid
+     * @return Annotation List
+     */
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}/annotation/list")
+    public String findAnnotations(@PathVariable UUID id) {
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        return iiifFacade.getImageAnnotations(context, id);
     }
 
     /**
@@ -104,7 +121,7 @@ public class IIIFController {
      *
      * @param id DSpace Item uuid
      * @param cid canvas identifier
-     * @return canvas as JSON
+     * @return Canvas
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/canvas/{cid}")
     public String findCanvas(@PathVariable UUID id, @PathVariable String cid) {

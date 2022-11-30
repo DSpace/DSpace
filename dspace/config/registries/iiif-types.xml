@@ -63,4 +63,11 @@
         <scope_note>Metadata field used to enable the IIIF Search service at the item level</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>iiif</schema>
+        <element>image</element>
+        <qualifier>annotations</qualifier>
+        <scope_note>Metadata field used for IIIF image annotations in json format</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

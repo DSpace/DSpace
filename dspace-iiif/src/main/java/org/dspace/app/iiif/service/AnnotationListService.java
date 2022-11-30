@@ -18,12 +18,15 @@ import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -58,6 +61,37 @@ public class AnnotationListService extends AbstractResourceService {
 
     public AnnotationListService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
+    }
+
+
+    /**
+     * Returns image annotation list from the bitstream metadata field. The
+     * JSON annotation list is created outside DSpace and added to bitstream
+     * metadata by the user.
+     * @param context DSpace context
+     * @param uuid bitstream UUID
+     * @return IIIF annotation list
+     */
+    public String getImageAnnotations(Context context, UUID uuid) throws RuntimeException {
+        BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        Bitstream bitstream = null;
+        try {
+            bitstream = bitstreamService.find(context, uuid);
+            if (bitstream == null) {
+                throw new ResourceNotFoundException("DSpace bitstream for  id " + uuid + " not found");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        List<MetadataValue> metadata = bitstreamService.getMetadata(bitstream, "iiif", "image",
+            "annotations", Item.ANY);
+
+        // If annotations exist, the JSON formatted list will be found in the first, non-repeating metadata field.
+        if (metadata.size() > 0) {
+            return metadata.get(0).getValue();
+        } else {
+            throw new ResourceNotFoundException("IIIF Annotation List not found for  id " + uuid);
+        }
     }
 
     /**

@@ -56,6 +56,9 @@ public class CanvasService extends AbstractResourceService {
     @Autowired
     ApplicationContext applicationContext;
 
+    @Autowired
+    ImageAnnotationService imageAnnotationService;
+
     protected String[] BITSTREAM_METADATA_FIELDS;
 
     /**
@@ -177,7 +180,7 @@ public class CanvasService extends AbstractResourceService {
      * @return a canvas generator
      */
     protected CanvasGenerator getCanvas(Context context, String manifestId, Bitstream bitstream, Bundle bundle,
-            Item item, int count, String mimeType) {
+                                        Item item, int count, String mimeType) {
         int pagePosition = count + 1;
 
         String canvasNaming = utils.getCanvasNaming(item, I18nUtil.getMessage("iiif.canvas.default-naming"));
@@ -194,10 +197,15 @@ public class CanvasService extends AbstractResourceService {
         ImageContentGenerator thumb = imageContentService.getImageContent(bitstreamId, mimeType,
                 thumbUtil.getThumbnailProfile(), THUMBNAIL_PATH);
 
-        return addMetadata(context, bitstream,
+        CanvasGenerator canvasGenerator = setCanvasMetadata(context, bitstream,
                 new CanvasGenerator(IIIF_ENDPOINT + manifestId + "/canvas/c" + count)
                     .addImage(image.generateResource()).addThumbnail(thumb.generateResource()).setHeight(canvasHeight)
                     .setWidth(canvasWidth).setLabel(label));
+
+        // Add annotation list to the canvas if annotations exist in the bitstream metadata.
+        addAnnotations(bitstream, canvasGenerator);
+
+        return canvasGenerator;
     }
 
     /**
@@ -211,13 +219,13 @@ public class CanvasService extends AbstractResourceService {
     }
 
     /**
-     * Adds metadata to canvas.
+     * Adds metadata and optional image annotation service to canvas.
      * @param context DSpace context
      * @param bitstream DSpace bitstream
      * @param canvasGenerator canvas generator
      * @return canvas generator
      */
-    private CanvasGenerator addMetadata(Context context, Bitstream bitstream, CanvasGenerator canvasGenerator) {
+    private CanvasGenerator setCanvasMetadata(Context context, Bitstream bitstream, CanvasGenerator canvasGenerator) {
         BitstreamService bService = ContentServiceFactory.getInstance().getBitstreamService();
         for (String field : BITSTREAM_METADATA_FIELDS) {
             if (StringUtils.startsWith(field, "@") && StringUtils.endsWith(field, "@")) {
@@ -261,6 +269,30 @@ public class CanvasService extends AbstractResourceService {
                 }
             }
         }
+
+        return canvasGenerator;
+    }
+
+
+    /**
+     * Adds an annotation link to the Canvas if the Bitstream's metadata includes an annotation list.
+     *
+     * @param bitstream the bitstream
+     * @param canvasGenerator canvas generator
+     * @return canvas generator
+     */
+    private CanvasGenerator addAnnotations(Bitstream bitstream, CanvasGenerator canvasGenerator) {
+        bitstream.getMetadata().stream()
+                 .filter((m) -> {
+                     String q = m.getMetadataField().getQualifier();
+                     return q != null && q.contentEquals("annotations");
+                 })
+                 .findFirst()
+                 .ifPresent(s -> {
+                     ImageAnnotationService is = new ImageAnnotationService(configurationService);
+                     canvasGenerator.addAnnotations(is.getImageAnnotations(bitstream));
+                 });
+
         return canvasGenerator;
     }
 

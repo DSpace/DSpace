@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Service
-public class IIIFServiceFacade {
+public class  IIIFServiceFacade {
 
     @Autowired
     ItemService itemService;
@@ -123,7 +123,7 @@ public class IIIFServiceFacade {
     }
 
     /**
-     * Returns annotations for machine readable metadata that describes the resource.
+     * Returns annotations for machine-readable metadata that describes the resource.
      *
      * @param id the Item uuid
      * @return AnnotationList as JSON
@@ -131,6 +131,17 @@ public class IIIFServiceFacade {
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
     public String getSeeAlsoAnnotations(Context context, UUID id) {
         return annotationListService.getSeeAlsoAnnotations(context, id);
+    }
+
+    /**
+     * Returns IIIF image annotations for a bitstream.
+     *
+     * @param id the bitstream uuid
+     * @return AnnotationList as JSON
+     */
+    @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'READ')")
+    public String getImageAnnotations(Context context, UUID id) {
+        return annotationListService.getImageAnnotations(context, id);
     }
 
 }

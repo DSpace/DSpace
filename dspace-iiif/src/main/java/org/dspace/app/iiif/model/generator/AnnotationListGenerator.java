@@ -55,7 +55,9 @@ public class AnnotationListGenerator implements IIIFResource {
             throw new RuntimeException("Missing the required identifier for the annotation list.");
         }
         AnnotationList annotationList = new AnnotationList(identifier);
-        annotationList.setResources(annotations);
+        if (annotations.size() > 0) {
+            annotationList.setResources(annotations);
+        }
         return annotationList;
     }
 }
