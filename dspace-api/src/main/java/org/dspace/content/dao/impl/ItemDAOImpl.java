@@ -26,6 +26,8 @@ import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
+import org.dspace.contentreports.QueryOperator;
+import org.dspace.contentreports.QueryPredicate;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -50,7 +52,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemDAOImpl.class);
 
     protected ItemDAOImpl() {
-        super();
     }
 
     @Override
@@ -286,6 +287,82 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
         return ((List<Item>) criteria.list()).iterator();
 
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, String regexClause, long offset, int limit) throws SQLException {
+        // TODO: Refactor the query to use JPA instead of the old Hibernate Criteria API
+        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
+        criteria.setFirstResult((int) offset);
+        criteria.setMaxResults(limit);
+
+        fillCriteriaForMetadataQuery(criteria, queryPredicates, collectionUuids, regexClause);
+        criteria.addOrder(Order.asc("item.id"));
+
+        return criteria.list();
+    }
+
+    @Override
+    public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, String regexClause) throws SQLException {
+        // TODO: Refactor the query to use JPA instead of the old Hibernate Criteria API
+        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
+        criteria.setProjection(Projections.rowCount());
+
+        fillCriteriaForMetadataQuery(criteria, queryPredicates, collectionUuids, regexClause);
+
+        List<Number> count = criteria.list();
+        if (count == null || count.isEmpty()) {
+            return 0;
+        }
+        return count.get(0).longValue();
+    }
+
+    private void fillCriteriaForMetadataQuery(Criteria criteria, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, String regexClause) {
+        if (!collectionUuids.isEmpty()) {
+            DetachedCriteria dcollCriteria = DetachedCriteria.forClass(Collection.class, "coll");
+            dcollCriteria.setProjection(Projections.property("coll.id"));
+            dcollCriteria.add(Restrictions.eqProperty("coll.id", "item.owningCollection"));
+            dcollCriteria.add(Restrictions.in("coll.id", collectionUuids));
+            criteria.add(Subqueries.exists(dcollCriteria));
+        }
+
+        for (int i = 0; i < queryPredicates.size(); i++) {
+            QueryPredicate predicate = queryPredicates.get(i);
+            QueryOperator op = predicate.getOperator();
+            if (op == null) {
+                log.warn("Skipping Invalid Operator: null");
+                continue;
+            }
+
+            if (op.getUsesRegex()) {
+                if (regexClause.isEmpty()) {
+                    log.warn("Skipping Unsupported Regex Operator: " + op);
+                    continue;
+                }
+            }
+
+            DetachedCriteria subcriteria = DetachedCriteria.forClass(MetadataValue.class, "mv");
+            subcriteria.add(Property.forName("mv.dSpaceObject").eqProperty("item.id"));
+            subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
+
+            if (predicate.getFields().isEmpty()) {
+                subcriteria.add(Restrictions.in("metadataField", predicate.getFields()));
+            }
+
+            subcriteria.add(op.buildPredicate(predicate.getValue(), regexClause));
+
+            if (op.getNegate()) {
+                criteria.add(Subqueries.notExists(subcriteria));
+            } else {
+                criteria.add(Subqueries.exists(subcriteria));
+            }
+        }
+
+        log.debug(String.format("Running custom query with %d filters", queryPredicates.size()));
     }
 
     @Override

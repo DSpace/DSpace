@@ -27,6 +27,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.contentreports.QueryPredicate;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -647,6 +648,38 @@ public interface ItemService
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit)
         throws SQLException, AuthorizeException, IOException;
+
+    /**
+     * Returns a list of items that match the given predicates, within the
+     * specified collections, if any. This querying method is used by the
+     * Filtered Items report functionality.
+     * @param context DSpace context object
+     * @param queryPredicates metadata field predicates
+     * @param collectionUuids UUIDs of the collections to search
+     * @param offset position in the list to start returning items
+     * @param limit maximum number of items to return
+     * @return a list of matching items in the specified collections,
+     * or in any collection if no collection UUIDs are provided
+     * @throws SQLException if a database error occurs
+     */
+    List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, long offset, int limit)
+            throws SQLException;
+
+    /**
+     * Returns the total number of items that match the given predicates, within the
+     * specified collections, if any. This querying method is used for pagination by the
+     * Filtered Items report functionality.
+     * @param context DSpace context object
+     * @param queryPredicates metadata field predicates
+     * @param collectionUuids UUIDs of the collections to search
+     * @return the total number of matching items in the specified collections,
+     * or in any collection if no collection UUIDs are provided
+     * @throws SQLException if a database error occurs
+     */
+    long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids)
+            throws SQLException;
 
     /**
      * Find all the items in the archive with a given authority key value

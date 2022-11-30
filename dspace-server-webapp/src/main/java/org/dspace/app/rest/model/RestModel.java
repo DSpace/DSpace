@@ -21,6 +21,7 @@ import org.atteo.evo.inflector.English;
 public interface RestModel extends Serializable {
 
     public static final String ROOT = "root";
+    public static final String CONTENT_REPORTS = "contentreports";
     public static final String CORE = "core";
     public static final String EPERSON = "eperson";
     public static final String DISCOVER = "discover";

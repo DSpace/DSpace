@@ -17,6 +17,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.contentreports.QueryPredicate;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -84,7 +85,14 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit) throws SQLException;
 
-    public Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
+    List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+                                          List<UUID> collectionUuids, String regexClause,
+                                          long offset, int limit) throws SQLException;
+
+    long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, String regexClause) throws SQLException;
+
+    Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
                                                boolean inArchive) throws SQLException;
 
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,

@@ -48,6 +48,7 @@ import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
+import org.dspace.contentreports.QueryPredicate;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -150,7 +151,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     private ResearcherProfileService researcherProfileService;
 
     protected ItemServiceImpl() {
-        super();
     }
 
     @Override
@@ -1262,6 +1262,22 @@ prevent the generation of resource policy entry values with null dspace_object a
         return itemDAO
             .findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset,
                                  limit);
+    }
+
+    @Override
+    public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, long offset, int limit)
+            throws SQLException {
+        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?",
+                offset, limit);
+    }
+
+
+    @Override
+    public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids)
+            throws SQLException {
+        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?");
     }
 
     @Override
