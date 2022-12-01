@@ -8,15 +8,11 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -42,30 +38,18 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
             Collection col = ((IndexableCollection) idxObj).getIndexedObject();
             if (col != null) {
                 try {
-                    String fieldValue = null;
-                    Community parent = (Community) ContentServiceFactory.getInstance().getDSpaceObjectService(col)
-                                                                        .getParentObject(context, col);
-                    while (parent != null) {
-                        if (parent.getAdministrators() != null) {
-                            fieldValue = "g" + parent.getAdministrators().getID();
-                            document.addField("submit", fieldValue);
-                        }
-                        parent = (Community) ContentServiceFactory.getInstance().getDSpaceObjectService(parent)
-                                                                                .getParentObject(context, parent);
-                    }
-                    List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context,col,Constants.ADD);
-                    policies.addAll(authorizeService.getPoliciesActionFilter(context, col, Constants.ADMIN));
+                    // Index groups with ADMIN rights on the Collection, on
+                    // Communities containing those Collections, and recursively on any Community containing such a
+                    // Community.
+                    // TODO: Strictly speaking we should also check for epersons who received admin rights directly,
+                    //       without being part of the admin group. Finding them may be a lot slower though.
+                    IndexingUtils.findTransitiveAdminGroupIds(context, col)
+                        .forEach(unprefixedId -> document.addField("submit", "g" + unprefixedId));
 
-                    for (ResourcePolicy resourcePolicy : policies) {
-                        if (resourcePolicy.getGroup() != null) {
-                            fieldValue = "g" + resourcePolicy.getGroup().getID();
-                        } else {
-                            fieldValue = "e" + resourcePolicy.getEPerson().getID();
-
-                        }
-                        document.addField("submit", fieldValue);
-                        context.uncacheEntity(resourcePolicy);
-                    }
+                    // Index groups and epersons with ADD rights on the Collection.
+                    IndexingUtils.findDirectAuthorizedGroupsAndEPersonsPrefixedIds(
+                        authorizeService, context, col, new int[] {Constants.ADD}
+                    ).forEach(prefixedId -> document.addField("submit", prefixedId));
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                              "Collection: (id " + col.getID() + " type " + col.getName() + ")" ));
