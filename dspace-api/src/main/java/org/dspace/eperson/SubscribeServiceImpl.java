@@ -46,8 +46,18 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> findAll(Context context) throws SQLException {
-        return subscriptionDAO.findAllOrderedByEPerson(context);
+    public List<Subscription> findAll(Context context, String resourceType,
+                                      Integer limit, Integer offset) throws Exception {
+        if (resourceType == null) {
+            return subscriptionDAO.findAllOrderedByEPerson(context);
+        } else {
+            if (resourceType.equals("Item") || resourceType.equals("Collection") || resourceType.equals("Community")) {
+                return subscriptionDAO.findAllOrderedByEPersonAndResourceType(context, resourceType, limit, offset);
+            } else {
+                log.error("Resource type must be Item, Collection or Community");
+                throw new Exception("Resource type must be Item, Collection or Community");
+            }
+        }
     }
 
     @Override
@@ -96,16 +106,17 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson)
+    public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson, Integer limit, Integer offset)
             throws SQLException {
-        return subscriptionDAO.findByEPerson(context, eperson);
+        return subscriptionDAO.findByEPerson(context, eperson, limit, offset);
     }
 
     @Override
     public List<Subscription> getSubscriptionsByEPersonAndDso(Context context,
-                                                              EPerson eperson, DSpaceObject dSpaceObject)
+                                                              EPerson eperson, DSpaceObject dSpaceObject,
+                                                              Integer limit, Integer offset)
             throws SQLException {
-        return subscriptionDAO.findByEPerson(context, eperson);
+        return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject, limit, offset);
     }
 
     @Override
@@ -122,14 +133,13 @@ public class SubscribeServiceImpl implements SubscribeService {
             context.setCurrentUser(eperson);
         }
         collections = collectionService.findAuthorized(context, null, Constants.ADD);
-
         return collections;
     }
 
     @Override
     public boolean isSubscribed(Context context, EPerson eperson,
                                 DSpaceObject dSpaceObject) throws SQLException {
-        return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject) != null;
+        return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject, -1, -1) != null;
     }
 
     @Override

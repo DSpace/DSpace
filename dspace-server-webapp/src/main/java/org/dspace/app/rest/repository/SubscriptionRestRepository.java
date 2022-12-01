@@ -90,10 +90,13 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<SubscriptionRest> findAll(Context context, Pageable pageable) {
         try {
-            List<Subscription> subscriptionList = subscribeService.findAll(context);
+            HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+            String resourceType = req.getParameter("resourceType");
+            List<Subscription> subscriptionList = subscribeService.findAll(context, resourceType,
+                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
-        } catch (SQLException sqlException) {
-            throw new RuntimeException(sqlException.getMessage(), sqlException);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -104,7 +107,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
             EPerson ePerson = personService.findByIdOrLegacyId(context, id);
             if (context.getCurrentUser().equals(ePerson)
                     || authorizeService.isAdmin(context, context.getCurrentUser())) {
-                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context, ePerson);
+                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context,
+                        ePerson, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
                 return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
@@ -130,7 +134,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository
             if (context.getCurrentUser().equals(ePerson)
                     || authorizeService.isAdmin(context, context.getCurrentUser())) {
                 List<Subscription> subscriptionList =
-                        subscribeService.getSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject);
+                        subscribeService.getSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject,
+                                pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
                 return converter.toRestPage(subscriptionList, pageable, subscriptionList.size(),
                         utils.obtainProjection());
             } else {

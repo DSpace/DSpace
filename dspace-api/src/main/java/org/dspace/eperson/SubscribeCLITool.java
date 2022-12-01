@@ -93,8 +93,12 @@ public class SubscribeCLITool {
         IOException {
         // Grab the subscriptions
 
-        List<Subscription> subscriptions = subscribeService.findAll(context);
-
+        List<Subscription> subscriptions = new ArrayList<>();
+        try {
+            subscriptions = subscribeService.findAll(context, null, -1, -1);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
         EPerson currentEPerson = null;
         List<Collection> collections = null; // List of Collections
 

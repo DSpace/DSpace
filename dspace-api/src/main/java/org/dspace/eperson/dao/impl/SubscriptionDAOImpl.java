@@ -2,7 +2,6 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson.dao.impl;
@@ -36,18 +35,21 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public List<Subscription> findByEPerson(Context context, EPerson eperson) throws SQLException {
+    public List<Subscription> findByEPerson(Context context, EPerson eperson,
+                                            Integer limit, Integer offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
         criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
-        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
+        return list(context, criteriaQuery, false, Subscription.class, limit, offset);
 
     }
+
     @Override
     public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson,
-                                                  DSpaceObject dSpaceObject) throws SQLException {
+                                                  DSpaceObject dSpaceObject,
+                                                  Integer limit, Integer offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         javax.persistence.criteria.CriteriaQuery criteriaQuery =
                 getCriteriaQuery(criteriaBuilder, Subscription.class);
@@ -56,10 +58,10 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
 
         criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(
-                subscriptionRoot.get(Subscription_.ePerson), eperson),
+                        subscriptionRoot.get(Subscription_.ePerson), eperson),
                 criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
         ));
-        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
+        return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
 
 
@@ -89,6 +91,23 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         query.executeUpdate();
     }
 
+    @Override
+    public List<Subscription> findAllOrderedByEPersonAndResourceType(Context context, String resourceType,
+                                                      Integer limit, Integer offset) throws SQLException {
+        String hqlQuery = "select s from Subscription s join %s dso ON dso.id = s.dSpaceObject ORDER BY eperson_id";
+        if (resourceType != null) {
+            hqlQuery = String.format(hqlQuery, resourceType);
+        }
+        Query query = createQuery(context, hqlQuery);
+        if (limit != -1) {
+            query.setMaxResults(limit);
+        }
+        if (offset != -1) {
+            query.setFirstResult(offset);
+        }
+        query.setHint("org.hibernate.cacheable", false);
+        return query.getResultList();
+    }
     @Override
     public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);

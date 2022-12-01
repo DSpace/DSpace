@@ -2,7 +2,6 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson.service;
@@ -33,10 +32,13 @@ public interface SubscribeService {
      * new item appears in the collection.
      *
      * @param context DSpace context
+     * @param limit Number of subscriptions to return
+     * @param offset Offset number
      * @return list of Subscription objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findAll(Context context) throws SQLException;
+    public List<Subscription> findAll(Context context, String resourceType,
+                                      Integer limit, Integer offset) throws Exception;
 
     /**
      * Subscribe an e-person to a collection. An e-mail will be sent every day a
@@ -72,10 +74,13 @@ public interface SubscribeService {
      *
      * @param context DSpace context
      * @param eperson EPerson
+     * @param limit Number of subscriptions to return
+     * @param offset Offset number
      * @return array of collections e-person is subscribed to
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson) throws SQLException;
+    public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson,
+                                                        Integer limit, Integer offset) throws SQLException;
 
     /**
      * Find out which collections an e-person is subscribed to and related with dso
@@ -83,12 +88,16 @@ public interface SubscribeService {
      * @param context      DSpace context
      * @param eperson      EPerson
      * @param dSpaceObject DSpaceObject
+     * @param limit Number of subscriptions to return
+     * @param offset Offset number
      * @return array of collections e-person is subscribed to and related with dso
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public List<Subscription> getSubscriptionsByEPersonAndDso(Context context,
                                                               EPerson eperson,
-                                                              DSpaceObject dSpaceObject) throws SQLException;
+                                                              DSpaceObject dSpaceObject,
+                                                              Integer limit,
+                                                              Integer offset) throws SQLException;
 
     /**
      * Find out which collections the currently logged in e-person can subscribe to
@@ -187,7 +196,7 @@ public interface SubscribeService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public Subscription removeSubscriptionParameter(Context context, Integer id,
-             SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException;
+               SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException;
 
     /**
      * Deletes a subscription
