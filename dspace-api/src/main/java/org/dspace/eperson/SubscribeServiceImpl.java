@@ -60,17 +60,13 @@ public class SubscribeServiceImpl implements SubscribeService {
         if (authorizeService.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
                 .getCurrentUser().getID().equals(eperson.getID())))) {
-            if (!isSubscribed(context, eperson, dSpaceObject)) {
-                Subscription new_subscription = subscriptionDAO.create(context, new Subscription());
-                subscriptionParameterList.forEach(subscriptionParameter -> new_subscription.addParameter(subscriptionParameter));
+            Subscription new_subscription = subscriptionDAO.create(context, new Subscription());
+            subscriptionParameterList.forEach(subscriptionParameter -> new_subscription.addParameter(subscriptionParameter));
 //                new_subscription.setSubscriptionParameterList(subscriptionParameterList);
-                new_subscription.setePerson(eperson);
-                new_subscription.setdSpaceObject(dSpaceObject);
-                new_subscription.setType(type);
-                return new_subscription;
-            } else {
-                throw new IllegalArgumentException("Subscription already exists");
-            }
+            new_subscription.setePerson(eperson);
+            new_subscription.setdSpaceObject(dSpaceObject);
+            new_subscription.setType(type);
+            return new_subscription;
         } else {
             throw new AuthorizeException(
                     "Only admin or e-person themselves can subscribe");
@@ -107,6 +103,12 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
+    public List<Subscription> getSubscriptionsByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject)
+            throws SQLException {
+        return subscriptionDAO.findByEPerson(context, eperson);
+    }
+
+    @Override
     public List<Collection> getAvailableSubscriptions(Context context)
             throws SQLException {
         return getAvailableSubscriptions(context, null);
@@ -127,12 +129,12 @@ public class SubscribeServiceImpl implements SubscribeService {
     @Override
     public boolean isSubscribed(Context context, EPerson eperson,
                                 DSpaceObject dSpaceObject) throws SQLException {
-        return subscriptionDAO.findByCollectionAndEPerson(context, eperson, dSpaceObject) != null;
+        return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject) != null;
     }
 
     @Override
-    public void deleteByCollection(Context context, Collection collection) throws SQLException {
-        subscriptionDAO.deleteByCollection(context, collection);
+    public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException {
+        subscriptionDAO.deleteByDspaceObject(context, dSpaceObject);
     }
 
     @Override
@@ -167,7 +169,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Subscription addSubscriptionParameter(Context context, Integer id, SubscriptionParameter  subscriptionParameter) throws SQLException, AuthorizeException {
+    public Subscription addSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
@@ -178,8 +180,9 @@ public class SubscribeServiceImpl implements SubscribeService {
             throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
         }
     }
+
     @Override
-    public Subscription removeSubscriptionParameter(Context context, Integer id, SubscriptionParameter  subscriptionParameter) throws SQLException, AuthorizeException {
+    public Subscription removeSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
@@ -190,6 +193,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
         }
     }
+
     @Override
     public void deleteSubscription(Context context, Integer id) throws SQLException, AuthorizeException {
         // initially find the eperson associated with the subscription

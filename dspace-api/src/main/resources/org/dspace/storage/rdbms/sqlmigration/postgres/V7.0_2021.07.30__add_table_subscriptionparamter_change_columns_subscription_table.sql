@@ -12,6 +12,9 @@
 
 
 CREATE SEQUENCE subscription_parameter_seq;
+-----------------------------------------------------------------------------------
+-- ADD table subscription_parameter
+-----------------------------------------------------------------------------------
 CREATE TABLE  subscription_parameter
 (
   subscription_parameter_id  INTEGER NOT NULL,
@@ -19,7 +22,7 @@ CREATE TABLE  subscription_parameter
   value  CHARACTER VARYING(255),
   subscription_id     INTEGER  NOT NULL,
   CONSTRAINT subscription_parameter_pkey PRIMARY KEY (subscription_parameter_id),
-  CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id)
+  CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id)  ON DELETE CASCADE
 );
  --
 ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;

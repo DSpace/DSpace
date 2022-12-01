@@ -89,7 +89,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         try {
             Context context = obtainContext();
             EPerson ePerson = personService.findByIdOrLegacyId(context, id);
-            if (context.getCurrentUser().equals(ePerson) || authorizeService.isAdmin(context, ePerson)) {
+            if (context.getCurrentUser().equals(ePerson) || authorizeService.isAdmin(context, context.getCurrentUser())) {
                 List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context, ePerson);
                 return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
             } else {
@@ -99,7 +99,33 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new RuntimeException(sqlException.getMessage(), sqlException);
         }
     }
+    @PreAuthorize("isAuthenticated()")
+    @SearchRestMethod(name = "findByEPersonAndDso")
+    public Page<SubscriptionRest> findByEPersonAndDso(Pageable pageable) throws Exception {
+        try {
+            Context context = obtainContext();
+            HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+            String epersonId = req.getParameter("eperson_id");
+            String dsoId = req.getParameter("dspace_object_id");
+            DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
+            EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
+            // dso must always be set
+            if (dsoId == null || epersonId == null) {
+                throw new UnprocessableEntityException("error parsing the body");
+            }
+            if (context.getCurrentUser().equals(ePerson) || authorizeService.isAdmin(context, context.getCurrentUser())) {
+                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context, ePerson);
+                return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
+            } else {
+                throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
+            }
+        } catch (SQLException sqlException) {
+            throw new SQLException(sqlException.getMessage(), sqlException);
 
+        } catch (AuthorizeException authorizeException) {
+            throw new AuthorizeException(authorizeException.getMessage());
+        }
+    }
     @Override
     @PreAuthorize("isAuthenticated()")
     protected SubscriptionRest createAndReturn(Context context) {

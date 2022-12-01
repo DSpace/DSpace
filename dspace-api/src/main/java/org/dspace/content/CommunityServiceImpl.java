@@ -36,6 +36,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
@@ -73,7 +74,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected SiteService siteService;
     @Autowired(required = true)
     protected IdentifierService identifierService;
-
+    @Autowired(required = true)
+    protected SubscribeService subscribeService;
     protected CommunityServiceImpl() {
         super();
 
@@ -225,7 +227,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             context, community, Constants.DELETE))) {
             canEdit(context, community);
         }
-
+        subscribeService.deleteByDspaceObject(context, community);
         // First, delete any existing logo
         Bitstream oldLogo = community.getLogo();
         if (oldLogo != null) {
