@@ -132,11 +132,15 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String filename = vocabulariesPath + vocabularyName + ".xml";
             log.info("Loading " + filename);
             vocabulary = new InputSource(filename);
+
+            hierarchyDelimiter = " " + hierarchyDelimiter + " ";
         }
     }
 
     protected String buildString(Node node) {
-        if (node.getNodeType() == Node.DOCUMENT_NODE) {
+        if (node.getNodeType() == Node.DOCUMENT_NODE || (
+            node.getParentNode() != null &&
+            node.getParentNode().getNodeType() == Node.DOCUMENT_NODE)) {
             return ("");
         } else {
             String parentValue = buildString(node.getParentNode());
