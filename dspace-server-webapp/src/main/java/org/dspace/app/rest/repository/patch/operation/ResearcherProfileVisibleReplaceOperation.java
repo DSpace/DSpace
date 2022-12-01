@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Implementation for ResearcherProfile visibility patches.
- *
+ *SubscriptionParameterAddOperationpatches
  * Example:
  * <code> curl -X PATCH http://${dspace.server.url}/api/eperson/profiles/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "

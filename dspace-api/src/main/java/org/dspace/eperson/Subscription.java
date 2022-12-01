@@ -55,8 +55,9 @@ public class Subscription implements ReloadableEntity<Integer> {
     @Column(name = "type")
     private String type;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "subscription", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.eperson.service.SubscribeService#subscribe(Context, EPerson, DSpaceObject, List, String)}
@@ -104,5 +105,18 @@ public class Subscription implements ReloadableEntity<Integer> {
 
     public void setSubscriptionParameterList(List<SubscriptionParameter> subscriptionList) {
         this.subscriptionParameterList = subscriptionList;
+    }
+
+    public void addParameter(SubscriptionParameter subscriptionParameter) {
+        subscriptionParameterList.add(subscriptionParameter);
+        subscriptionParameter.setSubscription(this);
+    }
+
+    public void removeParameterList() {
+        subscriptionParameterList.clear();
+    }
+
+    public void removeParameter(SubscriptionParameter subscriptionParameter) {
+        subscriptionParameterList.remove(subscriptionParameter);
     }
 }

@@ -152,18 +152,43 @@ public class SubscribeServiceImpl implements SubscribeService {
                                            String type) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         if (authorizeService.isAdmin(context, context.getCurrentUser()) || eperson.equals(context.getCurrentUser())) {
-            Subscription subscription = subscriptionDAO.findByID(context, Subscription.class, id);
-            subscription.setType(type);
-            subscription.setdSpaceObject(dSpaceObject);
-            subscription.setSubscriptionParameterList(subscriptionParameterList);
-            subscription.setePerson(eperson);
-            subscriptionDAO.save(context, subscription);
-            return subscription;
+            Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
+            subscriptionDB.removeParameterList();
+            subscriptionDB.setType(type);
+            subscriptionDB.setdSpaceObject(dSpaceObject);
+            subscriptionParameterList.forEach(subscriptionParameter -> subscriptionDB.addParameter(subscriptionParameter));
+            subscriptionDB.setePerson(eperson);
+            subscriptionDAO.save(context, subscriptionDB);
+            return subscriptionDB;
         } else {
             throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
         }
     }
 
+    @Override
+    public Subscription addSubscriptionParameter(Context context, Integer id, SubscriptionParameter  subscriptionParameter) throws SQLException, AuthorizeException {
+        // must be admin or the subscriber of the subscription
+        Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
+        if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
+            subscriptionDB.addParameter(subscriptionParameter);
+            subscriptionDAO.save(context, subscriptionDB);
+            return subscriptionDB;
+        } else {
+            throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
+        }
+    }
+    @Override
+    public Subscription removeSubscriptionParameter(Context context, Integer id, SubscriptionParameter  subscriptionParameter) throws SQLException, AuthorizeException {
+        // must be admin or the subscriber of the subscription
+        Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
+        if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
+            subscriptionDB.removeParameter(subscriptionParameter);
+            subscriptionDAO.save(context, subscriptionDB);
+            return subscriptionDB;
+        } else {
+            throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
+        }
+    }
     @Override
     public void deleteSubscription(Context context, Integer id) throws SQLException, AuthorizeException {
         // initially find the eperson associated with the subscription

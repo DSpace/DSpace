@@ -154,5 +154,20 @@ public interface SubscribeService {
      * @param context DSpace context
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
+    public Subscription addSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter)  throws SQLException, AuthorizeException;
+    /**
+     * Deletes a subscription
+     *
+     * @param context DSpace context
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public Subscription removeSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter)  throws SQLException, AuthorizeException;
+
+    /**
+     * Deletes a subscription
+     *
+     * @param context DSpace context
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
     public void deleteSubscription(Context context, Integer id) throws SQLException, AuthorizeException;
 }

@@ -154,6 +154,21 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws UnprocessableEntityException, DSpaceBadRequestException {
+        Subscription subscription = null;
+        try {
+            subscription = subscribeService.findById(context, id);
+            if (subscription == null) {
+                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+            }
+            resourcePatch.patch(context, subscription, patch.getOperations());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
     @PreAuthorize("isAuthenticated()")
     public void delete(Context context, Integer id) {
         try {
