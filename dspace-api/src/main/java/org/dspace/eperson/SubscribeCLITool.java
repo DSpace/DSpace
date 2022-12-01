@@ -120,7 +120,7 @@ public class SubscribeCLITool {
                 collections = new ArrayList<>();
             }
 
-            collections.add(subscription.getCollection());
+            collections.add((Collection) subscription.getdSpaceObject());
         }
 
         // Process the last person

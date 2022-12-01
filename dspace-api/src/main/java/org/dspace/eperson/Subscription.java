@@ -7,6 +7,7 @@
  */
 package org.dspace.eperson;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,12 +16,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Database entity representation of the subscription table
@@ -38,16 +45,21 @@ public class Subscription implements ReloadableEntity<Integer> {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id")
-    private Collection collection;
+    @JoinColumn(name = "dspace_object_id")
+    private DSpaceObject dSpaceObject;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "eperson_id")
     private EPerson ePerson;
 
+    @Column(name = "type")
+    private String type;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "subscription", cascade = CascadeType.ALL)
+    private List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.eperson.service.SubscribeService#subscribe(Context, EPerson, Collection)}
+     * {@link org.dspace.eperson.service.SubscribeService#subscribe(Context, EPerson, DSpaceObject, List, String)}
      */
     protected Subscription() {
 
@@ -58,19 +70,39 @@ public class Subscription implements ReloadableEntity<Integer> {
         return id;
     }
 
-    public Collection getCollection() {
-        return collection;
+    public DSpaceObject getdSpaceObject() {
+        return this.dSpaceObject;
     }
 
-    void setCollection(Collection collection) {
-        this.collection = collection;
+    void setDSpaceObject(DSpaceObject dSpaceObject) {
+        this.dSpaceObject = dSpaceObject;
     }
 
     public EPerson getePerson() {
         return ePerson;
     }
 
-    void setePerson(EPerson ePerson) {
+    public void setePerson(EPerson ePerson) {
         this.ePerson = ePerson;
+    }
+
+    public void setdSpaceObject(DSpaceObject dSpaceObject) {
+        this.dSpaceObject = dSpaceObject;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<SubscriptionParameter> getSubscriptionParameterList() {
+        return subscriptionParameterList;
+    }
+
+    public void setSubscriptionParameterList(List<SubscriptionParameter> subscriptionList) {
+        this.subscriptionParameterList = subscriptionList;
     }
 }

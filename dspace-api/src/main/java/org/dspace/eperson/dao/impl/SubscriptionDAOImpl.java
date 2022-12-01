@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -47,17 +48,16 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public Subscription findByCollectionAndEPerson(Context context, EPerson eperson, Collection collection)
-        throws SQLException {
+    public Subscription findByCollectionAndEPerson(Context context, EPerson eperson, DSpaceObject dSpaceObject)
+            throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
-        criteriaQuery
-            .where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson),
-                                       criteriaBuilder.equal(subscriptionRoot.get(Subscription_.collection), collection)
-                   )
-        );
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson),
+                                criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
+                        )
+                );
         return singleResult(context, criteriaQuery);
     }
 
@@ -80,7 +80,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     @Override
     public void deleteByCollectionAndEPerson(Context context, Collection collection, EPerson eperson)
-        throws SQLException {
+            throws SQLException {
         String hqlQuery = "delete from Subscription where collection=:collection AND ePerson=:ePerson";
         Query query = createQuery(context, hqlQuery);
         query.setParameter("collection", collection);
@@ -90,17 +90,13 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     @Override
     public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException {
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
-
-        List<javax.persistence.criteria.Order> orderList = new ArrayList<>(1);
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
         criteriaQuery.orderBy(orderList);
-
         return list(context, criteriaQuery, false, Subscription.class, -1, -1);
     }
 }
