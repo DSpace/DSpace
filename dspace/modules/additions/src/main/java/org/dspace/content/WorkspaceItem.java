@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -232,17 +231,17 @@ public class WorkspaceItem
         multipleTitles = b;
     }
 
-    // Customization for LIBDRUM-628
-    @Override
-    public boolean isDataset() {
-        return isDataset;
-    }
-
-    @Override
-    public void setDataset(boolean b) {
-        isDataset = b;
-    }
-    // End customization for LIBDRUM-628
+//    // Customization for LIBDRUM-628
+//    @Override
+//    public boolean isDataset() {
+//        return isDataset;
+//    }
+//
+//    @Override
+//    public void setDataset(boolean b) {
+//        isDataset = b;
+//    }
+//    // End customization for LIBDRUM-628
 
     @Override
     public boolean isPublishedBefore() {
