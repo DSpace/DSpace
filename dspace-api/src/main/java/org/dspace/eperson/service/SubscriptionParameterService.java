@@ -7,18 +7,18 @@
  */
 package org.dspace.eperson.service;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Service interface class for the SubscriptionParameter object.
- * The implementation of this class is responsible for all business logic calls for the SubscriptionParameter object and is
- * autowired by spring
+ * The implementation of this class is responsible for all business logic calls for
+ * the SubscriptionParameter object and is autowired by spring
  * Class defining methods for sending new item e-mail alerts to users
  *
  * @author Alba Aliu @atis.al

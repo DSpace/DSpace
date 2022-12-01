@@ -2,7 +2,6 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson;
@@ -61,8 +60,8 @@ public class SubscribeServiceImpl implements SubscribeService {
                 || ((context.getCurrentUser() != null) && (context
                 .getCurrentUser().getID().equals(eperson.getID())))) {
             Subscription new_subscription = subscriptionDAO.create(context, new Subscription());
-            subscriptionParameterList.forEach(subscriptionParameter -> new_subscription.addParameter(subscriptionParameter));
-//                new_subscription.setSubscriptionParameterList(subscriptionParameterList);
+            subscriptionParameterList.forEach(subscriptionParameter ->
+                    new_subscription.addParameter(subscriptionParameter));
             new_subscription.setePerson(eperson);
             new_subscription.setdSpaceObject(dSpaceObject);
             new_subscription.setType(type);
@@ -75,20 +74,20 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public void unsubscribe(Context context, EPerson eperson,
-                            Collection collection) throws SQLException, AuthorizeException {
+                            DSpaceObject dSpaceObject) throws SQLException, AuthorizeException {
         // Check authorisation. Must be administrator, or the eperson.
         if (authorizeService.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
                 .getCurrentUser().getID().equals(eperson.getID())))) {
-            if (collection == null) {
+            if (dSpaceObject == null) {
                 // Unsubscribe from all
                 subscriptionDAO.deleteByEPerson(context, eperson);
             } else {
-                subscriptionDAO.deleteByCollectionAndEPerson(context, collection, eperson);
+                subscriptionDAO.deleteByDSOAndEPerson(context, dSpaceObject, eperson);
 
-                log.info(LogHelper.getHeader(context, "unsubscribe",
-                                              "eperson_id=" + eperson.getID() + ",collection_id="
-                                                  + collection.getID()));
+                log.info(LogManager.getHeader(context, "unsubscribe",
+                        "eperson_id=" + eperson.getID() + ",collection_id="
+                                + dSpaceObject.getID()));
             }
         } else {
             throw new AuthorizeException(
@@ -103,7 +102,8 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> getSubscriptionsByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject)
+    public List<Subscription> getSubscriptionsByEPersonAndDso(Context context,
+                                                              EPerson eperson, DSpaceObject dSpaceObject)
             throws SQLException {
         return subscriptionDAO.findByEPerson(context, eperson);
     }
@@ -159,7 +159,8 @@ public class SubscribeServiceImpl implements SubscribeService {
             subscriptionDB.removeParameterList();
             subscriptionDB.setType(type);
             subscriptionDB.setdSpaceObject(dSpaceObject);
-            subscriptionParameterList.forEach(subscriptionParameter -> subscriptionDB.addParameter(subscriptionParameter));
+            subscriptionParameterList.forEach(subscriptionParameter ->
+                    subscriptionDB.addParameter(subscriptionParameter));
             subscriptionDB.setePerson(eperson);
             subscriptionDAO.save(context, subscriptionDB);
             return subscriptionDB;
@@ -169,10 +170,12 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Subscription addSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+    public Subscription addSubscriptionParameter(Context context, Integer id,
+                      SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
-        if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
+        if (authorizeService.isAdmin(context, context.getCurrentUser())
+                || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
             subscriptionDB.addParameter(subscriptionParameter);
             subscriptionDAO.save(context, subscriptionDB);
             return subscriptionDB;
@@ -182,10 +185,12 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Subscription removeSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+    public Subscription removeSubscriptionParameter(Context context, Integer id,
+                          SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
-        if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
+        if (authorizeService.isAdmin(context, context.getCurrentUser())
+                || subscriptionDB.getePerson().equals(context.getCurrentUser())) {
             subscriptionDB.removeParameter(subscriptionParameter);
             subscriptionDAO.save(context, subscriptionDB);
             return subscriptionDB;
@@ -200,8 +205,14 @@ public class SubscribeServiceImpl implements SubscribeService {
         Subscription subscription = subscriptionDAO.findByID(context, Subscription.class, id);
         if (subscription != null) {
             // must be admin or the subscriber of the subscription
-            if (authorizeService.isAdmin(context, context.getCurrentUser()) || subscription.getePerson().equals(context.getCurrentUser())) {
-                subscriptionDAO.delete(context, subscription);
+            if (authorizeService.isAdmin(context, context.getCurrentUser())
+                    || subscription.getePerson().equals(context.getCurrentUser())) {
+                try {
+                    subscriptionDAO.delete(context, subscription);
+                } catch (SQLException sqlException) {
+                    throw new SQLException(sqlException);
+                }
+
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can delete the subscription");
             }

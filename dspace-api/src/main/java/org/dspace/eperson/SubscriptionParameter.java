@@ -9,7 +9,6 @@ package org.dspace.eperson;
 
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,8 +30,9 @@ import javax.persistence.Table;
 public class SubscriptionParameter {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_parameter_seq")
-    @SequenceGenerator(name = "subscription_parameter_seq", sequenceName = "subscription_parameter_seq", allocationSize = 1)
-    @Column(name = "subscription_parameter_id", unique = true, nullable = false, insertable = true)
+    @SequenceGenerator(name = "subscription_parameter_seq",
+            sequenceName = "subscription_parameter_seq", allocationSize = 1)
+    @Column(name = "subscription_parameter_id", unique = true)
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "subscription_id")

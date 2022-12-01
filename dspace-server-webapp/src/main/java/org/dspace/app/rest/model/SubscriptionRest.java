@@ -2,28 +2,23 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.RestResourceController;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@LinksRest(links = {
-        @LinkRest(
-                name = SubscriptionRest.DSPACE_OBJECT,
-                method = "getDSpaceObject"
-        ),
-        @LinkRest(
-                name = SubscriptionRest.EPERSON,
-                method = "getEPerson"
-        )
+import org.dspace.app.rest.RestResourceController;
+
+@LinksRest(links = {@LinkRest(name = SubscriptionRest.DSPACE_OBJECT,
+        method = "getDSpaceObject"), @LinkRest(
+        name = SubscriptionRest.EPERSON,
+        method = "getEPerson")
 })
-public class SubscriptionRest extends BaseObjectRest<Integer>{
+public class SubscriptionRest extends BaseObjectRest<Integer> {
     public static final String NAME = "subscription";
     public static final String NAME_PLURAL = "subscriptions";
     public static final String CATEGORY = "core";
@@ -60,6 +55,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer>{
     public void setSubscriptionParameterList(List<SubscriptionParameter> subscriptionParameterList) {
         this.subscriptionParameterList = subscriptionParameterList;
     }
+
     public String getSubscriptionType() {
         return this.type;
     }

@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
@@ -27,10 +27,10 @@ import org.dspace.content.service.SiteService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
-import org.dspace.eperson.service.SubscribeService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -56,21 +55,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    SubscribeService subscribeService;
+    private Collection collection;
+    private Item publicItem;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        // We turn off the authorization system in order to create the structure as
-        // defined below
-//        context.turnOffAuthorisationSystem();
-//        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
-//        colPeople = CollectionBuilder.createCollection(context, parentCommunity).withName("People")
-//                .withEntityType("Person").build();
-//        context.restoreAuthSystemState();
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community community = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        collection = CollectionBuilder.createCollection(context, community).withName("Collection 1").build();
+        // creation of the item which will be the DSO related with a subscription
+        publicItem = ItemBuilder.createItem(context, collection)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -80,28 +87,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient().perform(get("/api/core/subscriptions"))
                 //The status has to be 401 Not Authorized
                 .andExpect(status().isUnauthorized());
-
         String token = getAuthToken(admin.getEmail(), password);
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Test")
-                .withIssueDate("2010-10-17")
-                .withAuthor("Smith, Donald")
-                .withSubject("ExtraEntry")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TypeTest");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TypeTest", publicItem, admin, subscriptionParameterList).build();
         subscriptionParameter.setSubscription(subscription);
         //When we call the root endpoint
         context.restoreAuthSystemState();
@@ -127,33 +119,18 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void findByIdAsAdministrator() throws Exception {
+        context.turnOffAuthorisationSystem();
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/core/subscriptions"))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
-
         String token = getAuthToken(admin.getEmail(), password);
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
         getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()))
@@ -175,34 +152,19 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void findByIdAsRandomUser() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
+    public void findByIdAsAnonymous() throws Exception {
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Parameter");
         subscriptionParameter.setValue("ValueParameter");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
-        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()))
-                //The status has to be 403
-                .andExpect(status().isForbidden());
+        getClient().perform(get("/api/core/subscriptions/" + subscription.getID()))
+                //The status has to be 401
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -213,26 +175,16 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 //                .andExpect(status().isUnauthorized());
         String token = getAuthToken(eperson.getEmail(), password);
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
+        EPerson user = EPersonBuilder.createEPerson(context)
+                .withEmail("user@test.it")
+                .withPassword(password)
                 .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Parameter1");
         subscriptionParameter.setValue("ValueParameter1");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, user, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint
         getClient(token).perform(get("/api/core/subscriptions/search/findByEPerson?id=" + eperson.getID()))
@@ -242,14 +194,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("TypeTest")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("TestType")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.endsWith("ePerson")))
                 .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Parameter1")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("ValueParameter1")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions")));
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("ValueParameter1")));
 
 
         EPerson epersonIT = EPersonBuilder.createEPerson(context)
@@ -257,30 +208,28 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .withPassword(password)
                 .withLanguage("al")
                 .build();
-        String epersonITtoken = getAuthToken(epersonIT.getEmail(), password);
-        getClient(epersonITtoken).perform(get("/api/core/subscriptions/" + subscription.getID()))
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter1");
+        subscriptionParameter.setValue("ValueParameter1");
+        subscriptionParameterList.add(subscriptionParameter);
+        List<SubscriptionParameter> subscriptionParameterList1 = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter1 = new SubscriptionParameter();
+        subscriptionParameter1.setName("Parameter1");
+        subscriptionParameter1.setValue("ValueParameter1");
+        subscriptionParameterList1.add(subscriptionParameter1);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", collection, user, subscriptionParameterList).build();
+        Subscription subscription1 = SubscribeBuilder.subscribeBuilder(context, "Test", collection, user, subscriptionParameterList1).build();
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/subscriptions/search/findByEPersonAndDso?dspace_object_id=" + collection.getID() + "&eperson_id=" + user.getID()))
                 //The status has to be 200 OK
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void addSubscriptionNotLoggedIn() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
-        context.restoreAuthSystemState();
         SubscriptionParameterRest subscriptionParameterRest = new SubscriptionParameterRest();
         subscriptionParameterRest.setValue("nameTest");
         subscriptionParameterRest.setName("valueTest");
@@ -289,11 +238,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         SubscriptionRest subscriptionRest = new SubscriptionRest();
         subscriptionRest.setType("testType");
         MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
-        params.add("dspace_object_id", publicItem1.getID().toString());
+        params.add("dspace_object_id", publicItem.getID().toString());
         params.add("eperson_id", eperson.getID().toString());
         ObjectMapper objectMapper = new ObjectMapper();
-        getClient().perform(post("/api/core/subscriptions?dspace_object_id="+publicItem1.getID()+"&eperson_id="+eperson.getID())
-                .content(objectMapper.writeValueAsString(subscriptionRest))
+        getClient().perform(post("/api/core/subscriptions?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + eperson.getID())
+                        .content(objectMapper.writeValueAsString(subscriptionRest))
                         .contentType(contentType))
                 //The status has to be 401 Not Authorized
                 .andExpect(status().isUnauthorized());
@@ -301,22 +250,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void addSubscriptionAsAdmin() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
-        context.restoreAuthSystemState();
         //When we call the root endpoint as anonymous user
         SubscriptionParameterRest subscriptionParameterRest = new SubscriptionParameterRest();
         subscriptionParameterRest.setValue("nameTest");
@@ -328,9 +261,17 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 //        subscriptionRest.setSubscriptionParameterList(subscriptionParameterRestList);
         ObjectMapper objectMapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/core/subscriptions?dspace_object_id="+publicItem1.getID()+"&eperson_id="+admin.getID())
-                        .content(objectMapper.writeValueAsString(subscriptionRest))
-                .contentType(contentType))
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+        getClient(token).perform(post("/api/core/subscriptions?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
+                        .content(objectMapper.writeValueAsString(map))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -349,29 +290,27 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     public void editSubscriptionAnonymous() throws Exception {
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Parameter1");
         subscriptionParameter.setValue("ValueParameter1");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
         context.restoreAuthSystemState();
         //When we call the root endpoint as anonymous user
-        getClient().perform(put("/api/core/subscriptions"))
+        getClient().perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
+                        .content(objectMapper.writeValueAsString(newSubscription))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
     }
@@ -384,30 +323,17 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .withPassword(password)
                 .withLanguage("al")
                 .build();
-        String epersonITtoken = getAuthToken(epersonIT.getEmail(), password);
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Parameter1");
         subscriptionParameter.setValue("ValueParameter1");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "TestType");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         //When we call the root endpoint as anonymous user
-        getClient(epersonITtoken).perform(put("/api/core/subscriptions"))
+        getClient().perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
+                        .content(objectMapper.writeValueAsString(newSubscription))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 //The status has to be 403 Not Authorized
                 .andExpect(status().isUnauthorized());
     }
@@ -417,46 +343,39 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
-        getClient(tokenSubscriber).perform(put("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
-                .andExpect(status().isOk());
-        //When we call the root endpoint as anonymous user
-        getClient(tokenAdmin).perform(put("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
+        String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + eperson.getID())
+                        //The status has to be 403 Not Authorized
+                        .content(objectMapper.writeValueAsString(newSubscription))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.type", is("Test")))
-                .andExpect(jsonPath("$.id", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
-                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("Daily")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/ePerson")));
+                .andExpect(jsonPath("$.subscriptionType", is("test")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("daily")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
     @Test
@@ -468,26 +387,12 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .withLanguage("al")
                 .build();
         String epersonITtoken = getAuthToken(epersonIT.getEmail(), password);
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
         getClient(epersonITtoken).perform(put("/api/core/subscriptions"))
                 //The status has to be 403 Not Authorized
@@ -497,26 +402,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     public void deleteSubscriptionAsAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem, eperson, subscriptionParameterList).build();
+        String token = getAuthToken(admin.getEmail(), password);
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(put("/api/core/subscriptions"))
@@ -526,26 +418,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void patchReplaceSubscriptionParameterAsAdmin() throws Exception {
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
+        context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
@@ -575,26 +454,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void patchSubscriptionParameterNotAsAdminNotAsSubscriber() throws Exception {
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
+        context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem, eperson, subscriptionParameterList).build();
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
         value.put("name", "frequency");
@@ -611,32 +477,19 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(epersonITtoken).perform(patch("/api/core/subscriptions/" + subscription.getID())
                         .content(patchBody)
                 )
-                //The status has to be 200 OK
-                .andExpect(status().isUnauthorized());
+                //The status has to be 403 Forbidden
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void patchAddSubscriptionParameter() throws Exception {
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
+        context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();
@@ -669,26 +522,12 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     public void patchRemoveSubscriptionParameter() throws Exception {
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        // creation of the item which will be the DSO related with a subscription
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                .withTitle("Item")
-                .withIssueDate("2020-10-17")
-                .withAuthor("John, Doe")
-                .withSubject("Test")
-                .build();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
         subscriptionParameter.setName("TestName");
         subscriptionParameter.setValue("TestValue");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, eperson, publicItem1, subscriptionParameterList, "Test");
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "Test", publicItem, eperson, subscriptionParameterList).build();
         String token = getAuthToken(admin.getEmail(), password);
         List<Operation> ops = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<>();

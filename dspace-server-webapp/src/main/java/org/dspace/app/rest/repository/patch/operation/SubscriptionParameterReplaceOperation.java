@@ -2,10 +2,12 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository.patch.operation;
+
+import java.sql.SQLException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,9 +23,6 @@ import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
-
 
 /**
  * Implementation for SubscriptionParameterReplaceOperation patches.
@@ -54,9 +53,11 @@ public class SubscriptionParameterReplaceOperation extends PatchOperation<Subscr
                 } else {
                     value = objectMapper.readTree((String) operation.getValue());
                 }
-                SubscriptionParameterRest subscriptionParameterRest = objectMapper.readValue(value.toString(), SubscriptionParameterRest.class);
+                SubscriptionParameterRest subscriptionParameterRest = objectMapper.readValue(
+                        value.toString(), SubscriptionParameterRest.class);
                 try {
-                    SubscriptionParameter subscriptionParameter = subscriptionParameterService.edit(context, subscriptionParameterId, subscriptionParameterRest.getValue(),
+                    SubscriptionParameter subscriptionParameter = subscriptionParameterService.edit(context,
+                            subscriptionParameterId, subscriptionParameterRest.getValue(),
                             subscriptionParameterRest.getName(),
                             subscription);
                 } catch (SQLException | AuthorizeException exception) {

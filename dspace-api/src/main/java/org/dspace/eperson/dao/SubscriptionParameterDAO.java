@@ -6,9 +6,9 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson.dao;
-
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.SubscriptionParameter;
+
 
 /**
  * Database Access Object interface class for the SubscriptionParamter object.

@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.Utils;
@@ -16,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the converter from Entity Subscription to the REST data model
- * 
+ *
  * @author Alba Aliu at atis.al
  *
  */
@@ -24,12 +28,9 @@ import org.springframework.stereotype.Component;
 public class SubscriptionConverter implements DSpaceConverter<Subscription, SubscriptionRest> {
     @Autowired
     protected Utils utils;
-    /* (non-Javadoc)
-     * @see org.dspace.app.rest.converter.DSpaceConverter#convert
-     * (java.lang.Object, org.dspace.app.rest.projection.Projection)
-     */
     @Autowired
     private ConverterService converter;
+
     @Override
     public SubscriptionRest convert(Subscription subscription, Projection projection) {
         SubscriptionRest rest = new SubscriptionRest();

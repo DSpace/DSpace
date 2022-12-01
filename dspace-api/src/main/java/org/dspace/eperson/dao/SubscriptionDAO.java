@@ -2,7 +2,6 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
  * http://www.dspace.org/license/
  */
 package org.dspace.eperson.dao;
@@ -10,7 +9,6 @@ package org.dspace.eperson.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -31,11 +29,12 @@ public interface SubscriptionDAO extends GenericDAO<Subscription> {
 
     public List<Subscription> findByEPerson(Context context, EPerson eperson) throws SQLException;
 
-    public List<Subscription> findByEPersonAndDso(Context context, EPerson eperson, DSpaceObject dSpaceObject) throws SQLException;
+    public List<Subscription> findByEPersonAndDso(Context context,
+                                                  EPerson eperson, DSpaceObject dSpaceObject) throws SQLException;
 
     public void deleteByEPerson(Context context, EPerson eperson) throws SQLException;
 
-    public void deleteByCollectionAndEPerson(Context context, Collection collection, EPerson eperson)
+    public void deleteByDSOAndEPerson(Context context, DSpaceObject dSpaceObject, EPerson eperson)
             throws SQLException;
 
     public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException;
