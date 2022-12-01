@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
@@ -38,7 +39,7 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
     public DSpaceObjectRest getDSpaceObject(@Nullable HttpServletRequest request,
                                             Integer subscriptionId,
                                             @Nullable Pageable optionalPageable,
-                                            Projection projection) {
+                                            Projection projection) throws AuthorizeException {
         try {
             Context context = obtainContext();
             Subscription subscription = subscribeService.findById(context, subscriptionId);
@@ -51,6 +52,8 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
             return converter.toRest(initializer.getImplementation(), projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } catch (AuthorizeException e) {
+            throw new AuthorizeException(e.getMessage());
         }
     }
 }

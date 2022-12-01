@@ -80,13 +80,10 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
     }
 
+    // FIND ALL
     @Test
     public void findAll() throws Exception {
         context.turnOffAuthorisationSystem();
-        //When we call the root endpoint as anonymous user
-        getClient().perform(get("/api/core/subscriptions"))
-                //The status has to be 401 Not Authorized
-                .andExpect(status().isUnauthorized());
         String token = getAuthToken(admin.getEmail(), password);
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
@@ -118,12 +115,77 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void findByIdAsAdministrator() throws Exception {
+    public void findAllAnonymous() throws Exception {
+        //When we call the root endpoint as anonymous user
+        getClient().perform(get("/api/core/subscriptions"))
+                //The status has to be 401 Not Authorized
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findAllAsUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(eperson.getEmail(), password);
+        context.restoreAuthSystemState();
+        //When we call the root endpoint as simple user
+        getClient(token).perform(get("/api/core/subscriptions"))
+                //The status has to be 403 Forbidden
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findAllWithResourceType() throws Exception {
         context.turnOffAuthorisationSystem();
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
+                //The status has to be 401 Not Authorized
                 .andExpect(status().isUnauthorized());
+        String token = getAuthToken(admin.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Frequency");
+        subscriptionParameter.setValue("Daily");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TypeTest", publicItem, admin, subscriptionParameterList).build();
+        subscriptionParameter.setSubscription(subscription);
+        //When we call the root endpoint
+        context.restoreAuthSystemState();
+        getClient(token).perform(get("/api/core/subscriptions?resourceType=Item"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionType", is("TypeTest")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0]._links.ePerson.href", Matchers.endsWith("ePerson")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Frequency")))
+                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("Daily")))
+                .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions?resourceType=Item")));
+        // search for subscriptions related with collections
+        getClient(token).perform(get("/api/core/subscriptions?resourceType=Collection"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                //By default we expect at least 1 submission forms so this to be reflected in the page object
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(0)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._links.self.href", Matchers.is(REST_SERVER_URL + "core/subscriptions?resourceType=Collection")));
+    }
+
+    // FIND BY ID
+    @Test
+    public void findByIdAsAdministrator() throws Exception {
+        context.turnOffAuthorisationSystem();
         String token = getAuthToken(admin.getEmail(), password);
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
@@ -167,6 +229,24 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void findByIdNotAsSubscriberNotAsAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String token = getAuthToken(eperson.getEmail(), password);
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+        //When we call the root endpoint
+        getClient(token).perform(get("/api/core/subscriptions/" + subscription.getID()))
+                //The status has to be 500
+                .andExpect(status().isInternalServerError());
+    }
+
+    // FIND ALL BY EPERSON/DSO
     @Test
     public void findAllSubscriptionsByEPerson() throws Exception {
         //When we call the root endpoint as anonymous user
@@ -228,6 +308,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isUnauthorized());
     }
 
+    // ADD
     @Test
     public void addSubscriptionNotLoggedIn() throws Exception {
         SubscriptionParameterRest subscriptionParameterRest = new SubscriptionParameterRest();
@@ -287,6 +368,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("ePerson")));
     }
 
+    // PUT
     @Test
     public void editSubscriptionAnonymous() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -330,12 +412,22 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context, "TestType", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String token = getAuthToken(epersonIT.getEmail(), password);
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("type", "test");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
         //When we call the root endpoint as anonymous user
-        getClient().perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
+        getClient(token).perform(put("/api/core/subscriptions/" + subscription.getID() + "?dspace_object_id=" + publicItem.getID() + "&eperson_id=" + admin.getID())
                         .content(objectMapper.writeValueAsString(newSubscription))
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
-                //The status has to be 403 Not Authorized
-                .andExpect(status().isUnauthorized());
+                //The status has to be 500 Error
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -378,6 +470,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
     }
 
+    // DELETE
     @Test
     public void deleteSubscriptionNotAsSubscriberNotAsAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -416,6 +509,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(status().isOk());
     }
 
+    // PATCH
     @Test
     public void patchReplaceSubscriptionParameterAsAdmin() throws Exception {
         context.turnOffAuthorisationSystem();

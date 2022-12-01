@@ -42,6 +42,9 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
         criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
 
     }
@@ -61,6 +64,9 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
                         subscriptionRoot.get(Subscription_.ePerson), eperson),
                 criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
         ));
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
 
@@ -92,9 +98,10 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public List<Subscription> findAllOrderedByEPersonAndResourceType(Context context, String resourceType,
+    public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
                                                       Integer limit, Integer offset) throws SQLException {
-        String hqlQuery = "select s from Subscription s join %s dso ON dso.id = s.dSpaceObject ORDER BY eperson_id";
+        String hqlQuery = "select s from Subscription s join %s dso " +
+                "ON dso.id = s.dSpaceObject ORDER BY subscription_id";
         if (resourceType != null) {
             hqlQuery = String.format(hqlQuery, resourceType);
         }
@@ -109,14 +116,14 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         return query.getResultList();
     }
     @Override
-    public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException {
+    public List<Subscription> findAllOrderedById(Context context, Integer limit, Integer offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
         criteriaQuery.orderBy(orderList);
-        return list(context, criteriaQuery, false, Subscription.class, -1, -1);
+        return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
 }

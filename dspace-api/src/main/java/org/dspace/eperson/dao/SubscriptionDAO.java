@@ -39,8 +39,8 @@ public interface SubscriptionDAO extends GenericDAO<Subscription> {
     public void deleteByDSOAndEPerson(Context context, DSpaceObject dSpaceObject, EPerson eperson)
             throws SQLException;
 
-    public List<Subscription> findAllOrderedByEPersonAndResourceType(Context context, String resourceType,
+    public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
                                                       Integer limit, Integer offset) throws SQLException;
 
-    public List<Subscription> findAllOrderedByEPerson(Context context) throws SQLException;
+    public List<Subscription> findAllOrderedById(Context context, Integer limit, Integer offset) throws SQLException;
 }

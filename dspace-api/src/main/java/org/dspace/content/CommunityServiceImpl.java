@@ -219,15 +219,15 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Bitstream setLogo(Context context, Community community, InputStream is)
-        throws AuthorizeException, IOException, SQLException {
+            throws AuthorizeException, IOException, SQLException {
         // Check authorisation
         // authorized to remove the logo when DELETE rights
         // authorized when canEdit
         if (!((is == null) && authorizeService.authorizeActionBoolean(
-            context, community, Constants.DELETE))) {
+                context, community, Constants.DELETE))) {
             canEdit(context, community);
         }
-        subscribeService.deleteByDspaceObject(context, community);
+
         // First, delete any existing logo
         Bitstream oldLogo = community.getLogo();
         if (oldLogo != null) {
@@ -244,7 +244,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             // now create policy for logo bitstream
             // to match our READ policy
             List<ResourcePolicy> policies = authorizeService
-                .getPoliciesActionFilter(context, community, Constants.READ);
+                    .getPoliciesActionFilter(context, community, Constants.READ);
             authorizeService.addPolicies(context, policies, newLogo);
 
             log.info(LogHelper.getHeader(context, "set_logo",
