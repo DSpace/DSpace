@@ -62,7 +62,8 @@ public class SubscribeServiceImpl implements SubscribeService {
                 .getCurrentUser().getID().equals(eperson.getID())))) {
             if (!isSubscribed(context, eperson, dSpaceObject)) {
                 Subscription new_subscription = subscriptionDAO.create(context, new Subscription());
-                new_subscription.setSubscriptionParameterList(subscriptionParameterList);
+                subscriptionParameterList.forEach(subscriptionParameter -> new_subscription.addParameter(subscriptionParameter));
+//                new_subscription.setSubscriptionParameterList(subscriptionParameterList);
                 new_subscription.setePerson(eperson);
                 new_subscription.setdSpaceObject(dSpaceObject);
                 new_subscription.setType(type);
@@ -100,7 +101,7 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> getSubscriptions(Context context, EPerson eperson)
+    public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson)
             throws SQLException {
         return subscriptionDAO.findByEPerson(context, eperson);
     }

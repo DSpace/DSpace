@@ -55,7 +55,7 @@ public class Subscription implements ReloadableEntity<Integer> {
     @Column(name = "type")
     private String type;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
 
     /**

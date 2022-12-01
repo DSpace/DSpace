@@ -18,12 +18,12 @@ import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,8 +53,10 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     protected ConverterService converter;
     @Autowired
     protected EPersonService personService;
-    @Autowired(required = true)
-    protected ContentServiceFactory contentServiceFactory;
+    @Autowired
+    private DSpaceObjectUtils dspaceObjectUtil;
+    @Autowired
+    private ResourcePatch<Subscription> resourcePatch;
 
 
     @Override
@@ -85,10 +87,11 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @SearchRestMethod(name = "findByEPerson")
     public Page<SubscriptionRest> findAllByEPerson(Context context, String id) {
         try {
-            EPerson ePerson = personService.findByNetid(context, id);
+            Context context = obtainContext();
+            EPerson ePerson = personService.findByIdOrLegacyId(context, id);
             if (context.getCurrentUser().equals(ePerson) || authorizeService.isAdmin(context, ePerson)) {
-                List<Subscription> subscriptionList = subscribeService.getSubscriptions(context, ePerson);
-                return converter.toRest(subscriptionList, utils.obtainProjection());
+                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context, ePerson);
+                return converter.toRestPage(subscriptionList, pageable, utils.obtainProjection());
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
             }
@@ -110,11 +113,24 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new UnprocessableEntityException("error parsing the body");
         }
         try {
-//           EPerson ePerson = personService.findByNetid(context, subscriptionRest.getePerson().getNetid()) ;
-            Subscription subscription = subscribeService.subscribe(context, null,
-                    dSpaceObject,
-                    subscriptionRest.getSubscriptionParameterList(),
-                    subscriptionRest.getType());
+            Subscription subscription = null;
+            DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
+            EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
+            List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
+            if (subscriptionParameterList != null) {
+                List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
+                for (SubscriptionParameterRest subscriptionParameterRest : subscriptionParameterList) {
+                    SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+                    subscriptionParameter.setName(subscriptionParameterRest.getName());
+                    subscriptionParameter.setValue(subscriptionParameterRest.getValue());
+                    subscriptionParameters.add(subscriptionParameter);
+                }
+                subscription = subscribeService.subscribe(context, ePerson,
+                        dSpaceObject,
+                        subscriptionParameters,
+                        subscriptionRest.getType());
+            }
+            context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -154,8 +170,9 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws UnprocessableEntityException, DSpaceBadRequestException {
+    @PreAuthorize("isAuthenticated()")
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch)
+            throws UnprocessableEntityException, DSpaceBadRequestException {
         Subscription subscription = null;
         try {
             subscription = subscribeService.findById(context, id);

@@ -7,12 +7,9 @@
  */
 package org.dspace.app.rest.repository;
 
-import org.apache.poi.poifs.crypt.DataSpaceMapUtils;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
@@ -26,11 +23,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.sql.SQLException;
 
 /**
- * Link repository for "mappedCollections" subresource of an individual item.
+ * Link repository for "dataSpaceObject" of subscription
  */
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.DSPACE_OBJECT)
 @Transactional
@@ -39,8 +35,6 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
     @Autowired
     SubscribeService subscribeService;
 
-    @Autowired
-    ItemService itemService;
 
     public DSpaceObjectRest getDSpaceObject(@Nullable HttpServletRequest request,
                                             Integer subscriptionId,

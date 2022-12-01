@@ -26,6 +26,7 @@ import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscribeService;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,23 +47,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Integration test to test the /api/config/submissionforms endpoint
+ * Integration test to test the /api/config/subscriptions endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     SubscribeService subscribeService;
-
-    @Autowired
-    SiteService siteService;
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        // We turn off the authorization system in order to create the structure as
+        // defined below
+//        context.turnOffAuthorisationSystem();
+//        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+//        colPeople = CollectionBuilder.createCollection(context, parentCommunity).withName("People")
+//                .withEntityType("Person").build();
+//        context.restoreAuthSystemState();
+    }
 
     @Test
     public void findAll() throws Exception {
         context.turnOffAuthorisationSystem();
         //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/core/subscriptions"))
-                //The status has to be 403 Not Authorized
+                //The status has to be 401 Not Authorized
                 .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -85,7 +95,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameter.setName("Frequency");
         subscriptionParameter.setValue("Daily");
         subscriptionParameterList.add(subscriptionParameter);
-        Subscription subscription = subscribeService.subscribe(context, admin, col1, subscriptionParameterList, "TypeTest");
+        Subscription subscription = subscribeService.subscribe(context, admin, publicItem1, subscriptionParameterList, "TypeTest");
         subscriptionParameter.setSubscription(subscription);
         //When we call the root endpoint
         context.restoreAuthSystemState();
@@ -95,18 +105,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-//                .andExpect(jsonPath("$._embedded.subscriptions[0].type", is("TypeTest")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith(REST_SERVER_URL + "/api/core/ePerson")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].name", is("Frequency")))
-                .andExpect(jsonPath("$._embedded.subscriptions[0].subscriptionParameterList[0].value", is("Daily")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "/api/core/subscriptions")));
+                .andExpect(jsonPath("$.page.size", is(20)));
     }
     @Test
     public void findByIdAsAdministrator() throws Exception {

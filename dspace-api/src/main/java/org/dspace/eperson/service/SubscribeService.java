@@ -75,7 +75,7 @@ public interface SubscribeService {
      * @return array of collections e-person is subscribed to
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> getSubscriptions(Context context, EPerson eperson) throws SQLException;
+    public List<Subscription> getSubscriptionsByEPerson(Context context, EPerson eperson) throws SQLException;
 
     /**
      * Find out which collections the currently logged in e-person can subscribe to
@@ -141,6 +141,11 @@ public interface SubscribeService {
      * Updates a subscription by id
      *
      * @param context DSpace context
+     * @param id Integer id
+     * @param eperson EPerson eperson
+     * @param dSpaceObject DSpaceObject dSpaceObject
+     * @param subscriptionParameterList  List<SubscriptionParameter>  subscriptionParameterList
+     * @param type  String  type
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public Subscription updateSubscription(Context context, Integer id,  EPerson eperson,
@@ -149,16 +154,20 @@ public interface SubscribeService {
                                            String type)  throws SQLException, AuthorizeException;
 
     /**
-     * Deletes a subscription
+     * Adds a parameter to a subscription
      *
      * @param context DSpace context
+     * @param id Integer id
+     * @param subscriptionParameter SubscriptionParameter subscriptionParameter
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public Subscription addSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter)  throws SQLException, AuthorizeException;
     /**
-     * Deletes a subscription
+     * Deletes a parameter from subscription
      *
      * @param context DSpace context
+     * @param id Integer id
+     * @param subscriptionParameter SubscriptionParameter subscriptionParameter
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public Subscription removeSubscriptionParameter(Context context, Integer id, SubscriptionParameter subscriptionParameter)  throws SQLException, AuthorizeException;
