@@ -99,6 +99,16 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> clarinLicenseRightsFacet(boolean hasNext) {
+        return allOf(
+                hasJsonPath("$.name", is("rights")),
+                hasJsonPath("$.facetType", is("standard")),
+                hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$._links.self.href", containsString("api/discover/facets/rights")),
+                hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/rights"))
+        );
+    }
+
     /**
      * Check that a facet over the dc.type exists and match the default configuration
      * 

@@ -487,6 +487,13 @@
   </dc-type>
 
   <dc-type>
+    <schema>dc</schema>
+    <element>rights</element>
+    <qualifier>label</qualifier>
+    <scope_note>Rights label should be one of PUB, RES, ACA.</scope_note>
+  </dc-type>
+
+  <dc-type>
 	<schema>dc</schema>
     <element>source</element>
     <!-- unqualified -->

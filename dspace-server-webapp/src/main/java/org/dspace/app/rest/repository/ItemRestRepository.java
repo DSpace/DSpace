@@ -19,14 +19,18 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
+import org.dspace.app.rest.model.ClarinLicenseResourceUserAllowanceRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
@@ -44,6 +48,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.service.clarin.ClarinItemService;
 import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +99,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
+
+    @Autowired
+    private ClarinItemService clarinItemService;
 
     public ItemRestRepository(ItemService dsoService) {
         super(dsoService);
@@ -364,5 +372,19 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
         return converter.toRest(item, utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "byBitstream")
+    public Page<ItemRest> findByValue(@Parameter(value = "bitstreamUUID", required = true) UUID
+                                                                            bitstreamUUID,
+                                                                    Pageable pageable) throws SQLException {
+        Context context = obtainContext();
+
+        List<Item> itemList = clarinItemService.findByBitstreamUUID(context, bitstreamUUID);
+        if (CollectionUtils.isEmpty(itemList)) {
+            return null;
+        }
+
+        return converter.toRestPage(itemList, pageable, utils.obtainProjection());
     }
 }

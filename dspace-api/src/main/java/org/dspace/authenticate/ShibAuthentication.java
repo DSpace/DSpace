@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +35,12 @@ import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.content.clarin.ClarinUserRegistration;
+import org.dspace.content.factory.ClarinServiceFactory;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
@@ -98,6 +102,8 @@ public class ShibAuthentication implements AuthenticationMethod {
     protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
                                                                                  .getMetadataSchemaService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected ClarinUserRegistrationService clarinUserRegistrationService =
+            ClarinServiceFactory.getInstance().getClarinUserRegistration();
 
 
     /**
@@ -776,6 +782,29 @@ public class ShibAuthentication implements AuthenticationMethod {
         AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
         ePersonService.update(context, eperson);
         context.dispatchEvents();
+
+        /* CLARIN
+         *
+         * Register User in the CLARIN license database
+         *
+         */
+        // if no email the registration is postponed after entering and confirming mail
+        if(Objects.nonNull(email)){
+            try{
+                ClarinUserRegistration clarinUserRegistration = new ClarinUserRegistration();
+                clarinUserRegistration.setConfirmation(true);
+                clarinUserRegistration.setEmail(email);
+                clarinUserRegistration.setPersonID(eperson.getID());
+                clarinUserRegistration.setOrganization(netid);
+                clarinUserRegistrationService.create(context, clarinUserRegistration);
+                eperson.setCanLogIn(false);
+                ePersonService.update(context, eperson);
+            }catch(Exception e){
+                throw new AuthorizeException("User has not been added among registred users!") ;
+            }
+        }
+
+        /* CLARIN */
 
         // Turn authorizations back on.
         context.restoreAuthSystemState();

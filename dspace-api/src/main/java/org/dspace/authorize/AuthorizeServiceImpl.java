@@ -77,7 +77,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     protected WorkflowItemService workflowItemService;
     @Autowired(required = true)
     private SearchService searchService;
-
+    @Autowired(required = true)
+    AuthorizationBitstreamUtils authorizationBitstreamUtils;
 
     protected AuthorizeServiceImpl() {
 
@@ -167,6 +168,14 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                                              + actionText + " on " + Constants.typeText[otype] + ":"
                                              + oid + " by user " + userid, o, action);
         }
+
+        // CLARIN
+        // This function throws exception if the authorization fails - if it is not reported, the license
+        // restrictions are OK
+        if (o.getType() == Constants.BITSTREAM && !isAdmin(c)) {
+            authorizationBitstreamUtils.authorizeBitstream(c, (Bitstream) o);
+        }
+        // CLARIN
     }
 
     @Override

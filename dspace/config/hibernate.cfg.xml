@@ -64,6 +64,13 @@
 
         <mapping class="org.dspace.handle.Handle"/>
 
+        <mapping class="org.dspace.content.clarin.ClarinLicense"/>
+        <mapping class="org.dspace.content.clarin.ClarinLicenseLabel"/>
+        <mapping class="org.dspace.content.clarin.ClarinLicenseResourceMapping"/>
+        <mapping class="org.dspace.content.clarin.ClarinLicenseResourceUserAllowance"/>
+        <mapping class="org.dspace.content.clarin.ClarinUserRegistration"/>
+        <mapping class="org.dspace.content.clarin.ClarinUserMetadata"/>
+
         <mapping class="org.dspace.harvest.HarvestedCollection"/>
         <mapping class="org.dspace.harvest.HarvestedItem"/>
 

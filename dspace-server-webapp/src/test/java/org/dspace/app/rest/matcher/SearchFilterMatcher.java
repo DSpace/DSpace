@@ -156,4 +156,13 @@ public class SearchFilterMatcher {
             checkOperators()
         );
     }
+    public static Matcher<? super Object> clarinLicenseRightsFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("rights")),
+                hasJsonPath("$.hasFacets", is(true)),
+                hasJsonPath("$.type", is("standard")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
+        );
+    }
 }
