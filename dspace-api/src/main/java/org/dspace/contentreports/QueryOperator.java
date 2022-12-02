@@ -13,10 +13,9 @@ import java.util.function.BiFunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.StandardBasicTypes;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.type.StandardBasicTypes;
 
 /**
  * Operators available for creating predicates to query the
@@ -34,7 +33,7 @@ public enum QueryOperator {
     CONTAINS("contains", true, false, (val, regexClause) -> Property.forName("mv.value").like("%" + val + "%")),
     DOES_NOT_CONTAIN("doesnt_contain", true, true, (val, regexClause) -> CONTAINS.buildPredicate(val, regexClause)),
     MATCHES("matches", false, false,
-            (val, regexClause) -> Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING)),
+        (val, regexClause) -> Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING)),
     DOES_NOT_MATCH("doesnt_match", false, true, (val, regexClause) -> MATCHES.buildPredicate(val, regexClause));
 
     private String code;
