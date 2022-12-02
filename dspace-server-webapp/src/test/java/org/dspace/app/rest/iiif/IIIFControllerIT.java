@@ -258,7 +258,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
         // Expect annotation list
-        getClient().perform(get("/iiif/" + bitstream.getID() + "/annotation/list"))
+        getClient().perform(get("/iiif/" + bitstream.getID() + "/list/annotation"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.id",
                        is("https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1")))
