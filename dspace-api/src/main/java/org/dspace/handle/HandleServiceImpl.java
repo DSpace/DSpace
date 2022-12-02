@@ -211,7 +211,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        List<Handle> handles = getInternalHandles(context, dso);
+        List<Handle> handles = dso.getHandles();
         if (CollectionUtils.isNotEmpty(handles)) {
             for (Handle handle : handles) {
                 //Only set the "resouce_id" column to null when unbinding a handle.
@@ -256,7 +256,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String findHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        List<Handle> handles = getInternalHandles(context, dso);
+        List<Handle> handles = dso.getHandles();
         if (CollectionUtils.isEmpty(handles)) {
             return null;
         } else {
@@ -328,20 +328,6 @@ public class HandleServiceImpl implements HandleService {
     ////////////////////////////////////////
     // Internal methods
     ////////////////////////////////////////
-
-    /**
-     * Return the handle for an Object, or null if the Object has no handle.
-     *
-     * @param context DSpace context
-     * @param dso     DSpaceObject for which we require our handles
-     * @return The handle for object, or null if the object has no handle.
-     * @throws SQLException If a database error occurs
-     */
-    protected List<Handle> getInternalHandles(Context context, DSpaceObject dso)
-        throws SQLException {
-        return handleDAO.getHandlesByDSpaceObject(context, dso);
-    }
-
     /**
      * Find the database row corresponding to handle.
      *
