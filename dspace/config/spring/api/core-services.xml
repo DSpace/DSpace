@@ -80,6 +80,15 @@
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
+
+    <bean class="org.dspace.content.clarin.ClarinLicenseServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinLicenseLabelServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinLicenseResourceMappingServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinUserRegistrationServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinLicenseResourceUserAllowanceServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinUserMetadataServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinItemServiceImpl"/>
+
     <bean class="org.dspace.core.NewsServiceImpl">
         <property name="acceptableFilenames">
             <list>
@@ -102,7 +111,10 @@
     <bean class="org.dspace.eperson.GroupServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
+    <bean class="org.dspace.eperson.SupervisorServiceImpl"/>
+
+    <bean class="org.dspace.authorize.AuthorizationBitstreamUtils"/>
+
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>

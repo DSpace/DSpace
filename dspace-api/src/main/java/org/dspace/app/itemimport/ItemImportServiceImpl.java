@@ -7,6 +7,7 @@
  */
 package org.dspace.app.itemimport;
 
+import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_HEIGHT_QUALIFIER;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_LABEL_ELEMENT;
@@ -41,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -56,6 +58,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
@@ -84,6 +87,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
@@ -96,6 +100,8 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
+import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -178,6 +184,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected RelationshipTypeService relationshipTypeService;
     @Autowired(required = true)
     protected MetadataValueService metadataValueService;
+    @Autowired(required = true)
+    protected ClarinLicenseService clarinLicenseService;
+    @Autowired(required = true)
+    protected ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
 
     protected String tempWorkDir;
 
@@ -683,6 +693,35 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             deleteItem(c, oldItem);
             Item newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
             c.uncacheEntity(oldItem);
+            c.uncacheEntity(newItem);
+
+            // attach license, license label requires an update
+            // get license name and check if exists and is not null, license name is stored in the metadatum
+            // `dc.rights`
+            List<MetadataValue> dcRights =
+                    itemService.getMetadata(newItem, "dc", "rights", null, Item.ANY);
+            if (CollectionUtils.isEmpty(dcRights) && Objects.nonNull(dcRights.get(0))) {
+                continue;
+            }
+
+            final String licenseName = dcRights.get(0).getValue();
+            if (Objects.isNull(licenseName)) {
+                continue;
+            }
+
+            final ClarinLicense license = clarinLicenseService.findByName(c, licenseName);
+            for (Bundle bundle : newItem.getBundles(CONTENT_BUNDLE_NAME)) {
+                for (Bitstream b : bundle.getBitstreams()) {
+                    this.clarinLicenseResourceMappingService.detachLicenses(c, b);
+                    // add the license to bitstream
+                    this.clarinLicenseResourceMappingService.attachLicense(c, license, b);
+                }
+            }
+
+            itemService.clearMetadata(c, newItem, "dc", "rights", "label", Item.ANY);
+            itemService.addMetadata(c, newItem, "dc", "rights", "label", Item.ANY,
+                    license.getNonExtendedClarinLicenseLabel().getLabel());
+            itemService.update(c, newItem);
             c.uncacheEntity(newItem);
         }
     }

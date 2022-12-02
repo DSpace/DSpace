@@ -41,7 +41,7 @@ public class MetadataValueRestRepositoryIT extends AbstractControllerIntegration
 
     private static final String SPONSOR_SCHEMA = "local";
     private static final String SPONSOR_ELEMENT = "sponsor";
-    private static final String SPONSOR_VALUE = WorkspaceItemRestRepositoryIT.EU_SPONSOR;
+    private static final String SPONSOR_VALUE = ClarinWorkspaceItemRestRepositoryIT.EU_SPONSOR;
 
     private Item publicItem;
     private Item sponsorItem;

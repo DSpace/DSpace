@@ -156,6 +156,11 @@
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
         </step-definition>
+        <step-definition id="clarin-license">
+            <heading>submit.progressbar.clarin-license</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ClarinLicenseResourceStep</processing-class>
+            <type>clarin-license</type>
+        </step-definition>
 
         <!-- This optional step may allow the user to select a Creative Commons license -->
         <step-definition id="cclicense" mandatory="false">
@@ -278,6 +283,7 @@
 
             <!--Step will be to Sign off on the required DSpace License agreement -->
             <step id="license"/>
+            <step id="clarin-license"/>
         </submission-process>
 
         <!--

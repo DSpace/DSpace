@@ -22,11 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.ExternalHandleMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.ClarinHandleBuilder;
 import org.dspace.handle.external.ExternalHandleConstants;
 import org.dspace.handle.external.Handle;
 import org.dspace.handle.service.HandleClarinService;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,33 +57,16 @@ public class ExternalHandleRestRepositoryIT extends AbstractControllerIntegratio
         int index = 0;
         for (String magicURL : magicURLs) {
             // create Handle
-            org.dspace.handle.Handle handle =
-                    handleClarinService.createExternalHandle(context, "123/" + index, magicURL);
-            // add created Handle to the list
+
+            org.dspace.handle.Handle handle = ClarinHandleBuilder
+                    .createHandle(context, "123/" + index, magicURL)
+                    .build();
             this.handlesWithMagicURLs.add(handle);
             index++;
         }
 
         context.commit();
         context.restoreAuthSystemState();
-    }
-
-    @After
-    public void cleanup() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        handlesWithMagicURLs.forEach(handle -> {
-            try {
-                this.handleClarinService.delete(context, handle);
-            } catch (SQLException | AuthorizeException e) {
-                e.printStackTrace();
-            }
-        });
-
-        context.commit();
-        context.restoreAuthSystemState();
-
-        handlesWithMagicURLs = null;
     }
 
     @Test

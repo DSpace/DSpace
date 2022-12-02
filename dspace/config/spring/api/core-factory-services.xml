@@ -25,6 +25,7 @@
     <bean id="contentServiceFactory" class="org.dspace.content.factory.ContentServiceFactoryImpl"/>
     <bean id="scriptServiceFactory" class="org.dspace.scripts.factory.impl.ScriptServiceFactoryImpl"/>
     <bean id="coreServiceFactory" class="org.dspace.core.factory.CoreServiceFactoryImpl"/>
+    <bean id="clarinServiceFactory" class="org.dspace.content.factory.ClarinServiceFactoryImpl"/>
 
 
     <bean id="accessStatusServiceFactory" class="org.dspace.access.status.factory.AccessStatusServiceFactoryImpl"/>

@@ -26,6 +26,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -63,6 +64,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
+    @Autowired(required = true)
+    protected ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -289,6 +292,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         // Remove policies only after the bitstream has been updated (otherwise the current user has not WRITE rights)
         authorizeService.removeAllPolicies(context, bitstream);
+
+        // detach the license from the bitstream
+        clarinLicenseResourceMappingService.detachLicenses(context, bitstream);
     }
 
     @Override

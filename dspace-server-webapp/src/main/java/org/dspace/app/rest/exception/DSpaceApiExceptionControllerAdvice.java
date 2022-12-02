@@ -105,6 +105,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                 HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
     }
 
+    @ExceptionHandler({ClarinLicenseNotFoundException.class})
+    protected void clarinLicenseNotFoundException(HttpServletRequest request, HttpServletResponse response,
+                                             Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_NOT_FOUND);
+    }
+
     @ExceptionHandler(SQLException.class)
     protected void handleSQLException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
