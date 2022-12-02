@@ -7,10 +7,11 @@
  */
 package org.dspace.discovery;
 
-import static org.dspace.discovery.IndexingUtils.findDirectAuthorizedGroupsAndEPersonsPrefixedIds;
+import static org.dspace.discovery.IndexingUtils.findDirectlyAuthorizedGroupAndEPersonPrefixedIds;
 import static org.dspace.discovery.IndexingUtils.findTransitiveAdminGroupIds;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
@@ -49,10 +50,12 @@ public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin
                         .forEach(unprefixedId -> document.addField("edit", "g" + unprefixedId));
 
                     // Index groups and epersons with WRITE rights on the Item.
-                    findDirectAuthorizedGroupsAndEPersonsPrefixedIds(
+                    List<String> prefixedIds = findDirectlyAuthorizedGroupAndEPersonPrefixedIds(
                         authorizeService, context, item, new int[] {Constants.WRITE}
-                    ).forEach(prefixedId -> document.addField("edit", prefixedId));
-
+                    );
+                    for (String prefixedId : prefixedIds) {
+                        document.addField("edit", prefixedId);
+                    }
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                         "Item: (id " + item.getID() + " name " + item.getName() + ")" ));

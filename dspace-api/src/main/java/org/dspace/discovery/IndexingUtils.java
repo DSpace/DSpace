@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -89,12 +90,6 @@ public abstract class IndexingUtils {
      * (through direct resource policy) or indirectly (through a policy on the owning collection, or on
      * the owning collection's community, or on any of that community's ancestor communities).
      *
-     * @param authService
-     * @param context
-     * @param item
-     * @return
-     * @throws SQLException
-     *
      * @param authService   The authentication service
      * @param context       DSpace context object
      * @param item          Item for which we search the admin group IDs
@@ -126,18 +121,20 @@ public abstract class IndexingUtils {
      *          group or eperson ID.
      * @throws SQLException if database error
      */
-    static Stream<String> findDirectAuthorizedGroupsAndEPersonsPrefixedIds(AuthorizeService authService,
-        Context context, DSpaceObject obj, int[] authorizations) throws SQLException {
-
-        ArrayList<Stream<String>> subResults = new ArrayList<>();
+    static List<String> findDirectlyAuthorizedGroupAndEPersonPrefixedIds(
+        AuthorizeService authService, Context context, DSpaceObject obj, int[] authorizations)
+        throws SQLException {
+        ArrayList<String> prefixedIds = new ArrayList<>();
         for (int auth : authorizations) {
-            Stream<String> subResult = authService.getPoliciesActionFilter(context, obj, auth).stream()
-                .map(policy -> policy.getGroup() == null ? "e" + policy.getEPerson().getID()
-                                                         : "g" + policy.getGroup().getID());
-            subResults.add(subResult);
-            // TODO: context.uncacheEntitiy(policy);
+            for (ResourcePolicy policy : authService.getPoliciesActionFilter(context, obj, auth)) {
+                String prefixedId = policy.getGroup() == null
+                    ? "e" + policy.getEPerson().getID()
+                    : "g" + policy.getGroup().getID();
+                prefixedIds.add(prefixedId);
+                context.uncacheEntity(policy);
+            }
         }
-        return sequence(subResults);
+        return prefixedIds;
     }
 
     private static <T> Stream<T> sequence(List<Stream<T>> subResults) {

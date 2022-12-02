@@ -7,7 +7,11 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.IndexingUtils.findDirectlyAuthorizedGroupAndEPersonPrefixedIds;
+import static org.dspace.discovery.IndexingUtils.findTransitiveAdminGroupIds;
+
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
@@ -43,13 +47,16 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
                     // Community.
                     // TODO: Strictly speaking we should also check for epersons who received admin rights directly,
                     //       without being part of the admin group. Finding them may be a lot slower though.
-                    IndexingUtils.findTransitiveAdminGroupIds(context, col)
+                    findTransitiveAdminGroupIds(context, col)
                         .forEach(unprefixedId -> document.addField("submit", "g" + unprefixedId));
 
                     // Index groups and epersons with ADD rights on the Collection.
-                    IndexingUtils.findDirectAuthorizedGroupsAndEPersonsPrefixedIds(
+                    List<String> prefixedIds = findDirectlyAuthorizedGroupAndEPersonPrefixedIds(
                         authorizeService, context, col, new int[] {Constants.ADD}
-                    ).forEach(prefixedId -> document.addField("submit", prefixedId));
+                    );
+                    for (String prefixedId : prefixedIds) {
+                        document.addField("submit", prefixedId);
+                    }
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
                              "Collection: (id " + col.getID() + " type " + col.getName() + ")" ));
@@ -57,5 +64,4 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
             }
         }
     }
-
 }
