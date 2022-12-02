@@ -2,7 +2,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main", "dspace-1_4_x", "dspace-1_5_x", "dspace-1_6_x", "dspace-1_7_x", "dspace-1_8_x", "dspace-3_x", "dspace-4_x", "dspace-5_x", "dspace-6_x", "sj-enable-codeql-code-scanning-replace-lgtm" ]
+    branches: [ "main", "dspace-1_4_x", "dspace-1_5_x", "dspace-1_6_x", "dspace-1_7_x", "dspace-1_8_x", "dspace-3_x", "dspace-4_x", "dspace-5_x", "dspace-6_x" ]
   pull_request:
     branches: [ "main" ]
   schedule:
