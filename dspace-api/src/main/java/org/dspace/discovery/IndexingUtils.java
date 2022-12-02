@@ -9,7 +9,6 @@ package org.dspace.discovery;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -64,6 +63,7 @@ public class IndexingUtils {
      */
     static List<UUID> findTransitiveAdminGroupIds(Context context, Community community) throws SQLException {
         return getAncestorCommunities(context, community).stream()
+            .filter(parent -> parent.getAdministrators() != null)
             .map(parent -> parent.getAdministrators().getID())
             .collect(Collectors.toList());
     }
@@ -79,7 +79,10 @@ public class IndexingUtils {
      * @throws SQLException if database error
      */
     static List<UUID> findTransitiveAdminGroupIds(Context context, Collection collection) throws SQLException {
-        List<UUID> ids = Arrays.asList(collection.getAdministrators().getID());
+        List<UUID> ids = new ArrayList<>();
+        if (collection.getAdministrators() != null) {
+            ids.add(collection.getAdministrators().getID());
+        }
         for (Community community : collection.getCommunities()) {
             for (UUID id : findTransitiveAdminGroupIds(context, community)) {
                 ids.add(id);
