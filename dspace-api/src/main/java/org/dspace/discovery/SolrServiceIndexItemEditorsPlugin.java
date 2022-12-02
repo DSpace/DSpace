@@ -12,10 +12,12 @@ import static org.dspace.discovery.IndexingUtils.findTransitiveAdminGroupIds;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -41,17 +43,20 @@ public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin
             Item item = ((IndexableItem) idxObj).getIndexedObject();
             if (item != null) {
                 try {
-                    // Index groups with ADMIN rights on the Item, on Collections containing the Item, on
+                    // Index groups with ADMIN rights on Collections containing the Item, on
                     // Communities containing those Collections, and recursively on any Community containing ssuch a
                     // Community.
                     // TODO: Strictly speaking we should also check for epersons who received admin rights directly,
                     //       without being part of the admin group. Finding them may be a lot slower though.
-                    findTransitiveAdminGroupIds(authorizeService, context, item)
-                        .forEach(unprefixedId -> document.addField("edit", "g" + unprefixedId));
+                    for (Collection collection : item.getCollections()) {
+                        for (UUID unprefixedId : findTransitiveAdminGroupIds(context, collection)) {
+                            document.addField("edit", "g" + unprefixedId);
+                        }
+                    }
 
-                    // Index groups and epersons with WRITE rights on the Item.
+                    // Index groups and epersons with WRITE or direct ADMIN rights on the Item.
                     List<String> prefixedIds = findDirectlyAuthorizedGroupAndEPersonPrefixedIds(
-                        authorizeService, context, item, new int[] {Constants.WRITE}
+                        authorizeService, context, item, new int[] {Constants.WRITE, Constants.ADMIN}
                     );
                     for (String prefixedId : prefixedIds) {
                         document.addField("edit", prefixedId);

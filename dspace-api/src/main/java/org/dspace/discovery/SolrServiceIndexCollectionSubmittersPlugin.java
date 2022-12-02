@@ -12,6 +12,7 @@ import static org.dspace.discovery.IndexingUtils.findTransitiveAdminGroupIds;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
@@ -47,12 +48,13 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
                     // Community.
                     // TODO: Strictly speaking we should also check for epersons who received admin rights directly,
                     //       without being part of the admin group. Finding them may be a lot slower though.
-                    findTransitiveAdminGroupIds(context, col)
-                        .forEach(unprefixedId -> document.addField("submit", "g" + unprefixedId));
+                    for (UUID unprefixedId : findTransitiveAdminGroupIds(context, col)) {
+                        document.addField("submit", "g" + unprefixedId);
+                    }
 
-                    // Index groups and epersons with ADD rights on the Collection.
+                    // Index groups and epersons with ADD or ADMIN rights on the Collection.
                     List<String> prefixedIds = findDirectlyAuthorizedGroupAndEPersonPrefixedIds(
-                        authorizeService, context, col, new int[] {Constants.ADD}
+                        authorizeService, context, col, new int[] {Constants.ADD, Constants.ADMIN}
                     );
                     for (String prefixedId : prefixedIds) {
                         document.addField("submit", prefixedId);
