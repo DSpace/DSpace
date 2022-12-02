@@ -9,6 +9,7 @@ package org.dspace.handle;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -211,17 +212,17 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        List<Handle> handles = dso.getHandles();
-        if (CollectionUtils.isNotEmpty(handles)) {
-            for (Handle handle : handles) {
+        Iterator<Handle> handles = dso.getHandles().iterator();
+        if (handles.hasNext()) {
+            while (handles.hasNext()) {
+                final Handle handle = handles.next();
+                handles.remove();
                 //Only set the "resouce_id" column to null when unbinding a handle.
                 // We want to keep around the "resource_type_id" value, so that we
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
 
-                //Also remove the handle from the DSO list to keep a consistent model
-                dso.getHandles().remove(handle);
 
                 handleDAO.save(context, handle);
 
