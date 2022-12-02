@@ -9,7 +9,9 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -30,27 +32,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision$
  */
 public class SubscribeServiceImpl implements SubscribeService {
-    /**
-     * log4j logger
-     */
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(SubscribeServiceImpl.class);
+
+    private Logger log = LogManager.getLogger(SubscribeServiceImpl.class);
 
     @Autowired(required = true)
-    protected SubscriptionDAO subscriptionDAO;
+    private SubscriptionDAO subscriptionDAO;
     @Autowired(required = true)
-    protected AuthorizeService authorizeService;
+    private AuthorizeService authorizeService;
     @Autowired(required = true)
-    protected CollectionService collectionService;
-
-    protected SubscribeServiceImpl() {
-
-    }
+    private CollectionService collectionService;
 
     @Override
     public List<Subscription> findAll(Context context, String resourceType,
                                       Integer limit, Integer offset) throws Exception {
         if (resourceType == null) {
-            return subscriptionDAO.findAllOrderedById(context, limit, offset);
+            return subscriptionDAO.findAllOrderedByDSO(context, limit, offset);
         } else {
             if (resourceType.equals("Item") || resourceType.equals("Collection") || resourceType.equals("Community")) {
                 return subscriptionDAO.findAllOrderedByIDAndResourceType(context, resourceType, limit, offset);
@@ -78,14 +74,13 @@ public class SubscribeServiceImpl implements SubscribeService {
             newSubscription.setType(type);
             return newSubscription;
         } else {
-            throw new AuthorizeException(
-                    "Only admin or e-person themselves can subscribe");
+            throw new AuthorizeException("Only admin or e-person themselves can subscribe");
         }
     }
 
     @Override
-    public void unsubscribe(Context context, EPerson eperson,
-                            DSpaceObject dSpaceObject) throws SQLException, AuthorizeException {
+    public void unsubscribe(Context context, EPerson eperson, DSpaceObject dSpaceObject)
+            throws SQLException, AuthorizeException {
         // Check authorisation. Must be administrator, or the eperson.
         if (authorizeService.isAdmin(context)
                 || ((context.getCurrentUser() != null) && (context
@@ -96,13 +91,12 @@ public class SubscribeServiceImpl implements SubscribeService {
             } else {
                 subscriptionDAO.deleteByDSOAndEPerson(context, dSpaceObject, eperson);
 
-                log.info(LogManager.getHeader(context, "unsubscribe",
-                        "eperson_id=" + eperson.getID() + ",collection_id="
-                                + dSpaceObject.getID()));
+                log.info(LogHelper.getHeader(context, "unsubscribe",
+                                              "eperson_id=" + eperson.getID() + ",collection_id="
+                                                  + dSpaceObject.getID()));
             }
         } else {
-            throw new AuthorizeException(
-                    "Only admin or e-person themselves can unsubscribe");
+            throw new AuthorizeException("Only admin or e-person themselves can unsubscribe");
         }
     }
 
@@ -113,33 +107,26 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> getSubscriptionsByEPersonAndDso(Context context,
-                                                              EPerson eperson, DSpaceObject dSpaceObject,
-                                                              Integer limit, Integer offset)
-            throws SQLException {
+    public List<Subscription> getSubscriptionsByEPersonAndDso(Context context,EPerson eperson,DSpaceObject dSpaceObject,
+                                                              Integer limit, Integer offset) throws SQLException {
         return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject, limit, offset);
     }
 
     @Override
-    public List<Collection> getAvailableSubscriptions(Context context)
-            throws SQLException {
+    public List<Collection> getAvailableSubscriptions(Context context) throws SQLException {
         return getAvailableSubscriptions(context, null);
     }
 
     @Override
-    public List<Collection> getAvailableSubscriptions(Context context, EPerson eperson)
-            throws SQLException {
-        List<Collection> collections;
-        if (eperson != null) {
+    public List<Collection> getAvailableSubscriptions(Context context, EPerson eperson) throws SQLException {
+        if (Objects.nonNull(eperson)) {
             context.setCurrentUser(eperson);
         }
-        collections = collectionService.findAuthorized(context, null, Constants.ADD);
-        return collections;
+        return collectionService.findAuthorized(context, null, Constants.ADD);
     }
 
     @Override
-    public boolean isSubscribed(Context context, EPerson eperson,
-                                DSpaceObject dSpaceObject) throws SQLException {
+    public boolean isSubscribed(Context context, EPerson eperson, DSpaceObject dSpaceObject) throws SQLException {
         return subscriptionDAO.findByEPersonAndDso(context, eperson, dSpaceObject, -1, -1) != null;
     }
 
@@ -158,7 +145,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         Subscription subscription = subscriptionDAO.findByID(context, Subscription.class, id);
         if (context.getCurrentUser().equals(subscription.getePerson()) ||
                 authorizeService.isAdmin(context, context.getCurrentUser())) {
-            return  subscription;
+            return subscription;
         }
         throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
     }
@@ -187,7 +174,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public Subscription addSubscriptionParameter(Context context, Integer id,
-                      SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+                   SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser())
@@ -202,7 +189,7 @@ public class SubscribeServiceImpl implements SubscribeService {
 
     @Override
     public Subscription removeSubscriptionParameter(Context context, Integer id,
-                          SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
+                       SubscriptionParameter subscriptionParameter) throws SQLException, AuthorizeException {
         // must be admin or the subscriber of the subscription
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         if (authorizeService.isAdmin(context, context.getCurrentUser())
@@ -228,13 +215,34 @@ public class SubscribeServiceImpl implements SubscribeService {
                 } catch (SQLException sqlException) {
                     throw new SQLException(sqlException);
                 }
-
             } else {
                 throw new AuthorizeException("Only admin or e-person themselves can delete the subscription");
             }
         } else {
-            throw new IllegalArgumentException("Subscription with id" + id + "is not found");
+            throw new IllegalArgumentException("Subscription with id " + id + " is not found");
         }
-
     }
+
+    @Override
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                                     String type, String frequencyValue) throws SQLException {
+        return subscriptionDAO.findAllSubscriptionsByTypeAndFrequency(context, type, frequencyValue);
+    }
+
+    @Override
+    public Long countAll(Context context) throws SQLException {
+        return subscriptionDAO.countAll(context);
+    }
+
+    @Override
+    public Long countAllByEPerson(Context context, EPerson ePerson) throws SQLException {
+        return subscriptionDAO.countAllByEPerson(context, ePerson);
+    }
+
+    @Override
+    public Long countAllByEPersonAndDSO(Context context, EPerson ePerson, DSpaceObject dSpaceObject)
+            throws SQLException {
+        return subscriptionDAO.countAllByEPersonAndDso(context, ePerson, dSpaceObject);
+    }
+
 }

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,7 +16,9 @@ import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
 import org.hibernate.proxy.HibernateProxy;
@@ -29,31 +32,33 @@ import org.springframework.stereotype.Component;
  * Link repository for "dataSpaceObject" of subscription
  */
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.DSPACE_OBJECT)
-@Transactional
 public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired
-    SubscribeService subscribeService;
-
+    private SubscribeService subscribeService;
 
     public DSpaceObjectRest getDSpaceObject(@Nullable HttpServletRequest request,
-                                            Integer subscriptionId,
                                             @Nullable Pageable optionalPageable,
-                                            Projection projection) throws AuthorizeException {
+                                            Integer subscriptionId, Projection projection) throws AuthorizeException {
         try {
-            Context context = obtainContext();
-            Subscription subscription = subscribeService.findById(context, subscriptionId);
-            if (subscription == null) {
+            Subscription subscription = subscribeService.findById(obtainContext(), subscriptionId);
+            if (Objects.isNull(subscription)) {
                 throw new ResourceNotFoundException("No such subscription: " + subscriptionId);
             }
-            HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
-            LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-
-            return converter.toRest(initializer.getImplementation(), projection);
+            if (subscription.getdSpaceObject() instanceof Item ||
+                subscription.getdSpaceObject() instanceof Community ||
+                subscription.getdSpaceObject() instanceof Collection) {
+                return converter.toRest(subscription.getdSpaceObject(), projection);
+            } else {
+                HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
+                LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+                return converter.toRest(initializer.getImplementation(), projection);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (AuthorizeException e) {
             throw new AuthorizeException(e.getMessage());
         }
     }
+
 }

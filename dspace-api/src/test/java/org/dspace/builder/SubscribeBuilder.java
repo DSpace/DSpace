@@ -7,6 +7,9 @@
  */
 package org.dspace.builder;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -17,9 +20,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscribeService;
-
-import java.sql.SQLException;
-import java.util.List;
 
 public class SubscribeBuilder extends AbstractBuilder<Subscription, SubscribeService> {
 
@@ -80,16 +80,17 @@ public class SubscribeBuilder extends AbstractBuilder<Subscription, SubscribeSer
             }
             c.complete();
         }
-
         indexingService.commit();
     }
 
-    public static SubscribeBuilder subscribeBuilder(final Context context, String type, DSpaceObject dSpaceObject, EPerson ePerson, List<SubscriptionParameter> subscriptionParameterList) {
+    public static SubscribeBuilder subscribeBuilder(final Context context, String type, DSpaceObject dSpaceObject,
+            EPerson ePerson, List<SubscriptionParameter> subscriptionParameterList) {
         SubscribeBuilder builder = new SubscribeBuilder(context);
         return builder.create(context, type, dSpaceObject, ePerson, subscriptionParameterList);
     }
 
-    private SubscribeBuilder create(Context context, String type, DSpaceObject dSpaceObject, EPerson ePerson, List<SubscriptionParameter> subscriptionParameterList) {
+    private SubscribeBuilder create(Context context, String type, DSpaceObject dSpaceObject, EPerson ePerson,
+            List<SubscriptionParameter> subscriptionParameterList) {
         try {
 
             this.context = context;
@@ -101,4 +102,5 @@ public class SubscribeBuilder extends AbstractBuilder<Subscription, SubscribeSer
         }
         return this;
     }
+
 }

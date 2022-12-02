@@ -13,12 +13,15 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
-@LinksRest(links = {@LinkRest(name = SubscriptionRest.DSPACE_OBJECT,
+@LinksRest(links = { @LinkRest(name = SubscriptionRest.DSPACE_OBJECT,
         method = "getDSpaceObject"), @LinkRest(
         name = SubscriptionRest.EPERSON,
         method = "getEPerson")
 })
 public class SubscriptionRest extends BaseObjectRest<Integer> {
+
+    private static final long serialVersionUID = 1L;
+
     public static final String NAME = "subscription";
     public static final String NAME_PLURAL = "subscriptions";
     public static final String CATEGORY = "core";
@@ -27,7 +30,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
 
     private Integer id;
     private String type;
-    private List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+    private List<SubscriptionParameterRest> subscriptionParameterList = new ArrayList<>();
 
     @Override
     public String getCategory() {
@@ -35,7 +38,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     }
 
     @Override
-    public Class getController() {
+    public Class<RestResourceController> getController() {
         return RestResourceController.class;
     }
 
@@ -48,11 +51,11 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
         this.type = type;
     }
 
-    public List<SubscriptionParameter> getSubscriptionParameterList() {
+    public List<SubscriptionParameterRest> getSubscriptionParameterList() {
         return subscriptionParameterList;
     }
 
-    public void setSubscriptionParameterList(List<SubscriptionParameter> subscriptionParameterList) {
+    public void setSubscriptionParameterList(List<SubscriptionParameterRest> subscriptionParameterList) {
         this.subscriptionParameterList = subscriptionParameterList;
     }
 
@@ -69,4 +72,5 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     public void setId(Integer id) {
         this.id = id;
     }
+
 }

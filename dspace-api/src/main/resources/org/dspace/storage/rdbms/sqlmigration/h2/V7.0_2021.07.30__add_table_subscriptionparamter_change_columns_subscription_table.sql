@@ -20,7 +20,7 @@ CREATE TABLE  subscription_parameter
 (
   subscription_parameter_id  INTEGER NOT NULL,
   name    CHARACTER VARYING(255),
-  value  CHARACTER VARYING(255),
+  `value`  CHARACTER VARYING(255),
   subscription_id     INTEGER  NOT NULL,
   CONSTRAINT subscription_parameter_pkey PRIMARY KEY (subscription_parameter_id),
   CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id) ON DELETE CASCADE

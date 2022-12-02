@@ -30,6 +30,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -71,7 +72,8 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private SupervisedItemService supervisedItemService;
     @Autowired(required = true)
     private SiteService siteService;
-
+    @Autowired(required = true)
+    private SubscribeService subscribeService;
     @Autowired(required = true)
     private RelationshipService relationshipService;
     @Autowired(required = true)
@@ -156,6 +158,11 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public SiteService getSiteService() {
         return siteService;
+    }
+
+    @Override
+    public SubscribeService getSubscribeService() {
+        return subscribeService ;
     }
 
     @Override

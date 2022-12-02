@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.eperson.Subscription;
+import org.dspace.eperson.SubscriptionParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,16 +27,24 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SubscriptionConverter implements DSpaceConverter<Subscription, SubscriptionRest> {
+
     @Autowired
     protected Utils utils;
-    @Autowired
-    private ConverterService converter;
 
     @Override
     public SubscriptionRest convert(Subscription subscription, Projection projection) {
         SubscriptionRest rest = new SubscriptionRest();
+        rest.setProjection(projection);
         rest.setId(subscription.getID());
-        rest.setSubscriptionParameterList(subscription.getSubscriptionParameterList());
+        List<SubscriptionParameterRest> subscriptionParameterRestList = new ArrayList<>();
+        for (SubscriptionParameter subscriptionParameter : subscription.getSubscriptionParameterList()) {
+            SubscriptionParameterRest subscriptionParameterRest = new SubscriptionParameterRest();
+            subscriptionParameterRest.setName(subscriptionParameter.getName());
+            subscriptionParameterRest.setValue(subscriptionParameter.getValue());
+            subscriptionParameterRest.setId(subscriptionParameter.getId());
+            subscriptionParameterRestList.add(subscriptionParameterRest);
+        }
+        rest.setSubscriptionParameterList(subscriptionParameterRestList);
         rest.setType(subscription.getType());
         return rest;
     }

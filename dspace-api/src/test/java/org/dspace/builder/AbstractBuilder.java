@@ -42,6 +42,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -102,6 +103,7 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
+    static SubscribeService subscribeService;
 
     protected Context context;
 
@@ -161,6 +163,7 @@ public abstract class AbstractBuilder<T, S> {
         orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
         orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
+        subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
     }
 
 
@@ -194,7 +197,7 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = null;
         versioningService = null;
         orcidTokenService = null;
-
+        subscribeService = null;
     }
 
     public static void cleanupObjects() throws Exception {

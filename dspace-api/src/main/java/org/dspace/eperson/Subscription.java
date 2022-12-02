@@ -26,8 +26,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
-
-
 /**
  * Database entity representation of the subscription table
  *
@@ -61,9 +59,7 @@ public class Subscription implements ReloadableEntity<Integer> {
      * Protected constructor, create object using:
      * {@link org.dspace.eperson.service.SubscribeService#subscribe(Context, EPerson, DSpaceObject, List, String)}
      */
-    protected Subscription() {
-
-    }
+    protected Subscription() {}
 
     @Override
     public Integer getID() {

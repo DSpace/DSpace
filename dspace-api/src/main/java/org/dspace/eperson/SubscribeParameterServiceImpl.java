@@ -10,13 +10,11 @@ package org.dspace.eperson;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.dao.SubscriptionParameterDAO;
 import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 /**
  * Class implemennting method for service layer of SubscriptionParameter entity
@@ -24,18 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Alba Aliu at atis.al
  */
 public class SubscribeParameterServiceImpl implements SubscriptionParameterService {
-    /**
-     * log4j logger
-     */
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(SubscribeParameterServiceImpl.class);
 
     @Autowired(required = true)
     protected SubscriptionParameterDAO subscriptionParameterDAO;
 
-
-    protected SubscribeParameterServiceImpl() {
-
-    }
+    protected SubscribeParameterServiceImpl() {}
 
     @Override
     public List<SubscriptionParameter> findAll(Context context) throws SQLException {
@@ -82,4 +73,5 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
         }
 
     }
+
 }

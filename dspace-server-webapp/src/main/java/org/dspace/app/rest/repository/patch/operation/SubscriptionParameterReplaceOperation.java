@@ -16,10 +16,8 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Subscription;
-import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.SubscriptionParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +36,6 @@ public class SubscriptionParameterReplaceOperation extends PatchOperation<Subscr
     @Autowired
     private SubscriptionParameterService subscriptionParameterService;
 
-
     @Override
     public Subscription perform(Context context, Subscription subscription, Operation operation)
             throws SQLException {
@@ -55,14 +52,8 @@ public class SubscriptionParameterReplaceOperation extends PatchOperation<Subscr
                 }
                 SubscriptionParameterRest subscriptionParameterRest = objectMapper.readValue(
                         value.toString(), SubscriptionParameterRest.class);
-                try {
-                    SubscriptionParameter subscriptionParameter = subscriptionParameterService.edit(context,
-                            subscriptionParameterId, subscriptionParameterRest.getValue(),
-                            subscriptionParameterRest.getName(),
-                            subscription);
-                } catch (SQLException | AuthorizeException exception) {
-                    throw new RuntimeException(exception);
-                }
+                subscriptionParameterService.edit(context, subscriptionParameterId,subscriptionParameterRest.getValue(),
+                                                  subscriptionParameterRest.getName(), subscription);
             } catch (UnprocessableEntityException e) {
                 throw new UnprocessableEntityException(e.getMessage(), e);
             } catch (Exception e) {
@@ -76,19 +67,17 @@ public class SubscriptionParameterReplaceOperation extends PatchOperation<Subscr
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        return (objectToMatch instanceof Subscription
-                && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE));
+        return (objectToMatch instanceof Subscription && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE));
     }
 
     /**
      * Checks whether the subscription
-     *
-     * @param subscription Object on which patch is being done
      */
+    @SuppressWarnings("ReturnValueIgnored")
     private void checkModelForExistingValue(Subscription subscription, Integer id) {
         subscription.getSubscriptionParameterList().stream().filter(subscriptionParameter -> {
             return subscriptionParameter.getId().equals(id);
         }).findFirst().orElseThrow();
-
     }
+
 }

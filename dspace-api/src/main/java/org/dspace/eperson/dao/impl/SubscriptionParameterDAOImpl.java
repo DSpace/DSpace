@@ -18,9 +18,11 @@ import org.dspace.eperson.dao.SubscriptionParameterDAO;
  *
  * @author Alba Aliu at atis.al
  */
-public class SubscriptionParameterDAOImpl extends AbstractHibernateDAO
-        <SubscriptionParameter> implements SubscriptionParameterDAO {
+public class SubscriptionParameterDAOImpl extends AbstractHibernateDAO<SubscriptionParameter>
+        implements SubscriptionParameterDAO {
+
     protected SubscriptionParameterDAOImpl() {
         super();
     }
+
 }

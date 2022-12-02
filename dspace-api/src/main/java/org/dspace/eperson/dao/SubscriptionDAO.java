@@ -28,11 +28,10 @@ public interface SubscriptionDAO extends GenericDAO<Subscription> {
 
     public void deleteByDspaceObject(Context context, DSpaceObject dSpaceObject) throws SQLException;
 
-    public List<Subscription> findByEPerson(Context context,
-                                            EPerson eperson, Integer limit, Integer offset) throws SQLException;
+    public List<Subscription> findByEPerson(Context context, EPerson eperson, Integer limit, Integer offset)
+            throws SQLException;
 
-    public List<Subscription> findByEPersonAndDso(Context context,
-                                                  EPerson eperson, DSpaceObject dSpaceObject,
+    public List<Subscription> findByEPersonAndDso(Context context,EPerson eperson, DSpaceObject dSpaceObject,
                                                   Integer limit, Integer offset) throws SQLException;
 
     public void deleteByEPerson(Context context, EPerson eperson) throws SQLException;
@@ -41,7 +40,17 @@ public interface SubscriptionDAO extends GenericDAO<Subscription> {
             throws SQLException;
 
     public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
-                                                      Integer limit, Integer offset) throws SQLException;
+                                                                Integer limit, Integer offset) throws SQLException;
 
-    public List<Subscription> findAllOrderedById(Context context, Integer limit, Integer offset) throws SQLException;
+    public List<Subscription> findAllOrderedByDSO(Context context, Integer limit, Integer offset) throws SQLException;
+
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type,String frequencyValue)
+            throws SQLException;
+
+    public Long countAll(Context context) throws SQLException;
+
+    public Long countAllByEPerson(Context context, EPerson ePerson) throws SQLException;
+
+    public Long countAllByEPersonAndDso(Context context, EPerson ePerson,DSpaceObject dSpaceObject) throws SQLException;
+
 }

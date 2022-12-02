@@ -9,10 +9,12 @@ package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.DSpaceObject;
@@ -20,6 +22,8 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
+import org.dspace.eperson.SubscriptionParameter;
+import org.dspace.eperson.SubscriptionParameter_;
 import org.dspace.eperson.Subscription_;
 import org.dspace.eperson.dao.SubscriptionDAO;
 
@@ -31,6 +35,7 @@ import org.dspace.eperson.dao.SubscriptionDAO;
  * @author kevinvandevelde at atmire.com
  */
 public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> implements SubscriptionDAO {
+
     protected SubscriptionDAOImpl() {
         super();
     }
@@ -44,10 +49,9 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         criteriaQuery.select(subscriptionRoot);
         criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.dSpaceObject)));
         criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
-
     }
 
     @Override
@@ -59,14 +63,12 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
                 getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
-        criteriaQuery.where(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.ePerson), eperson));
-
         criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(
-                        subscriptionRoot.get(Subscription_.ePerson), eperson),
+                            subscriptionRoot.get(Subscription_.ePerson), eperson),
                 criteriaBuilder.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)
         ));
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.dSpaceObject)));
         criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
@@ -100,7 +102,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
 
     @Override
     public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
-                                                      Integer limit, Integer offset) throws SQLException {
+                                                                Integer limit, Integer offset) throws SQLException {
         String hqlQuery = "select s from Subscription s join %s dso " +
                 "ON dso.id = s.dSpaceObject ORDER BY subscription_id";
         if (resourceType != null) {
@@ -116,15 +118,69 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
         query.setHint("org.hibernate.cacheable", false);
         return query.getResultList();
     }
+
     @Override
-    public List<Subscription> findAllOrderedById(Context context, Integer limit, Integer offset) throws SQLException {
+    public List<Subscription> findAllOrderedByDSO(Context context, Integer limit, Integer offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
         List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.dSpaceObject)));
         criteriaQuery.orderBy(orderList);
         return list(context, criteriaQuery, false, Subscription.class, limit, offset);
     }
+
+    @Override
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
+                        String type, String frequencyValue) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
+        Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
+        criteriaQuery.select(subscriptionRoot);
+        Join<Subscription, SubscriptionParameter> childJoin = subscriptionRoot.join("subscriptionParameterList");
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.TYPE), type),
+                criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.name), "frequency"),
+                criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.value), frequencyValue)
+                ));
+        List<javax.persistence.criteria.Order> orderList = new ArrayList<>(1);
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.ePerson)));
+        orderList.add(criteriaBuilder.asc(subscriptionRoot.get(Subscription_.id)));
+        criteriaQuery.orderBy(orderList);
+        return list(context, criteriaQuery, false, Subscription.class, 10000, -1);
+    }
+
+    @Override
+    public Long countAll(Context context) throws SQLException {
+        CriteriaBuilder qb = getCriteriaBuilder(context);
+        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+        cq.select(qb.count(cq.from(Subscription.class)));
+        Query query = this.getHibernateSession(context).createQuery(cq);
+        return (Long) query.getSingleResult();
+    }
+
+    @Override
+    public Long countAllByEPerson(Context context, EPerson ePerson) throws SQLException {
+        CriteriaBuilder qb = getCriteriaBuilder(context);
+        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+        Root<Subscription> subscriptionRoot = cq.from(Subscription.class);
+        cq.select(qb.count(subscriptionRoot));
+        cq.where(qb.equal(subscriptionRoot.get(Subscription_.ePerson), ePerson));
+        Query query = this.getHibernateSession(context).createQuery(cq);
+        return (Long) query.getSingleResult();
+    }
+
+    @Override
+    public Long countAllByEPersonAndDso(Context context,
+          EPerson ePerson, DSpaceObject dSpaceObject) throws SQLException {
+        CriteriaBuilder qb = getCriteriaBuilder(context);
+        CriteriaQuery<Long> cq = qb.createQuery(Long.class);
+        Root<Subscription> subscriptionRoot = cq.from(Subscription.class);
+        cq.select(qb.count(subscriptionRoot));
+        cq.where(qb.and(qb.equal(subscriptionRoot.get(Subscription_.ePerson)
+                , ePerson), qb.equal(subscriptionRoot.get(Subscription_.dSpaceObject), dSpaceObject)));
+        Query query = this.getHibernateSession(context).createQuery(cq);
+        return (Long) query.getSingleResult();
+    }
+
 }
