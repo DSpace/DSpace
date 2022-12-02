@@ -34,7 +34,7 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   }
 
   @Override
-  public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException {
+  public List<EtdUnit> findByCollection(Context context, Collection collection) throws SQLException {
     Query query = createQuery(context,
         "from EtdUnit where (from Collection c where c.uuid = :collection_uuid) in elements(collection)");
     query.setParameter("collection_uuid", collection.getID());
@@ -56,10 +56,12 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   }
 
   @Override
-  public List<EtdUnit> searchByName(Context context, String nameQuery, int offset, int limit) throws SQLException {
+  public List<EtdUnit> findByNameLike(final Context context, final String etdunitName, final int offset,
+      final int limit)
+      throws SQLException {
     Query query = createQuery(context,
         "SELECT eu FROM EtdUnit eu WHERE lower(eu.name) LIKE lower(:name)");
-    query.setParameter("name", "%" + StringUtils.trimToEmpty(nameQuery) + "%");
+    query.setParameter("name", "%" + StringUtils.trimToEmpty(etdunitName) + "%");
 
     if (0 <= offset) {
       query.setFirstResult(offset);
@@ -72,16 +74,16 @@ public class EtdUnitDAOImpl extends AbstractHibernateDSODAO<EtdUnit> implements 
   }
 
   @Override
-  public int searchByNameResultCount(Context context, String nameQuery) throws SQLException {
+  public int countByNameLike(final Context context, final String etdunitName) throws SQLException {
     Query query = createQuery(context,
         "SELECT count(*) FROM EtdUnit eu WHERE lower(eu.name) LIKE lower(:name)");
-    query.setParameter("name", "%" + nameQuery + "%");
+    query.setParameter("name", "%" + etdunitName + "%");
 
     return count(query);
   }
 
   @Override
-  public List<EtdUnit> findAllSortedByName(Context context) throws SQLException {
+  public List<EtdUnit> findAll(Context context, int pageSize, int offset) throws SQLException {
     Query query = createQuery(context,
         "SELECT eu FROM EtdUnit eu ORDER BY eu.name ASC");
     query.setHint("org.hibernate.cacheable", Boolean.TRUE);

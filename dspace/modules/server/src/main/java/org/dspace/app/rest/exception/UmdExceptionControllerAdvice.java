@@ -44,6 +44,7 @@ public class UmdExceptionControllerAdvice extends ResponseEntityExceptionHandler
      */
     @ExceptionHandler({
         UnitNameNotProvidedException.class,
+        EtdUnitNameNotProvidedException.class,
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {

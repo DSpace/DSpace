@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.EtdUnitRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.UnitRest;
@@ -135,7 +136,8 @@ public class DeleteFeature implements AuthorizationFeature {
             WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME,
             EPersonRest.CATEGORY + "." + EPersonRest.NAME,
             GroupRest.CATEGORY + "." + GroupRest.NAME,
-            UnitRest.CATEGORY + "." + UnitRest.NAME
+            UnitRest.CATEGORY + "." + UnitRest.NAME,
+            EtdUnitRest.CATEGORY + "." + EtdUnitRest.NAME
         };
     }
 }

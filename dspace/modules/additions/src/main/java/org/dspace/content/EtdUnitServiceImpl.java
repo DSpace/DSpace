@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.event.Event;
+import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> implements EtdUnitService {
 
     /** log4j category */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdUnitServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdUnitServiceImpl.class);
 
     @Autowired(required = true)
     protected EtdUnitDAO etdunitDAO;
@@ -54,14 +56,17 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
         EtdUnit newEtdunit = etdunitDAO.create(context, new EtdUnit());
 
-        etdunitDAO.save(context, newEtdunit);
-
         context.addEvent(new Event(Event.CREATE, Constants.ETDUNIT, newEtdunit.getID(), newEtdunit.getName()));
 
         log.info(LogHelper.getHeader(context, "create_etdunit",
                 "etdunit_id=" + newEtdunit.getID()));
 
         return newEtdunit;
+    }
+
+    @Override
+    public void setName(EtdUnit etdunit, String name) throws SQLException {
+        etdunit.setName(name);
     }
 
     @Override
@@ -75,13 +80,13 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
     }
 
     @Override
-    public List<EtdUnit> findAll(Context context) throws SQLException {
-        return etdunitDAO.findAllSortedByName(context);
+    public List<EtdUnit> findAll(Context context, int pageSize, int offset) throws SQLException {
+        return etdunitDAO.findAll(context, pageSize, offset);
     }
 
     @Override
     public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException {
-        return etdunitDAO.findAllByCollection(context, collection);
+        return etdunitDAO.findByCollection(context, collection);
     }
 
     @Override
@@ -91,12 +96,35 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
 
     @Override
     public List<EtdUnit> search(Context context, String query, int offset, int limit) throws SQLException {
-        return etdunitDAO.searchByName(context, query, offset, limit);
+        List<EtdUnit> etdunits = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by unit name
+            etdunits = etdunitDAO.findByNameLike(context, query, offset, limit);
+        } else {
+            // Search by unit id
+            EtdUnit etdunit = find(context, uuid);
+            if (etdunit != null) {
+                etdunits.add(etdunit);
+            }
+        }
+        return etdunits;
     }
 
     @Override
     public int searchResultCount(Context context, String query) throws SQLException {
-        return etdunitDAO.searchByNameResultCount(context, query);
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by unit name
+            return etdunitDAO.countByNameLike(context, query);
+        } else {
+            // Search by unit id
+            EtdUnit etdunit = find(context, uuid);
+            if (etdunit != null) {
+                return 1;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -104,12 +132,13 @@ public class EtdUnitServiceImpl extends DSpaceObjectServiceImpl<EtdUnit> impleme
         // Authorize
         canEdit(context);
 
-        log.info(LogHelper.getHeader(context, "update_etdunit",
-                "etdunit_id=" + etdunit.getID()));
-
         super.update(context, etdunit);
 
         etdunitDAO.save(context, etdunit);
+
+        log.info(LogHelper.getHeader(context, "update_etdunit",
+                "etdunit_id=" + etdunit.getID()));
+
         if (etdunit.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.ETDUNIT, etdunit.getID(), etdunit.getName()));
             etdunit.clearModified();
