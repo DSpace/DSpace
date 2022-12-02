@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -70,7 +69,9 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     private Collection profileCollection;
 
     @Before
-    public void setup() {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
 
         context.turnOffAuthorisationSystem();
 
@@ -84,12 +85,15 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @After
-    public void after() throws SQLException, AuthorizeException {
+    @Override
+    public void destroy() throws Exception {
         List<OrcidQueue> records = orcidQueueService.findAll(context);
         for (OrcidQueue record : records) {
             orcidQueueService.delete(context, record);
         }
         context.setDispatcher(null);
+
+        super.destroy();
     }
 
     @Test
