@@ -1,0 +1,48 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main", "dspace-1_4_x", "dspace-1_5_x", "dspace-1_6_x", "dspace-1_7_x", "dspace-1_8_x", "dspace-3_x", "dspace-4_x", "dspace-5_x", "dspace-6_x" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: "37 0 * * 1"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ java, javascript ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        if: ${{ matrix.language == 'java' }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
