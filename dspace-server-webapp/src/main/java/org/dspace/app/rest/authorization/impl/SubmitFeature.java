@@ -13,6 +13,7 @@ import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -40,7 +41,7 @@ public class SubmitFeature implements AuthorizationFeature {
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException {
-        if (object == null) {
+        if (object instanceof SiteRest) {
             // Check whether the user has permission to add to any collection
             return collectionService.countCollectionsWithSubmit("", context, null) > 0;
         } else if (object instanceof CollectionRest) {
@@ -53,6 +54,9 @@ public class SubmitFeature implements AuthorizationFeature {
 
     @Override
     public String[] getSupportedTypes() {
-        return new String[0];
+        return new String[] {
+            CollectionRest.CATEGORY + "." + CollectionRest.NAME,
+            SiteRest.CATEGORY + "." + SiteRest.NAME
+        };
     }
 }
