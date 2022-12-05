@@ -198,7 +198,7 @@ public class SubmitFeatureIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testDirectEPersonWritePolicyOnCollection() throws Exception {
+    public void testDirectEPersonAddPolicyOnCollection() throws Exception {
         ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
                 .withUser(eperson)
                 .withDspaceObject(collectionA1)
@@ -209,7 +209,7 @@ public class SubmitFeatureIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void testDirectGroupWritePolicyOnCollection() throws Exception {
+    public void testDirectGroupAddPolicyOnCollection() throws Exception {
         ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
             .withGroup(group)
             .withDspaceObject(collectionA1)
