@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @AuthorizationFeatureDocumentation(name = EditItemFeature.NAME,
     description = "It can be used to verify if a user has rights to edit any item.")
 public class EditItemFeature implements AuthorizationFeature {
-    public static final String NAME = "canEdit";
+    public static final String NAME = "canEditItem";
     @Autowired
     AuthorizeService authService;
     @Autowired
