@@ -5,7 +5,7 @@ DSpace is a community built and supported project. We do not have a centralized 
 * [Contribute new code via a Pull Request](#contribute-new-code-via-a-pull-request)
 * [Contribute documentation](#contribute-documentation)
 * [Help others on mailing lists or Slack](#help-others-on-mailing-lists-or-slack)
-* [Join a working or interest group](#join-a-working-or-interest group)
+* [Join a working or interest group](#join-a-working-or-interest-group)
 
 ## Contribute new code via a Pull Request
 
@@ -17,9 +17,9 @@ Code Contribution Checklist
 - [ ] PRs **must** pass Checkstyle validation based on our [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide).
 - [ ] PRs **must** include Javadoc for _all new/modified public methods and classes_. Larger private methods should also have Javadoc
 - [ ] PRs **must** pass all automated tests and include new/updated Unit or Integration tests based on our [Code Testing Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Testing+Guide).
+- [ ] If a PR includes new libraries/dependencies (in any `pom.xml`), then their software licenses **must** align with the [DSpace BSD License](https://github.com/DSpace/DSpace/blob/main/LICENSE) based on the [Licensing of Contributions](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-LicensingofContributions) documentation.
 - [ ] Basic technical documentation _should_ be provided for any new features or changes to the REST API. REST API changes should be documented in our [Rest Contract](https://github.com/DSpace/RestContract).
-- [ ] If a PR includes new dependencies (in any `pom.xml`), then their software licenses **must** align with the [DSpace BSD License](https://github.com/DSpace/DSpace/blob/main/LICENSE) based on the [Licensing of Contributions](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-LicensingofContributions) documentation.
-- [ ] If your PR fixes an issue ticket, please [link them together](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).
+- [ ] If a PR fixes an issue ticket, please [link them together](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).
 
 Additional details on the code contribution process can be found in our [Code Contribution Guidelines](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines)
 
