@@ -41,7 +41,7 @@ public class SubscriptionConverter implements DSpaceConverter<Subscription, Subs
             SubscriptionParameterRest subscriptionParameterRest = new SubscriptionParameterRest();
             subscriptionParameterRest.setName(subscriptionParameter.getName());
             subscriptionParameterRest.setValue(subscriptionParameter.getValue());
-            subscriptionParameterRest.setId(subscriptionParameter.getId());
+            subscriptionParameterRest.setId(subscriptionParameter.getID());
             subscriptionParameterRestList.add(subscriptionParameterRest);
         }
         rest.setSubscriptionParameterList(subscriptionParameterRestList);

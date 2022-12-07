@@ -9,8 +9,8 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.dao.SubscriptionParameterDAO;
 import org.dspace.eperson.service.SubscriptionParameterService;
@@ -34,8 +34,8 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
     }
 
     @Override
-    public SubscriptionParameter add(Context context, String name, String value,
-                         Subscription subscription) throws SQLException, AuthorizeException {
+    public SubscriptionParameter add(Context context, String name, String value, Subscription subscription)
+            throws SQLException {
         SubscriptionParameter subscriptionParameter =
                 subscriptionParameterDAO.create(context, new SubscriptionParameter());
         subscriptionParameter.setName(name);
@@ -43,12 +43,12 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
         subscriptionParameter.setValue(value);
         return subscriptionParameter;
     }
+
     @Override
-    public SubscriptionParameter edit(Context context,Integer id,String value,
-                                      String name, Subscription subscription) throws SQLException, AuthorizeException {
+    public SubscriptionParameter edit(Context context, Integer id, String value, String name, Subscription subscription)
+            throws SQLException {
         SubscriptionParameter subscriptionParameter =
-                subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
-        subscriptionParameter.setId(id);
+                    subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
         subscriptionParameter.setName(name);
         subscriptionParameter.setSubscription(subscription);
         subscriptionParameter.setValue(value);
@@ -62,16 +62,15 @@ public class SubscribeParameterServiceImpl implements SubscriptionParameterServi
     }
 
     @Override
-    public void deleteSubscriptionParameter(Context context, Integer id) throws SQLException, AuthorizeException {
+    public void delete(Context context, Integer id) throws SQLException {
         SubscriptionParameter subscriptionParameter =
                 subscriptionParameterDAO.findByID(context, SubscriptionParameter.class, id);
-        if (subscriptionParameter != null) {
+        if (Objects.nonNull(subscriptionParameter)) {
             subscriptionParameter.setSubscription(null);
             subscriptionParameterDAO.delete(context, subscriptionParameter);
         } else {
             throw new SQLException("Subscription parameter with id" + id + "do not exists");
         }
-
     }
 
 }

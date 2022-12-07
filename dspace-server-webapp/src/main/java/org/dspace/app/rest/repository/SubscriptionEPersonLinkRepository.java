@@ -43,8 +43,6 @@ public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestReposit
             return converter.toRest(subscription.getePerson(),  projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (AuthorizeException e) {
-            throw new AuthorizeException(e.getMessage());
         }
     }
 

@@ -56,8 +56,6 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (AuthorizeException e) {
-            throw new AuthorizeException(e.getMessage());
         }
     }
 

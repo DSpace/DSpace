@@ -119,7 +119,6 @@ public abstract class ContentServiceFactory {
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(T dso) {
         // No need to worry when supressing, as long as our "getDSpaceObjectManager" method is properly implemented
         // no casting issues should occur
-        @SuppressWarnings("unchecked")
         DSpaceObjectService<T> manager = getDSpaceObjectService(dso.getType());
         return manager;
     }

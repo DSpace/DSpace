@@ -5,19 +5,20 @@
  *
  * http://www.dspace.org/license/
  */
-
 package org.dspace.app.rest.model;
-
 
 import org.dspace.eperson.Subscription;
 
+/**
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public class SubscriptionParameterRest {
+
     private Integer id;
     private String name;
     private String value;
 
-    public SubscriptionParameterRest() {
-    }
+    public SubscriptionParameterRest() {}
 
     public SubscriptionParameterRest(Integer id, String name, String value, Subscription subscription) {
         this.id = id;

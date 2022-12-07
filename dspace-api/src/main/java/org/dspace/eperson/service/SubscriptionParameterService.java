@@ -44,9 +44,8 @@ public interface SubscriptionParameterService {
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public SubscriptionParameter add(Context context, String value,
-                                  String name,
-                                  Subscription subscription) throws SQLException, AuthorizeException;
+    public SubscriptionParameter add(Context context, String value, String name, Subscription subscription)
+            throws SQLException;
 
     /**
      * Updates a  subscription parameter with id
@@ -60,9 +59,8 @@ public interface SubscriptionParameterService {
      * @throws AuthorizeException Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
      */
-    public SubscriptionParameter edit(Context context, Integer id, String value,
-                                     String name,
-                                     Subscription subscription) throws SQLException, AuthorizeException;
+    public SubscriptionParameter edit(Context context, Integer id, String value, String name, Subscription subscription)
+            throws SQLException;
 
     /**
      * Finds a subscriptionParameter by id
@@ -73,14 +71,12 @@ public interface SubscriptionParameterService {
      */
     public SubscriptionParameter findById(Context context, int id) throws SQLException;
 
-
     /**
      * Deletes a subscriptionParameter with id
      *
      * @param context DSpace context
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public void deleteSubscriptionParameter(Context context, Integer id) throws SQLException, AuthorizeException;
-
+    public void delete(Context context, Integer id) throws SQLException;
 
 }

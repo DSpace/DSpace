@@ -41,8 +41,8 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public List<Subscription> findByEPerson(Context context, EPerson eperson,
-                                            Integer limit, Integer offset) throws SQLException {
+    public List<Subscription> findByEPerson(Context context, EPerson eperson, Integer limit, Integer offset)
+            throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         javax.persistence.criteria.CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);

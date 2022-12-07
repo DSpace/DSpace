@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.dspace.app.rest.model.SubscriptionRest.CATEGORY;
+import static org.dspace.app.rest.model.SubscriptionRest.NAME;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,14 +22,14 @@ import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -48,39 +51,32 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository responsible to manage SubscriptionRest object
  *
- * @author Alba Aliu at atis.al
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME)
-public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer>
-        implements LinkRestRepository {
+public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer> {
 
     @Autowired
     private ConverterService converter;
     @Autowired
-    private EPersonService personService;
+    private EPersonService ePersonService;
     @Autowired
     private AuthorizeService authorizeService;
     @Autowired
     private SubscribeService subscribeService;
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
-    @Autowired
-    private ResourcePatch<Subscription> resourcePatch;
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'subscription', 'READ')")
     public SubscriptionRest findOne(Context context, Integer id) {
+        Subscription subscription = null;
         try {
-            Subscription subscription = subscribeService.findById(context, id);
-            if (Objects.isNull(subscription)) {
-                throw new ResourceNotFoundException("The subscription for ID: " + id + " could not be found");
-            }
-            return converter.toRest(subscription, utils.obtainProjection());
-        } catch (SQLException sqlException) {
-            throw new RuntimeException(sqlException.getMessage(), sqlException);
-        } catch (AuthorizeException authorizeException) {
-            throw new RuntimeException(authorizeException.getMessage());
+            subscription = subscribeService.findById(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
+        return Objects.isNull(subscription) ? null : converter.toRest(subscription, utils.obtainProjection());
     }
 
     @Override
@@ -90,91 +86,77 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
             String resourceType = req.getParameter("resourceType");
             List<Subscription> subscriptionList = subscribeService.findAll(context, resourceType,
-                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
+                                                         Math.toIntExact(pageable.getPageSize()),
+                                                         Math.toIntExact(pageable.getOffset()));
             Long total = subscribeService.countAll(context);
             return converter.toRestPage(subscriptionList, pageable, total,  utils.obtainProjection());
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
     @SearchRestMethod(name = "findByEPerson")
-    public Page<SubscriptionRest> findAllSubscriptionsByEPerson(String id, Pageable pageable) throws Exception {
+    @PreAuthorize("hasPermission(#epersonId, 'AdminOrOwner', 'READ')")
+    public Page<SubscriptionRest> findSubscriptionsByEPerson(@Parameter(value = "uuid", required = true) UUID epersonId,
+                                                              Pageable pageable)throws Exception {
+        Long total = null;
+        List<Subscription> subscriptions = null;
         try {
             Context context = obtainContext();
-            EPerson ePerson = personService.findByIdOrLegacyId(context, id);
-            if (context.getCurrentUser().equals(ePerson)
-                    || authorizeService.isAdmin(context, context.getCurrentUser())) {
-                List<Subscription> subscriptionList = subscribeService.getSubscriptionsByEPerson(context,
-                        ePerson, pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
-                Long total = subscribeService.countAllByEPerson(context, ePerson);
-                return converter.toRestPage(subscriptionList, pageable, total, utils.obtainProjection());
-            } else {
-                throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
-            }
-        } catch (SQLException sqlException) {
-            throw new SQLException(sqlException.getMessage(), sqlException);
-
-        } catch (AuthorizeException authorizeException) {
-            throw new AuthorizeException(authorizeException.getMessage());
+            EPerson ePerson = ePersonService.find(context, epersonId);
+            subscriptions = subscribeService.findSubscriptionsByEPerson(context, ePerson,
+                                                 Math.toIntExact(pageable.getPageSize()),
+                                                 Math.toIntExact(pageable.getOffset()));
+            total = subscribeService.countSubscriptionsByEPerson(context, ePerson);
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage(), e);
         }
+        return converter.toRestPage(subscriptions, pageable, total, utils.obtainProjection());
     }
 
-    @PreAuthorize("isAuthenticated()")
     @SearchRestMethod(name = "findByEPersonAndDso")
-    public Page<SubscriptionRest> findByEPersonAndDso(Pageable pageable) throws Exception {
+    @PreAuthorize("hasPermission(#epersonId, 'AdminOrOwner', 'READ')")
+    public Page<SubscriptionRest> findByEPersonAndDso(@Parameter(value = "eperson_id", required = true) UUID epersonId,
+                                                      @Parameter(value = "dspace_object_id",required = true) UUID dsoId,
+                                                       Pageable pageable) throws Exception {
+        Long total = null;
+        List<Subscription> subscriptions = null;
         try {
             Context context = obtainContext();
-            HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-            String epersonId = req.getParameter("eperson_id");
-            String dsoId = req.getParameter("dspace_object_id");
-            DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
-            EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
-            // dso must always be set
-            if (dsoId == null || epersonId == null) {
-                throw new UnprocessableEntityException("error parsing the body");
-            }
-            if (context.getCurrentUser().equals(ePerson)
-                    || authorizeService.isAdmin(context, context.getCurrentUser())) {
-                List<Subscription> subscriptionList =
-                        subscribeService.getSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject,
-                                pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
-                Long total = subscribeService.countAllByEPersonAndDSO(context, ePerson, dSpaceObject);
-                return converter.toRestPage(subscriptionList, pageable, total,
-                        utils.obtainProjection());
-            } else {
-                throw new AuthorizeException("Only admin or e-person themselves can search for it's subscription");
-            }
-        } catch (SQLException sqlException) {
-            throw new SQLException(sqlException.getMessage(), sqlException);
-
-        } catch (AuthorizeException authorizeException) {
-            throw new AuthorizeException(authorizeException.getMessage());
+            DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, dsoId);
+            EPerson ePerson = ePersonService.find(context, epersonId);
+            subscriptions = subscribeService.findSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject,
+                                                                    Math.toIntExact(pageable.getPageSize()),
+                                                                    Math.toIntExact(pageable.getOffset()));
+            total = subscribeService.countByEPersonAndDSO(context, ePerson, dSpaceObject);
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage(), e);
         }
+        return converter.toRestPage(subscriptions, pageable, total, utils.obtainProjection());
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
         String dsoId = req.getParameter("dspace_object_id");
-        // dso must always be set
-        if (dsoId == null || epersonId == null) {
-            throw new UnprocessableEntityException("error parsing the body");
+
+        if (Objects.isNull(dsoId) || Objects.isNull(epersonId)) {
+            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provieded!");
         }
-        ObjectMapper mapper = new ObjectMapper();
+
         try {
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
-            EPerson ePerson = personService.findByIdOrLegacyId(context, epersonId);
-            if (ePerson == null || dSpaceObject == null) {
+            EPerson ePerson = ePersonService.findByIdOrLegacyId(context, epersonId);
+            if (Objects.isNull(ePerson) || Objects.isNull(dSpaceObject)) {
                 throw new BadRequestException("Id of person or dspace object must represents reals ids");
             }
+
             // user must have read permissions to dataspace object
             if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,  Constants.READ, true)) {
                 throw new AuthorizeException("The user has not READ rights on this DSO");
             }
+
             // if user is admin do not make this control,
             // otherwise make this control because normal user can only subscribe with their own ID of user.
             if (!authorizeService.isAdmin(context)) {
@@ -183,7 +165,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 }
             }
             ServletInputStream input = req.getInputStream();
-            SubscriptionRest subscriptionRest = mapper.readValue(input, SubscriptionRest.class);
+            SubscriptionRest subscriptionRest = new ObjectMapper().readValue(input, SubscriptionRest.class);
             Subscription subscription = null;
             List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
             if (subscriptionParameterList != null) {
@@ -212,91 +194,71 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#id, 'subscription', 'WRITE')")
     protected SubscriptionRest put(Context context, HttpServletRequest request, String apiCategory, String model,
                                    Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
+
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
         String dsoId = req.getParameter("dspace_object_id");
-        SubscriptionRest subscriptionRest = null;
-        DSpaceObject dSpaceObject = null;
-        EPerson ePerson = null;
+
+        SubscriptionRest subscriptionRest;
         try {
             subscriptionRest = new ObjectMapper().readValue(jsonNode.toString(), SubscriptionRest.class);
         } catch (IOException e) {
-            throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage());
+            throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage(), e);
         }
-        String notFoundException = "ResourceNotFoundException:" + apiCategory + "." + model
-                + " with id: " + id + " not found";
-        Subscription subscription;
-        try {
-            subscription = subscribeService.findById(context, id);
-            if (subscription == null) {
-                throw new ResourceNotFoundException(notFoundException);
-            }
-            dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
-            ePerson = personService.findByIdOrLegacyId(context, epersonId);
-            if (dSpaceObject == null || ePerson == null) {
-                throw new ResourceNotFoundException(notFoundException);
-            }
-        } catch (SQLException e) {
-            throw new ResourceNotFoundException(notFoundException);
-        } catch (AuthorizeException e) {
-            throw new AuthorizeException(e.getMessage());
+
+        Subscription subscription = subscribeService.findById(context, id);
+        if (Objects.isNull(subscription)) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
+
+        EPerson ePerson = ePersonService.findByIdOrLegacyId(context, epersonId);
+        if (Objects.isNull(ePerson)) {
+            throw new ResourceNotFoundException("There is not ePerson with uuid:" + epersonId);
+        }
+        DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
+        if (Objects.isNull(dSpaceObject)) {
+            throw new ResourceNotFoundException("There is not DSpaceObject with uuid:" + dsoId);
+        }
+
         if (id.equals(subscription.getID())) {
             List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
-            for (SubscriptionParameterRest subscriptionParameterRest :
-                    subscriptionRest.getSubscriptionParameterList()) {
+            for (SubscriptionParameterRest subscriptionParamRest : subscriptionRest.getSubscriptionParameterList()) {
                 SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
                 subscriptionParameter.setSubscription(subscription);
-                subscriptionParameter.setValue(subscriptionParameterRest.getValue());
-                subscriptionParameter.setName(subscriptionParameterRest.getName());
+                subscriptionParameter.setValue(subscriptionParamRest.getValue());
+                subscriptionParameter.setName(subscriptionParamRest.getName());
                 subscriptionParameterList.add(subscriptionParameter);
             }
-            subscription = subscribeService.updateSubscription(context, id, ePerson,
-                    dSpaceObject, subscriptionParameterList, subscriptionRest.getSubscriptionType());
+            subscription = subscribeService.updateSubscription(context, id, ePerson, dSpaceObject,
+                                            subscriptionParameterList, subscriptionRest.getSubscriptionType());
             context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } else {
-            throw new IllegalArgumentException("The id in the Json and the id in the url do not match: "
-                    + id + ", "
-                    + subscription.getID());
+            throw new IllegalArgumentException("The id in the Json and the id in the url do not match: " + id + ", "
+                                               + subscription.getID());
         }
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
-    public void patch(Context context,HttpServletRequest request,String category, String model, Integer id, Patch patch)
-            throws UnprocessableEntityException, DSpaceBadRequestException, AuthorizeException {
+    @PreAuthorize("hasPermission(#id, 'subscription', 'DELETE')")
+    protected void delete(Context context, Integer id) throws AuthorizeException {
         try {
             Subscription subscription = subscribeService.findById(context, id);
-            if (subscription == null) {
-                throw new ResourceNotFoundException(category + "." + model + " with id: " + id + " not found");
+            if (Objects.isNull(subscription)) {
+                throw new ResourceNotFoundException(CATEGORY + "." + NAME + " with id: " + id + " not found");
             }
-            if (!authorizeService.isAdmin(context) || subscription.getePerson().equals(context.getCurrentUser())) {
-                throw new AuthorizeException("Only admin or e-person themselves can edit the subscription");
-            }
-            resourcePatch.patch(context, subscription, patch.getOperations());
+            subscribeService.deleteSubscription(context, subscription);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (AuthorizeException authorizeException) {
-            throw new AuthorizeException(authorizeException.getMessage());
-        } catch (RuntimeException runtimeException) {
-            throw new RuntimeException(runtimeException.getMessage());
+            throw new RuntimeException("Unable to delete Subscription with id = " + id, e);
         }
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
-    public void delete(Context context, Integer id) throws AuthorizeException {
-        try {
-            subscribeService.deleteSubscription(context, id);
-        } catch (SQLException sqlException) {
-            throw new RuntimeException(sqlException.getMessage(), sqlException);
-        } catch (AuthorizeException authorizeException) {
-            throw new AuthorizeException(authorizeException.getMessage());
-        }
+    protected void patch(Context c, HttpServletRequest req, String category, String model, Integer id, Patch patch) {
+        throw new RepositoryMethodNotImplementedException(SubscriptionRest.NAME, "patch");
     }
 
     @Override

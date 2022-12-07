@@ -17,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.dspace.core.ReloadableEntity;
+
 /**
  * Database entity representation of the subscription_parameter table
  *
@@ -24,7 +26,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "subscription_parameter")
-public class SubscriptionParameter {
+public class SubscriptionParameter implements ReloadableEntity<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subscription_parameter_seq")
@@ -76,7 +78,8 @@ public class SubscriptionParameter {
         this.value = value;
     }
 
-    public Integer getId() {
+    @Override
+    public Integer getID() {
         return id;
     }
 
