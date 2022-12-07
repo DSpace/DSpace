@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -146,6 +147,58 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
                            !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
         } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
+    public void testRegisterDomainRegistered() throws Exception {
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        try {
+            configurationService.setProperty("authentication-password.domain.valid", "test.com");
+            RegistrationRest registrationRest = new RegistrationRest();
+            String email = "testPerson@test.com";
+            registrationRest.setEmail(email);
+
+            ObjectMapper mapper = new ObjectMapper();
+            getClient().perform(post("/api/eperson/registrations")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isCreated());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
+            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
+    public void testRegisterDomainNotRegistred() throws Exception {
+        List<RegistrationData> registrationDataList = new ArrayList<>();
+        try {
+            configurationService.setProperty("authentication-password.domain.valid", "test.com");
+            RegistrationRest registrationRest = new RegistrationRest();
+            String email = "testPerson@bladibla.com";
+            registrationRest.setEmail(email);
+
+            ObjectMapper mapper = new ObjectMapper();
+            getClient().perform(post("/api/eperson/registrations")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isBadRequest());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(0, registrationDataList.size());
+        } finally {
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();

@@ -23,6 +23,7 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -51,6 +52,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Autowired
     private RequestService requestService;
@@ -104,6 +108,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
                     throw new AccessDeniedException(
                         "Registration is disabled, you are not authorized to create a new Authorization");
+                }
+                if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
+                    throw new DSpaceBadRequestException("registration is not allowed with this email address");
                 }
                 accountService.sendRegistrationInfo(context, registrationRest.getEmail());
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {

@@ -15,6 +15,7 @@ import javax.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -52,6 +53,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+
     protected AccountServiceImpl() {
 
     }
@@ -79,6 +83,9 @@ public class AccountServiceImpl implements AccountService {
         AuthorizeException {
         if (!configurationService.getBooleanProperty("user.registration", true)) {
             throw new IllegalStateException("The user.registration parameter was set to false");
+        }
+        if (!authenticationService.canSelfRegister(context, null, email)) {
+            throw new IllegalStateException("self registration is not allowed with this email address");
         }
         sendInfo(context, email, true, true);
     }
