@@ -25,11 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
-import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -98,7 +96,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @SearchRestMethod(name = "findByEPerson")
     @PreAuthorize("hasPermission(#epersonId, 'AdminOrOwner', 'READ')")
     public Page<SubscriptionRest> findSubscriptionsByEPerson(@Parameter(value = "uuid", required = true) UUID epersonId,
-                                                              Pageable pageable)throws Exception {
+                                                              Pageable pageable) throws Exception {
         Long total = null;
         List<Subscription> subscriptions = null;
         try {
@@ -176,18 +174,13 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                     subscriptionParameter.setValue(subscriptionParameterRest.getValue());
                     subscriptionParameters.add(subscriptionParameter);
                 }
-                subscription = subscribeService.subscribe(context, ePerson,
-                        dSpaceObject,
-                        subscriptionParameters,
-                        subscriptionRest.getSubscriptionType());
+                var type = subscriptionRest.getSubscriptionType();
+                subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters, type);
             }
             context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } catch (SQLException sqlException) {
             throw new SQLException(sqlException.getMessage(), sqlException);
-
-        } catch (AuthorizeException authorizeException) {
-            throw new AuthorizeException(authorizeException.getMessage());
         } catch (IOException ioException) {
             throw new UnprocessableEntityException("error parsing the body");
         }
@@ -196,7 +189,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'WRITE')")
     protected SubscriptionRest put(Context context, HttpServletRequest request, String apiCategory, String model,
-                                   Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
+                                   Integer id, JsonNode jsonNode) throws SQLException {
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
@@ -244,7 +237,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
 
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'DELETE')")
-    protected void delete(Context context, Integer id) throws AuthorizeException {
+    protected void delete(Context context, Integer id) {
         try {
             Subscription subscription = subscribeService.findById(context, id);
             if (Objects.isNull(subscription)) {
@@ -254,11 +247,6 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete Subscription with id = " + id, e);
         }
-    }
-
-    @Override
-    protected void patch(Context c, HttpServletRequest req, String category, String model, Integer id, Patch patch) {
-        throw new RepositoryMethodNotImplementedException(SubscriptionRest.NAME, "patch");
     }
 
     @Override

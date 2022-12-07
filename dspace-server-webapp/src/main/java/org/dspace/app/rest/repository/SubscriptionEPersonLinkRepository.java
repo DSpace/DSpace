@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,7 @@ public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestReposit
     private SubscribeService subscribeService;
 
     public EPersonRest getEPerson(@Nullable HttpServletRequest request, Integer subscriptionId,
-                                  @Nullable Pageable optionalPageable,
-                                  Projection projection) throws AuthorizeException {
+                                  @Nullable Pageable optionalPageable, Projection projection) {
         try {
             Subscription subscription = subscribeService.findById(obtainContext(), subscriptionId);
             if (Objects.isNull(subscription)) {
@@ -42,7 +40,7 @@ public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestReposit
             }
             return converter.toRest(subscription.getePerson(),  projection);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
