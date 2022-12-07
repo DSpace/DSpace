@@ -1250,9 +1250,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected String transformFacetField(DiscoverFacetField facetFieldConfig, String field, boolean removePostfix) {
         if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             if (removePostfix) {
-                return field.substring(0, field.lastIndexOf("_filter"));
+                return field.substring(0, field.lastIndexOf("_prefix"));
             } else {
-                return field + "_filter";
+                return field + "_prefix";
             }
         } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             if (removePostfix) {
