@@ -25,6 +25,7 @@ import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,9 +37,9 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
     @Autowired
     private SubscribeService subscribeService;
 
-    public DSpaceObjectRest getDSpaceObject(@Nullable HttpServletRequest request,
-                                            @Nullable Pageable optionalPageable,
-                                            Integer subscriptionId, Projection projection) {
+    @PreAuthorize("hasPermission(#subscriptionId, 'subscription', 'READ')")
+    public DSpaceObjectRest getDSpaceObject(@Nullable HttpServletRequest request, Integer subscriptionId,
+                                            @Nullable Pageable optionalPageable, Projection projection) {
         try {
             Subscription subscription = subscribeService.findById(obtainContext(), subscriptionId);
             if (Objects.isNull(subscription)) {

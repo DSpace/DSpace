@@ -20,6 +20,7 @@ import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,6 +32,7 @@ public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestReposit
     @Autowired
     private SubscribeService subscribeService;
 
+    @PreAuthorize("hasPermission(#subscriptionId, 'subscription', 'READ')")
     public EPersonRest getEPerson(@Nullable HttpServletRequest request, Integer subscriptionId,
                                   @Nullable Pageable optionalPageable, Projection projection) {
         try {

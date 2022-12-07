@@ -13,6 +13,7 @@ import static org.dspace.app.rest.model.SubscriptionRest.NAME;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
@@ -39,10 +41,12 @@ import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.SubscribeService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -52,7 +56,8 @@ import org.springframework.stereotype.Component;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 @Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME)
-public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer> {
+public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer>
+                                         implements InitializingBean {
 
     @Autowired
     private ConverterService converter;
@@ -64,6 +69,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     private SubscribeService subscribeService;
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
+    @Autowired
+    private DiscoverableEndpointsService discoverableEndpointsService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'READ')")
@@ -252,6 +259,12 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @Override
     public Class<SubscriptionRest> getDomainClass() {
         return SubscriptionRest.class;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        discoverableEndpointsService.register(this, Arrays.asList(Link.of("/api/" + SubscriptionRest.CATEGORY +
+                       "/" + SubscriptionRest.NAME_PLURAL + "/search", SubscriptionRest.NAME_PLURAL + "-search")));
     }
 
 }

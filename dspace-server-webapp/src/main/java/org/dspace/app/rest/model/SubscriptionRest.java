@@ -12,10 +12,9 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
-@LinksRest(links = { @LinkRest(name = SubscriptionRest.DSPACE_OBJECT,
-        method = "getDSpaceObject"), @LinkRest(
-        name = SubscriptionRest.EPERSON,
-        method = "getEPerson")
+@LinksRest(links = {
+    @LinkRest(name = SubscriptionRest.DSPACE_OBJECT, method = "getDSpaceObject"),
+    @LinkRest(name = SubscriptionRest.EPERSON, method = "getEPerson")
 })
 public class SubscriptionRest extends BaseObjectRest<Integer> {
 
