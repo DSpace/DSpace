@@ -24,8 +24,13 @@
     </util:map>
 
     <bean id="dataciteTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/titles"/>
+                <property name="elementAttribute" value="/title"/>
+            </bean>
+        </property>
         <property name="field" ref="datacite.title"/>
-        <property name="query" value="/titles"/>
     </bean>
     <bean id="datacite.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.title"/>
