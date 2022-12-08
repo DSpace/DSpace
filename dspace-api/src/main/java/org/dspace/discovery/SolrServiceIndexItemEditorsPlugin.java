@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin {
     private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(SolrServiceIndexCollectionSubmittersPlugin.class);
+        .getLogger(SolrServiceIndexItemEditorsPlugin.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
