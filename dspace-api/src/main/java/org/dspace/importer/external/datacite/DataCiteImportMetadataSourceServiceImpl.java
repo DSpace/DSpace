@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.el.MethodNotFoundException;
-import javax.ws.rs.client.WebTarget;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,8 +52,6 @@ public class DataCiteImportMetadataSourceServiceImpl
     private final int timeoutMs = 180000;
 
     private final String url = "https://api.datacite.org/dois/";
-
-    private WebTarget webTarget;
 
     @Override
     public String getImportSource() {
@@ -100,6 +97,10 @@ public class DataCiteImportMetadataSourceServiceImpl
         uriParameters.put("query", id);
         String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, url, params);
         JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+        if (jsonNode == null) {
+            log.warn("DataCite returned invalid JSON");
+            return records;
+        }
         JsonNode dataNode = jsonNode.at("/data");
         if (dataNode.isArray()) {
             Iterator<JsonNode> iterator = dataNode.iterator();
