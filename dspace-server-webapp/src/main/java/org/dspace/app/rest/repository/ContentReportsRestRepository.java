@@ -99,15 +99,13 @@ public class ContentReportsRestRepository extends AbstractDSpaceRestRepository {
                     report.addItem(itemRest);
                 }
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
         try {
             long count = itemService.countForMetadataQuery(context, predicates, collectionUuids);
             report.setItemCount(count);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
 
@@ -123,7 +121,8 @@ public class ContentReportsRestRepository extends AbstractDSpaceRestRepository {
         }
     }
 
-    private List<MetadataField> getMetadataFields(org.dspace.core.Context context, String query_field) throws SQLException {
+    private List<MetadataField> getMetadataFields(org.dspace.core.Context context, String query_field)
+            throws SQLException {
         List<MetadataField> fields = new ArrayList<>();
         if ("*".equals(query_field)) {
             return fields;

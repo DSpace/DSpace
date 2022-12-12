@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
@@ -106,7 +105,8 @@ public class ContentReportsRestController implements InitializingBean {
         return filteredCollectionsReport(context, query);
     }
 
-    private ResponseEntity<RepresentationModel<?>> filteredCollectionsReport(Context context, FilteredCollectionsQuery query) {
+    private ResponseEntity<RepresentationModel<?>> filteredCollectionsReport(Context context,
+            FilteredCollectionsQuery query) {
         FilteredCollectionsRest report = contentReportsRestRepository
                 .findFilteredCollections(context, query);
         FilteredCollectionsResource result = converter.toResource(report);
