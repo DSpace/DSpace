@@ -10,11 +10,11 @@ package org.dspace.contentreports;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.type.StandardBasicTypes;
 
 /**
