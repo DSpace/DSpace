@@ -117,9 +117,28 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
                 "Mathematical Proof Between Generations");
         MetadatumDTO doi = createMetadatumDTO("dc", "identifier", "doi", "10.48550/arxiv.2207.04779");
-
+        MetadatumDTO author1 = createMetadatumDTO("dc", "contributor", "author", "Bayer, Jonas");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Benzmüller, Christoph");
+        MetadatumDTO author3 = createMetadatumDTO("dc", "contributor", "author", "Buzzard, Kevin");
+        MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "David, Marco");
+        MetadatumDTO author5 = createMetadatumDTO("dc", "contributor", "author", "Lamport, Leslie");
+        MetadatumDTO author6 = createMetadatumDTO("dc", "contributor", "author", "Matiyasevich, Yuri");
+        MetadatumDTO author7 = createMetadatumDTO("dc", "contributor", "author", "Paulson, Lawrence");
+        MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Schleicher, Dierk");
+        MetadatumDTO author9 = createMetadatumDTO("dc", "contributor", "author", "Stock, Benedikt");
+        MetadatumDTO author10 = createMetadatumDTO("dc", "contributor", "author", "Zelmanov, Efim");
         metadatums.add(title);
         metadatums.add(doi);
+        metadatums.add(author1);
+        metadatums.add(author2);
+        metadatums.add(author3);
+        metadatums.add(author4);
+        metadatums.add(author5);
+        metadatums.add(author6);
+        metadatums.add(author7);
+        metadatums.add(author8);
+        metadatums.add(author9);
+        metadatums.add(author10);
 
         ImportRecord firstRecord = new ImportRecord(metadatums);
 

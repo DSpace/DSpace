@@ -20,8 +20,22 @@
         </description>
         <entry key-ref="datacite.title" value-ref="dataciteTitleContrib"/>
         <entry key-ref="datacite.id" value-ref="dataciteIDContrib"/>
+        <entry key-ref="datacite.author" value-ref="dataciteAuthorContrib"/>
         <!-- TODO: Further Mappings here! querys are applied among the data.attributes object containing the informations -->
     </util:map>
+
+    <bean id="dataciteAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/creators"/>
+                <property name="elementAttribute" value="/name"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.author"/>
+    </bean>
+    <bean id="datacite.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
 
     <bean id="dataciteTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="metadataProcessor">
