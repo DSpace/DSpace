@@ -28,6 +28,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,6 +40,8 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
     @Autowired
     private ContentServiceFactory contentServiceFactory;
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 

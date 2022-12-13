@@ -76,6 +76,7 @@ public class SWORDEntry extends Entry {
         super(name);
     }
 
+    @Override
     protected void initialise() {
         super.initialise();
         swordNoOp = null;
@@ -207,6 +208,7 @@ public class SWORDEntry extends Entry {
         this.swordPackaging = new SwordPackaging(packaging);
     }
 
+    @Override
     protected void marshallElements(Element entry) {
         super.marshallElements(entry);
 
@@ -329,6 +331,7 @@ public class SWORDEntry extends Entry {
         return result;
     }
 
+    @Override
     public SwordValidationInfo unmarshall(Element entry, Properties validationProperties)
         throws UnmarshallException {
 
@@ -343,6 +346,7 @@ public class SWORDEntry extends Entry {
      * @param elementName name of element to check
      * @return true if element is checked
      */
+    @Override
     protected boolean isElementChecked(XmlName elementName) {
         if (elementName == null) {
             return false;
@@ -356,10 +360,12 @@ public class SWORDEntry extends Entry {
             super.isElementChecked(elementName);
     }
 
+    @Override
     public SwordValidationInfo validate(Properties validationContext) {
         return validate(null, validationContext);
     }
 
+    @Override
     protected SwordValidationInfo validate(SwordValidationInfo info,
                                            Properties validationContext) {
         boolean validateAll = (info == null);
@@ -379,7 +385,7 @@ public class SWORDEntry extends Entry {
                                                                          "element.",
                                                                      SwordValidationInfoType.WARNING));
             }
-        } else if (swordUserAgent != null && validateAll) {
+        } else if (validateAll) {
             swordEntry.addValidationInfo(swordUserAgent.validate(validationContext));
         }
 
@@ -392,7 +398,7 @@ public class SWORDEntry extends Entry {
                                                                      "resource has received or a URI that " +
                                                                      "dereferences to such a description.",
                                                                  SwordValidationInfoType.ERROR));
-        } else if (swordTreatment != null && validateAll) {
+        } else if (validateAll) {
             swordEntry.addValidationInfo(swordTreatment.validate(validationContext));
         }
 
@@ -408,7 +414,7 @@ public class SWORDEntry extends Entry {
                                                                          " process.",
                                                                      SwordValidationInfoType.WARNING));
             }
-        } else if (swordVerboseDescription != null && validateAll) {
+        } else if (validateAll) {
             swordEntry.addValidationInfo(swordVerboseDescription.validate(validationContext));
         }
 
@@ -427,7 +433,7 @@ public class SWORDEntry extends Entry {
                                                                          "this element to signify an error.",
                                                                      SwordValidationInfoType.WARNING));
             }
-        } else if (swordNoOp != null && validateAll) {
+        } else if (validateAll) {
             swordEntry.addValidationInfo(swordNoOp.validate(validationContext));
         }
 
@@ -439,7 +445,7 @@ public class SWORDEntry extends Entry {
                                                                      "element to declare the packaging type. If used " +
                                                                      "it SHOULD take a value from [SWORD-TYPES].",
                                                                  SwordValidationInfoType.INFO));
-        } else if (swordPackaging != null && validateAll) {
+        } else if (validateAll) {
             swordEntry.addValidationInfo(swordPackaging.validate(validationContext));
         }
 

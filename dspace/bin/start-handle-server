@@ -10,7 +10,8 @@
 # Unix shell script for starting Handle server.  WARNING this assumes any
 # previously running Handle servers have been terminated.
 
-# Assume we're in the bin subdirectory of the DSpace installation directory
+# Assume that this script is in the bin subdirectory of the DSpace
+# installation directory.
 BINDIR=`dirname $0`
 
 # Read parameters from DSpace config
@@ -21,19 +22,10 @@ HANDLEDIR=`$BINDIR/dspace dsprop --property handle.dir`
 # If you want your handle server logs stored elsewhere, change this value
 LOGDIR=$DSPACEDIR/log
 
-# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
-JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
-
-# Class path for DSpace will be:
-#   Any existing classpath
-#   The JARs (WEB-INF/lib/*.jar)
-#   The WEB-INF/classes directory
-FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
-
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
-    #Default Java to use 256MB of memory
-    JAVA_OPTS=-Xmx256m
+  #Default Java to use 256MB of memory
+  JAVA_OPTS=-Xmx256m
 fi
 
 # Remove lock file, in case the old Handle server did not shut down properly
@@ -42,4 +34,8 @@ rm -f $HANDLEDIR/txns/lock
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
 # does not support more than one JVM writing to the same rolling log.
-nohup java $JAVA_OPTS -classpath $FULLPATH -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main $HANDLEDIR </dev/null >> $LOGDIR/handle-server.log 2>&1 &
+nohup java $JAVA_OPTS -classpath `$BINDIR/dspace classpath` \
+    -Ddspace.log.init.disable=true \
+    -Dlog4j.configuration=log4j-handle-plugin.properties \
+    net.handle.server.Main $HANDLEDIR \
+    </dev/null >> $LOGDIR/handle-server.log 2>&1 &

@@ -1052,7 +1052,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    // Metadata fields are returned alphabetically.
                    // So, on the last page we'll just ensure it *at least* includes the last field alphabetically
                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItems(
-                              MetadataFieldMatcher.matchMetadataFieldByKeys("workflow", "score", null)
+                              MetadataFieldMatcher.matchMetadataField(
+                                  alphabeticMdFields.get(alphabeticMdFields.size() - 1))
                               )))
                    .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                            Matchers.containsString("/api/core/metadatafields?"),

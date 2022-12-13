@@ -19,7 +19,6 @@ public class MetadataImportCliScriptConfiguration extends MetadataImportScriptCo
     public Options getOptions() {
         Options options = super.getOptions();
         options.addOption("e", "email", true, "email address or user id of user (required if adding new items)");
-        options.getOption("e").setType(String.class);
         options.getOption("e").setRequired(true);
         super.options = options;
         return options;

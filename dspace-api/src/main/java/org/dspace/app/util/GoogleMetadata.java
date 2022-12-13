@@ -42,7 +42,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Configuration and mapping for Google Scholar output metadata
@@ -470,11 +470,7 @@ public class GoogleMetadata {
             parsedOptions.add(parsedFields);
         }
 
-        if (null != parsedOptions) {
-            return parsedOptions;
-        } else {
-            return null;
-        }
+        return parsedOptions;
     }
 
     /**

@@ -12,6 +12,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,6 +27,8 @@ public class ResourcePolicyConverter implements DSpaceConverter<ResourcePolicy, 
     @Autowired
     ResourcePolicyService resourcePolicyService;
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     ConverterService converterService;
 

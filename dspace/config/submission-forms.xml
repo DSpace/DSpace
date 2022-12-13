@@ -515,6 +515,37 @@
 <!--                </field>-->
 <!--            </row>-->
             <row>
+                <relation-field>
+                    <relationship-type>isProjectOfPerson</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Investigator</label>
+                    <hint>Enter the investigator's name (Family name, Given names).</hint>
+                    <linked-metadata-field>
+                        <dc-schema>project</dc-schema>
+                        <dc-element>investigator</dc-element>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                </relation-field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isProjectOfOrgUnit</relationship-type>
+                    <search-configuration>orgunit</search-configuration>
+                    <repeatable>false</repeatable>
+                    <label>Organization</label>
+                    <hint>Enter the organization's name</hint>
+                    <linked-metadata-field>
+                        <dc-schema>project</dc-schema>
+                        <dc-element>funder</dc-element>
+                        <dc-qualifier>name</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources/>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
@@ -522,6 +553,39 @@
                     <label>Keywords</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the keywords of the project</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>startDate</dc-element>
+                    <label>Start date</label>
+                    <input-type>date</input-type>
+                    <hint>Enter the start date of the project</hint>
+                </field>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>endDate</dc-element>
+                    <label>End date</label>
+                    <input-type>date</input-type>
+                    <hint>Enter the end date of the project</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <label>Amount</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the amount of the project</hint>
+                </field>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <dc-qualifier>currency</dc-qualifier>
+                    <label>Amount currency</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the amount currency of the project</hint>
                 </field>
             </row>
             <row>

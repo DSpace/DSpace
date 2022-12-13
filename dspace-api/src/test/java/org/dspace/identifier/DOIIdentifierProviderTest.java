@@ -191,7 +191,7 @@ public class DOIIdentifierProviderTest
         List<String> remainder = new ArrayList<>();
 
         for (MetadataValue id : metadata) {
-            if (!id.getValue().startsWith(DOI.RESOLVER)) {
+            if (!id.getValue().startsWith(doiService.getResolver())) {
                 remainder.add(id.getValue());
             }
         }
@@ -278,11 +278,11 @@ public class DOIIdentifierProviderTest
             PREFIX + "/" + NAMESPACE_SEPARATOR + "lkjljasd1234",
             DOI.SCHEME + "10.5072/123abc-lkj/kljl",
             "http://dx.doi.org/10.5072/123abc-lkj/kljl",
-            DOI.RESOLVER + "/10.5072/123abc-lkj/kljl"
+            doiService.getResolver() + "/10.5072/123abc-lkj/kljl"
         };
 
         for (String doi : validDOIs) {
-            assertTrue("DOI should be supported", provider.supports(doi));
+            assertTrue("DOI " + doi + " should be supported", provider.supports(doi));
         }
     }
 

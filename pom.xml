@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.2.2-SNAPSHOT</version>
+    <version>7.5-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -13,39 +13,42 @@
 
     <organization>
         <name>LYRASIS</name>
-        <url>http://www.dspace.org</url>
+        <url>https://dspace.org</url>
     </organization>
 
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.2.20.RELEASE</spring.version>
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.4.10.Final</hibernate.version>
-        <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.2.25</postgresql.driver.version>
-        <solr.client.version>8.8.1</solr.client.version>
+        <spring.version>5.3.20</spring.version>
+        <spring-boot.version>2.6.8</spring-boot.version>
+        <spring-security.version>5.6.5</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>5.6.5.Final</hibernate.version>
+        <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.4.3</postgresql.driver.version>
+        <solr.client.version>8.11.1</solr.client.version>
 
-        <axiom.version>1.2.22</axiom.version>
+        <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
-        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.12.3</jackson.version>
+        <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
+        <jackson.version>2.13.4</jackson.version>
+        <jackson-databind.version>2.13.4.2</jackson-databind.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.41.v20210516</jetty.version>
+        <jetty.version>9.4.48.v20220622</jetty.version>
         <log4j.version>2.17.1</log4j.version>
-        <pdfbox-version>2.0.24</pdfbox-version>
-        <poi-version>3.17</poi-version>
+        <pdfbox-version>2.0.27</pdfbox-version>
+        <rome.version>1.18.0</rome.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <tika.version>2.3.0</tika.version>
+        <!-- Sync with whatever version Tika uses -->
+        <bouncycastle.version>1.70</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
-        <!-- Spring Data REST HAL Browser (used by Server webapp) -->
-        <spring-hal-browser.version>3.2.6.RELEASE</spring-hal-browser.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
-        <json-path.version>2.4.0</json-path.version>
+        <json-path.version>2.6.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
              (used by Server webapp) -->
         <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
@@ -55,7 +58,7 @@
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
         <!-- Used by (now obsolete) 'dspace-rest' WAR -->
-        <jersey.version>2.30.1</jersey.version>
+        <jersey.version>2.35</jersey.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -155,6 +158,7 @@
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            <arg>-Xpkginfo:always</arg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>
@@ -699,7 +703,7 @@
                                         <licenseMerge>Apache Software License, Version 2.0|The SAX License|The W3C License</licenseMerge>
                                         <!-- JDOM uses this license, but it's essentially just Apache -->
                                         <licenseMerge>Apache Software License, Version 2.0|Similar to Apache License but with the acknowledgment clause removed</licenseMerge>
-                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License</licenseMerge>
+                                        <licenseMerge>BSD License|The BSD License|BSD licence|BSD license|BSD|BSD-style license|New BSD License|New BSD license|Revised BSD License|BSD 2-Clause license|3-Clause BSD License|BSD 2-Clause|BSD 3-clause New License|BSD Licence 3|BSD-2-Clause|BSD-3-Clause|Modified BSD|The New BSD License|The BSD 3-Clause License (BSD3)|BSD License 3</licenseMerge>
                                         <!-- DSpace uses a BSD License -->
                                         <licenseMerge>BSD License|DSpace BSD License|DSpace Sourcecode License</licenseMerge>
                                         <!-- Coverity uses modified BSD: https://github.com/coverity/coverity-security-library -->
@@ -720,7 +724,7 @@
                                         <!-- JBoss Transaction API claims this license, but it is dual licensed with CDDL being one: https://github.com/jboss/jboss-transaction-api_spec -->
                                         <licenseMerge>Common Development and Distribution License (CDDL)|GNU General Public License, Version 2 with the Classpath Exception</licenseMerge>
                                         <licenseMerge>Eclipse Distribution License, Version 1.0|Eclipse Distribution License (EDL), Version 1.0|Eclipse Distribution License - v 1.0|Eclipse Distribution License v. 1.0|EDL 1.0</licenseMerge>
-                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License v1.0|Eclipse Public License, Version 1.0|EPL 2.0</licenseMerge>
+                                        <licenseMerge>Eclipse Public License|Eclipse Public License - Version 1.0|Eclipse Public License - v 1.0|EPL 1.0 license|Eclipse Public License (EPL), Version 1.0|Eclipse Public License 1.0|Eclipse Public License v1.0|Eclipse Public License, Version 1.0|EPL 1.0|EPL 2.0|Eclipse Public License - v 2.0</licenseMerge>
                                         <!-- JUnit claims this license but is actually Eclipse Public License: http://junit.org/license.html -->
                                         <licenseMerge>Eclipse Public License|Common Public License Version 1.0</licenseMerge>
                                         <!-- Jersey is dual licensed as EPL but lists its main license as GPL: https://github.com/eclipse-ee4j/jersey#licensing-and-governance -->
@@ -735,9 +739,9 @@
                                         <licenseMerge>MIT License|(MIT-style) netCDF C library license</licenseMerge>
                                         <licenseMerge>Mozilla Public License|Mozilla Public License version 1.1|Mozilla Public License 1.1 (MPL 1.1)|MPL 1.1|Mozilla Public License Version 2.0|Mozilla Public License, Version 2.0</licenseMerge>
                                         <!-- H2 Database claims this license, but for our purposes it's MPL: http://www.h2database.com -->
-                                        <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0</licenseMerge>
+                                        <licenseMerge>Mozilla Public License|MPL 2.0, and EPL 1.0|MPL 2.0</licenseMerge>
                                         <!-- "concurrent.concurrent" claims this license, but is actually Public Domain: http://mvnrepository.com/artifact/concurrent/concurrent/ -->
-                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems</licenseMerge>
+                                        <licenseMerge>Public Domain|Public domain, Sun Microsoystems|Public Domain, per Creative Commons CC0</licenseMerge>
                                         <!-- WTFPL is essentially Public Domain: http://www.wtfpl.net/ ;) -->
                                         <licenseMerge>Public Domain|WTFPL</licenseMerge>
                                     </licenseMerges>
@@ -868,14 +872,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.2.2-SNAPSHOT</version>
+                       <version>7.5-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.2.2-SNAPSHOT</version>
+                       <version>7.5-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1026,69 +1030,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.2.2-SNAPSHOT</version>
+                <version>7.5-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1106,28 +1110,6 @@
                 <version>${postgresql.driver.version}</version>
             </dependency>
 
-            <!-- Solr introduces multiple versions of zookeeper. So,
-                 we specify the version we want -->
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.14</version>
-            </dependency>
-
-            <!-- solr-cell and axiom-api disagree on versions -->
-            <dependency>
-                <groupId>org.apache.james</groupId>
-                <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.3</version>
-            </dependency>
-
-            <!-- solr-core, solr-cell disagree with nimbus-jose-jwt -->
-            <dependency>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>8.0.1</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
@@ -1142,8 +1124,14 @@
 
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-ehcache</artifactId>
+                <artifactId>hibernate-jcache</artifactId>
                 <version>${hibernate.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.cache</groupId>
+                <artifactId>cache-api</artifactId>
+                <version>${jcache-version}</version>
             </dependency>
 
             <dependency>
@@ -1151,6 +1139,30 @@
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <!-- Hibernate introduces multiple versions of jboss-logging. So, specify version we want -->
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.4.3.Final</version>
+            </dependency>
+
+            <!-- Rome is used for RSS / ATOM syndication feeds -->
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-modules</artifactId>
+                <version>${rome.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.rometools</groupId>
+                <artifactId>rome-utils</artifactId>
+                <version>${rome.version}</version>
             </dependency>
 
             <dependency>
@@ -1260,7 +1272,7 @@
 
             <dependency>
                 <groupId>org.apache.solr</groupId>
-                <artifactId>solr-cell</artifactId>
+                <artifactId>solr-solrj</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
             <dependency>
@@ -1268,35 +1280,43 @@
                 <artifactId>lucene-core</artifactId>
                 <version>${solr.client.version}</version>
             </dependency>
-            <!-- Used for full-text indexing with Solr. Should be synced with version of Tika in solr-cell -->
+
+            <!-- Tika is used to extract full text from documents in order to index in Solr -->
             <dependency>
                 <groupId>org.apache.tika</groupId>
-                <artifactId>tika-parsers</artifactId>
-                <version>1.24.1</version>
-                <!-- Exclude a few tika-parsers dependencies that we already use, with slightly different versions -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.protobuf</groupId>
-                        <artifactId>protobuf-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.sf.ehcache</groupId>
-                        <artifactId>ehcache-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jakarta.ws.rs</groupId>
-                        <artifactId>jakarta.ws.rs-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.xml.soap</groupId>
-                        <artifactId>javax.xml.soap-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.jvnet.staxex</groupId>
-                        <artifactId>stax-ex</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-parsers-standard-package</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>apache-mime4j-core</artifactId>
+                <version>0.8.4</version>
+            </dependency>
+            <!-- Tika and solr-core disagree on versions of ASM -->
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1334,7 +1354,7 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
-                    <!-- Newer version brought in by solr-cell -->
+                    <!-- Newer version brought in by Tika -->
                     <exclusion>
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-csv</artifactId>
@@ -1345,34 +1365,83 @@
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.0</version>
+		<exclusions>
+                    <!-- A later version is brought in by google-oauth-client -->
+                    <exclusion>
+                        <groupId>com.google.code.gson</groupId>
+                        <artifactId>gson</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Required to run Handle Server -->
             <dependency>
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
                 <version>3.0.0</version>
-                <exclusions>
-                    <!-- A later version of Jetty is pulled in below -->
-                    <exclusion>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-http</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-io</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty</groupId>
-                        <artifactId>jetty-util</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
-            <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
+            <!-- Jetty is needed to run Handle Server (and tests in some modules)
+                 Solr and Handle Server disagree on version of Jetty, so we force a specific version here. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${jetty.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-alpn-java-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-deploy</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlets</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-xml</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>http2-common</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.http2</groupId>
+                <artifactId>http2-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>mets</artifactId>
@@ -1411,12 +1480,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-configuration2</artifactId>
-                <version>2.7</version>
+                <version>2.8.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-dbcp2</artifactId>
-                <version>2.8.0</version>
+                <version>2.9.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-fileupload</groupId>
@@ -1431,7 +1500,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.7</version>
+                <version>3.12.0</version>
             </dependency>
             <!-- NOTE: We don't use commons-logging directly, but many dependencies rely on it.
                  So, we specify the version to use to avoid dependency convergence issues. -->
@@ -1443,7 +1512,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
-                <version>2.9.0</version>
+                <version>2.11.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-validator</groupId>
@@ -1466,6 +1540,7 @@
                 <version>3.1.0</version>
             </dependency>
 
+            <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
             <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
@@ -1479,8 +1554,8 @@
             </dependency>
             <dependency>
                 <groupId>org.jdom</groupId>
-                <artifactId>jdom</artifactId>
-                <version>1.1.3</version>
+                <artifactId>jdom2</artifactId>
+                <version>2.0.6.1</version>
             </dependency>
 
             <dependency>
@@ -1529,55 +1604,13 @@
                 <artifactId>fontbox</artifactId>
                 <version>${pdfbox-version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version brought in by solr-cell -->
-                    <exclusion>
-                        <groupId>com.github.virtuald</groupId>
-                        <artifactId>curvesapi</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-schemas</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version pulled in below -->
-                    <exclusion>
-                        <groupId>org.apache.xmlbeans</groupId>
-                        <artifactId>xmlbeans</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlbeans</groupId>
-                <artifactId>xmlbeans</artifactId>
-                <version>3.1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>2.7.0</version>
-            </dependency>
+            <!-- Tika and Jena disagree on version of Xerces to use. Select latest -->
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
-                <version>2.12.0</version>
+                <version>2.12.2</version>
             </dependency>
+            <!-- SWORDv1 and SWORDv2 modules both pull in various versions of xml-apis. Select latest version -->
             <dependency>
                 <groupId>xml-apis</groupId>
                 <artifactId>xml-apis</artifactId>
@@ -1595,20 +1628,26 @@
                 <artifactId>ojdbc6</artifactId>
                 <version>11.2.0.4.0</version>
             </dependency>
+            <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>oclc-harvester2</artifactId>
-                <version>0.1.12</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.4.4</version>
+                <version>4.4.15</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>4.5.13</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.httpcomponents</groupId>
+              <artifactId>httpmime</artifactId>
+              <version>4.5.13</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1666,14 +1705,8 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.187</version>
+                <version>2.1.210</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.8.6</version>
-                <scope>compile</scope>
             </dependency>
             <!-- Google Analytics -->
             <dependency>
@@ -1709,7 +1742,7 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.32.1</version>
+                <version>1.33.3</version>
             </dependency>
 
             <!-- Findbugs annotations -->
@@ -1745,18 +1778,40 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson-databind.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>30.0-jre</version>
+                <version>31.0.1-jre</version>
+                <exclusions>
+                    <!-- Use version provided by Solr / Postgres -->
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
                 <version>1.2.5</version>
             </dependency>
+
+            <!-- json-path is needed by Spring HATEOAS -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${json-path.version}</version>
+            </dependency>
+            <!-- json-path-assert is just needed by tests -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path-assert</artifactId>
+                <version>${json-path.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>
@@ -1883,7 +1938,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>dspace-7.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
 

@@ -57,7 +57,7 @@ public class ItemDepositor extends Depositor {
         if (!(dso instanceof Item)) {
             throw new DSpaceSWORDException(
                 "You tried to initialise the item depositor with something" +
-                    "other than an item object");
+                    " other than an item object");
         }
 
         this.item = (Item) dso;

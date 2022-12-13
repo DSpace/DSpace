@@ -20,7 +20,9 @@ import org.dspace.app.rest.utils.DSpaceAPIRequestLoggingFilter;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.app.sitemap.GenerateSitemaps;
+import org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli;
 import org.dspace.app.util.DSpaceContextListener;
+import org.dspace.google.GoogleAsyncEventListener;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -65,9 +68,22 @@ public class Application extends SpringBootServletInitializer {
     @Autowired
     private ApplicationConfig configuration;
 
+    @Autowired
+    private GoogleAsyncEventListener googleAsyncEventListener;
+
     @Scheduled(cron = "${sitemap.cron:-}")
     public void generateSitemap() throws IOException, SQLException {
         GenerateSitemaps.generateSitemapsScheduled();
+    }
+
+    @Scheduled(cron = "${solr-database-resync.cron:-}")
+    public void solrDatabaseResync() throws Exception {
+        SolrDatabaseResyncCli.runScheduled();
+    }
+
+    @Scheduled(cron = "${google.analytics.cron:-}")
+    public void sendGoogleAnalyticsEvents() {
+        googleAsyncEventListener.sendCollectedEvents();
     }
 
     /**
@@ -160,6 +176,7 @@ public class Application extends SpringBootServletInitializer {
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 // Get allowed origins for api and iiif endpoints.
+                // The actuator endpoints are configured using management.endpoints.web.cors.* properties
                 String[] corsAllowedOrigins = configuration
                     .getCorsAllowedOrigins(configuration.getCorsAllowedOriginsConfig());
                 String[] iiifAllowedOrigins = configuration
@@ -175,7 +192,8 @@ public class Application extends SpringBootServletInitializer {
                             .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
                             // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER")
+                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+                                "x-recaptcha-token")
                             // Allow list of response headers allowed to be sent by us (the server) to the client
                             .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
@@ -186,19 +204,38 @@ public class Application extends SpringBootServletInitializer {
                             .allowCredentials(iiifAllowCredentials).allowedOrigins(iiifAllowedOrigins)
                             // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER")
+                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+                                "x-recaptcha-token")
                             // Allow list of response headers allowed to be sent by us (the server) to the client
                             .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
             }
 
             /**
+             * Add a ViewController for the root path, to load HAL Browser
+             * @param registry ViewControllerRegistry
+             */
+            @Override
+            public void addViewControllers(ViewControllerRegistry registry) {
+                // Ensure accessing the root path will load the index.html of the HAL Browser
+                registry.addViewController("/").setViewName("forward:/index.html");
+            }
+
+            /**
              * Add a new ResourceHandler to allow us to use WebJars.org to pull in web dependencies
-             * dynamically for HAL Browser, and access them off the /webjars path.
+             * dynamically for HAL Browser, etc.
              * @param registry ResourceHandlerRegistry
              */
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                // First, "mount" the Hal Browser resources at the /browser path
+                // NOTE: the hal-browser directory uses the version of the Hal browser, so this needs to be synced
+                // with the org.webjars.hal-browser version in the POM
+                registry
+                    .addResourceHandler("/browser/**")
+                    .addResourceLocations("/webjars/hal-browser/ad9b865/");
+
+                // Make all other Webjars available off the /webjars path
                 registry
                     .addResourceHandler("/webjars/**")
                     .addResourceLocations("/webjars/");

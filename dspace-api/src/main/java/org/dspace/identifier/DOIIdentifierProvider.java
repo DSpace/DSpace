@@ -543,7 +543,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
         if (DELETED.equals(doiRow.getStatus()) || TO_BE_DELETED.equals(doiRow.getStatus())) {
             throw new DOIIdentifierException("You tried to update the metadata"
-                    + "of a DOI that is marked as DELETED.",
+                    + " of a DOI that is marked as DELETED.",
                     DOIIdentifierException.DOI_IS_DELETED);
         }
 
@@ -1028,7 +1028,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         Item item = (Item) dso;
 
         List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
-        String leftPart = DOI.RESOLVER + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
+        String leftPart = doiService.getResolver() + SLASH + getPrefix() + SLASH + getNamespaceSeparator();
         for (MetadataValue id : metadata) {
             if (id.getValue().startsWith(leftPart)) {
                 return doiService.DOIFromExternalFormat(id.getValue());

@@ -304,56 +304,8 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void checkCanCreateVersionFeatureAndPropertyBlockEntityEnableTest() throws Exception {
+    public void checkCanCreateVersionFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        configurationService.setProperty("versioning.block.entity", true);
-
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
-
-        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
-                                          .withName("Collection 1")
-                                          .withEntityType("Publication")
-                                          .withAdminGroup(eperson)
-                                          .build();
-
-        Item itemA = ItemBuilder.createItem(context, col)
-                                .withTitle("Public item")
-                                .withIssueDate("2021-04-19")
-                                .withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
-
-        context.restoreAuthSystemState();
-
-        ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
-
-        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenUser = getAuthToken(user.getEmail(), password);
-
-        // define authorization that we know not exists
-        Authorization user2ItemA = new Authorization(user, canCreateVersionFeature, itemRestA);
-        Authorization admin2ItemA = new Authorization(admin, canCreateVersionFeature, itemRestA);
-        Authorization eperson2ItemA = new Authorization(eperson, canCreateVersionFeature, itemRestA);
-
-        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
-                             .andExpect(status().isNotFound());
-
-        getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemA.getID()))
-                            .andExpect(status().isNotFound());
-
-        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
-                               .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void checkCanCreateVersionFeatureAndPropertyBlockEntityDisabledTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        configurationService.setProperty("versioning.block.entity", false);
 
         Community rootCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Parent Community")
@@ -388,53 +340,6 @@ public class CanCreateVersionFeatureIT extends AbstractControllerIntegrationTest
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(
                                         AuthorizationMatcher.matchAuthorization(admin2ItemA))));
-
-        getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemA.getID()))
-                            .andExpect(status().isNotFound());
-
-        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + eperson2ItemA.getID()))
-                               .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void checkCanCreateVersionFeatureAndPropertyBlockEntityUnsetedTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        configurationService.setProperty("versioning.submitterCanCreateNewVersion", true);
-        configurationService.setProperty("versioning.block.entity", null);
-
-        Community rootCommunity = CommunityBuilder.createCommunity(context)
-                                                  .withName("Parent Community")
-                                                  .build();
-
-        Collection col = CollectionBuilder.createCollection(context, rootCommunity)
-                                          .withName("Collection 1")
-                                          .withEntityType("Publication")
-                                          .withSubmitterGroup(eperson)
-                                          .build();
-
-        Item itemA = ItemBuilder.createItem(context, col)
-                                .withTitle("Public item")
-                                .withIssueDate("2021-04-19")
-                                .withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
-
-        context.restoreAuthSystemState();
-
-        ItemRest itemRestA = itemConverter.convert(itemA, DefaultProjection.DEFAULT);
-
-        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenUser = getAuthToken(user.getEmail(), password);
-
-        // define authorization that we know not exists
-        Authorization user2ItemA = new Authorization(user, canCreateVersionFeature, itemRestA);
-        Authorization admin2ItemA = new Authorization(admin, canCreateVersionFeature, itemRestA);
-        Authorization eperson2ItemA = new Authorization(eperson, canCreateVersionFeature, itemRestA);
-
-        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + admin2ItemA.getID()))
-                             .andExpect(status().isNotFound());
 
         getClient(tokenUser).perform(get("/api/authz/authorizations/" + user2ItemA.getID()))
                             .andExpect(status().isNotFound());
