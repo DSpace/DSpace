@@ -18,6 +18,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
@@ -72,7 +74,7 @@ public class SearchUtils {
     /**
      * Return the discovery configuration to use in a specific scope for the king of search identified by the prefix. A
      * null prefix mean the normal query, other predefined values are workspace or workflow
-     * 
+     *
      *
      * @param context
      * @param prefix
@@ -90,9 +92,28 @@ public class SearchUtils {
         }
     }
 
+    public static Set<DiscoveryConfiguration> addDiscoveryConfigurationForParents(
+            Context context, Set<DiscoveryConfiguration> configurations, String prefix, DSpaceObject dso)
+            throws SQLException {
+        if (dso == null) {
+            configurations.add(getDiscoveryConfigurationByName(null));
+            return configurations;
+        }
+        if (prefix != null) {
+            configurations.add(getDiscoveryConfigurationByName(prefix + "." + dso.getHandle()));
+        } else {
+            configurations.add(getDiscoveryConfigurationByName(dso.getHandle()));
+        }
+
+        DSpaceObjectService<DSpaceObject> dSpaceObjectService = ContentServiceFactory.getInstance()
+                                                                                     .getDSpaceObjectService(dso);
+        DSpaceObject parentObject = dSpaceObjectService.getParentObject(context, dso);
+        return addDiscoveryConfigurationForParents(context, configurations, prefix, parentObject);
+    }
+
     /**
      * Return the discovery configuration identified by the specified name
-     * 
+     *
      * @param configurationName the configuration name assigned to the bean in the
      *                          discovery.xml
      * @return the discovery configuration
@@ -128,8 +149,8 @@ public class SearchUtils {
      * @return a list of configuration objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item,
-                                                                             final Context context) throws SQLException {
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item, Context context)
+            throws SQLException {
         List<Collection> collections = item.getCollections();
         return getAllDiscoveryConfigurations(context, null, collections, item);
     }
@@ -171,8 +192,7 @@ public class SearchUtils {
         Set<DiscoveryConfiguration> result = new HashSet<>();
 
         for (Collection collection : collections) {
-            DiscoveryConfiguration configuration = getDiscoveryConfiguration(context, prefix, collection);
-            result.add(configuration);
+            addDiscoveryConfigurationForParents(context, result, prefix, collection);
         }
 
         //Add alwaysIndex configurations

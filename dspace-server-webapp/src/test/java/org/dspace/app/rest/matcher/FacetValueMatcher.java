@@ -52,6 +52,16 @@ public class FacetValueMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchEntry(String facet, String label, int count) {
+        return allOf(
+                hasJsonPath("$.label", is(label)),
+                hasJsonPath("$.type", is("discover")),
+                hasJsonPath("$.count", is(count)),
+                hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+                hasJsonPath("$._links.search.href", containsString("f." + facet + "=" + label + ",equals"))
+        );
+    }
+
 
     public static Matcher<? super Object> entrySubject(String label, String authority, int count) {
         return allOf(

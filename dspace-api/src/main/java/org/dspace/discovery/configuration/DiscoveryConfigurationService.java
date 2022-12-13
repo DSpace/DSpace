@@ -20,7 +20,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.core.ReloadableEntity;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -135,9 +134,9 @@ public class DiscoveryConfigurationService {
         System.out.println(DSpaceServicesFactory.getInstance().getServiceManager().getServicesNames().size());
         DiscoveryConfigurationService mainService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                          .getServiceByName(
-                                                                             DiscoveryConfigurationService.class
-                                                                                 .getName(),
-                                                                             DiscoveryConfigurationService.class);
+                                                                                 DiscoveryConfigurationService.class
+                                                                                         .getName(),
+                                                                                 DiscoveryConfigurationService.class);
 
         for (String key : mainService.getMap().keySet()) {
             System.out.println(key);
@@ -165,7 +164,7 @@ public class DiscoveryConfigurationService {
 
             System.out.println("Recent submissions configuration:");
             DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration = discoveryConfiguration
-                .getRecentSubmissionConfiguration();
+                    .getRecentSubmissionConfiguration();
             System.out.println("\tMetadata sort field: " + recentSubmissionConfiguration.getMetadataSortField());
             System.out.println("\tMax recent submissions: " + recentSubmissionConfiguration.getMax());
 

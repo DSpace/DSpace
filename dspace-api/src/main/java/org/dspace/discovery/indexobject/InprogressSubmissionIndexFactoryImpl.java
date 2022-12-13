@@ -73,9 +73,11 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         // Add item metadata
         List<DiscoveryConfiguration> discoveryConfigurations;
         if (inProgressSubmission instanceof WorkflowItem) {
-            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(context, (WorkflowItem) inProgressSubmission);
+            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(context,
+                                                                                (WorkflowItem) inProgressSubmission);
         } else if (inProgressSubmission instanceof WorkspaceItem) {
-            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(context, (WorkspaceItem) inProgressSubmission);
+            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(context,
+                                                                                (WorkspaceItem) inProgressSubmission);
         } else {
             discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(item, context);
         }
