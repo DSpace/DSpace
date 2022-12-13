@@ -29,12 +29,42 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This class tests the correct inheritance of Discovery configurations for sub communities and collections.
+ * To thoroughly test this, a community and collection structure is set up to where different communities have custom
+ * configurations configured for them.
+ * 
+ * The following structure is uses:
+ * - Parent Community 1     - Custom configuration: discovery-parent-community-1
+ *  -- Subcommunity 11      - Custom configuration: discovery-sub-community-1-1
+ *      -- Collection 111   - Custom configuration: discovery-collection-1-1-1
+ *      -- Collection 112
+ *  -- Subcommunity 12
+ *      -- Collection 121   - Custom configuration: discovery-collection-1-2-1
+ *      -- Collection 122
+ * - Parent Community 2
+ *  -- Subcommunity 21      - Custom configuration: discovery-sub-community-2-1
+ *      -- Collection 211   - Custom configuration: discovery-collection-2-1-1
+ *      -- Collection 212
+ *  -- Subcommunity 22
+ *      -- Collection 221   - Custom configuration: discovery-collection-2-2-1
+ *      -- Collection 222
+ *
+ * Each custom configuration contains a unique index for a unique metadata field, to verify if correct information is
+ * indexed and provided for the different search scopes.
+ *
+ * Each collection has an item in it. Next to these items, there are two mapped items, one in collection 111 and 222,
+ * and one in collection 122 and 211.
+ *
+ * The tests will verify that for each object, the correct facets are provided and that all the necessary fields to
+ * power these facets are indexed properly.
+ */
 public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     CollectionService collectionService;
 
-    private Community community1;
+    private Community parentCommunity1;
     private Community subcommunity11;
     private Community subcommunity12;
     private Collection collection111;
@@ -42,7 +72,7 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     private Collection collection121;
     private Collection collection122;
 
-    private Community community2;
+    private Community parentCommunity2;
     private Community subcommunity21;
     private Community subcommunity22;
     private Collection collection211;
@@ -64,13 +94,13 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
         MetadataFieldBuilder.createMetadataField(context, "test", "collection211field", "").build();
         MetadataFieldBuilder.createMetadataField(context, "test", "collection221field", "").build();
 
-        community1 = CommunityBuilder.createCommunity(context, "123456789/discovery-parent-community-1")
-                                     .build();
+        parentCommunity1 = CommunityBuilder.createCommunity(context, "123456789/discovery-parent-community-1")
+                                           .build();
         subcommunity11 = CommunityBuilder
-                .createSubCommunity(context, community1, "123456789/discovery-sub-community-1-1")
+                .createSubCommunity(context, parentCommunity1, "123456789/discovery-sub-community-1-1")
                 .build();
         subcommunity12 = CommunityBuilder
-                .createSubCommunity(context, community1, "123456789/discovery-sub-community-1-2")
+                .createSubCommunity(context, parentCommunity1, "123456789/discovery-sub-community-1-2")
                 .build();
         collection111 = CollectionBuilder
                 .createCollection(context, subcommunity11, "123456789/discovery-collection-1-1-1")
@@ -86,15 +116,15 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                 .createCollection(context, subcommunity12, "123456789/discovery-collection-1-2-2")
                 .build();
 
-        community2 = CommunityBuilder.createCommunity(context, "123456789/discovery-parent-community-2")
-                                     .build();
+        parentCommunity2 = CommunityBuilder.createCommunity(context, "123456789/discovery-parent-community-2")
+                                           .build();
 
 
         subcommunity21 = CommunityBuilder
-                .createSubCommunity(context, community2, "123456789/discovery-sub-community-2-1")
+                .createSubCommunity(context, parentCommunity2, "123456789/discovery-sub-community-2-1")
                 .build();
         subcommunity22 = CommunityBuilder
-                .createSubCommunity(context, community2, "123456789/discovery-sub-community-2-2")
+                .createSubCommunity(context, parentCommunity2, "123456789/discovery-sub-community-2-2")
                 .build();
         collection211 = CollectionBuilder
                 .createCollection(context, subcommunity21, "123456789/discovery-collection-2-1-1")
@@ -235,7 +265,7 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     @Test
     public void ScopeBasedIndexingAndSearchTestParentCommunity1() throws Exception {
 
-        getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(community1.getID())))
+        getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(parentCommunity1.getID())))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
@@ -246,7 +276,7 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                    );
 
         getClient().perform(get("/api/discover/facets/parentcommunity1field")
-                                    .param("scope", String.valueOf(community1.getID())))
+                                    .param("scope", String.valueOf(parentCommunity1.getID())))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))
                    .andExpect(jsonPath("$._embedded.values",
@@ -435,7 +465,7 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     @Test
     public void ScopeBasedIndexingAndSearchTestParentCommunity2() throws Exception {
 
-        getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(community2.getID())))
+        getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(parentCommunity2.getID())))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.type", is("discover")))

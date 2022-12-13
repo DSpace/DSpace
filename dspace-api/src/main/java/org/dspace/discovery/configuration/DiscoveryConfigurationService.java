@@ -63,6 +63,13 @@ public class DiscoveryConfigurationService {
         return getDiscoveryConfiguration(name);
     }
 
+    /**
+     * Retrieve the discovery configuration for the provided DSO. When no direct match is found, the parent object will
+     * be checked until there is no parent left, in which case the "default" configuration will be returned.
+     * @param context   - The database context
+     * @param dso       - The DSpace object to retrieve the configuration for
+     * @return the discovery configuration for the provided DSO.
+     */
     public DiscoveryConfiguration getDiscoveryDSOConfiguration(final Context context,
                                                                DSpaceObject dso) {
         String name;
@@ -91,6 +98,14 @@ public class DiscoveryConfigurationService {
         return getDiscoveryConfiguration(name, true);
     }
 
+    /**
+     * Retrieve the configuration for the provided name. When useDefault is set to true, the "default" configuration
+     * will be returned when no match is found. When useDefault is set to false, null will be returned when no match is
+     * found.
+     * @param name          - The name of the configuration to retrieve
+     * @param useDefault    - Whether the default configuration should be used when no match is found
+     * @return the configuration for the provided name
+     */
     public DiscoveryConfiguration getDiscoveryConfiguration(final String name, boolean useDefault) {
         DiscoveryConfiguration result;
 

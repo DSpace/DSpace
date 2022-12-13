@@ -77,6 +77,7 @@ public class SearchUtils {
      *
      *
      * @param context
+     *            the database context
      * @param prefix
      *            the namespace of the configuration to lookup if any
      * @param dso
@@ -92,6 +93,15 @@ public class SearchUtils {
         }
     }
 
+    /**
+     * Retrieve the configuration for the current dspace object and all its parents and add it to the provided set
+     * @param context           - The database context
+     * @param configurations    - The set of configurations to add the retrieved configurations to
+     * @param prefix            - The namespace of the configuration to lookup if any
+     * @param dso               - The DSpace Object
+     * @return the set of configurations with additional retrieved ones for the dspace object and parents
+     * @throws SQLException
+     */
     public static Set<DiscoveryConfiguration> addDiscoveryConfigurationForParents(
             Context context, Set<DiscoveryConfiguration> configurations, String prefix, DSpaceObject dso)
             throws SQLException {
@@ -124,6 +134,13 @@ public class SearchUtils {
 
         return configurationService.getDiscoveryConfiguration(configurationName);
     }
+
+    /**
+     * Return the discovery configuration for the provided DSO
+     * @param context   - The database context
+     * @param dso       - The DSpace object to retrieve the configuration for
+     * @return the discovery configuration for the provided DSO
+     */
     public static DiscoveryConfiguration getDiscoveryConfigurationByDSO(
         Context context, DSpaceObject dso) {
         DiscoveryConfigurationService configurationService = getConfigurationService();
@@ -145,7 +162,7 @@ public class SearchUtils {
      * A configuration object can be returned for each parent community/collection
      *
      * @param item the DSpace item
-     * @param context
+     * @param context   the database context
      * @return a list of configuration objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
