@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery.indexobject;
 
+import static org.dspace.discovery.SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFIXES;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -759,12 +761,14 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
                 }
             }
+            //Also add prefix field with all parts of value
+            saveFacetPrefixParts(doc, searchFilter, value, separator);
         }
     }
 
     /**
      * Stores every "value part" in lowercase, together with the original value in regular case,
-     * separated by the separator, in the {fieldName}_prefix field.
+     * separated by the separator, in the {fieldName}{@link SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFIXES} field.
      * <br>
      * E.g. Author "With Multiple Words" gets stored as:
      * <br>
@@ -787,7 +791,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         while (matcher.find()) {
             int index = matcher.start();
             String currentPart = StringUtils.substring(value, index);
-            doc.addField(searchFilter.getIndexFieldName() + "_prefix",
+            doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
                          currentPart.toLowerCase() + separator + value);
         }
     }
