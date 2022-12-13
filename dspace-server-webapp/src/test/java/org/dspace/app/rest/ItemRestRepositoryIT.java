@@ -62,6 +62,7 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -4664,4 +4665,185 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.status", notNullValue()));
     }
 
+    @Test
+    public void findItemsWithEditResourcePolicyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community comm1 = CommunityBuilder.createCommunity(context).withName("Community 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, comm1).withName("Collection 1").build();
+
+        EPerson hasDirectEditRights = EPersonBuilder.createEPerson(context)
+            .withEmail("has@editrights.com").withPassword(password)
+            .build();
+        EPerson hasDirectAdminRights = EPersonBuilder.createEPerson(context)
+            .withEmail("has@adminrights.com").withPassword(password)
+            .build();
+        Item byResourcePolicy = ItemBuilder.createItem(context, col1)
+            .withTitle("direct edit rights for eperson")
+            .build();
+        Item uneditable = ItemBuilder.createItem(context, col1)
+            .withTitle("uneditable item")
+            .build();
+        ResourcePolicy policy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(byResourcePolicy).withAction(WRITE).withUser(hasDirectEditRights)
+            .build();
+        policy = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withDspaceObject(byResourcePolicy).withAction(Constants.ADMIN).withUser(hasDirectAdminRights)
+            .build();
+        context.restoreAuthSystemState();
+
+        String tokenHasDirectEditRightsToken = getAuthToken(hasDirectEditRights.getEmail(), password);
+        String tokenHasDirectAdminRightsToken = getAuthToken(hasDirectAdminRights.getEmail(), password);
+
+        getClient(tokenHasDirectEditRightsToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.contains(ItemMatcher.matchItemProperties(byResourcePolicy))))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+        getClient(tokenHasDirectAdminRightsToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.contains(ItemMatcher.matchItemProperties(byResourcePolicy))))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findItemsWithEditAdminPropagationTest() throws Exception {
+        /*
+        Cases:
+          - items in collection with admin rights
+          - items in collection in community with admin rights
+         */
+
+        context.turnOffAuthorisationSystem();
+
+        /*
+        DSO structure:
+
+        root
+        ├── subcomm1
+            ├── subcomm1collA
+                ├── subcomm1collAitemX
+                ├── subcomm1collAitemY
+            ├── subcomm1collB
+                └── subcomm1collBitem
+        └── subcomm2
+            └── subcomm2coll
+                └── subcomm2collitem
+         */
+        EPerson rootAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("root@admin.com").withPassword(password).build();
+        EPerson subcomm1Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm1@admin.com").withPassword(password).build();
+        EPerson subcomm2Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm2@admin.com").withPassword(password).build();
+        EPerson subcomm1collA_Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm1collA@admin.com").withPassword(password).build();
+        EPerson subcomm1collB_Admin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm1collB@admin.com").withPassword(password).build();
+        EPerson subcomm2collAdmin = EPersonBuilder.createEPerson(context)
+            .withEmail("subcomm2coll@admin.com").withPassword(password).build();
+
+        Community root = CommunityBuilder.createCommunity(context)
+            .withAdminGroup(rootAdmin)
+            .withName("root")
+            .build();
+        Community subcomm1 = CommunityBuilder.createSubCommunity(context, root)
+            .withAdminGroup(subcomm1Admin)
+            .withName("subcomm1")
+            .build();
+        Community subcomm2 = CommunityBuilder.createSubCommunity(context, root)
+            .withAdminGroup(subcomm2Admin)
+            .withName("subcomm2")
+            .build();
+        Collection subcomm1collA = CollectionBuilder.createCollection(context, subcomm1)
+            .withAdminGroup(subcomm1collA_Admin)
+            .withName("subcomm1collA")
+            .build();
+        Collection subcomm1collB = CollectionBuilder.createCollection(context, subcomm1)
+            .withAdminGroup(subcomm1collB_Admin)
+            .withName("subcomm1collB")
+            .build();
+        Collection subcomm2coll = CollectionBuilder.createCollection(context, subcomm2)
+            .withAdminGroup(subcomm2collAdmin)
+            .withName("subcomm2coll")
+            .build();
+        Item subcomm1collAitemX = ItemBuilder.createItem(context, subcomm1collA).withTitle("subcomm1collAitemX")
+            .build();
+        Item subcomm1collAitemY = ItemBuilder.createItem(context, subcomm1collA).withTitle("subcomm1collAitemY")
+            .build();
+        Item subcomm1collBitem = ItemBuilder.createItem(context, subcomm1collB).withTitle("subcomm1collBitem")
+            .build();
+        Item subcomm2collitem = ItemBuilder.createItem(context, subcomm2coll).withTitle("subcomm2collitem")
+            .build();
+        context.restoreAuthSystemState();
+
+        String rootAdminToken = getAuthToken(rootAdmin.getEmail(), password);
+        String subcomm1AdminToken = getAuthToken(subcomm1Admin.getEmail(), password);
+        String subcomm2AdminToken = getAuthToken(subcomm2Admin.getEmail(), password);
+        String subcomm1collA_AdminToken = getAuthToken(subcomm1collA_Admin.getEmail(), password);
+        String subcomm1collB_AdminToken = getAuthToken(subcomm1collB_Admin.getEmail(), password);
+        String subcomm2collAdminToken = getAuthToken(subcomm2collAdmin.getEmail(), password);
+
+        getClient(rootAdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY),
+                    ItemMatcher.matchItemProperties(subcomm1collBitem),
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        getClient(subcomm1AdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY),
+                    ItemMatcher.matchItemProperties(subcomm1collBitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        getClient(subcomm2AdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        getClient(subcomm1collA_AdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(subcomm1collB_AdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                       Matchers.containsInAnyOrder(
+                            ItemMatcher.matchItemProperties(subcomm1collBitem)
+                       )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        getClient(subcomm2collAdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
 }
