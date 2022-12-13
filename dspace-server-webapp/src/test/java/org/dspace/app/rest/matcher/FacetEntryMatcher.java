@@ -99,6 +99,17 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchFacet(String name, String facetType, boolean hasNext) {
+        return allOf(
+                hasJsonPath("$.name", is(name)),
+                hasJsonPath("$.facetType", is(facetType)),
+                hasJsonPath("$.facetLimit", any(Integer.class)),
+                hasJsonPath("$._links.self.href", containsString("api/discover/facets/" + name)),
+                hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/" + name))
+        );
+    }
+
+
     /**
      * Check that a facet over the dc.type exists and match the default configuration
      * 

@@ -53,10 +53,16 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
                         if (bitstreams != null) {
                             for (Bitstream bitstream : bitstreams) {
                                 document.addField(SOLR_FIELD_NAME_FOR_FILENAMES, bitstream.getName());
+                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_keyword", bitstream.getName());
+                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_filter", bitstream.getName());
 
                                 String description = bitstream.getDescription();
                                 if ((description != null) && !description.isEmpty()) {
                                     document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS, description);
+                                    document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS + "_keyword",
+                                                      bitstream.getName());
+                                    document.addField(SOLR_FIELD_NAME_FOR_DESCRIPTIONS + "_filter",
+                                                      bitstream.getName());
                                 }
                             }
                         }

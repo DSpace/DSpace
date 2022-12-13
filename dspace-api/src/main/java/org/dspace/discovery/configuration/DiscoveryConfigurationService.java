@@ -7,12 +7,19 @@
  */
 package org.dspace.discovery.configuration;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -21,6 +28,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoveryConfigurationService {
+
+    private static final Logger log = LogManager.getLogger();
 
     private Map<String, DiscoveryConfiguration> map;
     private Map<Integer, List<String>> toIgnoreMetadataFields = new HashMap<>();
@@ -41,25 +50,68 @@ public class DiscoveryConfigurationService {
         this.toIgnoreMetadataFields = toIgnoreMetadataFields;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(IndexableObject dso) {
+    public DiscoveryConfiguration getDiscoveryConfiguration(final Context context,
+                                                            IndexableObject dso) {
         String name;
         if (dso == null) {
             name = "default";
         } else if (dso instanceof IndexableDSpaceObject) {
-            name = ((IndexableDSpaceObject) dso).getIndexedObject().getHandle();
+            return getDiscoveryDSOConfiguration(context, ((IndexableDSpaceObject) dso).getIndexedObject());
         } else {
             name = dso.getUniqueIndexID();
         }
-
         return getDiscoveryConfiguration(name);
     }
 
+    /**
+     * Retrieve the discovery configuration for the provided DSO. When no direct match is found, the parent object will
+     * be checked until there is no parent left, in which case the "default" configuration will be returned.
+     * @param context   - The database context
+     * @param dso       - The DSpace object to retrieve the configuration for
+     * @return the discovery configuration for the provided DSO.
+     */
+    public DiscoveryConfiguration getDiscoveryDSOConfiguration(final Context context,
+                                                               DSpaceObject dso) {
+        String name;
+        if (dso == null) {
+            name = "default";
+        } else {
+            name = dso.getHandle();
+        }
+
+        DiscoveryConfiguration configuration = getDiscoveryConfiguration(name, false);
+        if (configuration != null) {
+            return configuration;
+        }
+        DSpaceObjectService<DSpaceObject> dSpaceObjectService =
+                ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
+        DSpaceObject parentObject = null;
+        try {
+            parentObject = dSpaceObjectService.getParentObject(context, dso);
+        } catch (SQLException e) {
+            log.error(e);
+        }
+        return getDiscoveryDSOConfiguration(context, parentObject);
+    }
+
     public DiscoveryConfiguration getDiscoveryConfiguration(final String name) {
+        return getDiscoveryConfiguration(name, true);
+    }
+
+    /**
+     * Retrieve the configuration for the provided name. When useDefault is set to true, the "default" configuration
+     * will be returned when no match is found. When useDefault is set to false, null will be returned when no match is
+     * found.
+     * @param name          - The name of the configuration to retrieve
+     * @param useDefault    - Whether the default configuration should be used when no match is found
+     * @return the configuration for the provided name
+     */
+    public DiscoveryConfiguration getDiscoveryConfiguration(final String name, boolean useDefault) {
         DiscoveryConfiguration result;
 
         result = StringUtils.isBlank(name) ? null : getMap().get(name);
 
-        if (result == null) {
+        if (result == null && useDefault) {
             //No specific configuration, get the default one
             result = getMap().get("default");
         }
@@ -68,11 +120,12 @@ public class DiscoveryConfigurationService {
     }
 
     public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
+                                                                       final Context context,
                                                                        final IndexableObject dso) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {
-            return getDiscoveryConfiguration(dso);
+            return getDiscoveryConfiguration(context, dso);
         }
     }
 
@@ -96,9 +149,9 @@ public class DiscoveryConfigurationService {
         System.out.println(DSpaceServicesFactory.getInstance().getServiceManager().getServicesNames().size());
         DiscoveryConfigurationService mainService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                          .getServiceByName(
-                                                                             DiscoveryConfigurationService.class
-                                                                                 .getName(),
-                                                                             DiscoveryConfigurationService.class);
+                                                                                 DiscoveryConfigurationService.class
+                                                                                         .getName(),
+                                                                                 DiscoveryConfigurationService.class);
 
         for (String key : mainService.getMap().keySet()) {
             System.out.println(key);
@@ -126,7 +179,7 @@ public class DiscoveryConfigurationService {
 
             System.out.println("Recent submissions configuration:");
             DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration = discoveryConfiguration
-                .getRecentSubmissionConfiguration();
+                    .getRecentSubmissionConfiguration();
             System.out.println("\tMetadata sort field: " + recentSubmissionConfiguration.getMetadataSortField());
             System.out.println("\tMax recent submissions: " + recentSubmissionConfiguration.getMax());
 
