@@ -119,8 +119,8 @@ public class DiscoveryConfigurationService {
         return result;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
-                                                                       final Context context,
+    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final Context context,
+                                                                       final String configurationName,
                                                                        final IndexableObject dso) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
