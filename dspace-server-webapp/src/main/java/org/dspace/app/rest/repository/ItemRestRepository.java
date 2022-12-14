@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -367,13 +368,15 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      * @throws SearchServiceException
      */
     @SearchRestMethod(name = "findItemsWithEdit")
-    public Page<ItemRest> findItemsWithEdit(Pageable pageable) throws SearchServiceException {
+    public Page<ItemRest> findItemsWithEdit(@Parameter(value = "query") String q, Pageable pageable)
+        throws SearchServiceException {
         try {
             Context context = obtainContext();
-            List<Item> items = itemService.findItemsWithEdit(context,
+            List<Item> items = itemService.findItemsWithEdit(q,
+                                                             context,
                                                              Math.toIntExact(pageable.getOffset()),
                                                              Math.toIntExact(pageable.getPageSize()));
-            int tot = itemService.countItemsWithEdit(context);
+            int tot = itemService.countItemsWithEdit(q, context);
             return converter.toRestPage(items, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

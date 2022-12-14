@@ -778,7 +778,7 @@ public interface ItemService
      * @throws SQLException
      * @throws SearchServiceException
      */
-    public List<Item> findItemsWithEdit(Context context, int offset, int limit)
+    public List<Item> findItemsWithEdit(String q, Context context, int offset, int limit)
         throws SQLException, SearchServiceException;
 
     /**
@@ -788,7 +788,7 @@ public interface ItemService
      * @throws SQLException
      * @throws SearchServiceException
      */
-    public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException;
+    public int countItemsWithEdit(String q, Context context) throws SQLException, SearchServiceException;
 
     /**
      * Check if the supplied item is an inprogress submission

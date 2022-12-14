@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -1086,7 +1087,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
-    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery)
+    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery, String q)
         throws SQLException, SearchServiceException {
         EPerson currentUser = context.getCurrentUser();
         if (!authorizeService.isAdmin(context)) {
@@ -1097,26 +1098,30 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                 .collect(Collectors.joining(" OR ", "edit:(", ")"));
             discoverQuery.addFilterQueries(query);
         }
+        if (StringUtils.isNotBlank(q)) {
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            discoverQuery.setQuery(String.format("(%s OR %s*)", escapedQuery, escapedQuery));
+        }
         return searchService.search(context, discoverQuery);
     }
 
-    public List<Item> findItemsWithEdit(Context context, int offset, int limit)
+    public List<Item> findItemsWithEdit(String q, Context context, int offset, int limit)
         throws SQLException, SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery, q);
         return resp.getIndexableObjects().stream()
             .map(solrItems -> ((IndexableItem) solrItems).getIndexedObject())
             .collect(Collectors.toList());
     }
 
-    public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException {
+    public int countItemsWithEdit(String q, Context context) throws SQLException, SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
-        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery, q);
         return (int) resp.getTotalSearchResults();
     }
 
