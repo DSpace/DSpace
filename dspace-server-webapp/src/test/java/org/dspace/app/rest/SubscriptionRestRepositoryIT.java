@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.SubscriptionMatcher;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
@@ -694,6 +695,168 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("WEEKLY")))
                              .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
                              .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")));
+    }
+
+    @Test
+    public void linkedEpersonOfSubscriptionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
+    }
+
+    @Test
+    public void linkedEpersonOfSubscriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
+    }
+
+    @Test
+    public void linkedEpersonOfSubscriptionUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void linkedEpersonOfSubscriptionForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+                               .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void linkedEpersonOfSubscriptionNotFoundTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + Integer.MAX_VALUE + "/ePerson"))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void linkedDSpaceObjectOfSubscriptionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(publicItem.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(publicItem.getName())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                             .andExpect(jsonPath("$.discoverable", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)))
+                             .andExpect(jsonPath("$.type", Matchers.is("item")));
+    }
+
+    @Test
+    public void linkedDSpaceObjectOfSubscriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.uuid", Matchers.is(publicItem.getID().toString())))
+                             .andExpect(jsonPath("$.name", Matchers.is(publicItem.getName())))
+                             .andExpect(jsonPath("$.withdrawn", Matchers.is(false)))
+                             .andExpect(jsonPath("$.discoverable", Matchers.is(true)))
+                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)))
+                             .andExpect(jsonPath("$.type", Matchers.is("item")));
+    }
+
+    @Test
+    public void linkedDSpaceObjectOfSubscriptionUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void linkedDSpaceObjectOfSubscriptionForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("Parameter");
+        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "TestType", publicItem, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+                               .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void linkedDSpaceObjectOfSubscriptionNotFoundTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + Integer.MAX_VALUE + "/dSpaceObject"))
+                             .andExpect(status().isNotFound());
     }
 
 }
