@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * The {@link ScriptConfiguration} for the {@link ItemImportCLI} script
- * 
+ *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfiguration<ItemImportCLI> {
@@ -55,7 +55,7 @@ public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfigurat
         options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
                 .hasArg(false).required(false).build());
-        options.addOption(Option.builder("x").longOpt("exclude_content")
+        options.addOption(Option.builder("x").longOpt("exclude-bitstreams")
                 .desc("do not load or expect content bitstreams")
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("p").longOpt("template")
