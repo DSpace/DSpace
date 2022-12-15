@@ -39,10 +39,10 @@ import org.dspace.profile.OrcidSynchronizationMode;
 public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     private boolean withdrawn = false;
+    private String handle = null;
     private WorkspaceItem workspaceItem;
     private Item item;
     private Group readerGroup = null;
-    private String handle = null;
 
     protected ItemBuilder(Context context) {
         super(context);
@@ -371,7 +371,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     @Override
     public Item build() {
         try {
-            installItemService.installItem(context, workspaceItem, handle);
+            installItemService.installItem(context, workspaceItem, this.handle);
             itemService.update(context, item);
 
             //Check if we need to make this item private. This has to be done after item install.
@@ -397,12 +397,17 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
        try (Context c = new Context()) {
             c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
+            // If the workspaceItem used to create this item still exists, delete it
+            workspaceItem = c.reloadEntity(workspaceItem);
+            if (workspaceItem != null) {
+                workspaceItemService.deleteAll(c, workspaceItem);
+            }
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             item = c.reloadEntity(item);
             if (item != null) {
                  delete(c, item);
-                 c.complete();
             }
+            c.complete();
        }
     }
 

@@ -7,8 +7,12 @@
  */
 package org.dspace.service.impl;
 
+import static org.apache.commons.lang3.StringUtils.ordinalIndexOf;
+
+import java.net.Inet4Address;
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Utils;
@@ -64,6 +68,13 @@ public class ClientInfoServiceImpl implements ClientInfoService {
         } else if (StringUtils.isNotBlank(xForwardedForHeaderValue)) {
             log.warn("X-Forwarded-For header sent from client, but useProxies is not enabled. " +
                          "To trust X-Forwarded-For headers, set useProxies=true.");
+        }
+
+        if (isIPv4Address(ip)) {
+            int ipAnonymizationBytes = getIpAnonymizationBytes();
+            if (ipAnonymizationBytes > 0) {
+                ip = anonymizeIpAddress(ip, ipAnonymizationBytes);
+            }
         }
 
         return ip;
@@ -139,7 +150,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
 
         // If our IPTable is not empty, log the trusted proxies and return it
         if (!ipTable.isEmpty()) {
-            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable.toSet().toString());
+            log.info("Trusted proxies (configure via 'proxies.trusted.ipranges'): {}", ipTable);
             return ipTable;
         } else {
             return null;
@@ -191,5 +202,39 @@ public class ClientInfoServiceImpl implements ClientInfoService {
         }
 
         return ip;
+    }
+
+    /**
+     * Anonymize the given IP address by setting the last specified bytes to 0
+     * @param  ipAddress the ip address to be anonymize
+     * @param  bytes     the number of bytes to be set to 0
+     * @return           the modified ip address
+     */
+    private String anonymizeIpAddress(String ipAddress, int bytes) {
+
+        if (bytes > 4) {
+            log.warn("It is not possible to anonymize " + bytes + " bytes of an IPv4 address.");
+            return ipAddress;
+        }
+
+        if (bytes == 4) {
+            return "0.0.0.0";
+        }
+
+        String zeroSuffix = StringUtils.repeat(".0", bytes);
+        return removeLastBytes(ipAddress, bytes) + zeroSuffix;
+
+    }
+
+    private String removeLastBytes(String ipAddress, int bytes) {
+        return ipAddress.substring(0, ordinalIndexOf(ipAddress, ".", 4 - bytes));
+    }
+
+    private int getIpAnonymizationBytes() {
+        return configurationService.getIntProperty("client.ip-anonymization.parts", 0);
+    }
+
+    private boolean isIPv4Address(String ipAddress) {
+        return InetAddresses.forString(ipAddress) instanceof Inet4Address;
     }
 }

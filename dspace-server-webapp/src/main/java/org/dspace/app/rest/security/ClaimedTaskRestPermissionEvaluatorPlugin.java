@@ -27,7 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to interact with a claimed task only if he own it
+ * An authenticated user is allowed to interact with a claimed task only if they own it
  * claim.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)

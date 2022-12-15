@@ -124,6 +124,11 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
     }
 
     @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+        return false;
+    }
+
+    @Override
     public boolean canSelfRegister(Context context, HttpServletRequest request, String username) throws SQLException {
         return canSelfRegister();
     }

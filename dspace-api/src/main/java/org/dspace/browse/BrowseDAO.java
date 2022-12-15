@@ -346,7 +346,7 @@ public interface BrowseDAO {
     public String getFilterValueField();
 
     /**
-     * Set he name of the field in which the value to constrain results is
+     * Set the name of the field in which the value to constrain results is
      * contained
      *
      * @param valueField the name of the field

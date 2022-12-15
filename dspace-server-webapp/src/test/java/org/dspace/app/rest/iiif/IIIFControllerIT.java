@@ -22,27 +22,33 @@ import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
-    public static final String IIIFBundle = "IIIF";
+    public static final String IIIFBundle = "RANGETEST";
 
     @Autowired
     ItemService itemService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void disabledTest() throws Exception {
@@ -81,7 +87,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneIIIFSearchableEntityTypeWithGlobalConfigIT() throws Exception {
+    public void findOneIIIFSearchableItemWithDefaultDimensionsIT() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -134,7 +140,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Page 1")))
-                .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(2200)))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(64)))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(64)))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].images[0].resource.service.@id",
                         Matchers.endsWith(bitstream1.getID().toString())))
                 .andExpect(jsonPath("$.sequences[0].canvases[0].metadata[0].label", is("File name")))
@@ -491,11 +498,11 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.structures[0].ranges[1]",
                                        Matchers.endsWith("/iiif/" + publicItem1.getID() + "/manifest/range/r0-1")))
 
-                   // Should contain a structure with label=IIIF, corresponding to IIIF bundle
+                   // Should contain a structure with label=RANGETEST, corresponding to IIIF bundle
                    // It should have exactly 2 canvases (corresponding to 2 bitstreams)
-                   .andExpect(jsonPath("$.structures[?(@.label=='IIIF')].canvases[0]").exists())
-                   .andExpect(jsonPath("$.structures[?(@.label=='IIIF')].canvases[1]").exists())
-                   .andExpect(jsonPath("$.structures[?(@.label=='IIIF')].canvases[2]").doesNotExist())
+                   .andExpect(jsonPath("$.structures[?(@.label=='RANGETEST')].canvases[0]").exists())
+                   .andExpect(jsonPath("$.structures[?(@.label=='RANGETEST')].canvases[1]").exists())
+                   .andExpect(jsonPath("$.structures[?(@.label=='RANGETEST')].canvases[2]").doesNotExist())
 
                    // Should contain a structure with label=ORIGINAL, corresponding to ORIGINAL bundle
                    // It should have exactly 1 canvas (corresponding to 1 bitstream)
@@ -694,6 +701,79 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c7")))
                 .andExpect(jsonPath("$.service").exists());
     }
+
+    @Test
+    public void findOneWithAlternateIIIFBundleAndNoStructures() throws Exception {
+
+        String altBundle = "IIIFAlternate";
+
+        context.turnOffAuthorisationSystem();
+
+        configurationService.setProperty("iiif.exclude.toc.bundle", altBundle);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withIIIFCanvasHeight(3000)
+                                      .withIIIFCanvasWidth(2000)
+                                      .withIIIFCanvasNaming("Global")
+                                      .enableIIIF()
+                                      .enableIIIFSearch()
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            // add PDF to ORIGINAL
+            BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Bitstream1.pdf")
+                .withMimeType("application/pdf")
+                .build();
+        }
+        // Add images to the alternate IIIF bundle
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                .createBitstream(context, publicItem1, is, altBundle)
+                .withName("Bitstream2.png")
+                .withMimeType("image/png")
+                .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                .createBitstream(context, publicItem1, is, altBundle)
+                .withName("Bitstream3.tiff")
+                .withMimeType("image/tiff")
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Expected a rendering element and no structures (because all images are inside the toc excluded bundle)
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                   // should contain 3 canvases, corresponding to each bitstream
+                   .andExpect(jsonPath("$.sequences[0].canvases[*].label",
+                       Matchers.contains("Global 1", "Global 2")))
+
+                   // structures should not be present
+                   .andExpect(jsonPath("$.structures").doesNotExist())
+
+                   // Should sequence with exactly 2 canvases (corresponding to 2 bitstreams)
+                   .andExpect(jsonPath("$.sequences[0].canvases[0]").exists())
+                   .andExpect(jsonPath("$.sequences[0].canvases[1]").exists())
+                   .andExpect(jsonPath("$.sequences[1].canvases[2]").doesNotExist())
+
+                   // Should include the pdf file in rendering
+                   .andExpect(jsonPath("$.rendering[?(@.format=='application/pdf')]").exists());
+
+    }
+
 
     @Test
     public void findOneIIIFNotSearcheableIT() throws Exception {
@@ -1211,6 +1291,47 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.metadata[0].value", is("Public item (revised)")));
+    }
+
+    @Test
+    public void setDefaultCanvasDimensionCustomBundle() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+
+
+        Bundle targetBundle = BundleBuilder.createBundle(context, publicItem1)
+                                           .withName(IIIFBundle)
+                                           .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            Bitstream bitstream1 = BitstreamBuilder
+                    .createBitstream(context, targetBundle, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        // canvas dimensions using bitstream in the custom bundle (no bitstreams in ORIGINAL)
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(64)))
+                   .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(64)));
     }
 
 }

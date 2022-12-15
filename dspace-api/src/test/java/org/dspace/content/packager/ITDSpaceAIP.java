@@ -147,25 +147,24 @@ public class ITDSpaceAIP extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
 
-        log.info("setUpClass() - CREATE TEST HIERARCHY");
-        // Create a hierachy of sub-Communities and Collections and Items,
-        // which looks like this:
-        //  "Top Community"
-        //      - "Child Community"
-        //          - "Grandchild Community"
-        //              - "GreatGrandchild Collection"
-        //                  - "GreatGrandchild Collection Item #1"
-        //                  - "GreatGrandchild Collection Item #2"
-        //                  - "Mapped Item" (mapped collection)
-        //          - "Grandchild Collection"
-        //              - "Grandchild Collection Item #1"
-        //              - "Mapped Item" (owning collection)
-        //
+            log.info("setUpClass() - CREATE TEST HIERARCHY");
+            // Create a hierachy of sub-Communities and Collections and Items,
+            // which looks like this:
+            //  "Top Community"
+            //      - "Child Community"
+            //          - "Grandchild Community"
+            //              - "GreatGrandchild Collection"
+            //                  - "GreatGrandchild Collection Item #1"
+            //                  - "GreatGrandchild Collection Item #2"
+            //                  - "Mapped Item" (mapped collection)
+            //          - "Grandchild Collection"
+            //              - "Grandchild Collection Item #1"
+            //              - "Mapped Item" (owning collection)
+            //
         Community topCommunity = CommunityBuilder.createCommunity(context)
                                                  .withTitle("Top Community")
                                                  .build();
-
-        topCommunityHandle = topCommunity.getHandle();
+            topCommunityHandle = topCommunity.getHandle();
 
         Community child = CommunityBuilder.createSubCommunity(context, topCommunity)
                                           .withTitle("Child Community")

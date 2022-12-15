@@ -6,6 +6,9 @@ name: Build
 # Run this Build for all pushes / PRs to current branch
 on: [push, pull_request]
 
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -42,18 +45,18 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # https://github.com/actions/setup-java
       - name: Install JDK ${{ matrix.java }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       # https://github.com/actions/cache
       - name: Cache Maven dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # Cache entire ~/.m2/repository
           path: ~/.m2/repository
@@ -71,11 +74,11 @@ jobs:
       # (This artifact is downloadable at the bottom of any job's summary page)
       - name: Upload Results of ${{ matrix.type }} to Artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
 
       # https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3

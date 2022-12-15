@@ -7,13 +7,13 @@
  */
 package org.dspace.iiif.canvasdimension;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -232,9 +232,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
             .withName("Bitstream2.jpg")
             .withMimeType("image/jpeg")
             .build();
-
         context.restoreAuthSystemState();
-
         String id = parentCommunity.getID().toString();
         execCanvasScript(id);
 
@@ -409,7 +407,8 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
         execCanvasScriptWithMaxRecs(id);
         // check System.out for number of items processed.
-        assertEquals("2 IIIF items were processed.", StringUtils.chomp(outContent.toString()));
+        Pattern regex = Pattern.compile(".*2 IIIF items were processed", Pattern.DOTALL);
+        assertTrue(regex.matcher(StringUtils.chomp(outContent.toString())).find());
     }
 
     @Test

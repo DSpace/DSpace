@@ -101,4 +101,9 @@ public class OrcidAuthentication implements AuthenticationMethod {
         return getOrcidAuthentication().isUsed(context, request);
     }
 
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+        return false;
+    }
+
 }

@@ -50,9 +50,10 @@ dspace.ui.url = http://localhost:4000
 # Name of the site
 dspace.name = DSpace at My University
 
-# assetstore.dir, look at DSPACE/config/spring/api/bitstore.xml for more options
-# default is ${dspace.dir}/assetstore, uncomment and modify if you need to use a different path
-#assetstore.dir = ${dspace.dir}/assetstore
+# Assetstore configurations have moved to config/modules/assetstore.cfg
+# and config/spring/api/bitstore.xml.
+# Additional storage options (e.g. Amazon S3) are available in `assetstore.cfg`
+# assetstore.dir = ${dspace.dir}/assetstore
 
 # Default language for metadata values
 #default.language = en_US
