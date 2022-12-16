@@ -71,7 +71,7 @@ public class SWORDComboBox extends JComboBox {
     public void updateList() {
         Object s = getSelectedItem();
 
-        if (!isEditable() || s == null || (s != null && ((String) s).trim().length() == 0)) {
+        if (!isEditable() || s == null || ((String) s).trim().length() == 0) {
             // don't update with an empty item or if the combo box is not editable.
             return;
         }

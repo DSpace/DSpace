@@ -39,29 +39,34 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 
 /**
- * Provides some batch editing capabilities for items in DSpace:
- * Metadata fields - Add, Delete
- * Bitstreams - Add, Delete
+ * Provides some batch editing capabilities for items in DSpace.
+ * <ul>
+ *   <li>Metadata fields - Add, Delete</li>
+ *   <li>Bitstreams - Add, Delete</li>
+ * </ul>
  *
- * The design has been for compatibility with ItemImporter
+ * <p>
+ * The design has been for compatibility with
+ * {@link org.dspace.app.itemimport.service.ItemImportService}
  * in the use of the DSpace archive format which is used to
  * specify changes on a per item basis.  The directory names
  * to correspond to each item are arbitrary and will only be
  * used for logging purposes.  The reference to the item is
- * from a required dc.identifier with the item handle to be
- * included in the dublin_core.xml (or similar metadata) file.
+ * from a required {@code dc.identifier} with the item handle to be
+ * included in the {@code dublin_core.xml} (or similar metadata) file.
  *
- * Any combination of these actions is permitted in a single run of this class
+ * <p>
+ * Any combination of these actions is permitted in a single run of this class.
  * The order of actions is important when used in combination.
- * It is the responsibility of the calling class (here, ItemUpdate)
- * to register UpdateAction classes in the order to which they are
+ * It is the responsibility of the calling class (here, {@code ItemUpdate})
+ * to register {@link UpdateAction} classes in the order which they are
  * to be performed.
  *
- *
- * It is unfortunate that so much code needs to be borrowed
- * from ItemImport as it is not reusable in private methods, etc.
- * Some of this has been placed into the MetadataUtilities class
- * for possible reuse elsewhere.
+ * <p>
+ * It is unfortunate that so much code needs to be borrowed from
+ * {@link org.dspace.app.itemimport.service.ItemImportService} as it is not
+ * reusable in private methods, etc.  Some of this has been placed into the
+ * {@link MetadataUtilities} class for possible reuse elsewhere.
  *
  * @author W. Hays based on a conceptual design by R. Rodgers
  */
@@ -73,7 +78,7 @@ public class ItemUpdate {
     public static final String DELETE_CONTENTS_FILE = "delete_contents";
 
     public static String HANDLE_PREFIX = null;
-    public static final Map<String, String> filterAliases = new HashMap<String, String>();
+    public static final Map<String, String> filterAliases = new HashMap<>();
 
     public static boolean verbose = false;
 
@@ -375,7 +380,7 @@ public class ItemUpdate {
         // open and process the source directory
         File sourceDir = new File(sourceDirPath);
 
-        if ((sourceDir == null) || !sourceDir.exists() || !sourceDir.isDirectory()) {
+        if (!sourceDir.exists() || !sourceDir.isDirectory()) {
             pr("Error, cannot open archive source directory " + sourceDirPath);
             throw new Exception("error with archive source directory " + sourceDirPath);
         }

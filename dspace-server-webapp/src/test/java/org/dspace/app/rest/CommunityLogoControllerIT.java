@@ -46,7 +46,7 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
 
     private String createLogoInternal() throws Exception {
         MvcResult mvcPostResult = getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -59,7 +59,7 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
     @Test
     public void createLogoNotLoggedIn() throws Exception {
         getClient().perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate(parentCommunity.getID().toString()))
                 .file(bitstreamFile))
                 .andExpect(status().isUnauthorized());
     }
@@ -83,7 +83,7 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
     public void createLogoNoRights() throws Exception {
         String userToken = getAuthToken(eperson.getEmail(), password);
         getClient(userToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isForbidden());
     }
@@ -91,12 +91,12 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
     @Test
     public void createDuplicateLogo() throws Exception {
         getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isCreated());
 
         getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate(parentCommunity.getID().toString()))
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate(parentCommunity.getID().toString()))
                         .file(bitstreamFile))
                 .andExpect(status().isUnprocessableEntity());
     }
@@ -104,7 +104,7 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
     @Test
     public void createLogoForNonexisting() throws Exception {
         getClient(adminAuthToken).perform(
-                MockMvcRequestBuilders.fileUpload(getLogoUrlTemplate("16a4b65b-3b3f-4ef5-8058-ef6f5a653ef9"))
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate("16a4b65b-3b3f-4ef5-8058-ef6f5a653ef9"))
                         .file(bitstreamFile))
                 .andExpect(status().isNotFound());
     }

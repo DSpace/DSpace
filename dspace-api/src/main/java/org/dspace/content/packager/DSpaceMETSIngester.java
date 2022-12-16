@@ -23,7 +23,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 /**
  * Packager plugin to ingest a

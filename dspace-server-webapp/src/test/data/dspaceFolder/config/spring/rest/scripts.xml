@@ -27,4 +27,20 @@
         <property name="description" value="Delete all the values of the specified metadata field"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
     </bean>
+
+     <bean id="type-conversion-test" class="org.dspace.app.scripts.TypeConversionTestScriptConfiguration" primary="true">
+        <property name="description" value="Test the type conversion different option types"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.scripts.TypeConversionTestScript"/>
+    </bean>
+
+    <bean id="import" class="org.dspace.app.itemimport.ItemImportScriptConfiguration" primary="true">
+        <property name="description" value="Batch Import from Simple Archive Format (SAF)" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemimport.ItemImport"/>
+    </bean>
+
+    <bean id="export" class="org.dspace.app.itemexport.ItemExportScriptConfiguration" primary="true">
+        <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExport"/>
+    </bean>
+
 </beans>

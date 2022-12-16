@@ -29,7 +29,7 @@ public class SearchFilterToAppliedFilterConverter {
         AuthorityValue authorityValue = null;
         if (searchFilter.hasAuthorityOperator()) {
             // FIXME this is obviously wrong as it assumes that the authorityValueService is able to retrieve the label
-            // for each Authority. Indeed, the AuthorityValueService regardless to his name is specific of the
+            // for each Authority. Indeed, the AuthorityValueService regardless of its name is specific of the
             // "SOLRAuthority" implementation and should not have a prominent role.
             // Moreover, it is not possible to discover which authority is responsible for the value selected in the
             // facet as the authority is bind at the metadata level and so a facet could contains values from multiple

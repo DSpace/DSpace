@@ -164,6 +164,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
                      toSort.get(1).getName());
         assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream3",
                      toSort.get(2).getName());
+
+        // Also, verify all bitstreams are considered equal (comparison returns 0)
+        GoogleBitstreamComparator comparator = new GoogleBitstreamComparator(context, settings);
+        assertEquals(0, comparator.compare(bitstream1, bitstream2));
+        assertEquals(0, comparator.compare(bitstream2, bitstream3));
+        assertEquals(0, comparator.compare(bitstream3, bitstream1));
     }
 
     /**
