@@ -880,7 +880,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
                                                               IndexableCollection.TYPE,
-            offset, limit,DSpaceObjectService.COMMUNITIES_AND_COLLECTIONS_SORT_FIELD,SORT_ORDER.asc);
+            offset, limit, DSpaceObjectService.COMMUNITIES_AND_COLLECTIONS_SORT_FIELD, SORT_ORDER.asc);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(collection);
