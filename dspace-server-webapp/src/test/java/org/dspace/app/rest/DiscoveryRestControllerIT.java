@@ -6305,6 +6305,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._embedded.values").isEmpty())
                    .andExpect(jsonPath("$.page.number", is(0)));
 
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
         metadataAuthorityService.clearCache();
     }
 }
