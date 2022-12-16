@@ -57,7 +57,7 @@ public class LiveImportDataProvider extends AbstractExternalDataProvider {
 
     /**
      * This method set the MetadataSource for the ExternalDataProvider
-     * @param metadataSource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
+     * @param querySource Source {@link org.dspace.importer.external.service.components.QuerySource} implementation used to process the input data
      */
     public void setMetadataSource(QuerySource querySource) {
         this.querySource = querySource;
