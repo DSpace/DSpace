@@ -472,7 +472,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                         + var);
                             }
                         }
-                        // if searchFilter is of type "facet", delegate to indexFacetFilters method
+                        // if searchFilter is of type "facet", delegate to indexIfFilterTypeFacet method
                         if (searchFilter.getFilterType().equals(DiscoverySearchFilterFacet.FILTER_TYPE_FACET)) {
                             indexIfFilterTypeFacet(doc, searchFilter, value, date,
                                                    authority, preferedLabel, separator);
@@ -695,7 +695,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                              value.toLowerCase() + separator + value);
             }
             //Also add prefix field with all parts of value
-            saveFacetPrefixParts(doc, searchFilter, value, separator);
+            saveFacetPrefixParts(doc, searchFilter, value, separator, authority, preferedLabel);
         } else if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             if (date != null) {
                 String indexField = searchFilter.getIndexFieldName() + ".year";
@@ -762,7 +762,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 }
             }
             //Also add prefix field with all parts of value
-            saveFacetPrefixParts(doc, searchFilter, value, separator);
+            saveFacetPrefixParts(doc, searchFilter, value, separator, authority, preferedLabel);
         }
     }
 
@@ -783,16 +783,23 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
      * @param value the metadata value
      * @param separator the separator being used to separate value part and original value
      */
-    private void saveFacetPrefixParts(SolrInputDocument doc, DiscoverySearchFilter searchFilter,
-                                      String value, String separator) {
+    private void saveFacetPrefixParts(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
+                                      String separator, String authority, String preferedLabel) {
         value = StringUtils.normalizeSpace(value);
         Pattern pattern = Pattern.compile("\\b\\w+\\b", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(value);
         while (matcher.find()) {
             int index = matcher.start();
             String currentPart = StringUtils.substring(value, index);
-            doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
-                         currentPart.toLowerCase() + separator + value);
+            if (authority != null) {
+                String facetValue = preferedLabel != null ? preferedLabel : currentPart;
+                doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
+                             facetValue.toLowerCase() + separator + value
+                                 + SearchUtils.AUTHORITY_SEPARATOR + authority);
+            } else {
+                doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
+                             currentPart.toLowerCase() + separator + value);
+            }
         }
     }
 }

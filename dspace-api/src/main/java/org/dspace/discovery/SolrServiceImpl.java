@@ -1253,7 +1253,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
-     * Gets the solr field that contains the the facet value split on each word break to the end, so can be searched
+     * Gets the solr field that contains the facet value split on each word break to the end, so can be searched
      * on each word in the value, see {@link org.dspace.discovery.indexobject.ItemIndexFactoryImpl
      * #saveFacetPrefixParts(SolrInputDocument, DiscoverySearchFilter, String, String)}
      * Ony applicable to facets of type {@link DiscoveryConfigurationParameters.TYPE_TEXT}, otherwise uses the regular
@@ -1354,7 +1354,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             return value;
         }
         if (field.endsWith("_filter") || field.endsWith("_ac")
-            || field.endsWith("_acid")) {
+            || field.endsWith("_acid") || field.endsWith(SOLR_FIELD_SUFFIX_FACET_PREFIXES)) {
             //We have a filter make sure we split !
             String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
                                                     .getProperty("discovery.solr.facets.split.char");
