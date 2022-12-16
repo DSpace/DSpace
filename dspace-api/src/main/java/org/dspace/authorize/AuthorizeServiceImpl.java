@@ -41,7 +41,6 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.eperson.EPerson;
@@ -934,7 +933,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return false;
     }
 
-    private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit, String sortField, SORT_ORDER sortOrder)
+    private DiscoverResult getDiscoverResult(Context context, String query, Integer offset, Integer limit,
+            String sortField, SORT_ORDER sortOrder)
         throws SearchServiceException, SQLException {
         String groupQuery = getGroupToQuery(groupService.allMemberGroups(context, context.getCurrentUser()));
 

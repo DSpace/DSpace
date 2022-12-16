@@ -56,7 +56,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * Field used to sort community and collection lists at solr
      */
     public static final String COMMUNITIES_AND_COLLECTIONS_SORT_FIELD = "dc.title_sort";
-    
+
     /**
      * Generic find for when the precise type of an Entity is not known
      *
