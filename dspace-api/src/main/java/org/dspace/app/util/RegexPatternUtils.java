@@ -51,20 +51,21 @@ public class RegexPatternUtils {
             return null;
         }
         Matcher inputMatcher = PATTERN_REGEX_INPUT_VALIDATOR.matcher(regex);
-        Pattern pattern = null;
+        String regexPattern = regex;
+        String regexFlags = "";
         if (inputMatcher.matches()) {
-            String regexPattern = inputMatcher.group(2);
-            String regexFlags =
+            regexPattern =
+                Optional.of(inputMatcher.group(2))
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(regex);
+            regexFlags =
                 Optional.ofNullable(inputMatcher.group(3))
-                .filter(StringUtils::isNotBlank)
-                .map(flags -> String.format(REGEX_FLAGS, flags))
-                .orElse("")
-                .replaceAll("g", "");
-            pattern = Pattern.compile(regexFlags + regexPattern);
-        } else {
-            pattern = Pattern.compile(regex);
+                    .filter(StringUtils::isNotBlank)
+                    .map(flags -> String.format(REGEX_FLAGS, flags))
+                    .orElse("")
+                    .replaceAll("g", "");
         }
-        return pattern;
+        return Pattern.compile(regexFlags + regexPattern);
     }
 
     private RegexPatternUtils() {}
