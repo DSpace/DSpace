@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -184,5 +185,30 @@ public class RegexPatternUtilsTest extends AbstractUnitTest {
         String nullPattern = null;
         computePattern = RegexPatternUtils.computePattern(nullPattern);
         assertNull(computePattern);
+    }
+
+    @Test
+    public void testMultiFlagRegex() {
+        String multilineSensitive = "/[a-z]+/gi";
+        Pattern computePattern = RegexPatternUtils.computePattern(multilineSensitive);
+        assertNotNull(computePattern);
+        Matcher matcher = computePattern.matcher("hello");
+        assertTrue(matcher.matches());
+        matcher = computePattern.matcher("Hello");
+        assertTrue(matcher.matches());
+
+        multilineSensitive = "/[a-z]+/gim";
+        computePattern = RegexPatternUtils.computePattern(multilineSensitive);
+        assertNotNull(computePattern);
+        matcher = computePattern.matcher("Hello" + System.lineSeparator() + "Everyone");
+        assertTrue(matcher.find());
+        assertEquals("Hello", matcher.group());
+        assertTrue(matcher.find());
+        assertEquals("Everyone", matcher.group());
+
+        matcher = computePattern.matcher("hello");
+        assertTrue(matcher.matches());
+        matcher = computePattern.matcher("HELLO");
+        assertTrue(matcher.matches());
     }
 }
