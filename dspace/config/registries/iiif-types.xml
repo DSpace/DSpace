@@ -65,9 +65,9 @@
 
     <dc-type>
         <schema>iiif</schema>
-        <element>image</element>
+        <element>media</element>
         <qualifier>annotations</qualifier>
-        <scope_note>Metadata field used for IIIF image annotations in json format</scope_note>
+        <scope_note>Metadata field used for IIIF media annotations in json format</scope_note>
     </dc-type>
 
 </dspace-dc-types>

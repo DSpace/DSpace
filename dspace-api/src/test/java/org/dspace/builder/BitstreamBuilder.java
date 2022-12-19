@@ -152,7 +152,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     }
 
     public BitstreamBuilder withIiifImageAnnotatiion(String s) throws SQLException {
-        bitstreamService.addMetadata(context, bitstream, "iiif", "image", "annotations", null, String.valueOf(s));
+        bitstreamService.addMetadata(context, bitstream, "iiif", "media", "annotations", null, String.valueOf(s));
         return this;
     }
 

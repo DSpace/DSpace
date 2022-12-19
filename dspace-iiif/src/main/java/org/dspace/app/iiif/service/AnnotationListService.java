@@ -83,7 +83,7 @@ public class AnnotationListService extends AbstractResourceService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        List<MetadataValue> metadata = bitstreamService.getMetadata(bitstream, "iiif", "image",
+        List<MetadataValue> metadata = bitstreamService.getMetadata(bitstream, "iiif", "media",
             "annotations", Item.ANY);
 
         // If annotations exist, the JSON formatted list will be found in the first, non-repeating metadata field.
