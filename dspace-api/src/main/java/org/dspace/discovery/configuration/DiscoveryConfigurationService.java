@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -33,6 +34,12 @@ public class DiscoveryConfigurationService {
 
     private Map<String, DiscoveryConfiguration> map;
     private Map<Integer, List<String>> toIgnoreMetadataFields = new HashMap<>();
+
+    /**
+     * Discovery configurations, cached by DSO UUID. When a DSO doesn't have its own configuration, we take the one of
+     * the first parent that does. This cache ensures we don't have to go up the hierarchy every time.
+     */
+    private final Map<UUID, DiscoveryConfiguration> uuidMap = new HashMap<>();
 
     public Map<String, DiscoveryConfiguration> getMap() {
         return map;
@@ -72,26 +79,38 @@ public class DiscoveryConfigurationService {
      */
     public DiscoveryConfiguration getDiscoveryDSOConfiguration(final Context context,
                                                                DSpaceObject dso) {
-        String name;
+        // Fall back to default configuration
         if (dso == null) {
-            name = "default";
-        } else {
-            name = dso.getHandle();
+            return getDiscoveryConfiguration("default", false);
         }
 
-        DiscoveryConfiguration configuration = getDiscoveryConfiguration(name, false);
-        if (configuration != null) {
-            return configuration;
+        // Attempt to retrieve cached configuration by UUID
+        if (uuidMap.containsKey(dso.getID())) {
+            return uuidMap.get(dso.getID());
         }
-        DSpaceObjectService<DSpaceObject> dSpaceObjectService =
+
+        DiscoveryConfiguration configuration;
+
+        // Attempt to retrieve configuration by DSO handle
+        configuration = getDiscoveryConfiguration(dso.getHandle(), false);
+
+        if (configuration == null) {
+            // Recurse up the Comm/Coll hierarchy until a configuration is found
+            DSpaceObjectService<DSpaceObject> dSpaceObjectService =
                 ContentServiceFactory.getInstance().getDSpaceObjectService(dso);
-        DSpaceObject parentObject = null;
-        try {
-            parentObject = dSpaceObjectService.getParentObject(context, dso);
-        } catch (SQLException e) {
-            log.error(e);
+            DSpaceObject parentObject = null;
+            try {
+                parentObject = dSpaceObjectService.getParentObject(context, dso);
+            } catch (SQLException e) {
+                log.error(e);
+            }
+            configuration = getDiscoveryDSOConfiguration(context, parentObject);
         }
-        return getDiscoveryDSOConfiguration(context, parentObject);
+
+        // Cache the resulting configuration
+        uuidMap.put(dso.getID(), configuration);
+
+        return configuration;
     }
 
     public DiscoveryConfiguration getDiscoveryConfiguration(final String name) {
@@ -119,8 +138,8 @@ public class DiscoveryConfigurationService {
         return result;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName,
-                                                                       final Context context,
+    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final Context context,
+                                                                       final String configurationName,
                                                                        final IndexableObject dso) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
