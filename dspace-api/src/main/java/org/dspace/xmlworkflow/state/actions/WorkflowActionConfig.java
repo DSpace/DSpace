@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.state.actions;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.xmlworkflow.state.Step;
 
@@ -67,6 +68,30 @@ public class WorkflowActionConfig {
      */
     public List<String> getOptions() {
         return this.processingAction.getOptions();
+    }
+
+    /**
+     * Returns a list of advanced options this user has on this action, resulting in the next step of the workflow
+     * @returnA list of advanced options of this action, resulting in the next step of the workflow
+     */
+    public List<String> getAdvancedOptions() {
+        return this.processingAction.getAdvancedOptions();
+    }
+
+    /**
+     * Returns a boolean depending on whether this action has advanced options
+     * @return The boolean indicating whether this action has advanced options
+     */
+    public boolean isAdvanced() {
+        return this.processingAction.isAdvanced();
+    }
+
+    /**
+     * Returns a Map of info for the advanced options this user has on this action
+     * @return a Map of info for the advanced options this user has on this action
+     */
+    public Map<String, ActionAdvancedInfo> getAdvancedInfo() {
+        return this.processingAction.getAdvancedInfo();
     }
 
 }

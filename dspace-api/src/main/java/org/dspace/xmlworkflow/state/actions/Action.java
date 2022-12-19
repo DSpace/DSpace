@@ -10,7 +10,9 @@ package org.dspace.xmlworkflow.state.actions;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
@@ -37,6 +39,8 @@ public abstract class Action {
 
     private WorkflowActionConfig parent;
     private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.workflow.error_fields";
+    private List<String> advancedOptions = new ArrayList<>();
+    private Map<String, ActionAdvancedInfo> advancedInfo = new HashMap<>();
 
     /**
      * Called when a workflow item becomes eligible for this Action.
@@ -191,5 +195,17 @@ public abstract class Action {
 
         //save updated list
         setErrorFields(request, errorFields);
+    }
+
+    protected List<String> getAdvancedOptions() {
+        return advancedOptions;
+    }
+
+    protected boolean isAdvanced() {
+        return !advancedOptions.isEmpty();
+    }
+
+    protected Map<String, ActionAdvancedInfo> getAdvancedInfo() {
+        return advancedInfo;
     }
 }

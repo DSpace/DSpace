@@ -26,6 +26,8 @@ public class WorkflowActionConverter implements DSpaceConverter<WorkflowActionCo
         restModel.setProjection(projection);
         restModel.setId(modelObject.getId());
         restModel.setOptions(modelObject.getOptions());
+        restModel.setAdvancedOptions(modelObject.getAdvancedOptions());
+        restModel.setAdvancedInfo(modelObject.getAdvancedInfo());
         return restModel;
     }
 

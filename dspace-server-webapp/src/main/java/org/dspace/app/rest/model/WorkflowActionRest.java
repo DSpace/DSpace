@@ -8,8 +8,10 @@
 package org.dspace.app.rest.model;
 
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 
 /**
  * The rest resource used for workflow actions
@@ -23,6 +25,8 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
     public static final String NAME_PLURAL = "workflowactions";
 
     private List<String> options;
+    private List<String> advancedOptions;
+    private Map<String, ActionAdvancedInfo> advancedInfo;
 
     @Override
     public String getCategory() {
@@ -55,5 +59,50 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
      */
     public void setOptions(List<String> options) {
         this.options = options;
+    }
+
+    /**
+     * Generic getter for the advanced options
+     *
+     * @return the advanced options value of this WorkflowActionRest
+     */
+    public List<String> getAdvancedOptions() {
+        return advancedOptions;
+    }
+
+    /**
+     * Generic setter for the advanced options
+     *
+     * @param advancedOptions The advanced options to be set on this WorkflowActionRest
+     */
+    public void setAdvancedOptions(List<String> advancedOptions) {
+        this.advancedOptions = advancedOptions;
+    }
+
+    /**
+     * Generic getter for advanced boolean
+     *
+     * @return the advanced boolean value of this WorkflowActionRest
+     */
+    public boolean getAdvanced() {
+        return !advancedOptions.isEmpty();
+    }
+
+    /**
+     * Generic getter for advanced info
+     *
+     * @return the advanced info value of this WorkflowActionRest
+     */
+    public Map<String, ActionAdvancedInfo> getAdvancedInfo() {
+        return advancedInfo;
+    }
+
+    /**
+     * Generic setter for advanced info
+     *
+     * @param advancedInfo The advanced info to be set on this WorkflowActionRest
+     */
+    public void setAdvancedInfo(Map<String, ActionAdvancedInfo> advancedInfo) {
+        this.advancedInfo = advancedInfo;
     }
 }
