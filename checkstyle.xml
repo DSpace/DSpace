@@ -92,9 +92,7 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <!-- Requirements for Javadocs for methods -->
         <module name="JavadocMethod">
             <!-- All public methods MUST HAVE Javadocs -->
-            <!-- <property name="scope" value="public"/> -->
-            <!-- TODO: Above rule has been disabled because of large amount of missing public method Javadocs -->
-            <property name="scope" value="nothing"/>
+            <property name="scope" value="public"/>
             <!-- Allow params, throws and return tags to be optional -->
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>

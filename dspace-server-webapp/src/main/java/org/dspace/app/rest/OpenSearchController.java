@@ -45,6 +45,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -141,16 +143,36 @@ public class OpenSearchController {
             queryArgs.setStart(start);
             queryArgs.setMaxResults(count);
             queryArgs.setDSpaceObjectFilter(IndexableItem.TYPE);
+
             if (sort != null) {
-                //this is the default sort so we want to switch this to date accessioned
-                if (sortDirection != null && sortDirection.equals("DESC")) {
-                    queryArgs.setSortField(sort + "_sort", SORT_ORDER.desc);
-                } else {
-                    queryArgs.setSortField(sort + "_sort", SORT_ORDER.asc);
+                DiscoveryConfiguration discoveryConfiguration =
+                    searchConfigurationService.getDiscoveryConfiguration("");
+                if (discoveryConfiguration != null) {
+                    DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration
+                        .getSearchSortConfiguration();
+                    if (searchSortConfiguration != null) {
+                        DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration
+                            .getSortFieldConfiguration(sort);
+                        if (sortFieldConfiguration != null) {
+                            String sortField = searchService
+                                .toSortFieldIndex(sortFieldConfiguration.getMetadataField(),
+                                sortFieldConfiguration.getType());
+
+                            if (sortDirection != null && sortDirection.equals("DESC")) {
+                                queryArgs.setSortField(sortField, SORT_ORDER.desc);
+                            } else {
+                                queryArgs.setSortField(sortField, SORT_ORDER.asc);
+                            }
+                        } else {
+                            throw new IllegalArgumentException(sort + " is not a valid sort field");
+                        }
+                    }
                 }
             } else {
+                // this is the default sort so we want to switch this to date accessioned
                 queryArgs.setSortField("dc.date.accessioned_dt", SORT_ORDER.desc);
             }
+
             if (dsoObject != null) {
                 container = scopeResolver.resolveScope(context, dsoObject);
                 DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
