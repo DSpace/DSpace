@@ -9,10 +9,13 @@ package org.dspace.app.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.dspace.AbstractUnitTest;
 import org.junit.Test;
@@ -157,5 +160,29 @@ public class RegexPatternUtilsTest extends AbstractUnitTest {
         assertFalse(matcher.matches());
         matcher = computePattern.matcher("Hello");
         assertFalse(matcher.matches());
+    }
+
+    @Test
+    public void testInvalidRegex() {
+        String invalidSensitive = "[a-z+";
+        assertThrows(PatternSyntaxException.class, () -> RegexPatternUtils.computePattern(invalidSensitive));
+
+        String invalidRange = "a{1-";
+        assertThrows(PatternSyntaxException.class, () -> RegexPatternUtils.computePattern(invalidRange));
+
+        String invalidGroupPattern = "(abc";
+        assertThrows(PatternSyntaxException.class, () -> RegexPatternUtils.computePattern(invalidGroupPattern));
+
+        String emptyPattern = "";
+        Pattern computePattern = RegexPatternUtils.computePattern(emptyPattern);
+        assertNull(computePattern);
+
+        String blankPattern = "                      ";
+        computePattern = RegexPatternUtils.computePattern(blankPattern);
+        assertNull(computePattern);
+
+        String nullPattern = null;
+        computePattern = RegexPatternUtils.computePattern(nullPattern);
+        assertNull(computePattern);
     }
 }
