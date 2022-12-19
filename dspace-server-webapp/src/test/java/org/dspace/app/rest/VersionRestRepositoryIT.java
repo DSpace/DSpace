@@ -877,7 +877,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
 
         item.setSubmitter(eperson);
-        System.out.println(item.getSubmitter().getEmail().toString());
 
         context.restoreAuthSystemState();
 
@@ -895,7 +894,6 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.type", is("version"))
                     )))
                     .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
-            System.out.println("version 2: " + item.getSubmitter().getEmail().toString());
         } finally {
             VersionBuilder.delete(idRef.get());
         }
