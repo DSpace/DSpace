@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.RegistrationMatcher;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.services.ConfigurationService;
@@ -192,13 +193,44 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
+                                    .param("type", "register")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isBadRequest());
+        } finally {
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
+    public void testRegisterDomainNotRegisteredMailAddressRegistred() throws Exception {
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        try {
+            context.turnOffAuthorisationSystem();
+            String email = "test@gmail.com";
+            EPersonBuilder.createEPerson(context)
+                          .withEmail(email)
+                          .withCanLogin(true)
+                          .build();
+            context.restoreAuthSystemState();
+            configurationService.setProperty("authentication-password.domain.valid", "test.com");
+            RegistrationRest registrationRest = new RegistrationRest();
+            registrationRest.setEmail(email);
+
+            ObjectMapper mapper = new ObjectMapper();
+            getClient().perform(post("/api/eperson/registrations")
+                                    .param("type", "register")
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isBadRequest());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(0, registrationDataList.size());
         } finally {
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
