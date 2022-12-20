@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.InternalServerErrorException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -88,6 +89,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
+        String type = request.getParameter("type");
         RegistrationRest registrationRest;
 
         String captchaToken = request.getHeader("X-Recaptcha-Token");
@@ -109,6 +111,15 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         }
         if (StringUtils.isBlank(registrationRest.getEmail())) {
             throw new UnprocessableEntityException("The email cannot be omitted from the Registration endpoint");
+        }
+        try {
+            if (type != null && type.equals("register") &&
+                !authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
+                throw new DSpaceBadRequestException("registration is not allowed with this email address");
+            }
+        } catch (SQLException e) {
+            log.error("something went wrong while checking if registration is allowed");
+            throw new InternalServerErrorException(e);
         }
         EPerson eperson = null;
         try {
@@ -132,9 +143,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
                     throw new AccessDeniedException(
                         "Registration is disabled, you are not authorized to create a new Authorization");
-                }
-                if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
-                    throw new DSpaceBadRequestException("registration is not allowed with this email address");
                 }
                 accountService.sendRegistrationInfo(context, registrationRest.getEmail());
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
