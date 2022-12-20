@@ -947,7 +947,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        discoverQuery.setSortField(COMMUNITIES_AND_COLLECTIONS_SORT_FIELD, SORT_ORDER.asc);
+        discoverQuery.setSortField(SOLR_SORT_FIELD, SORT_ORDER.asc);
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, null, community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {
             Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
@@ -1027,7 +1027,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        discoverQuery.setSortField(COMMUNITIES_AND_COLLECTIONS_SORT_FIELD, SORT_ORDER.asc);
+        discoverQuery.setSortField(SOLR_SORT_FIELD, SORT_ORDER.asc);
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,
                 entityType, community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {

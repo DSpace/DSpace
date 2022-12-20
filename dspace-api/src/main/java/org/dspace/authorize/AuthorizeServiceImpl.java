@@ -31,7 +31,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -879,7 +879,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         query = formatCustomQuery(query);
         DiscoverResult discoverResult = getDiscoverResult(context, query + "search.resourcetype:" +
                                                               IndexableCollection.TYPE,
-            offset, limit, DSpaceObjectService.COMMUNITIES_AND_COLLECTIONS_SORT_FIELD, SORT_ORDER.asc);
+            offset, limit, CollectionService.SOLR_SORT_FIELD, SORT_ORDER.asc);
         for (IndexableObject solrCollections : discoverResult.getIndexableObjects()) {
             Collection collection = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(collection);
