@@ -33,6 +33,11 @@ import org.dspace.eperson.Group;
 public interface CollectionService
         extends DSpaceObjectService<Collection>, DSpaceObjectLegacySupportService<Collection> {
 
+    /*
+     * Field used to sort community and collection lists at solr
+     */
+    public static final String SOLR_SORT_FIELD = "dc.title_sort";
+
     /**
      * Create a new collection with a new ID.
      * Once created the collection is added to the given community
@@ -45,7 +50,6 @@ public interface CollectionService
      */
     public Collection create(Context context, Community community) throws SQLException,
         AuthorizeException;
-
 
     /**
      * Create a new collection with the supplied handle and with a new ID.
