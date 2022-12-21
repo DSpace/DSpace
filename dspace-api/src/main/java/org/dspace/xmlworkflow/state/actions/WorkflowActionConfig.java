@@ -8,7 +8,6 @@
 package org.dspace.xmlworkflow.state.actions;
 
 import java.util.List;
-import java.util.Map;
 
 import org.dspace.xmlworkflow.state.Step;
 
@@ -72,7 +71,7 @@ public class WorkflowActionConfig {
 
     /**
      * Returns a list of advanced options this user has on this action, resulting in the next step of the workflow
-     * @returnA list of advanced options of this action, resulting in the next step of the workflow
+     * @return A list of advanced options of this action, resulting in the next step of the workflow
      */
     public List<String> getAdvancedOptions() {
         return this.processingAction.getAdvancedOptions();
@@ -90,7 +89,7 @@ public class WorkflowActionConfig {
      * Returns a Map of info for the advanced options this user has on this action
      * @return a Map of info for the advanced options this user has on this action
      */
-    public Map<String, ActionAdvancedInfo> getAdvancedInfo() {
+    public List<ActionAdvancedInfo> getAdvancedInfo() {
         return this.processingAction.getAdvancedInfo();
     }
 

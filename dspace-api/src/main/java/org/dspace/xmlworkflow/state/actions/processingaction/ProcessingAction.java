@@ -8,7 +8,6 @@
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.sql.SQLException;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.content.service.ItemService;
@@ -48,12 +47,5 @@ public abstract class ProcessingAction extends Action {
             task.getWorkflowID().equals(getParent().getStep().getWorkflow().getID()) &&
             task.getStepID().equals(getParent().getStep().getId()) &&
             task.getActionID().equals(getParent().getId());
-    }
-
-    @Override
-    protected List<String> getAdvancedOptions() {
-        List<String> advancedOptions = super.getAdvancedOptions();
-        advancedOptions.add(SUBMIT_EDIT_METADATA);
-        return advancedOptions;
     }
 }

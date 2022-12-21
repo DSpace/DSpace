@@ -8,8 +8,9 @@
 package org.dspace.xmlworkflow.state.actions;
 
 public interface ActionAdvancedInfo {
-    boolean isDescriptionRequired();
-    void setDescriptionRequired(boolean descriptionRequired);
-    int getMaxValue();
-    void setMaxValue(int maxValue);
+    String getType();
+    void setType(String type);
+    String getId();
+    void setId(String id);
+
 }

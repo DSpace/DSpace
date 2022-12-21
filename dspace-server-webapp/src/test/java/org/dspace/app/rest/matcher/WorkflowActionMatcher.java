@@ -32,7 +32,6 @@ public class WorkflowActionMatcher {
         return allOf(
                 hasJsonPath("$.id", is(workflowAction.getId())),
                 hasJsonPath("$.options", is(workflowAction.getOptions())),
-                hasJsonPath("$.advancedOptions", is(workflowAction.getAdvancedOptions())),
                 hasJsonPath("$.advanced", is(workflowAction.isAdvanced())),
                 hasJsonPath("$._links.self.href", containsString(WORKFLOW_ACTIONS_ENDPOINT + workflowAction.getId()))
         );

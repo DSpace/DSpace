@@ -7,10 +7,12 @@
  */
 package org.dspace.app.rest.model;
 
-public class ScoreReviewActionAdvancedInfoRest extends WorkflowActionRest {
+public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
 
     private boolean descriptionRequired;
     private int maxValue;
+    private String type;
+    private String id;
 
     /**
      * Generic getter for the description required boolean
@@ -48,6 +50,42 @@ public class ScoreReviewActionAdvancedInfoRest extends WorkflowActionRest {
         this.maxValue = maxValue;
     }
 
+    /**
+     * Generic getter for the type
+     *
+     * @return the type of this ScoreReviewActionAdvancedInfoRest
+     */
+    @Override
+    public String getType() {
+        return type;
+    }
 
+    /**
+     * Generic setter for the type
+     *
+     * @param type The type to be set on this ScoreReviewActionAdvancedInfoRest
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
 
+    /**
+     * Generic getter for the id
+     *
+     * @return the id of this ScoreReviewActionAdvancedInfoRest
+     */
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Generic setter for the id
+     *
+     * @param id The id to be set on this ScoreReviewActionAdvancedInfoRest
+     */
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
 }

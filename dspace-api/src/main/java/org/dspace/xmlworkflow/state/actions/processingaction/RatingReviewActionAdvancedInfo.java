@@ -8,10 +8,14 @@
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
+import org.springframework.util.DigestUtils;
 
-public class ScoreReviewActionAdvancedInfo implements ActionAdvancedInfo {
+public class RatingReviewActionAdvancedInfo implements ActionAdvancedInfo {
     private boolean descriptionRequired;
     private int maxValue;
+    private String type;
+    private String id;
+
 
     public boolean isDescriptionRequired() {
         return descriptionRequired;
@@ -27,5 +31,28 @@ public class ScoreReviewActionAdvancedInfo implements ActionAdvancedInfo {
 
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(String type) {
+        this.type = "action_info_" + type;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(String type) {
+        String idString = type
+            + ";descriptionRequired," + descriptionRequired
+            + ";maxValue," + maxValue;
+        this.id = DigestUtils.md5DigestAsHex(idString.getBytes());
     }
 }

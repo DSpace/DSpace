@@ -8,8 +8,9 @@
 package org.dspace.app.rest.model;
 
 import java.util.List;
-import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 
@@ -26,7 +27,7 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
 
     private List<String> options;
     private List<String> advancedOptions;
-    private Map<String, ActionAdvancedInfo> advancedInfo;
+    private List<ActionAdvancedInfo> advancedInfo;
 
     @Override
     public String getCategory() {
@@ -66,6 +67,7 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
      *
      * @return the advanced options value of this WorkflowActionRest
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> getAdvancedOptions() {
         return advancedOptions;
     }
@@ -85,7 +87,7 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
      * @return the advanced boolean value of this WorkflowActionRest
      */
     public boolean getAdvanced() {
-        return !advancedOptions.isEmpty();
+        return CollectionUtils.isNotEmpty(getAdvancedOptions());
     }
 
     /**
@@ -93,7 +95,8 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
      *
      * @return the advanced info value of this WorkflowActionRest
      */
-    public Map<String, ActionAdvancedInfo> getAdvancedInfo() {
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public List<ActionAdvancedInfo> getAdvancedInfo() {
         return advancedInfo;
     }
 
@@ -102,7 +105,7 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
      *
      * @param advancedInfo The advanced info to be set on this WorkflowActionRest
      */
-    public void setAdvancedInfo(Map<String, ActionAdvancedInfo> advancedInfo) {
+    public void setAdvancedInfo(List<ActionAdvancedInfo> advancedInfo) {
         this.advancedInfo = advancedInfo;
     }
 }

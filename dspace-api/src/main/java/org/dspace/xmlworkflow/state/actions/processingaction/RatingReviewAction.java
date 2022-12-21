@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.util.Util;
@@ -24,7 +23,7 @@ import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
-public class RatingReviewAction extends ProcessingAction implements ActionAdvancedInfo {
+public class RatingReviewAction extends ProcessingAction {
 
     private static final String RATING = "rating";
 
@@ -66,35 +65,25 @@ public class RatingReviewAction extends ProcessingAction implements ActionAdvanc
 
     @Override
     protected boolean isAdvanced() {
-        return !getOptions().isEmpty();
+        return !getAdvancedOptions().isEmpty();
     }
 
     @Override
-    protected Map<String, ActionAdvancedInfo> getAdvancedInfo() {
-        Map<String, ActionAdvancedInfo> advancedInfo =  super.getAdvancedInfo();
-        ActionAdvancedInfo scoreReviewActionAdvancedInfo = new ScoreReviewActionAdvancedInfo();
-        scoreReviewActionAdvancedInfo.setMaxValue(getMaxValue());
-        scoreReviewActionAdvancedInfo.setDescriptionRequired(isDescriptionRequired());
-        advancedInfo.put(RATING, scoreReviewActionAdvancedInfo);
+    protected List<ActionAdvancedInfo> getAdvancedInfo() {
+        List<ActionAdvancedInfo> advancedInfo = super.getAdvancedInfo();
+        RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
+        ratingReviewActionAdvancedInfo.setDescriptionRequired(descriptionRequired);
+        ratingReviewActionAdvancedInfo.setMaxValue(maxValue);
+        ratingReviewActionAdvancedInfo.setType(RATING);
+        ratingReviewActionAdvancedInfo.setId(RATING);
+        advancedInfo.add(ratingReviewActionAdvancedInfo);
         return advancedInfo;
     }
 
-    @Override
-    public boolean isDescriptionRequired() {
-        return descriptionRequired;
-    }
-
-    @Override
     public void setDescriptionRequired(boolean descriptionRequired) {
         this.descriptionRequired = descriptionRequired;
     }
 
-    @Override
-    public int getMaxValue() {
-        return maxValue;
-    }
-
-    @Override
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
     }

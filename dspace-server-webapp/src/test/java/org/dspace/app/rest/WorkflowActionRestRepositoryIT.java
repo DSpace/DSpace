@@ -14,8 +14,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Map;
-
 import org.dspace.app.rest.matcher.WorkflowActionMatcher;
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.repository.WorkflowActionRestRepository;
@@ -85,8 +83,7 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             // has options
             .andExpect(jsonPath("$.options", not(empty())))
-            .andExpect(jsonPath("$.advancedOptions", not(empty())))
-            .andExpect(jsonPath("$.advanced", is(true)))
+            .andExpect(jsonPath("$.advanced", is(false)))
             //Matches expected corresponding rest action values
             .andExpect(jsonPath("$", Matchers.is(
                 WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)
@@ -104,7 +101,6 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             // has no options
             .andExpect(jsonPath("$.options", empty()))
-            .andExpect(jsonPath("$.advancedOptions", empty()))
             .andExpect(jsonPath("$.advanced", is(false)))
             //Matches expected corresponding rest action values
             .andExpect(jsonPath("$", Matchers.is(
@@ -147,26 +143,6 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$.advancedOptions", not(empty())))
             .andExpect(jsonPath("$.advanced", is(true)))
             .andExpect(jsonPath("$.advancedInfo", not(empty())))
-            //Matches expected corresponding rest action values
-            .andExpect(jsonPath("$", Matchers.is(
-                WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)
-            )));
-    }
-
-    @Test
-    public void getWorkflowActionByName_ExistentWithOptions_scorereviewaction() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        String nameActionWithOptions = "scorereviewaction";
-        WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
-        //When we call this facets endpoint
-        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
-            //We expect a 200 is ok status
-            .andExpect(status().isOk())
-            // has options
-            .andExpect(jsonPath("$.options", not(empty())))
-            .andExpect(jsonPath("$.advancedOptions", not(empty())))
-            .andExpect(jsonPath("$.advanced", is(true)))
-            .andExpect(jsonPath("$.advancedInfo", is(Map.of())))
             //Matches expected corresponding rest action values
             .andExpect(jsonPath("$", Matchers.is(
                 WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)
