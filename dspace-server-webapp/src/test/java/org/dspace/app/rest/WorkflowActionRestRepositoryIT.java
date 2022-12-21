@@ -149,4 +149,24 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             )));
     }
 
+    @Test
+    public void getWorkflowActionByName_ExistentWithOptions_selectrevieweraction() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        String nameActionWithOptions = "selectrevieweraction";
+        WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
+        //When we call this facets endpoint
+        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
+            //We expect a 200 is ok status
+            .andExpect(status().isOk())
+            // has options
+            .andExpect(jsonPath("$.options", not(empty())))
+            .andExpect(jsonPath("$.advancedOptions", not(empty())))
+            .andExpect(jsonPath("$.advanced", is(true)))
+            .andExpect(jsonPath("$.advancedInfo", not(empty())))
+            //Matches expected corresponding rest action values
+            .andExpect(jsonPath("$", Matchers.is(
+                WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)
+            )));
+    }
+
 }

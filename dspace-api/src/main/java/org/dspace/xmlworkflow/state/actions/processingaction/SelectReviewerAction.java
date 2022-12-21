@@ -9,6 +9,7 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -108,6 +110,27 @@ public class SelectReviewerAction extends ProcessingAction {
         options.add(SUBMIT_SEARCH);
         options.add(SUBMIT_SELECT_REVIEWER);
         return options;
+    }
+
+    @Override
+    protected List<String> getAdvancedOptions() {
+        return Arrays.asList(SUBMIT_SELECT_REVIEWER);
+    }
+
+    @Override
+    protected boolean isAdvanced() {
+        return !getAdvancedOptions().isEmpty();
+    }
+
+    @Override
+    protected List<ActionAdvancedInfo> getAdvancedInfo() {
+        List<ActionAdvancedInfo> advancedInfo = super.getAdvancedInfo();
+        SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo = new SelectReviewerActionAdvancedInfo();
+        selectReviewerActionAdvancedInfo.setRole(role);
+        selectReviewerActionAdvancedInfo.setType(SUBMIT_SELECT_REVIEWER);
+        selectReviewerActionAdvancedInfo.setId(SUBMIT_SELECT_REVIEWER);
+        advancedInfo.add(selectReviewerActionAdvancedInfo);
+        return advancedInfo;
     }
 
     public Role getRole() {
