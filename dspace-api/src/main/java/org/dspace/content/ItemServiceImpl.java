@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -1099,8 +1098,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             discoverQuery.addFilterQueries(query);
         }
         if (StringUtils.isNotBlank(q)) {
-            String escapedQuery = ClientUtils.escapeQueryChars(q);
-            discoverQuery.setQuery(String.format("(%s OR %s*)", escapedQuery, escapedQuery));
+            discoverQuery.setQuery(q);
         }
         return searchService.search(context, discoverQuery);
     }
