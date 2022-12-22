@@ -97,4 +97,16 @@ public class FacetValueMatcher {
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
     }
+
+    public static Matcher<? super Object> entrySupervisedBy(String label, String authority, int count) {
+        return allOf(
+            hasJsonPath("$.authorityKey", is(authority)),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.supervisedBy=" + authority + ",authority"))
+        );
+    }
+
 }

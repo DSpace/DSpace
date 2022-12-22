@@ -46,6 +46,7 @@ import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
@@ -55,6 +56,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
@@ -2121,6 +2123,73 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             // remove the workflowitem if any
             WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
         }
+    }
+
+    @Test
+    public void testSupervisorFindOne() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson user =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("user@test.com")
+                          .withPassword(password)
+                          .build();
+
+        EPerson anotherUser =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("anotheruser@test.com")
+                          .withPassword(password)
+                          .build();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Community child1 =
+            CommunityBuilder.createSubCommunity(context, parentCommunity)
+                            .withName("Sub Community")
+                            .build();
+
+        Collection collection =
+            CollectionBuilder.createCollection(context, child1)
+                             .withName("Collection 1")
+                             .withWorkflowGroup(1, admin)
+                             .build();
+
+        Group group =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(user)
+                        .build();
+
+        XmlWorkflowItem workflowItem =
+            WorkflowItemBuilder.createWorkflowItem(context, collection)
+                               .withSubmitter(admin)
+                               .withTitle("Workflow Item")
+                               .withIssueDate("2017-10-17")
+                               .withAuthor("Author one")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(post("/api/core/supervisionorders/")
+                .param("uuid", workflowItem.getItem().getID().toString())
+                .param("group", group.getID().toString())
+                .param("type", "EDITOR")
+                .contentType(contentType))
+            .andExpect(status().isCreated());
+
+        getClient(getAuthToken(anotherUser.getEmail(), password))
+            .perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
+            .andExpect(status().isForbidden());
+
+        getClient(getAuthToken(user.getEmail(), password))
+            .perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
+            .andExpect(status().isOk());
     }
 
 }

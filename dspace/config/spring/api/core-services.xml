@@ -148,5 +148,7 @@
     <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
     <bean class="org.dspace.authorize.RegexPasswordValidator" />
 
+    <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
+
 </beans>
 

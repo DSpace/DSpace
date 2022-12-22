@@ -19,6 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
 
     @Autowired
     WorkspaceItemService wis;
+
+    @Autowired
+    private SupervisionOrderService supervisionOrderService;
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
@@ -82,6 +86,13 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
                     return true;
                 }
             }
+
+            if (witem.getItem() != null) {
+                if (supervisionOrderService.isSupervisor(context, ePerson, witem.getItem())) {
+                    return true;
+                }
+            }
+
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }

@@ -22,13 +22,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceAlreadyExistsException;
+import org.dspace.app.exception.ResourceConflictException;
+import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.orcid.exception.OrcidValidationException;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpHeaders;
@@ -59,6 +65,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
     private static final Logger log = LogManager.getLogger();
+
+    @Autowired
+    @Lazy
+    private ConverterService converterService;
+
+    @Autowired
+    private Utils utils;
 
     /**
      * Default collection of HTTP error codes to log as ERROR with full stack trace.
@@ -233,6 +246,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
         sendErrorResponse(request, response, ex, "An exception has occurred", returnCode);
 
+    }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    protected ResponseEntity<? extends RestModel> resourceConflictException(ResourceConflictException ex) {
+        RestModel resource = converterService.toRest(ex.getResource(), utils.obtainProjection());
+        return new ResponseEntity<RestModel>(resource, HttpStatus.CONFLICT);
     }
 
     /**

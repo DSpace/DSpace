@@ -49,6 +49,8 @@ import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -102,6 +104,8 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
+    static SupervisionOrderService supervisionOrderService;
+
 
     protected Context context;
 
@@ -161,6 +165,7 @@ public abstract class AbstractBuilder<T, S> {
         orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
         orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
+        supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
     }
 
 
@@ -194,6 +199,7 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = null;
         versioningService = null;
         orcidTokenService = null;
+        supervisionOrderService = null;
 
     }
 
