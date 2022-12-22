@@ -29,6 +29,7 @@ import org.dspace.importer.external.liveimportclient.service.LiveImportClient;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.DoiCheck;
 import org.dspace.importer.external.service.components.QuerySource;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,9 +50,8 @@ public class DataCiteImportMetadataSourceServiceImpl
     @Autowired
     private LiveImportClient liveImportClient;
 
-    private final int timeoutMs = 180000;
-
-    private final String url = "https://api.datacite.org/dois/";
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     public String getImportSource() {
@@ -95,6 +95,8 @@ public class DataCiteImportMetadataSourceServiceImpl
             id = query;
         }
         uriParameters.put("query", id);
+        int timeoutMs = configurationService.getIntProperty("datacite.timeout", 180000);
+        String url = configurationService.getProperty("datacite.url", "https://api.datacite.org/dois/");
         String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, url, params);
         JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
         if (jsonNode == null) {
