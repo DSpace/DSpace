@@ -118,11 +118,6 @@ public class SelectReviewerAction extends ProcessingAction {
     }
 
     @Override
-    protected boolean isAdvanced() {
-        return !getAdvancedOptions().isEmpty();
-    }
-
-    @Override
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
         List<ActionAdvancedInfo> advancedInfo = super.getAdvancedInfo();
         SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo = new SelectReviewerActionAdvancedInfo();

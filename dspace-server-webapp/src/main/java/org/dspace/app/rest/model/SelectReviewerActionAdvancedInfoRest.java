@@ -9,6 +9,9 @@ package org.dspace.app.rest.model;
 
 import org.dspace.xmlworkflow.Role;
 
+/**
+ *  The SelectReviewerActionAdvancedInfoRest REST Resource
+ */
 public class SelectReviewerActionAdvancedInfoRest extends WorkflowActionRest {
 
     private Role role;

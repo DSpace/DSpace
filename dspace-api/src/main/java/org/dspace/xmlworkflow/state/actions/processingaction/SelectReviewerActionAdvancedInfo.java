@@ -11,15 +11,29 @@ import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 import org.springframework.util.DigestUtils;
 
+/**
+ * Class that holds the advanced information needed for the
+ * {@link org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction}
+ */
 public class SelectReviewerActionAdvancedInfo implements ActionAdvancedInfo {
     private Role role;
     private String type;
     private String id;
 
+    /**
+     * Generic getter for the role
+     *
+     * @return the role value
+     */
     public Role getRole() {
         return role;
     }
 
+    /**
+     * Generic setter for the role
+     *
+     * @param role The role to be set
+     */
     public void setRole(Role role) {
         this.role = role;
     }

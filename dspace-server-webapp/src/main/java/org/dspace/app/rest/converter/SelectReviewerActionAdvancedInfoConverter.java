@@ -11,6 +11,10 @@ import org.dspace.app.rest.model.SelectReviewerActionAdvancedInfoRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerActionAdvancedInfo;
 
+/**
+ * This converter is responsible for transforming the model representation of a SelectReviewerActionAdvancedInfo to
+ * the REST representation of a SelectReviewerActionAdvancedInfo
+ */
 public class SelectReviewerActionAdvancedInfoConverter
     implements DSpaceConverter<SelectReviewerActionAdvancedInfo, SelectReviewerActionAdvancedInfoRest> {
 

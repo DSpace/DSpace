@@ -195,14 +195,26 @@ public abstract class Action {
         setErrorFields(request, errorFields);
     }
 
+    /**
+     * Returns a list of advanced options that the user can select at this action
+     * @return  A list of advanced options of this action, resulting in the next step of the workflow
+     */
     protected List<String> getAdvancedOptions() {
         return advancedOptions;
     }
 
+    /**
+     * Returns true if this Action has advanced options, false if it doesn't
+     * @return true if there are advanced options, false otherwise
+     */
     protected boolean isAdvanced() {
         return !getAdvancedOptions().isEmpty();
     }
 
+    /**
+     * Returns a list of advanced info required by the advanced options
+     * @return  A list of advanced info required by the advanced options
+     */
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
         return advancedInfo;
     }

@@ -11,6 +11,10 @@ import org.dspace.app.rest.model.RatingReviewActionAdvancedInfoRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.state.actions.processingaction.RatingReviewActionAdvancedInfo;
 
+/**
+ * This converter is responsible for transforming the model representation of a RatingReviewActionAdvancedInfo to
+ * the REST representation of a RatingReviewActionAdvancedInfo
+ */
 public class RatingReviewActionAdvancedInfoConverter
     implements DSpaceConverter<RatingReviewActionAdvancedInfo, RatingReviewActionAdvancedInfoRest> {
 

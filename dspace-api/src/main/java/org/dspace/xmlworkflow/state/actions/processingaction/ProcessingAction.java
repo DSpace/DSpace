@@ -48,4 +48,9 @@ public abstract class ProcessingAction extends Action {
             task.getStepID().equals(getParent().getStep().getId()) &&
             task.getActionID().equals(getParent().getId());
     }
+
+    @Override
+    protected boolean isAdvanced() {
+        return !getAdvancedOptions().isEmpty();
+    }
 }

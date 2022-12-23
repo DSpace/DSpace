@@ -23,6 +23,11 @@ import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
+/**
+ * This action will allow users to rate a certain item
+ * if the score is lower than the maximum score the
+ * item will be sent to the next action/step else it will be rejected
+ */
 public class RatingReviewAction extends ProcessingAction {
 
     private static final String RATING = "rating";
@@ -64,11 +69,6 @@ public class RatingReviewAction extends ProcessingAction {
     }
 
     @Override
-    protected boolean isAdvanced() {
-        return !getAdvancedOptions().isEmpty();
-    }
-
-    @Override
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
         List<ActionAdvancedInfo> advancedInfo = super.getAdvancedInfo();
         RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
@@ -80,10 +80,18 @@ public class RatingReviewAction extends ProcessingAction {
         return advancedInfo;
     }
 
+    /**
+     * Setter that sets the descriptionRequired property from workflow-actions.xml
+     * @param descriptionRequired boolean whether a description is required
+     */
     public void setDescriptionRequired(boolean descriptionRequired) {
         this.descriptionRequired = descriptionRequired;
     }
 
+    /**
+     * Setter that sets the maxValue property from workflow-actions.xml
+     * @param maxValue integer of the maximum allowed value
+     */
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
     }

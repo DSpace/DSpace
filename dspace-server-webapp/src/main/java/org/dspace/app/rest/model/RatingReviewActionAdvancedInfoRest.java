@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+/**
+ *  The RatingReviewActionAdvancedInfo REST Resource
+ */
 public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
 
     private boolean descriptionRequired;
@@ -17,7 +20,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic getter for the description required boolean
      *
-     * @return the description required boolean value of this ScoreReviewActionAdvancedInfoRest
+     * @return the description required boolean value of this RatingReviewActionAdvancedInfoRest
      */
     public boolean isDescriptionRequired() {
         return descriptionRequired;
@@ -26,7 +29,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic setter for the description required boolean
      *
-     * @param descriptionRequired The description required boolean to be set on this ScoreReviewActionAdvancedInfoRest
+     * @param descriptionRequired The description required boolean to be set on this RatingReviewActionAdvancedInfoRest
      */
     public void setDescriptionRequired(boolean descriptionRequired) {
         this.descriptionRequired = descriptionRequired;
@@ -35,7 +38,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic getter for the max value
      *
-     * @return the max value of this ScoreReviewActionAdvancedInfoRest
+     * @return the max value of this RatingReviewActionAdvancedInfoRest
      */
     public int getMaxValue() {
         return maxValue;
@@ -44,7 +47,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic setter for the max value
      *
-     * @param maxValue The max value to be set on this ScoreReviewActionAdvancedInfoRest
+     * @param maxValue The max value to be set on this RatingReviewActionAdvancedInfoRest
      */
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
@@ -53,7 +56,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic getter for the type
      *
-     * @return the type of this ScoreReviewActionAdvancedInfoRest
+     * @return the type of this RatingReviewActionAdvancedInfoRest
      */
     @Override
     public String getType() {
@@ -63,7 +66,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic setter for the type
      *
-     * @param type The type to be set on this ScoreReviewActionAdvancedInfoRest
+     * @param type The type to be set on this RatingReviewActionAdvancedInfoRest
      */
     public void setType(String type) {
         this.type = type;
@@ -72,7 +75,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic getter for the id
      *
-     * @return the id of this ScoreReviewActionAdvancedInfoRest
+     * @return the id of this RatingReviewActionAdvancedInfoRest
      */
     @Override
     public String getId() {
@@ -82,7 +85,7 @@ public class RatingReviewActionAdvancedInfoRest extends WorkflowActionRest {
     /**
      * Generic setter for the id
      *
-     * @param id The id to be set on this ScoreReviewActionAdvancedInfoRest
+     * @param id The id to be set on this RatingReviewActionAdvancedInfoRest
      */
     @Override
     public void setId(String id) {
