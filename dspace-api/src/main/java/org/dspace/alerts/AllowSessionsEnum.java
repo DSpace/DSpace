@@ -11,9 +11,9 @@ package org.dspace.alerts;
  * Enum representing the options for allowing sessions
  */
 public enum AllowSessionsEnum {
-    ALL(0),
-    CURRENT(1),
-    ADMIN(2);
+    ALLOW_ALL_SESSIONS(0),
+    ALLOW_CURRENT_SESSIONS_ONLY(1),
+    ALLOW_ADMIN_SESSIONS_ONLY(2);
 
     private int allowSessionsType;
 
@@ -27,16 +27,16 @@ public enum AllowSessionsEnum {
 
     public static AllowSessionsEnum fromInt(Integer alertAllowSessionType) {
         if (alertAllowSessionType == null) {
-            return AllowSessionsEnum.ALL;
+            return AllowSessionsEnum.ALLOW_ALL_SESSIONS;
         }
 
         switch (alertAllowSessionType) {
             case 0:
-                return AllowSessionsEnum.ALL;
+                return AllowSessionsEnum.ALLOW_ALL_SESSIONS;
             case 1:
-                return AllowSessionsEnum.CURRENT;
+                return AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY;
             case 2:
-                return AllowSessionsEnum.ADMIN;
+                return AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY;
             default:
                 throw new IllegalArgumentException("No corresponding enum value for integer");
         }

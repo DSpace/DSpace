@@ -69,10 +69,10 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
     public void findAllTest() throws Exception {
         Date countdownDate = new Date();
         SystemWideAlert systemWideAlert1 = systemWideAlertService.create(context, "Test alert 1",
-                                                                         AllowSessionsEnum.CURRENT, countdownDate,
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY, countdownDate,
                                                                          true);
         SystemWideAlert systemWideAlert2 = systemWideAlertService.create(context, "Test alert 2",
-                                                                         AllowSessionsEnum.ADMIN, null,
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
                                                                          false);
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         getClient().perform(get("/api/system/systemwidealerts/"))
@@ -103,10 +103,10 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         Date countdownDate = new Date();
         SystemWideAlert systemWideAlert1 = systemWideAlertService.create(context, "Test alert 1",
-                                                                         AllowSessionsEnum.CURRENT, countdownDate,
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY, countdownDate,
                                                                          true);
         SystemWideAlert systemWideAlert2 = systemWideAlertService.create(context, "Test alert 2",
-                                                                         AllowSessionsEnum.ADMIN, null,
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
                                                                          false);
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         getClient().perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
@@ -216,7 +216,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
     public void createWhenAlreadyExistsTest() throws Exception {
 
         SystemWideAlert systemWideAlert = systemWideAlertService.create(context, "Test alert",
-                                                                        AllowSessionsEnum.ADMIN, null,
+                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
                                                                         false);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
@@ -240,7 +240,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
     public void putTest() throws Exception {
 
         SystemWideAlert systemWideAlert = systemWideAlertService.create(context, "Alert test message",
-                                                                        AllowSessionsEnum.ADMIN, null,
+                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
                                                                         false);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();

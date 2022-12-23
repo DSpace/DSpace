@@ -94,7 +94,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         if (active == null || active.isEmpty()) {
             return true;
         }
-        return active.get(0).getAllowSessions() == AllowSessionsEnum.ALL.getValue();
+        return active.get(0).getAllowSessions() == AllowSessionsEnum.ALLOW_ALL_SESSIONS.getValue();
     }
 
     public boolean canUserMaintainSession(Context context, EPerson ePerson) throws SQLException {
@@ -105,6 +105,6 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         if (active == null || active.isEmpty()) {
             return true;
         }
-        return active.get(0).getAllowSessions() != AllowSessionsEnum.ADMIN.getValue();
+        return active.get(0).getAllowSessions() != AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY.getValue();
     }
 }
