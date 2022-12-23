@@ -14,14 +14,12 @@ import java.util.Objects;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Item;
-import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableInProgressSubmission;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
 import org.dspace.discovery.indexobject.IndexableWorkspaceItem;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.service.SupervisionOrderService;
-import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -30,12 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
 public class SolrServiceSupervisionOrderIndexingPlugin implements SolrServiceIndexPlugin {
-
-    @Autowired(required = true)
-    private WorkspaceItemService workspaceItemService;
-
-    @Autowired(required = true)
-    private WorkflowItemService workflowItemService;
 
     @Autowired(required = true)
     private SupervisionOrderService supervisionOrderService;
