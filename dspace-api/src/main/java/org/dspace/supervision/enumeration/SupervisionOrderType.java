@@ -7,11 +7,22 @@
  */
 package org.dspace.supervision.enumeration;
 
+
 /**
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
 public enum SupervisionOrderType {
     OBSERVER,
-    EDITOR
+    NONE,
+    EDITOR;
+
+    public static boolean invalid(String type) {
+        try {
+            SupervisionOrderType.valueOf(type);
+            return false;
+        } catch (IllegalArgumentException ignored) {
+            return true;
+        }
+    }
 }

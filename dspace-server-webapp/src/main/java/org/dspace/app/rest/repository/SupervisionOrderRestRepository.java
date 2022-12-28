@@ -10,9 +10,11 @@ package org.dspace.app.rest.repository;
 import static org.dspace.authorize.ResourcePolicy.TYPE_SUBMISSION;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -183,9 +185,11 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
 
         if (Objects.isNull(type)) {
             throw new MissingParameterException("Missing type parameter");
-        } else if (!type.equals(SupervisionOrderType.EDITOR.toString()) &&
-            !type.equals(SupervisionOrderType.OBSERVER.toString())) {
-            throw new IllegalArgumentException("wrong type value, Type must be (EDITOR or OBSERVER)");
+        } else if (SupervisionOrderType.invalid(type)) {
+            throw new IllegalArgumentException("wrong type value, Type must be (" +
+                                                   Arrays.stream(SupervisionOrderType.values())
+                                                       .map(Enum::name)
+                                                       .collect(Collectors.joining(" or ")) + ")");
         }
 
     }
