@@ -11,6 +11,8 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_QUERY_PARAM;
+import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_REGISTER;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -2179,6 +2181,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2229,6 +2232,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2293,6 +2297,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2355,6 +2360,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2421,6 +2427,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2430,6 +2437,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRestTwo = new RegistrationRest();
         registrationRestTwo.setEmail(newRegisterEmailTwo);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRestTwo)))
                    .andExpect(status().isCreated());
@@ -2480,6 +2488,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2528,6 +2537,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2577,6 +2587,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2644,6 +2655,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2712,6 +2724,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2759,6 +2772,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
@@ -2808,6 +2822,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(newRegisterEmail);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
