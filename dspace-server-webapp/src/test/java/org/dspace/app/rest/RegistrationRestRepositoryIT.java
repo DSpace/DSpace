@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_FORGOT;
+import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_QUERY_PARAM;
+import static org.dspace.app.rest.repository.RegistrationRestRepository.TYPE_REGISTER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -113,6 +116,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(email);
         getClient().perform(post("/api/eperson/registrations")
+                                .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                 .content(mapper.writeValueAsBytes(registrationRest))
                                 .contentType(contentType))
                    .andExpect(status().isCreated());
@@ -129,6 +133,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
         try {
             getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
@@ -139,6 +144,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             String newEmail = "newEPersonTest@gmail.com";
             registrationRest.setEmail(newEmail);
             getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
@@ -151,6 +157,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             newEmail = "newEPersonTestTwo@gmail.com";
             registrationRest.setEmail(newEmail);
             getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().is(HttpServletResponse.SC_UNAUTHORIZED));
@@ -178,6 +185,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
@@ -194,7 +202,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testRegisterDomainNotRegistred() throws Exception {
+    public void testRegisterDomainNotRegistered() throws Exception {
         List<RegistrationData> registrationDataList = new ArrayList<>();
         try {
             configurationService.setProperty("authentication-password.domain.valid", "test.com");
@@ -204,7 +212,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
-                                    .param("type", "register")
+                                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isBadRequest());
@@ -235,7 +243,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
             ObjectMapper mapper = new ObjectMapper();
             getClient().perform(post("/api/eperson/registrations")
-                                    .param("type", "register")
+                                    .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isBadRequest());
@@ -262,6 +270,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(eperson.getEmail());
             getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_FORGOT)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
@@ -311,6 +320,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         String captchaToken = "invalid-captcha-Token";
         // when reCAPTCHA enabled and request contains Invalid "X-Recaptcha-Token” header
         getClient().perform(post("/api/eperson/registrations")
+                   .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                    .header("X-Recaptcha-Token", captchaToken)
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
@@ -347,12 +357,14 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         try {
             // will throw InvalidReCaptchaException because 'X-Recaptcha-Token' not equal captchaToken
             getClient().perform(post("/api/eperson/registrations")
+                       .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                        .header("X-Recaptcha-Token", captchaToken1)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
                        .andExpect(status().isForbidden());
 
             getClient().perform(post("/api/eperson/registrations")
+                       .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                        .header("X-Recaptcha-Token", captchaToken)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
@@ -365,6 +377,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             String newEmail = "newEPersonTest@gmail.com";
             registrationRest.setEmail(newEmail);
             getClient().perform(post("/api/eperson/registrations")
+                       .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                        .header("X-Recaptcha-Token", captchaToken)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
@@ -380,6 +393,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             newEmail = "newEPersonTestTwo@gmail.com";
             registrationRest.setEmail(newEmail);
             getClient().perform(post("/api/eperson/registrations")
+                       .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                        .header("X-Recaptcha-Token", captchaToken)
                        .content(mapper.writeValueAsBytes(registrationRest))
                        .contentType(contentType))
