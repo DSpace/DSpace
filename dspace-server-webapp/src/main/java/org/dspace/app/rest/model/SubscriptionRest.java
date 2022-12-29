@@ -27,7 +27,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     public static final String EPERSON = "ePerson";
 
     private Integer id;
-    private String type;
+    private String subscriptionType;
     private List<SubscriptionParameterRest> subscriptionParameterList = new ArrayList<>();
 
     @Override
@@ -45,8 +45,8 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setSubscriptionType(String type) {
+        this.subscriptionType = type;
     }
 
     public List<SubscriptionParameterRest> getSubscriptionParameterList() {
@@ -58,7 +58,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     }
 
     public String getSubscriptionType() {
-        return this.type;
+        return this.subscriptionType;
     }
 
     @Override

@@ -386,7 +386,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         subscriptionParameterRestList.add(subscriptionParameterRest);
 
         SubscriptionRest subscriptionRest = new SubscriptionRest();
-        subscriptionRest.setType("testType");
+        subscriptionRest.setSubscriptionType("testType");
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
         params.add("dspace_object_id", publicItem.getID().toString());
@@ -409,7 +409,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
 
         Map<String, Object> map = new HashMap<>();
-        map.put("type", "testType");
+        map.put("subscriptionType", "testType");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "Frequency");
@@ -445,7 +445,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
 
         Map<String, Object> map = new HashMap<>();
-        map.put("type", "testType");
+        map.put("subscriptionType", "testType");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "Frequency");
@@ -477,6 +477,34 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void createInvalidSubscriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "testType");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "Frequency");
+        sub_list.put("value", "daily");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/core/subscriptions")
+                               .param("dspace_object_id", publicItem.getID().toString())
+                               .param("eperson_id", eperson.getID().toString())
+                               .content(new ObjectMapper().writeValueAsString(map))
+                               .contentType(MediaType.APPLICATION_JSON_VALUE))
+                   .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
     public void createSubscriptionPersonForAnotherPersonTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -486,7 +514,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                                      .build();
 
         Map<String, Object> map = new HashMap<>();
-        map.put("type", "testType");
+        map.put("subscriptionType", "testType");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "Frequency");
@@ -576,7 +604,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> newSubscription = new HashMap<>();
-        newSubscription.put("type", "test");
+        newSubscription.put("subscriptionType", "test");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "frequency");
@@ -606,7 +634,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> newSubscription = new HashMap<>();
-        newSubscription.put("type", "test");
+        newSubscription.put("subscriptionType", "test");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "Frequency");
@@ -637,7 +665,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> newSubscription = new HashMap<>();
-        newSubscription.put("type", "test");
+        newSubscription.put("subscriptionType", "test");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "Frequency");
@@ -674,7 +702,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> newSubscription = new HashMap<>();
-        newSubscription.put("type", "test");
+        newSubscription.put("subscriptionType", "test");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
         sub_list.put("name", "Frequency");
