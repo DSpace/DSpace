@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.InternalServerErrorException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -96,42 +95,38 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             throw new IllegalArgumentException(String.format("Needs query param '%s' with value %s or %s indicating " +
                 "what kind of registration request it is", TYPE_QUERY_PARAM, TYPE_FORGOT, TYPE_REGISTER));
         }
+        EPerson eperson = null;
         try {
-            if (type.equals(TYPE_REGISTER) &&
-                !authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
-                throw new DSpaceBadRequestException("registration is not allowed with this email address");
-            }
+            eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
         } catch (SQLException e) {
-            log.error("something went wrong while checking if registration is allowed");
-            throw new InternalServerErrorException(e);
+            log.error("Something went wrong retrieving EPerson for email: " + registrationRest.getEmail(), e);
         }
-        if (type.equalsIgnoreCase(TYPE_FORGOT)) {
-            EPerson eperson = null;
-            try {
-                eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
-            } catch (SQLException e) {
-                log.error("Something went wrong retrieving EPerson for email: " + registrationRest.getEmail(), e);
-            }
+        if (eperson != null && type.equalsIgnoreCase(TYPE_FORGOT)) {
             try {
                 if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                     throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
-                                                            + eperson.getEmail());
+                        + eperson.getEmail());
                 }
                 accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                 log.error("Something went wrong with sending forgot password info email: "
-                              + registrationRest.getEmail(), e);
+                    + registrationRest.getEmail(), e);
             }
-        } else {
+        } else if (type.equalsIgnoreCase(TYPE_REGISTER)) {
             try {
+                String email = registrationRest.getEmail();
                 if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
                     throw new AccessDeniedException(
                         "Registration is disabled, you are not authorized to create a new Authorization");
                 }
-                accountService.sendRegistrationInfo(context, registrationRest.getEmail());
+                if (!authenticationService.canSelfRegister(context, request, email)) {
+                    throw new DSpaceBadRequestException(String.format("Registration is not allowed with email address" +
+                        " %s", email));
+                }
+                accountService.sendRegistrationInfo(context, email);
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                 log.error("Something went wrong with sending registration info email: "
-                              + registrationRest.getEmail(), e);
+                    + registrationRest.getEmail(), e);
             }
         }
         return null;
