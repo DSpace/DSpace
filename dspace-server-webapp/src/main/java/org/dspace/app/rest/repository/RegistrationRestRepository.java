@@ -48,6 +48,10 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RegistrationRestRepository.class);
 
+    public static final String TYPE_QUERY_PARAM = "type";
+    public static final String TYPE_REGISTER = "register";
+    public static final String TYPE_FORGOT = "forgot";
+
     @Autowired
     private EPersonService ePersonService;
 
@@ -77,7 +81,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
-        String type = request.getParameter("type");
         RegistrationRest registrationRest;
         try {
             ServletInputStream input = request.getInputStream();
@@ -88,8 +91,13 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         if (StringUtils.isBlank(registrationRest.getEmail())) {
             throw new UnprocessableEntityException("The email cannot be omitted from the Registration endpoint");
         }
+        String type = request.getParameter(TYPE_QUERY_PARAM);
+        if (!type.equalsIgnoreCase(TYPE_FORGOT) && !type.equalsIgnoreCase(TYPE_REGISTER)) {
+            throw new IllegalArgumentException(String.format("Needs query param '%s' with value %s or %s indicating " +
+                "what kind of registration request it is", TYPE_QUERY_PARAM, TYPE_FORGOT, TYPE_REGISTER));
+        }
         try {
-            if (type != null && type.equals("register") &&
+            if (type.equals(TYPE_REGISTER) &&
                 !authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
                 throw new DSpaceBadRequestException("registration is not allowed with this email address");
             }
@@ -97,13 +105,13 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             log.error("something went wrong while checking if registration is allowed");
             throw new InternalServerErrorException(e);
         }
-        EPerson eperson = null;
-        try {
-            eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
-        } catch (SQLException e) {
-            log.error("Something went wrong retrieving EPerson for email: " + registrationRest.getEmail(), e);
-        }
-        if (eperson != null) {
+        if (type.equalsIgnoreCase(TYPE_FORGOT)) {
+            EPerson eperson = null;
+            try {
+                eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
+            } catch (SQLException e) {
+                log.error("Something went wrong retrieving EPerson for email: " + registrationRest.getEmail(), e);
+            }
             try {
                 if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                     throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
