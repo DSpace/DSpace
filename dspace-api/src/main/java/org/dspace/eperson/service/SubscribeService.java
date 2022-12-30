@@ -166,7 +166,7 @@ public interface SubscribeService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public Subscription updateSubscription(Context context, Integer id, EPerson eperson, DSpaceObject dSpaceObject,
-                              List<SubscriptionParameter> subscriptionParameterList, String type) throws SQLException;
+            List<SubscriptionParameter> subscriptionParameterList, String type) throws SQLException;
 
     /**
      * Adds a parameter to a subscription
@@ -176,8 +176,8 @@ public interface SubscribeService {
      * @param subscriptionParameter SubscriptionParameter subscriptionParameter
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Subscription addSubscriptionParameter(Context context,Integer id,SubscriptionParameter subscriptionParameter)
-            throws SQLException;
+    public Subscription addSubscriptionParameter(Context context,Integer id,
+            SubscriptionParameter subscriptionParameter) throws SQLException;
 
     /**
      * Deletes a parameter from subscription
@@ -187,14 +187,14 @@ public interface SubscribeService {
      * @param subscriptionParam     SubscriptionParameter subscriptionParameter
      * @throws SQLException         An exception that provides information on a database access error or other errors.
      */
-    public Subscription removeSubscriptionParameter(Context context, Integer id,SubscriptionParameter subscriptionParam)
-            throws SQLException;
+    public Subscription removeSubscriptionParameter(Context context, Integer id,
+            SubscriptionParameter subscriptionParam) throws SQLException;
 
     /**
      * Deletes a subscription
      *
      * @param context DSpace context
-     * @param id Integer id of subscription
+     * @param subscription The subscription to delete
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public void deleteSubscription(Context context, Subscription subscription) throws SQLException;
@@ -207,8 +207,8 @@ public interface SubscribeService {
      * @param frequencyValue String frequency value of subscription
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type,String frequencyValue)
-            throws SQLException;
+    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type,
+            String frequencyValue) throws SQLException;
 
     /**
      * Counts all subscriptions
