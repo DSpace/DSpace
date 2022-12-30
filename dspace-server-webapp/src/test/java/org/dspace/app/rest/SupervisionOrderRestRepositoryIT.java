@@ -42,6 +42,7 @@ import org.dspace.eperson.Group;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -927,6 +928,16 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
 
         getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrder.getID()))
                              .andExpect(status().isNotFound());
+
+        String patchBody = getPatchContent(List.of(new ReplaceOperation("/withdrawn", true)));
+
+        getClient(getAuthToken(eperson.getEmail(), password)).perform(patch("/api/core/items/" + item.getID())
+                                          .content(patchBody)
+                                          .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isForbidden());
+
+        Assert.assertTrue(item.getResourcePolicies().stream()
+                              .noneMatch(rp -> group.getID().equals(rp.getGroup().getID())));
     }
 
 }

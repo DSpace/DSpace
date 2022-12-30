@@ -912,7 +912,6 @@
                 <ref bean="searchFilterObjectNamedType" />
                 <ref bean="searchFilterType" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterSupervision" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page -->
@@ -921,7 +920,6 @@
                 <ref bean="searchFilterObjectNamedType" />
                 <ref bean="searchFilterType" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterSupervision" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -941,7 +939,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, workspace and accepted for workflow -->
-                <value>search.resourcetype:WorkspaceItem</value>
+                <value>search.resourcetype:WorkspaceItem AND supervised:true</value>
             </list>
         </property>
         <!--Default result per page  -->

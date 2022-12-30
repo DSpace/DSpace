@@ -146,7 +146,9 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
                         " with id: " + id + " not found"
                 );
             }
+            removeGroupPoliciesToItem(context, supervisionOrder.getItem(), supervisionOrder.getGroup());
             supervisionOrderService.delete(context, supervisionOrder);
+
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -201,6 +203,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             if (type.equals("EDITOR")) {
                 addGroupPolicyToItem(context, item, Constants.READ, group, TYPE_SUBMISSION);
                 addGroupPolicyToItem(context, item, Constants.WRITE, group, TYPE_SUBMISSION);
+                addGroupPolicyToItem(context, item, Constants.ADD, group, TYPE_SUBMISSION);
             } else if (type.equals("OBSERVER")) {
                 addGroupPolicyToItem(context, item, Constants.READ, group, TYPE_SUBMISSION);
             }
@@ -216,6 +219,19 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             List<Bitstream> bits = bundle.getBitstreams();
             for (Bitstream bitstream : bits) {
                 authorizeService.addPolicy(context, bitstream, action, group, policyType);
+            }
+        }
+    }
+
+    private void removeGroupPoliciesToItem(Context context, Item item, Group group)
+        throws AuthorizeException, SQLException {
+        authorizeService.removeGroupPolicies(context, item, group);
+        List<Bundle> bundles = item.getBundles();
+        for (Bundle bundle : bundles) {
+            authorizeService.removeGroupPolicies(context, bundle, group);
+            List<Bitstream> bits = bundle.getBitstreams();
+            for (Bitstream bitstream : bits) {
+                authorizeService.removeGroupPolicies(context, bitstream, group);
             }
         }
     }
