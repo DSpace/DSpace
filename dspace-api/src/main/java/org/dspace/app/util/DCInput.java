@@ -10,6 +10,7 @@ package org.dspace.app.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
@@ -131,9 +132,14 @@ public class DCInput {
     private boolean closedVocabulary = false;
 
     /**
-     * the regex to comply with, null if nothing
+     * the regex in ECMAScript standard format, usable also by rests.
      */
     private String regex = null;
+
+    /**
+     * the computed pattern, null if nothing
+     */
+    private Pattern pattern = null;
 
     /**
      * allowed document types
@@ -178,7 +184,7 @@ public class DCInput {
 
         //check if the input have a language tag
         language = Boolean.valueOf(fieldMap.get("language"));
-        valueLanguageList = new ArrayList();
+        valueLanguageList = new ArrayList<>();
         if (language) {
             String languageNameTmp = fieldMap.get("value-pairs-name");
             if (StringUtils.isBlank(languageNameTmp)) {
@@ -191,7 +197,7 @@ public class DCInput {
         repeatable = "true".equalsIgnoreCase(repStr)
             || "yes".equalsIgnoreCase(repStr);
         String nameVariantsString = fieldMap.get("name-variants");
-        nameVariants = (StringUtils.isNotBlank(nameVariantsString)) ?
+        nameVariants = StringUtils.isNotBlank(nameVariantsString) ?
                 nameVariantsString.equalsIgnoreCase("true") : false;
         label = fieldMap.get("label");
         inputType = fieldMap.get("input-type");
@@ -203,17 +209,17 @@ public class DCInput {
         }
         hint = fieldMap.get("hint");
         warning = fieldMap.get("required");
-        required = (warning != null && warning.length() > 0);
+        required = warning != null && warning.length() > 0;
         visibility = fieldMap.get("visibility");
         readOnly = fieldMap.get("readonly");
         vocabulary = fieldMap.get("vocabulary");
-        regex = fieldMap.get("regex");
+        this.initRegex(fieldMap.get("regex"));
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
             || "yes".equalsIgnoreCase(closedVocabularyStr);
 
         // parsing of the <type-bind> element (using the colon as split separator)
-        typeBind = new ArrayList<>();
+        typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if (typeBindDef != null && typeBindDef.trim().length() > 0) {
             String[] types = typeBindDef.split(",");
@@ -238,6 +244,22 @@ public class DCInput {
 
     }
 
+    protected void initRegex(String regex) {
+        this.regex = null;
+        this.pattern = null;
+        if (regex != null) {
+            try {
+                Optional.ofNullable(RegexPatternUtils.computePattern(regex))
+                    .ifPresent(pattern -> {
+                        this.pattern = pattern;
+                        this.regex = regex;
+                    });
+            } catch (PatternSyntaxException e) {
+                log.warn("The regex field of input {} with value {} is invalid!", this.label, regex);
+            }
+        }
+    }
+
     /**
      * Is this DCInput for display in the given scope? The scope should be
      * either "workflow" or "submit", as per the input forms definition. If the
@@ -248,7 +270,7 @@ public class DCInput {
      * @return whether the input should be displayed or not
      */
     public boolean isVisible(String scope) {
-        return (visibility == null || visibility.equals(scope));
+        return visibility == null || visibility.equals(scope);
     }
 
     /**
@@ -381,7 +403,7 @@ public class DCInput {
 
     /**
      * Get the style for this form field
-     * 
+     *
      * @return the style
      */
     public String getStyle() {
@@ -512,8 +534,12 @@ public class DCInput {
         return visibility;
     }
 
+    public Pattern getPattern() {
+        return this.pattern;
+    }
+
     public String getRegex() {
-        return regex;
+        return this.regex;
     }
 
     public String getFieldName() {
@@ -546,8 +572,7 @@ public class DCInput {
     public boolean validate(String value) {
         if (StringUtils.isNotBlank(value)) {
             try {
-                if (StringUtils.isNotBlank(regex)) {
-                    Pattern pattern = Pattern.compile(regex);
+                if (this.pattern != null) {
                     if (!pattern.matcher(value).matches()) {
                         return false;
                     }
@@ -557,7 +582,6 @@ public class DCInput {
             }
 
         }
-
         return true;
     }
 
