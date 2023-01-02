@@ -1100,6 +1100,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return searchService.search(context, discoverQuery);
     }
 
+    @Override
     public List<Item> findItemsWithEdit(Context context, int offset, int limit)
         throws SQLException, SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -1112,6 +1113,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             .collect(Collectors.toList());
     }
 
+    @Override
     public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);

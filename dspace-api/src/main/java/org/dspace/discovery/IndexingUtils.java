@@ -34,8 +34,6 @@ public class IndexingUtils {
      * Retrieve all ancestor communities of a given community, with the first one being the given community and the
      * last one being the root.
      * <p>
-     * TODO: can be done in a single SQL query with recursive common table expressions
-     * TODO: should probably be moved to CommunityService
      *
      * @param context   DSpace context object
      * @param community Community for which we search the ancestors
