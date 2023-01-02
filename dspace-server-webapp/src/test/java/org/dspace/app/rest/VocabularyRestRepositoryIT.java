@@ -179,7 +179,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         VocabularyMatcher.matchVocabularyEntry("Research Subject Categories",
                           "", "vocabularyEntry"),
                         VocabularyMatcher.matchVocabularyEntry("Family research",
-                          "SOCIAL SCIENCES :: Social sciences :: Social work :: Family research",
+                          "SOCIAL SCIENCES::Social sciences::Social work::Family research",
                           "vocabularyEntry"))))
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
