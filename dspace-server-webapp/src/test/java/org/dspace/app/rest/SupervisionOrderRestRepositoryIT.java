@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.model.patch.AddOperation;
@@ -35,8 +36,10 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.SupervisionOrderBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.supervision.SupervisionOrder;
@@ -938,6 +941,148 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
 
         Assert.assertTrue(item.getResourcePolicies().stream()
                               .noneMatch(rp -> group.getID().equals(rp.getGroup().getID())));
+    }
+
+    @Test
+    public void deleteItemThenSupervisionOrderBeDeletedTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Collection 1")
+                             .build();
+
+        Item item =
+            ItemBuilder.createItem(context, col1)
+                       .withTitle("item title")
+                       .build();
+
+        Group group =
+            GroupBuilder.createGroup(context)
+                        .withName("group")
+                        .addMember(eperson)
+                        .build();
+
+        SupervisionOrder supervisionOrder =
+            SupervisionOrderBuilder.createSupervisionOrder(context, item, group)
+                                   .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrder.getID()))
+                             .andExpect(status().isOk());
+
+        getClient(adminToken).perform(delete("/api/core/items/" + item.getID()))
+                             .andExpect(status().isNoContent());
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrder.getID()))
+                             .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void deleteGroupThenSupervisionOrderBeDeletedTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Collection 1")
+                             .build();
+
+        Item item =
+            ItemBuilder.createItem(context, col1)
+                       .withTitle("item title")
+                       .build();
+
+        Group group =
+            GroupBuilder.createGroup(context)
+                        .withName("group")
+                        .addMember(eperson)
+                        .build();
+
+        SupervisionOrder supervisionOrder =
+            SupervisionOrderBuilder.createSupervisionOrder(context, item, group)
+                                   .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrder.getID()))
+                             .andExpect(status().isOk());
+
+        getClient(adminToken).perform(delete("/api/eperson/groups/" + group.getID()))
+                             .andExpect(status().isNoContent());
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrder.getID()))
+                             .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void deleteWorkspaceItemThenSupervisionOrderBeDeletedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Collection publications =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Publications")
+                             .withEntityType("Publication")
+                             .build();
+
+        Group groupA =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(eperson)
+                        .build();
+
+        WorkspaceItem witem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, publications)
+                                .withTitle("Workspace Item 1")
+                                .withIssueDate("2017-10-17")
+                                .withSubject("ExtraEntry")
+                                .grantLicense()
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/core/supervisionorders/")
+                                 .param("uuid", witem.getItem().getID().toString())
+                                 .param("group", groupA.getID().toString())
+                                 .param("type", "EDITOR")
+                                 .contentType(contentType))
+                             .andExpect(status().isCreated())
+                             .andDo(result -> idRef
+                                 .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRef.get()))
+                             .andExpect(status().isOk());
+
+        getClient(adminToken).perform(delete("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isNoContent());
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRef.get()))
+                             .andExpect(status().isNotFound());
+
     }
 
 }
