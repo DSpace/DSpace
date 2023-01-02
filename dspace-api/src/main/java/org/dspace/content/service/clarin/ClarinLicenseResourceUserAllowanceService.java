@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.clarin.ClarinLicenseResourceUserAllowance;
-import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.core.Context;
 
 public interface ClarinLicenseResourceUserAllowanceService {
@@ -27,5 +26,6 @@ public interface ClarinLicenseResourceUserAllowanceService {
     boolean verifyToken(Context context, UUID resourceID, String token) throws SQLException;
     boolean isUserAllowedToAccessTheResource(Context context, UUID userId, UUID resourceId) throws SQLException;
     List<ClarinLicenseResourceUserAllowance> findByEPersonId(Context context, UUID userID) throws SQLException;
-    List<ClarinLicenseResourceUserAllowance> findByEPersonIdAndBitstreamId(Context context, UUID userID, UUID bitstreamID) throws SQLException;
+    List<ClarinLicenseResourceUserAllowance> findByEPersonIdAndBitstreamId(Context context, UUID userID,
+                                                                           UUID bitstreamID) throws SQLException;
 }

@@ -7,16 +7,16 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ClarinLicenseResourceUserAllowanceRest;
-import org.dspace.app.rest.model.ClarinLicenseRest;
-import org.dspace.app.rest.model.MetadataValueWrapperRest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseResourceUserAllowance;
 import org.dspace.content.service.clarin.ClarinLicenseResourceUserAllowanceService;
 import org.dspace.core.Context;
@@ -25,11 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Component(ClarinLicenseResourceUserAllowanceRest.CATEGORY + "." + ClarinLicenseResourceUserAllowanceRest.NAME)
 public class ClarinLicenseResourceUserAllowanceRestRepository
@@ -67,10 +62,10 @@ public class ClarinLicenseResourceUserAllowanceRestRepository
     }
 
     @SearchRestMethod(name = "byBitstreamAndUser")
-    public Page<ClarinLicenseResourceUserAllowanceRest> findByValue(@Parameter(value = "bitstreamUUID", required = true) UUID
-                                                            bitstreamUUID,
-                                                      @Parameter(value = "userUUID", required = true) UUID userUUID,
-                                                      Pageable pageable) throws SQLException {
+    public Page<ClarinLicenseResourceUserAllowanceRest> findByValue(
+            @Parameter(value = "bitstreamUUID", required = true) UUID bitstreamUUID,
+            @Parameter(value = "userUUID", required = true) UUID userUUID,
+            Pageable pageable) throws SQLException {
         Context context = obtainContext();
 
         List<ClarinLicenseResourceUserAllowance> clarinLicenseResourceUserAllowance =

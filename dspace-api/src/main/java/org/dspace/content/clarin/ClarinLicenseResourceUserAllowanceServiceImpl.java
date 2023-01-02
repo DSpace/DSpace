@@ -107,7 +107,7 @@ public class ClarinLicenseResourceUserAllowanceServiceImpl implements ClarinLice
                 clarinLicenseResourceMappingService.getLicenseToAgree(context, userId, resourceId);
 
         // If the list is empty there are none licenses to agree -> the user is authorized.
-            return Objects.isNull(clarinLicenseToAgree);
+        return Objects.isNull(clarinLicenseToAgree);
     }
 
     @Override

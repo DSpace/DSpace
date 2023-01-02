@@ -54,7 +54,8 @@ public final class CreateAdministrator {
      */
     private final Context context;
 
-    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true, "organization the user belongs to");
+    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true,
+            "organization the user belongs to");
 
     protected EPersonService ePersonService;
     protected GroupService groupService;

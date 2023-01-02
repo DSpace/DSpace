@@ -7,11 +7,26 @@
  */
 package org.dspace.app.rest.repository;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
+import static org.dspace.content.clarin.ClarinLicense.SEND_TOKEN;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.NotFoundException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.utils.DateUtils;
 import org.dspace.app.rest.model.ClarinUserMetadataRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.clarin.ClarinLicense;
@@ -32,24 +47,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.NotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
-import static org.dspace.content.clarin.ClarinLicense.SEND_TOKEN;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/api/" + ClarinUserMetadataRest.CATEGORY + "/" + ClarinUserMetadataRest.NAME + "/" + "manage")

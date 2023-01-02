@@ -13,7 +13,8 @@ import org.dspace.content.clarin.ClarinUserRegistration;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ClarinUserRegistrationConverter implements DSpaceConverter<ClarinUserRegistration, ClarinUserRegistrationRest> {
+public class ClarinUserRegistrationConverter implements DSpaceConverter<ClarinUserRegistration,
+        ClarinUserRegistrationRest> {
 
     @Override
     public ClarinUserRegistrationRest convert(ClarinUserRegistration modelObject, Projection projection) {

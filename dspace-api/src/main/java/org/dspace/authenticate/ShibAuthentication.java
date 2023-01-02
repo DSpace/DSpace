@@ -773,8 +773,8 @@ public class ShibAuthentication implements AuthenticationMethod {
          *
          */
         // if no email the registration is postponed after entering and confirming mail
-        if(Objects.nonNull(email)){
-            try{
+        if (Objects.nonNull(email)) {
+            try {
                 ClarinUserRegistration clarinUserRegistration = new ClarinUserRegistration();
                 clarinUserRegistration.setConfirmation(true);
                 clarinUserRegistration.setEmail(email);
@@ -783,7 +783,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                 clarinUserRegistrationService.create(context, clarinUserRegistration);
                 eperson.setCanLogIn(false);
                 ePersonService.update(context, eperson);
-            }catch(Exception e){
+            } catch (Exception e) {
                 throw new AuthorizeException("User has not been added among registred users!") ;
             }
         }
