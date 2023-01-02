@@ -851,6 +851,55 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void createNewVersionItemByCollectionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community rootCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        EPerson colAdmin = EPersonBuilder.createEPerson(context)
+                .withCanLogin(true)
+                .withEmail("coladmin@email.com")
+                .withPassword(password)
+                .withNameInMetadata("Collection", "Admin")
+                .build();
+        Collection col = CollectionBuilder
+                .createCollection(context, rootCommunity)
+                .withName("Collection 1")
+                .withAdminGroup(colAdmin)
+                .build();
+
+        Item item = ItemBuilder.createItem(context, col)
+                .withTitle("Public test item")
+                .withIssueDate("2022-12-19")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        item.setSubmitter(eperson);
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String token = getAuthToken(colAdmin.getEmail(), password);
+        try {
+            getClient(token).perform(post("/api/versioning/versions")
+                            .param("summary", "test summary!")
+                            .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                            .content("/api/core/items/" + item.getID()))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.version", is(2)),
+                            hasJsonPath("$.summary", is("test summary!")),
+                            hasJsonPath("$.type", is("version"))
+                    )))
+                    .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            VersionBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
     public void patchReplaceSummaryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
