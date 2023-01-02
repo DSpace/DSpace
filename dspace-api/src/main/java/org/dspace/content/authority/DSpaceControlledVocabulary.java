@@ -132,8 +132,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String filename = vocabulariesPath + vocabularyName + ".xml";
             log.info("Loading " + filename);
             vocabulary = new InputSource(filename);
-
-            hierarchyDelimiter = " " + hierarchyDelimiter + " ";
         }
     }
 
