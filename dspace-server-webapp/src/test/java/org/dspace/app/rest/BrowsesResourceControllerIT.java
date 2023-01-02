@@ -1111,7 +1111,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
                    //We expect the totalElements to be the 1 item present in the collection
                    .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   //As this is is a small collection, we expect to go-to page 0
+                   //As this is a small collection, we expect to go-to page 0
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Blade")))
 
@@ -1121,6 +1121,33 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                             "Blade Runner",
                                                                                             "1982-06-25")
                                        )));
+
+        //Test filtering with spaces:
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by Title endpoint
+        //with startsWith set to Blade Runner and scope set to Col 1
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=Blade Runner")
+                .param("scope", col1.getID().toString())
+                .param("size", "2"))
+
+            //** THEN **
+            //The status has to be 200 OK
+            .andExpect(status().isOk())
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+
+            //We expect the totalElements to be the 1 item present in the collection
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            //As this is a small collection, we expect to go-to page 0
+            .andExpect(jsonPath("$.page.number", is(0)))
+            .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Blade Runner")))
+
+            //Verify that the index jumps to the "Blade Runner" item.
+            .andExpect(jsonPath("$._embedded.items",
+                contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                    "Blade Runner",
+                    "1982-06-25")
+                )));
     }
 
     @Test
