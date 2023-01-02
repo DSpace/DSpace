@@ -9,18 +9,12 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.repository.ClarinLicenseRestRepository.OPERATION_PATH_LICENSE_RESOURCE;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.http.MediaType.TEXT_PLAIN;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jayway.jsonpath.matchers.JsonPathMatchers;
-import org.apache.http.entity.ContentType;
-import org.dspace.authorize.DownloadTokenExpiredException;
-import org.dspace.authorize.MissingLicenseAgreementException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,10 +26,13 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
+import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.DownloadTokenExpiredException;
+import org.dspace.authorize.MissingLicenseAgreementException;
 import org.dspace.builder.ClarinLicenseBuilder;
 import org.dspace.builder.ClarinLicenseLabelBuilder;
 import org.dspace.builder.ClarinLicenseResourceUserAllowanceBuilder;
@@ -59,7 +56,6 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 public class AuthorizationRestControllerIT extends AbstractControllerIntegrationTest {
 

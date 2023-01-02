@@ -7,46 +7,16 @@
  */
 package org.dspace.app.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.model.ClarinUserMetadataRest;
-import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.model.patch.ReplaceOperation;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.DownloadTokenExpiredException;
-import org.dspace.builder.BitstreamBuilder;
-import org.dspace.builder.BundleBuilder;
-import org.dspace.builder.ClarinLicenseBuilder;
-import org.dspace.builder.ClarinLicenseLabelBuilder;
-import org.dspace.builder.ClarinUserMetadataBuilder;
-import org.dspace.builder.ClarinUserRegistrationBuilder;
-import org.dspace.builder.CollectionBuilder;
-import org.dspace.builder.CommunityBuilder;
-import org.dspace.builder.ItemBuilder;
-import org.dspace.builder.WorkspaceItemBuilder;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.clarin.ClarinLicense;
-import org.dspace.content.clarin.ClarinLicenseLabel;
-import org.dspace.content.clarin.ClarinUserMetadata;
-import org.dspace.content.clarin.ClarinUserRegistration;
-import org.dspace.content.service.clarin.ClarinLicenseLabelService;
-import org.dspace.content.service.clarin.ClarinLicenseService;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
+import static org.dspace.app.rest.repository.ClarinLicenseRestRepository.OPERATION_PATH_LICENSE_RESOURCE;
 import static org.dspace.app.rest.repository.ClarinUserMetadataRestController.CHECK_EMAIL_RESPONSE_CONTENT;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -56,15 +26,31 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static org.dspace.app.rest.repository.ClarinLicenseRestRepository.OPERATION_PATH_LICENSE_RESOURCE;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.model.ClarinUserMetadataRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.ClarinLicenseBuilder;
+import org.dspace.builder.ClarinLicenseLabelBuilder;
+import org.dspace.builder.ClarinUserMetadataBuilder;
+import org.dspace.builder.ClarinUserRegistrationBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.clarin.ClarinLicense;
+import org.dspace.content.clarin.ClarinLicenseLabel;
+import org.dspace.content.clarin.ClarinUserRegistration;
+import org.dspace.content.service.clarin.ClarinLicenseLabelService;
+import org.dspace.content.service.clarin.ClarinLicenseService;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegrationTest {
 

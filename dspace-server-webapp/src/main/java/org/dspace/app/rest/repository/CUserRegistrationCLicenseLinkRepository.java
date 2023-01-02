@@ -7,13 +7,16 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.rest.model.ClarinLicenseRest;
 import org.dspace.app.rest.model.ClarinUserRegistrationRest;
-import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.clarin.ClarinLicense;
-import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
@@ -22,13 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Component(ClarinUserRegistrationRest.CATEGORY + "." + ClarinUserRegistrationRest.NAME + "." +
         ClarinUserRegistrationRest.CLARIN_LICENSES)

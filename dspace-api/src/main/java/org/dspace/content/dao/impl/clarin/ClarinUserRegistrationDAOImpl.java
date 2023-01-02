@@ -7,15 +7,15 @@
  */
 package org.dspace.content.dao.impl.clarin;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.Query;
+
 import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.dao.clarin.ClarinUserRegistrationDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-
-import javax.persistence.Query;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
 
 public class ClarinUserRegistrationDAOImpl extends AbstractHibernateDAO<ClarinUserRegistration>
         implements ClarinUserRegistrationDAO {

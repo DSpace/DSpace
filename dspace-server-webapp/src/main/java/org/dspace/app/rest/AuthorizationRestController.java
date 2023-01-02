@@ -14,15 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.authorize.AuthorizationBitstreamUtils;
 import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.authorize.DownloadTokenExpiredException;
-import org.dspace.authorize.MissingLicenseAgreementException;
 import org.dspace.app.rest.model.AuthrnRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.AuthorizationBitstreamUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.DownloadTokenExpiredException;
+import org.dspace.authorize.MissingLicenseAgreementException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;

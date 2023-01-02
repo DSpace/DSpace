@@ -66,7 +66,8 @@ public class EPersonCLITool {
     private static final Option OPT_NEW_PASSWORD
             = new Option("w", "newPassword", false, "prompt for new password");
 
-    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true, "organization the user belongs to");
+    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true,
+            "organization the user belongs to");
 
     static final String ERR_PASSWORD_EMPTY = "The new password may not be empty.";
     static final String ERR_PASSWORD_NOMATCH = "Passwords do not match.  Password not set";

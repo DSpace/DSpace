@@ -7,13 +7,12 @@
  */
 package org.dspace.content.service.clarin;
 
-import org.dspace.content.Item;
-import org.dspace.content.clarin.ClarinLicenseResourceUserAllowance;
-import org.dspace.core.Context;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 /**
  * Service interface class for the Item object.

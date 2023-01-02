@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.core.Context;
 
