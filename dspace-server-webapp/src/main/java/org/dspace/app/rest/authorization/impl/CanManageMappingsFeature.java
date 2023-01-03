@@ -68,18 +68,20 @@ public class CanManageMappingsFeature implements AuthorizationFeature {
                 return false;
             }
             try {
-                Optional<Collection> collections = collectionService.findCollectionsWithSubmit(StringUtils.EMPTY,
-                                                 context, null, 0, Integer.MAX_VALUE)
-                                                .stream()
-                                                .filter(c -> !c.getID().equals(item.getOwningCollection().getID()))
-                                                .filter(c -> {
-                                                    try {
-                                                        return collectionService.canEditBoolean(context, c);
-                                                    } catch (SQLException e) {
-                                                        throw new RuntimeException(e.getMessage(), e);
-                                                    }
-                                                })
-                                                .findFirst();
+                Optional<Collection> collections = collectionService.findCollectionsWithSubmit(
+                    context,
+                    StringUtils.EMPTY,
+                    null, 0, Integer.MAX_VALUE)
+                                            .stream()
+                                            .filter(c -> !c.getID().equals(item.getOwningCollection().getID()))
+                                            .filter(c -> {
+                                                try {
+                                                    return collectionService.canEditBoolean(context, c);
+                                                } catch (SQLException e) {
+                                                    throw new RuntimeException(e.getMessage(), e);
+                                                }
+                                            })
+                                            .findFirst();
                 return collections.isPresent();
             } catch (SearchServiceException e) {
                 throw new RuntimeException(e.getMessage(), e);

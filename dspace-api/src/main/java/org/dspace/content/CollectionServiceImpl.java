@@ -938,8 +938,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        int offset, int limit) throws SQLException, SearchServiceException {
+    public List<Collection> findCollectionsWithSubmit(Context context, String q, Community community,
+                                                      int offset, int limit)
+        throws SQLException, SearchServiceException {
 
         List<Collection> collections = new ArrayList<>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -955,7 +956,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community)
+    public int countCollectionsWithSubmit(Context context, String q, Community community)
         throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -1018,8 +1019,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community, String entityType,
-            int offset, int limit) throws SQLException, SearchServiceException {
+    public List<Collection> findCollectionsWithSubmit(Context context, String q, Community community, String entityType,
+                                                      int offset, int limit)
+        throws SQLException, SearchServiceException {
         List<Collection> collections = new ArrayList<>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
@@ -1035,7 +1037,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
+    public int countCollectionsWithSubmit(Context context, String q, Community community, String entityType)
             throws SQLException, SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
