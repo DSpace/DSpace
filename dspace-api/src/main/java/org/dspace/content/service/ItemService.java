@@ -771,24 +771,26 @@ public interface ItemService
 
     /**
      * finds all items for which the current user has editing rights
+     *
      * @param context DSpace context object
-     * @param offset page offset
-     * @param limit  page size limit
+     * @param offset  page offset
+     * @param limit   page size limit
      * @return list of items for which the current user has editing rights
      * @throws SQLException
      * @throws SearchServiceException
      */
-    public List<Item> findItemsWithEdit(String q, Context context, int offset, int limit)
+    public List<Item> findItemsWithEdit(Context context, String q, int offset, int limit)
         throws SQLException, SearchServiceException;
 
     /**
      * counts all items for which the current user has editing rights
+     *
      * @param context DSpace context object
      * @return list of items for which the current user has editing rights
      * @throws SQLException
      * @throws SearchServiceException
      */
-    public int countItemsWithEdit(String q, Context context) throws SQLException, SearchServiceException;
+    public int countItemsWithEdit(Context context, String q) throws SQLException, SearchServiceException;
 
     /**
      * Check if the supplied item is an inprogress submission
