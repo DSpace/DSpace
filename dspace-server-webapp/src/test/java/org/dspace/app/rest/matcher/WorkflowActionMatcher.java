@@ -14,7 +14,10 @@ import static org.hamcrest.Matchers.is;
 
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.state.actions.processingaction.RatingReviewActionAdvancedInfo;
+import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerActionAdvancedInfo;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 /**
  * @author Maria Verdonck (Atmire) on 06/01/2020
@@ -34,6 +37,33 @@ public class WorkflowActionMatcher {
                 hasJsonPath("$.options", is(workflowAction.getOptions())),
                 hasJsonPath("$.advanced", is(workflowAction.isAdvanced())),
                 hasJsonPath("$._links.self.href", containsString(WORKFLOW_ACTIONS_ENDPOINT + workflowAction.getId()))
+        );
+    }
+
+    /**
+     * Matcher to check the contents of the advancedInfo for "ratingreviewaction"
+     * @param ratingReviewActionAdvancedInfo identical RatingReviewActionAdvancedInfo object
+     */
+    public static Matcher<? super Object> matchRatingReviewActionAdvancedInfo(
+        RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo) {
+        return Matchers.allOf(
+            hasJsonPath("$.descriptionRequired", is(ratingReviewActionAdvancedInfo.isDescriptionRequired())),
+            hasJsonPath("$.maxValue", is(ratingReviewActionAdvancedInfo.getMaxValue())),
+            hasJsonPath("$.type", is(ratingReviewActionAdvancedInfo.getType())),
+            hasJsonPath("$.id", is(ratingReviewActionAdvancedInfo.getId()))
+        );
+    }
+
+    /**
+     * Matcher to check the contents of the advancedInfo for "selectrevieweraction"
+     * @param selectReviewerActionAdvancedInfo identical SelectReviewerActionAdvancedInfo object
+     */
+    public static Matcher<? super Object> matchSelectReviewerActionAdvancedInfo(
+        SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo) {
+        return Matchers.allOf(
+            hasJsonPath("$.group", is(selectReviewerActionAdvancedInfo.getGroup())),
+            hasJsonPath("$.type", is(selectReviewerActionAdvancedInfo.getType())),
+            hasJsonPath("$.id", is(selectReviewerActionAdvancedInfo.getId()))
         );
     }
 }

@@ -7,7 +7,6 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
-import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
 import org.springframework.util.DigestUtils;
 
@@ -16,26 +15,26 @@ import org.springframework.util.DigestUtils;
  * {@link org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction}
  */
 public class SelectReviewerActionAdvancedInfo implements ActionAdvancedInfo {
-    private Role role;
+    private String group;
     private String type;
     private String id;
 
     /**
-     * Generic getter for the role
+     * Generic getter for the group
      *
-     * @return the role value
+     * @return the group value
      */
-    public Role getRole() {
-        return role;
+    public String getGroup() {
+        return group;
     }
 
     /**
-     * Generic setter for the role
+     * Generic setter for the group
      *
-     * @param role The role to be set
+     * @param group The group to be set
      */
-    public void setRole(Role role) {
-        this.role = role;
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     @Override
@@ -56,7 +55,7 @@ public class SelectReviewerActionAdvancedInfo implements ActionAdvancedInfo {
     @Override
     public void setId(String type) {
         String idString = type
-            + ";role," + role;
+            + ";group," + group;
         this.id = DigestUtils.md5DigestAsHex(idString.getBytes());
     }
 }

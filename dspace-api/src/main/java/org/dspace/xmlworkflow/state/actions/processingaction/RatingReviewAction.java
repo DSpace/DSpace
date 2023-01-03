@@ -9,6 +9,7 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +71,7 @@ public class RatingReviewAction extends ProcessingAction {
 
     @Override
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
-        List<ActionAdvancedInfo> advancedInfo = super.getAdvancedInfo();
+        List<ActionAdvancedInfo> advancedInfo = new ArrayList<>();
         RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
         ratingReviewActionAdvancedInfo.setDescriptionRequired(descriptionRequired);
         ratingReviewActionAdvancedInfo.setMaxValue(maxValue);

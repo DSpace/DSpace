@@ -18,9 +18,16 @@ import org.dspace.app.rest.matcher.WorkflowActionMatcher;
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.repository.WorkflowActionRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.state.actions.processingaction.RatingReviewActionAdvancedInfo;
+import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerActionAdvancedInfo;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -32,6 +39,8 @@ import org.junit.Test;
 public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     private XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     private static final String WORKFLOW_ACTIONS_ENDPOINT
         = "/api/" + WorkflowActionRest.CATEGORY + "/" + WorkflowActionRest.NAME_PLURAL;
@@ -134,6 +143,14 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
         String token = getAuthToken(eperson.getEmail(), password);
         String nameActionWithOptions = "ratingreviewaction";
         WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
+
+        // create RatingReviewActionAdvancedInfo to compare with output
+        RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
+        ratingReviewActionAdvancedInfo.setDescriptionRequired(true);
+        ratingReviewActionAdvancedInfo.setMaxValue(5);
+        ratingReviewActionAdvancedInfo.setType("rating");
+        ratingReviewActionAdvancedInfo.setId("rating");
+
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
             //We expect a 200 is ok status
@@ -142,7 +159,8 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$.options", not(empty())))
             .andExpect(jsonPath("$.advancedOptions", not(empty())))
             .andExpect(jsonPath("$.advanced", is(true)))
-            .andExpect(jsonPath("$.advancedInfo", not(empty())))
+            .andExpect(jsonPath("$.advancedInfo", Matchers.contains(
+                WorkflowActionMatcher.matchRatingReviewActionAdvancedInfo(ratingReviewActionAdvancedInfo))))
             //Matches expected corresponding rest action values
             .andExpect(jsonPath("$", Matchers.is(
                 WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)
@@ -153,6 +171,19 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
     public void getWorkflowActionByName_ExistentWithOptions_selectrevieweraction() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
         String nameActionWithOptions = "selectrevieweraction";
+        // create reviewers group
+        context.turnOffAuthorisationSystem();
+        Group group = groupService.create(context);
+        configurationService.setProperty("action.selectrevieweraction.group", group.getID());
+        context.restoreAuthSystemState();
+
+        // create SelectReviewerActionAdvancedInfo to compare with output
+        SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo = new SelectReviewerActionAdvancedInfo();
+        selectReviewerActionAdvancedInfo.setGroup(group.getID().toString());
+        selectReviewerActionAdvancedInfo.setType("submit_select_reviewer");
+        selectReviewerActionAdvancedInfo.setId("submit_select_reviewer");
+
+
         WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
@@ -162,7 +193,8 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$.options", not(empty())))
             .andExpect(jsonPath("$.advancedOptions", not(empty())))
             .andExpect(jsonPath("$.advanced", is(true)))
-            .andExpect(jsonPath("$.advancedInfo", not(empty())))
+            .andExpect(jsonPath("$.advancedInfo", Matchers.contains(
+                WorkflowActionMatcher.matchSelectReviewerActionAdvancedInfo(selectReviewerActionAdvancedInfo))))
             //Matches expected corresponding rest action values
             .andExpect(jsonPath("$", Matchers.is(
                 WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)

@@ -7,33 +7,31 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.xmlworkflow.Role;
-
 /**
  *  The SelectReviewerActionAdvancedInfoRest REST Resource
  */
 public class SelectReviewerActionAdvancedInfoRest extends WorkflowActionRest {
 
-    private Role role;
+    private String groupId;
     private String type;
     private String id;
 
     /**
-     * Generic getter for the role
+     * Generic getter for the group
      *
-     * @return the role value of this SelectReviewerActionAdvancedInfoRest
+     * @return the group value of this SelectReviewerActionAdvancedInfoRest
      */
-    public Role getRole() {
-        return role;
+    public String getGroup() {
+        return groupId;
     }
 
     /**
-     * Generic setter for the role
+     * Generic setter for the group uuid
      *
-     * @param role The role to be set on this SelectReviewerActionAdvancedInfoRest
+     * @param groupId The group uuid to be set on this SelectReviewerActionAdvancedInfoRest
      */
-    public void setRole(Role role) {
-        this.role = role;
+    public void setGroup(String groupId) {
+        this.groupId = groupId;
     }
 
     /**

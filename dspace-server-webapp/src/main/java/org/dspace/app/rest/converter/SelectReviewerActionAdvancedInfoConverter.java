@@ -23,7 +23,7 @@ public class SelectReviewerActionAdvancedInfoConverter
                                                         Projection projection) {
         SelectReviewerActionAdvancedInfoRest restModel = new SelectReviewerActionAdvancedInfoRest();
         restModel.setProjection(projection);
-        restModel.setRole(modelObject.getRole());
+        restModel.setGroup(modelObject.getGroup());
         restModel.setType(modelObject.getType());
         restModel.setId(modelObject.getId());
         return restModel;

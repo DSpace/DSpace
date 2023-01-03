@@ -18,7 +18,10 @@ import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
@@ -45,7 +48,7 @@ public class SelectReviewerAction extends ProcessingAction {
 
     private static final String SUBMIT_CANCEL = "submit_cancel";
     private static final String SUBMIT_SEARCH = "submit_search";
-    private static final String SUBMIT_SELECT_REVIEWER = "submit_select_reviewer_";
+    private static final String SUBMIT_SELECT_REVIEWER = "submit_select_reviewer";
 
     private Role role;
 
@@ -54,6 +57,12 @@ public class SelectReviewerAction extends ProcessingAction {
 
     @Autowired(required = true)
     private WorkflowItemRoleService workflowItemRoleService;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private GroupService groupService;
 
     @Override
     public void activate(Context c, XmlWorkflowItem wf) {
@@ -91,6 +100,9 @@ public class SelectReviewerAction extends ProcessingAction {
             //Retrieve the identifier of the eperson which will do the reviewing
             UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
             EPerson reviewer = ePersonService.find(c, reviewerId);
+            if (!groupService.allMembers(c, getGroup()).contains(reviewer)) {
+                return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
+            }
             //We have a reviewer, assign him, the workflowitemrole will be translated into a task in the autoassign
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
             workflowItemRole.setEPerson(reviewer);
@@ -107,7 +119,6 @@ public class SelectReviewerAction extends ProcessingAction {
     @Override
     public List<String> getOptions() {
         List<String> options = new ArrayList<>();
-        options.add(SUBMIT_SEARCH);
         options.add(SUBMIT_SELECT_REVIEWER);
         return options;
     }
@@ -119,9 +130,9 @@ public class SelectReviewerAction extends ProcessingAction {
 
     @Override
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
-        List<ActionAdvancedInfo> advancedInfo = super.getAdvancedInfo();
+        List<ActionAdvancedInfo> advancedInfo = new ArrayList<>();
         SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo = new SelectReviewerActionAdvancedInfo();
-        selectReviewerActionAdvancedInfo.setRole(role);
+        selectReviewerActionAdvancedInfo.setGroup(getGroup().getID().toString());
         selectReviewerActionAdvancedInfo.setType(SUBMIT_SELECT_REVIEWER);
         selectReviewerActionAdvancedInfo.setId(SUBMIT_SELECT_REVIEWER);
         advancedInfo.add(selectReviewerActionAdvancedInfo);
@@ -135,5 +146,29 @@ public class SelectReviewerAction extends ProcessingAction {
     @Autowired(required = true)
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    /**
+     * Get the Reviewer group from the "action.selectrevieweraction.group" property in actions.cfg by its UUID or name
+     * Returns null if no (valid) group configured
+     * @return configured reviewers Group from property or null if none
+     */
+    private Group getGroup() {
+        Context context = new Context();
+        String groupIdOrName = configurationService.getProperty("action.selectrevieweraction.group");
+        Group group = null;
+
+        try {
+            // try to get group by name
+            group = groupService.findByName(context, groupIdOrName);
+            if (group == null) {
+                // try to get group by uuid if not a name
+                group = groupService.find(context, UUID.fromString(groupIdOrName));
+            }
+        } catch (Exception ignored) {
+            // ignore, there is no reviewer group set
+        }
+
+        return group;
     }
 }
