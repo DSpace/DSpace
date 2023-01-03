@@ -4779,12 +4779,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         context.restoreAuthSystemState();
 
+        String siteAdminToken = getAuthToken(admin.getEmail(), password);
         String rootAdminToken = getAuthToken(rootAdmin.getEmail(), password);
         String subcomm1AdminToken = getAuthToken(subcomm1Admin.getEmail(), password);
         String subcomm2AdminToken = getAuthToken(subcomm2Admin.getEmail(), password);
         String subcomm1collA_AdminToken = getAuthToken(subcomm1collA_Admin.getEmail(), password);
         String subcomm1collB_AdminToken = getAuthToken(subcomm1collB_Admin.getEmail(), password);
         String subcomm2collAdminToken = getAuthToken(subcomm2collAdmin.getEmail(), password);
+
+        getClient(siteAdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.items",
+                Matchers.containsInAnyOrder(
+                    ItemMatcher.matchItemProperties(subcomm1collAitemX),
+                    ItemMatcher.matchItemProperties(subcomm1collAitemY),
+                    ItemMatcher.matchItemProperties(subcomm1collBitem),
+                    ItemMatcher.matchItemProperties(subcomm2collitem)
+                )))
+            .andExpect(jsonPath("$.page.totalElements", is(4)));
 
         getClient(rootAdminToken).perform(get("/api/core/items/search/findItemsWithEdit"))
             .andExpect(status().isOk())
