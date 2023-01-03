@@ -132,7 +132,9 @@ public class SelectReviewerAction extends ProcessingAction {
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
         List<ActionAdvancedInfo> advancedInfo = new ArrayList<>();
         SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo = new SelectReviewerActionAdvancedInfo();
-        selectReviewerActionAdvancedInfo.setGroup(getGroup().getID().toString());
+        if (getGroup() != null) {
+            selectReviewerActionAdvancedInfo.setGroup(getGroup().getID().toString());
+        }
         selectReviewerActionAdvancedInfo.setType(SUBMIT_SELECT_REVIEWER);
         selectReviewerActionAdvancedInfo.setId(SUBMIT_SELECT_REVIEWER);
         advancedInfo.add(selectReviewerActionAdvancedInfo);
