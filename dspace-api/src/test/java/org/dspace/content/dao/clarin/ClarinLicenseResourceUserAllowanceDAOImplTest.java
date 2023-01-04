@@ -7,6 +7,8 @@
  */
 package org.dspace.content.dao.clarin;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.SQLException;
@@ -21,8 +23,6 @@ import org.dspace.content.factory.ClarinServiceFactory;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Assert;
@@ -30,7 +30,6 @@ import org.junit.Test;
 
 public class ClarinLicenseResourceUserAllowanceDAOImplTest extends AbstractIntegrationTest {
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ClarinLicenseResourceMappingService clarinLicenseResourceMappingService =
             ClarinServiceFactory.getInstance().getClarinLicenseResourceMappingService();
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
@@ -52,13 +51,20 @@ public class ClarinLicenseResourceUserAllowanceDAOImplTest extends AbstractInteg
         }
     }
 
+    /**
+     * Delete all initalized DSpace objects after each test
+     */
     @After
     @Override
     public void destroy() {
-        clarinLicenseResourceUserAllowance = null;
-        clarinLicenseResourceUserAllowanceDAO = null;
-        clarinLicenseResourceMappingService = null;
-        bitstreamService = null;
+        try {
+            context.turnOffAuthorisationSystem();
+            clarinLicenseResourceUserAllowanceDAO.delete(context, clarinLicenseResourceUserAllowance);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        super.destroy();
+
     }
 
     @Test
