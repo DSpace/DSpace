@@ -24,12 +24,17 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.EtdUnitService;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -41,11 +46,20 @@ public class EtdUnitServiceImplTest extends AbstractUnitTest {
   private EtdUnit etdunit1;
   private EtdUnit etdunit2;
   private EtdUnit etdunit3;
+  private Community community;
   private Collection collection1;
   private Collection collection2;
 
   protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+  protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
   protected EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
+
+  @BeforeClass
+  public static void initTestEnvironment() {
+    // Need to initialize AbstractBuilder so services for various builders
+    // are properly initialized
+    AbstractBuilder.init();
+  }
 
   /**
    * This method will be run before every test as per @Before. It will
@@ -58,12 +72,19 @@ public class EtdUnitServiceImplTest extends AbstractUnitTest {
   @Override
   public void init() {
     super.init();
+
     try {
       etdunit1 = EtdUnitTestUtils.createEtdUnit(context, "EtdUnit One", true);
       etdunit2 = EtdUnitTestUtils.createEtdUnit(context, "EtdUnit Two", false);
       etdunit3 = EtdUnitTestUtils.createEtdUnit(context, "EtdUnit Three", false);
-      collection1 = CollectionBuilder.createCollection(context, null).build();
-      collection2 = CollectionBuilder.createCollection(context, null).build();
+
+      context.turnOffAuthorisationSystem();
+      community = CommunityBuilder.createCommunity(context).build();
+
+      collection1 = CollectionBuilder.createCollection(context, community).build();
+      collection2 = CollectionBuilder.createCollection(context, community).build();
+      context.restoreAuthSystemState();
+
     } catch (SQLException ex) {
       log.error("SQL Error in init", ex);
       fail("SQL Error in init: " + ex.getMessage());
@@ -80,6 +101,14 @@ public class EtdUnitServiceImplTest extends AbstractUnitTest {
       EtdUnitTestUtils.deleteEtdUnit(context, etdunit3);
       EtdUnitTestUtils.deleteEtdUnit(context, etdunit2);
       EtdUnitTestUtils.deleteEtdUnit(context, etdunit1);
+
+      context.turnOffAuthorisationSystem();
+      collectionService.delete(context, collection1);
+      collectionService.delete(context, collection2);
+
+      communityService.delete(context, community);
+      context.restoreAuthSystemState();
+
       super.destroy();
     } catch (SQLException ex) {
       log.error("SQL Error in init", ex);
@@ -91,6 +120,12 @@ public class EtdUnitServiceImplTest extends AbstractUnitTest {
       log.error("IO Error in init", ex);
       fail("IO Error in init: " + ex.getMessage());
     }
+  }
+
+  @AfterClass
+  public static void destroyTestEnvironment() throws SQLException {
+      // Unload DSpace services
+      AbstractBuilder.destroy();
   }
 
   @Test
