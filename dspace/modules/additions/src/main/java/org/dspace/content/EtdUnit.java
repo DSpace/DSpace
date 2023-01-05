@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -136,7 +135,7 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     /**
      * Remove a collection from this etdunit
-     * 
+     *
      * @param collection
      *                   the collection to remove
      */

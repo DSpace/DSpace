@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.EtdUnitService;
+import org.dspace.core.Context;
 
 /**
  * Convenience methods for handling EtdUnits in tests.
@@ -43,7 +43,7 @@ public class EtdUnitTestUtils {
     /**
      * Retrieves the EtdUnit with the given name from the database, or returns null
      * if a EtdUnit with the given name cannot be found.
-     * 
+     *
      * @param context     the DSpace context
      * @param etdunitName the name of the EtdUnit to retrieve
      * @return the EtdUnit with the given name from the database, or null if a

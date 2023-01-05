@@ -5,12 +5,12 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.core.Context;
 import org.dspace.content.Collection;
 import org.dspace.content.EtdUnit;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EtdUnitService;
+import org.dspace.core.Context;
 
 /**
  * Builder to construct EtdUnit objects
@@ -28,7 +28,7 @@ public class EtdUnitBuilder extends AbstractDSpaceObjectBuilder<EtdUnit> {
 
     /**
      * Constructs a EtdUnitBuilder with the given Context
-     * 
+     *
      * @param context the DSpace context
      */
     protected EtdUnitBuilder(Context context) {
@@ -51,7 +51,7 @@ public class EtdUnitBuilder extends AbstractDSpaceObjectBuilder<EtdUnit> {
 
     /**
      * Returns a EtdUnitBuilder initialized with the given Context
-     * 
+     *
      * @param context the DSpace context
      * @return a EtdUnitBuilder with the given context
      */
