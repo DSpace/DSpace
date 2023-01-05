@@ -21,7 +21,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Namespace;
+import org.jdom2.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,12 +130,6 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
         return aliasList.toArray(new String[aliasList.size()]);
     }
 
-    /**
-     * We need to force this, because some dependency elsewhere interferes.
-     */
-    private static final String TRANSFORMER_FACTORY_CLASS
-        = "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl";
-
     private Transformer transformer = null;
     private File transformFile = null;
     private long transformLastModified = 0;
@@ -181,8 +175,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
                 Source transformSource
                     = new StreamSource(new FileInputStream(transformFile));
                 TransformerFactory transformerFactory
-                    = TransformerFactory.newInstance(
-                    TRANSFORMER_FACTORY_CLASS, null);
+                    = TransformerFactory.newInstance();
                 transformer = transformerFactory.newTransformer(transformSource);
                 transformLastModified = transformFile.lastModified();
             } catch (TransformerConfigurationException | FileNotFoundException e) {

@@ -21,7 +21,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.external.OrcidRestConnector;
@@ -40,7 +41,7 @@ import org.orcid.jaxb.model.v3.release.search.Result;
  */
 public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
 
-    private static Logger log = Logger.getLogger(Orcidv3SolrAuthorityImpl.class);
+    private final static Logger log = LogManager.getLogger();
 
     private OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;

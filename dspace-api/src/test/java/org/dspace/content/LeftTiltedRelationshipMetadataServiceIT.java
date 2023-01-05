@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
@@ -71,18 +72,27 @@ public class LeftTiltedRelationshipMetadataServiceIT extends RelationshipMetadat
         //request the virtual metadata of the publication only
         List<RelationshipMetadataValue> leftList = relationshipMetadataService
             .getRelationshipMetadata(leftItem, true);
-        assertThat(leftList.size(), equalTo(2));
-        assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
-        assertThat(leftList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
-        assertThat(leftList.get(0).getMetadataField().getElement(), equalTo("contributor"));
-        assertThat(leftList.get(0).getMetadataField().getQualifier(), equalTo("author"));
+        assertThat(leftList.size(), equalTo(3));
+
+        assertThat(leftList.get(0).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(leftList.get(0).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(leftList.get(0).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(0).getMetadataField().getQualifier(), equalTo("latestForDiscovery"));
         assertThat(leftList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        assertThat(leftList.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
-        assertThat(leftList.get(1).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(leftList.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(1).getValue(), equalTo("familyName, firstName"));
+        assertThat(leftList.get(1).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
+        assertThat(leftList.get(1).getMetadataField().getElement(), equalTo("contributor"));
+        assertThat(leftList.get(1).getMetadataField().getQualifier(), equalTo("author"));
         assertThat(leftList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        assertThat(leftList.get(2).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(leftList.get(2).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(leftList.get(2).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(2).getMetadataField().getQualifier(), nullValue());
+        assertThat(leftList.get(2).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
         // rightItem is the author
         List<MetadataValue> rightRelationshipMetadataList = itemService

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<activities:works path="/0000-0001-9227-636X/works" xmlns:internal="http://www.orcid.org/ns/internal" xmlns:education="http://www.orcid.org/ns/education" xmlns:distinction="http://www.orcid.org/ns/distinction" xmlns:deprecated="http://www.orcid.org/ns/deprecated" xmlns:other-name="http://www.orcid.org/ns/other-name" xmlns:membership="http://www.orcid.org/ns/membership" xmlns:error="http://www.orcid.org/ns/error" xmlns:common="http://www.orcid.org/ns/common" xmlns:record="http://www.orcid.org/ns/record" xmlns:personal-details="http://www.orcid.org/ns/personal-details" xmlns:keyword="http://www.orcid.org/ns/keyword" xmlns:email="http://www.orcid.org/ns/email" xmlns:external-identifier="http://www.orcid.org/ns/external-identifier" xmlns:funding="http://www.orcid.org/ns/funding" xmlns:preferences="http://www.orcid.org/ns/preferences" xmlns:address="http://www.orcid.org/ns/address" xmlns:invited-position="http://www.orcid.org/ns/invited-position" xmlns:work="http://www.orcid.org/ns/work" xmlns:history="http://www.orcid.org/ns/history" xmlns:employment="http://www.orcid.org/ns/employment" xmlns:qualification="http://www.orcid.org/ns/qualification" xmlns:service="http://www.orcid.org/ns/service" xmlns:person="http://www.orcid.org/ns/person" xmlns:activities="http://www.orcid.org/ns/activities" xmlns:researcher-url="http://www.orcid.org/ns/researcher-url" xmlns:peer-review="http://www.orcid.org/ns/peer-review" xmlns:bulk="http://www.orcid.org/ns/bulk" xmlns:research-resource="http://www.orcid.org/ns/research-resource">
+    <common:last-modified-date>2015-06-19T19:14:26.350Z</common:last-modified-date>
+    <activities:group>
+        <common:last-modified-date>2015-06-19T19:14:26.350Z</common:last-modified-date>
+        <common:external-ids/>
+        <work:work-summary put-code="277904" path="/0000-0001-9227-636X/work/277904" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.160Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:26.350Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>The elements of style and the survey of ophthalmology.</common:title>
+            </work:title>
+    		<work:type>invention</work:type>
+            <common:publication-date>
+                <common:year>2012</common:year>
+                <common:month>11</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+    </activities:group>
+    <activities:group>
+        <common:last-modified-date>2015-06-19T19:14:26.339Z</common:last-modified-date>
+        <common:external-ids/>
+        <work:work-summary put-code="277903" path="/0000-0001-9227-636X/work/277903" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.159Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:26.339Z</common:last-modified-date>
+            <common:source>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/DSPACE-CLIENT-ID</common:uri>
+                    <common:path>DSPACE-CLIENT-ID</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>DSPACE-CRIS</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Introduction.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>2011</common:year>
+                <common:month>11</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+    </activities:group>
+    <activities:group>
+        <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
+        <common:external-ids/>
+        <work:work-summary put-code="277902" path="/0000-0001-9227-636X/work/277902" visibility="public" display-index="1">
+            <common:created-date>2014-01-22T19:11:57.159Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Another cautionary tale.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>2011</common:year>
+                <common:month>05</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+        <work:work-summary put-code="287902" path="/0000-0001-9227-636X/work/277902" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.159Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:26.327Z</common:last-modified-date>
+            <common:source>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/4Science</common:uri>
+                    <common:path>4Science</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Another cautionary tale (4Science).</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>2011</common:year>
+                <common:month>05</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+    </activities:group>
+    <activities:group>
+        <common:last-modified-date>2015-06-19T19:14:26.108Z</common:last-modified-date>
+        <common:external-ids/>
+        <work:work-summary put-code="277885" path="/0000-0001-9227-636X/work/277885" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.155Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:26.108Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/DSPACE-CLIENT-ID</common:uri>
+                    <common:path>DSPACE-CLIENT-ID</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>DSPACE-CRIS</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Functional hemianopsia: a historical perspective.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>1988</common:year>
+                <common:month>05</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+        <work:work-summary put-code="277971" path="/0000-0001-9227-636X/work/277871" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.151Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:25.924Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Branch artery occlusion in a young man.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>1985</common:year>
+                <common:month>07</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+    </activities:group>
+    <activities:group>
+        <common:last-modified-date>2015-06-19T19:14:26.108Z</common:last-modified-date>
+        <common:external-ids/>
+        <work:work-summary put-code="277871" path="/0000-0001-9227-636X/work/277871" visibility="public" display-index="0">
+            <common:created-date>2014-01-22T19:11:57.151Z</common:created-date>
+            <common:last-modified-date>2015-06-19T19:14:25.924Z</common:last-modified-date>
+            <common:source>
+                <common:source-orcid>
+                    <common:uri>https://sandbox.orcid.org/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-orcid>
+                <common:source-client-id>
+                    <common:uri>https://sandbox.orcid.org/client/0000-0002-4105-0763</common:uri>
+                    <common:path>0000-0002-4105-0763</common:path>
+                    <common:host>sandbox.orcid.org</common:host>
+                </common:source-client-id>
+                <common:source-name>BU Profiles to ORCID Integration Site</common:source-name>
+            </common:source>
+            <work:title>
+                <common:title>Branch artery occlusion in a young woman.</common:title>
+            </work:title>
+            <work:type>journal-article</work:type>
+            <common:publication-date>
+                <common:year>1985</common:year>
+                <common:month>07</common:month>
+                <common:day>01</common:day>
+            </common:publication-date>
+        </work:work-summary>
+    </activities:group>
+</activities:works>

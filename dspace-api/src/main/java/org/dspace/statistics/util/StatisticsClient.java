@@ -16,6 +16,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.logging.log4j.Logger;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
@@ -136,6 +137,7 @@ public class StatisticsClient {
                 URL url = new URL(value);
 
                 Get get = new Get();
+                get.setProject(new Project());
                 get.setDest(new File(spiders, url.getHost() + url.getPath().replace("/", "-")));
                 get.setSrc(url);
                 get.setUseTimestamp(true);

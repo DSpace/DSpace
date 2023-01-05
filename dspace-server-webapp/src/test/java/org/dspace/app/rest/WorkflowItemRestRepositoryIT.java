@@ -768,6 +768,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                     .withTitle("Submission Item")
                     .withIssueDate("2017-10-17")
+                    .grantLicense()
                     .build();
 
             context.restoreAuthSystemState();
@@ -926,6 +927,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1053,6 +1055,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withTitle("Workflow Item 1")
             .withIssueDate("2017-10-17")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1122,6 +1125,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1134,6 +1138,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withSubject("Subject2")
             .withSubject("Subject3")
             .withSubject("Subject4")
+            .grantLicense()
             .build();
         claimedTask2.setStepID("editstep");
         claimedTask2.setActionID("editaction");
@@ -1146,6 +1151,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withSubject("Subject2")
             .withSubject("Subject3")
             .withSubject("Subject4")
+            .grantLicense()
             .build();
         claimedTask3.setStepID("editstep");
         claimedTask3.setActionID("editaction");
@@ -1320,6 +1326,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
             .withIssueDate("2017-10-17")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1390,6 +1397,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald").withAuthor("Doe, John")
             .withSubject("ExtraEntry")
+            .grantLicense()
             .build();
         claimedTask.setStepID("editstep");
         claimedTask.setActionID("editaction");
@@ -1862,7 +1870,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void whenWorkspaceitemBecomeWorkflowitemWithAccessConditionsTheBitstremMustBeDownloableTest()
+    public void whenWorkspaceitemBecomeWorkflowitemWithAccessConditionsTheBitstreamMustBeDownloableTest()
             throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1890,14 +1898,13 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         String bitstreamContent = "0123456789";
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
-
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, Charset.defaultCharset())) {
 
             context.setCurrentUser(submitter);
             witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
                                         .withTitle("Test WorkspaceItem")
                                         .withIssueDate("2019-10-01")
+                                        .grantLicense()
                                         .build();
 
             bitstream = BitstreamBuilder.createBitstream(context, witem.getItem(), is)
@@ -1905,56 +1912,60 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                         .withDescription("This is a bitstream to test range requests")
                                         .withMimeType("text/plain")
                                         .build();
+        }
 
-            context.restoreAuthSystemState();
+        context.restoreAuthSystemState();
 
-            String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-            String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
-            String tokenReviewer1 = getAuthToken(reviewer1.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+        String tokenReviewer1 = getAuthToken(reviewer1.getEmail(), password);
 
-            // submitter can download the bitstream
-            getClient(tokenSubmitter).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
-                                     .andExpect(status().isOk())
-                                     .andExpect(header().string("Accept-Ranges", "bytes"))
-                                     .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                                     .andExpect(content().contentType("text/plain"))
-                                     .andExpect(content().bytes(bitstreamContent.getBytes()));
+        // submitter can download the bitstream
+        getClient(tokenSubmitter).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                 .andExpect(status().isOk())
+                                 .andExpect(header().string("Accept-Ranges", "bytes"))
+                                 .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                                 .andExpect(content().contentType("text/plain;charset=UTF-8"))
+                                 .andExpect(content().bytes(bitstreamContent.getBytes()));
 
-            // reviewer can't still download the bitstream
-            getClient(tokenReviewer1).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
-                                     .andExpect(status().isForbidden());
+        // reviewer can't still download the bitstream
+        getClient(tokenReviewer1).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                 .andExpect(status().isForbidden());
 
-            // others can't download the bitstream
-            getClient(tokenEPerson).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
-                                   .andExpect(status().isForbidden());
+        // others can't download the bitstream
+        getClient(tokenEPerson).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                               .andExpect(status().isForbidden());
 
-            // create a list of values to use in add operation
-            List<Operation> addAccessCondition = new ArrayList<>();
-            List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<>();
+        List<Map<String, String>> accessConditions = new ArrayList<Map<String,String>>();
 
-            Map<String, String> value = new HashMap<>();
-            value.put("name", "administrator");
+        Map<String, String> value = new HashMap<>();
+        value.put("name", "administrator");
 
-            accessConditions.add(value);
+        accessConditions.add(value);
 
-            addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions", accessConditions));
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions", accessConditions));
 
-            String patchBody = getPatchContent(addAccessCondition);
-            getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-                     .content(patchBody)
-                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                     .andExpect(status().isOk())
-                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
-                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
-                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+        String patchBody = getPatchContent(addAccessCondition);
+        getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
 
-            // verify that the patch changes have been persisted
-            getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                     .andExpect(status().isOk())
-                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
-                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
-                     .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
+        // verify that the patch changes have been persisted
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].name",is("administrator")))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].startDate",nullValue()))
+                 .andExpect(jsonPath("$.sections.upload.files[0].accessConditions[0].endDate", nullValue()));
 
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        try {
             // submit the workspaceitem to start the workflow
             getClient(tokenSubmitter).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
                      .content("/api/submission/workspaceitems/" + witem.getID())
@@ -1976,7 +1987,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                      .andExpect(status().isOk())
                      .andExpect(header().string("Accept-Ranges", "bytes"))
                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                     .andExpect(content().contentType("text/plain"))
+                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // submitter can download the bitstream
@@ -1984,7 +1995,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                      .andExpect(status().isOk())
                      .andExpect(header().string("Accept-Ranges", "bytes"))
                      .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
-                     .andExpect(content().contentType("text/plain"))
+                     .andExpect(content().contentType("text/plain;charset=UTF-8"))
                      .andExpect(content().bytes(bitstreamContent.getBytes()));
 
             // others can't download the bitstream
@@ -2024,6 +2035,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
                                     .withTitle("Test WorkspaceItem")
                                     .withIssueDate("2019-10-01")
+                                    .grantLicense()
                                     .build();
 
         UUID itemUuid = witem.getItem().getID();

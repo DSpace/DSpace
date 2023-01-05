@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
@@ -41,14 +42,15 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Verifier;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Verifier;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,6 +246,7 @@ public class XSLTDisseminationCrosswalk
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      * @see DisseminationCrosswalk
+     * @return List of Elements
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
@@ -268,7 +271,12 @@ public class XSLTDisseminationCrosswalk
         try {
             JDOMResult result = new JDOMResult();
             xform.transform(new JDOMSource(createDIM(dso).getChildren()), result);
-            return result.getResult();
+            List<Content> contentList = result.getResult();
+            // Transform List<Content> into List<Element>
+            List<Element> elementList = contentList.stream()
+                                                   .filter(obj -> obj instanceof Element)
+                                                   .map(Element.class::cast).collect(Collectors.toList());
+            return elementList;
         } catch (TransformerException e) {
             LOG.error("Got error: " + e.toString());
             throw new CrosswalkInternalException("XSL translation failed: " + e.toString(), e);

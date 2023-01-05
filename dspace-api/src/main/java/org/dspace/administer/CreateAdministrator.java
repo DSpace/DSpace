@@ -14,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
@@ -54,14 +55,14 @@ public final class CreateAdministrator {
     protected GroupService groupService;
 
     /**
-     * For invoking via the command line.  If called with no command line arguments,
+     * For invoking via the command line. If called with no command line arguments,
      * it will negotiate with the user for the administrator details
      *
      * @param argv the command line arguments given
      * @throws Exception if error
      */
     public static void main(String[] argv)
-        throws Exception {
+            throws Exception {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
 
@@ -69,19 +70,41 @@ public final class CreateAdministrator {
 
         options.addOption("e", "email", true, "administrator email address");
         options.addOption("f", "first", true, "administrator first name");
+        options.addOption("h", "help", false, "explain create-administrator options");
         options.addOption("l", "last", true, "administrator last name");
         options.addOption("c", "language", true, "administrator language");
         options.addOption("p", "password", true, "administrator password");
 
-        CommandLine line = parser.parse(options, argv);
+        CommandLine line = null;
+
+        try {
+
+            line = parser.parse(options, argv);
+
+        } catch (Exception e) {
+
+            System.out.println(e.getMessage() + "\nTry \"dspace create-administrator -h\" to print help information.");
+            System.exit(1);
+
+        }
 
         if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
-            line.hasOption("c") && line.hasOption("p")) {
+                line.hasOption("c") && line.hasOption("p")) {
             ca.createAdministrator(line.getOptionValue("e"),
-                                   line.getOptionValue("f"), line.getOptionValue("l"),
-                                   line.getOptionValue("c"), line.getOptionValue("p"));
+                    line.getOptionValue("f"), line.getOptionValue("l"),
+                    line.getOptionValue("c"), line.getOptionValue("p"));
+        } else if (line.hasOption("h")) {
+            String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+                    " DSpace site. Unless all the required parameters are passed it will" +
+                    " prompt for an e-mail address, last name, first name and password from" +
+                    " standard input.. An administrator group is then created and the data passed" +
+                    "  in used to create an e-person in that group.\n\n";
+            String footer = "\n";
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("dspace create-administrator", header, options, footer, true);
+            return;
         } else {
-            ca.negotiateAdministratorDetails();
+            ca.negotiateAdministratorDetails(line);
         }
     }
 
@@ -91,7 +114,7 @@ public final class CreateAdministrator {
      * @throws Exception if error
      */
     protected CreateAdministrator()
-        throws Exception {
+            throws Exception {
         context = new Context();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -103,20 +126,20 @@ public final class CreateAdministrator {
      *
      * @throws Exception if error
      */
-    protected void negotiateAdministratorDetails()
-        throws Exception {
+    protected void negotiateAdministratorDetails(CommandLine line)
+            throws Exception {
         Console console = System.console();
 
         System.out.println("Creating an initial administrator account");
 
-        boolean dataOK = false;
-
-        String email = null;
-        String firstName = null;
-        String lastName = null;
-        char[] password1 = null;
-        char[] password2 = null;
+        String email = line.getOptionValue('e');
+        String firstName = line.getOptionValue('f');
+        String lastName = line.getOptionValue('l');
         String language = I18nUtil.getDefaultLocale().getLanguage();
+        ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
+        boolean flag = line.hasOption('p');
+        char[] password = null;
+        boolean dataOK = line.hasOption('f') && line.hasOption('e') && line.hasOption('l');
 
         while (!dataOK) {
             System.out.print("E-mail address: ");
@@ -147,8 +170,6 @@ public final class CreateAdministrator {
             if (lastName != null) {
                 lastName = lastName.trim();
             }
-
-            ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
             if (cfg.hasProperty("webui.supported.locales")) {
                 System.out.println("Select one of the following languages: "
                         + cfg.getProperty("webui.supported.locales"));
@@ -163,46 +184,59 @@ public final class CreateAdministrator {
                 }
             }
 
-            System.out.println("Password will not display on screen.");
-            System.out.print("Password: ");
+            System.out.print("Is the above data correct? (y or n): ");
             System.out.flush();
 
-            password1 = console.readPassword();
+            String s = console.readLine();
 
-            System.out.print("Again to confirm: ");
-            System.out.flush();
-
-            password2 = console.readPassword();
-
-            //TODO real password validation
-            if (password1.length > 1 && Arrays.equals(password1, password2)) {
-                // password OK
-                System.out.print("Is the above data correct? (y or n): ");
-                System.out.flush();
-
-                String s = console.readLine();
-
-                if (s != null) {
-                    s = s.trim();
-                    if (s.toLowerCase().startsWith("y")) {
-                        dataOK = true;
-                    }
+            if (s != null) {
+                s = s.trim();
+                if (s.toLowerCase().startsWith("y")) {
+                    dataOK = true;
                 }
-            } else {
-                System.out.println("Passwords don't match");
             }
+
         }
-
+        if (!flag) {
+            password = getPassword(console);
+            if (password == null) {
+                return;
+            }
+        } else {
+            password = line.getOptionValue("p").toCharArray();
+        }
         // if we make it to here, we are ready to create an administrator
-        createAdministrator(email, firstName, lastName, language, String.valueOf(password1));
+        createAdministrator(email, firstName, lastName, language, String.valueOf(password));
 
-        //Cleaning arrays that held password
-        Arrays.fill(password1, ' ');
-        Arrays.fill(password2, ' ');
+    }
+
+    private char[] getPassword(Console console) {
+        char[] password1 = null;
+        char[] password2 = null;
+        System.out.println("Password will not display on screen.");
+        System.out.print("Password: ");
+        System.out.flush();
+
+        password1 = console.readPassword();
+
+        System.out.print("Again to confirm: ");
+        System.out.flush();
+
+        password2 = console.readPassword();
+
+        // TODO real password validation
+        if (password1.length > 1 && Arrays.equals(password1, password2)) {
+            // password OK
+            Arrays.fill(password2, ' ');
+            return password1;
+        } else {
+            System.out.println("Passwords don't match");
+            return null;
+        }
     }
 
     /**
-     * Create the administrator with the given details.  If the user
+     * Create the administrator with the given details. If the user
      * already exists then they are simply upped to administrator status
      *
      * @param email    the email for the user
@@ -213,8 +247,8 @@ public final class CreateAdministrator {
      * @throws Exception if error
      */
     protected void createAdministrator(String email, String first, String last,
-                                       String language, String pw)
-        throws Exception {
+            String language, String pw)
+            throws Exception {
         // Of course we aren't an administrator yet so we need to
         // circumvent authorisation
         context.turnOffAuthorisationSystem();

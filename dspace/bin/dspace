@@ -10,22 +10,22 @@
 # This is a Unix shell script for running a command-line DSpace tool.
 # It sets the CLASSPATH appropriately before invoking Java.
 
+# Assume that this script is in the bin subdirectory of the DSpace installation directory.
 BINDIR=`dirname $0`
 DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 
-# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
+# Get the JARs in $DSPACEDIR/lib
 JARS="$DSPACEDIR/lib/*"
 
 # Class path for DSpace will be:
 #   Any existing classpath
-#   The JARs (WEB-INF/lib/*.jar)
-#   The WEB-INF/classes directory
+#   The JARs (lib/*.jar)
+#   The configuration directory
 if [ "$CLASSPATH" = "" ]; then
-    FULLPATH=$JARS:$DSPACEDIR/config
+  FULLPATH=$JARS:$DSPACEDIR/config
 else
-    FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
+  FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 fi
-
 
 # If the user only wants the CLASSPATH, just give it now.
 if [ "$1" = "classpath" ]; then

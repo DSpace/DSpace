@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns="https://cir.nii.ac.jp/schema/1.0/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
+         xmlns:datacite="https://schema.datacite.org/meta/kernel-4/"
+         xmlns:ndl="http://ndl.go.jp/dcndl/terms/"
+         xmlns:cinii="http://ci.nii.ac.jp/ns/1.0/"
+         xmlns:jpcoar="https://github.com/JPCOAR/schema/blob/master/1.0/">
+    <Article rdf:about="https://cir.nii.ac.jp/crid/1050010687833449984.rdf">
+        <productIdentifier rdf:parseType="Resource">
+            <identifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/URI">http://www.lib.kobe-u.ac.jp/handle_kernel/90009212</identifier>
+        </productIdentifier>
+        <resourceType>学術雑誌論文(journal article)</resourceType>
+        <dc:title>Band structures of passive films on titanium in simulated bioliquids determined by photoelectrochemical response: principle governing the biocompatibility</dc:title>
+        <dc:language>en</dc:language>
+        <description rdf:parseType="Resource">
+            <type>Other</type>
+            <notation>The band structures and band gap energies, E (g), of passive films formed on titanium (Ti) in simulated bioliquids, Hanks&apos; solution (Hanks) and saline, were evaluated. Ti was polarized at 0, −0.1, and −0.2 V-Ag/AgCl, E (f), for 1 h. After polarization, the surfaces were characterized using X-ray photoelectron spectroscopy, and the photoelectrochemical responses were evaluated. The current change during photoirradiation was recorded as a photocurrent transient at each measuring potential, E (m), and by changing the wavelength of the incident light. Passive films consisted of a very thin TiO2 layer containing small amounts of Ti2O3 and TiO, hydroxyl groups, and water. During polarization in Hanks, calcium and phosphate ions were incorporated or formed calcium phosphate but not in saline. Calcium phosphate and hydroxyl groups influenced the band structure. E (g) was graded in Hanks but constant in saline, independent of E (f) and E (m). The passive film on Ti behaved as an n-type semiconductor containing two layers: an inner oxide layer with a large E (g) and an outer hydroxide layer with a small E (g). In Hanks, E (g) was 3.3–3.4 eV in the inner oxide layer and 2.9 eV in the outer hydroxide layer. In saline, E (g) was 3.3 eV in the inner layer and 2.7 eV in the outer layer. Calcium phosphate and hydroxyl groups influenced the band structure of the passive film. The E (g) of the outermost surface was smaller than that of TiO2 ceramics, which is probably one of the principles of the excellent biocompatibility of Ti among metals.</notation>
+        </description>
+        <creator>
+            <Researcher rdf:about="https://cir.nii.ac.jp/crid/1070010687833449987">
+                <foaf:name>Kim, Seong-Cheol</foaf:name>
+            </Researcher>
+        </creator>
+        <creator>
+            <Researcher rdf:about="https://cir.nii.ac.jp/crid/1070010687833449988">
+                <foaf:name>Hanawa, Takao</foaf:name>
+            </Researcher>
+        </creator>
+        <creator>
+            <Researcher rdf:about="https://cir.nii.ac.jp/crid/1070010687833449985">
+                <foaf:name>Manaka, Tomoyo</foaf:name>
+            </Researcher>
+        </creator>
+        <creator>
+            <Researcher rdf:about="https://cir.nii.ac.jp/crid/1070010687833449986">
+                <foaf:name>Tsuchiya, Hiroaki</foaf:name>
+            </Researcher>
+        </creator>
+        <creator>
+            <Researcher rdf:about="https://cir.nii.ac.jp/crid/1070010687833449984">
+                <foaf:name>Fujimoto, Shinji</foaf:name>
+            </Researcher>
+        </creator>
+        <publication rdf:parseType="Resource">
+            <publicationIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/NCID">AA11561821</publicationIdentifier>
+            <publicationIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/ISSN">14686996</publicationIdentifier>
+            <publicationIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/ISSN">18785514</publicationIdentifier>
+            <prism:publicationName>Science and Technology of Advanced Materials</prism:publicationName>
+            <dc:publisher>Taylor &amp; Francis</dc:publisher>
+            <prism:publicationDate>2022-12-31</prism:publicationDate>
+            <prism:volume>23</prism:volume>
+            <prism:number>1</prism:number>
+            <prism:startingPage>322</prism:startingPage>
+            <prism:endingPage>331</prism:endingPage>
+        </publication>
+        <dc:rights>© 2022 The Author(s). Published by National Institute for Materials Science in partnership with Taylor &amp; Francis Group. This is an Open Access article distributed under the terms of the Creative Commons Attribution License (http://creativecommons.org/licenses/by/4.0/), which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.</dc:rights>
+        <url>
+            <rdf:Description rdf:about="http://www.lib.kobe-u.ac.jp/handle_kernel/90009212">
+        </rdf:Description>
+        </url>
+        <createdAt>2022-05-17</createdAt>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=band%20gap" dc:title="band gap"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=band%20structure" dc:title="band structure"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=biocompatibility" dc:title="biocompatibility"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=Hanks&apos;%20solution" dc:title="Hanks&apos; solution"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=passive%20film" dc:title="passive film"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=photocurrent" dc:title="photocurrent"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=saline" dc:title="saline"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=Titanium" dc:title="Titanium"></foaf:topic>
+        <foaf:topic rdf:resource="https://cir.nii.ac.jp/all?q=XPS" dc:title="XPS"></foaf:topic>
+        <dataSourceIdentifier rdf:datatype="https://cir.nii.ac.jp/schema/1.0/IRDB">oai:irdb.nii.ac.jp:01257:0005348137</dataSourceIdentifier>
+    </Article>
+</rdf:RDF>
