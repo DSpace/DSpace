@@ -37,9 +37,12 @@ import org.dspace.app.rest.model.EtdUnitRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EtdUnitBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.EtdUnit;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -48,7 +51,6 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
@@ -61,10 +63,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         @Autowired
         private ConfigurationService configurationService;
-
-        @Before
-        public void setup() {
-        }
 
         /**
          * Populates the database with sample etdunits
@@ -446,11 +444,9 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         public void addCollectionTest() throws Exception {
                 EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
 
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
-                                .build();
-                Collection collection2 = CollectionBuilder.createCollection(context, null).withName("Test Collection2")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
 
@@ -466,17 +462,20 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                 etdunit = context.reloadEntity(etdunit);
                 collection1 = context.reloadEntity(collection1);
                 assertTrue(etdunitService.isMember(etdunit, collection1));
+
+                // Cleanup
+                EtdUnitBuilder.deleteEtdUnit(etdunit.getID());
         }
 
         @Test
         public void addMultipleCollectionsTest() throws Exception {
                 EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
 
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
-                Collection collection2 = CollectionBuilder.createCollection(context, null).withName("Test Collection2")
+                Collection collection2 = CollectionBuilder.createCollection(context, community).withName("Test Collection2")
                                 .build();
                 context.restoreAuthSystemState();
 
@@ -508,9 +507,9 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         @Test
         public void addCollectionForbiddenTest() throws Exception {
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
                 EtdUnit etdunit = createEtdUnit("addCollectionTest", Collections.EMPTY_LIST);
@@ -526,9 +525,9 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         @Test
         public void addCollectionUnauthorizedTest() throws Exception {
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
 
@@ -544,9 +543,9 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         @Test
         public void addCollection_EtdUnitNotFoundTest() throws Exception {
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
 
@@ -574,10 +573,10 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         @Test
         public void removeCollectionTest() throws Exception {
                 EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
                 List<Collection> collections = List.of(collection1);
@@ -599,10 +598,10 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         @Test
         public void removeCollectionForbiddenTest() throws Exception {
                 EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
                 List<Collection> collections = List.of(collection1);
@@ -619,15 +618,18 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                 collection1 = context.reloadEntity(collection1);
 
                 assertTrue(etdunitService.isMember(etdunit, collection1));
+
+                // Cleanup
+                EtdUnitBuilder.deleteEtdUnit(etdunit.getID());
         }
 
         @Test
         public void removeCollectionUnauthorizedTest() throws Exception {
                 EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
                 List<Collection> collections = List.of(collection1);
@@ -643,13 +645,16 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                 collection1 = context.reloadEntity(collection1);
 
                 assertTrue(etdunitService.isMember(etdunit, collection1));
+
+                // Cleanup
+                EtdUnitBuilder.deleteEtdUnit(etdunit.getID());
         }
 
         @Test
         public void removeCollection_EtdUnitNotFoundTest() throws Exception {
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
 
@@ -664,10 +669,10 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         @Test
         public void removeCollectionUnprocessableTest() throws Exception {
                 EtdUnitService etdunitService = ContentServiceFactory.getInstance().getEtdUnitService();
-                CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
                 context.turnOffAuthorisationSystem();
-                Collection collection1 = CollectionBuilder.createCollection(context, null).withName("Test Collection1")
+                Community community = CommunityBuilder.createCommunity(context).build();
+                Collection collection1 = CollectionBuilder.createCollection(context, community).withName("Test Collection1")
                                 .build();
                 context.restoreAuthSystemState();
                 List<Collection> collections = List.of(collection1);
@@ -685,6 +690,9 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
                 collection1 = context.reloadEntity(collection1);
 
                 assertTrue(etdunitService.isMember(etdunit, collection1));
+
+                // Cleanup
+                EtdUnitBuilder.deleteEtdUnit(etdunit.getID());
         }
 
         @Test
