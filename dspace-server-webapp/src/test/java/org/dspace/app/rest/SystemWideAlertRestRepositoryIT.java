@@ -69,10 +69,12 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
     public void findAllTest() throws Exception {
         Date countdownDate = new Date();
         SystemWideAlert systemWideAlert1 = systemWideAlertService.create(context, "Test alert 1",
-                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY, countdownDate,
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY,
+                                                                         countdownDate,
                                                                          true);
         SystemWideAlert systemWideAlert2 = systemWideAlertService.create(context, "Test alert 2",
-                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
+                                                                         null,
                                                                          false);
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         getClient().perform(get("/api/system/systemwidealerts/"))
@@ -103,10 +105,12 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         Date countdownDate = new Date();
         SystemWideAlert systemWideAlert1 = systemWideAlertService.create(context, "Test alert 1",
-                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY, countdownDate,
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY,
+                                                                         countdownDate,
                                                                          true);
         SystemWideAlert systemWideAlert2 = systemWideAlertService.create(context, "Test alert 2",
-                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
+                                                                         null,
                                                                          false);
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         getClient().perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
@@ -146,13 +150,13 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                             .andExpect(status().isCreated())
                             .andExpect(
                                     jsonPath("$", allOf(
-                                                     hasJsonPath("$.alertId"),
-                                                     hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
-                                                     hasJsonPath("$.allowSessions",
-                                                                 is(systemWideAlertRest.getAllowSessions())),
-                                                     hasJsonPath("$.countdownTo",
-                                                         startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
-                                                     hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
+                                         hasJsonPath("$.alertId"),
+                                         hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
+                                         hasJsonPath("$.allowSessions",
+                                                     is(systemWideAlertRest.getAllowSessions())),
+                                         hasJsonPath("$.countdownTo",
+                                                     startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
+                                         hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                              )
                                     ))
                             .andDo(result -> idRef
@@ -216,7 +220,8 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
     public void createWhenAlreadyExistsTest() throws Exception {
 
         SystemWideAlert systemWideAlert = systemWideAlertService.create(context, "Test alert",
-                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
+                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
+                                                                        null,
                                                                         false);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
@@ -240,7 +245,8 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
     public void putTest() throws Exception {
 
         SystemWideAlert systemWideAlert = systemWideAlertService.create(context, "Alert test message",
-                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY, null,
+                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
+                                                                        null,
                                                                         false);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
@@ -262,13 +268,13 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                             .andExpect(status().isOk())
                             .andExpect(
                                     jsonPath("$", allOf(
-                                                     hasJsonPath("$.alertId"),
-                                                     hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
-                                                     hasJsonPath("$.allowSessions",
-                                                                 is(systemWideAlertRest.getAllowSessions())),
-                                                     hasJsonPath("$.countdownTo",
+                                             hasJsonPath("$.alertId"),
+                                             hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
+                                             hasJsonPath("$.allowSessions",
+                                                         is(systemWideAlertRest.getAllowSessions())),
+                                             hasJsonPath("$.countdownTo",
                                                          startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
-                                                     hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
+                                             hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                              )
                                     ));
 
