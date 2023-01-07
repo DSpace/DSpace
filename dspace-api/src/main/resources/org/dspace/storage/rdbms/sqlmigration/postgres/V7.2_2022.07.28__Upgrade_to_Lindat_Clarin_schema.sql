@@ -284,6 +284,24 @@ SELECT pg_catalog.setval('user_metadata_user_metadata_id_seq', 68, true);
 -- Name: license_id; Type: DEFAULT; Schema: public; Owner: dspace
 
 
+CREATE TABLE verification_token (
+    verification_token_id integer NOT NULL,
+    eperson_netid varchar(256),
+    shib_headers varchar(2048),
+    token varchar(256),
+    email varchar(256)
+);
+
+CREATE SEQUENCE verification_token_verification_token_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE ONLY verification_token ALTER COLUMN verification_token_id SET DEFAULT nextval('verification_token_verification_token_id_seq'::regclass);
+
 ALTER TABLE ONLY license_definition ALTER COLUMN license_id SET DEFAULT nextval('license_definition_license_id_seq'::regclass);
 
 
@@ -416,6 +434,9 @@ ALTER TABLE ONLY license_resource_user_allowance
 
 ALTER TABLE ONLY user_registration
     ADD CONSTRAINT user_registration_pkey PRIMARY KEY (user_registration_id);
+
+ALTER TABLE verification_token
+    ADD CONSTRAINT verification_token_pkey PRIMARY KEY (verification_token_id);
 
 --
 -- Name: user_registration_license_definition_fk; Type: FK CONSTRAINT; Schema: public; Owner: dspace

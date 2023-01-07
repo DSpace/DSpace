@@ -1,0 +1,14 @@
+## E-mail sent to confirm authenticity of the user's e-mail.
+##
+## Parameters: {0} confirmation e-mail
+##
+## See org.dspace.core.Email for information on the format of this file.
+##
+
+Confirmation e-mail:    ${params[0]}
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}

@@ -13,6 +13,7 @@ import org.dspace.content.service.clarin.ClarinLicenseResourceUserAllowanceServi
 import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.content.service.clarin.ClarinUserMetadataService;
 import org.dspace.content.service.clarin.ClarinUserRegistrationService;
+import org.dspace.content.service.clarin.ClarinVerificationTokenService;
 import org.dspace.handle.service.HandleClarinService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -38,8 +39,11 @@ public abstract class ClarinServiceFactory {
 
     public abstract ClarinLicenseResourceUserAllowanceService getClarinLicenseResourceUserAllowance();
 
+    public abstract ClarinVerificationTokenService getClarinVerificationTokenService();
+
     public static ClarinServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServiceByName("clarinServiceFactory", ClarinServiceFactory.class);
     }
+
 }

@@ -66,6 +66,7 @@ public class ClarinLicenseResourceUserAllowanceRestRepository
             @Parameter(value = "bitstreamUUID", required = true) UUID bitstreamUUID,
             @Parameter(value = "userUUID", required = true) UUID userUUID,
             Pageable pageable) throws SQLException {
+
         Context context = obtainContext();
 
         List<ClarinLicenseResourceUserAllowance> clarinLicenseResourceUserAllowance =

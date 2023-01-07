@@ -81,6 +81,7 @@
     <bean class="org.dspace.content.clarin.ClarinLicenseResourceUserAllowanceServiceImpl"/>
     <bean class="org.dspace.content.clarin.ClarinUserMetadataServiceImpl"/>
     <bean class="org.dspace.content.clarin.ClarinItemServiceImpl"/>
+    <bean class="org.dspace.content.clarin.ClarinVerificationTokenServiceImpl"/>
 
     <bean class="org.dspace.core.NewsServiceImpl">
         <property name="acceptableFilenames">

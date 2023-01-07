@@ -13,6 +13,7 @@ import org.dspace.content.service.clarin.ClarinLicenseResourceUserAllowanceServi
 import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.content.service.clarin.ClarinUserMetadataService;
 import org.dspace.content.service.clarin.ClarinUserRegistrationService;
+import org.dspace.content.service.clarin.ClarinVerificationTokenService;
 import org.dspace.handle.service.HandleClarinService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,6 +45,9 @@ public class ClarinServiceFactoryImpl extends ClarinServiceFactory {
 
     @Autowired(required = true)
     private ClarinLicenseResourceUserAllowanceService clarinLicenseResourceUserAllowanceService;
+
+    @Autowired(required = true)
+    private ClarinVerificationTokenService clarinVerificationTokenService;
 
     @Override
     public ClarinLicenseService getClarinLicenseService() {
@@ -78,5 +82,10 @@ public class ClarinServiceFactoryImpl extends ClarinServiceFactory {
     @Override
     public ClarinLicenseResourceUserAllowanceService getClarinLicenseResourceUserAllowance() {
         return clarinLicenseResourceUserAllowanceService;
+    }
+
+    @Override
+    public ClarinVerificationTokenService getClarinVerificationTokenService() {
+        return clarinVerificationTokenService;
     }
 }
