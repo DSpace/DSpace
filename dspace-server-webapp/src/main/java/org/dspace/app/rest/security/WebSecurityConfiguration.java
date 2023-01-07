@@ -8,6 +8,7 @@
 package org.dspace.app.rest.security;
 
 import org.dspace.app.rest.exception.DSpaceAccessDeniedHandler;
+import org.dspace.app.rest.security.clarin.ClarinShibbolethLoginFilter;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +142,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                              LogoutFilter.class)
             // Add a filter before our shibboleth endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager(),
+            .addFilterBefore(new ClarinShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager(),
                                                        restAuthenticationService),
                              LogoutFilter.class)
             //Add a filter before our ORCID endpoints to do the authentication based on the data in the

@@ -99,7 +99,6 @@ public class ShibbolethLoginFilter extends StatelessLoginFilter {
         redirectAfterSuccess(req, res);
     }
 
-
     /**
      * After successful login, redirect to the DSpace URL specified by this Shibboleth request (in the "redirectUrl"
      * request parameter). If that 'redirectUrl' is not valid or trusted for this DSpace site, then return a 400 error.

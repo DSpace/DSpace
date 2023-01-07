@@ -31,6 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Service implementation for the ClarinLicense object.
+ * This class is responsible for all business logic calls for the ClarinLicense object and
+ * is autowired by spring. This class should never be accessed directly.
+ *
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ */
 public class ClarinLicenseServiceImpl implements ClarinLicenseService {
 
     private static final Logger log = LoggerFactory.getLogger(ClarinLicenseServiceImpl.class);

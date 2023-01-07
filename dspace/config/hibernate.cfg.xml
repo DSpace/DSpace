@@ -76,6 +76,7 @@
         <mapping class="org.dspace.content.clarin.ClarinLicenseResourceUserAllowance"/>
         <mapping class="org.dspace.content.clarin.ClarinUserRegistration"/>
         <mapping class="org.dspace.content.clarin.ClarinUserMetadata"/>
+        <mapping class="org.dspace.content.clarin.ClarinVerificationToken"/>
 
         <mapping class="org.dspace.harvest.HarvestedCollection"/>
         <mapping class="org.dspace.harvest.HarvestedItem"/>
