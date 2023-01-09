@@ -97,23 +97,49 @@ public class SelectReviewerAction extends ProcessingAction {
             request.setAttribute("page", SEARCH_RESULTS_PAGE);
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE, SEARCH_RESULTS_PAGE);
         } else if (submitButton.startsWith(SUBMIT_SELECT_REVIEWER)) {
-            //Retrieve the identifier of the eperson which will do the reviewing
-            UUID reviewerId = UUID.fromString(submitButton.substring(submitButton.lastIndexOf("_") + 1));
-            EPerson reviewer = ePersonService.find(c, reviewerId);
-            if (!groupService.allMembers(c, getGroup()).contains(reviewer)) {
+            return processSelectReviewers(c, wfi, step, request);
+        }
+
+        //There are only 2 active buttons on this page, so if anything else happens just return an error
+        return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
+    }
+
+    public ActionResult processSelectReviewers(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+        throws SQLException, AuthorizeException {
+        //Retrieve the identifier of the eperson which will do the reviewing
+        String[] reviewerIds = request.getParameterValues("eperson");
+        List<EPerson> reviewers = new ArrayList<>();
+        for (String reviewerId : reviewerIds) {
+            reviewers.add(ePersonService.find(c, UUID.fromString(reviewerId)));
+        }
+        if (reviewers.size() == 1) {
+            if (!groupService.allMembers(c, getGroup()).contains(reviewers.get(0))) {
                 return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
             }
             //We have a reviewer, assign him, the workflowitemrole will be translated into a task in the autoassign
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
-            workflowItemRole.setEPerson(reviewer);
+            workflowItemRole.setEPerson(reviewers.get(0));
+            workflowItemRole.setRoleId(getRole().getId());
+            workflowItemRole.setWorkflowItem(wfi);
+            workflowItemRoleService.update(c, workflowItemRole);
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+        } else {
+            if (!groupService.allMembers(c, getGroup()).containsAll(reviewers)) {
+                return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
+            }
+            //We have multiple reviewers, create a group and assign this group, the workflowitemrole will be
+            // translated into a task in the autoassign
+            Group reviewerGroup = groupService.create(c);
+            for (EPerson reviewer : reviewers) {
+                groupService.addMember(c, reviewerGroup, reviewer);
+            }
+            WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
+            workflowItemRole.setGroup(reviewerGroup);
             workflowItemRole.setRoleId(getRole().getId());
             workflowItemRole.setWorkflowItem(wfi);
             workflowItemRoleService.update(c, workflowItemRole);
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         }
-
-        //There are only 2 active buttons on this page, so if anything else happens just return an error
-        return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
     }
 
     @Override
