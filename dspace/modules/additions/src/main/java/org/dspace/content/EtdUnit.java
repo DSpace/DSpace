@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,26 +32,20 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * @author Ben Wallberg
  */
 
-
 @Entity
-@Table(name="etdunit")
+@Table(name = "etdunit")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
-{
-
-    @Column(name="etdunit_id", insertable = false, updatable = false)
+public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport {
+    @Column(name = "etdunit_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    @Column(name="name", length = 256, unique = true)
+    @Column(name = "name", length = 256, unique = true)
     private String name;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "collection2etdunit",
-            joinColumns = {@JoinColumn(name = "etdunit_id") },
-            inverseJoinColumns = {@JoinColumn(name = "collection_id") }
-    )
+    @JoinTable(name = "collection2etdunit", joinColumns = { @JoinColumn(name = "etdunit_id") }, inverseJoinColumns = {
+            @JoinColumn(name = "collection_id") })
     private Set<Collection> collections = new HashSet<>();
 
     @Transient
@@ -68,8 +61,7 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return name
      */
     @Override
-    public String getName()
-    {
+    public String getName() {
         return this.name == null ? "" : this.name;
     }
 
@@ -77,29 +69,25 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
      * set name of etdunit
      *
      * @param name
-     *            new etdunit name
+     *             new etdunit name
      */
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
         setModified();
     }
 
     /**
-     * Return <code>true</code> if <code>other</code> is the same EtdUnit as
-     * this object, <code>false</code> otherwise
+     * Return <code>true</code> if < * this object, <code>false</code> otherwise
      *
      * @param other
-     *            object to compare to
+     *              object to compare to
      *
      * @return <code>true</code> if object passed in represents the same etdunit
      *         as this object
      */
     @Override
-    public boolean equals(Object other)
-    {
-        if (!(other instanceof EtdUnit))
-        {
+    public boolean equals(Object other) {
+        if (!(other instanceof EtdUnit) || getID() == null) {
             return false;
         }
 
@@ -108,18 +96,19 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Override
     public int hashCode() {
+        if (getID() == null) {
+            return 0;
+        }
         return Objects.hash(getID());
     }
 
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.ETDUNIT;
     }
 
     @Override
-    public String getHandle()
-    {
+    public String getHandle() {
         return null;
     }
 
@@ -129,8 +118,7 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return array of <code>Collection</code> s this etdunit maps to
      * @throws SQLException
      */
-    public List<Collection> getCollections() throws SQLException
-    {
+    public List<Collection> getCollections() throws SQLException {
         return new ArrayList<Collection>(this.collections);
     }
 
@@ -138,10 +126,9 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
      * Add an existing collection to this etdunit
      *
      * @param collection
-     *            the collection to add
+     *                   the collection to add
      */
-    void addCollection(Collection collection) throws SQLException
-    {
+    void addCollection(Collection collection) throws SQLException {
         this.collections.add(collection);
         setModified();
     }
@@ -150,10 +137,9 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
      * Remove a collection from this etdunit
      *
      * @param collection
-     *            the collection to remove
+     *                   the collection to remove
      */
-    void removeCollection(Collection collection) throws SQLException
-    {
+    void removeCollection(Collection collection) throws SQLException {
         this.collections.remove(collection);
         setModified();
     }
@@ -161,13 +147,12 @@ public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Returns true or false based on whether a given collection is a member.
      */
-    public boolean isMember(Collection collection)
-    {
+    public boolean isMember(Collection collection) {
         return collections.contains(collection);
     }
 
     @Override
     public Integer getLegacyId() {
-      return this.legacyId;
+        return this.legacyId;
     }
 }
