@@ -35,7 +35,7 @@ public class ScoreReviewAction extends ProcessingAction {
     private static final Logger log = LogManager.getLogger(ScoreReviewAction.class);
 
     // Option(s)
-    private static final String SUBMIT_SCORE = "submit_score";
+    public static final String SUBMIT_SCORE = "submit_score";
 
     // Response param(s)
     private static final String SCORE = "score";
