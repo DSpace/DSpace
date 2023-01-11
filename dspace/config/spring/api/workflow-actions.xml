@@ -13,13 +13,12 @@
     <bean id="selectrevieweractionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction" scope="prototype">
         <property name="role" ref="scoreassignedreviewer"/>
     </bean>
-    <bean id="scorereviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction" scope="prototype"/>
-    <bean id="ratingreviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.RatingReviewAction" scope="prototype">
+    <bean id="scorereviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction" scope="prototype">
         <property name="descriptionRequired" value="true"/>
         <property name="maxValue" value="5"/>
     </bean>
     <bean id="evaluationactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ScoreEvaluationAction" scope="prototype">
-        <property name="minimumAcceptanceScore" value="50" />
+        <property name="minimumAcceptanceScore" value="3" />
     </bean>
 
 

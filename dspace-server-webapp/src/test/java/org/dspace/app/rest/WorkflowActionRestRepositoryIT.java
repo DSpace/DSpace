@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction.SUBMIT_SCORE;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -141,15 +142,15 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
     @Test
     public void getWorkflowActionByName_ExistentWithOptions_ratingreviewaction() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
-        String nameActionWithOptions = "ratingreviewaction";
+        String nameActionWithOptions = "scorereviewaction";
         WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
 
         // create RatingReviewActionAdvancedInfo to compare with output
         RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
         ratingReviewActionAdvancedInfo.setDescriptionRequired(true);
         ratingReviewActionAdvancedInfo.setMaxValue(5);
-        ratingReviewActionAdvancedInfo.setType("rating");
-        ratingReviewActionAdvancedInfo.setId("rating");
+        ratingReviewActionAdvancedInfo.setType(SUBMIT_SCORE);
+        ratingReviewActionAdvancedInfo.setId(SUBMIT_SCORE);
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
