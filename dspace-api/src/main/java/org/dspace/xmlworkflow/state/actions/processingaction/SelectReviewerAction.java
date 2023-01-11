@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -78,24 +79,6 @@ public class SelectReviewerAction extends ProcessingAction {
         if (submitButton.equals(SUBMIT_CANCEL)) {
             //Send us back to the submissions page
             return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-
-        } else if (submitButton.equals(SUBMIT_SEARCH)) {
-            //Perform the search
-            String query = request.getParameter("query");
-            int page = Util.getIntParameter(request, "result-page");
-            if (page == -1) {
-                page = 0;
-            }
-
-            int resultCount = ePersonService.searchResultCount(c, query);
-            List<EPerson> epeople = ePersonService.search(c, query, page * RESULTS_PER_PAGE, RESULTS_PER_PAGE);
-
-
-            request.setAttribute("eperson-result-count", resultCount);
-            request.setAttribute("eperson-results", epeople);
-            request.setAttribute("result-page", page);
-            request.setAttribute("page", SEARCH_RESULTS_PAGE);
-            return new ActionResult(ActionResult.TYPE.TYPE_PAGE, SEARCH_RESULTS_PAGE);
         } else if (submitButton.startsWith(SUBMIT_SELECT_REVIEWER)) {
             return processSelectReviewers(c, wfi, step, request);
         }
@@ -104,10 +87,24 @@ public class SelectReviewerAction extends ProcessingAction {
         return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
     }
 
+    /**
+     * Method to handle the "submit_select_reviewer" action
+     *
+     * @param c       current DSpace session
+     * @param wfi     the item on which the action is to be performed
+     * @param step    the workflow step in which the action is performed
+     * @param request the current client request
+     * @return the result of performing the action
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     public ActionResult processSelectReviewers(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException {
         //Retrieve the identifier of the eperson which will do the reviewing
         String[] reviewerIds = request.getParameterValues("eperson");
+        if (ArrayUtils.isEmpty(reviewerIds)) {
+            return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
+        }
         List<EPerson> reviewers = new ArrayList<>();
         for (String reviewerId : reviewerIds) {
             reviewers.add(ePersonService.find(c, UUID.fromString(reviewerId)));
@@ -129,10 +126,12 @@ public class SelectReviewerAction extends ProcessingAction {
             }
             //We have multiple reviewers, create a group and assign this group, the workflowitemrole will be
             // translated into a task in the autoassign
+            c.turnOffAuthorisationSystem();
             Group reviewerGroup = groupService.create(c);
             for (EPerson reviewer : reviewers) {
                 groupService.addMember(c, reviewerGroup, reviewer);
             }
+            c.restoreAuthSystemState();
             WorkflowItemRole workflowItemRole = workflowItemRoleService.create(c);
             workflowItemRole.setGroup(reviewerGroup);
             workflowItemRole.setRoleId(getRole().getId());
