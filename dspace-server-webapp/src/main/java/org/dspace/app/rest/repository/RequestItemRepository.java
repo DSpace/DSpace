@@ -15,7 +15,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -229,14 +231,20 @@ public class RequestItemRepository
         }
 
         // Check for authorized user
-        RequestItemAuthor authorizer;
+        List<RequestItemAuthor> authorizers;
         try {
-            authorizer = requestItemAuthorExtractor.getRequestItemAuthor(context, ri.getItem());
+            authorizers = requestItemAuthorExtractor.getRequestItemAuthor(context, ri.getItem());
         } catch (SQLException ex) {
             LOG.warn("Failed to find an authorizer:  {}", ex.getMessage());
-            authorizer = new RequestItemAuthor("", "");
+            authorizers = Collections.EMPTY_LIST;
         }
-        if (!authorizer.getEmail().equals(context.getCurrentUser().getEmail())) {
+
+        boolean authorized = false;
+        String requester = context.getCurrentUser().getEmail();
+        for (RequestItemAuthor authorizer : authorizers) {
+            authorized |= authorizer.getEmail().equals(requester);
+        }
+        if (!authorized) {
             throw new AuthorizeException("Not authorized to approve this request");
         }
 

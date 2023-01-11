@@ -18,6 +18,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
@@ -25,8 +26,6 @@ import org.dspace.eperson.Group;
  * Builder class to build bitstreams in test cases
  */
 public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
-
-    public static final String ORIGINAL = "ORIGINAL";
 
     private Bitstream bitstream;
     private Item item;
@@ -158,12 +157,12 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     }
 
     private Bundle getOriginalBundle(Item item) throws SQLException, AuthorizeException {
-        List<Bundle> bundles = itemService.getBundles(item, ORIGINAL);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         Bundle targetBundle = null;
 
         if (bundles.size() < 1) {
             // not found, create a new one
-            targetBundle = bundleService.create(context, item, ORIGINAL);
+            targetBundle = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
         } else {
             // put bitstreams into first bundle
             targetBundle = bundles.iterator().next();
@@ -206,6 +205,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             bitstream = c.reloadEntity(bitstream);

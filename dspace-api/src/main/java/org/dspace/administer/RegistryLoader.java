@@ -16,9 +16,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -122,12 +125,13 @@ public class RegistryLoader {
      */
     public static void loadBitstreamFormats(Context context, String filename)
         throws SQLException, IOException, ParserConfigurationException,
-        SAXException, TransformerException, AuthorizeException {
+        SAXException, TransformerException, AuthorizeException, XPathExpressionException {
         Document document = loadXML(filename);
 
         // Get the nodes corresponding to formats
-        NodeList typeNodes = XPathAPI.selectNodeList(document,
-                                                     "dspace-bitstream-types/bitstream-type");
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList typeNodes = (NodeList) xPath.compile("dspace-bitstream-types/bitstream-type")
+                                             .evaluate(document, XPathConstants.NODESET);
 
         // Add each one as a new format to the registry
         for (int i = 0; i < typeNodes.getLength(); i++) {
@@ -151,8 +155,7 @@ public class RegistryLoader {
      * @throws AuthorizeException   if authorization error
      */
     private static void loadFormat(Context context, Node node)
-        throws SQLException, IOException, TransformerException,
-        AuthorizeException {
+        throws SQLException, AuthorizeException, XPathExpressionException {
         // Get the values
         String mimeType = getElementData(node, "mimetype");
         String shortDesc = getElementData(node, "short_description");
@@ -231,9 +234,10 @@ public class RegistryLoader {
      * @throws TransformerException if transformer error
      */
     private static String getElementData(Node parentElement, String childName)
-        throws TransformerException {
+        throws XPathExpressionException {
         // Grab the child node
-        Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        Node childNode = (Node) xPath.compile(childName).evaluate(parentElement, XPathConstants.NODE);
 
         if (childNode == null) {
             // No child node, so no values
@@ -274,9 +278,10 @@ public class RegistryLoader {
      * @throws TransformerException if transformer error
      */
     private static String[] getRepeatedElementData(Node parentElement,
-                                                   String childName) throws TransformerException {
+                                                   String childName) throws XPathExpressionException {
         // Grab the child node
-        NodeList childNodes = XPathAPI.selectNodeList(parentElement, childName);
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        NodeList childNodes = (NodeList) xPath.compile(childName).evaluate(parentElement, XPathConstants.NODESET);
 
         String[] data = new String[childNodes.getLength()];
 

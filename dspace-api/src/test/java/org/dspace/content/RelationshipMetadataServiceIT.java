@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -186,18 +187,27 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         //request the virtual metadata of the publication only
         List<RelationshipMetadataValue> leftList = relationshipMetadataService
             .getRelationshipMetadata(leftItem, true);
-        assertThat(leftList.size(), equalTo(2));
-        assertThat(leftList.get(0).getValue(), equalTo("familyName, firstName"));
-        assertThat(leftList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
-        assertThat(leftList.get(0).getMetadataField().getElement(), equalTo("contributor"));
-        assertThat(leftList.get(0).getMetadataField().getQualifier(), equalTo("author"));
+        assertThat(leftList.size(), equalTo(3));
+
+        assertThat(leftList.get(0).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(leftList.get(0).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(leftList.get(0).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(0).getMetadataField().getQualifier(), equalTo("latestForDiscovery"));
         assertThat(leftList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        assertThat(leftList.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
-        assertThat(leftList.get(1).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(leftList.get(1).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(1).getValue(), equalTo("familyName, firstName"));
+        assertThat(leftList.get(1).getMetadataField().getMetadataSchema().getName(), equalTo("dc"));
+        assertThat(leftList.get(1).getMetadataField().getElement(), equalTo("contributor"));
+        assertThat(leftList.get(1).getMetadataField().getQualifier(), equalTo("author"));
         assertThat(leftList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        assertThat(leftList.get(2).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(leftList.get(2).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(leftList.get(2).getMetadataField().getElement(), equalTo("isAuthorOfPublication"));
+        assertThat(leftList.get(2).getMetadataField().getQualifier(), nullValue());
+        assertThat(leftList.get(2).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
         // rightItem is the author
         List<MetadataValue> rightRelationshipMetadataList = itemService
@@ -208,12 +218,21 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         //request the virtual metadata of the publication
         List<RelationshipMetadataValue> rightList = relationshipMetadataService
             .getRelationshipMetadata(rightItem, true);
-        assertThat(rightList.size(), equalTo(1));
+        assertThat(rightList.size(), equalTo(2));
+
         assertThat(rightList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
         assertThat(rightList.get(0).getMetadataField().getMetadataSchema().getName(),
             equalTo(MetadataSchemaEnum.RELATION.getName()));
         assertThat(rightList.get(0).getMetadataField().getElement(), equalTo("isPublicationOfAuthor"));
+        assertThat(rightList.get(0).getMetadataField().getQualifier(), equalTo("latestForDiscovery"));
         assertThat(rightList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        assertThat(rightList.get(1).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(rightList.get(1).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(rightList.get(1).getMetadataField().getElement(), equalTo("isPublicationOfAuthor"));
+        assertThat(rightList.get(1).getMetadataField().getQualifier(), nullValue());
+        assertThat(rightList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
     }
 
     @Test
@@ -380,34 +399,52 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         //request the virtual metadata of the journal issue
         List<RelationshipMetadataValue> issueRelList =
             relationshipMetadataService.getRelationshipMetadata(leftItem, true);
-        assertThat(issueRelList.size(), equalTo(2));
-        assertThat(issueRelList.get(0).getValue(), equalTo("30"));
-        assertThat(issueRelList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("publicationvolume"));
-        assertThat(issueRelList.get(0).getMetadataField().getElement(), equalTo("volumeNumber"));
-        assertThat(issueRelList.get(0).getMetadataField().getQualifier(), equalTo(null));
+        assertThat(issueRelList.size(), equalTo(3));
+
+        assertThat(issueRelList.get(0).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(issueRelList.get(0).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(issueRelList.get(0).getMetadataField().getElement(), equalTo("isJournalVolumeOfIssue"));
+        assertThat(issueRelList.get(0).getMetadataField().getQualifier(), equalTo("latestForDiscovery"));
         assertThat(issueRelList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        assertThat(issueRelList.get(1).getValue(), equalTo(String.valueOf(rightItem.getID())));
-        assertThat(issueRelList.get(1).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(issueRelList.get(1).getMetadataField().getElement(), equalTo("isJournalVolumeOfIssue"));
+        assertThat(issueRelList.get(1).getValue(), equalTo("30"));
+        assertThat(issueRelList.get(1).getMetadataField().getMetadataSchema().getName(), equalTo("publicationvolume"));
+        assertThat(issueRelList.get(1).getMetadataField().getElement(), equalTo("volumeNumber"));
+        assertThat(issueRelList.get(1).getMetadataField().getQualifier(), equalTo(null));
         assertThat(issueRelList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        assertThat(issueRelList.get(2).getValue(), equalTo(String.valueOf(rightItem.getID())));
+        assertThat(issueRelList.get(2).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(issueRelList.get(2).getMetadataField().getElement(), equalTo("isJournalVolumeOfIssue"));
+        assertThat(issueRelList.get(2).getMetadataField().getQualifier(), nullValue());
+        assertThat(issueRelList.get(2).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
         //request the virtual metadata of the journal volume
         List<RelationshipMetadataValue> volumeRelList =
             relationshipMetadataService.getRelationshipMetadata(rightItem, true);
-        assertThat(volumeRelList.size(), equalTo(2));
-        assertThat(volumeRelList.get(0).getValue(), equalTo("2"));
-        assertThat(volumeRelList.get(0).getMetadataField().getMetadataSchema().getName(), equalTo("publicationissue"));
-        assertThat(volumeRelList.get(0).getMetadataField().getElement(), equalTo("issueNumber"));
-        assertThat(volumeRelList.get(0).getMetadataField().getQualifier(), equalTo(null));
+        assertThat(volumeRelList.size(), equalTo(3));
+
+        assertThat(volumeRelList.get(0).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(volumeRelList.get(0).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(volumeRelList.get(0).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
+        assertThat(volumeRelList.get(0).getMetadataField().getQualifier(), equalTo("latestForDiscovery"));
         assertThat(volumeRelList.get(0).getAuthority(), equalTo("virtual::" + relationship.getID()));
 
-        assertThat(volumeRelList.get(1).getValue(), equalTo(String.valueOf(leftItem.getID())));
-        assertThat(volumeRelList.get(1).getMetadataField().getMetadataSchema().getName(),
-            equalTo(MetadataSchemaEnum.RELATION.getName()));
-        assertThat(volumeRelList.get(1).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
+        assertThat(volumeRelList.get(1).getValue(), equalTo("2"));
+        assertThat(volumeRelList.get(1).getMetadataField().getMetadataSchema().getName(), equalTo("publicationissue"));
+        assertThat(volumeRelList.get(1).getMetadataField().getElement(), equalTo("issueNumber"));
+        assertThat(volumeRelList.get(1).getMetadataField().getQualifier(), equalTo(null));
         assertThat(volumeRelList.get(1).getAuthority(), equalTo("virtual::" + relationship.getID()));
+
+        assertThat(volumeRelList.get(2).getValue(), equalTo(String.valueOf(leftItem.getID())));
+        assertThat(volumeRelList.get(2).getMetadataField().getMetadataSchema().getName(),
+            equalTo(MetadataSchemaEnum.RELATION.getName()));
+        assertThat(volumeRelList.get(2).getMetadataField().getElement(), equalTo("isIssueOfJournalVolume"));
+        assertThat(volumeRelList.get(2).getMetadataField().getQualifier(), nullValue());
+        assertThat(volumeRelList.get(2).getAuthority(), equalTo("virtual::" + relationship.getID()));
     }
 
     @Test
@@ -612,45 +649,6 @@ public class RelationshipMetadataServiceIT extends AbstractIntegrationTestWithDa
         assertThat(itemService
                 .getMetadata(rightItem, MetadataSchemaEnum.RELATION.getName(), "isPublicationOfAuthor", null, Item.ANY)
                 .size(), equalTo(1));
-    }
-
-    @Test
-    public void testGetNextRightPlace() throws Exception {
-        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(0));
-        initPublicationAuthor();
-
-        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(1));
-
-        context.turnOffAuthorisationSystem();
-
-        Item secondItem = ItemBuilder.createItem(context, col).build();
-        RelationshipBuilder.createRelationshipBuilder(context, secondItem, rightItem,
-            isAuthorOfPublicationRelationshipType).build();
-        context.restoreAuthSystemState();
-
-        assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(2));
-    }
-
-    @Test
-    public void testGetNextLeftPlace() throws Exception {
-        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(0));
-        initPublicationAuthor();
-
-        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(1));
-
-        context.turnOffAuthorisationSystem();
-
-        Item secondAuthor = ItemBuilder.createItem(context, col2)
-                                       .withPersonIdentifierFirstName("firstName")
-                                       .withPersonIdentifierLastName("familyName").build();
-
-        RelationshipBuilder.createRelationshipBuilder(context, leftItem, secondAuthor,
-            isAuthorOfPublicationRelationshipType).build();
-        context.restoreAuthSystemState();
-
-        assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(2));
-
-
     }
 
     @Test

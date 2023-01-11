@@ -34,9 +34,9 @@ import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.Verifier;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.Verifier;
 
 /**
  * Crosswalk for creating appropriate &lt;meta&gt; elements to appear in the
@@ -90,17 +90,17 @@ public class XHTMLHeadDisseminationCrosswalk
      * Maps DSpace metadata field to name to use in XHTML head element, e.g.
      * dc.creator or dc.description.abstract
      */
-    private Map<String, String> names;
+    private final Map<String, String> names;
 
     /**
      * Maps DSpace metadata field to scheme for that field, if any
      */
-    private Map<String, String> schemes;
+    private final Map<String, String> schemes;
 
     /**
      * Schemas to add -- maps schema.NAME to schema URL
      */
-    private Map<String, String> schemaURLs;
+    private final Map<String, String> schemaURLs;
 
     public XHTMLHeadDisseminationCrosswalk() throws IOException {
         names = new HashMap<>();
@@ -109,17 +109,9 @@ public class XHTMLHeadDisseminationCrosswalk
 
         // Read in configuration
         Properties crosswalkProps = new Properties();
-        FileInputStream fis = new FileInputStream(config);
-        try {
+
+        try (FileInputStream fis = new FileInputStream(config);) {
             crosswalkProps.load(fis);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException ioe) {
-                    // ignore
-                }
-            }
         }
 
         Enumeration e = crosswalkProps.keys();
@@ -178,6 +170,7 @@ public class XHTMLHeadDisseminationCrosswalk
      * @throws IOException        if IO error
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
+     * @return List of Elements
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso) throws CrosswalkException,

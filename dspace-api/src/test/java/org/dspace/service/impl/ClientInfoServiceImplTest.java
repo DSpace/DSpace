@@ -223,4 +223,40 @@ public class ClientInfoServiceImplTest extends AbstractDSpaceTest {
 
         assertFalse(clientInfoService.isUseProxiesEnabled());
     }
+
+    @Test
+    public void testIpAnonymization() {
+        clientInfoService = new ClientInfoServiceImpl(configurationService);
+
+        String remoteIp = "192.168.1.25";
+
+        assertEquals("192.168.1.25", clientInfoService.getClientIp(remoteIp, null));
+
+        try {
+
+            configurationService.setProperty("client.ip-anonymization.parts", 1);
+
+            assertEquals("192.168.1.0", clientInfoService.getClientIp(remoteIp, null));
+
+            configurationService.setProperty("client.ip-anonymization.parts", 2);
+
+            assertEquals("192.168.0.0", clientInfoService.getClientIp(remoteIp, null));
+
+            configurationService.setProperty("client.ip-anonymization.parts", 3);
+
+            assertEquals("192.0.0.0", clientInfoService.getClientIp(remoteIp, null));
+
+            configurationService.setProperty("client.ip-anonymization.parts", 4);
+
+            assertEquals("0.0.0.0", clientInfoService.getClientIp(remoteIp, null));
+
+            configurationService.setProperty("client.ip-anonymization.parts", 5);
+
+            assertEquals("192.168.1.25", clientInfoService.getClientIp(remoteIp, null));
+
+        } finally {
+            configurationService.setProperty("client.ip-anonymization.parts", 0);
+        }
+
+    }
 }

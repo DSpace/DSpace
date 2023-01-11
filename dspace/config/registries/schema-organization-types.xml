@@ -73,5 +73,13 @@
         <qualifier>ror</qualifier>
         <scope_note>Research Organization Registry</scope_note>
     </dc-type>
+  
+    <dc-type>
+        <schema>organization</schema>
+        <element>identifier</element>
+        <qualifier>crossrefid</qualifier>
+        <scope_note>Crossref identifier</scope_note>
+    </dc-type>
+    
 
 </dspace-dc-types>

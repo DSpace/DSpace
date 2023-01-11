@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -28,7 +29,9 @@ import java.util.List;
  *
  * @see SHERPAPublisherPolicy
  */
-public class SHERPAPermittedVersion {
+public class SHERPAPermittedVersion implements Serializable {
+
+    private static final long serialVersionUID = 4992181606327727442L;
 
     // Version (submitted, accepted, published)
     private String articleVersion;
@@ -46,11 +49,6 @@ public class SHERPAPermittedVersion {
     private List<String> licenses;
     // Embargo
     private SHERPAEmbargo embargo;
-
-    protected static class SHERPAEmbargo {
-        String units;
-        int amount;
-    }
 
     public String getArticleVersion() {
         return articleVersion;

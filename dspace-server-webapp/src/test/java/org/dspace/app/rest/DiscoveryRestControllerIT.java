@@ -56,6 +56,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.eperson.EPerson;
@@ -77,6 +78,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     MetadataAuthorityService metadataAuthorityService;
 
+    @Autowired
+    ChoiceAuthorityService choiceAuthorityService;
 
     @Test
     public void rootDiscoverTest() throws Exception {
@@ -200,6 +203,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
 
         metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
 
         //Turn off the authorization system, otherwise we can't make the objects
         context.turnOffAuthorisationSystem();
@@ -281,6 +285,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
         metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
 
     }
 
@@ -353,6 +358,146 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetValueMatcher.entryAuthor("Smith, Donald")
                 )))
         ;
+    }
+
+    @Test
+    public void discoverFacetsAuthorTestWithPrefix_Capital_And_Special_Chars() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, John")
+                                      .withAuthor("Jan, Doe")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("S’Idan, Mo")
+                                      .withAuthor("Tick&Tock")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("M Akai")
+                                      .withAuthor("stIjn, SmITH")
+                                      .build();
+
+        Item publicItem4 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 4")
+                                      .withIssueDate("2012-05-13")
+                                      .withSubject("St Augustine")
+                                      .build();
+
+        Item publicItem5 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 5")
+                                      .withIssueDate("2015-11-23")
+                                      .withSubject("Health & Medicine")
+                                      .build();
+
+        Item publicItem6 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 6")
+                                      .withIssueDate("2003-07-11")
+                                      .withSubject("1% economy")
+                                      .build();
+
+        Item publicItem7 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 7")
+                                      .withIssueDate("2008-12-31")
+                                      .withSubject("I.T.")
+                                      .build();
+
+        Item publicItem8 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 8")
+                                      .withIssueDate("2013-07-21")
+                                      .withSubject("?Unknown")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        // The prefix query for author queries should be case-insensitive and correctly handle special characters
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "Smith"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Smith, John"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "S"))
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("Smith, John"),
+                                                          FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("S’Idan, Mo"),
+                                                          FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("stIjn, SmITH"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "M A"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("M Akai"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "S’I"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("S’Idan, Mo"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "Jan, D"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Jan, Doe"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "Tick&"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Tick&Tock"))));
+
+        // Should also be the case for subject queries
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "St A"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("St Augustine"))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Health & M"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("Health & Medicine"))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "1% e"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("1% economy"))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "I."))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("I.T."))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "?U"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("?Unknown"))));
     }
 
     @Test
@@ -4160,7 +4305,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
         //** WHEN **
-        // each submitter, including the administrator should see only her submission
+        // each submitter, including the administrator should see only their submission
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -4454,8 +4599,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
 
         // admin should see two pool items and a claimed task,
-        // one pool item from the submitter and one from herself
-        // because the admin is in the reviewer group for step 1, not because she is an admin
+        // one pool item from the submitter and one from the admin
+        // because the admin is in the reviewer group for step 1, not because they are an admin
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -4678,7 +4823,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer1 should not see pool items, as he is not an administrator
+        // reviewer1 should not see pool items, as it is not an administrator
         getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -4696,7 +4841,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
 
         // admin should see three pool items and a claimed task
-        // one pool item from the submitter and two from herself
+        // one pool item from the submitter and two from the admin
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -4750,7 +4895,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer2 should not see pool items, as he is not an administrator
+        // reviewer2 should not see pool items, as it is not an administrator
         getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK

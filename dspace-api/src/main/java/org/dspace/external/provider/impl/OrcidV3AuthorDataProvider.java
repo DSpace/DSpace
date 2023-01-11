@@ -140,7 +140,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
                             new MetadataValueDTO("person", "identifier", "orcid", null, person.getName().getPath()));
             externalDataObject
                     .addMetadata(new MetadataValueDTO("dc", "identifier", "uri", null,
-                                                      orcidUrl + person.getName().getPath()));
+                                                      orcidUrl + "/" + person.getName().getPath()));
             if (!StringUtils.isBlank(lastName) && !StringUtils.isBlank(firstName)) {
                 externalDataObject.setDisplayValue(lastName + ", " + firstName);
                 externalDataObject.setValue(lastName + ", " + firstName);

@@ -8,7 +8,7 @@
 package org.dspace.xmlworkflow.state;
 
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,7 +118,7 @@ public class Workflow implements BeanNameAware {
      * @return a map containing the roles, the role name will the key, the role itself the value
      */
     public Map<String, Role> getRoles() {
-        Map<String, Role> roles = new HashMap<>();
+        Map<String, Role> roles = new LinkedHashMap<>();
         for (Step step : steps) {
             if (step.getRole() != null) {
                 roles.put(step.getRole().getId(), step.getRole());

@@ -7,7 +7,8 @@
  */
 package org.dspace.content.logic.condition;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Context;
@@ -19,7 +20,7 @@ import org.dspace.core.Context;
  * @version $Revision$
  */
 public class IsWithdrawnCondition extends AbstractCondition {
-    private static Logger log = Logger.getLogger(IsWithdrawnCondition.class);
+    private final static Logger log = LogManager.getLogger();
 
     /**
      * Return true if item is withdrawn

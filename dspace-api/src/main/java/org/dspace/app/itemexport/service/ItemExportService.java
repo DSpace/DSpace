@@ -17,6 +17,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * Item exporter to create simple AIPs for DSpace content. Currently exports
@@ -266,5 +267,11 @@ public interface ItemExportService {
      * @throws Exception if error
      */
     public void zip(String strSource, String target) throws Exception;
+
+    /**
+     * Set the DSpace Runnable Handler
+     * @param handler
+     */
+    public void setHandler(DSpaceRunnableHandler handler);
 
 }

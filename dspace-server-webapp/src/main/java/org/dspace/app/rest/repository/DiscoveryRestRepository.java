@@ -24,7 +24,7 @@ import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.utils.DiscoverQueryBuilder;
+import org.dspace.app.rest.utils.RestDiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -59,7 +59,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     private ScopeResolver scopeResolver;
 
     @Autowired
-    private DiscoverQueryBuilder queryBuilder;
+    private RestDiscoverQueryBuilder queryBuilder;
 
     @Autowired
     private DiscoverResultConverter discoverResultConverter;

@@ -111,7 +111,7 @@ public interface RequestService {
     /**
      * Set the ID of the current authenticated user
      *
-     * @return the id of the user associated with the current thread OR null if there is no user
+     * @param epersonId the id of the user associated with the current thread OR null if there is no user
      */
     public void setCurrentUserId(UUID epersonId);
 
