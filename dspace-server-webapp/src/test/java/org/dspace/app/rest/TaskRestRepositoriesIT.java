@@ -15,8 +15,8 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -1511,7 +1511,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isForbidden());
 
-        // nor the administrator can approve a task that he doesn't own
+        // nor the administrator can approve a task that it doesn't own
         getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
                 .param("submit_approve", "true")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
@@ -1687,7 +1687,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isForbidden());
 
-        // nor the administrator can approve a task that he doesn't own
+        // nor the administrator can approve a task that it doesn't own
         getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + claimedTask.getID())
                 .param("submit_reject", "true")
                 .param("reason", "I need to test the reject")
@@ -2650,7 +2650,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
             bibtex);
-        getClient(reviewer1Token).perform(fileUpload("/api/workflow/workflowitems/" + witem.getID())
+        getClient(reviewer1Token).perform(multipart("/api/workflow/workflowitems/" + witem.getID())
             .file(bibtexFile))
             .andExpect(status().isUnprocessableEntity());
 
@@ -2791,7 +2791,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
             bibtex);
-        getClient(authToken).perform(fileUpload("/api/workflow/workflowitems/" + witem.getID())
+        getClient(authToken).perform(multipart("/api/workflow/workflowitems/" + witem.getID())
             .file(bibtexFile))
             .andExpect(status().isUnprocessableEntity());
 
@@ -2944,7 +2944,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
             bibtex);
-        getClient(reviewer1Token).perform(fileUpload("/api/workflow/workflowitems/" + witem.getID())
+        getClient(reviewer1Token).perform(multipart("/api/workflow/workflowitems/" + witem.getID())
             .file(bibtexFile))
             .andExpect(status().isCreated());
 

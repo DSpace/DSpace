@@ -8,8 +8,10 @@
 package org.dspace.content.dao;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
+import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.scripts.Process;
@@ -81,4 +83,18 @@ public interface ProcessDAO extends GenericDAO<Process> {
 
     int countTotalWithParameters(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
         throws SQLException;
+
+    /**
+     * Find all the processes with one of the given status and with a creation time
+     * older than the specified date.
+     *
+     * @param  context      The relevant DSpace context
+     * @param  statuses     the statuses of the processes to search for
+     * @param  date         the creation date to search for
+     * @return              The list of all Processes which match requirements
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Date date)
+        throws SQLException;
+
 }

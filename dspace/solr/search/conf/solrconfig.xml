@@ -30,9 +30,6 @@
          regex='icu4j-.*\.jar'/>
     <lib dir='${solr.install.dir}/contrib/analysis-extras/lucene-libs/'
          regex='lucene-analyzers-icu-.*\.jar'/>
-    <lib dir="${solr.install.dir}/contrib/extraction/lib" />
-    <lib dir="${solr.install.dir}/dist/"
-         regex="solr-cell-\d.*\.jar" />
 
     <dataDir>${solr.data.dir:}</dataDir>
 
@@ -64,6 +61,11 @@
         <autoSoftCommit>
             <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
         </autoSoftCommit>
+
+        <!-- This is required for Atomic Updates -->
+        <updateLog>
+            <str name="dir">${solr.ulog.dir:}</str>
+        </updateLog>
     </updateHandler>
 
     <!-- Settings for how Solr will process & respond to queries -->

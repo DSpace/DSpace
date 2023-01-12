@@ -100,7 +100,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         //Then remove the current user from the inProgressUsers
         inProgressUserService.delete(context, inProgressUserService.findByWorkflowItemAndEPerson(context, wfi, user));
 
-        //Make sure the removed user has his custom rights removed
+        //Make sure the removed user has their custom rights removed
         xmlWorkflowService.removeUserItemPolicies(context, wfi.getItem(), user);
 
         Workflow workflow = workflowFactory.getWorkflow(wfi.getCollection());

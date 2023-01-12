@@ -77,7 +77,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
         ItemUpdate.pr("Contents bitstream count: " + contents.size());
 
         String[] files = dir.list(ItemUpdate.fileFilter);
-        List<String> fileList = new ArrayList<String>();
+        List<String> fileList = new ArrayList<>();
         for (String filename : files) {
             fileList.add(filename);
             ItemUpdate.pr("file: " + filename);
@@ -134,9 +134,6 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
         ItemUpdate.pr("contents entry for bitstream: " + ce.toString());
         File f = new File(dir, ce.filename);
 
-        // get an input stream
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f));
-
         Bitstream bs = null;
         String newBundleName = ce.bundlename;
 
@@ -173,7 +170,9 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                 targetBundle = bundles.iterator().next();
             }
 
-            bs = bitstreamService.create(context, targetBundle, bis);
+            try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f));) {
+                bs = bitstreamService.create(context, targetBundle, bis);
+            }
             bs.setName(context, ce.filename);
 
             // Identify the format
