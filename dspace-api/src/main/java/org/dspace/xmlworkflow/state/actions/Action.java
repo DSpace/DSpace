@@ -14,10 +14,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DCDate;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
@@ -218,4 +223,34 @@ public abstract class Action {
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
         return advancedInfo;
     }
+
+
+    /**
+     * Adds info in the metadata field dc.description.provenance about item being approved containing in which step
+     * it was approved, which user approved it and the time
+     *
+     * @param c   DSpace contect
+     * @param wfi Workflow item we're adding workflow accept provenance on
+     */
+    public void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+        //Add the provenance for the accept
+        String now = DCDate.getCurrent().toString();
+
+        // Get user's name + email address
+        String usersName =
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().getEPersonName(c.getCurrentUser());
+
+        String provDescription = getProvenanceStartId() + " Approved for entry into archive by " + usersName + " on "
+            + now + " (GMT) ";
+
+        // Add to item as a DC field
+        c.turnOffAuthorisationSystem();
+        itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",
+            provDescription);
+        itemService.update(c, wfi.getItem());
+        c.restoreAuthSystemState();
+    }
+
 }
