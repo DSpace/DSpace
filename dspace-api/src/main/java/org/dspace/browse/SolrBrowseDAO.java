@@ -177,6 +177,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         if (sResponse == null) {
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
+            addDefaultFilterQueries(query);
             addStatusFilter(query);
             if (distinct) {
                 DiscoverFacetField dff;
@@ -244,6 +245,9 @@ public class SolrBrowseDAO implements BrowseDAO {
                 query.addFilterQueries("location.comm:" + container.getID());
             }
         }
+    }
+
+    private void addDefaultFilterQueries(DiscoverQuery query) {
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(container);
         discoveryConfiguration.getDefaultFilterQueries().forEach(query::addFilterQueries);
     }
@@ -336,6 +340,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         throws BrowseException {
         DiscoverQuery query = new DiscoverQuery();
         addLocationScopeFilter(query);
+        addDefaultFilterQueries(query);
         addStatusFilter(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
