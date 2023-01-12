@@ -88,11 +88,9 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<SubscriptionRest> findAll(Context context, Pageable pageable) {
         try {
-            HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-            String resourceType = req.getParameter("resourceType");
-            List<Subscription> subscriptionList = subscribeService.findAll(context, resourceType,
-                                                         Math.toIntExact(pageable.getPageSize()),
-                                                         Math.toIntExact(pageable.getOffset()));
+            List<Subscription> subscriptionList = subscribeService.findAll(context, null,
+                                                           Math.toIntExact(pageable.getPageSize()),
+                                                           Math.toIntExact(pageable.getOffset()));
             Long total = subscribeService.countAll(context);
             return converter.toRestPage(subscriptionList, pageable, total,  utils.obtainProjection());
         } catch (Exception e) {

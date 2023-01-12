@@ -128,45 +128,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void findAllWithResourceType() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
-        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Frequency");
-        subscriptionParameter.setValue("Daily");
-        subscriptionParameterList.add(subscriptionParameter);
-
-        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
-                                    "TypeTest", publicItem, admin, subscriptionParameterList).build();
-
-        context.restoreAuthSystemState();
-
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions?resourceType=Item"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.subscriptions", Matchers.contains(
-                               SubscriptionMatcher.matchSubscription(subscription)
-                               )))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
-                .andExpect(jsonPath("$.page.number", is(0)));
-
-        // search for subscriptions related with collections
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions?resourceType=Collection"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                //By default we expect at least 1 submission forms so this to be reflected in the page object
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(0)))
-                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(0)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$._links.self.href",
-                           Matchers.is(REST_SERVER_URL + "core/subscriptions?resourceType=Collection")));
-    }
-
-    @Test
     public void findOneWithOwnerTest() throws Exception {
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
@@ -491,17 +452,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.restoreAuthSystemState();
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
-
-
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(post("/api/core/subscriptions")
                                .param("dspace_object_id", publicItem.getID().toString())
                                .param("eperson_id", eperson.getID().toString())
                                .content(new ObjectMapper().writeValueAsString(map))
                                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                   .andExpect(status().isUnprocessableEntity());
-
+                               .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
