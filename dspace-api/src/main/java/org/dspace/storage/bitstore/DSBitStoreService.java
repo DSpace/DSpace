@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
@@ -126,13 +127,13 @@ public class DSBitStoreService extends BaseBitStoreService {
     /**
      * Obtain technical metadata about an asset in the asset store.
      *
-     * @param bitstream The asset to describe
-     * @param attrs     A Map whose keys consist of desired metadata fields
-     * @return attrs
-     * A Map with key/value pairs of desired metadata
-     * @throws java.io.IOException If a problem occurs while obtaining metadata
+     * @param  bitstream The asset to describe
+     * @param  attrs     A List of desired metadata fields
+     * @return           attrs A Map with key/value pairs of desired metadata
+     * @throws           java.io.IOException If a problem occurs while obtaining
+     *                   metadata
      */
-    public Map about(Bitstream bitstream, Map attrs) throws IOException {
+    public Map<String, Object> about(Bitstream bitstream, List<String> attrs) throws IOException {
         try {
             // potentially expensive, since it may calculate the checksum
             File file = getFile(bitstream);

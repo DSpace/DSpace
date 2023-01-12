@@ -245,7 +245,7 @@ public final class CheckerCommand {
         info.setProcessStartDate(new Date());
 
         try {
-            Map checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
+            Map<String, Object> checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
             if (MapUtils.isNotEmpty(checksumMap)) {
                 info.setBitstreamFound(true);
                 if (checksumMap.containsKey("checksum")) {
