@@ -10,10 +10,9 @@ package org.dspace.app.rest.model;
 import java.util.EnumMap;
 import java.util.Map;
 
-import org.dspace.app.rest.contentreport.Filter;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.contentreport.Filter;
 
 /**
  * This class serves as a REST representation of a single Collection of a {@link FilteredCollectionsRest}

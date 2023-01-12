@@ -33,7 +33,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class FilteredCollectionsReportUtils {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredCollectionsReportUtils.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(FilteredCollectionsReportUtils.class);
 
     @Autowired
     private CollectionService collectionService;
