@@ -112,23 +112,23 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
     /**
      * Test to verify that if a user submits an item into the workflow, a reviewmanager can select a single reviewer
      * eperson
-     *
-     * @throws Exception
      */
     @Test
     public void workflowUserSingleSelectedReviewer_ItemShouldBeEditable() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org").build();
         context.setCurrentUser(submitter);
+        EPerson reviewManager =
+            EPersonBuilder.createEPerson(context).withEmail("reviewmanager-test@example.org").build();
         Community community = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
         Collection colWithWorkflow = CollectionBuilder.createCollection(context, community, "123456789/workflow-test-1")
             .withName("Collection WITH workflow")
-            .withWorkflowGroup("reviewmanagers", submitter)
+            .withWorkflowGroup("reviewmanagers", reviewManager)
             .build();
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
-        ClaimedTask taskToReject = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, submitter)
+        ClaimedTask task = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, reviewManager)
             .withTitle("Test workflow item to reject").build();
         // Set reviewer group property and add reviewer to group
         configurationService.setProperty("action.selectrevieweraction.group", "Reviewers");
@@ -137,40 +137,39 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         groupService.addMember(context, reviewerGroup, reviewer);
         context.restoreAuthSystemState();
 
-        // Submitter person is both original submitter as well as reviewer, should have edit access of claimed task
-        assertTrue(this.containsRPForUser(taskToReject.getWorkflowItem().getItem(), submitter, Constants.WRITE));
+        // Review Manager should have access to workflow item
+        assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewManager, Constants.WRITE));
 
-        // reject
-        MockHttpServletRequest httpRejectRequest = new MockHttpServletRequest();
-        httpRejectRequest.setParameter("submit_select_reviewer", "true");
-        httpRejectRequest.setParameter("eperson", reviewer.getID().toString());
-        executeWorkflowAction(httpRejectRequest, workflow, taskToReject);
+        // select 1 reviewer
+        MockHttpServletRequest httpSelectReviewerRequest = new MockHttpServletRequest();
+        httpSelectReviewerRequest.setParameter("submit_select_reviewer", "true");
+        httpSelectReviewerRequest.setParameter("eperson", reviewer.getID().toString());
+        executeWorkflowAction(httpSelectReviewerRequest, workflow, task);
 
-        // Submitter person is both original submitter as well as reviewer, should have edit access of reject, i.e.
-        // sent back/to submission task
-        assertTrue(this.containsRPForUser(taskToReject.getWorkflowItem().getItem(), submitter, Constants.WRITE));
+        // Reviewer should have access to workflow item
+        assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer, Constants.WRITE));
     }
 
     /**
      * Test to verify that if a user submits an item into the workflow, a reviewmanager can select a multiple reviewer
      * epersons
-     *
-     * @throws Exception
      */
     @Test
     public void workflowUserMultipleSelectedReviewer_ItemShouldBeEditable() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org").build();
         context.setCurrentUser(submitter);
+        EPerson reviewManager =
+            EPersonBuilder.createEPerson(context).withEmail("reviewmanager-test@example.org").build();
         Community community = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
         Collection colWithWorkflow = CollectionBuilder.createCollection(context, community, "123456789/workflow-test-1")
             .withName("Collection WITH workflow")
-            .withWorkflowGroup("reviewmanagers", submitter)
+            .withWorkflowGroup("reviewmanagers", reviewManager)
             .build();
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
-        ClaimedTask taskToReject = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, submitter)
+        ClaimedTask task = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, reviewManager)
             .withTitle("Test workflow item to reject").build();
         // Set reviewer group property and add reviewer to group
         configurationService.setProperty("action.selectrevieweraction.group", "Reviewers");
@@ -181,19 +180,18 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         groupService.addMember(context, reviewerGroup, reviewer2);
         context.restoreAuthSystemState();
 
-        // Submitter person is both original submitter as well as reviewer, should have edit access of claimed task
-        assertTrue(this.containsRPForUser(taskToReject.getWorkflowItem().getItem(), submitter, Constants.WRITE));
+        // Review Manager should have access to workflow item
+        assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewManager, Constants.WRITE));
 
-        // reject
-        MockHttpServletRequest httpRejectRequest = new MockHttpServletRequest();
-        httpRejectRequest.setParameter("submit_select_reviewer", "true");
-        httpRejectRequest.setParameter("eperson", reviewer1.getID().toString());
-        httpRejectRequest.setParameter("eperson", reviewer2.getID().toString());
-        executeWorkflowAction(httpRejectRequest, workflow, taskToReject);
+        // Select multiple reviewers
+        MockHttpServletRequest httpSelectMultipleReviewers = new MockHttpServletRequest();
+        httpSelectMultipleReviewers.setParameter("submit_select_reviewer", "true");
+        httpSelectMultipleReviewers.setParameter("eperson", reviewer1.getID().toString(), reviewer2.getID().toString());
+        executeWorkflowAction(httpSelectMultipleReviewers, workflow, task);
 
-        // Submitter person is both original submitter as well as reviewer, should have edit access of reject, i.e.
-        // sent back/to submission task
-        assertTrue(this.containsRPForUser(taskToReject.getWorkflowItem().getItem(), submitter, Constants.WRITE));
+        // Reviewers should have access to workflow item
+        assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer1, Constants.WRITE));
+        assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer2, Constants.WRITE));
     }
 
     private boolean containsRPForUser(Item item, EPerson user, int action) throws SQLException {
