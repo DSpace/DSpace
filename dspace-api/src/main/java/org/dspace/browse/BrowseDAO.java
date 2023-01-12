@@ -8,8 +8,8 @@
 package org.dspace.browse;
 
 import java.util.List;
-import java.util.UUID;
 
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 
 /**
@@ -140,21 +140,21 @@ public interface BrowseDAO {
     public void setAscending(boolean ascending);
 
     /**
-     * Get the database ID of the container object.  The container object will be a
+     * Get the container object.  The container object will be a
      * Community or a Collection.
      *
-     * @return the database id of the container, or -1 if none is set
+     * @return the container, or null if none is set
      */
-    public UUID getContainerID();
+    public DSpaceObject getContainer();
 
     /**
-     * Set the database id of the container object.  This should be the id of a
-     * Community or Collection.  This will constrain the results of the browse
-     * to only items or values within items that appear in the given container.
+     * Set the container object.  This should be a Community or Collection.
+     * This will constrain the results of the browse to only items or values within items that appear in the given
+     * container and add the related configuration default filters.
      *
-     * @param containerID community/collection internal ID (UUID)
+     * @param container community/collection
      */
-    public void setContainerID(UUID containerID);
+    public void setContainer(DSpaceObject container);
 
     /**
      * get the name of the field in which to look for the container id.  This is
