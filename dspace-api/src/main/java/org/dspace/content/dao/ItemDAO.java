@@ -80,9 +80,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
                                               boolean inArchive) throws SQLException;
 
-    @Deprecated(forRemoval = true) Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
-                                              List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
-                                              String regexClause, int offset, int limit) throws SQLException;
+    @Deprecated(forRemoval = true) Iterator<Item> findByMetadataQuery(Context context,
+            List<List<MetadataField>> listFieldList,
+            List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
+            String regexClause, int offset, int limit) throws SQLException;
 
     /**
      * Returns all the Items that belong to the specified aollections (if any)

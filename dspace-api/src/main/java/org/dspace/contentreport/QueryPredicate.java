@@ -41,7 +41,7 @@ public class QueryPredicate {
 
     /**
      * Shortcut method that builds a QueryPredicate from a list of fields, an operator, and a value.
-     * @param field Fields that form the predicate subject
+     * @param fields Fields that form the predicate subject
      * @param operator Predicate operator
      * @param value Predicate object
      * @return a QueryPredicate instance built from the provided parameters
