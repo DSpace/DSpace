@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.4</version>
+        <version>7.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -589,13 +589,6 @@
             <artifactId>solr-core</artifactId>
             <scope>test</scope>
             <version>${solr.client.version}</version>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -846,11 +839,6 @@
           <!-- for mockserver -->
           <!-- Solve dependency convergence issues related to
                'mockserver-junit-rule' by selecting the versions we want to use. -->
-          <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.9</version>
-          </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>

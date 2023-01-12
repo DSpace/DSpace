@@ -111,7 +111,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         }
 
         EPerson submitter = item.getSubmitter();
-        boolean isAdmin = authorizeService.isAdmin(context);
+        boolean isAdmin = authorizeService.isAdmin(context, item);
         boolean canCreateVersion = configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion");
 
         if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser()))) {

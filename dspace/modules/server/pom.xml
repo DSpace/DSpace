@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.4</version>
+        <version>7.5-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -336,13 +336,6 @@ just adding new jar in the classloader</description>
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
