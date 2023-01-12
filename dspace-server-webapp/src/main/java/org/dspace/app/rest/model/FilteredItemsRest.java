@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.ContentReportsRestController;
+import org.dspace.app.rest.ContentReportRestController;
 
 /**
  * This class serves as a REST representation of a Filtered Items Report from the DSpace statistics.
@@ -25,7 +25,7 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
     /** Type of instances of this class, used by the DSpace REST infrastructure */
     public static final String NAME = "filtereditemsreport";
     /** Category of instances of this class, used by the DSpace REST infrastructure */
-    public static final String CATEGORY = RestModel.CONTENT_REPORTS;
+    public static final String CATEGORY = RestModel.CONTENT_REPORT;
 
     /** Items included in the report */
     private List<FilteredItemRest> items = new ArrayList<>();
@@ -44,7 +44,7 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
      */
     @Override
     public Class<?> getController() {
-        return ContentReportsRestController.class;
+        return ContentReportRestController.class;
     }
 
     @Override

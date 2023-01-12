@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.ContentReportsRestController;
+import org.dspace.app.rest.ContentReportRestController;
 
 /**
  * This class serves as a REST representation of a Filtered Collections Report from the DSpace statistics.
@@ -25,7 +25,7 @@ public class FilteredCollectionsRest extends BaseObjectRest<String> {
     /** Type of instances of this class, used by the DSpace REST infrastructure */
     public static final String NAME = "filteredcollectionsreport";
     /** Category of instances of this class, used by the DSpace REST infrastructure */
-    public static final String CATEGORY = RestModel.CONTENT_REPORTS;
+    public static final String CATEGORY = RestModel.CONTENT_REPORT;
 
     /** Collections included in the report */
     private List<FilteredCollectionRest> collections = new ArrayList<>();
@@ -48,7 +48,7 @@ public class FilteredCollectionsRest extends BaseObjectRest<String> {
      */
     @Override
     public Class<?> getController() {
-        return ContentReportsRestController.class;
+        return ContentReportRestController.class;
     }
 
     @Override
@@ -108,9 +108,9 @@ public class FilteredCollectionsRest extends BaseObjectRest<String> {
                 coll.getValues().forEach(summary::addValue);
             }
             int total = collections.stream()
-                    .mapToInt(FilteredCollectionRest::getNbTotalItems)
+                    .mapToInt(FilteredCollectionRest::getTotalItems)
                     .sum();
-            summary.setNbTotalItems(total);
+            summary.setTotalItems(total);
             int allFilters = collections.stream()
                     .mapToInt(FilteredCollectionRest::getAllFiltersValue)
                     .sum();

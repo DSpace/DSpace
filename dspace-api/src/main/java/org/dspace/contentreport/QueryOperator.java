@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.contentreports;
+package org.dspace.contentreport;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;

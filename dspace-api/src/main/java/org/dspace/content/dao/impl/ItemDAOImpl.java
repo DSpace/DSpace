@@ -21,13 +21,14 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject_;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
-import org.dspace.contentreports.QueryOperator;
-import org.dspace.contentreports.QueryPredicate;
+import org.dspace.contentreport.QueryOperator;
+import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -177,51 +178,61 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     enum OP {
         equals {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return Property.forName("mv.value").eq(val);
             }
         },
         not_equals {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return OP.equals.buildPredicate(val, regexClause);
             }
         },
         like {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return Property.forName("mv.value").like(val);
             }
         },
         not_like {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return OP.like.buildPredicate(val, regexClause);
             }
         },
         contains {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return Property.forName("mv.value").like("%" + val + "%");
             }
         },
         doesnt_contain {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return OP.contains.buildPredicate(val, regexClause);
             }
         },
         exists {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return Property.forName("mv.value").isNotNull();
             }
         },
         doesnt_exist {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return OP.exists.buildPredicate(val, regexClause);
             }
         },
         matches {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING);
             }
         },
         doesnt_match {
+            @Override
             public Criterion buildPredicate(String val, String regexClause) {
                 return OP.matches.buildPredicate(val, regexClause);
             }
@@ -231,7 +242,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit) throws SQLException {
@@ -320,6 +331,17 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         return count.get(0).longValue();
     }
 
+    /**
+     * This method fills a Criteria object with criteria defined by a list of metadata
+     * query predicates and a list of collections. It is used by
+     * {@link #findByMetadataQuery(Context, List, List, String, long, int)} and
+     * {@link #countForMetadataQuery(Context, List, List, String)}.
+     * @param criteria The Criteria object to be filled
+     * @param queryPredicates The list of predicates to convert into query criteria
+     * @param collectionUuids A list of collections to filter the data to retrieve
+     * @param regexClause Syntactic expression used to query the database using a regular expression
+     *        (e.g.: "text_value ~ ?")
+     */
     private void fillCriteriaForMetadataQuery(Criteria criteria, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, String regexClause) {
         if (!collectionUuids.isEmpty()) {
@@ -406,8 +428,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 criteriaBuilder.notEqual(itemRoot.get(Item_.owningCollection), collection),
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
                 criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
-        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(Item_.id)));
-        criteriaQuery.groupBy(itemRoot.get(Item_.id));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
+        criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
         return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
     }
 

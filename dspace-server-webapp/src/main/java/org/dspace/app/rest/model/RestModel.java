@@ -20,26 +20,26 @@ import org.atteo.evo.inflector.English;
  */
 public interface RestModel extends Serializable {
 
-    public static final String ROOT = "root";
-    public static final String CONTENT_REPORTS = "contentreports";
-    public static final String CORE = "core";
-    public static final String EPERSON = "eperson";
-    public static final String DISCOVER = "discover";
-    public static final String CONFIGURATION = "config";
-    public static final String INTEGRATION = "integration";
-    public static final String STATISTICS = "statistics";
-    public static final String SUBMISSION = "submission";
-    public static final String SYSTEM = "system";
-    public static final String WORKFLOW = "workflow";
-    public static final String AUTHORIZATION = "authz";
-    public static final String VERSIONING = "versioning";
-    public static final String AUTHENTICATION = "authn";
-    public static final String TOOLS = "tools";
+    String ROOT = "root";
+    String CONTENT_REPORT = "contentreport";
+    String CORE = "core";
+    String EPERSON = "eperson";
+    String DISCOVER = "discover";
+    String CONFIGURATION = "config";
+    String INTEGRATION = "integration";
+    String STATISTICS = "statistics";
+    String SUBMISSION = "submission";
+    String SYSTEM = "system";
+    String WORKFLOW = "workflow";
+    String AUTHORIZATION = "authz";
+    String VERSIONING = "versioning";
+    String AUTHENTICATION = "authn";
+    String TOOLS = "tools";
 
-    public String getType();
+    String getType();
 
     @JsonIgnore
-    default public String getTypePlural() {
+    default String getTypePlural() {
         return English.plural(getType());
     }
 }

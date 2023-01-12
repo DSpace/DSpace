@@ -16,10 +16,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.app.rest.contentreports.Filter;
+import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.converter.FilteredItemConverter;
-import org.dspace.app.rest.model.ContentReportsSupportRest;
+import org.dspace.app.rest.model.ContentReportSupportRest;
 import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
 import org.dspace.app.rest.model.FilteredCollectionsRest;
@@ -33,7 +32,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
-import org.dspace.contentreports.QueryPredicate;
+import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -44,10 +43,10 @@ import org.springframework.stereotype.Component;
  * (Filtered Collections and Filtered Items).
  * @author Jean-François Morin (Université Laval)
  */
-@Component(ContentReportsSupportRest.CATEGORY + "." + ContentReportsSupportRest.NAME)
-public class ContentReportsRestRepository extends AbstractDSpaceRestRepository {
+@Component(ContentReportSupportRest.CATEGORY + "." + ContentReportSupportRest.NAME)
+public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentReportsRestRepository.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentReportRestRepository.class);
 
     @Autowired
     private FilteredCollectionsReportUtils reportUtils;
@@ -58,20 +57,17 @@ public class ContentReportsRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private FilteredItemConverter itemConverter;
 
-    public ContentReportsSupportRest getContentReportsSupport() {
-        return new ContentReportsSupportRest();
+    public ContentReportSupportRest getContentReportSupport() {
+        return new ContentReportSupportRest();
     }
 
     public FilteredCollectionsRest findFilteredCollections(Context context, FilteredCollectionsQuery query) {
         FilteredCollectionsRest report = new FilteredCollectionsRest();
         report.setId("filteredcollections");
-        try {
-            Set<Filter> filters = query.getEnabledFilters();
-            List<FilteredCollectionRest> colls = reportUtils.getFilteredCollections(context, filters);
-            colls.forEach(report::addCollection);
-        } catch (SolrServerException e) {
-            log.error(e.getMessage(), e);
-        }
+
+        Set<Filter> filters = query.getEnabledFilters();
+        List<FilteredCollectionRest> colls = reportUtils.getFilteredCollections(context, filters);
+        colls.forEach(report::addCollection);
         return report;
     }
 

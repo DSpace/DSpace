@@ -13,8 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.app.rest.contentreports.Filter;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -33,14 +33,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class FilteredCollectionsReportUtils {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredCollectionsReportUtils.class);
+
     @Autowired
     private CollectionService collectionService;
 
     @Autowired
     private ItemService itemService;
 
+    /**
+     * Retrieves item statistics per collection according to a set of Boolean filters.
+     * @param context DSpace context
+     * @param filters Set of filters
+     * @return a list of collections with the requested statistics for each of them
+     */
     public List<FilteredCollectionRest> getFilteredCollections(
-            Context context, Set<Filter> filters) throws SolrServerException {
+            Context context, Set<Filter> filters) {
         List<FilteredCollectionRest> colls = new ArrayList<>();
         try {
             List<Collection> collections = collectionService.findAll(context);
@@ -77,11 +85,11 @@ public class FilteredCollectionsReportUtils {
                         coll.addAllFiltersValue(1);
                     }
                 }
-                coll.setNbTotalItems(nbTotalItems);
+                coll.setTotalItems(nbTotalItems);
                 coll.seal();
             }
         } catch (SQLException e) {
-            throw new SolrServerException("SQLException trying to receive filtered collections statistics");
+            log.error("SQLException trying to receive filtered collections statistics", e);
         }
         return colls;
     }

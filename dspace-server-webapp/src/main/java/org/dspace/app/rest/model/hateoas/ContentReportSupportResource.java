@@ -7,12 +7,12 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.ContentReportsSupportRest;
+import org.dspace.app.rest.model.ContentReportSupportRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
-@RelNameDSpaceResource(ContentReportsSupportRest.NAME)
-public class ContentReportsSupportResource extends HALResource<ContentReportsSupportRest> {
-    public ContentReportsSupportResource(ContentReportsSupportRest content) {
+@RelNameDSpaceResource(ContentReportSupportRest.NAME)
+public class ContentReportSupportResource extends HALResource<ContentReportSupportRest> {
+    public ContentReportSupportResource(ContentReportSupportRest content) {
         super(content);
     }
 }

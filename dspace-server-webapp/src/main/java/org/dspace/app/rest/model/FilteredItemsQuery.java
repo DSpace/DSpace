@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.dspace.app.rest.contentreports.Filter;
-import org.dspace.contentreports.QueryOperator;
+import org.dspace.app.rest.contentreport.Filter;
+import org.dspace.contentreport.QueryOperator;
 
 /**
  * Structured query contents for the Filtered Items report

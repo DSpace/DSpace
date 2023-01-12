@@ -7,14 +7,28 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.contentreports.QueryOperator;
+import org.dspace.contentreport.QueryOperator;
 
+/**
+ * Data structure representing a query predicate used by the Filtered Items report
+ * to filter items to retrieve. This version is specific to the REST layer and its
+ * property types are detached from the persistence layer.
+ * @see org.dspace.contentreport.QueryPredicate
+ * @author Jean-François Morin (Université Laval)
+ */
 public class FilteredItemsQueryPredicate {
 
     private String field;
     private QueryOperator operator;
     private String value;
 
+    /**
+     * Shortcut method that builds a FilteredItemsQueryPredicate from a single field, an operator, and a value.
+     * @param field Predicate subject
+     * @param operator Predicate operator
+     * @param value Predicate object
+     * @return a FilteredItemsQueryPredicate instance built from the provided parameters
+     */
     public static FilteredItemsQueryPredicate of(String field, QueryOperator operator, String value) {
         var predicate = new FilteredItemsQueryPredicate();
         predicate.field = field;

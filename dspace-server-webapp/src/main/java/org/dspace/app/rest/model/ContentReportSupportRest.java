@@ -7,13 +7,13 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.ContentReportsRestController;
+import org.dspace.app.rest.ContentReportRestController;
 
-public class ContentReportsSupportRest extends BaseObjectRest<String> {
+public class ContentReportSupportRest extends BaseObjectRest<String> {
 
     private static final long serialVersionUID = 9137258312781361906L;
-    public static final String NAME = "contentreports";
-    public static final String CATEGORY = RestModel.CONTENT_REPORTS;
+    public static final String NAME = "contentreport";
+    public static final String CATEGORY = RestModel.CONTENT_REPORT;
 
     @Override
     public String getCategory() {
@@ -22,7 +22,7 @@ public class ContentReportsSupportRest extends BaseObjectRest<String> {
 
     @Override
     public Class<?> getController() {
-        return ContentReportsRestController.class;
+        return ContentReportRestController.class;
     }
 
     @Override

@@ -10,9 +10,10 @@ package org.dspace.app.rest.model;
 import java.util.EnumMap;
 import java.util.Map;
 
+import org.dspace.app.rest.contentreport.Filter;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.dspace.app.rest.contentreports.Filter;
 
 /**
  * This class serves as a REST representation of a single Collection of a {@link FilteredCollectionsRest}
@@ -38,7 +39,7 @@ public class FilteredCollectionRest implements Cloneable {
     private String communityHandle;
     /** Total number of items in the collection */
     @JsonProperty("nb_total_items")
-    private int nbTotalItems;
+    private int totalItems;
     /** Number of filtered items per requested filter in the collection */
     private Map<Filter, Integer> values = new EnumMap<>(Filter.class);
     /** Number of items in the collection that match all requested filters */
@@ -127,13 +128,13 @@ public class FilteredCollectionRest implements Cloneable {
         this.communityHandle = communityHandle;
     }
 
-    public int getNbTotalItems() {
-        return nbTotalItems;
+    public int getTotalItems() {
+        return totalItems;
     }
 
-    public void setNbTotalItems(int nbTotalItems) {
+    public void setTotalItems(int totalItems) {
         checkSealed();
-        this.nbTotalItems = nbTotalItems;
+        this.totalItems = totalItems;
     }
 
     public int getAllFiltersValue() {

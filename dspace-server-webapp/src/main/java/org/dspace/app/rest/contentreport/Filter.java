@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.contentreports;
+package org.dspace.app.rest.contentreport;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -21,10 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.contentreports.ItemFilterUtil.BundleName;
+import org.dspace.app.rest.contentreport.ItemFilterUtil.BundleName;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -52,20 +51,40 @@ public enum Filter {
     @JsonProperty("is_not_discoverable")
     IS_NOT_DISCOVERABLE(FilterCategory.PROPERTY, (context, item) -> !item.isDiscoverable()),
 
+    /**
+     * Matches items having multiple original bitstreams.
+     */
     @JsonProperty("has_multiple_originals")
     HAS_MULTIPLE_ORIGINALS(FilterCategory.BITSTREAM, (context, item) ->
         ItemFilterUtil.countOriginalBitstream(item) > 1),
+    /**
+     * Matches items having no original bitstreams.
+     */
     @JsonProperty("has_no_originals")
     HAS_NO_ORIGINALS(FilterCategory.BITSTREAM, (context, item) -> ItemFilterUtil.countOriginalBitstream(item) == 0),
+    /**
+     * Matches items having exactly one original bitstream.
+     */
     @JsonProperty("has_one_original")
     HAS_ONE_ORIGINAL(FilterCategory.BITSTREAM, (context, item) -> ItemFilterUtil.countOriginalBitstream(item) == 1),
 
+    /**
+     * Matches items having bitstreams with a MIME type that matches one defined in the "rest.report-mime-document"
+     * configuration property.
+     */
     @JsonProperty("has_doc_original")
     HAS_DOC_ORIGINAL(FilterCategory.BITSTREAM_MIME, (context, item) ->
         ItemFilterUtil.countOriginalBitstreamMime(context, item, ItemFilterUtil.getDocumentMimeTypes()) > 0),
+    /**
+     * Matches items having bitstreams with a MIME type starting with "image" (e.g., image/jpeg, image/png).
+     */
     @JsonProperty("has_image_original")
     HAS_IMAGE_ORIGINAL(FilterCategory.BITSTREAM_MIME, (context, item) ->
         ItemFilterUtil.countOriginalBitstreamMimeStartsWith(context, item, "image") > 0),
+    /**
+     * Matches items having bitstreams with a MIME type other than document (cf. HAS_DOCUMENT above) or image
+     * (cf. HAS_IMAGE_ORIGINAL above).
+     */
     @JsonProperty("has_unsupp_type")
     HAS_UNSUPPORTED_TYPE(FilterCategory.BITSTREAM_MIME, (context, item) -> {
         int bitCount = ItemFilterUtil.countOriginalBitstream(item);
@@ -76,6 +95,9 @@ public enum Filter {
         int imgCount = ItemFilterUtil.countOriginalBitstreamMimeStartsWith(context, item, "image");
         return (bitCount - docCount - imgCount) > 0;
     }),
+    /**
+     * Matches items having bitstreams of multiple types (document, image, other).
+     */
     @JsonProperty("has_mixed_original")
     HAS_MIXED_ORIGINAL(FilterCategory.BITSTREAM_MIME, (context, item) -> {
         int countBit = ItemFilterUtil.countOriginalBitstream(item);
@@ -98,14 +120,23 @@ public enum Filter {
     @JsonProperty("has_jpg_original")
     HAS_JPEG_ORIGINAL(FilterCategory.BITSTREAM_MIME, (context, item) ->
         ItemFilterUtil.countOriginalBitstreamMime(context, item, ItemFilterUtil.MIMES_JPG) > 0),
+    /**
+     * Matches items having at least one PDF of size less than 20 kb (configurable in rest.cfg).
+     */
     @JsonProperty("has_small_pdf")
     HAS_SMALL_PDF(FilterCategory.BITSTREAM_MIME, (context, item) ->
         ItemFilterUtil.countBitstreamSmallerThanMinSize(
                 context, BundleName.ORIGINAL, item, ItemFilterUtil.MIMES_PDF, "rest.report-pdf-min-size") > 0),
+    /**
+     * Matches items having at least one PDF of size more than 25 Mb (configurable in rest.cfg).
+     */
     @JsonProperty("has_large_pdf")
     HAS_LARGE_PDF(FilterCategory.BITSTREAM_MIME, (context, item) ->
         ItemFilterUtil.countBitstreamLargerThanMaxSize(
                 context, BundleName.ORIGINAL,  item, ItemFilterUtil.MIMES_PDF, "rest.report-pdf-max-size") > 0),
+    /**
+     * Matches items having at least one non-text bitstream.
+     */
     @JsonProperty("has_doc_without_text")
     HAS_DOC_WITHOUT_TEXT(FilterCategory.BITSTREAM_MIME, (context, item) -> {
         int countDoc = ItemFilterUtil.countOriginalBitstreamMime(context, item, ItemFilterUtil.getDocumentMimeTypes());
@@ -116,6 +147,9 @@ public enum Filter {
         return countDoc > countText;
     }),
 
+    /**
+     * Matches items having at least one image, but all of supported types.
+     */
     @JsonProperty("has_only_supp_image_type")
     HAS_ONLY_SUPPORTED_IMAGE_TYPE(FilterCategory.MIME, (context, item) -> {
         int imageCount = ItemFilterUtil.countOriginalBitstreamMimeStartsWith(context, item, "image/");
@@ -126,6 +160,9 @@ public enum Filter {
                 context, item, ItemFilterUtil.getSupportedImageMimeTypes());
         return (imageCount == suppImageCount);
     }),
+    /**
+     * Matches items having at least one image of an unsupported type.
+     */
     @JsonProperty("has_unsupp_image_type")
     HAS_UNSUPPORTED_IMAGE_TYPE(FilterCategory.MIME, (context, item) -> {
         int imageCount = ItemFilterUtil.countOriginalBitstreamMimeStartsWith(context, item, "image/");
@@ -136,6 +173,9 @@ public enum Filter {
                 context, item, ItemFilterUtil.getSupportedImageMimeTypes());
         return (imageCount - suppImageCount) > 0;
     }),
+    /**
+     * Matches items having at least one document, but all of supported types.
+     */
     @JsonProperty("has_only_supp_doc_type")
     HAS_ONLY_SUPPORTED_DOC_TYPE(FilterCategory.MIME, (context, item) -> {
         int docCount = ItemFilterUtil.countOriginalBitstreamMime(context, item, ItemFilterUtil.getDocumentMimeTypes());
@@ -146,6 +186,9 @@ public enum Filter {
                 context, item, ItemFilterUtil.getSupportedDocumentMimeTypes());
         return docCount == suppDocCount;
     }),
+    /**
+     * Matches items having at least one document of an unsupported type.
+     */
     @JsonProperty("has_unsupp_doc_type")
     HAS_UNSUPPORTED_DOC_TYPE(FilterCategory.MIME, (context, item) -> {
         int docCount = ItemFilterUtil.countOriginalBitstreamMime(context, item, ItemFilterUtil.getDocumentMimeTypes());
@@ -157,16 +200,25 @@ public enum Filter {
         return (docCount - suppDocCount) > 0;
     }),
 
+    /**
+     * Matches items having at least one unsupported bundle.
+     */
     @JsonProperty("has_unsupported_bundle")
     HAS_UNSUPPORTED_BUNDLE(FilterCategory.BUNDLE, (context, item) -> {
         String[] bundleList = DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getArrayProperty("rest.report-supp-bundles");
         return ItemFilterUtil.hasUnsupportedBundle(item, bundleList);
     }),
+    /**
+     * Matches items having at least one thumbnail of size less than 400 bytes (configurable in rest.cfg).
+     */
     @JsonProperty("has_small_thumbnail")
     HAS_SMALL_THUMBNAIL(FilterCategory.BUNDLE, (context, item) ->
         ItemFilterUtil.countBitstreamSmallerThanMinSize(
                 context, BundleName.THUMBNAIL, item, ItemFilterUtil.MIMES_JPG, "rest.report-thumbnail-min-size") > 0),
+    /**
+     * Matches items having at least one original without a thumbnail.
+     */
     @JsonProperty("has_original_without_thumbnail")
     HAS_ORIGINAL_WITHOUT_THUMBNAIL(FilterCategory.BUNDLE, (context, item) -> {
         int countBit = ItemFilterUtil.countOriginalBitstream(item);
@@ -176,6 +228,9 @@ public enum Filter {
         int countThumb = ItemFilterUtil.countBitstream(BundleName.THUMBNAIL, item);
         return countBit > countThumb;
     }),
+    /**
+     * Matches items having at least one non-JPEG thumbnail.
+     */
     @JsonProperty("has_invalid_thumbnail_name")
     HAS_INVALID_THUMBNAIL_NAME(FilterCategory.BUNDLE, (context, item) -> {
         List<String> originalNames = ItemFilterUtil.getBitstreamNames(BundleName.ORIGINAL, item);
@@ -183,13 +238,12 @@ public enum Filter {
         if (thumbNames.size() != originalNames.size()) {
             return false;
         }
-        for (String name: originalNames) {
-            if (!thumbNames.contains(name + ".jpg")) {
-                return true;
-            }
-        }
-        return false;
+        return originalNames.stream()
+                .anyMatch(name -> !thumbNames.contains(name + ".jpg") && !thumbNames.contains(name + ".jpeg"));
     }),
+    /**
+     * Matches items having at least one non-generated thumbnail.
+     */
     @JsonProperty("has_non_generated_thumb")
     HAS_NON_GENERATED_THUMBNAIL(FilterCategory.BUNDLE, (context, item) -> {
         String[] generatedThumbDesc = DSpaceServicesFactory.getInstance().getConfigurationService()
@@ -201,58 +255,67 @@ public enum Filter {
         int countGen = ItemFilterUtil.countBitstreamByDesc(BundleName.THUMBNAIL, item, generatedThumbDesc);
         return (countThumb > countGen);
     }),
+    /**
+     * Matches items having no licence-typed bitstreams.
+     */
     @JsonProperty("no_license")
     NO_LICENSE(FilterCategory.BUNDLE, (context, item) ->
         ItemFilterUtil.countBitstream(BundleName.LICENSE, item) == 0),
+    /**
+     * Matches items having licence documentation (a licence bitstream named other than license.txt).
+     */
     @JsonProperty("has_license_documentation")
     HAS_LICENSE_DOCUMENTATION(FilterCategory.BUNDLE, (context, item) -> {
         List<String> names = ItemFilterUtil.getBitstreamNames(BundleName.LICENSE, item);
-        for (String name: names) {
-            if (!name.equals("license.txt")) {
-                return true;
-            }
-        }
-        return false;
+        return names.stream()
+                .anyMatch(name -> !name.equals("license.txt"));
     }),
 
+    /**
+     * Matches items having at least one original with restricted access.
+     */
     @JsonProperty("has_restricted_original")
     HAS_RESTRICTED_ORIGINAL(FilterCategory.PERMISSION, (context, item) -> {
-        try {
-            for (Bundle bundle: item.getBundles()) {
-                if (!bundle.getName().equals(BundleName.ORIGINAL.name())) {
-                    continue;
-                }
-                for (Bitstream bit: bundle.getBitstreams()) {
-                    if (!getAuthorizeService()
-                            .authorizeActionBoolean(getAnonymousContext(), bit, org.dspace.core.Constants.READ)) {
-                        return true;
+        return item.getBundles().stream()
+                .filter(bundle -> bundle.getName().equals(BundleName.ORIGINAL.name()))
+                .map(Bundle::getBitstreams)
+                .flatMap(List::stream)
+                .anyMatch(bit -> {
+                    try {
+                        if (!getAuthorizeService()
+                                .authorizeActionBoolean(getAnonymousContext(), bit, org.dspace.core.Constants.READ)) {
+                            return true;
+                        }
+                    } catch (SQLException e) {
+                        getLog().warn("SQL Exception testing original bitstream access " + e.getMessage(), e);
                     }
-                }
-            }
-        } catch (SQLException e) {
-            getLog().warn("SQL Exception testing original bitstream access " + e.getMessage(), e);
-        }
-        return false;
+                    return false;
+                });
     }),
+    /**
+     * Matches items having at least one thumbnail with restricted access.
+     */
     @JsonProperty("has_restricted_thumbnail")
     HAS_RESTRICTED_THUMBNAIL(FilterCategory.PERMISSION, (context, item) -> {
-        try {
-            for (Bundle bundle: item.getBundles()) {
-                if (!bundle.getName().equals(BundleName.THUMBNAIL.name())) {
-                    continue;
-                }
-                for (Bitstream bit: bundle.getBitstreams()) {
-                    if (!getAuthorizeService()
-                            .authorizeActionBoolean(getAnonymousContext(), bit, org.dspace.core.Constants.READ)) {
-                        return true;
+        return item.getBundles().stream()
+                .filter(bundle -> bundle.getName().equals(BundleName.THUMBNAIL.name()))
+                .map(Bundle::getBitstreams)
+                .flatMap(List::stream)
+                .anyMatch(bit -> {
+                    try {
+                        if (!getAuthorizeService()
+                                .authorizeActionBoolean(getAnonymousContext(), bit, org.dspace.core.Constants.READ)) {
+                            return true;
+                        }
+                    } catch (SQLException e) {
+                        getLog().warn("SQL Exception testing thumbnail bitstream access " + e.getMessage(), e);
                     }
-                }
-            }
-        } catch (SQLException e) {
-            getLog().warn("SQL Exception testing thumbnail bitstream access " + e.getMessage(), e);
-        }
-        return false;
+                    return false;
+                });
     }),
+    /**
+     * Matches items having metadata with restricted access.
+     */
     @JsonProperty("has_restricted_metadata")
     HAS_RESTRICTED_METADATA(FilterCategory.PERMISSION, (context, item) -> {
         try {

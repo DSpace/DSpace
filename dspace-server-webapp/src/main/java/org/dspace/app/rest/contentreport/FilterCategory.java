@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.contentreports;
+package org.dspace.app.rest.contentreport;
 
 import java.util.Arrays;
 import java.util.List;
