@@ -156,7 +156,7 @@ public class ManifestService extends AbstractResourceService {
         List<Bundle> bundles = utils.getIIIFBundles(item);
         // Set the default canvas dimensions.
         if (guessCanvasDimension) {
-            canvasService.guessCanvasDimensions(bundles);
+            canvasService.guessCanvasDimensions(context, bundles);
         }
         for (Bundle bnd : bundles) {
             String bundleToCPrefix = null;

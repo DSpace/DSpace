@@ -137,7 +137,7 @@ public class IIIFUtils {
      * @param b the DSpace bitstream to check
      * @return true if the bitstream can be used as IIIF resource
      */
-    private boolean isIIIFBitstream(Context context, Bitstream b) {
+    public boolean isIIIFBitstream(Context context, Bitstream b) {
         return checkImageMimeType(getBitstreamMimeType(b, context)) && b.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
                 .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
@@ -228,7 +228,7 @@ public class IIIFUtils {
      * @param mimetype
      * @return true if an image
      */
-    public boolean checkImageMimeType(String mimetype) {
+    private boolean checkImageMimeType(String mimetype) {
         if (mimetype != null && mimetype.contains("image/")) {
             return true;
         }
