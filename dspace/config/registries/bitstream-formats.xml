@@ -187,6 +187,7 @@
     <internal>false</internal>
     <extension>jpeg</extension>
     <extension>jpg</extension>
+    <extension>jfif</extension>
   </bitstream-type>
   
   <bitstream-type>
