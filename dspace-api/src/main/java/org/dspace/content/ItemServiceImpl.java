@@ -1076,9 +1076,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     /**
-     * Finds all Indexed Items where the current user has submit rights. If the user is an Admin,
+     * Finds all Indexed Items where the current user has edit rights. If the user is an Admin,
      * this is all Indexed Items. Otherwise, it includes those Items where
-     * an indexed "submit" policy lists either the eperson or one of the eperson's groups
+     * an indexed "edit" policy lists either the eperson or one of the eperson's groups
      *
      * @param context                    DSpace context
      * @param discoverQuery
