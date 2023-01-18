@@ -44,7 +44,7 @@
   - Remember to run the JVM in server mode, and use a higher logging level
     that avoids logging every request
 -->
-<schema name="Discovery Search DSpace 5 + CRIS" version="1.5">
+<schema name="DSpace 7 Deduplication" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        Applications should change this to reflect the nature of the search collection.
        version="1.4" is Solr's version number for the schema syntax and semantics.  It should
@@ -417,8 +417,8 @@
         <filter class="solr.TrimFilterFactory" />
       </analyzer>
     </fieldType>
-    
-    <!-- This field is used for store metadatavalue (with authority, prefered label, variants and 
+
+    <!-- This field is used for store metadatavalue (with authority, prefered label, variants and
     	 language) to use in projection  -->
     <fieldType name="dspaceMetadataProjection" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
@@ -426,7 +426,7 @@
             <tokenizer class="solr.KeywordTokenizerFactory"/>
         </analyzer>
     </fieldType>
-    
+
     <!--This field is used for auto complete features in the discovery search-->
     <fieldType name="dspaceAutoComplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
@@ -475,13 +475,13 @@
               <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
           </analyzer>
       </fieldType>
-      
+
       <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
  </types>
 
 
  <fields>
- 
+
  	<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
    <!-- Valid attributes for fields:
      name: mandatory - the name for the field
@@ -508,7 +508,7 @@
      default: a value that should be used if no value is specified
        when adding a document.
    -->
-	
+
     <!-- Internal DSpaceObject Type ID -->
     <field name="dedup.withdrawn" type="string" indexed="true" stored="true" omitNorms="true" docValues="true" multiValued="true"/>
     <field name="dedup.resourcetype" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
@@ -517,23 +517,23 @@
 	<!-- it is "dedup.resourceid.first-dedup.resourceid.second" with "dedup.resourceid.first < dedup.resourceid.second" -->
    	<field name="dedup.id" type="string" indexed="true" stored="true" required="true" omitNorms="true" docValues="true"/>
    	<field name="dedup.ids" type="string" indexed="true" stored="true" required="true" omitNorms="true" multiValued="true" docValues="true"/>
-   	
+
    	<!-- flag -->
    	<field name="dedup.flag" type="string" indexed="true" stored="true" required="true" omitNorms="true" docValues="true"/>
-   
-   	<!-- signature -->
-   	<field name="dedup.signature" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true"/>    
 
-    <!-- dedup.uniqueid = dedup-id + dedup.flag -->   
+   	<!-- signature -->
+   	<field name="dedup.signature" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true"/>
+
+    <!-- dedup.uniqueid = dedup-id + dedup.flag -->
     <field name="dedup.uniqueid" type="string" indexed="true" stored="true" required="true" docValues="true"/>
 
    	<!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    	<field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
-   	    
+
    	<copyField source="*_signature" dest="dedup.signature"/>
-   	
+
 	<field name="dedup.note" type="text" indexed="true"  stored="true" multiValued="false" />
-   	    
+
    	<dynamicField name="*_i"  type="int"    indexed="true"  stored="true" multiValued="true" docValues="true"/>
    	<dynamicField name="*_s"  type="string"  indexed="true"  stored="true" multiValued="true" docValues="true"/>
    	<dynamicField name="*_l"  type="long"   indexed="true"  stored="true" multiValued="true" docValues="true"/>
@@ -543,7 +543,7 @@
    	<dynamicField name="*_d"  type="double" indexed="true"  stored="true" multiValued="true" docValues="true"/>
    	<dynamicField name="*_dt" type="date" indexed="true"  stored="true" multiValued="true"/>
    	<dynamicField name="*_signature" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true"/>
-       	
+
  </fields>
 
  <!-- Field to use to determine and enforce document uniqueness.

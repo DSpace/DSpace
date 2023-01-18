@@ -15,11 +15,21 @@ import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.utils.DedupUtils;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "add" PATCH operation. This records a decision made about whether a potential duplicate
@@ -35,6 +45,17 @@ import org.dspace.workflow.WorkflowItem;
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
  */
 public class DetectDuplicateAddPatchOperation extends AddPatchOperation<DuplicateDecisionObjectRest> {
+
+    @Autowired
+    protected AuthorizeService authorizeService;
+    @Autowired
+    protected WorkflowItemService<XmlWorkflowItem> workflowItemService;
+    @Autowired
+    protected WorkflowService<XmlWorkflowItem> workflowService;
+    @Autowired
+    protected PoolTaskService poolTaskService;
+    @Autowired
+    protected ClaimedTaskService claimedTaskService;
 
     /**
      * Add a duplicate decision to the database and index to Solr.
@@ -83,9 +104,20 @@ public class DetectDuplicateAddPatchOperation extends AddPatchOperation<Duplicat
         // Get the item resource type
         Integer resourceType = source.getItem().getType();
 
+        // Get the user who sent this request
+        EPerson decider = context.getCurrentUser();
+        if (decider == null) {
+            throw new AuthorizeException("You must be logged in to perform this operation.");
+        }
+
         switch (decisionType) {
             // A submitter made this decision. Set or validate decision type.
             case "submitterDecision":
+                // First, check that this was requested by the submitter! Or by an admin.
+                if (!(decider.equals(source.getSubmitter()) || authorizeService.isAdmin(context, decider))) {
+                    throw new AuthorizeException("User must be submitter or admin to set submitterDecision for this " +
+                            "duplicate. User = " + decider.getID() + ", Item = " + source.getItem().getID());
+                }
                 if (decisionObject.getType() == null) {
                     decisionObject.setType(DuplicateDecisionType.WORKSPACE);
                     // Throw an exception if the item is null or not in workspace
@@ -101,15 +133,24 @@ public class DetectDuplicateAddPatchOperation extends AddPatchOperation<Duplicat
                 }
                 break;
             case "workflowDecision":
+                // First, check that this was submitted by the submitter! Or by an admin.
+                XmlWorkflowItem workflowItem = workflowItemService.findByItem(context, source.getItem());
+                // Throw an exception if the item is null or not in workflow
+                if (workflowItem == null || !(source instanceof WorkflowItem)) {
+                    throw new UnprocessableEntityException(
+                            String.format("The specified path %s can be used only with a workflow item",
+                                    decisionType));
+                }
+                // Throw an exception if current user is not in the workflow group
+                ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, workflowItem, decider);
+                if (claimedTask == null && !authorizeService.isAdmin(context, decider)) {
+                    throw new AuthorizeException("User must have claimed this task or be an admin to set " +
+                            "workflowDecision for this duplicate. User = " + decider.getID() + ", Item = " +
+                            source.getItem().getID());
+                }
                 // A reviewer or editor made this decision. Set or validate decision type.
                 if (decisionObject.getType() == null) {
                     decisionObject.setType(DuplicateDecisionType.WORKFLOW);
-                    // Throw an exception if the item is null or not in workflow
-                    if (!(source instanceof WorkflowItem)) {
-                        throw new UnprocessableEntityException(
-                                String.format("The specified path %s can be used only with a workflow item",
-                                        decisionType));
-                    }
                 // Throw an exception if the existing decision object type doesn't match the decision type
                 } else if (decisionObject.getType() != DuplicateDecisionType.WORKFLOW) {
                     throw new UnprocessableEntityException(
@@ -118,6 +159,11 @@ public class DetectDuplicateAddPatchOperation extends AddPatchOperation<Duplicat
                 break;
             case "adminDecision":
                 // An administrator made this decision. Set the decision type. The item may be in workflow OR workspace.
+                if (!authorizeService.isAdmin(context, decider)) {
+                    throw new AuthorizeException("User must be an admin to set " +
+                            "adminDecision for this duplicate. User = " + decider.getID() + ", Item = " +
+                            source.getItem().getID());
+                }
                 if (decisionObject.getType() == null) {
                     decisionObject.setType(DuplicateDecisionType.ADMIN);
                     // Throw an exception if the existing decision object type doesn't match the decision type
