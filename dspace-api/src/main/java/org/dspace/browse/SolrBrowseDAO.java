@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
@@ -204,6 +205,10 @@ public class SolrBrowseDAO implements BrowseDAO {
                     query.addFilterQueries("{!field f=" + facetField + "_value_filter}" + value);
                 } else if (valuePartial) {
                     query.addFilterQueries("{!field f=" + facetField + "_partial}" + value);
+                }
+                if (StringUtils.isNotBlank(startsWith) && orderField != null) {
+                    query.addFilterQueries(
+                        "bi_" + orderField + "_sort:" + ClientUtils.escapeQueryChars(startsWith) + "*");
                 }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core

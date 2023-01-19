@@ -142,10 +142,10 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
 
         Item item = itemService.find(context, installItem.getID());
-        RequestItemAuthor requestItemAuthor = requestItemAuthorExtractor.getRequestItemAuthor(context, item);
+        List<RequestItemAuthor> requestItemAuthor = requestItemAuthorExtractor.getRequestItemAuthor(context, item);
 
-        assertEquals("Help Desk", requestItemAuthor.getFullName());
-        assertEquals("dspace-help@myu.edu", requestItemAuthor.getEmail());
+        assertEquals("Help Desk", requestItemAuthor.get(0).getFullName());
+        assertEquals("dspace-help@myu.edu", requestItemAuthor.get(0).getEmail());
     }
 
     /**
@@ -171,7 +171,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
         Item item = installItemService.installItem(context, wsi);
 
-        List<Operation> opsToWithDraw = new ArrayList<Operation>();
+        List<Operation> opsToWithDraw = new ArrayList<>();
         ReplaceOperation replaceOperationToWithDraw = new ReplaceOperation("/withdrawn", true);
         opsToWithDraw.add(replaceOperationToWithDraw);
         String patchBodyToWithdraw = getPatchContent(opsToWithDraw);
@@ -191,7 +191,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
         assertNull(retrieveItemSubmitter(item.getID()));
 
-        List<Operation> opsToReinstate = new ArrayList<Operation>();
+        List<Operation> opsToReinstate = new ArrayList<>();
         ReplaceOperation replaceOperationToReinstate = new ReplaceOperation("/withdrawn", false);
         opsToReinstate.add(replaceOperationToReinstate);
         String patchBodyToReinstate = getPatchContent(opsToReinstate);

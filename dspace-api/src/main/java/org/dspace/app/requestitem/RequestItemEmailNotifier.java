@@ -56,7 +56,8 @@ public class RequestItemEmailNotifier {
     private static final RequestItemAuthorExtractor requestItemAuthorExtractor
             = DSpaceServicesFactory.getInstance()
                     .getServiceManager()
-                    .getServiceByName(null, RequestItemAuthorExtractor.class);
+                    .getServiceByName("requestItemAuthorExtractor",
+                            RequestItemAuthorExtractor.class);
 
     private RequestItemEmailNotifier() {}
 
@@ -72,28 +73,48 @@ public class RequestItemEmailNotifier {
     static public void sendRequest(Context context, RequestItem ri, String responseLink)
             throws IOException, SQLException {
         // Who is making this request?
-        RequestItemAuthor author = requestItemAuthorExtractor
+        List<RequestItemAuthor> authors = requestItemAuthorExtractor
                 .getRequestItemAuthor(context, ri.getItem());
-        String authorEmail = author.getEmail();
-        String authorName = author.getFullName();
 
         // Build an email to the approver.
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
                 "request_item.author"));
-        email.addRecipient(authorEmail);
+        for (RequestItemAuthor author : authors) {
+            email.addRecipient(author.getEmail());
+        }
         email.setReplyTo(ri.getReqEmail()); // Requester's address
+
         email.addArgument(ri.getReqName()); // {0} Requester's name
+
         email.addArgument(ri.getReqEmail()); // {1} Requester's address
+
         email.addArgument(ri.isAllfiles() // {2} All bitstreams or just one?
             ? I18nUtil.getMessage("itemRequest.all") : ri.getBitstream().getName());
-        email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle()));
+
+        email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {3}
+
         email.addArgument(ri.getItem().getName()); // {4} requested item's title
+
         email.addArgument(ri.getReqMessage()); // {5} message from requester
+
         email.addArgument(responseLink); // {6} Link back to DSpace for action
-        email.addArgument(authorName); // {7} corresponding author name
-        email.addArgument(authorEmail); // {8} corresponding author email
-        email.addArgument(configurationService.getProperty("dspace.name"));
-        email.addArgument(configurationService.getProperty("mail.helpdesk"));
+
+        StringBuilder names = new StringBuilder();
+        StringBuilder addresses = new StringBuilder();
+        for (RequestItemAuthor author : authors) {
+            if (names.length() > 0) {
+                names.append("; ");
+                addresses.append("; ");
+            }
+            names.append(author.getFullName());
+            addresses.append(author.getEmail());
+        }
+        email.addArgument(names.toString()); // {7} corresponding author name
+        email.addArgument(addresses.toString()); // {8} corresponding author email
+
+        email.addArgument(configurationService.getProperty("dspace.name")); // {9}
+
+        email.addArgument(configurationService.getProperty("mail.helpdesk")); // {10}
 
         // Send the email.
         try {
@@ -134,9 +155,9 @@ public class RequestItemEmailNotifier {
         email.setContent("body", message);
         email.setSubject(subject);
         email.addRecipient(ri.getReqEmail());
-        if (ri.isAccept_request()) {
-            // Attach bitstreams.
-            try {
+        // Attach bitstreams.
+        try {
+            if (ri.isAccept_request()) {
                 if (ri.isAllfiles()) {
                     Item item = ri.getItem();
                     List<Bundle> bundles = item.getBundles("ORIGINAL");
@@ -159,11 +180,19 @@ public class RequestItemEmailNotifier {
                             bitstream.getFormat(context).getMIMEType());
                 }
                 email.send();
-            } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
-                LOG.warn(LogHelper.getHeader(context,
-                        "error_mailing_requestItem", e.getMessage()));
-                throw new IOException("Reply not sent:  " + e.getMessage());
+            } else {
+                boolean sendRejectEmail = configurationService
+                    .getBooleanProperty("request.item.reject.email", true);
+                // Not all sites want the "refusal" to be sent back to the requester via
+                // email. However, by default, the rejection email is sent back.
+                if (sendRejectEmail) {
+                    email.send();
+                }
             }
+        } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
+            LOG.warn(LogHelper.getHeader(context,
+                    "error_mailing_requestItem", e.getMessage()));
+            throw new IOException("Reply not sent:  " + e.getMessage());
         }
         LOG.info(LogHelper.getHeader(context,
                 "sent_attach_requestItem", "token={}"), ri.getToken());
@@ -200,8 +229,13 @@ public class RequestItemEmailNotifier {
         message.addArgument(bitstreamName);          // {0} bitstream name or "all"
         message.addArgument(item.getHandle());       // {1} Item handle
         message.addArgument(ri.getToken());          // {2} Request token
-        message.addArgument(approver.getFullName()); // {3} Approver's name
-        message.addArgument(approver.getEmail());    // {4} Approver's address
+        if (approver != null) {
+            message.addArgument(approver.getFullName()); // {3} Approver's name
+            message.addArgument(approver.getEmail());    // {4} Approver's address
+        } else {
+            message.addArgument("anonymous approver");                           // [3] Approver's name
+            message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address
+        }
 
         // Who gets this message?
         String recipient;

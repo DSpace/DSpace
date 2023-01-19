@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -43,6 +44,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,13 +76,21 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
-                          List<DSpaceCommandLineParameter> parameters) throws SQLException {
+                          List<DSpaceCommandLineParameter> parameters,
+                          final Set<Group> specialGroups) throws SQLException {
 
         Process process = new Process();
         process.setEPerson(ePerson);
         process.setName(scriptName);
         process.setParameters(DSpaceCommandLineParameter.concatenate(parameters));
         process.setCreationTime(new Date());
+        Optional.ofNullable(specialGroups)
+            .ifPresent(sg -> {
+                // we use a set to be sure no duplicated special groups are stored with process
+                Set<Group> specialGroupsSet = new HashSet<>(sg);
+                process.setGroups(new ArrayList<>(specialGroupsSet));
+            });
+
         Process createdProcess = processDAO.create(context, process);
         log.info(LogHelper.getHeader(context, "process_create",
                                       "Process has been created for eperson with email " + ePerson.getEmail()
@@ -293,6 +303,12 @@ public class ProcessServiceImpl implements ProcessService {
         appendFile(context, process, inputStream, Process.OUTPUT_TYPE, process.getName() + process.getID() + ".log");
         inputStream.close();
         tempFile.delete();
+    }
+
+    @Override
+    public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
+        Date date) throws SQLException {
+        return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {

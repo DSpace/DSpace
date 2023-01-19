@@ -28,6 +28,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
@@ -2412,6 +2413,29 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient(token).perform(delete("/api/core/collections/" + UUID.randomUUID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteCollectionWorkflowGroupWithPooledTaskTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group reviewer = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+
+        // Submit an Item into the workflow -> moves to the "reviewer" step's pool.
+        // The role must have at least one EPerson, otherwise the WSI gets archived immediately
+        groupService.addMember(context, reviewer, eperson);
+        workflowService.start(
+            context,
+            WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                .withTitle("Dummy Item")
+                                .build()
+        );
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isUnprocessableEntity());
     }
 
 }

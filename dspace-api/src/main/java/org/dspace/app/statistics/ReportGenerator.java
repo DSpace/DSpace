@@ -27,6 +27,10 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
@@ -162,7 +166,7 @@ public class ReportGenerator {
     /**
      * pattern that matches an unqualified aggregator property
      */
-    private static final Pattern real = Pattern.compile("^(.+)=(.+)");
+    private static final Pattern REAL = Pattern.compile("^(.+)=(.+)");
 
     //////////////////////////
     // Miscellaneous variables
@@ -221,28 +225,46 @@ public class ReportGenerator {
         String myOutput = null;
         String myMap = null;
 
-        // read in our command line options
-        for (int i = 0; i < argv.length; i++) {
-            if (argv[i].equals("-format")) {
-                myFormat = argv[i + 1].toLowerCase();
-            }
+        Options options = new Options();
+        Option option;
 
-            if (argv[i].equals("-in")) {
-                myInput = argv[i + 1];
-            }
+        option = Option.builder().longOpt("format").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-out")) {
-                myOutput = argv[i + 1];
-            }
+        option = Option.builder().longOpt("in").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-map")) {
-                myMap = argv[i + 1];
-            }
+        option = Option.builder().longOpt("out").hasArg().build();
+        options.addOption(option);
 
-            if (argv[i].equals("-help")) {
-                usage();
-                System.exit(0);
-            }
+        option = Option.builder().longOpt("map").hasArg().build();
+        options.addOption(option);
+
+        option = Option.builder().longOpt("help").build();
+        options.addOption(option);
+
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, argv);
+
+        if (cmd.hasOption("help")) {
+            usage();
+            System.exit(0);
+        }
+
+        if (cmd.hasOption("format")) {
+            myFormat = cmd.getOptionValue("format");
+        }
+
+        if (cmd.hasOption("in")) {
+            myInput = cmd.getOptionValue("in");
+        }
+
+        if (cmd.hasOption("out")) {
+            myOutput = cmd.getOptionValue("out");
+        }
+
+        if (cmd.hasOption("map")) {
+            myMap = cmd.getOptionValue("map");
         }
 
         processReport(context, myFormat, myInput, myOutput, myMap);
@@ -576,7 +598,7 @@ public class ReportGenerator {
 
             // loop through the map file and read in the values
             while ((record = br.readLine()) != null) {
-                Matcher matchReal = real.matcher(record);
+                Matcher matchReal = REAL.matcher(record);
 
                 // if the line is real then read it in
                 if (matchReal.matches()) {
@@ -650,7 +672,7 @@ public class ReportGenerator {
         // loop through the aggregator file and read in the values
         while ((record = br.readLine()) != null) {
             // match real lines
-            Matcher matchReal = real.matcher(record);
+            Matcher matchReal = REAL.matcher(record);
 
             // pre-prepare our input strings
             String section = null;

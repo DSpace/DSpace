@@ -39,7 +39,7 @@ class BrandText {
      * its location within a rectangular area.
      *
      * @param location one of the class location constants e.g. <code>Identifier.BL</code>
-     * @param the      text associated with the location
+     * @param text     text associated with the location
      */
     public BrandText(String location, String text) {
         this.location = location;

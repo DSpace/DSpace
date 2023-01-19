@@ -8,6 +8,7 @@
 package org.dspace.iiif.canvasdimension;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
@@ -48,6 +49,7 @@ public class CanvasDimensionCLI {
 
     public static void main(String[] argv) throws Exception {
 
+        Date startTime = new Date();
 
         boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
         if (!iiifEnabled) {
@@ -64,7 +66,8 @@ public class CanvasDimensionCLI {
         String identifier = null;
         String eperson = null;
 
-        Context context = new Context();
+        Context context = new Context(Context.Mode.BATCH_EDIT);
+
         IIIFCanvasDimensionService canvasProcessor = IIIFCanvasDimensionServiceFactory.getInstance()
                                                                                       .getIiifCanvasDimensionService();
 
@@ -220,9 +223,15 @@ public class CanvasDimensionCLI {
             context.commit();
         }
 
+        Date endTime = new Date();
+        System.out.println("Started: " + startTime.getTime());
+        System.out.println("Ended: " + endTime.getTime());
+        System.out.println(
+            "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
+                .getTime() - startTime.getTime()) + " msecs)");
+
         // Always print summary to standard out.
         System.out.println(processed + " IIIF items were processed.");
-
     }
 
 }

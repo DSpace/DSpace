@@ -24,6 +24,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * This is the base converter from/to objects in the DSpace API data model and
@@ -38,6 +39,8 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
 
     private static final Logger log = LogManager.getLogger(DSpaceObjectConverter.class);
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     ConverterService converter;
 

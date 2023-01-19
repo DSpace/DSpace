@@ -22,6 +22,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -52,6 +53,8 @@ public class PasswordAuthentication
     private static final Logger log = LogManager.getLogger();
 
     private static final String PASSWORD_AUTHENTICATED = "password.authenticated";
+
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
 
 
@@ -263,5 +266,13 @@ public class PasswordAuthentication
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+        if (context == null || ePerson == null) {
+            return false;
+        }
+        return ePersonService.checkPassword(context, ePerson, currentPassword);
     }
 }

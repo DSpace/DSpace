@@ -92,7 +92,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
             return poolTask;
         } else {
             //If the user has a is processing or has finished the step for a workflowitem, there is no need to look
-            // for pooltasks for one of his
+            // for pooltasks for one of their
             //groups because the user already has the task claimed
             if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) != null) {
                 return null;

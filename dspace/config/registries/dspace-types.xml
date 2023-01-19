@@ -43,4 +43,54 @@
         <qualifier>enabled</qualifier>
         <scope_note>Stores a boolean text value (true or false) to indicate if the iiif feature is enabled or not for the dspace object. If absent the value is derived from the parent dspace object</scope_note>
     </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>object</element>
+        <qualifier>owner</qualifier>
+        <scope_note>Used to support researcher profiles</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>scope</qualifier>
+        <scope_note>Stores the scopes/authorizations granted by the user during authentication on ORCID</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-mode</qualifier>
+        <scope_note>Stores the synchronization with ORCID mode chosen by the user</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-publications</qualifier>
+        <scope_note>Stores the publication synchronization with ORCID preference chosen by the user</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-fundings</qualifier>
+        <scope_note>Stores the funding synchronization with ORCID preference chosen by the user</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>sync-profile</qualifier>
+        <scope_note>Stores the profile synchronization with ORCID preference chosen by the user</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>orcid</element>
+        <qualifier>authenticated</qualifier>
+        <scope_note>Stores the timestamp related to the user authentication on ORCID</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

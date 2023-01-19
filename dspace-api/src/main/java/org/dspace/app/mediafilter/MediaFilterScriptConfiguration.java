@@ -50,15 +50,11 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
     public Options getOptions() {
         Options options = new Options();
         options.addOption("v", "verbose", false, "print all extracted text and other details to STDOUT");
-        options.getOption("v").setType(boolean.class);
         options.addOption("q", "quiet", false, "do not print anything except in the event of errors.");
-        options.getOption("q").setType(boolean.class);
         options.addOption("f", "force", false, "force all bitstreams to be processed");
-        options.getOption("f").setType(boolean.class);
         options.addOption("i", "identifier", true, "ONLY process bitstreams belonging to identifier");
         options.addOption("m", "maximum", true, "process no more than maximum items");
         options.addOption("h", "help", false, "help");
-        options.getOption("h").setType(boolean.class);
 
         Option pluginOption = Option.builder("p")
                                     .longOpt("plugins")

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
@@ -34,13 +35,14 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Content;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMResult;
+import org.jdom2.transform.JDOMSource;
 
 /**
  * Configurable XSLT-driven ingestion Crosswalk
@@ -141,7 +143,12 @@ public class XSLTIngestionCrosswalk
         try {
             JDOMResult result = new JDOMResult();
             xform.transform(new JDOMSource(metadata), result);
-            ingestDIM(context, dso, result.getResult(), createMissingMetadataFields);
+            List<Content> contentList = result.getResult();
+            // Transform List<Content> into List<Element>
+            List<Element> elementList = contentList.stream()
+                                                   .filter(obj -> obj instanceof Element)
+                                                   .map(Element.class::cast).collect(Collectors.toList());
+            ingestDIM(context, dso, elementList, createMissingMetadataFields);
         } catch (TransformerException e) {
             log.error("Got error: " + e.toString());
             throw new CrosswalkInternalException("XSL Transformation failed: " + e.toString(), e);

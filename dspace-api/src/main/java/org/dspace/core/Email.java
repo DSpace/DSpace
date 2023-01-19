@@ -152,14 +152,14 @@ public class Email {
     private static final String RESOURCE_REPOSITORY_NAME = "Email";
     private static final Properties VELOCITY_PROPERTIES = new Properties();
     static {
-        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADER, "string");
-        VELOCITY_PROPERTIES.put("string.resource.loader.description",
+        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADERS, "string");
+        VELOCITY_PROPERTIES.put("resource.loader.string.description",
                 "Velocity StringResource loader");
-        VELOCITY_PROPERTIES.put("string.resource.loader.class",
+        VELOCITY_PROPERTIES.put("resource.loader.string.class",
                 StringResourceLoader.class.getName());
-        VELOCITY_PROPERTIES.put("string.resource.loader.repository.name",
+        VELOCITY_PROPERTIES.put("resource.loader.string.repository.name",
                 RESOURCE_REPOSITORY_NAME);
-        VELOCITY_PROPERTIES.put("string.resource.loader.repository.static",
+        VELOCITY_PROPERTIES.put("resource.loader.string.repository.static",
                 "false");
     }
 
@@ -355,7 +355,7 @@ public class Email {
         for (String headerName : config.getArrayProperty("mail.message.headers")) {
             String headerValue = (String) vctx.get(headerName);
             if ("subject".equalsIgnoreCase(headerName)) {
-                if (null != subject) {
+                if (null != headerValue) {
                     subject = headerValue;
                 }
             } else if ("charset".equalsIgnoreCase(headerName)) {

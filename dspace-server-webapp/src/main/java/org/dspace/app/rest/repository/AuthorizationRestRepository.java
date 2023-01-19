@@ -200,7 +200,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             // restore the real current user
             context.restoreContextUser();
         }
-        return converter.toRestPage(authorizations, null, utils.obtainProjection());
+        return converter.toRestPage(authorizations, pageable, utils.obtainProjection());
     }
 
     private List<Authorization> findAuthorizationsByUUIDList(
