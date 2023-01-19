@@ -103,6 +103,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrServiceImpl.class);
 
+    // Suffix of the solr field used to index the facet/filter so that the facet search can search all word in a
+    // facet by indexing "each word to end of value' partial value
     public static final String SOLR_FIELD_SUFFIX_FACET_PREFIXES = "_prefix";
 
     @Autowired
