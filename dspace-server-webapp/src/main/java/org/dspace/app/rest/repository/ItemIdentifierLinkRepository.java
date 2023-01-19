@@ -25,6 +25,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.identifier.DOI;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
@@ -65,7 +66,8 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
         try {
             if (doi != null) {
                 String doiUrl = doiService.DOIToExternalForm(doi.getDoi());
-                IdentifierRest identifierRest = new IdentifierRest(doiUrl, "doi", String.valueOf(doi.getStatus()));
+                IdentifierRest identifierRest = new IdentifierRest(
+                        doiUrl, "doi", DOIIdentifierProvider.statusText[doi.getStatus()]);
                 identifierRestList.add(identifierRest);
             }
             if (handle != null) {

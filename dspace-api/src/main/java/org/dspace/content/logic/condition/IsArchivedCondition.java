@@ -14,7 +14,7 @@ import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Context;
 
 /**
- * A condition that returns true if the item is withdrawn
+ * A condition that returns true if the item is archived
  *
  * @author Kim Shepherd
  * @version $Revision$
@@ -23,7 +23,7 @@ public class IsArchivedCondition extends AbstractCondition {
     private final static Logger log = LogManager.getLogger();
 
     /**
-     * Return true if item is withdrawn
+     * Return true if item is archived
      * Return false if not
      * @param context   DSpace context
      * @param item      Item to evaluate
@@ -32,7 +32,7 @@ public class IsArchivedCondition extends AbstractCondition {
      */
     @Override
     public boolean getResult(Context context, Item item) throws LogicalStatementException {
-        log.debug("Result of isWithdrawn is " + item.isArchived());
+        log.debug("Result of isArchived is " + item.isArchived());
         return item.isArchived();
     }
 }

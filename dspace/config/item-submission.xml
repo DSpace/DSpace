@@ -240,7 +240,9 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-            <step id="identifiers"/>
+            <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
+                 that identifiers.cfg and identifier-service.xml are properly configured. -->
+            <!--<step id="identifiers"/>-->
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>

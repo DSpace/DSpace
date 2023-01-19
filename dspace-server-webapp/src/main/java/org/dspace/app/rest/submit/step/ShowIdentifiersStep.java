@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.step;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -91,6 +92,11 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
         IdentifierService identifierService =
                 IdentifierServiceFactory.getInstance().getIdentifierService();
         // Attempt to look up handle and DOI identifiers for this item
+        String[] defaultTypes = {"handle", "doi"};
+        List<String> displayTypes = Arrays.asList(configurationService.getArrayProperty(
+                "identifiers.submission.display",
+                defaultTypes));
+        result.setDisplayTypes(displayTypes);
         String handle = identifierService.lookup(context, obj.getItem(), Handle.class);
         String simpleDoi = identifierService.lookup(context, obj.getItem(), DOI.class);
         DOI doi = null;
@@ -126,7 +132,7 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
             handle = HandleServiceFactory.getInstance().getHandleService().getCanonicalForm(handle);
         }
 
-        // Populate bean with data and return
+        // Populate bean with data and return, if the identifier type is configured for exposure
         result.setDoi(doiString);
         result.setHandle(handle);
         result.setOtherIdentifiers(otherIdentifiers);

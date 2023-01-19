@@ -97,6 +97,21 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     // The DOI is created in the database, but no more context is known
     public static final Integer MINTED = 11;
 
+    public static final String[] statusText = {
+        "UNKNOWN",                      // 0
+        "TO_BE_REGISTERED",             // 1
+        "TO_BE_RESERVED",               // 2
+        "IS_REGISTERED",                // 3
+        "IS_RESERVED",                  // 4
+        "UPDATE_RESERVED",              // 5
+        "UPDATE_REGISTERED",            // 6
+        "UPDATE_BEFORE_REGISTRATION",   // 7
+        "TO_BE_DELETED",                // 8
+        "DELETED",                      // 9
+        "PENDING",                      // 10
+        "MINTED",                       // 11
+    };
+
     @Autowired(required = true)
     protected DOIService doiService;
     @Autowired(required = true)

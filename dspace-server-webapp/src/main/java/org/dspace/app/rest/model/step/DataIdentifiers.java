@@ -19,6 +19,8 @@ public class DataIdentifiers implements SectionData {
     String handle;
     String doi;
     List<String> otherIdentifiers;
+    // Types to display, a hint for te UI
+    List<String> displayTypes;
 
     public DataIdentifiers() {
 
@@ -46,6 +48,14 @@ public class DataIdentifiers implements SectionData {
 
     public void setOtherIdentifiers(List<String> otherIdentifiers) {
         this.otherIdentifiers = otherIdentifiers;
+    }
+
+    public List<String> getDisplayTypes() {
+        return displayTypes;
+    }
+
+    public void setDisplayTypes(List<String> displayTypes) {
+        this.displayTypes = displayTypes;
     }
 
     public String toString() {

@@ -10,15 +10,12 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
-import org.dspace.app.rest.model.IdentifierRest;
 import org.dspace.app.rest.model.IdentifiersRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
@@ -49,6 +46,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -84,28 +82,46 @@ public class ItemIdentifierController {
     Utils utils;
 
     /**
-     * Queue a new, pending or minted DOI for registration for a given item. Requires administrative privilege.
-     * This request is sent from the Register DOI button (configurable) on the item status page.
+     * Request that an identifier of a given type is 'created' for an item. Depending on the identifier type
+     * this could mean minting, registration, reservation, queuing for registration later, etc.
      *
-     * @return 302 FOUND if the DOI is already registered or reserved, 201 CREATED if queued for registration
+     * @return 201 CREATED on success, or 302 FOUND if already created, or an error
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADMIN')")
     public ResponseEntity<RepresentationModel<?>> registerIdentifierForItem(@PathVariable UUID uuid,
                                                                             HttpServletRequest request,
-                                                                            HttpServletResponse response)
+                                                                            HttpServletResponse response,
+                                                                            @RequestParam(name = "type") String type)
             throws SQLException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
         Item item = itemService.find(context, uuid);
-        ItemRest itemRest;
+
 
         if (item == null) {
             throw new ResourceNotFoundException("Could not find item with id " + uuid);
         }
 
+        // Check for a valid identifier type and register the appropriate type of identifier
+        if ("doi".equals(type)) {
+            return registerDOI(context, item);
+        } else {
+            throw new IllegalArgumentException("Valid identifier type (eg. 'doi') is required, parameter name 'type'");
+        }
+    }
+
+    /**
+     * Queue a new, pending or minted DOI for registration for a given item. Requires administrative privilege.
+     * This request is sent from the Register DOI button (configurable) on the item status page.
+     *
+     * @return 302 FOUND if the DOI is already registered or reserved, 201 CREATED if queued for registration
+     */
+    private ResponseEntity<RepresentationModel<?>> registerDOI(Context context, Item item)
+            throws SQLException, AuthorizeException {
         String identifier = null;
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ItemRest itemRest;
         try {
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
@@ -148,5 +164,4 @@ public class ItemIdentifierController {
         // Return the status and item resource
         return ControllerUtils.toResponseEntity(httpStatus, new HttpHeaders(), itemResource);
     }
-
 }

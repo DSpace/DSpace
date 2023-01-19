@@ -71,7 +71,7 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
         // Expect first forbidden
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/core/items/" +
-                        publicItem1.getID().toString() + "/identifiers"))
+                        publicItem1.getID().toString() + "/identifiers?type=doi"))
                 .andExpect(status().isForbidden());
 
         // Set token to admin credentials
@@ -79,12 +79,12 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
 
         // Expect a successful 201 CREATED for this item with no DOI
         getClient(token).perform(post("/api/core/items/" +
-                        publicItem1.getID().toString() + "/identifiers"))
+                        publicItem1.getID().toString() + "/identifiers?type=doi"))
                 .andExpect(status().isCreated());
 
         // Expected 302 FOUND status code for a DOI already in REGISTERED / TO_BE_REGISTERED state
         getClient(token).perform(post("/api/core/items/" +
-                        publicItem1.getID().toString() + "/identifiers"))
+                        publicItem1.getID().toString() + "/identifiers?type=doi"))
                 .andExpect(status().isFound());
 
         // Get the doi we minted and queued for registration

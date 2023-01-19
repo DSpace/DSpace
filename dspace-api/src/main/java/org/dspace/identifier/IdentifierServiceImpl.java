@@ -117,9 +117,8 @@ public class IdentifierServiceImpl implements IdentifierService {
     @Override
     public void register(Context context, DSpaceObject dso, Class<? extends Identifier> type, Filter filter)
             throws AuthorizeException, SQLException, IdentifierException {
-        //We need to commit our context because one of the providers might require the handle created above
-        // Next resolve all other services
         boolean registered = false;
+        // Iterate all services and register identifiers as appropriate
         for (IdentifierProvider service : providers) {
             if (service.supports(type)) {
                 try {
@@ -139,16 +138,15 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                     + "find a provider that supports this identifier.");
         }
-        //Update our item / collection / community
+        // Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
     @Override
     public void register(Context context, DSpaceObject dso, Class<? extends Identifier> type)
             throws AuthorizeException, SQLException, IdentifierException {
-        //We need to commit our context because one of the providers might require the handle created above
-        // Next resolve all other services
         boolean registered = false;
+        // Iterate all services and register identifiers as appropriate
         for (IdentifierProvider service : providers) {
             if (service.supports(type)) {
                 try {
@@ -163,15 +161,14 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                     + "find a provider that supports this identifier.");
         }
-        //Update our item / collection / community
+        // Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
     @Override
     public void register(Context context, DSpaceObject dso, Map<Class<? extends Identifier>, Filter> typeFilters)
             throws AuthorizeException, SQLException, IdentifierException {
-        //We need to commit our context because one of the providers might require the handle created above
-        // Next resolve all other services
+        // Iterate all services and register identifiers as appropriate
         for (IdentifierProvider service : providers) {
             try {
                 // If the service supports filtering, look through the map and the first supported class
@@ -200,7 +197,7 @@ public class IdentifierServiceImpl implements IdentifierService {
                 log.warn("Identifier not registered (inapplicable): " + e.getMessage());
             }
         }
-        //Update our item / collection / community
+        // Update our item / collection / community
         contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
     }
 
@@ -209,8 +206,7 @@ public class IdentifierServiceImpl implements IdentifierService {
     @Override
     public void register(Context context, DSpaceObject object, String identifier)
         throws AuthorizeException, SQLException, IdentifierException {
-        //We need to commit our context because one of the providers might require the handle created above
-        // Next resolve all other services
+        // Iterate all services and register identifiers as appropriate
         boolean registered = false;
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
@@ -226,7 +222,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                                               + "find a provider that supports this identifier.");
         }
-        //Update our item / collection / community
+        // pdate our item / collection / community
         contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 
