@@ -154,7 +154,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             //       the collection entity type is by default blank when a collection is first created
             if (StringUtils.isNotBlank(original.getValue())) {
                 itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
-                                        metadataField.getQualifier(), original.getLanguage(), original.getValue());
+                        metadataField.getQualifier(), original.getLanguage(), original.getValue());
             }
         }
 
