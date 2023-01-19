@@ -69,4 +69,25 @@
     <scope_note>Store the withdrawal reason in addition to provenance</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>local</schema>
+    <element>featuredService</element>
+    <qualifier>kontext</qualifier>
+    <scope_note>Links to data in kontext</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>featuredService</element>
+    <qualifier>pmltq</qualifier>
+    <scope_note>Links to data in PML-TQ</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>featuredService</element>
+    <qualifier>teitok</qualifier>
+    <scope_note>Links to data in TEITOK</scope_note>
+  </dc-type>
+
 </dspace-dc-types>

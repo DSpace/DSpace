@@ -39,6 +39,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,14 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .withNetId("123456789")
                 .build();
         context.restoreAuthSystemState();
+    }
+
+    @Override
+    @After
+    public void destroy() throws Exception {
+        // Remove the created user manually because some tests are failing
+        EPersonBuilder.deleteEPerson(clarinEperson.getID());
+        super.destroy();
     }
 
     /**
@@ -218,6 +227,9 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                         .header("SHIB-GIVENNAME", firstname)
                         .header("SHIB-SURNAME", lastname))
                 .andExpect(status().isFound());
+
+        // Delete created eperson - clean after the test
+        EPersonBuilder.deleteEPerson(ePerson.getID());
     }
 
     // This test is copied from the `ShibbolethLoginFilterIT` and modified following the Clarin updates.
