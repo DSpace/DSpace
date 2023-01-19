@@ -27,7 +27,6 @@ import org.dspace.content.Item;
 import org.dspace.content.logic.TrueFilter;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
