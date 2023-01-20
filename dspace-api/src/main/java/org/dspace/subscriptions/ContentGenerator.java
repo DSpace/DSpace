@@ -58,18 +58,18 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ePerson);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscriptions_content"));
                 email.addRecipient(ePerson.getEmail());
-                email.addArgument(generateHtmlBodyMail(context, indexableComm));
-                email.addArgument(generateHtmlBodyMail(context, indexableColl));
-                email.addArgument(generateHtmlBodyMail(context, indexableItems));
+                email.addArgument(generateBodyMail(context, indexableComm));
+                email.addArgument(generateBodyMail(context, indexableColl));
+                email.addArgument(generateBodyMail(context, indexableItems));
                 email.send();
             }
         } catch (Exception e) {
-            // log this email error
-            log.warn("Cannot email user eperson_id:" + ePerson.getID() + " eperson_email:" + ePerson.getEmail());
+            log.error(e.getMessage(), e);
+            log.warn("Cannot email user eperson_id: {} eperson_email: {}", ePerson::getID, ePerson::getEmail);
         }
     }
 
-    private String generateHtmlBodyMail(Context context, List<IndexableObject> indexableObjects) {
+    private String generateBodyMail(Context context, List<IndexableObject> indexableObjects) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write("\n".getBytes(UTF_8));
