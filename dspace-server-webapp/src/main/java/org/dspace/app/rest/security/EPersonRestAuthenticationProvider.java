@@ -11,7 +11,7 @@ import static org.dspace.app.rest.security.WebSecurityConfiguration.ADMIN_GRANT;
 import static org.dspace.app.rest.security.WebSecurityConfiguration.AUTHENTICATED_GRANT;
 
 import java.sql.SQLException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +27,8 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,15 +66,8 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired(required = false)
-    private List<PostLoggedInAction> postLoggedInActions;
-
-    @PostConstruct
-    public void postConstruct() {
-        if (postLoggedInActions == null) {
-            postLoggedInActions = Collections.emptyList();
-        }
-    }
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -210,6 +205,25 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             }
 
             authorities.add(new SimpleGrantedAuthority(AUTHENTICATED_GRANT));
+
+            // CLARIN
+            // Add to the user authorities from the CLARIN custom groups. The possible groups are loaded
+            // from the configuration file, property: `authentication-shibboleth.clarin.custom.groups`
+            try {
+                String[] customGroupsArray = configurationService
+                        .getArrayProperty("authentication-shibboleth.clarin.custom.groups");
+                List<String> customGroupsList = Arrays.asList(customGroupsArray);
+                for (Group group : context.getSpecialGroups()) {
+                    if (!customGroupsList.contains(group.getName())) {
+                        continue;
+                    }
+                    // The user special group is in the allowed groups -> add the group as the Authority
+                    authorities.add(new SimpleGrantedAuthority(group.getName()));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Cannot add the custom authority to the user because: " + e.getSQLState());
+            }
+            // CLARIN
         }
 
         return authorities;
