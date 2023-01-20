@@ -11,15 +11,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -265,7 +262,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
 
             // Step 4: Log the user in.
             context.setCurrentUser(eperson);
-            request.setAttribute("shib.authenticated", true);
+            request.getSession().setAttribute("shib.authenticated", true);
             AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
 
             log.info(eperson.getEmail() + " has been authenticated via shibboleth.");
@@ -336,106 +333,21 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
                 return result;
             }
 
-            log.debug("Starting to determine special groups");
-            String[] defaultRoles =
-                    configurationService.getArrayProperty("authentication-shibboleth.default-roles");
-            String roleHeader = configurationService.getProperty("authentication-shibboleth.role-header");
-            boolean ignoreScope = configurationService
-                    .getBooleanProperty("authentication-shibboleth.role-header.ignore-scope", true);
-            boolean ignoreValue = configurationService
-                    .getBooleanProperty("authentication-shibboleth.role-header.ignore-value", false);
 
-            if (ignoreScope && ignoreValue) {
-                throw new IllegalStateException(
-                        "Both config parameters for ignoring an roll attributes scope and value are turned on," +
-                                " this is not a permissable configuration. (Note: ignore-scope defaults to true) " +
-                                "The configuration parameters are: 'authentication.shib.role-header.ignore-scope' " +
-                                "and 'authentication.shib.role-header.ignore-value'");
-            }
-
-            // Get the Shib supplied affiliation or use the default affiliation
-            List<String> affiliations = findMultipleAttributes(request, roleHeader);
-            if (affiliations == null) {
-                if (defaultRoles != null) {
-                    affiliations = Arrays.asList(defaultRoles);
-                }
-                log.debug(
-                        "Failed to find Shibboleth role header, '" + roleHeader + "', falling back" +
-                                " to the default roles: '" + StringUtils.join(defaultRoles, ",") + "'");
-            } else {
-                log.debug("Found Shibboleth role header: '" + roleHeader + "' = '" + affiliations + "'");
-            }
-
-            // Loop through each affiliation
-            Set<Group> groups = new HashSet<>();
-            if (affiliations != null) {
-                for (String affiliation : affiliations) {
-                    // If we ignore the affiliation's scope then strip the scope if it exists.
-                    if (ignoreScope) {
-                        int index = affiliation.indexOf('@');
-                        if (index != -1) {
-                            affiliation = affiliation.substring(0, index);
-                        }
-                    }
-                    // If we ignore the value, then strip it out so only the scope remains.
-                    if (ignoreValue) {
-                        int index = affiliation.indexOf('@');
-                        if (index != -1) {
-                            affiliation = affiliation.substring(index + 1, affiliation.length());
-                        }
-                    }
-
-                    // Get the group names
-                    String[] groupNames = configurationService
-                            .getArrayProperty("authentication-shibboleth.role." + affiliation);
-                    if (groupNames == null || groupNames.length == 0) {
-                        groupNames = configurationService
-                                .getArrayProperty("authentication-shibboleth.role." + affiliation.toLowerCase());
-                    }
-
-                    if (groupNames == null) {
-                        log.debug(
-                                "Unable to find role mapping for the value, '" + affiliation + "', there should be a " +
-                                        "mapping in config/modules/authentication-shibboleth.cfg:  role." +
-                                        affiliation + " = <some group name>");
-                        continue;
-                    } else {
-                        log.debug(
-                                "Mapping role affiliation to DSpace group: '" + StringUtils.join(groupNames,
-                                        ",") + "'");
-                    }
-
-                    // Add each group to the list.
-                    for (int i = 0; i < groupNames.length; i++) {
-                        try {
-                            Group group = groupService.findByName(context, groupNames[i].trim());
-                            if (group != null) {
-                                groups.add(group);
-                            } else {
-                                log.debug("Unable to find group: '" + groupNames[i].trim() + "'");
-                            }
-                        } catch (SQLException sqle) {
-                            log.error(
-                                    "Exception thrown while trying to lookup affiliation role for" +
-                                            " group name: '" + groupNames[i].trim() + "'", sqle);
-                        }
-                    } // for each groupNames
-                } // foreach affiliations
-            } // if affiliations
-
-
-            log.info("Added current EPerson to special groups: " + groups);
-
-            List<UUID> groupIds = new ArrayList<>();
-            for (Group group : groups) {
-                groupIds.add(group.getID());
-            }
-
+            List<UUID> groupIds = new ShibGroup(new ShibHeaders(request), context).get();
             // Cache the special groups, so we don't have to recalculate them again
             // for this session.
-            request.setAttribute("shib.specialgroup", groupIds);
+            request.getSession().setAttribute("shib.specialgroup", groupIds);
 
-            return new ArrayList<>(groups);
+            List<Group> groups = new ArrayList<>();
+            for (UUID uuid : groupIds) {
+                Group foundGroup = groupService.find(context, uuid);
+                if (Objects.isNull(foundGroup)) {
+                    continue;
+                }
+                groups.add(foundGroup);
+            }
+            return groups;
         } catch (Throwable t) {
             log.error("Unable to validate any sepcial groups this user may belong too because of an exception.", t);
             return Collections.EMPTY_LIST;
@@ -1400,7 +1312,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
     public boolean isUsed(final Context context, final HttpServletRequest request) {
         if (request != null &&
                 context.getCurrentUser() != null &&
-                request.getAttribute("shib.authenticated") != null) {
+                request.getSession().getAttribute("shib.authenticated") != null) {
             return true;
         }
         return false;

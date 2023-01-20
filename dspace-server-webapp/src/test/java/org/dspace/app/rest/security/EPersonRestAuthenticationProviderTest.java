@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -43,11 +44,16 @@ public class EPersonRestAuthenticationProviderTest {
     @Mock
     private AuthorizeService authorizeService;
 
+    @Mock
+    private ConfigurationService configurationService;
+
     @Test
     public void testGetGrantedAuthoritiesAdmin() throws Exception {
         when(authorizeService.isAdmin(context, ePerson)).thenReturn(true);
 
         when(context.getCurrentUser()).thenReturn(ePerson);
+        when(configurationService.getArrayProperty("authentication-shibboleth.clarin.custom.groups"))
+                .thenReturn(new String[0]);
         List<GrantedAuthority> authorities = ePersonRestAuthenticationProvider.getGrantedAuthorities(context);
 
         assertThat(authorities.stream().map(a -> a.getAuthority()).collect(Collectors.toList()), containsInAnyOrder(
@@ -59,6 +65,8 @@ public class EPersonRestAuthenticationProviderTest {
     public void testGetGrantedAuthoritiesEPerson() throws Exception {
         when(authorizeService.isAdmin(context, ePerson)).thenReturn(false);
         when(context.getCurrentUser()).thenReturn(ePerson);
+        when(configurationService.getArrayProperty("authentication-shibboleth.clarin.custom.groups"))
+                .thenReturn(new String[0]);
 
         List<GrantedAuthority> authorities = ePersonRestAuthenticationProvider.getGrantedAuthorities(context);
 

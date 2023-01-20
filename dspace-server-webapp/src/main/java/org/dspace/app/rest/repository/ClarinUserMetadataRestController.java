@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotFoundException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,7 +67,7 @@ public class ClarinUserMetadataRestController {
     @PreAuthorize("permitAll()")
     public ResponseEntity manageUserMetadata(@RequestParam("bitstreamUUID") UUID bitstreamUUID,
                                                      HttpServletRequest request)
-            throws SQLException, ParseException, IOException, AuthorizeException, ParserConfigurationException {
+            throws SQLException, ParseException, IOException, AuthorizeException {
 
         // Get context from the request
         Context context = obtainContext(request);
