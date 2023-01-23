@@ -45,7 +45,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
                                   final Date countdownTo, final boolean active) throws SQLException {
         SystemWideAlert systemWideAlert = new SystemWideAlert();
         systemWideAlert.setMessage(message);
-        systemWideAlert.setAllowSessions(allowSessionsType.getValue());
+        systemWideAlert.setAllowSessions(allowSessionsType);
         systemWideAlert.setCountdownTo(countdownTo);
         systemWideAlert.setActive(active);
 

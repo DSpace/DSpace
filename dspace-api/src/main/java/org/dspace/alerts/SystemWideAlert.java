@@ -106,8 +106,8 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
      *
      * @param allowSessions Integer representing what kind of sessions are allowed
      */
-    public void setAllowSessions(final int allowSessions) {
-        this.allowSessions = allowSessions;
+    public void setAllowSessions(AllowSessionsEnum allowSessions) {
+        this.allowSessions = allowSessions.getValue();
     }
 
     /**

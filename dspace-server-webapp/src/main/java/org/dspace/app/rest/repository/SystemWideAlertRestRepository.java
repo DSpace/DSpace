@@ -105,7 +105,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
         }
 
         systemWideAlert.setMessage(systemWideAlertRest.getMessage());
-        systemWideAlert.setAllowSessions(systemWideAlertRest.getAllowSessions());
+        systemWideAlert.setAllowSessions(AllowSessionsEnum.fromInt(systemWideAlertRest.getAllowSessions()));
         systemWideAlert.setCountdownTo(systemWideAlertRest.getCountdownTo());
         systemWideAlert.setActive(systemWideAlertRest.isActive());
 
