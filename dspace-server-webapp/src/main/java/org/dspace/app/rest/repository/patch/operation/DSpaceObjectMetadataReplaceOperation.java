@@ -54,8 +54,16 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
         String propertyOfMd = metadataPatchUtils.extractPropertyOfMdFromPath(partsOfPath);
         String newValueMdAttribute = metadataPatchUtils.extractNewValueOfMd(operation);
 
-        replace(context, resource, dsoService, metadataField, metadataValueToReplace, indexInPath, propertyOfMd,
-                newValueMdAttribute);
+		// check if metadta value set or not
+		// clear metadata if value is empty or null
+		if(newValueMdAttribute != null && !newValueMdAttribute.isEmpty()) {
+        	replace(context, resource, dsoService, metadataField, metadataValueToReplace, indexInPath, propertyOfMd,
+                    newValueMdAttribute);
+        }else {
+        	dsoService.clearMetadata(context, resource, metadataField.getMetadataSchema().getName(),
+                    metadataField.getElement(), metadataField.getQualifier(), Item.ANY);
+        }
+
         return resource;
     }
 
