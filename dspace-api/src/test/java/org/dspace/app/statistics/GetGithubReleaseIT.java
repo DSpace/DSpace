@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.dspace.AbstractIntegrationTest;
-import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.util.DSpaceConfigurationInitializer;
 import org.dspace.util.DSpaceKernelInitializer;
 import org.junit.Ignore;
@@ -67,7 +67,7 @@ public class GetGithubReleaseIT
         // Create and configure the test instance.
         GetGithubRelease instance = new GetGithubRelease();
         instance.configuration = new GetGithubReleaseScriptConfiguration();
-        instance.initialize(args, new CommandLineDSpaceRunnableHandler(), eperson);
+        instance.initialize(args, new TestDSpaceRunnableHandler(), eperson);
 
         // Test!
         instance.run();
