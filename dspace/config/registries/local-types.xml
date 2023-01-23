@@ -5,7 +5,7 @@
   - An empty registry for instance-specific, local metadata. Any non-standard
   - metadata fields should be added here to avoid polluting the standard
   - namespaces.
-  - 
+  -
   -->
 <dspace-dc-types>
 
@@ -31,5 +31,14 @@
     <scope_note>Description of example metadata field.</scope_note>
   </dc-type>
 -->
+
+  <!-- UMD customization for LIBDRUM-711 -->
+  <dc-type>
+    <schema>local</schema>
+    <element>equitableAccessSubmission</element>
+    <qualifier></qualifier>
+    <scope_note>Indicates whether item is being submitted in compliance with the UMD "Equitable Access" policy</scope_note>
+  </dc-type>
+  <!-- End UMD customization for LIBDRUM-711 -->
 
 </dspace-dc-types>

@@ -241,6 +241,15 @@
         </step-definition> -->
         <!-- End Customization for LIBDRUM-581 -->
 
+        <!-- Customizaton for LIBDRUM-711 -->
+        <step-definition id="equitableAccessSubmission">
+            <heading>submit.progressbar.equitableAccessSubmission</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+            <scope>submission</scope>
+        </step-definition>
+        <!-- End Customization for LIBDRUM-711 -->
+
         <step-definition id="sherpaPolicies" mandatory="true">
             <heading>submit.progressbar.sherpapolicy</heading>
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
@@ -278,6 +287,10 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
+
+            <!-- Customizaton for LIBDRUM-711 -->
+            <step id="equitableAccessSubmission"/>
+            <!-- End Customization for LIBDRUM-711 -->
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>

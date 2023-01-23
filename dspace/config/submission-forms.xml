@@ -48,6 +48,23 @@
             </row>
         </form>
 
+        <!-- UMD customization for LIBDRUM-711 -->
+        <form name="equitableAccessSubmission">
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>equitableAccessSubmission</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Equitable Access</label>
+                    <input-type value-pairs-name="yes_no">dropdown</input-type>
+                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
+                    <required>Please select "Yes" or "No"</required>
+                </field>
+            </row>
+        </form>
+        <!-- End UMD customization for LIBDRUM-711 -->
+
         <!-- Form which defines the first page/section of the "traditional" DSpace submission process,
              often used when depositing normal Items (i.e. Items which are not Entities). -->
         <form name="traditionalpageone">
@@ -2175,6 +2192,19 @@
                 <stored-value>FundingOrganization</stored-value>
             </pair>
         </value-pairs>
+
+        <!--  UMD customization for LIBDRUM-711 -->
+        <value-pairs value-pairs-name="yes_no" dc-term="type">
+            <pair>
+                <displayed-value>Yes</displayed-value>
+                <stored-value>Yes</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>No</displayed-value>
+                <stored-value>No</stored-value>
+            </pair>
+        </value-pairs>
+        <!-- End UMD customization for LIBDRUM-711 -->
 
     </form-value-pairs>
 
