@@ -161,13 +161,13 @@
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
 
-    <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
-    <bean class="org.dspace.authorize.RegexPasswordValidator" />
-
-    <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
-
-    <!-- Submission Config Service -->
-    <bean class="org.dspace.submit.service.SubmissionConfigServiceImpl"/>
+    <!-- Matomo statistics -->
+    <bean class="org.matomo.java.tracking.MatomoTracker">
+        <!-- TODO change me -->
+        <constructor-arg value="http://localhost/matomo.php"/>
+    </bean>
+    <bean class="org.dspace.app.statistics.clarin.ClarinMatomoBitstreamTracker"/>
+    <bean class="org.dspace.app.statistics.clarin.ClarinMatomoOAITracker"/>
 
 </beans>
 
