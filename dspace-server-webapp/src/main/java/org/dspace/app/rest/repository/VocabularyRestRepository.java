@@ -53,7 +53,7 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
     @Autowired
     private MetadataFieldService metadataFieldService;
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     @Override
     public VocabularyRest findOne(Context context, String name) {
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(name);
