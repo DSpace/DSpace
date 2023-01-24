@@ -773,6 +773,7 @@ public interface ItemService
      * finds all items for which the current user has editing rights
      *
      * @param context DSpace context object
+     * @param q       limit the returned items to those matching this query
      * @param offset  page offset
      * @param limit   page size limit
      * @return list of items for which the current user has editing rights
@@ -786,6 +787,7 @@ public interface ItemService
      * counts all items for which the current user has editing rights
      *
      * @param context DSpace context object
+     * @param q       limit the counted items to those matching this query
      * @return list of items for which the current user has editing rights
      * @throws SQLException
      * @throws SearchServiceException

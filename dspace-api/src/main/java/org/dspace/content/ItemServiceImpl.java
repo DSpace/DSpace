@@ -1082,6 +1082,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      *
      * @param context                    DSpace context
      * @param discoverQuery
+     * @param q                          limit the returned items to those matching this query
      * @return                           discovery search result objects
      * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
