@@ -1,0 +1,16 @@
+# Dockerfile for use by the continuous integration server (ci), in order to
+# build and test the application.
+#
+# This Dockerfile provides the appropriate environment for building and testing
+# the application. It should _not_ be used for creating Docker images for use
+# in production.
+
+FROM maven:3.8.6-openjdk-11-slim
+
+# Install git, as it is needed by the Jenkinsfile
+RUN apt-get update && \
+    apt-get install -y build-essential && \
+    apt-get install -y git && \
+    apt-get clean
+
+COPY dspace/src/main/docker/mvn-settings.xml /usr/share/maven/ref/settings.xml
