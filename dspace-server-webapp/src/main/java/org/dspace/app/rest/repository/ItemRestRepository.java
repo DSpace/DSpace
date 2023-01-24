@@ -367,6 +367,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      * @return Page of Items (REST representation) for which the current user has editing rights
      * @throws SearchServiceException
      */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findItemsWithEdit")
     public Page<ItemRest> findItemsWithEdit(@Parameter(value = "query") String q, Pageable pageable)
         throws SearchServiceException {

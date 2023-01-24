@@ -4666,6 +4666,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findItemsWithEditUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/core/items/search/findItemsWithEdit"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findItemsWithEditResourcePolicyTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community comm1 = CommunityBuilder.createCommunity(context).withName("Community 1").build();
