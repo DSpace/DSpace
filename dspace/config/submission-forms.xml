@@ -193,7 +193,9 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Type</label>
-                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <!-- UMD customization -->
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
+                    <!-- End UMD customization -->
                     <hint>Select the type of content of the item.
                     </hint>
                     <required></required>
@@ -395,7 +397,9 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Type</label>
-                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <!-- UMD customization -->
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
+                    <!-- End UMD customization -->
                     <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
                         have to hold down the "CTRL" or "Shift" key.
                     </hint>
@@ -1381,7 +1385,7 @@
             </row>
         </form>
 
-        <!-- Customization for LIBDRUM-684 -->
+        <!-- UMD Customization -->
         <!-- Form which defines the first page/section of the "MHHEA" DSpace submission process,
              based on the "traditionalpageone", with modifications. -->
         <form name="MHHEApageone">
@@ -1394,12 +1398,9 @@
                     <label>Author</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
-                    <!-- UMD customization for LIBDRUM-675 -->
                     <required>You must enter an author for this item.</required>
-                    <!-- End customization for LIBDRUM-675 -->
                 </field>
             </row>
-            <!-- UMD customization for LIBDRUM-675 -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1412,7 +1413,6 @@
                     <required></required>
                 </field>
             </row>
-            <!-- End customization for LIBDRUM-675 -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1452,7 +1452,6 @@
                     <required>You must enter at least the year.</required>
                 </field>
             </row>
-            <!-- Customization for LIBDRUM-684 -->
             <row>
                 <field>
                   <dc-schema>dc</dc-schema>
@@ -1471,7 +1470,6 @@
                   <regex>^(https*|DOI):(\/\/)*.*</regex>
                 </field>
             </row>
-            <!-- End customization for LIBDRUM-684 -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1531,7 +1529,7 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Type</label>
-                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
                     <hint>Select the type of content of the item.
                     </hint>
                     <required></required>
@@ -1553,7 +1551,7 @@
                 </field>
             </row>
         </form>
-        <!-- End Customization for LIBDRUM-684 -->
+        <!-- End UMD customization -->
 
     </form-definitions>
 
@@ -2193,7 +2191,7 @@
             </pair>
         </value-pairs>
 
-        <!--  UMD customization for LIBDRUM-711 -->
+        <!--  UMD customization -->
         <value-pairs value-pairs-name="yes_no" dc-term="type">
             <pair>
                 <displayed-value>Yes</displayed-value>
@@ -2204,7 +2202,66 @@
                 <stored-value>No</stored-value>
             </pair>
         </value-pairs>
-        <!-- End UMD customization for LIBDRUM-711 -->
+
+        <value-pairs value-pairs-name="umd_common_types" dc-term="type">
+            <pair>
+                <displayed-value>Article</displayed-value>
+                <stored-value>Article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Audiovisual</displayed-value>
+                <stored-value>Audiovisual</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book</displayed-value>
+                <stored-value>Book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Book chapter</displayed-value>
+                <stored-value>Book chapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dataset</displayed-value>
+                <stored-value>Dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dissertation</displayed-value>
+                <stored-value>Dissertation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Image</displayed-value>
+                <stored-value>Image</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Preprint</displayed-value>
+                <stored-value>Preprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Presentation</displayed-value>
+                <stored-value>Presentation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Report</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Software</displayed-value>
+                <stored-value>Software</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Thesis</displayed-value>
+                <stored-value>Thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Working Paper</displayed-value>
+                <stored-value>Working Paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+        </value-pairs>
+        <!-- End UMD customization -->
 
     </form-value-pairs>
 
