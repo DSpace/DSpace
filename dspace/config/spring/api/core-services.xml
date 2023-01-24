@@ -151,5 +151,13 @@
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
 
+    <!-- Matomo statistics -->
+    <bean class="org.matomo.java.tracking.MatomoTracker">
+        <!-- TODO change me -->
+        <constructor-arg value="http://localhost/matomo.php"/>
+    </bean>
+    <bean class="org.dspace.app.statistics.clarin.ClarinMatomoBitstreamTracker"/>
+    <bean class="org.dspace.app.statistics.clarin.ClarinMatomoOAITracker"/>
+
 </beans>
 
