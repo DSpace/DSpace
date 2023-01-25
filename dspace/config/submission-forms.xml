@@ -1443,6 +1443,17 @@
                     </hint>
                     <required>You must enter at least the year.</required>
                 </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Publisher</label>
+                    <style>col-sm-8</style>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                    <required></required>
+                </field>
             </row>
             <row>
                 <field>
@@ -1460,19 +1471,6 @@
                   </hint>
                   <required></required>
                   <regex>^(https*|DOI):(\/\/)*.*</regex>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>publisher</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Publisher</label>
-                    <style>col-sm-8</style>
-                    <input-type>onebox</input-type>
-                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
-                    <required></required>
                 </field>
             </row>
             <row>
