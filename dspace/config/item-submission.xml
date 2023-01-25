@@ -18,9 +18,10 @@
     <!-- for handle "default". -->
     <submission-map>
         <!-- Default submission process -->
-        <name-map collection-handle="default" submission-name="traditional"/>
-
         <!-- UMD customization -->
+        <!-- <name-map collection-handle="default" submission-name="traditional"/> -->
+        <name-map collection-handle="default" submission-name="umd-submission"/>
+
         <!-- Enable separate submisson process for  "Minority Health and Health Equity Archive" collection -->
         <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" />
         <!-- End UMD customization -->
@@ -216,6 +217,12 @@
         </step-definition>
 
         <!-- UMD customization -->
+        <step-definition id="umdDescribe" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
         <!-- LIBDRUM-684 -->
         <step-definition id="optionalUpload">
             <heading>submit.progressbar.upload</heading>
@@ -262,10 +269,6 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-
-            <!-- UMD customization for LIBDRUM-711 -->
-            <step id="equitableAccessSubmission"/>
-            <!-- End UMD customization for LIBDRUM-711 -->
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
@@ -399,6 +402,15 @@
         </submission-process>
 
         <!-- UMD customization -->
+        <!-- UMD default submission process -->
+        <submission-process name="umd-submission">
+            <step id="collection"/>
+            <step id="equitableAccessSubmission"/>
+            <step id="umdDescribe"/>
+            <step id="upload"/>
+            <step id="license"/>
+        </submission-process>
+
         <!-- LIBDRUM-684 -->
         <!--This "MHHEA_Collection" process replaces the DEFAULT item submission
             process for the "Minority Health and Health Equity Archive"
