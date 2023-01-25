@@ -30,6 +30,7 @@ public class IdentifiersRest implements RestModel {
     }
 
     // Return name for getType()
+    // Note this is the section name, NOT the identifier type
     @Override
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {

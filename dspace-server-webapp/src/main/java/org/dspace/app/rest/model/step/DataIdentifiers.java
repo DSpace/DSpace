@@ -7,8 +7,10 @@
  */
 package org.dspace.app.rest.model.step;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.dspace.app.rest.model.IdentifierRest;
 /**
  * Java bean with basic DOI / Handle / other identifier data for
  * display in submission step
@@ -16,38 +18,30 @@ import java.util.List;
  * @author Kim Shepherd (kim@shepherd.nz)
  */
 public class DataIdentifiers implements SectionData {
-    String handle;
-    String doi;
-    List<String> otherIdentifiers;
+    // Map of identifier types and values
+    List<IdentifierRest> identifiers;
     // Types to display, a hint for te UI
     List<String> displayTypes;
 
     public DataIdentifiers() {
-
+        identifiers = new ArrayList<>();
+        displayTypes = new ArrayList<>();
     }
 
-    public String getHandle() {
-        return handle;
+    public List<IdentifierRest> getIdentifiers() {
+        return identifiers;
     }
 
-    public void setHandle(String handle) {
-        this.handle = handle;
+    public void setIdentifiers(List<IdentifierRest> identifiers) {
+        this.identifiers = identifiers;
     }
 
-    public String getDoi() {
-        return doi;
-    }
-
-    public void setDoi(String doi) {
-        this.doi = doi;
-    }
-
-    public List<String> getOtherIdentifiers() {
-        return otherIdentifiers;
-    }
-
-    public void setOtherIdentifiers(List<String> otherIdentifiers) {
-        this.otherIdentifiers = otherIdentifiers;
+    public void addIdentifier(String type, String value, String status) {
+        IdentifierRest identifier = new IdentifierRest();
+        identifier.setValue(value);
+        identifier.setIdentifierType(type);
+        identifier.setIdentifierStatus(status);
+        this.identifiers.add(identifier);
     }
 
     public List<String> getDisplayTypes() {
@@ -60,10 +54,36 @@ public class DataIdentifiers implements SectionData {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Handle: ").append(handle);
-        sb.append("DOI: ").append(doi);
-        sb.append("Others: ").append(String.join(", ", otherIdentifiers));
+        for (IdentifierRest identifier : identifiers) {
+            sb.append(identifier.getType()).append(": ").append(identifier.getValue()).append("\n");
+        }
         return sb.toString();
+    }
+
+    protected class DataIdentifier {
+        private String type;
+        private String value;
+
+        public DataIdentifier(String type, String value) {
+            this.type = type;
+            this.value = value;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
     }
 
 }

@@ -8,7 +8,6 @@
 package org.dspace.app.rest.submit.step;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -85,7 +84,6 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
      * @return      A simple DataIdentifiers bean containing doi, handle and list of other identifiers
      */
     private DataIdentifiers getIdentifierData(InProgressSubmission obj) {
-        log.debug("getIdentifierData() called");
         Context context = getContext();
         DataIdentifiers result = new DataIdentifiers();
         // Load identifier service
@@ -98,7 +96,6 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
                 defaultTypes));
         result.setDisplayTypes(displayTypes);
         String handle = identifierService.lookup(context, obj.getItem(), Handle.class);
-        String simpleDoi = identifierService.lookup(context, obj.getItem(), DOI.class);
         DOI doi = null;
         String doiString = null;
         try {
@@ -111,13 +108,8 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
             log.error(e.getMessage());
         }
 
-        // Look up all identifiers and if they're not the DOI or handle, add them to the 'other' list
-        List<String> otherIdentifiers = new ArrayList<>();
-        for (String identifier : identifierService.lookup(context, obj.getItem())) {
-            if (!StringUtils.equals(simpleDoi, identifier) && !StringUtils.equals(handle, identifier)) {
-                otherIdentifiers.add(identifier);
-            }
-        }
+        // Other identifiers can be looked up / resolved through identifier service or
+        // its own specific service here
 
         // If we got a DOI, format it to its external form
         if (StringUtils.isNotEmpty(doiString)) {
@@ -133,10 +125,9 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
         }
 
         // Populate bean with data and return, if the identifier type is configured for exposure
-        result.setDoi(doiString);
-        result.setHandle(handle);
-        result.setOtherIdentifiers(otherIdentifiers);
-
+        result.addIdentifier("doi", doiString,
+                doi != null ? DOIIdentifierProvider.statusText[doi.getStatus()] : null);
+        result.addIdentifier("handle", handle, null);
         return result;
     }
 
