@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -203,7 +202,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void testRegisterDomainNotRegistered() throws Exception {
-        List<RegistrationData> registrationDataList = new ArrayList<>();
+        List<RegistrationData> registrationDataList;
         try {
             configurationService.setProperty("authentication-password.domain.valid", "test.com");
             RegistrationRest registrationRest = new RegistrationRest();
@@ -215,7 +214,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
-                       .andExpect(status().isBadRequest());
+                       .andExpect(status().isUnprocessableEntity());
         } finally {
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
@@ -246,7 +245,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
-                       .andExpect(status().isBadRequest());
+                       .andExpect(status().isUnprocessableEntity());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(0, registrationDataList.size());
         } finally {
@@ -418,6 +417,29 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         configurationService.setProperty("google.recaptcha.key.secret", secret);
         configurationService.setProperty("google.recaptcha.version", version);
         captchaService.init();
+    }
+
+    @Test
+    public void accountEndpoint_WithoutAccountTypeParam() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+        getClient().perform(post("/api/eperson/registrations")
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void accountEndpoint_WrongAccountTypeParam() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+        getClient().perform(post("/api/eperson/registrations")
+            .param(TYPE_QUERY_PARAM, "nonValidValue")
+            .content(mapper.writeValueAsBytes(registrationRest))
+            .contentType(contentType))
+            .andExpect(status().isBadRequest());
     }
 
 }
