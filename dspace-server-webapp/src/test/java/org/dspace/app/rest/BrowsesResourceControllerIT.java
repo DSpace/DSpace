@@ -980,7 +980,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     /**
      * This test was introduced to reproduce the bug DS-4269 Pagination links must be consistent also when there is not
      * explicit pagination parameters in the request (i.e. defaults apply)
-     * 
+     *
      * @throws Exception
      */
     public void browsePaginationWithoutExplicitParams() throws Exception {
@@ -2124,5 +2124,56 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
                                                  nullValue()));
+    }
+
+    /**
+     * Expect a single author browse definition
+     * @throws Exception
+     */
+    @Test
+    public void findOneLinked() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/api/discover/browses/search/byField?field=dc.contributor.author"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+
+                //The array of browse index should have a size 1
+                .andExpect(jsonPath("$.id", is("author")))
+
+                //Check that all (and only) the default browse indexes are present
+                .andExpect(jsonPath("$.metadataBrowse", is(true)))
+        ;
+    }
+
+    /**
+     * Expect a list of browse definitions that are also configured for link rendering
+     * @throws Exception
+     */
+    @Test
+    public void findAllLinked() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/api/discover/browses/search/allLinked"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+
+                // Expect TWO results, author and browse (see dspace-api test data local.cfg_
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+
+                //The array of browse index should have a size 2
+                .andExpect(jsonPath("$._embedded.browses", hasSize(2)))
+
+                //Check that all (and only) the default browse indexes are present
+                .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
+                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
+                        BrowseIndexMatcher.subjectBrowseIndex("asc")
+                )))
+        ;
     }
 }
