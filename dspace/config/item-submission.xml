@@ -23,7 +23,7 @@
         <name-map collection-handle="default" submission-name="umd-submission"/>
 
         <!-- Enable separate submisson process for  "Minority Health and Health Equity Archive" collection -->
-        <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" />
+        <name-map collection-handle="1903/21769" submission-name="MHHEA-submission" />
         <!-- End UMD customization -->
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
@@ -237,13 +237,6 @@
             <type>submission-form</type>
             <scope>submission</scope>
         </step-definition>
-
-        <!-- LIBDRUM-684 -->
-        <step-definition id="MHHEADescribe" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step-definition>
         <!-- End UMD customization -->
     </step-definitions>
 
@@ -411,13 +404,12 @@
             <step id="license"/>
         </submission-process>
 
-        <!-- LIBDRUM-684 -->
-        <!--This "MHHEA_Collection" process replaces the DEFAULT item submission
+        <!--This "MHHEA-submission" process replaces the DEFAULT item submission
             process for the "Minority Health and Health Equity Archive"
             collection -->
-        <submission-process name="MHHEA_Collection">
+        <submission-process name="MHHEA-submission">
             <step id="collection"/>
-            <step id="MHHEADescribe"/>
+            <step id="umdDescribe"/>
             <step id="optionalUpload"/>
             <step id="license"/>
         </submission-process> -->
