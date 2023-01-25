@@ -48,23 +48,6 @@
             </row>
         </form>
 
-        <!-- UMD customization for LIBDRUM-711 -->
-        <form name="equitableAccessSubmission">
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>equitableAccessSubmission</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Equitable Access</label>
-                    <input-type value-pairs-name="yes_no">dropdown</input-type>
-                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
-                    <required>Please select "Yes" or "No"</required>
-                </field>
-            </row>
-        </form>
-        <!-- End UMD customization for LIBDRUM-711 -->
-
         <!-- Form which defines the first page/section of the "traditional" DSpace submission process,
              often used when depositing normal Items (i.e. Items which are not Entities). -->
         <form name="traditionalpageone">
@@ -79,7 +62,7 @@
                     <hint>Enter the author's name (Family name, Given names).</hint>
                     <!-- UMD customization for LIBDRUM-675 -->
                     <required>You must enter an author for this item.</required>
-                    <!-- End customization for LIBDRUM-675 -->
+                    <!-- End UMD customization for LIBDRUM-675 -->
                 </field>
             </row>
             <!-- UMD customization for LIBDRUM-675 -->
@@ -95,7 +78,7 @@
                     <required></required>
                 </field>
             </row>
-            <!-- End customization for LIBDRUM-675 -->
+            <!-- End UMD customization for LIBDRUM-675 -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1386,6 +1369,22 @@
         </form>
 
         <!-- UMD Customization -->
+        <!-- Equitable access submission form -->
+        <form name="equitableAccessSubmission">
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>equitableAccessSubmission</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Equitable Access</label>
+                    <input-type value-pairs-name="yes_no">dropdown</input-type>
+                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
+                    <required>Please select "Yes" or "No"</required>
+                </field>
+            </row>
+        </form>
+
         <!-- Form which defines the first page/section of the "MHHEA" DSpace submission process,
              based on the "traditionalpageone", with modifications. -->
         <form name="MHHEApageone">

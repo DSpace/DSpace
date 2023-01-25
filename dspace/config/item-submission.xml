@@ -19,16 +19,11 @@
     <submission-map>
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
-        <!-- Customization for LIBDRUM-696 - Commenting out LIBDRUM-347 and
-             LIBDRUM-581 customizations until DSpace 7 implementations are
-             available.
-        <name-map collection-handle="1903/11324" submission-name="LibraryAward" />
-        -->
 
-        <!-- Customization for LIBDRUM-684 - Enable separate submisson process
-             for  "Minority Health and Health Equity Archive" collection -->
+        <!-- UMD customization -->
+        <!-- Enable separate submisson process for  "Minority Health and Health Equity Archive" collection -->
         <name-map collection-handle="1903/21769" submission-name="MHHEA_Collection" />
-        <!-- End Customization for LIBDRUM-684 -->
+        <!-- End UMD customization -->
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -214,55 +209,35 @@
             <type>sample</type>
         </step-definition>
 
-        <!-- Customization for LIBDRUM-347 -->
-        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
-            <step-definition id="libraryAwardUploadForm">
-            <heading>Library Award</heading>
-            <processing-class>edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep</processing-class>
-            <type>submission-form</type>
-        </step-definition> -->
-        <!-- End Customization for LIBDRUM-347 -->
-
-        <!-- Customization for LIBDRUM-684 -->
-        <step-definition id="optionalUpload">
-            <heading>submit.progressbar.upload</heading>
-            <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
-            <type>upload</type>
-        </step-definition>
-        <!-- End Customization for LIBDRUM-684 -->
-
-        <!-- Customization for LIBDRUM-581 -->
-        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
-        <step-definition id="conditionalLicense">
-            <heading>submit.progressbar.license</heading>
-            <processing-class>org.dspace.submit.step.ConditionalLicenseStep</processing-class>
-            <type>license</type>
-            <scope visibilityOutside="read-only">submission</scope>
-        </step-definition> -->
-        <!-- End Customization for LIBDRUM-581 -->
-
-        <!-- Customizaton for LIBDRUM-711 -->
-        <step-definition id="equitableAccessSubmission">
-            <heading>submit.progressbar.equitableAccessSubmission</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-            <scope>submission</scope>
-        </step-definition>
-        <!-- End Customization for LIBDRUM-711 -->
-
         <step-definition id="sherpaPolicies" mandatory="true">
             <heading>submit.progressbar.sherpapolicy</heading>
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
             <type>sherpaPolicy</type>
         </step-definition>
 
-        <!-- Customization for LIBDRUM-684 -->
+        <!-- UMD customization -->
+        <!-- LIBDRUM-684 -->
+        <step-definition id="optionalUpload">
+            <heading>submit.progressbar.upload</heading>
+            <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
+            <type>upload</type>
+        </step-definition>
+
+        <!-- LIBDRUM-711 -->
+        <step-definition id="equitableAccessSubmission">
+            <heading>submit.progressbar.equitableAccessSubmission</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+            <scope>submission</scope>
+        </step-definition>
+
+        <!-- LIBDRUM-684 -->
         <step-definition id="MHHEApageone" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <!-- End customization for LIBDRUM-684 -->
+        <!-- End UMD customization -->
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -288,9 +263,9 @@
 
             <step id="collection"/>
 
-            <!-- Customizaton for LIBDRUM-711 -->
+            <!-- UMD customization for LIBDRUM-711 -->
             <step id="equitableAccessSubmission"/>
-            <!-- End Customization for LIBDRUM-711 -->
+            <!-- End UMD customization for LIBDRUM-711 -->
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
@@ -313,31 +288,6 @@
             <!--Step will be to Sign off on the required DSpace License agreement -->
             <step id="license"/>
         </submission-process>
-
-        <!-- Customization for LIBDRUM-347 -->
-        <!--This "LibraryAward" process defines the DEFAULT item submission process -->
-        <!-- Commented out for LIBDRUM-696, until DSpace 7 implementation is available.
-            <submission-process name="LibraryAward">
-            <step id="collection"/>
-            <step id="traditionalpageone"/>
-            <step id="traditionalpagetwo"/>
-            <step id="libraryAwardUploadForm"/>
-            <step id="license"/>
-        </submission-process> -->
-        <!-- End Customization for LIBDRUM-347 -->
-
-        <!-- Customization for LIBDRUM-684 -->
-        <!--This "MHHEA_Collection" process replaces the DEFAULT item submission
-            process for the "Minority Health and Health Equity Archive"
-            collection -->
-        <submission-process name="MHHEA_Collection">
-            <step id="collection"/>
-            <step id="MHHEApageone"/>
-            <step id="traditionalpagetwo"/>
-            <step id="optionalUpload"/>
-            <step id="license"/>
-        </submission-process> -->
-        <!-- End Customization for LIBDRUM-684 -->
 
         <!--
         Submission Process for 'Publication' Entities.
@@ -447,6 +397,20 @@
             <step id="collection"/>
             <step id="openAIREOrganizationForm"/>
         </submission-process>
+
+        <!-- UMD customization -->
+        <!-- LIBDRUM-684 -->
+        <!--This "MHHEA_Collection" process replaces the DEFAULT item submission
+            process for the "Minority Health and Health Equity Archive"
+            collection -->
+        <submission-process name="MHHEA_Collection">
+            <step id="collection"/>
+            <step id="MHHEApageone"/>
+            <step id="traditionalpagetwo"/>
+            <step id="optionalUpload"/>
+            <step id="license"/>
+        </submission-process> -->
+        <!-- End UMD customization -->
     </submission-definitions>
 
 </item-submission>
