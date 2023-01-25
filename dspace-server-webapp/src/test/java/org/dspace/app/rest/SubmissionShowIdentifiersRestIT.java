@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for testing the Show Identifiers submission step
- * 
+ *
  * @author Kim Shepherd
  *
  */
@@ -96,7 +96,9 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         getClient(submitterToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sections.identifiers.handle").exists());
+                .andExpect(jsonPath("$.sections.identifiers.handle").exists())
+                .andExpect(jsonPath("$.sections.identifiers[1].type").value("identifier"))
+                .andExpect(jsonPath("$.sections.identifiers[1].identifierType").value("handle"));
     }
 
     @Test
@@ -109,7 +111,9 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         getClient(submitterToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.identifiers.doi").exists());
+                .andExpect(jsonPath("$.sections.identifiers.handle").exists())
+                .andExpect(jsonPath("$.sections.identifiers[0].type").value("identifier"))
+                .andExpect(jsonPath("$.sections.identifiers[0].identifierType").value("doi"));
     }
 
     private WorkspaceItem createWorkspaceItem(String title, Collection collection) {
