@@ -132,14 +132,15 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     }
 
     @Override
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,
-                        String type, String frequencyValue) throws SQLException {
+    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
+                        String subscriptionType, String frequencyValue) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Subscription.class);
         Root<Subscription> subscriptionRoot = criteriaQuery.from(Subscription.class);
         criteriaQuery.select(subscriptionRoot);
         Join<Subscription, SubscriptionParameter> childJoin = subscriptionRoot.join("subscriptionParameterList");
-        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.TYPE), type),
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(subscriptionRoot.get(Subscription_.TYPE), subscriptionType),
                 criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.name), "frequency"),
                 criteriaBuilder.equal(childJoin.get(SubscriptionParameter_.value), frequencyValue)
                 ));

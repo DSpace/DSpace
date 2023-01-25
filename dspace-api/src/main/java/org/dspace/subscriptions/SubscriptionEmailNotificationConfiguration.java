@@ -42,7 +42,8 @@ public class SubscriptionEmailNotificationConfiguration<T
     public Options getOptions() {
         if (Objects.isNull(options)) {
             Options options = new Options();
-            options.addOption("f", "Frequency", true, "Subscription frequency. It can have value D, M or W");
+            options.addOption("f", "Frequency", true, "Subscription frequency."
+                            + " It can have value D stand for 'Day', W stand for 'Week' and M stand for 'Month'");
             options.getOption("f").setRequired(true);
             super.options = options;
         }

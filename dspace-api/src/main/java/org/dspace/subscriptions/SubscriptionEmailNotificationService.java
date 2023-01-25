@@ -61,13 +61,14 @@ public class SubscriptionEmailNotificationService {
     public void perform(Context context, DSpaceRunnableHandler handler, String type, String frequency) {
         try {
             context.turnOffAuthorisationSystem();
-            List<Subscription> subscriptionList = findAllSubscriptionsByTypeAndFrequency(context, type, frequency);
+            List<Subscription> subscriptions = findAllSubscriptionsBySubscriptionTypeAndFrequency(context, type,
+                                               frequency);
             // if content subscription
             // Here is verified if type is "content" Or "statistics" as them are configured
             if (type.equals(generators.keySet().toArray()[0])) {
                 // the list of the person who has subscribed
                 int iterator = 0;
-                for (Subscription subscription : subscriptionList) {
+                for (Subscription subscription : subscriptions) {
                     DSpaceObject dSpaceObject = getdSpaceObject(subscription);
                     if (dSpaceObject instanceof Community) {
                         communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase(Locale.ROOT))
@@ -80,8 +81,8 @@ public class SubscriptionEmailNotificationService {
                              .findUpdates(context, dSpaceObject, frequency));
                     }
                     var ePerson = subscription.getePerson();
-                    if (iterator < subscriptionList.size() - 1) {
-                        if (ePerson.equals(subscriptionList.get(iterator + 1).getePerson())) {
+                    if (iterator < subscriptions.size() - 1) {
+                        if (ePerson.equals(subscriptions.get(iterator + 1).getePerson())) {
                             iterator++;
                             continue;
                         } else {
@@ -120,14 +121,16 @@ public class SubscriptionEmailNotificationService {
         return dSpaceObject;
     }
 
-    private List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type, String frequency) {
+    private List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
+             String subscriptionType, String frequency) {
         try {
-            return this.subscribeService.findAllSubscriptionsByTypeAndFrequency(context, type, frequency)
-                                        .stream()
-                                        .sorted(Comparator.comparing(s -> s.getePerson().getID()))
-                                        .collect(Collectors.toList());
+            return subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType,
+                                    frequency)
+                                   .stream()
+                                   .sorted(Comparator.comparing(s -> s.getePerson().getID()))
+                                   .collect(Collectors.toList());
         } catch (SQLException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
         return new ArrayList<Subscription>();
     }

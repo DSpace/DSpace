@@ -200,15 +200,15 @@ public interface SubscribeService {
     public void deleteSubscription(Context context, Subscription subscription) throws SQLException;
 
     /**
-     * Finds all subscriptions having given type and frequency
+     * Finds all subscriptions by subscriptionType and frequency
      *
-     * @param context DSpace context
-     * @param type String type of subscription
-     * @param frequencyValue String frequency value of subscription
-     * @throws SQLException An exception that provides information on a database access error or other errors.
+     * @param context             DSpace context
+     * @param subscriptionType    Could be "content" or "statistics". NOTE: in DSpace we have only "content"
+     * @param frequencyValue      Could be "D" stand for Day, "W" stand for Week, and "M" stand for Month
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context, String type,
-            String frequencyValue) throws SQLException;
+    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
+            String subscriptionType, String frequencyValue) throws SQLException;
 
     /**
      * Counts all subscriptions

@@ -21,6 +21,7 @@ import org.dspace.core.ReloadableEntity;
 
 /**
  * Database entity representation of the subscription_parameter table
+ * SubscriptionParameter represents a frequency with which an user wants to be notified.
  *
  * @author Alba Aliu at atis.al
  */
@@ -39,9 +40,16 @@ public class SubscriptionParameter implements ReloadableEntity<Integer> {
     @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
 
+    /*
+     * Currently, we have only one use case for this attribute: "frequency"
+     */
     @Column
     private String name;
 
+    /*
+     * Currently, we use this attribute only with following values: "D", "W", "M".
+     * Where D stand for Day, W stand for Week and M stand for Month
+     */
     @Column
     private String value;
 

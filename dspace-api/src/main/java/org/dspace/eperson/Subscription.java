@@ -49,8 +49,13 @@ public class Subscription implements ReloadableEntity<Integer> {
     @JoinColumn(name = "eperson_id")
     private EPerson ePerson;
 
+    /**
+     * Represent subscription type, for example, "content" or  "statistics".
+     * 
+     * NOTE: Currently, in DSpace we use only one "content"
+     */
     @Column(name = "type")
-    private String type;
+    private String subscriptionType;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "subscription", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
@@ -86,12 +91,12 @@ public class Subscription implements ReloadableEntity<Integer> {
         this.dSpaceObject = dSpaceObject;
     }
 
-    public String getType() {
-        return type;
+    public String getSubscriptionType() {
+        return subscriptionType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setSubscriptionType(String subscriptionType) {
+        this.subscriptionType = subscriptionType;
     }
 
     public List<SubscriptionParameter> getSubscriptionParameterList() {

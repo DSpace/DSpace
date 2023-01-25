@@ -72,7 +72,7 @@ public class SubscribeServiceImpl implements SubscribeService {
                     newSubscription.addParameter(subscriptionParameter));
             newSubscription.setePerson(eperson);
             newSubscription.setdSpaceObject(dSpaceObject);
-            newSubscription.setType(type);
+            newSubscription.setSubscriptionType(type);
             return newSubscription;
         } else {
             throw new AuthorizeException("Only admin or e-person themselves can subscribe");
@@ -153,7 +153,7 @@ public class SubscribeServiceImpl implements SubscribeService {
                                            throws SQLException {
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         subscriptionDB.removeParameterList();
-        subscriptionDB.setType(type);
+        subscriptionDB.setSubscriptionType(type);
         subscriptionDB.setdSpaceObject(dSpaceObject);
         subscriptionParameterList.forEach(x -> subscriptionDB.addParameter(x));
         subscriptionDB.setePerson(eperson);
@@ -185,9 +185,10 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> findAllSubscriptionsByTypeAndFrequency(Context context,String type, String frequencyValue)
-            throws SQLException {
-        return subscriptionDAO.findAllSubscriptionsByTypeAndFrequency(context, type, frequencyValue);
+    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
+            String subscriptionType, String frequencyValue) throws SQLException {
+        return subscriptionDAO.findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType,
+                frequencyValue);
     }
 
     @Override

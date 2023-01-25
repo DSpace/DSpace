@@ -31,20 +31,19 @@ public class SubscriptionMatcher {
         return allOf(
                 hasJsonPath("$.id", is(subscription.getID())),
                 hasJsonPath("$.type", is("subscription")),
-                hasJsonPath("$.subscriptionType", is(subscription.getType())),
+                hasJsonPath("$.subscriptionType", is(subscription.getSubscriptionType())),
                 hasJsonPath("$.subscriptionParameterList", Matchers.containsInAnyOrder(
                     subscription.getSubscriptionParameterList().stream()
-                        .map(x -> SubscriptionMatcher.matchSubscriptionParameter(x.getID(), x.getName(), x.getValue()))
-                        .collect(Collectors.toList())
+                                .map(x -> SubscriptionMatcher.matchSubscriptionParameter(x.getName(), x.getValue()))
+                                .collect(Collectors.toList())
                 )),
                 //Check links
                 matchLinks(subscription.getID())
                 );
     }
 
-    public static Matcher<? super Object> matchSubscriptionParameter(int id, String name, String value) {
+    public static Matcher<? super Object> matchSubscriptionParameter(String name, String value) {
         return allOf(
-            hasJsonPath("$.id", is(id)),
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.value", is(value))
         );

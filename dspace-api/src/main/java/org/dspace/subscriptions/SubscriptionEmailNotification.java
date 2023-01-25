@@ -7,6 +7,8 @@
  */
 package org.dspace.subscriptions;
 
+import static org.dspace.subscriptions.SubscriptionEmailNotificationService.FREQUENCIES;
+
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
@@ -51,13 +53,13 @@ public class SubscriptionEmailNotification
         if (StringUtils.isBlank(frequencyOption)) {
             throw new IllegalArgumentException("Option frequency f must be set");
         }
-        if (!frequencyOption.equals("D") && !frequencyOption.equals("M") && !frequencyOption.equals("W")) {
-            throw new IllegalArgumentException("Option f must be D, M or W");
+        if (!FREQUENCIES.contains(frequencyOption)) {
+            throw new IllegalArgumentException("Option f must be one of following values:" + FREQUENCIES);
         }
         subscriptionEmailNotificationService.perform(getContext(), handler, "content", frequencyOption);
     }
 
-    protected void assignCurrentUserInContext() throws SQLException {
+    private void assignCurrentUserInContext() throws SQLException {
         context = new Context();
         UUID uuid = getEpersonIdentifier();
         if (Objects.nonNull(uuid)) {
