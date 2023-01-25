@@ -239,7 +239,7 @@
         </step-definition>
 
         <!-- LIBDRUM-684 -->
-        <step-definition id="MHHEApageone" mandatory="true">
+        <step-definition id="MHHEADescribe" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -417,8 +417,7 @@
             collection -->
         <submission-process name="MHHEA_Collection">
             <step id="collection"/>
-            <step id="MHHEApageone"/>
-            <step id="traditionalpagetwo"/>
+            <step id="MHHEADescribe"/>
             <step id="optionalUpload"/>
             <step id="license"/>
         </submission-process> -->
