@@ -401,6 +401,7 @@
             <step id="equitableAccessSubmission"/>
             <step id="umdDescribe"/>
             <step id="upload"/>
+            <step id="cclicense"/>
             <step id="license"/>
         </submission-process>
 
@@ -411,6 +412,7 @@
             <step id="collection"/>
             <step id="umdDescribe"/>
             <step id="optionalUpload"/>
+            <step id="cclicense"/>
             <step id="license"/>
         </submission-process> -->
         <!-- End UMD customization -->
