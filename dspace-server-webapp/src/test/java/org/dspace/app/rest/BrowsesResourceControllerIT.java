@@ -2148,19 +2148,22 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
-    public void findTwoLinked() throws Exception {
+    public void findOneLinkedPassingTwoFields() throws Exception {
         //When we call the root endpoint
-        getClient().perform(get("/api/discover/browses/search/byFields?fields=dc.contributor.author,dc.date.issued"))
-                //The status has to be 200 OK
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.contributor.author")
+                        .param("fields", "dc.date.issued"))
+                // The status has to be 200 OK
                 .andExpect(status().isOk())
-                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
-                // The array of browse index should have a size 2 and contain both configured indices
-                .andExpect(jsonPath("$._embedded.browses", hasSize(2)))
-                .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
-                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
-                        BrowseIndexMatcher.subjectBrowseIndex("asc")
-                )));
+                // The array of browse index should have a size 1 because 'author' was the first
+                // field we passed, and we only expect the first index returned
+                // (this method is used by field components to find out if / how to link a value to a browse
+                // index, and this could mean multiple metadata fields)
+                .andExpect(jsonPath("$.id", is("author")))
+                // Check that all (and only) the default browse indexes are present
+                .andExpect(jsonPath("$.metadataBrowse", is(true)));
     }
 
     /**
