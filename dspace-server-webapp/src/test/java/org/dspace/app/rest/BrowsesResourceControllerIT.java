@@ -2147,6 +2147,22 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         ;
     }
 
+    @Test
+    public void findTwoLinked() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/api/discover/browses/search/byFields?fields=dc.contributor.author,dc.date.issued"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // The array of browse index should have a size 2 and contain both configured indices
+                .andExpect(jsonPath("$._embedded.browses", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
+                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
+                        BrowseIndexMatcher.subjectBrowseIndex("asc")
+                )));
+    }
+
     /**
      * Expect a list of browse definitions that are also configured for link rendering
      * @throws Exception
