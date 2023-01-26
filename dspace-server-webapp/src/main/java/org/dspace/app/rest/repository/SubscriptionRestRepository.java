@@ -120,7 +120,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @SearchRestMethod(name = "findByEPersonAndDso")
     @PreAuthorize("hasPermission(#epersonId, 'AdminOrOwner', 'READ')")
     public Page<SubscriptionRest> findByEPersonAndDso(@Parameter(value = "eperson_id", required = true) UUID epersonId,
-                                                      @Parameter(value = "dspace_object_id",required = true) UUID dsoId,
+                                                      @Parameter(value = "resource",required = true) UUID dsoId,
                                                        Pageable pageable) throws Exception {
         Long total = null;
         List<Subscription> subscriptions = null;
@@ -142,7 +142,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
-        String dsoId = req.getParameter("dspace_object_id");
+        String dsoId = req.getParameter("resource");
 
         if (Objects.isNull(dsoId) || Objects.isNull(epersonId)) {
             throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provieded!");
@@ -198,7 +198,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
-        String dsoId = req.getParameter("dspace_object_id");
+        String dsoId = req.getParameter("resource");
 
         SubscriptionRest subscriptionRest;
         try {

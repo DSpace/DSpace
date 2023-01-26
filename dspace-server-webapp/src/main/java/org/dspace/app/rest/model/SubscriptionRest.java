@@ -23,8 +23,8 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     public static final String NAME = "subscription";
     public static final String NAME_PLURAL = "subscriptions";
     public static final String CATEGORY = "core";
-    public static final String DSPACE_OBJECT = "dSpaceObject";
-    public static final String EPERSON = "ePerson";
+    public static final String DSPACE_OBJECT = "resource";
+    public static final String EPERSON = "eperson";
 
     private Integer id;
     private String subscriptionType;
