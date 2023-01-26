@@ -71,7 +71,7 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
         // Expect first forbidden
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/core/items/" +
-                        publicItem1.getID().toString() + "/identifiers?type=doi"))
+                        publicItem1.getID().toString() + "/identifiers?type=doi").content("doi"))
                 .andExpect(status().isForbidden());
 
         // Set token to admin credentials
@@ -79,7 +79,7 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
 
         // Expect a successful 201 CREATED for this item with no DOI
         getClient(token).perform(post("/api/core/items/" +
-                        publicItem1.getID().toString() + "/identifiers?type=doi"))
+                        publicItem1.getID().toString() + "/identifiers?type=doi").content("hello"))
                 .andExpect(status().isCreated());
 
         // Expected 302 FOUND status code for a DOI already in REGISTERED / TO_BE_REGISTERED state
@@ -100,7 +100,7 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
 
         // Do another POST, again this should return 201 CREATED as we shift the DOI from PENDING to TO_BE_REGISTERED
         getClient(token).perform(post("/api/core/items/" +
-                        publicItem1.getID().toString() + "/identifiers"))
+                        publicItem1.getID().toString() + "/identifiers?type=doi"))
                 .andExpect(status().isCreated());
 
         context.restoreAuthSystemState();
@@ -164,7 +164,7 @@ public class ItemIdentifierControllerIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$.identifiers[0].value").value(doiService.DOIToExternalForm(doiString)))
                 .andExpect(jsonPath("$.identifiers[0].identifierType").value("doi"))
                 .andExpect(jsonPath("$.identifiers[0].identifierStatus")
-                        .value(DOIIdentifierProvider.IS_REGISTERED.toString()));
+                        .value(DOIIdentifierProvider.statusText[DOIIdentifierProvider.IS_REGISTERED]));
 
         // Expect a valid Handle with the value, type we expect
         getClient(token).perform(get("/api/core/items/" +
