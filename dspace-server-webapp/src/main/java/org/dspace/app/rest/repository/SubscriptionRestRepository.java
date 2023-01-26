@@ -23,6 +23,7 @@ import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -41,6 +42,7 @@ import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.subscriptions.SubscriptionEmailNotificationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -71,6 +73,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     private DSpaceObjectUtils dspaceObjectUtil;
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
+    @Autowired
+    private SubscriptionEmailNotificationService subscriptionEmailNotificationService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'READ')")
@@ -167,19 +171,32 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                     throw new AuthorizeException("Only administrator can subscribe for other persons");
                 }
             }
+
+            Subscription subscription = null;
             ServletInputStream input = req.getInputStream();
             SubscriptionRest subscriptionRest = new ObjectMapper().readValue(input, SubscriptionRest.class);
-            Subscription subscription = null;
             List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
-            if (subscriptionParameterList != null) {
+            if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
                 List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
                 for (SubscriptionParameterRest subscriptionParameterRest : subscriptionParameterList) {
                     SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-                    subscriptionParameter.setName(subscriptionParameterRest.getName());
-                    subscriptionParameter.setValue(subscriptionParameterRest.getValue());
+                    var name = subscriptionParameterRest.getName();
+                    var value = subscriptionParameterRest.getValue();
+                    if (!nameAndValueAreSupported(name, value)) {
+                        throw new UnprocessableEntityException("Provided SubscriptionParameter name:" + name +
+                                                               " or value: " + value + " is not supported!");
+                    }
+                    subscriptionParameter.setName(name);
+                    subscriptionParameter.setValue(value);
                     subscriptionParameters.add(subscriptionParameter);
                 }
+
                 var type = subscriptionRest.getSubscriptionType();
+                if (!subscriptionEmailNotificationService.getSupportedSubscriptionTypes().contains(type)) {
+                    throw new UnprocessableEntityException("Provided subscriptionType:" + type + "  is not supported!" +
+                            " Must be one of: " + subscriptionEmailNotificationService.getSupportedSubscriptionTypes());
+                }
+
                 subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters, type);
             }
             context.commit();
@@ -189,6 +206,11 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         } catch (IOException ioException) {
             throw new UnprocessableEntityException("error parsing the body");
         }
+    }
+
+    private boolean nameAndValueAreSupported(String name, String value) {
+        return subscriptionEmailNotificationService.isSupportedSubscriptionParameterName(name) &&
+               subscriptionEmailNotificationService.getSubscriptionParameterValuesByName(name).contains(value);
     }
 
     @Override

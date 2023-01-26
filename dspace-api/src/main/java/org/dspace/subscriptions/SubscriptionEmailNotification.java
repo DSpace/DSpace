@@ -7,10 +7,9 @@
  */
 package org.dspace.subscriptions;
 
-import static org.dspace.subscriptions.SubscriptionEmailNotificationService.FREQUENCIES;
-
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
@@ -53,8 +52,10 @@ public class SubscriptionEmailNotification
         if (StringUtils.isBlank(frequencyOption)) {
             throw new IllegalArgumentException("Option frequency f must be set");
         }
-        if (!FREQUENCIES.contains(frequencyOption)) {
-            throw new IllegalArgumentException("Option f must be one of following values:" + FREQUENCIES);
+        Set<String> supportedValues = subscriptionEmailNotificationService
+                                                 .getSubscriptionParameterValuesByName("frequency");
+        if (!supportedValues.contains(frequencyOption)) {
+            throw new IllegalArgumentException("Option f must be one of following values:" + supportedValues);
         }
         subscriptionEmailNotificationService.perform(getContext(), handler, "content", frequencyOption);
     }
@@ -78,8 +79,8 @@ public class SubscriptionEmailNotification
         return subscriptionEmailNotificationService;
     }
 
-    public void setSubscriptionEmailNotificationService(SubscriptionEmailNotificationService subscriptionNotifService) {
-        this.subscriptionEmailNotificationService = subscriptionNotifService;
+    public void setSubscriptionEmailNotificationService(SubscriptionEmailNotificationService notificationService) {
+        this.subscriptionEmailNotificationService = notificationService;
     }
 
     public Context getContext() {
