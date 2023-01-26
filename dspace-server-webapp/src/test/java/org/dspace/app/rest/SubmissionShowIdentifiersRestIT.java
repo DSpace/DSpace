@@ -24,6 +24,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Test;
@@ -42,6 +44,9 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private HandleService handleService;
 
     private Collection collection;
     private EPerson submitter;
@@ -93,12 +98,14 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
         context.turnOffAuthorisationSystem();
         WorkspaceItem workspaceItem = createWorkspaceItem("Test publication", collection);
         context.restoreAuthSystemState();
+        // Expected handle
+        String expectedHandle = handleService.resolveToURL(context, workspaceItem.getItem().getHandle());
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         getClient(submitterToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sections.identifiers.handle").exists())
-                .andExpect(jsonPath("$.sections.identifiers[1].type").value("identifier"))
-                .andExpect(jsonPath("$.sections.identifiers[1].identifierType").value("handle"));
+                .andExpect(jsonPath("$.sections.identifiers.identifiers[1].type").value("identifier"))
+                .andExpect(jsonPath("$.sections.identifiers.identifiers[1].value").value(expectedHandle))
+                .andExpect(jsonPath("$.sections.identifiers.identifiers[1].identifierType").value("handle"));
     }
 
     @Test
@@ -110,10 +117,11 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
 
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         getClient(submitterToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
-            .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sections.identifiers.handle").exists())
-                .andExpect(jsonPath("$.sections.identifiers[0].type").value("identifier"))
-                .andExpect(jsonPath("$.sections.identifiers[0].identifierType").value("doi"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections.identifiers.identifiers[0].type").value("identifier"))
+                .andExpect(jsonPath("$.sections.identifiers.identifiers[0].identifierType").value("doi"))
+                .andExpect(jsonPath("$.sections.identifiers.identifiers[0].identifierStatus")
+                        .value(DOIIdentifierProvider.statusText[DOIIdentifierProvider.PENDING]));
     }
 
     private WorkspaceItem createWorkspaceItem(String title, Collection collection) {
