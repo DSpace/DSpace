@@ -54,8 +54,8 @@ public class SubscriptionMatcher {
      */
     public static Matcher<? super Object> matchLinks(Integer id) {
         return HalMatcher.matchLinks(REST_SERVER_URL + "core/subscriptions/" + id,
-                "dSpaceObject",
-                "ePerson",
+                "resource",
+                "eperson",
                 "self"
         );
     }

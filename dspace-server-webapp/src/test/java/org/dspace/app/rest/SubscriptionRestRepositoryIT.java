@@ -148,13 +148,13 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.subscriptionType", is("TestType")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Parameter")))
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
+                .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("/eperson")))
+                .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("/resource")))
                 .andExpect(jsonPath("$._links.self.href",
                            Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
-                .andExpect(jsonPath("$._links.dSpaceObject.href",
+                .andExpect(jsonPath("$._links.resource.href",
                            Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href",
+                .andExpect(jsonPath("$._links.eperson.href",
                            Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")));
     }
 
@@ -182,12 +182,12 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("ValueParameter")))
                 .andExpect(jsonPath("$._links.self.href",
                            Matchers.startsWith(REST_SERVER_URL + "core/subscriptions/" + subscription.getID())))
-                .andExpect(jsonPath("$._links.dSpaceObject.href",
+                .andExpect(jsonPath("$._links.resource.href",
                            Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")))
-                .andExpect(jsonPath("$._links.ePerson.href",
+                .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("/resource")))
+                .andExpect(jsonPath("$._links.eperson.href",
                            Matchers.startsWith(REST_SERVER_URL + "core/subscriptions")))
-                .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")));
+                .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("/eperson")));
     }
 
     @Test
@@ -358,7 +358,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         ObjectMapper objectMapper = new ObjectMapper();
 
         getClient().perform(post("/api/core/subscriptions")
-                   .param("dspace_object_id", publicItem.getID().toString())
+                   .param("resource", publicItem.getID().toString())
                    .param("eperson_id", eperson.getID().toString())
                    .content(objectMapper.writeValueAsString(subscriptionRest))
                    .contentType(contentType))
@@ -385,7 +385,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         try {
             String tokenAdmin = getAuthToken(admin.getEmail(), password);
             getClient(tokenAdmin).perform(post("/api/core/subscriptions")
-                                 .param("dspace_object_id", publicItem.getID().toString())
+                                 .param("resource", publicItem.getID().toString())
                                  .param("eperson_id", eperson.getID().toString())
                                  .content(new ObjectMapper().writeValueAsString(map))
                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -393,8 +393,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(jsonPath("$.subscriptionType", is("testType")))
                        .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
                        .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("daily")))
-                       .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("ePerson")))
-                       .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                       .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("eperson")))
+                       .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("resource")))
                        .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
         } finally {
             SubscribeBuilder.deleteSubscription(idRef.get());
@@ -421,7 +421,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         try {
             String tokenEPerson = getAuthToken(eperson.getEmail(), password);
             getClient(tokenEPerson).perform(post("/api/core/subscriptions")
-                                   .param("dspace_object_id", publicItem.getID().toString())
+                                   .param("resource", publicItem.getID().toString())
                                    .param("eperson_id", eperson.getID().toString())
                                    .content(new ObjectMapper().writeValueAsString(map))
                                    .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -429,8 +429,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(jsonPath("$.subscriptionType", is("testType")))
                        .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
                        .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("daily")))
-                       .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("ePerson")))
-                       .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("dSpaceObject")))
+                       .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("eperson")))
+                       .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("resource")))
                        .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
         } finally {
             SubscribeBuilder.deleteSubscription(idRef.get());
@@ -483,7 +483,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(post("/api/core/subscriptions")
-                               .param("dspace_object_id", publicItem.getID().toString())
+                               .param("resource", publicItem.getID().toString())
                                .param("eperson_id", user.getID().toString())
                                .content(new ObjectMapper().writeValueAsString(map))
                                .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -632,7 +632,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
-                                  .param("dspace_object_id", publicItem.getID().toString())
+                                  .param("resource", publicItem.getID().toString())
                                   .param("eperson_id", eperson.getID().toString())
                                   .content(objectMapper.writeValueAsString(newSubscription))
                                   .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -641,8 +641,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                                   .andExpect(jsonPath("$.subscriptionType", is("test")))
                                   .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
                                   .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("WEEKLY")))
-                                  .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
-                                  .andExpect(jsonPath("$._links.dSpaceObject.href",Matchers.endsWith("/dSpaceObject")));
+                                  .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("/eperson")))
+                                  .andExpect(jsonPath("$._links.resource.href",Matchers.endsWith("/resource")));
     }
 
     @Test
@@ -669,7 +669,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(put("/api/core/subscriptions/" + subscription.getID())
-                             .param("dspace_object_id", publicItem.getID().toString())
+                             .param("resource", publicItem.getID().toString())
                              .param("eperson_id", eperson.getID().toString())
                              .content(objectMapper.writeValueAsString(newSubscription))
                              .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -678,8 +678,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(jsonPath("$.subscriptionType", is("test")))
                              .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
                              .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("WEEKLY")))
-                             .andExpect(jsonPath("$._links.ePerson.href", Matchers.endsWith("/ePerson")))
-                             .andExpect(jsonPath("$._links.dSpaceObject.href", Matchers.endsWith("/dSpaceObject")));
+                             .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("/eperson")))
+                             .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("/resource")));
     }
 
     @Test
@@ -695,7 +695,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
     }
@@ -713,7 +713,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
     }
@@ -771,7 +771,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.uuid", Matchers.is(publicItem.getID().toString())))
                              .andExpect(jsonPath("$.name", Matchers.is(publicItem.getName())))
@@ -794,7 +794,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.uuid", Matchers.is(publicItem.getID().toString())))
                              .andExpect(jsonPath("$.name", Matchers.is(publicItem.getName())))

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.eperson.Subscription;
 
 /**
@@ -14,6 +15,7 @@ import org.dspace.eperson.Subscription;
  */
 public class SubscriptionParameterRest {
 
+    @JsonIgnore
     private Integer id;
     private String name;
     private String value;
