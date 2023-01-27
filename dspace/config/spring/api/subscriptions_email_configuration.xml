@@ -46,7 +46,7 @@
         <entry key="content" value-ref="contentNotifyGenerator"/>
     </util:map>
 
-    <bean id="contentNotifyGenerator" name="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" />
+    <bean id="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" />
 
     <util:map id="contentUpdates">
         <entry key="community" value-ref="communityUpdates"/>
@@ -61,27 +61,21 @@
     <util:map id="entityDissemination">
         <entry key="Publication" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="Person" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="Journal" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="OrgUnit" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="Dataset" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="Patent" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="Event" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="Equipment" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="JournalVolume" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="Project" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="PersonCv" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="OrgUnit" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Journal" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="JournalVolume" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="JournalIssue" value-ref="subscriptionDsoMetadataForEmailCompose"/>
-        <entry key="Funding" value-ref="subscriptionDsoMetadataForEmailCompose"/>
     </util:map>
 
     <bean class="org.dspace.content.crosswalk.SubscriptionDsoMetadataForEmailCompose" id="subscriptionDsoMetadataForEmailCompose">
         <property name="metadata" ref ="generalMetadataEntity"/>
     </bean>
 
-    <bean id="communityUpdates" name="communityUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CommunityUpdates" />
+    <bean id="communityUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CommunityUpdates" />
 
-    <bean id="collectionUpdates" name="collectionUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CollectionsUpdates" />
+    <bean id="collectionUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CollectionsUpdates" />
 
-    <bean id="itemUpdates" name="itemUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.ItemUpdates" />
+    <bean id="itemUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.ItemUpdates" />
 
 </beans>

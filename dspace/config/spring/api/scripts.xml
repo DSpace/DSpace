@@ -82,7 +82,7 @@
     </bean>
 
     <bean id="subscription-send" class="org.dspace.subscriptions.SubscriptionEmailNotificationCliScriptConfiguration">
-        <property name="description" value="Perform subscriptions send"/>
+        <property name="description" value="Send emails related to Community/Collection/Item subscriptions"/>
         <property name="dspaceRunnableClass" value="org.dspace.subscriptions.SubscriptionEmailNotificationCli"/>
     </bean>
 

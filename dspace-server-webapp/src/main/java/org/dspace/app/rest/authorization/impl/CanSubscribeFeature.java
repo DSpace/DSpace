@@ -26,13 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Checks if the given user can subscribe to a dataspace object
+ * Checks if the given user can subscribe to a DSpace object
  *
  * @author Alba Aliu (alba.aliu at atis.al)
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CanSubscribeFeature.NAME,
-        description = "Used to verify if the given user can subscribe to a dataspace object")
+        description = "Used to verify if the given user can subscribe to a DSpace object")
 public class CanSubscribeFeature implements AuthorizationFeature {
 
     public static final String NAME = "canSubscribeDso";
