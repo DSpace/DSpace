@@ -40,7 +40,7 @@ public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestReposit
             if (Objects.isNull(subscription)) {
                 throw new ResourceNotFoundException("No such subscription: " + subscriptionId);
             }
-            return converter.toRest(subscription.getePerson(),  projection);
+            return converter.toRest(subscription.getEPerson(),  projection);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

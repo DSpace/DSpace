@@ -104,12 +104,12 @@ public class SubscribeCLITool {
 
         // Go through the list collating subscriptions for each e-person
         for (Subscription subscription : subscriptions) {
-            if (!(subscription.getdSpaceObject() != null && subscription.getdSpaceObject() instanceof Collection)) {
+            if (!(subscription.getDSpaceObject() != null && subscription.getDSpaceObject() instanceof Collection)) {
                 continue;
             }
             // Does this row relate to the same e-person as the last?
             if ((currentEPerson == null)
-                || (!subscription.getePerson().getID().equals(currentEPerson
+                || (!subscription.getEPerson().getID().equals(currentEPerson
                                                                   .getID()))) {
                 // New e-person. Send mail for previous e-person
                 if (currentEPerson != null) {
@@ -123,11 +123,11 @@ public class SubscribeCLITool {
                     }
                 }
 
-                currentEPerson = subscription.getePerson();
+                currentEPerson = subscription.getEPerson();
                 collections = new ArrayList<>();
             }
 
-            collections.add((Collection) subscription.getdSpaceObject());
+            collections.add((Collection) subscription.getDSpaceObject());
         }
 
         // Process the last person

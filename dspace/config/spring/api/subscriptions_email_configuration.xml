@@ -82,6 +82,6 @@
 
     <bean id="collectionUpdates" name="collectionUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CollectionsUpdates" />
 
-    <bean id="itemUpdates" name="itemUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.ItemsUpdates" />
+    <bean id="itemUpdates" name="itemUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.ItemUpdates" />
 
 </beans>

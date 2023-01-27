@@ -41,7 +41,7 @@ public class SubscriptionEmailNotification
     @Override
     public void setup() throws ParseException {
         this.subscriptionEmailNotificationService = new DSpace().getServiceManager().getServiceByName(
-                SubscriptionEmailNotificationService.class.getName(), SubscriptionEmailNotificationService.class);
+              SubscriptionEmailNotificationServiceImpl.class.getName(), SubscriptionEmailNotificationServiceImpl.class);
     }
 
     @Override

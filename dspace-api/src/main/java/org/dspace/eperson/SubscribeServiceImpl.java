@@ -70,7 +70,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             Subscription newSubscription = subscriptionDAO.create(context, new Subscription());
             subscriptionParameterList.forEach(subscriptionParameter ->
                     newSubscription.addParameter(subscriptionParameter));
-            newSubscription.setePerson(eperson);
+            newSubscription.setEPerson(eperson);
             newSubscription.setdSpaceObject(dSpaceObject);
             newSubscription.setSubscriptionType(type);
             return newSubscription;
@@ -156,7 +156,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         subscriptionDB.setSubscriptionType(type);
         subscriptionDB.setdSpaceObject(dSpaceObject);
         subscriptionParameterList.forEach(x -> subscriptionDB.addParameter(x));
-        subscriptionDB.setePerson(eperson);
+        subscriptionDB.setEPerson(eperson);
         subscriptionDAO.save(context, subscriptionDB);
         return subscriptionDB;
     }

@@ -74,7 +74,7 @@ public class SubscriptionRestPermissionEvaluatorPlugin extends RestObjectPermiss
             }
 
             Subscription subscription = subscribeService.findById(context, Integer.parseInt(targetId.toString()));
-            return Objects.nonNull(subscription) ? currentUser.equals(subscription.getePerson()) : true;
+            return Objects.nonNull(subscription) ? currentUser.equals(subscription.getEPerson()) : true;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }

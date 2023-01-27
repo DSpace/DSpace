@@ -45,12 +45,12 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
             if (Objects.isNull(subscription)) {
                 throw new ResourceNotFoundException("No such subscription: " + subscriptionId);
             }
-            if (subscription.getdSpaceObject() instanceof Item ||
-                subscription.getdSpaceObject() instanceof Community ||
-                subscription.getdSpaceObject() instanceof Collection) {
-                return converter.toRest(subscription.getdSpaceObject(), projection);
+            if (subscription.getDSpaceObject() instanceof Item ||
+                subscription.getDSpaceObject() instanceof Community ||
+                subscription.getDSpaceObject() instanceof Collection) {
+                return converter.toRest(subscription.getDSpaceObject(), projection);
             } else {
-                HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
+                HibernateProxy hibernateProxy = (HibernateProxy) subscription.getDSpaceObject();
                 LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
                 return converter.toRest(initializer.getImplementation(), projection);
             }

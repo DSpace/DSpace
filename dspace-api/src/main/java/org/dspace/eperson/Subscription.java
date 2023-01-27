@@ -71,7 +71,7 @@ public class Subscription implements ReloadableEntity<Integer> {
         return id;
     }
 
-    public DSpaceObject getdSpaceObject() {
+    public DSpaceObject getDSpaceObject() {
         return this.dSpaceObject;
     }
 
@@ -79,11 +79,11 @@ public class Subscription implements ReloadableEntity<Integer> {
         this.dSpaceObject = dSpaceObject;
     }
 
-    public EPerson getePerson() {
+    public EPerson getEPerson() {
         return ePerson;
     }
 
-    public void setePerson(EPerson ePerson) {
+    public void setEPerson(EPerson ePerson) {
         this.ePerson = ePerson;
     }
 

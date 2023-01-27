@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Implementation class of SubscriptionGenerator
  * which will handle the logic of sending the emails
- * in case of content subscriptions
+ * in case of 'content' subscriptionType
  */
 @SuppressWarnings("rawtypes")
 public class ContentGenerator implements SubscriptionGenerator<IndexableObject> {

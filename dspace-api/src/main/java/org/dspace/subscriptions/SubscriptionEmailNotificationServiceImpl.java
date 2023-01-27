@@ -77,12 +77,12 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     }
 
     @SuppressWarnings("unchecked")
-    public void perform(Context context, DSpaceRunnableHandler handler, String type, String frequency) {
+    public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
         try {
-            List<Subscription> subscriptions = findAllSubscriptionsBySubscriptionTypeAndFrequency(context, type,
-                                               frequency);
-            // Here is verified if type is "content" Or "statistics" as them are configured
-            if (subscriptionType2generators.keySet().contains(type)) {
+            List<Subscription> subscriptions =
+                               findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType, frequency);
+            // Here is verified if SubscriptionType is "content" Or "statistics" as them are configured
+            if (subscriptionType2generators.keySet().contains(subscriptionType)) {
                 // the list of the person who has subscribed
                 int iterator = 0;
                 for (Subscription subscription : subscriptions) {
@@ -97,13 +97,13 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                         items.addAll(contentUpdates.get(Item.class.getSimpleName().toLowerCase(Locale.ROOT))
                              .findUpdates(context, dSpaceObject, frequency));
                     }
-                    var ePerson = subscription.getePerson();
+                    var ePerson = subscription.getEPerson();
                     if (iterator < subscriptions.size() - 1) {
-                        if (ePerson.equals(subscriptions.get(iterator + 1).getePerson())) {
+                        if (ePerson.equals(subscriptions.get(iterator + 1).getEPerson())) {
                             iterator++;
                             continue;
                         } else {
-                            subscriptionType2generators.get(type)
+                            subscriptionType2generators.get(subscriptionType)
                                       .notifyForSubscriptions(context, ePerson, communities, collections, items);
                             communities.clear();
                             collections.clear();
@@ -111,14 +111,14 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                         }
                     } else {
                         //in the end of the iteration
-                        subscriptionType2generators.get(type)
+                        subscriptionType2generators.get(subscriptionType)
                                         .notifyForSubscriptions(context, ePerson, communities, collections, items);
                     }
                     iterator++;
                 }
             } else {
-                throw new IllegalArgumentException("Currently this type:" + type +
-                                                   " of subscription is not supported!");
+                throw new IllegalArgumentException("Currently this SubscriptionType:" + subscriptionType +
+                                                   " is not supported!");
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -128,9 +128,9 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     }
 
     private DSpaceObject getdSpaceObject(Subscription subscription) {
-        DSpaceObject dSpaceObject = subscription.getdSpaceObject();
-        if (subscription.getdSpaceObject() instanceof HibernateProxy) {
-            HibernateProxy hibernateProxy = (HibernateProxy) subscription.getdSpaceObject();
+        DSpaceObject dSpaceObject = subscription.getDSpaceObject();
+        if (subscription.getDSpaceObject() instanceof HibernateProxy) {
+            HibernateProxy hibernateProxy = (HibernateProxy) subscription.getDSpaceObject();
             LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
             dSpaceObject = (DSpaceObject) initializer.getImplementation();
         }
@@ -143,7 +143,7 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
             return subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType,
                                     frequency)
                                    .stream()
-                                   .sorted(Comparator.comparing(s -> s.getePerson().getID()))
+                                   .sorted(Comparator.comparing(s -> s.getEPerson().getID()))
                                    .collect(Collectors.toList());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

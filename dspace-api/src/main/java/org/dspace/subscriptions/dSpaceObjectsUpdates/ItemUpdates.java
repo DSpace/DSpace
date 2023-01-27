@@ -46,9 +46,9 @@ import org.dspace.subscriptions.service.DSpaceObjectUpdates;
  *
  * @author Alba Aliu
  */
-public class ItemsUpdates implements DSpaceObjectUpdates {
+public class ItemUpdates implements DSpaceObjectUpdates {
 
-    private final Logger log = LogManager.getLogger(ItemsUpdates.class);
+    private final Logger log = LogManager.getLogger(ItemUpdates.class);
 
     private final CollectionService collectionService;
     private final CommunityService communityService;
@@ -181,7 +181,7 @@ public class ItemsUpdates implements DSpaceObjectUpdates {
         return discoverQuery;
     }
 
-    public ItemsUpdates(CollectionService collectionService, CommunityService communityService, ItemService itemService,
+    public ItemUpdates(CollectionService collectionService, CommunityService communityService, ItemService itemService,
                         DiscoveryConfigurationService searchConfigurationService, SearchService searchService) {
         this.collectionService = collectionService;
         this.communityService = communityService;
