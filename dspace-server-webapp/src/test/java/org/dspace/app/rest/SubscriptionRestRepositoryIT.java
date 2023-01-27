@@ -438,7 +438,79 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void createInvalidSubscriptionTest() throws Exception {
+    public void createSubscriptionWithWrongSubscriptionParameterNameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "TestName");
+        sub_list.put("value", "X");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/core/subscriptions")
+                               .param("resource", publicItem.getID().toString())
+                               .param("eperson_id", eperson.getID().toString())
+                               .content(new ObjectMapper().writeValueAsString(map))
+                               .contentType(MediaType.APPLICATION_JSON_VALUE))
+                               .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createSubscriptionWithInvalidSubscriptionParameterValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "X");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/core/subscriptions")
+                               .param("resource", publicItem.getID().toString())
+                               .param("eperson_id", eperson.getID().toString())
+                               .content(new ObjectMapper().writeValueAsString(map))
+                               .contentType(MediaType.APPLICATION_JSON_VALUE))
+                               .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createSubscriptionWithInvalidSubscriptionTypeValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "InvalidValue");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/core/subscriptions")
+                               .param("resource", publicItem.getID().toString())
+                               .param("eperson_id", eperson.getID().toString())
+                               .content(new ObjectMapper().writeValueAsString(map))
+                               .contentType(MediaType.APPLICATION_JSON_VALUE))
+                               .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createSubscriptionInvalidJsonTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Map<String, Object> map = new HashMap<>();
@@ -616,8 +688,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Frequency");
-        subscriptionParameter.setValue("Daily");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
@@ -628,8 +700,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         newSubscription.put("subscriptionType", "content");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
-        sub_list.put("name", "Frequency");
-        sub_list.put("value", "WEEKLY");
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
         list.add(sub_list);
         newSubscription.put("subscriptionParameterList", list);
 
@@ -642,19 +714,19 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                                   .andExpect(status().isOk())
                                   .andExpect(content().contentType(contentType))
                                   .andExpect(jsonPath("$.subscriptionType", is("content")))
-                                  .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
-                                  .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("WEEKLY")))
+                                  .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                                  .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("W")))
                                   .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("/eperson")))
                                   .andExpect(jsonPath("$._links.resource.href",Matchers.endsWith("/resource")));
     }
 
     @Test
-    public void putSubscriptionAdminTest() throws Exception {
+    public void putSubscriptionInvalidSubscriptionParameterNameTest() throws Exception {
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Frequency");
-        subscriptionParameter.setValue("Daily");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
@@ -665,8 +737,101 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         newSubscription.put("subscriptionType", "content");
         List<Map<String, Object>> list = new ArrayList<>();
         Map<String, Object> sub_list = new HashMap<>();
-        sub_list.put("name", "Frequency");
-        sub_list.put("value", "WEEKLY");
+        sub_list.put("name", "InvalidName");
+        sub_list.put("value", "W");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
+
+        String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
+                                  .param("resource", publicItem.getID().toString())
+                                  .param("eperson_id", eperson.getID().toString())
+                                  .content(objectMapper.writeValueAsString(newSubscription))
+                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                  .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void putSubscriptionInvalidSubscriptionParameterValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "content", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "Y");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
+
+        String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
+                                  .param("resource", publicItem.getID().toString())
+                                  .param("eperson_id", eperson.getID().toString())
+                                  .content(objectMapper.writeValueAsString(newSubscription))
+                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                  .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void putSubscriptionInvalidSubscriptionTypeValueTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "content", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("subscriptionType", "InvalidType");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "D");
+        list.add(sub_list);
+        newSubscription.put("subscriptionParameterList", list);
+
+        String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
+                                  .param("resource", publicItem.getID().toString())
+                                  .param("eperson_id", eperson.getID().toString())
+                                  .content(objectMapper.writeValueAsString(newSubscription))
+                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+                                  .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void putSubscriptionAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "content", publicItem, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> newSubscription = new HashMap<>();
+        newSubscription.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
         list.add(sub_list);
         newSubscription.put("subscriptionParameterList", list);
 
@@ -679,8 +844,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
                              .andExpect(status().isOk())
                              .andExpect(content().contentType(contentType))
                              .andExpect(jsonPath("$.subscriptionType", is("content")))
-                             .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("Frequency")))
-                             .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("WEEKLY")))
+                             .andExpect(jsonPath("$.subscriptionParameterList[0].name", is("frequency")))
+                             .andExpect(jsonPath("$.subscriptionParameterList[0].value", is("W")))
                              .andExpect(jsonPath("$._links.eperson.href", Matchers.endsWith("/eperson")))
                              .andExpect(jsonPath("$._links.resource.href", Matchers.endsWith("/resource")));
     }
@@ -690,8 +855,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("M");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
@@ -708,8 +873,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("M");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
@@ -726,14 +891,14 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("M");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+        getClient().perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -742,22 +907,22 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("W");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/ePerson"))
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                                .andExpect(status().isForbidden());
     }
 
     @Test
     public void linkedEpersonOfSubscriptionNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + Integer.MAX_VALUE + "/ePerson"))
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + Integer.MAX_VALUE + "/eperson"))
                              .andExpect(status().isNotFound());
     }
 
@@ -766,11 +931,11 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("W");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
-                                    "TestType", publicItem, eperson, subscriptionParameterList).build();
+                                    "content", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -789,8 +954,8 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("W");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
@@ -812,14 +977,14 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("W");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, eperson, subscriptionParameterList).build();
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+        getClient().perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -828,22 +993,22 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
         SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-        subscriptionParameter.setName("Parameter");
-        subscriptionParameter.setValue("ValueParameter");
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
         subscriptionParameterList.add(subscriptionParameter);
         Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
                                     "content", publicItem, admin, subscriptionParameterList).build();
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/dSpaceObject"))
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                                .andExpect(status().isForbidden());
     }
 
     @Test
     public void linkedDSpaceObjectOfSubscriptionNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + Integer.MAX_VALUE + "/dSpaceObject"))
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + Integer.MAX_VALUE + "/resource"))
                              .andExpect(status().isNotFound());
     }
 
