@@ -178,26 +178,9 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
             if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
                 List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
-                for (SubscriptionParameterRest subscriptionParameterRest : subscriptionParameterList) {
-                    SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-                    var name = subscriptionParameterRest.getName();
-                    var value = subscriptionParameterRest.getValue();
-                    if (!nameAndValueAreSupported(name, value)) {
-                        throw new UnprocessableEntityException("Provided SubscriptionParameter name:" + name +
-                                                               " or value: " + value + " is not supported!");
-                    }
-                    subscriptionParameter.setName(name);
-                    subscriptionParameter.setValue(value);
-                    subscriptionParameters.add(subscriptionParameter);
-                }
-
-                var type = subscriptionRest.getSubscriptionType();
-                if (!subscriptionEmailNotificationService.getSupportedSubscriptionTypes().contains(type)) {
-                    throw new UnprocessableEntityException("Provided subscriptionType:" + type + "  is not supported!" +
-                            " Must be one of: " + subscriptionEmailNotificationService.getSupportedSubscriptionTypes());
-                }
-
-                subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters, type);
+                validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
+                subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters,
+                                                          subscriptionRest.getSubscriptionType());
             }
             context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
@@ -205,6 +188,29 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new SQLException(sqlException.getMessage(), sqlException);
         } catch (IOException ioException) {
             throw new UnprocessableEntityException("error parsing the body");
+        }
+    }
+
+    private void validateParameters(SubscriptionRest subscriptionRest,
+                                    List<SubscriptionParameterRest> subscriptionParameterList,
+                                    List<SubscriptionParameter> subscriptionParameters) {
+        for (SubscriptionParameterRest subscriptionParameterRest : subscriptionParameterList) {
+            SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+            var name = subscriptionParameterRest.getName();
+            var value = subscriptionParameterRest.getValue();
+            if (!nameAndValueAreSupported(name, value)) {
+                throw new UnprocessableEntityException("Provided SubscriptionParameter name:" + name +
+                                                       " or value: " + value + " is not supported!");
+            }
+            subscriptionParameter.setName(name);
+            subscriptionParameter.setValue(value);
+            subscriptionParameters.add(subscriptionParameter);
+        }
+
+        var type = subscriptionRest.getSubscriptionType();
+        if (!subscriptionEmailNotificationService.getSupportedSubscriptionTypes().contains(type)) {
+            throw new UnprocessableEntityException("Provided subscriptionType:" + type + "  is not supported!" +
+                    " Must be one of: " + subscriptionEmailNotificationService.getSupportedSubscriptionTypes());
         }
     }
 
@@ -238,22 +244,18 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         if (Objects.isNull(ePerson)) {
             throw new ResourceNotFoundException("There is not ePerson with uuid:" + epersonId);
         }
+
         DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
         if (Objects.isNull(dSpaceObject)) {
             throw new ResourceNotFoundException("There is not DSpaceObject with uuid:" + dsoId);
         }
 
         if (id.equals(subscription.getID())) {
-            List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
-            for (SubscriptionParameterRest subscriptionParamRest : subscriptionRest.getSubscriptionParameterList()) {
-                SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
-                subscriptionParameter.setSubscription(subscription);
-                subscriptionParameter.setValue(subscriptionParamRest.getValue());
-                subscriptionParameter.setName(subscriptionParamRest.getName());
-                subscriptionParameterList.add(subscriptionParameter);
-            }
+            List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
+            List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
+            validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
             subscription = subscribeService.updateSubscription(context, id, ePerson, dSpaceObject,
-                                            subscriptionParameterList, subscriptionRest.getSubscriptionType());
+                                            subscriptionParameters, subscriptionRest.getSubscriptionType());
             context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } else {
