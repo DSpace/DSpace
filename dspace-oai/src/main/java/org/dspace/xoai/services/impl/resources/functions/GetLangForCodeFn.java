@@ -12,6 +12,7 @@ import org.dspace.utils.IsoLangCodes;
 
 /**
  * Serves as proxy for call from XSL engine. Calls SpecialItemService.
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class GetLangForCodeFn extends StringXSLFunction {
     @Override

@@ -20,6 +20,9 @@ import java.util.Set;
 
 /**
  *  Provides logging capabilities to XSL interpreter.
+ *
+ *  Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace) and modified by
+ *  @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class XslLogUtil {
 

@@ -24,6 +24,7 @@ import org.bouncycastle.util.Arrays;
 /**
  * Serves as proxy for call from XSL engine. Base for all functions having one string param
  * and returning one string.
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public abstract class StringXSLFunction implements ExtensionFunction {
 

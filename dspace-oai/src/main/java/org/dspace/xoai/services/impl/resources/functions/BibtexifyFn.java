@@ -8,19 +8,20 @@
 
 package org.dspace.xoai.services.impl.resources.functions;
 
-/**
- * Serves as proxy for call from XSL engine. Replaces http:// with https://
- * @author Marian Berger (marian.berger at dataquest.sk)
- */
-public class StringReplaceFn extends StringXSLFunction {
+import org.dspace.utils.BibtexUtil;
 
+/**
+ *  @author Marian Berger (marian.berger at dataquest.sk)
+ */
+public class BibtexifyFn extends ListXslFunction {
     @Override
     protected String getFnName() {
-        return "stringReplace";
+        return "bibtexify";
     }
 
     @Override
-    protected String getStringResult(String param) {
-        return param.replaceFirst("http://", "https://");
+    protected String getStringResponse(String param) {
+        return BibtexUtil.bibtexify(param);
     }
+
 }

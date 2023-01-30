@@ -12,6 +12,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Serves as proxy for call from XSL engine. Returns property from config.
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class GetPropertyFn extends StringXSLFunction {
 

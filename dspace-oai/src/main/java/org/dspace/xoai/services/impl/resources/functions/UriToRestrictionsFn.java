@@ -14,6 +14,7 @@ import org.dspace.utils.LicenseUtil;
 
 /**
  * Serves as proxy for call from XSL engine. Calls LicenseUtil
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class UriToRestrictionsFn extends NodeListXslFunction {
     @Override

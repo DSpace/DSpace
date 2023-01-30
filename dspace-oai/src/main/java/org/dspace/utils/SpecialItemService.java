@@ -38,12 +38,12 @@ import org.xml.sax.InputSource;
 @Component
 
 /**
- * @author Marian Berger (marian.berger@dataquest.sk)
- * Refactored class from clarin-dspace. https://github.com/ufal/clarin-dspace/blob
- * /si-master-origin/dspace-oai/src/main/java/cz/cuni/mff/ufal/utils/ItemUtil.java
- *
  * Provides various information based on
  * provided metadata or strings.
+ *
+ * Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace/blob
+ * /si-master-origin/dspace-oai/src/main/java/cz/cuni/mff/ufal/utils/ItemUtil.java) and modified by
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class SpecialItemService {
     private SpecialItemService() {}
