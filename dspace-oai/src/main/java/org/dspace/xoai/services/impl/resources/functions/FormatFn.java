@@ -8,21 +8,20 @@
 
 package org.dspace.xoai.services.impl.resources.functions;
 
-import org.dspace.utils.SpecialItemService;
-import org.w3c.dom.Node;
+import org.dspace.utils.BibtexUtil;
 
 /**
- * Serves as proxy for call from XSL engine. Calls SpecialItemService.
  * @author Marian Berger (marian.berger at dataquest.sk)
  */
-public class GetAuthorFn extends NodeXslFunction {
+public class FormatFn extends StringXSLFunction {
     @Override
     protected String getFnName() {
-        return "getAuthor";
+        return "format";
     }
 
     @Override
-    protected Node getNode(String param) {
-        return SpecialItemService.getAuthor(param);
+    protected String getStringResult(String param) {
+        return BibtexUtil.format(param);
     }
+
 }

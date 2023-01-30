@@ -23,6 +23,8 @@ import net.sf.saxon.jaxp.SaxonTransformerFactory;
 import net.sf.saxon.s9api.ExtensionFunction;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.xoai.services.impl.resources.functions.BibtexifyFn;
+import org.dspace.xoai.services.impl.resources.functions.FormatFn;
 import org.dspace.xoai.services.impl.resources.functions.GetAuthorFn;
 import org.dspace.xoai.services.impl.resources.functions.GetContactFn;
 import org.dspace.xoai.services.impl.resources.functions.GetFundingFn;
@@ -50,7 +52,8 @@ public class DSpaceResourceResolver implements ResourceResolver {
                 new GetPropertyFn(), new StringReplaceFn(), new UriToMetaShareFn(),
                 new UriToLicenseFn(), new LogMissingMsgFn(), new UriToRestrictionsFn(),
                 new GetContactFn(), new GetAuthorFn(), new GetFundingFn(), new GetLangForCodeFn(),
-                new GetPropertyFn(), new GetSizeFn(), new GetUploadedMetadataFn(), new LogMissingFn()
+                new GetPropertyFn(), new GetSizeFn(), new GetUploadedMetadataFn(), new LogMissingFn(),
+                new BibtexifyFn(), new FormatFn()
         );
 
         SaxonTransformerFactory saxonTransformerFactory = (SaxonTransformerFactory) transformerFactory;

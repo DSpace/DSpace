@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * This class is taken from UFAL-clarin.
- * https://github.com/ufal/clarin-dspace/blob
- * /si-master-origin/dspace-api/src/main/java/cz/cuni/mff/ufal/IsoLangCodes.java
+ *  Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace/blob
+ *  /si-master-origin/dspace-api/src/main/java/cz/cuni/mff/ufal/IsoLangCodes.java) and modified by
+ *  @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class IsoLangCodes {
 

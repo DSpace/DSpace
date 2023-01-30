@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 
 /**
  * Serves as proxy for call from XSL engine. Calls SpecialItemService.
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class GetFundingFn extends NodeXslFunction {
     @Override

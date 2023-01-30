@@ -26,6 +26,7 @@ import org.dspace.utils.XslLogUtil;
 
 /**
  * Serves as proxy for call from XSL engine.
+ * @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class LogMissingMsgFn implements ExtensionFunction {
 

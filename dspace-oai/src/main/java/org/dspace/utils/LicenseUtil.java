@@ -23,8 +23,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * This class is taken from UFAL-clarin. https://github.com/ufal/clarin-dspace/blob
- * /si-master-origin/dspace-oai/src/main/java/cz/cuni/mff/ufal/utils/LicenseUtil.java
+ *  Class is copied from the LINDAT/CLARIAH-CZ (This class is taken from UFAL-clarin. https://github.com/ufal/clarin-dspace/blob
+ *  * /si-master-origin/dspace-oai/src/main/java/cz/cuni/mff/ufal/utils/LicenseUtil.java) and modified by
+ *  @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class LicenseUtil {
 
