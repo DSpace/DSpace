@@ -164,7 +164,7 @@
     <!-- Matomo statistics -->
     <bean class="org.matomo.java.tracking.MatomoTracker">
         <!-- TODO change me -->
-        <constructor-arg value="http://localhost/matomo.php"/>
+        <constructor-arg value="http://dev-5.pc:8135/matomo.php"/>
     </bean>
     <bean class="org.dspace.app.statistics.clarin.ClarinMatomoBitstreamTracker"/>
     <bean class="org.dspace.app.statistics.clarin.ClarinMatomoOAITracker"/>
