@@ -18,50 +18,52 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
-import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * The purpose of this plugin is to index all ADD type resource policies related to collections.
- * 
- * @author Mykhaylo Boychuk (at 4science.it)
+ * Indexes policies that yield write access to items.
+ *
+ * @author Koen Pauwels at atmire.com
  */
-public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIndexPlugin {
-
+public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin {
     private static final Logger log = org.apache.logging.log4j.LogManager
-                                                .getLogger(SolrServiceIndexCollectionSubmittersPlugin.class);
+        .getLogger(SolrServiceIndexItemEditorsPlugin.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
-        if (idxObj instanceof IndexableCollection) {
-            Collection col = ((IndexableCollection) idxObj).getIndexedObject();
-            if (col != null) {
+        if (idxObj instanceof IndexableItem) {
+            Item item = ((IndexableItem) idxObj).getIndexedObject();
+            if (item != null) {
                 try {
-                    // Index groups with ADMIN rights on the Collection, on
-                    // Communities containing those Collections, and recursively on any Community containing such a
+                    // Index groups with ADMIN rights on Collections containing the Item, on
+                    // Communities containing those Collections, and recursively on any Community containing ssuch a
                     // Community.
                     // TODO: Strictly speaking we should also check for epersons who received admin rights directly,
                     //       without being part of the admin group. Finding them may be a lot slower though.
-                    for (UUID unprefixedId : findTransitiveAdminGroupIds(context, col)) {
-                        document.addField("submit", "g" + unprefixedId);
+                    for (Collection collection : item.getCollections()) {
+                        for (UUID unprefixedId : findTransitiveAdminGroupIds(context, collection)) {
+                            document.addField("edit", "g" + unprefixedId);
+                        }
                     }
 
-                    // Index groups and epersons with ADD or ADMIN rights on the Collection.
+                    // Index groups and epersons with WRITE or direct ADMIN rights on the Item.
                     List<String> prefixedIds = findDirectlyAuthorizedGroupAndEPersonPrefixedIds(
-                        authorizeService, context, col, new int[] {Constants.ADD, Constants.ADMIN}
+                        authorizeService, context, item, new int[] {Constants.WRITE, Constants.ADMIN}
                     );
                     for (String prefixedId : prefixedIds) {
-                        document.addField("submit", prefixedId);
+                        document.addField("edit", prefixedId);
                     }
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
-                             "Collection: (id " + col.getID() + " type " + col.getName() + ")" ));
+                        "Item: (id " + item.getID() + " name " + item.getName() + ")" ));
                 }
             }
         }

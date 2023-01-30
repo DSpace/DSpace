@@ -18,6 +18,7 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,7 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
 
     @Override
     public boolean isAuthorized(Context context, AuthorizationFeature feature, BaseObjectRest object)
-            throws SQLException {
+        throws SQLException, SearchServiceException {
         if (object == null) {
             // the authorization interface require that the object is not null
             return false;

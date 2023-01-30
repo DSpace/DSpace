@@ -13,6 +13,7 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.springframework.core.annotation.AnnotationUtils;
 
 /**
@@ -33,7 +34,7 @@ public interface AuthorizationFeature {
      *            wide feature
      * @return true if the user associated with the context has access to the feature for the specified object
      */
-    boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException;
+    boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException;
 
     /**
      * Return the name of the feature

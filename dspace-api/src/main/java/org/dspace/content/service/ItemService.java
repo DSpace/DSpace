@@ -28,6 +28,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -767,6 +768,31 @@ public interface ItemService
      * @throws SQLException if database error
      */
     int countWithdrawnItems(Context context) throws SQLException;
+
+    /**
+     * finds all items for which the current user has editing rights
+     *
+     * @param context DSpace context object
+     * @param q       limit the returned items to those matching this query
+     * @param offset  page offset
+     * @param limit   page size limit
+     * @return list of items for which the current user has editing rights
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
+    public List<Item> findItemsWithEdit(Context context, String q, int offset, int limit)
+        throws SQLException, SearchServiceException;
+
+    /**
+     * counts all items for which the current user has editing rights
+     *
+     * @param context DSpace context object
+     * @param q       limit the counted items to those matching this query
+     * @return list of items for which the current user has editing rights
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
+    public int countItemsWithEdit(Context context, String q) throws SQLException, SearchServiceException;
 
     /**
      * Check if the supplied item is an inprogress submission
