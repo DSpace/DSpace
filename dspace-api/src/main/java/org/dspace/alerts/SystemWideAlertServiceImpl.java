@@ -20,7 +20,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,12 +36,15 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
     @Autowired
     private AuthorizeService authorizeService;
 
-    @Autowired
-    private EPersonService ePersonService;
-
+    @Override
     public SystemWideAlert create(final Context context, final String message,
                                   final AllowSessionsEnum allowSessionsType,
-                                  final Date countdownTo, final boolean active) throws SQLException {
+                                  final Date countdownTo, final boolean active) throws SQLException,
+            AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                    "Only administrators can create a system-wide alert");
+        }
         SystemWideAlert systemWideAlert = new SystemWideAlert();
         systemWideAlert.setMessage(message);
         systemWideAlert.setAllowSessions(allowSessionsType);
@@ -59,36 +61,52 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         return createdAlert;
     }
 
+    @Override
     public SystemWideAlert find(final Context context, final int alertId) throws SQLException {
         return systemWideAlertDAO.findByID(context, SystemWideAlert.class, alertId);
     }
 
+    @Override
     public List<SystemWideAlert> findAll(final Context context) throws SQLException {
         return systemWideAlertDAO.findAll(context, SystemWideAlert.class);
     }
 
+    @Override
     public List<SystemWideAlert> findAll(final Context context, final int limit, final int offset) throws SQLException {
         return systemWideAlertDAO.findAll(context, limit, offset);
     }
 
+    @Override
     public List<SystemWideAlert> findAllActive(final Context context, final int limit, final int offset)
             throws SQLException {
         return systemWideAlertDAO.findAllActive(context, limit, offset);
     }
 
+    @Override
     public void delete(final Context context, final SystemWideAlert systemWideAlert)
             throws SQLException, IOException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                    "Only administrators can create a system-wide alert");
+        }
         systemWideAlertDAO.delete(context, systemWideAlert);
         log.info(LogHelper.getHeader(context, "system_wide_alert_create",
                                      "System Wide Alert with ID " + systemWideAlert.getID() + " has been deleted"));
 
     }
 
-    public void update(final Context context, final SystemWideAlert systemWideAlert) throws SQLException {
+    @Override
+    public void update(final Context context, final SystemWideAlert systemWideAlert)
+            throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                    "Only administrators can create a system-wide alert");
+        }
         systemWideAlertDAO.save(context, systemWideAlert);
 
     }
 
+    @Override
     public boolean canNonAdminUserLogin(Context context) throws SQLException {
         List<SystemWideAlert> active = findAllActive(context, 1, 0);
         if (active == null || active.isEmpty()) {
@@ -97,6 +115,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         return active.get(0).getAllowSessions() == AllowSessionsEnum.ALLOW_ALL_SESSIONS.getValue();
     }
 
+    @Override
     public boolean canUserMaintainSession(Context context, EPerson ePerson) throws SQLException {
         if (authorizeService.isAdmin(context, ePerson)) {
             return true;

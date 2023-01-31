@@ -19,65 +19,50 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.AllowSessionsEnum;
 import org.dspace.alerts.SystemWideAlert;
-import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.app.rest.model.SystemWideAlertRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
-import org.junit.After;
+import org.dspace.builder.SystemWideAlertBuilder;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test class to test the operations in the SystemWideAlertRestRepository
  */
 public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-    private static final Logger log = LogManager.getLogger(SystemWideAlertRestRepositoryIT.class);
-
-    @Autowired
-    private SystemWideAlertService systemWideAlertService;
-
-    @After
-    public void destroy() throws Exception {
-        context.turnOffAuthorisationSystem();
-        systemWideAlertService.findAll(context).stream().forEach(systemWideAlert -> {
-            try {
-                systemWideAlertService.delete(context, systemWideAlert);
-            } catch (SQLException | IOException | AuthorizeException e) {
-                log.error(e);
-            }
-        });
-        context.restoreAuthSystemState();
-
-        super.destroy();
-    }
-
-
     @Test
     public void findAllTest() throws Exception {
+        // Create two alert entries in the db to fully test the findAll method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
         Date countdownDate = new Date();
-        SystemWideAlert systemWideAlert1 = systemWideAlertService.create(context, "Test alert 1",
-                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY,
-                                                                         countdownDate,
-                                                                         true);
-        SystemWideAlert systemWideAlert2 = systemWideAlertService.create(context, "Test alert 2",
-                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
-                                                                         null,
-                                                                         false);
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        getClient().perform(get("/api/system/systemwidealerts/"))
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/system/systemwidealerts/"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.systemwidealerts", containsInAnyOrder(
                            allOf(
@@ -96,35 +81,243 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                    hasJsonPath("$.active", is(systemWideAlert2.isActive()))
                            )
                    )));
+    }
 
+    @Test
+    public void findAllUnauthorizedTest() throws Exception {
+        // Create two alert entries in the db to fully test the findAll method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
+        Date countdownDate = new Date();
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/system/systemwidealerts/"))
+                   .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void findAllForbiddenTest() throws Exception {
+        // Create two alert entries in the db to fully test the findAll method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
+        Date countdownDate = new Date();
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/system/systemwidealerts/"))
+                            .andExpect(status().isForbidden());
 
     }
 
     @Test
     public void findOneTest() throws Exception {
-
+        // Create two alert entries in the db to fully test the findOne method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
         Date countdownDate = new Date();
-        SystemWideAlert systemWideAlert1 = systemWideAlertService.create(context, "Test alert 1",
-                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY,
-                                                                         countdownDate,
-                                                                         true);
-        SystemWideAlert systemWideAlert2 = systemWideAlertService.create(context, "Test alert 2",
-                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
-                                                                         null,
-                                                                         false);
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        // When the alert is active and the user is not an admin, the user will be able to see the alert
+        getClient(authToken).perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(
+                                    jsonPath("$", allOf(
+                                             hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
+                                             hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
+                                             hasJsonPath("$.allowSessions",
+                                                         is(systemWideAlert1.getAllowSessions())),
+                                             hasJsonPath("$.countdownTo",
+                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                             hasJsonPath("$.active", is(systemWideAlert1.isActive()))
+                                             )
+                                    ));
+
+    }
+
+
+    @Test
+    public void findOneUnauthorizedTest() throws Exception {
+        // Create two alert entries in the db to fully test the findOne method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
+        Date countdownDate = new Date();
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        // When the alert is active and the user is not an admin, the user will be able to see the alert
         getClient().perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(
-                           jsonPath("$", allOf(
+                            .andExpect(status().isOk())
+                            .andExpect(
+                                    jsonPath("$", allOf(
+                                             hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
+                                             hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
+                                             hasJsonPath("$.allowSessions",
+                                                         is(systemWideAlert1.getAllowSessions())),
+                                             hasJsonPath("$.countdownTo",
+                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                             hasJsonPath("$.active", is(systemWideAlert1.isActive()))
+                                             )
+                                    ));
+
+        // When the alert is inactive and the user is not an admin, the user will not be able to see the presence of the
+        // alert and a 404 will be returned by the findOne endpoint
+        getClient().perform(get("/api/system/systemwidealerts/" + systemWideAlert2.getID()))
+                   .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        // Create two alert entries in the db to fully test the findOne method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
+        Date countdownDate = new Date();
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+
+        getClient(authToken).perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(
+                                    jsonPath("$", allOf(
+                                             hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
+                                             hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
+                                             hasJsonPath("$.allowSessions",
+                                                         is(systemWideAlert1.getAllowSessions())),
+                                             hasJsonPath("$.countdownTo",
+                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                             hasJsonPath("$.active", is(systemWideAlert1.isActive()))
+                                             )
+                                    ));
+
+        // When the alert is inactive and the user is not an admin, the user will not be able to see the presence of the
+        // alert and a 404 will be returned by the findOne endpoint
+        getClient(authToken).perform(get("/api/system/systemwidealerts/" + systemWideAlert2.getID()))
+                            .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void findAllActiveTest() throws Exception {
+        // Create three alert entries in the db to fully test the findActive search method
+        // Note: It is not possible to create two alerts through the REST API
+        context.turnOffAuthorisationSystem();
+        Date countdownDate = new Date();
+        SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
+                                                                 .withCountdownDate(countdownDate)
+                                                                 .isActive(true)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(false)
+                                                                 .build();
+
+        SystemWideAlert systemWideAlert3 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 3")
+                                                                 .withAllowSessions(
+                                                                         AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                 .withCountdownDate(null)
+                                                                 .isActive(true)
+                                                                 .build();
+        context.restoreAuthSystemState();
+
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        getClient().perform(get("/api/system/systemwidealerts/search/active"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$._embedded.systemwidealerts", containsInAnyOrder(
+                                    allOf(
                                             hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                             hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                             hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions())),
                                             hasJsonPath("$.countdownTo",
                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
                                             hasJsonPath("$.active", is(systemWideAlert1.isActive()))
+                                    ),
+                                    allOf(
+                                            hasJsonPath("$.alertId", is(systemWideAlert3.getID())),
+                                            hasJsonPath("$.message", is(systemWideAlert3.getMessage())),
+                                            hasJsonPath("$.allowSessions", is(systemWideAlert3.getAllowSessions())),
+                                            hasJsonPath("$.countdownTo", is(systemWideAlert3.getCountdownTo())),
+                                            hasJsonPath("$.active", is(systemWideAlert3.isActive()))
                                     )
-                           ));
+                            )));
 
     }
 
@@ -162,7 +355,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                             .andDo(result -> idRef
                                     .set((read(result.getResponse().getContentAsString(), "$.alertId"))));
 
-        getClient().perform(get("/api/system/systemwidealerts/" + idRef.get()))
+        getClient(authToken).perform(get("/api/system/systemwidealerts/" + idRef.get()))
                    .andExpect(status().isOk())
                    .andExpect(
                            jsonPath("$", allOf(
@@ -218,11 +411,16 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createWhenAlreadyExistsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-        SystemWideAlert systemWideAlert = systemWideAlertService.create(context, "Test alert",
-                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
-                                                                        null,
-                                                                        false);
+        SystemWideAlert systemWideAlert = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert")
+                                                                .withAllowSessions(
+                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                .withCountdownDate(null)
+                                                                .isActive(false)
+                                                                .build();
+
+        context.restoreAuthSystemState();
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
@@ -243,11 +441,14 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void putTest() throws Exception {
-
-        SystemWideAlert systemWideAlert = systemWideAlertService.create(context, "Alert test message",
-                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY,
-                                                                        null,
-                                                                        false);
+        context.turnOffAuthorisationSystem();
+        SystemWideAlert systemWideAlert = SystemWideAlertBuilder.createSystemWideAlert(context, "Alert test message")
+                                                                .withAllowSessions(
+                                                                        AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY)
+                                                                .withCountdownDate(null)
+                                                                .isActive(false)
+                                                                .build();
+        context.restoreAuthSystemState();
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setAlertId(systemWideAlert.getID());
@@ -278,7 +479,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              )
                                     ));
 
-        getClient().perform(get("/api/system/systemwidealerts/" + systemWideAlert.getID()))
+        getClient(authToken).perform(get("/api/system/systemwidealerts/" + systemWideAlert.getID()))
                    .andExpect(status().isOk())
                    .andExpect(
                            jsonPath("$", allOf(

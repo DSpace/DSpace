@@ -8,7 +8,14 @@
 package org.dspace.alerts;
 
 /**
- * Enum representing the options for allowing sessions
+ * Enum representing the options for allowing sessions:
+ *  ALLOW_ALL_SESSIONS -    Will allow all users to log in and continue their sessions
+ *  ALLOW_CURRENT_SESSIONS_ONLY -   Will prevent non admin users from logging in, however logged-in users
+ *                                  will remain logged in
+ *  ALLOW_ADMIN_SESSIONS_ONLY - Only admin users can log in, non admin sessions will be interrupted
+ *
+ *  NOTE: This functionality can be stored in the database, but no support is present right now to interrupt and prevent
+ *  sessions.
  */
 public enum AllowSessionsEnum {
     ALLOW_ALL_SESSIONS(0),

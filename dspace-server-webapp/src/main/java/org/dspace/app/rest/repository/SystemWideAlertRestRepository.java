@@ -23,10 +23,12 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.AllowSessionsEnum;
 import org.dspace.alerts.SystemWideAlert;
 import org.dspace.alerts.service.SystemWideAlertService;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SystemWideAlertRest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +48,9 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
     @Autowired
     private SystemWideAlertService systemWideAlertService;
 
+    @Autowired
+    private AuthorizeService authorizeService;
+
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected SystemWideAlertRest createAndReturn(Context context) throws SQLException, AuthorizeException {
@@ -54,6 +59,18 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
     }
 
 
+    /**
+     * This method will retrieve the system-wide alert for the provided ID
+     * However, only admins will be able to retrieve the inactive alerts. Non-admin users will only be able to retrieve
+     * active alerts. This is necessary also to be able to return the results through the search endpoint, since the
+     * PreAuthorization will be checked when converting the results to a list. Therefore, closing this endpoint fully
+     * off will
+     * prevent results from being displayed in the search endpoint
+     *
+     * @param context the dspace context
+     * @param id      the rest object id
+     * @return retrieve the system-wide alert for the provided ID
+     */
     @Override
     @PreAuthorize("permitAll()")
     public SystemWideAlertRest findOne(Context context, Integer id) {
@@ -63,6 +80,9 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
                 throw new ResourceNotFoundException(
                         "systemWideAlert with id " + systemWideAlert.getID() + " was not found");
             }
+            if (!authorizeService.isAdmin(context) && !systemWideAlert.isActive()) {
+                throw new AuthorizeException("Non admin users are not allowed to retrieve inactive alerts");
+            }
             return converter.toRest(systemWideAlert, utils.obtainProjection());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -71,7 +91,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<SystemWideAlertRest> findAll(Context context, Pageable pageable) {
         try {
             List<SystemWideAlert> systemWideAlerts = systemWideAlertService.findAll(context, pageable.getPageSize(),
@@ -118,12 +138,13 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
     /**
      * Helper method to create a system-wide alert and deny creation when one already exists
-     * @param context   The database context
+     *
+     * @param context The database context
      * @return the created system-wide alert
      * @throws SQLException
      */
     private SystemWideAlert createSystemWideAlert(Context context)
-            throws SQLException {
+            throws SQLException, AuthorizeException {
         List<SystemWideAlert> all = systemWideAlertService.findAll(context);
         if (!all.isEmpty()) {
             throw new DSpaceBadRequestException("A system wide alert already exists, no new value can be created. " +
@@ -154,6 +175,29 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
             throw new RuntimeException(e.getMessage(), e);
         }
         return systemWideAlert;
+    }
+
+    /**
+     * Search method to retrieve all active system-wide alerts
+     *
+     * @param pageable The page object
+     * @return all active system-wide alerts for the provided page
+     */
+    @PreAuthorize("permitAll()")
+    @SearchRestMethod(name = "active")
+    public Page<SystemWideAlertRest> findAllActive(Pageable pageable) {
+        Context context = obtainContext();
+        try {
+            List<SystemWideAlert> systemWideAlerts =
+                    systemWideAlertService.findAllActive(context,
+                                                         pageable.getPageSize(),
+                                                         Math.toIntExact(
+                                                                 pageable.getOffset()));
+            return converter.toRestPage(systemWideAlerts, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
     }
 
 

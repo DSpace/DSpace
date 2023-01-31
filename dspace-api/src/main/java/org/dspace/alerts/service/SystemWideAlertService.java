@@ -19,7 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
- * An interface for the ProcessService with methods regarding the SystemWideAlert workload
+ * An interface for the SystemWideAlertService with methods regarding the SystemWideAlert workload
  */
 public interface SystemWideAlertService {
 
@@ -36,7 +36,7 @@ public interface SystemWideAlertService {
      */
     SystemWideAlert create(Context context, String message, AllowSessionsEnum allowSessionsType,
                            Date countdownTo, boolean active
-    ) throws SQLException;
+    ) throws SQLException, AuthorizeException;
 
     /**
      * This method will retrieve a SystemWideAlert object from the Database with the given ID
@@ -96,7 +96,7 @@ public interface SystemWideAlertService {
      * @param systemWideAlert The SystemWideAlert object to be updated
      * @throws SQLException If something goes wrong
      */
-    void update(Context context, SystemWideAlert systemWideAlert) throws SQLException;
+    void update(Context context, SystemWideAlert systemWideAlert) throws SQLException, AuthorizeException;
 
 
     /**
