@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link ItemImport} script
- * 
+ *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptConfiguration<T> {
@@ -80,6 +80,9 @@ public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptC
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
+                .hasArg(false).required(false).build());
+        options.addOption(Option.builder("x").longOpt("exclude-bitstreams")
+                .desc("do not load or expect content bitstreams")
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("p").longOpt("template")
                 .desc("apply template")

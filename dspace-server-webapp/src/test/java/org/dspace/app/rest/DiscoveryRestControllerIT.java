@@ -361,6 +361,237 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void discoverFacetsAuthorTestWithPrefix_Capital_And_Special_Chars() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, John")
+                                      .withAuthor("Jan, Doe")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("S’Idan, Mo")
+                                      .withAuthor("Tick&Tock")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("M Akai")
+                                      .withAuthor("stIjn, SmITH")
+                                      .build();
+
+        Item publicItem4 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 4")
+                                      .withIssueDate("2012-05-13")
+                                      .withSubject("St Augustine")
+                                      .build();
+
+        Item publicItem5 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 5")
+                                      .withIssueDate("2015-11-23")
+                                      .withSubject("Health & Medicine")
+                                      .build();
+
+        Item publicItem6 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 6")
+                                      .withIssueDate("2003-07-11")
+                                      .withSubject("1% economy")
+                                      .build();
+
+        Item publicItem7 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 7")
+                                      .withIssueDate("2008-12-31")
+                                      .withSubject("I.T.")
+                                      .build();
+
+        Item publicItem8 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Public item 8")
+                                      .withIssueDate("2013-07-21")
+                                      .withSubject("?Unknown")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+        // The prefix query for author queries should be case-insensitive and correctly handle special characters
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "Smith"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entryFacetWithoutSelfLink("Smith, John"),
+                       FacetValueMatcher.entryFacetWithoutSelfLink("stIjn, SmITH"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "S"))
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("Smith, John"),
+                                                          FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("S’Idan, Mo"),
+                                                          // gets returned once for smith, once for stijn
+                                                          FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("stIjn, SmITH"),
+                                                          FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("stIjn, SmITH"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "M A"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("M Akai"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "S’I"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("S’Idan, Mo"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "Jan, D"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Jan, Doe"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "Tick&"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("Tick&Tock"))));
+
+        // Should also be the case for subject queries
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "St A"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("St Augustine"))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Health & M"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher
+                                                              .entryFacetWithoutSelfLink("Health & Medicine"))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "1% e"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("1% economy"))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "I."))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("I.T."))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "U"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(FacetValueMatcher.entryFacetWithoutSelfLink("?Unknown"))));
+    }
+
+    @Test
+    public void discoverFacetsAuthorTestWithPrefixFirstName() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Parent Collection").build();
+
+        Item item1 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 1")
+                                .withAuthor("Smith, John")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 2")
+                                .withAuthor("Smith, Jane")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "john"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(
+                                           FacetValueMatcher.entryAuthor("Smith, John"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "jane"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(
+                                           FacetValueMatcher.entryAuthor("Smith, Jane"))));
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "j"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(
+                                           FacetValueMatcher.entryAuthor("Smith, John"),
+                                           FacetValueMatcher.entryAuthor("Smith, Jane"))));
+    }
+
+    @Test
+    public void discoverFacetsAuthorWithAuthorityTestWithPrefixFirstName() throws Exception {
+        configurationService.setProperty("choices.plugin.dc.contributor.author", "SolrAuthorAuthority");
+        configurationService.setProperty("authority.controlled.dc.contributor.author", "true");
+
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Parent Collection").build();
+
+        Item item1 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 1")
+                                .withAuthor("Smith, John", "test_authority_1", Choices.CF_ACCEPTED)
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 2")
+                                .withAuthor("Smith, Jane", "test_authority_2", Choices.CF_ACCEPTED)
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/author")
+                                .param("prefix", "j"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values",
+                                       containsInAnyOrder(
+                                           FacetValueMatcher.entryAuthorWithAuthority(
+                                               "Smith, John", "test_authority_1", 1),
+                                           FacetValueMatcher.entryAuthorWithAuthority(
+                                               "Smith, Jane", "test_authority_2", 1))));
+
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+        metadataAuthorityService.clearCache();
+    }
+
+    @Test
     public void discoverFacetsAuthorTestForHasMoreFalse() throws Exception {
         //Turn of the authorization system so that we can create the structure specified below
         context.turnOffAuthorisationSystem();
@@ -5846,5 +6077,241 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         )))
                    .andExpect(jsonPath("$._embedded.values").value(Matchers.hasSize(1)));
 
+    }
+
+    @Test
+    public void discoverFacetsSubjectTestWithCapitalAndSpecialChars() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Parent Collection").build();
+
+        Item item1 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 1")
+                                .withSubject("Value with: Multiple Words ")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 2")
+                                .withSubject("Multiple worded subject ")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 3")
+                                .withSubject("Subject with a lot of Word values")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 4")
+                                .withSubject("With, Values")
+                                .build();
+
+        Item item5 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 5")
+                                .withSubject("Test:of:the:colon")
+                                .build();
+
+        Item item6 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 6")
+                                .withSubject("Test,of,comma")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 7")
+                                .withSubject("N’guyen")
+                                .build();
+
+        Item item8 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 8")
+                                .withSubject("test;Semicolon")
+                                .build();
+
+        Item item9 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 9")
+                                .withSubject("test||of|Pipe")
+                                .build();
+
+        Item item10 = ItemBuilder.createItem(context, collection)
+                                 .withTitle("Item 10")
+                                 .withSubject("Test-Subject")
+                                 .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "with a lot of word"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "multiple words"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Value with: Multiple Words", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "mUltiPle wor"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Multiple worded subject", 1),
+                       FacetValueMatcher.entrySubject("Value with: Multiple Words", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "with"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("With, Values", 1),
+                       FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1),
+                       FacetValueMatcher.entrySubject("Value with: Multiple Words", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "of"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1),
+                       FacetValueMatcher.entrySubject("Test,of,comma", 1),
+                       FacetValueMatcher.entrySubject("Test:of:the:colon", 1),
+                       FacetValueMatcher.entrySubject("test||of|Pipe", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "tEsT"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Test,of,comma", 1),
+                       FacetValueMatcher.entrySubject("Test-Subject", 1),
+                       FacetValueMatcher.entrySubject("Test:of:the:colon", 1),
+                       FacetValueMatcher.entrySubject("test;Semicolon", 1),
+                       FacetValueMatcher.entrySubject("test||of|Pipe", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "colon"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Test:of:the:colon", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "coMma"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Test,of,comma", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "guyen"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("N’guyen", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "semiColon"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("test;Semicolon", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "pipe"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("test||of|Pipe", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Subject"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubject("Multiple worded subject", 1),
+                       FacetValueMatcher.entrySubject("Test-Subject", 1),
+                       FacetValueMatcher.entrySubject("Subject with a lot of Word values", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Subject of word"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values").isEmpty())
+                   .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Value with words"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values").isEmpty())
+                   .andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    public void discoverFacetsSubjectWithAuthorityTest() throws Exception {
+        configurationService.setProperty("choices.plugin.dc.subject", "SolrSubjectAuthority");
+        configurationService.setProperty("authority.controlled.dc.subject", "true");
+
+        metadataAuthorityService.clearCache();
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Parent Collection").build();
+
+        Item item1 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 1")
+                                .withSubject("Value with: Multiple Words",
+                                             "test_authority_1", Choices.CF_ACCEPTED)
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 2")
+                                .withSubject("Multiple worded subject ",
+                                             "test_authority_2", Choices.CF_ACCEPTED)
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Item 3")
+                                .withSubject("Subject with a lot of Word values",
+                                             "test_authority_3", Choices.CF_ACCEPTED)
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "with a lot of word"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubjectWithAuthority("Subject with a lot of Word values",
+                                                      "test_authority_3", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "mUltiPle wor"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubjectWithAuthority("Multiple worded subject",
+                                                      "test_authority_2", 1),
+                       FacetValueMatcher.entrySubjectWithAuthority("Value with: Multiple Words",
+                                                      "test_authority_1", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Subject"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
+                       FacetValueMatcher.entrySubjectWithAuthority("Multiple worded subject",
+                                                      "test_authority_2", 1),
+                       FacetValueMatcher.entrySubjectWithAuthority("Subject with a lot of Word values",
+                                                      "test_authority_3", 1))));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Subject of word"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values").isEmpty())
+                   .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient().perform(get("/api/discover/facets/subject")
+                                .param("prefix", "Value with words"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.values").isEmpty())
+                   .andExpect(jsonPath("$.page.number", is(0)));
+
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+
+        metadataAuthorityService.clearCache();
     }
 }

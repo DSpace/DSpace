@@ -34,6 +34,14 @@
          </property>
     </bean>
 
+    <bean id="DataCiteImportService"
+          class="org.dspace.importer.external.datacite.DataCiteImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="DataCiteMetadataFieldMapping"/>
+    </bean>
+    <bean id="DataCiteMetadataFieldMapping"
+          class="org.dspace.importer.external.datacite.DataCiteFieldMapping">
+    </bean>
+
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>

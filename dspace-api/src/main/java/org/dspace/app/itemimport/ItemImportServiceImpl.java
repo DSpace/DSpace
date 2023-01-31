@@ -62,6 +62,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.util.LocalSchemaFilenameFilter;
@@ -135,7 +136,7 @@ import org.xml.sax.SAXException;
  * allow the registration of files (bitstreams) into DSpace.
  */
 public class ItemImportServiceImpl implements ItemImportService, InitializingBean {
-    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemImportServiceImpl.class);
+    private final Logger log = LogManager.getLogger();
 
     private DSpaceRunnableHandler handler;
 
@@ -181,6 +182,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected String tempWorkDir;
 
     protected boolean isTest = false;
+    protected boolean isExcludeContent = false;
     protected boolean isResume = false;
     protected boolean useWorkflow = false;
     protected boolean useWorkflowSendEmail = false;
@@ -1403,6 +1405,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected void processContentFileEntry(Context c, Item i, String path,
                                            String fileName, String bundleName, boolean primary) throws SQLException,
         IOException, AuthorizeException {
+        if (isExcludeContent) {
+            return;
+        }
+
         String fullpath = path + File.separatorChar + fileName;
 
         // get an input stream
@@ -2340,6 +2346,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     @Override
     public void setTest(boolean isTest) {
         this.isTest = isTest;
+    }
+
+    @Override
+    public void setExcludeContent(boolean isExcludeContent) {
+        this.isExcludeContent = isExcludeContent;
     }
 
     @Override
