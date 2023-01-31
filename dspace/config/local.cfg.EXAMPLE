@@ -392,7 +392,7 @@ wufoo.feedback.field.session = Field11
 wufoo.feedback.field.host = Field15
 
 # Data Community
-data.community.handle =
+data.community.handle = 1903/27669
 
 # Equitable Access Policy
 # The handle for the "Equitable Access Policy" community
