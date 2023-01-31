@@ -1461,13 +1461,47 @@
                     <dc-element>description</dc-element>
                     <dc-qualifier>uri</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>External Link</label>
+                    <label>Publication or External Link</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
                     <input-type>onebox</input-type>
                     <hint>
-                        If applicable, enter the URL(s) for the item located elsewhere on the Internet.
-                        If available, please use the DOI (Digital Object Identifier) for the file.
-                        Examples: https://drum.lib.umd.edu/, https://doi.org/10.13016/yhab-ufvn, or
-                        DOI:10.13016/yhab-ufvn.
+                        Enter the DOI (Digital Object Identifier) or other external link to the published version of this research work.
+                    </hint>
+                    <required></required>
+                    <regex>^(https*|DOI):(\/\/)*.*</regex>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Related Publication Link</label>
+                    <type-bind>
+                        <!-- Should display only for "Dataset" and "Software" -->
+                        Dataset,
+                        Software
+                    </type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>
+                        Enter the link to any research publication supported by the dataset or software. If available, please use the DOI (Digital Object Identifier) for the publication.
                     </hint>
                     <required></required>
                     <regex>^(https*|DOI):(\/\/)*.*</regex>
@@ -1479,9 +1513,43 @@
                     <dc-element>identifier</dc-element>
                     <dc-qualifier>citation</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Citation</label>
+                    <label>Publication Citation</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
                     <input-type>onebox</input-type>
-                    <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+                    <hint>If the item has been previously published or has a corresponding publication, enter its bibliographic citation.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Related Publication Citation</label>
+                    <type-bind>
+                        <!-- Should display only for "Dataset" and "Software" -->
+                        Dataset,
+                        Software
+                    </type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the standard citation for any research publication supported by the dataset or software.</hint>
                     <required></required>
                 </field>
             </row>
@@ -1492,6 +1560,23 @@
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Series/Report No.</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
                     <required></required>
@@ -1505,6 +1590,23 @@
                     <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
                     <label>Identifiers</label>
+                    <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
                     <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
                     <hint>If the item has any identification numbers or codes associated with
                         it, please enter the types and the actual numbers or codes.
@@ -1570,8 +1672,42 @@
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Description</label>
+                     <type-bind>
+                        <!-- Should display for all umd_common_types, except "Dataset" and "Software" -->
+                        Article,
+                        Audiovisual,
+                        Book,
+                        Book chapter,
+                        <!-- Dataset, -->
+                        Dissertation,
+                        Image,
+                        Preprint,
+                        Presentation,
+                        Report,
+                        <!-- Software, -->
+                        Thesis,
+                        Working Paper,
+                        Other
+                    </type-bind>
                     <input-type>textarea</input-type>
                     <hint>Enter any other description or comments in this box.</hint>
+                    <required></required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Methodology Description</label>
+                    <type-bind>
+                        <!-- Should display only for "Dataset" and "Software" -->
+                        Dataset,
+                        Software
+                    </type-bind>
+                    <input-type>textarea</input-type>
+                    <hint>Description of methods used for data collection/generation, processing, analysis, standards, quality-assurance procedures, etc.</hint>
                     <required></required>
                 </field>
             </row>
@@ -2229,6 +2365,8 @@
         </value-pairs>
 
         <!-- Values for the "Types" drop-down -->
+        <!-- Note: When adjusting these values, also adjust "type-bind"
+             attributes in the configuration above. -->
         <value-pairs value-pairs-name="umd_common_types" dc-term="type">
             <pair>
                 <displayed-value>Article</displayed-value>
