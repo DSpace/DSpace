@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.authorization.impl;
+import javax.ws.rs.NotAllowedException;
 import java.sql.SQLException;
 
 import org.dspace.app.rest.authorization.AuthorizationFeature;
@@ -15,6 +16,7 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +32,18 @@ public class CanRegisterDOIFeature implements AuthorizationFeature {
 
     @Autowired
     private AuthorizeServiceRestUtil authorizeServiceRestUtil;
+    @Autowired
+    private ConfigurationService configurationService;
 
     public static final String NAME = "canRegisterDOI";
 
     @Override
     @SuppressWarnings("rawtypes")
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+        // Check configuration to see if this REST operation is allowed
+        if (!configurationService.getBooleanProperty("identifiers.item-status.register-doi", false)) {
+            return false;
+        }
         if (object instanceof ItemRest) {
             return authorizeServiceRestUtil.authorizeActionBoolean(context, object, DSpaceRestPermission.ADMIN);
         }
