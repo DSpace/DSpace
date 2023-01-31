@@ -15,7 +15,7 @@ services:
   gui:
     image: phpmyadmin/phpmyadmin
     ports: 
-      - 8081:80
+      - 8148:80
     container_name: phpAdmin
     restart: always
     links:
@@ -26,13 +26,10 @@ services:
     container_name: matomo_statistics
     restart: always
     environment:
-      MYSQL_PASSWORD: example
-      MYSQL_DATABASE: matomo_statistics
-      MYSQL_USER: root
       MATOMO_DATABASE_ADAPTER: mysql
       MATOMO_DATABASE_HOST: db
       MATOMO_DATABASE_USERNAME: root
       MATOMO_DATABASE_PASSWORD: example
       MATOMO_DATABASE_DBNAME: matomo_statistics
     ports: 
-      - 80:80
+      - 8135:80
