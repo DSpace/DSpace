@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Kim Shepherd <kim@shepherd.nz>
  */
-public class IdentifiersRest implements RestModel {
+public class IdentifiersRest  extends BaseObjectRest<String> {
 
     // Set names used in component wiring
     public static final String NAME = "identifiers";
@@ -43,5 +43,15 @@ public class IdentifiersRest implements RestModel {
 
     public void setIdentifiers(List<IdentifierRest> identifiers) {
         this.identifiers = identifiers;
+    }
+
+    @Override
+    public String getCategory() {
+        return null;
+    }
+
+    @Override
+    public Class getController() {
+        return null;
     }
 }

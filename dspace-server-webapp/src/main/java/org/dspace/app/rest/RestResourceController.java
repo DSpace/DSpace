@@ -125,6 +125,7 @@ public class RestResourceController implements InitializingBean {
             // this doesn't work as we don't have an active http request
             // see https://github.com/spring-projects/spring-hateoas/issues/408
             // Link l = linkTo(this.getClass(), r).withRel(r);
+            log.error(r);
             String[] split = r.split("\\.", 2);
             String plural = English.plural(split[1]);
             Link l = Link.of("/api/" + split[0] + "/" + plural, plural);

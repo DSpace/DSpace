@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * Implementation of IdentifierRest REST resource, representing some DSpace identifier
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Kim Shepherd <kim@shepherd.nz>
  */
-public class IdentifierRest implements RestModel {
+public class IdentifierRest extends BaseObjectRest<String> implements RestModel {
 
     // Set names used in component wiring
     public static final String NAME = "identifier";
@@ -49,6 +50,11 @@ public class IdentifierRest implements RestModel {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     /**
@@ -97,5 +103,15 @@ public class IdentifierRest implements RestModel {
      */
     public void setIdentifierStatus(String identifierStatus) {
         this.identifierStatus = identifierStatus;
+    }
+
+    @Override
+    public String getCategory() {
+        return "ppid";
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
     }
 }

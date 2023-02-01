@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + IdentifierRestController.CATEGORY)
 public class IdentifierRestController implements InitializingBean {
-    public static final String CATEGORY = "pid";
+    public static final String CATEGORY = "pid_SDFSDFSDFSDF";
 
     public static final String ACTION = "find";
 
