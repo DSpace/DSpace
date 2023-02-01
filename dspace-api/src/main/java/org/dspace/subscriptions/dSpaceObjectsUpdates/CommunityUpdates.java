@@ -18,6 +18,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class which will be used to find
@@ -27,6 +28,7 @@ import org.dspace.subscriptions.service.DSpaceObjectUpdates;
  */
 public class CommunityUpdates implements DSpaceObjectUpdates {
 
+    @Autowired
     private SearchService searchService;
 
     @Override
@@ -39,10 +41,6 @@ public class CommunityUpdates implements DSpaceObjectUpdates {
         discoverQuery.addFilterQueries("lastModified_dt:" + this.findLastFrequency(frequency));
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         return discoverResult.getIndexableObjects();
-    }
-
-    public CommunityUpdates(SearchService searchService) {
-        this.searchService = searchService;
     }
 
 }

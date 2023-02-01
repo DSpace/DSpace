@@ -41,7 +41,7 @@ public class Subscription implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "subscription_seq", sequenceName = "subscription_seq", allocationSize = 1)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dspace_object_id")
     private DSpaceObject dSpaceObject;
 
