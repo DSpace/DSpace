@@ -78,8 +78,6 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     @Transient
     private transient BitstreamService bitstreamService;
-
-
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.BitstreamService#create(Context, Bundle, InputStream)}
@@ -434,5 +432,4 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
         getBitstreamService()
             .setMetadataSingleValue(context, this, "dcterms", "accessRights", null, null, acceptanceDate.toString());
     }
-
 }
