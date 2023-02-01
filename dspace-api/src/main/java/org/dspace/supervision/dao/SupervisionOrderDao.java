@@ -26,7 +26,25 @@ import org.dspace.supervision.SupervisionOrder;
  */
 public interface SupervisionOrderDao extends GenericDAO<SupervisionOrder> {
 
+    /**
+     * find all Supervision Orders related to the item
+     *
+     * @param context The DSpace context
+     * @param item the item
+     * @return the Supervision Orders related to the item
+     * @throws SQLException If something goes wrong in the database
+     */
     List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException;
+
+    /**
+     * find the Supervision Order related to the item and group
+     *
+     * @param context The DSpace context
+     * @param item the item
+     * @param group the group
+     * @return the Supervision Order related to the item and group
+     * @throws SQLException If something goes wrong in the database
+     */
     SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException;
 
 }

@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.exception.ResourceConflictException;
+import org.dspace.app.exception.ResourceAlreadyExistsException;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
@@ -116,6 +116,10 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             throw new UnprocessableEntityException("Item with uuid: " + itemId + " not found");
         }
 
+        if (item.isArchived()) {
+            throw new UnprocessableEntityException("An archived Item with uuid: " + itemId + " can't be supervised");
+        }
+
         Group group = groupService.find(context, UUID.fromString(groupId));
         if (group == null) {
             throw new UnprocessableEntityException("Group with uuid: " + groupId + " not found");
@@ -123,10 +127,8 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
 
         supervisionOrder = supervisionOrderService.findByItemAndGroup(context, item, group);
         if (Objects.nonNull(supervisionOrder)) {
-            throw new ResourceConflictException(
-                "There is a conflict supervision order with itemId <" + itemId + "> and groupId <" + groupId + ">",
-                supervisionOrder
-            );
+            throw new ResourceAlreadyExistsException(
+                "A supervision order already exists with itemId <" + itemId + "> and groupId <" + groupId + ">");
         }
         supervisionOrder = supervisionOrderService.create(context, item, group);
         addGroupPoliciesToItem(context, item, group, type);

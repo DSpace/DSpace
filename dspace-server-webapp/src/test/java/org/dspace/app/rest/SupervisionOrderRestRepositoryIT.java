@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
-import static org.dspace.app.rest.matcher.ItemMatcher.matchItemWithTitleAndDateIssued;
 import static org.dspace.app.rest.matcher.SupervisionOrderMatcher.matchSuperVisionOrder;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -20,13 +19,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
-import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.SupervisionOrderRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -40,6 +40,7 @@ import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.supervision.SupervisionOrder;
@@ -58,6 +59,9 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
 
     @Autowired
     private SupervisionOrderService supervisionOrderService;
+
+    @Autowired
+    private InstallItemService installItemService;
 
     @Test
     public void findAllByAnonymousUserTest() throws Exception {
@@ -667,11 +671,15 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                              .withName("Collection 1")
                              .build();
 
-        Item itemOne =
-            ItemBuilder.createItem(context, col1)
-                       .withTitle("item title")
-                       .withIssueDate("2017-10-17")
-                       .build();
+        WorkspaceItem workspaceItem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                .withTitle("Workspace Item 1")
+                                .withIssueDate("2017-10-17")
+                                .withSubject("ExtraEntry")
+                                .grantLicense()
+                                .build();
+
+        Item itemOne = workspaceItem.getItem();
 
         Group groupA =
             GroupBuilder.createGroup(context)
@@ -695,7 +703,47 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                                 .param("group", groupA.getID().toString())
                                 .param("type", "OBSERVER")
                                 .contentType(contentType))
-                             .andExpect(status().isConflict());
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createSupervisionOrderOnArchivedItemTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Collection 1")
+                             .build();
+
+        // create archived item
+        Item itemOne =
+            ItemBuilder.createItem(context, col1)
+                       .withTitle("item title")
+                       .withIssueDate("2017-10-17")
+                       .build();
+
+        Group groupA =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(eperson)
+                        .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/core/supervisionorders/")
+                                .param("uuid", itemOne.getID().toString())
+                                .param("group", groupA.getID().toString())
+                                .param("type", "OBSERVER")
+                                .contentType(contentType))
+                             .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -722,16 +770,24 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                             .withName("Parent Community")
                             .build();
 
-        Collection col1 =
+        Collection publications =
             CollectionBuilder.createCollection(context, parentCommunity)
-                             .withName("Collection 1")
+                             .withName("Publications")
+                             .withEntityType("Publication")
                              .build();
 
-        Item itemOne =
-            ItemBuilder.createItem(context, col1)
-                       .withTitle("item title")
-                       .withIssueDate("2017-10-17")
-                       .build();
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, publications)
+                                .withTitle("Workspace Item 1")
+                                .withIssueDate("2017-10-17")
+                                .withSubject("ExtraEntry")
+                                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                                .grantLicense()
+                                .build();
+
+        Item itemOne = witem.getItem();
 
         Group groupA =
             GroupBuilder.createGroup(context)
@@ -790,21 +846,38 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
         String authTokenB = getAuthToken(userB.getEmail(), password);
 
         String patchBody = getPatchContent(List.of(
-            new AddOperation("/metadata/dc.title", List.of(Map.of("value", "new title")))
+            new ReplaceOperation("/sections/traditionalpageone/dc.title/0", Map.of("value", "New Title"))
         ));
 
-        // update title of itemOne by userA is Ok
-        getClient(authTokenA).perform(patch("/api/core/items/" + itemOne.getID())
+        // update title of workspace item by userA is Ok
+        getClient(authTokenA).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                                  .content(patchBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(
-                                 matchItemWithTitleAndDateIssued(context.reloadEntity(itemOne),
-                                     "new title", "2017-10-17")
-                             )));
+                             .andExpect(jsonPath("$.errors").doesNotExist())
+                             .andExpect(jsonPath("$",
+                                 // check the new title and untouched values
+                                 Matchers.is(WorkspaceItemMatcher
+                                     .matchItemWithTitleAndDateIssuedAndSubject(
+                                         witem,
+                                         "New Title", "2017-10-17",
+                                         "ExtraEntry"))));
 
-        // update title of itemOne by userB is Forbidden
-        getClient(authTokenB).perform(patch("/api/core/items/" + itemOne.getID())
+        getClient(authTokenA).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.errors").doesNotExist())
+                             .andExpect(jsonPath("$",
+                                 Matchers.is(
+                                     WorkspaceItemMatcher
+                                         .matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem,
+                                             "New Title", "2017-10-17",
+                                             "ExtraEntry")
+                                 )));
+
+
+        // update title of workspace item by userB is Forbidden
+        getClient(authTokenB).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                                  .content(patchBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isForbidden());
@@ -1081,6 +1154,91 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                              .andExpect(status().isNoContent());
 
         getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRef.get()))
+                             .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void installWorkspaceItemThenSupervisionOrderBeDeletedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Collection publications =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Publications")
+                             .withEntityType("Publication")
+                             .build();
+
+        EPerson userA =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("test1@email.com")
+                          .withPassword(password)
+                          .build();
+
+        Group groupA =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(userA)
+                        .build();
+
+        Group groupB =
+            GroupBuilder.createGroup(context)
+                        .withName("group B")
+                        .addMember(eperson)
+                        .build();
+
+        WorkspaceItem witem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, publications)
+                                .withTitle("Workspace Item 1")
+                                .withIssueDate("2017-10-17")
+                                .withSubject("ExtraEntry")
+                                .grantLicense()
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<Integer> idRefOne = new AtomicReference<>();
+        AtomicReference<Integer> idRefTwo = new AtomicReference<>();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/core/supervisionorders/")
+                                 .param("uuid", witem.getItem().getID().toString())
+                                 .param("group", groupA.getID().toString())
+                                 .param("type", "EDITOR")
+                                 .contentType(contentType))
+                             .andExpect(status().isCreated())
+                             .andDo(result -> idRefOne
+                                 .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        getClient(adminToken).perform(post("/api/core/supervisionorders/")
+                                 .param("uuid", witem.getItem().getID().toString())
+                                 .param("group", groupB.getID().toString())
+                                 .param("type", "EDITOR")
+                                 .contentType(contentType))
+                             .andExpect(status().isCreated())
+                             .andDo(result -> idRefTwo
+                                 .set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRefOne.get()))
+                             .andExpect(status().isOk());
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRefTwo.get()))
+                             .andExpect(status().isOk());
+
+        // install item then supervision orders will be deleted
+        context.turnOffAuthorisationSystem();
+        installItemService.installItem(context, context.reloadEntity(witem));
+        context.restoreAuthSystemState();
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRefOne.get()))
+                             .andExpect(status().isNotFound());
+
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + idRefTwo.get()))
                              .andExpect(status().isNotFound());
 
     }

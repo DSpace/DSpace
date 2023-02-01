@@ -23,8 +23,12 @@ import org.dspace.supervision.service.SupervisionOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * A Solr Indexing plugin responsible for
+ * When item being indexed is a workspace or workflow item,
+ * and at least one supervision order is defined
+ * a 'supervised' field with value 'true' will be added to the solr document,
+ * if not a 'supervised' will be 'false'
  *
- * 
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
 public class SolrServiceSupervisionOrderIndexingPlugin implements SolrServiceIndexPlugin {

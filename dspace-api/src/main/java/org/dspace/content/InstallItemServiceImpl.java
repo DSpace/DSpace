@@ -22,6 +22,8 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.supervision.SupervisionOrder;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,6 +44,8 @@ public class InstallItemServiceImpl implements InstallItemService {
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected SupervisionOrderService supervisionOrderService;
 
     protected InstallItemServiceImpl() {
 
@@ -222,7 +226,17 @@ public class InstallItemServiceImpl implements InstallItemService {
         // set embargo lift date and take away read access if indicated.
         embargoService.setEmbargo(c, item);
 
+        // delete all related supervision orders
+        deleteSupervisionOrders(c, item);
+
         return item;
+    }
+
+    private void deleteSupervisionOrders(Context c, Item item) throws SQLException, AuthorizeException {
+        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(c, item);
+        for (SupervisionOrder supervisionOrder : supervisionOrders) {
+            supervisionOrderService.delete(c, supervisionOrder);
+        }
     }
 
     @Override

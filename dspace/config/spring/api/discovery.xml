@@ -64,7 +64,7 @@
                 <!-- Do not change the id of special entries or else they won't work -->
                 <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
-                <entry key="otherworkspace" value-ref="otherWorkspaceConfiguration" />
+                <entry key="supervisedWorkspace" value-ref="supervisedWorkspaceConfiguration" />
                 <!-- "workflow" is a special entry to search for your own workflow tasks -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <!-- "workflowAdmin" is a special entry to search for all workflow items if you are an administrator -->
@@ -902,10 +902,10 @@
     </bean>
 
     <!--The other workspace configuration settings for discovery -->
-    <bean id="otherWorkspaceConfiguration"
+    <bean id="supervisedWorkspaceConfiguration"
           class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="otherworkspace" />
+        <property name="id" value="supervisedWorkspace" />
         <!--Which sidebar facets are to be displayed -->
         <property name="sidebarFacets">
             <list>
