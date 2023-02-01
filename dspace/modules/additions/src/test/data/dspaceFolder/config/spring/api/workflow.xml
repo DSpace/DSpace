@@ -213,6 +213,7 @@
         <property name="actions">
             <list>
                 <ref bean="equitableaccesscollectionmappingaction"/>
+                <ref bean="datacommunitycollectionmappingaction"/>
             </list>
         </property>
     </bean>

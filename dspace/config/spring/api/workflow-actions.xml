@@ -104,5 +104,15 @@
         <property name="processingAction" ref="equitableAccessCollectionMappingAPI"/>
         <property name="requiresUI" value="false"/>
     </bean>
+
+    <bean id="dataCommunityCollectionMappingAPI"
+        class="edu.umd.lib.dspace.xmlworkflow.state.actions.DataCommunityCollectionMappingAction"
+        scope="prototype"/>
+
+    <bean id="datacommunitycollectionmappingaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="datacommunitycollectionmappingaction"/>
+        <property name="processingAction" ref="dataCommunityCollectionMappingAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
     <!-- End UMD customization -->
 </beans>
