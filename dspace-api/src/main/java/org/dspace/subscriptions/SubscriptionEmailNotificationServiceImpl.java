@@ -7,23 +7,23 @@
  */
 package org.dspace.subscriptions;
 
+import static org.dspace.core.Constants.COLLECTION;
+import static org.dspace.core.Constants.COMMUNITY;
+import static org.dspace.core.Constants.ITEM;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Subscription;
@@ -32,8 +32,6 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
 import org.dspace.subscriptions.service.SubscriptionGenerator;
-import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -55,29 +53,24 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     private Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
     @SuppressWarnings("rawtypes")
     private Map<String, SubscriptionGenerator> subscriptionType2generators = new HashMap<>();
-    @SuppressWarnings("rawtypes")
-    private List<IndexableObject> communities = new ArrayList<>();
-    @SuppressWarnings("rawtypes")
-    private List<IndexableObject> collections = new ArrayList<>();
-    @SuppressWarnings("rawtypes")
-    private List<IndexableObject> items = new ArrayList<>();
 
     @Autowired
     private SubscribeService subscribeService;
 
     @SuppressWarnings("rawtypes")
-    public SubscriptionEmailNotificationServiceImpl(SubscribeService subscribeService,
-                                                    Map<String, Set<String>> param2values,
+    public SubscriptionEmailNotificationServiceImpl(Map<String, Set<String>> param2values,
                                                     Map<String, DSpaceObjectUpdates> contentUpdates,
                                                     Map<String, SubscriptionGenerator> subscriptionType2generators) {
         this.param2values = param2values;
         this.contentUpdates = contentUpdates;
-        this.subscribeService = subscribeService;
         this.subscriptionType2generators = subscriptionType2generators;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
+        List<IndexableObject> items = new ArrayList<>();
+        List<IndexableObject> communities = new ArrayList<>();
+        List<IndexableObject> collections = new ArrayList<>();
         try {
             List<Subscription> subscriptions =
                                findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType, frequency);
@@ -86,19 +79,21 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                 // the list of the person who has subscribed
                 int iterator = 0;
                 for (Subscription subscription : subscriptions) {
-                    DSpaceObject dSpaceObject = getdSpaceObject(subscription);
-                    if (dSpaceObject instanceof Community) {
-                        communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase(Locale.ROOT))
-                                   .findUpdates(context, dSpaceObject, frequency));
-                    } else if (dSpaceObject instanceof Collection) {
-                        collections.addAll(contentUpdates.get(Collection.class.getSimpleName().toLowerCase(Locale.ROOT))
-                                   .findUpdates(context, dSpaceObject, frequency));
-                    } else if (dSpaceObject instanceof Item) {
-                        items.addAll(contentUpdates.get(Item.class.getSimpleName().toLowerCase(Locale.ROOT))
-                             .findUpdates(context, dSpaceObject, frequency));
+                    DSpaceObject dSpaceObject = subscription.getDSpaceObject();
+
+                    if (dSpaceObject.getType() == COMMUNITY) {
+                        communities.addAll(contentUpdates.get("community")
+                                                         .findUpdates(context, dSpaceObject, frequency));
+                    } else if (dSpaceObject.getType() == COLLECTION) {
+                        collections.addAll(contentUpdates.get("collection")
+                                                         .findUpdates(context, dSpaceObject, frequency));
+                    } else if (dSpaceObject.getType() == ITEM) {
+                        items.addAll(contentUpdates.get("item").findUpdates(context, dSpaceObject, frequency));
                     }
+
                     var ePerson = subscription.getEPerson();
                     if (iterator < subscriptions.size() - 1) {
+                        // as the subscriptions are ordered by eperson id, so we send them by ePerson
                         if (ePerson.equals(subscriptions.get(iterator + 1).getEPerson())) {
                             iterator++;
                             continue;
@@ -127,16 +122,15 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
         }
     }
 
-    private DSpaceObject getdSpaceObject(Subscription subscription) {
-        DSpaceObject dSpaceObject = subscription.getDSpaceObject();
-        if (subscription.getDSpaceObject() instanceof HibernateProxy) {
-            HibernateProxy hibernateProxy = (HibernateProxy) subscription.getDSpaceObject();
-            LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-            dSpaceObject = (DSpaceObject) initializer.getImplementation();
-        }
-        return dSpaceObject;
-    }
-
+    /**
+     * Return all Subscriptions by subscriptionType and frequency ordered by ePerson ID
+     * if there are none it returns an empty list
+     * 
+     * @param context            DSpace context
+     * @param subscriptionType   Could be "content" or "statistics". NOTE: in DSpace we have only "content"
+     * @param frequency          Could be "D" stand for Day, "W" stand for Week, and "M" stand for Month
+     * @return
+     */
     private List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
              String subscriptionType, String frequency) {
         try {
