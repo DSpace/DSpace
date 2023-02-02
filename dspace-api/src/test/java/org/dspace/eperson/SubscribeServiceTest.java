@@ -8,387 +8,410 @@
 
 package org.dspace.eperson;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.dspace.builder.SubscribeBuilder.subscribeBuilder;
+import static org.dspace.matcher.SubscribeMatcher.matches;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.AbstractDSpaceTest;
+import org.apache.commons.lang.StringUtils;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.SubscribeBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.eperson.dao.SubscriptionDAO;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.eperson.service.SubscribeService;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 
-public class SubscribeServiceTest extends AbstractDSpaceTest {
+public class SubscribeServiceTest extends AbstractIntegrationTestWithDatabase {
 
-    @Mock
-    private SubscriptionDAO subscriptionDAO;
+    private final SubscribeService subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
 
-    @Mock
-    private AuthorizeService authorizeService;
+    private Collection firstCollection;
+    private Collection secondCollection;
 
-    @InjectMocks
-    private SubscribeServiceImpl subscribeService;
-
-    private final Context context = Mockito.mock(Context.class);
-
-    @Test
-    public void findAllWithValidResource() throws Exception {
-
-        String resourceType = "Item";
-        Integer limit = 10;
-        Integer offset = 0;
-
-        Subscription subscription = createSubscription("content",
-                                                       getSubscriptionParameter("frequency", "W"));
-
-        when(subscriptionDAO.findAllOrderedByIDAndResourceType(context, resourceType, limit, offset))
-            .thenReturn(Collections.singletonList(subscription));
-
-        List<Subscription> subscriptions = subscribeService.findAll(context, resourceType, limit, offset);
-
-        assertEquals(subscriptions, Collections.singletonList(subscription));
-
+    @Before
+    public void init() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community parentCommunity = CommunityBuilder.createCommunity(context).build();
+        firstCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("First Collection").build();
+        secondCollection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Second Collection").build();
+        context.restoreAuthSystemState();
     }
 
     @Test
-    public void findAllWithoutResourceType() throws Exception {
-        String resourceType = StringUtils.EMPTY;
-        Integer limit = 10;
-        Integer offset = 0;
+    public void findAllWithoutAndWithLimit() throws Exception {
 
-        Subscription subscription = createSubscription("content",
-                                                       getSubscriptionParameter("frequency", "W"));
+        String resourceType = "Collection";
 
-        when(subscriptionDAO.findAllOrderedByDSO(context, limit, offset))
-            .thenReturn(Collections.singletonList(subscription));
+        EPerson subscribingUser = context.getCurrentUser();
 
-        List<Subscription> subscriptions = subscribeService.findAll(context, resourceType, limit, offset);
+        createSubscription("content", firstCollection, subscribingUser, weekly());
+        createSubscription("content", secondCollection, subscribingUser, daily(), annual());
 
-        assertEquals(subscriptions, Collections.singletonList(subscription));
+        // unlimited search returns all subscriptions
+
+        List<Subscription> subscriptions = subscribeService.findAll(context, resourceType, 10, 0);
+        assertThat(subscriptions, containsInAnyOrder(
+            asList(matches(firstCollection, subscribingUser, "content",
+                           singletonList(weekly())),
+                   matches(secondCollection, subscribingUser, "content",
+                           asList(daily(), annual())))));
+
+        // limited search returns first
+
+        subscriptions = subscribeService.findAll(context, resourceType, 1, 0);
+
+        assertThat(subscriptions, containsInAnyOrder(
+            singletonList(matches(firstCollection, subscribingUser, "content",
+                                  singletonList(weekly())))));
+
+        // search with offset returns second
+
+        subscriptions = subscribeService.findAll(context, resourceType, 100, 1);
+
+        assertThat(subscriptions, containsInAnyOrder(
+            singletonList(matches(secondCollection, subscribingUser, "content",
+                                  asList(daily(), annual())))));
+
+        // lookup without resource type
+        subscriptions = subscribeService.findAll(context, StringUtils.EMPTY, 100, 0);
+
+        assertThat(subscriptions, containsInAnyOrder(
+            asList(matches(firstCollection, subscribingUser, "content",
+                           singletonList(weekly())),
+                   matches(secondCollection, subscribingUser, "content",
+                           asList(daily(), annual())))));
+
+    }
+
+    private static SubscriptionParameter annual() {
+        return createSubscriptionParameter("frequency", "A");
+    }
+
+    private static SubscriptionParameter daily() {
+        return createSubscriptionParameter("frequency", "D");
     }
 
     @Test(expected = Exception.class)
-    public void findAllWithInValidResource() throws Exception {
+    public void findAllWithInvalidResource() throws Exception {
 
         String resourceType = "INVALID";
         Integer limit = 10;
         Integer offset = 0;
 
-        subscribeService.findAll(context, resourceType, limit, offset);
+        createSubscription("content", firstCollection, context.getCurrentUser(),
+                           weekly());
 
-        verifyNoInteractions(subscriptionDAO);
+        subscribeService.findAll(context, resourceType, limit, offset);
 
     }
 
     @Test
     public void newSubscriptionCreatedByAdmin() throws Exception {
 
-        Subscription dbSubscription = createSubscription("content",
-                                                       getSubscriptionParameter("frequency", "W"));
-
-        when(authorizeService.isAdmin(context)).thenReturn(true);
-        when(subscriptionDAO.create(eq(context), any(Subscription.class)))
-            .thenReturn(dbSubscription);
-        DSpaceObject dso = mock(DSpaceObject.class);
+        SubscriptionParameter monthly = createSubscriptionParameter("frequency", "M");
 
         List<SubscriptionParameter> parameters = Collections.singletonList(
-            getSubscriptionParameter("frequency", "M"));
+            monthly);
 
-        Subscription subscription = subscribeService.subscribe(context, getePerson(),
-                                                               dso, parameters, "content");
+        EPerson currentUser = context.getCurrentUser();
+        context.setCurrentUser(admin);
+        Subscription subscription = subscribeService.subscribe(context, eperson,
+                                                               firstCollection, parameters, "content");
 
-        assertEquals(subscription, dbSubscription);
+        assertThat(subscription, is(matches(firstCollection, eperson,
+                                            "content", singletonList(monthly))));
+
+        SubscribeBuilder.deleteSubscription(subscription.getID());
+        context.setCurrentUser(currentUser);
+
     }
 
     @Test
     public void newSubscriptionCreatedByCurrentUser() throws Exception {
 
-        Subscription dbSubscription = createSubscription("content",
-                                                       getSubscriptionParameter("frequency", "W"));
-        EPerson currentUser = getePerson();
-
-        when(context.getCurrentUser()).thenReturn(currentUser);
-
-        when(subscriptionDAO.create(eq(context), any(Subscription.class)))
-            .thenReturn(dbSubscription);
-        DSpaceObject dso = mock(DSpaceObject.class);
-
-        List<SubscriptionParameter> parameters = Collections.singletonList(
-            getSubscriptionParameter("frequency", "D"));
-
+        EPerson currentUser = context.getCurrentUser();
         Subscription subscription = subscribeService.subscribe(context, currentUser,
-                                                               dso, parameters, "content");
+                                                               secondCollection,
+                                                               asList(daily(), weekly()), "content");
 
-        assertEquals(subscription, dbSubscription);
+        assertThat(subscription, matches(secondCollection, currentUser, "content",
+                                         asList(daily(), weekly())));
+
+        SubscribeBuilder.deleteSubscription(subscription.getID());
     }
 
     @Test(expected = AuthorizeException.class)
     public void nonAdminDifferentUserTriesToSubscribe() throws Exception {
-
-        EPerson currentUser = getePerson();
-        EPerson subscribingUser = getePerson();
-
-        when(context.getCurrentUser()).thenReturn(currentUser);
-
-        DSpaceObject dso = mock(DSpaceObject.class);
-
-        List<SubscriptionParameter> parameters = Collections.singletonList(
-            getSubscriptionParameter("frequency", "D"));
-
-        subscribeService.subscribe(context, subscribingUser,dso, parameters, "content");
-
-        verifyNoInteractions(subscriptionDAO);
-    }
-
-    @Test(expected = SQLException.class)
-    public void exceptionWhileStoringSubscription() throws Exception {
-        EPerson currentUser = getePerson();
-
-        when(context.getCurrentUser()).thenReturn(currentUser);
-
-        doThrow(new SQLException()).when(subscriptionDAO).create(eq(context), any(Subscription.class));
-
-        DSpaceObject dso = mock(DSpaceObject.class);
-
-        List<SubscriptionParameter> parameters = Collections.singletonList(
-            getSubscriptionParameter("frequency", "D"));
-
-        subscribeService.subscribe(context, currentUser,dso, parameters, "content");
+        context.turnOffAuthorisationSystem();
+        EPerson notAdmin = EPersonBuilder.createEPerson(context).withEmail("not-admin@example.com").build();
+        context.restoreAuthSystemState();
+        EPerson currentUser = context.getCurrentUser();
+        context.setCurrentUser(notAdmin);
+        try {
+            subscribeService.subscribe(context, admin, firstCollection,
+                                       singletonList(
+                                           daily()), "content");
+        } finally {
+            context.setCurrentUser(currentUser);
+        }
 
     }
 
     @Test
     public void unsubscribeByAdmin() throws Exception {
 
-        when(authorizeService.isAdmin(context)).thenReturn(true);
-        DSpaceObject dso = mock(DSpaceObject.class);
+        EPerson subscribingUser = context.getCurrentUser();
+        createSubscription("content", secondCollection, subscribingUser,
+                           weekly());
 
-        EPerson currentUser = getePerson();
-        subscribeService.unsubscribe(context, currentUser,
-                                     dso);
-        verify(subscriptionDAO).deleteByDSOAndEPerson(context, dso, currentUser);
+        List<Subscription> subscriptions =
+            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+                                                              secondCollection, 100, 0);
+
+        assertEquals(subscriptions.size(), 1);
+
+        context.setCurrentUser(admin);
+        subscribeService.unsubscribe(context, subscribingUser, secondCollection);
+        context.setCurrentUser(subscribingUser);
+
+        subscriptions =
+            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+                                                              secondCollection, 100, 0);
+
+        assertEquals(subscriptions.size(), 0);
     }
 
     @Test
-    public void unsubscribeByCurrentUser() throws Exception {
+    public void subscribingUserUnsubscribesTheirSubscription() throws Exception {
 
-        EPerson currentUser = getePerson();
-        when(authorizeService.isAdmin(context)).thenReturn(false);
-        when(context.getCurrentUser()).thenReturn(currentUser);
+        EPerson subscribingUser = context.getCurrentUser();
+        createSubscription("content", secondCollection, subscribingUser,
+                           weekly());
 
-        DSpaceObject dso = mock(DSpaceObject.class);
+        List<Subscription> subscriptions =
+            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+                                                              secondCollection, 100, 0);
 
-        subscribeService.unsubscribe(context, currentUser, dso);
-        verify(subscriptionDAO).deleteByDSOAndEPerson(context, dso, currentUser);
+        assertEquals(subscriptions.size(), 1);
+
+
+        subscribeService.unsubscribe(context, subscribingUser, secondCollection);
+
+        subscriptions =
+            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+                                                              secondCollection, 100, 0);
+
+        assertEquals(subscriptions.size(), 0);
     }
 
     @Test(expected = AuthorizeException.class)
-    public void nonAdminDifferentUserTriesToUnSubscribe() throws Exception {
-        EPerson currentUser = getePerson();
-        EPerson unsubscribingUser = getePerson();
+    public void nonAdminDifferentUserTriesToUnSubscribeAnotherUser() throws Exception {
+        EPerson subscribingUser = context.getCurrentUser();
+        Subscription subscription = createSubscription("content", secondCollection, subscribingUser,
+                                                       weekly());
 
-        when(authorizeService.isAdmin(context)).thenReturn(false);
-        when(context.getCurrentUser()).thenReturn(currentUser);
+        context.turnOffAuthorisationSystem();
+        EPerson nonAdmin = EPersonBuilder.createEPerson(context).build();
+        context.restoreAuthSystemState();
 
-        DSpaceObject dso = mock(DSpaceObject.class);
 
-        subscribeService.unsubscribe(context, unsubscribingUser, dso);
-
-        verifyNoInteractions(subscriptionDAO);
-    }
-
-    @Test(expected = SQLException.class)
-    public void exceptionWhileDeletingSubscription() throws Exception {
-        EPerson currentUser = getePerson();
-
-        when(context.getCurrentUser()).thenReturn(currentUser);
-
-        DSpaceObject dso = mock(DSpaceObject.class);
-
-        doThrow(new SQLException()).when(subscriptionDAO).deleteByDSOAndEPerson(eq(context), eq(dso),
-                                                                                eq(currentUser));
-
-        subscribeService.unsubscribe(context, currentUser,dso);
+        try {
+            context.setCurrentUser(nonAdmin);
+            subscribeService.unsubscribe(context, subscribingUser, secondCollection);
+        } finally {
+            context.setCurrentUser(subscribingUser);
+            SubscribeBuilder.deleteSubscription(subscription.getID());
+        }
 
     }
 
     @Test
     public void updateSubscription() throws Exception {
 
-
-        int subscriptionId = 434123;
-
-        Subscription subscription = createSubscription("original", getSubscriptionParameter("frequency", "D"),
-                                                       getSubscriptionParameter("frequency", "M"));
-
-        when(subscriptionDAO.findByID(context, Subscription.class, subscriptionId))
-            .thenReturn(subscription);
+        EPerson currentUser = context.getCurrentUser();
+        Subscription subscription = createSubscription("original",
+                              firstCollection, currentUser,
+                              createSubscriptionParameter("frequency", "M"));
 
         String updatedType = "updated";
         List<SubscriptionParameter> updatedParameters = Collections.singletonList(
-            getSubscriptionParameter("frequency", "A")
+            annual()
         );
 
-        Subscription updated = subscribeService.updateSubscription(context, subscriptionId, null, null,
-                                                                        updatedParameters, updatedType);
+        try {
+            Subscription updated = subscribeService.updateSubscription(context, subscription.getID(),
+                                                                       updatedType, updatedParameters);
 
-        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
-        verify(subscriptionDAO).save(eq(context), captor.capture());
+            assertThat(updated, is(matches(firstCollection, currentUser, updatedType, updatedParameters)));
 
-        assertEquals(captor.getValue().getSubscriptionParameterList(), updatedParameters);
-        assertEquals(captor.getValue().getSubscriptionType(), updatedType);
+            List<Subscription> subscriptions =
+                subscribeService.findSubscriptionsByEPersonAndDso(context, currentUser, firstCollection, 10, 0);
 
-        assertEquals(updated.getSubscriptionType(), updatedType);
-        assertEquals(updated.getSubscriptionParameterList(), updatedParameters);
+            assertThat(subscriptions, contains(
+                matches(firstCollection, currentUser, updatedType, updatedParameters)));
 
-    }
-
-    @Test(expected = SQLException.class)
-    public void errorWhileUpdating() throws Exception {
-
-
-        int subscriptionId = 434;
-
-        Subscription subscription = createSubscription("original", getSubscriptionParameter("frequency", "D"),
-                                                       getSubscriptionParameter("frequency", "M"));
-
-        when(subscriptionDAO.findByID(context, Subscription.class, subscriptionId))
-            .thenReturn(subscription);
-        doThrow(new SQLException()).when(subscriptionDAO).save(eq(context), any(Subscription.class));
-
-        String updatedType = "updated";
-        List<SubscriptionParameter> updatedParameters = Collections.singletonList(
-            getSubscriptionParameter("frequency", "A")
-        );
-
-        subscribeService.updateSubscription(context, subscriptionId, null, null,
-                                                                   updatedParameters, updatedType);
+        } finally {
+            SubscribeBuilder.deleteSubscription(subscription.getID());
+        }
 
     }
 
     @Test
     public void parametersAdditionAndRemoval() throws Exception {
 
-        int subscriptionId = 43123;
+        SubscriptionParameter firstParameter = createSubscriptionParameter("key1", "value1");
+        SubscriptionParameter secondParameter = createSubscriptionParameter("key2", "value2");
 
-        SubscriptionParameter firstParameter = getSubscriptionParameter("key1", "value1");
-        SubscriptionParameter secondParameter = getSubscriptionParameter("key2", "value2");
-
-        Subscription existingSubscription = createSubscription("type",
+        EPerson currentUser = context.getCurrentUser();
+        Subscription subscription = createSubscription("type", secondCollection, currentUser,
                                                                firstParameter, secondParameter);
+        int subscriptionId = subscription.getID();
 
-        when(subscriptionDAO.findByID(context, Subscription.class, subscriptionId))
-            .thenReturn(existingSubscription);
+        SubscriptionParameter addedParameter = createSubscriptionParameter("added", "add");
 
-        SubscriptionParameter addedParameter = getSubscriptionParameter("added", "add");
 
-        Subscription updatedSubscription = subscribeService.addSubscriptionParameter(context, subscriptionId,
-                                                                                     addedParameter);
+        try {
+            Subscription updatedSubscription = subscribeService.addSubscriptionParameter(context, subscriptionId,
+                                                                                         addedParameter);
+            assertThat(updatedSubscription, is(matches(secondCollection, currentUser, "type",
+                                                       asList(firstParameter, secondParameter, addedParameter))));
+            updatedSubscription = subscribeService.removeSubscriptionParameter(context, subscriptionId,
+                                                                               secondParameter);
+            assertThat(updatedSubscription, is(matches(secondCollection, currentUser, "type",
+                                                       asList(firstParameter, addedParameter))));
+        } finally {
+            SubscribeBuilder.deleteSubscription(subscriptionId);
+        }
+    }
 
-        assertParametersAreUpdated(updatedSubscription, List.of(firstParameter, secondParameter,
-                                                                addedParameter));
+    @Test
+    public void findersAndDeletionsTest() throws SQLException {
+        // method to test all find and delete methods exposed by SubscribeService
+        context.turnOffAuthorisationSystem();
+        EPerson firstSubscriber = EPersonBuilder.createEPerson(context).withEmail("first-user@example.com").build();
+        EPerson secondSubscriber = EPersonBuilder.createEPerson(context).withEmail("second-user@example.com").build();
+        EPerson thirdSubscriber = EPersonBuilder.createEPerson(context).withEmail("third-user@example.com").build();
+        context.restoreAuthSystemState();
 
-        updatedSubscription = subscribeService.removeSubscriptionParameter(context, subscriptionId,
-                                                                        secondParameter);
+        EPerson currentUser = context.getCurrentUser();
+        try {
+            context.setCurrentUser(firstSubscriber);
+            createSubscription("type1", firstCollection, firstSubscriber, daily(),
+                               weekly());
+            createSubscription("type1", secondCollection, firstSubscriber,
+                               daily(),
+                               annual());
+            createSubscription("type2", secondCollection, firstSubscriber,
+                               daily());
 
-        assertParametersAreUpdated(updatedSubscription, List.of(firstParameter, addedParameter));
+            context.setCurrentUser(secondSubscriber);
+            createSubscription("type1", firstCollection, secondSubscriber,
+                               daily());
+            createSubscription("type1", secondCollection, secondSubscriber,
+                               daily(),
+                               annual());
+
+            context.setCurrentUser(thirdSubscriber);
+            createSubscription("type1", firstCollection, thirdSubscriber, daily());
+            createSubscription("type1", secondCollection, thirdSubscriber,
+                               daily(),
+                               annual());
+
+        } finally {
+            context.setCurrentUser(currentUser);
+        }
+
+        List<Subscription> firstUserSubscriptions =
+            subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 100, 0);
+
+        assertThat(firstUserSubscriptions, containsInAnyOrder(
+            matches(firstCollection, firstSubscriber, "type1", asList(daily(),
+                                                                      weekly())),
+            matches(secondCollection, firstSubscriber, "type1", asList(daily(),
+                                                                       annual())),
+            matches(secondCollection, firstSubscriber, "type2", singletonList(
+                daily()))
+        ));
+
+        List<Subscription> firstUserSubscriptionsLimited =
+            subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 1, 0);
+
+        assertThat(firstUserSubscriptionsLimited.size(), is(1));
+
+        List<Subscription> firstUserSubscriptionsWithOffset =
+            subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 100, 1);
+
+        assertThat(firstUserSubscriptionsWithOffset.size(), is(2));
+
+        subscribeService.deleteByEPerson(context, firstSubscriber);
+        assertThat(subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 100, 0),
+                   is(List.of()));
+
+        List<Subscription> secondSubscriberSecondCollectionSubscriptions =
+            subscribeService.findSubscriptionsByEPersonAndDso(context, secondSubscriber, firstCollection, 10, 0);
+
+        assertThat(secondSubscriberSecondCollectionSubscriptions, contains(
+            matches(firstCollection, secondSubscriber, "type1", singletonList(daily()))
+        ));
+
+        List<Subscription> byTypeAndFrequency =
+            subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context, "type1",
+                                                                                "D");
+        assertThat(byTypeAndFrequency, containsInAnyOrder(
+            matches(firstCollection, secondSubscriber, "type1", singletonList(
+                daily())),
+            matches(secondCollection, secondSubscriber, "type1", asList(daily(),
+                                                                        annual())),
+            matches(firstCollection, thirdSubscriber, "type1", singletonList(
+                daily())),
+            matches(secondCollection, thirdSubscriber, "type1", asList(daily(),
+                                                                       annual()))
+            ));
+
+        assertThat(subscribeService.countAll(context), is(4L));
+        assertThat(subscribeService.countByEPersonAndDSO(context, secondSubscriber, secondCollection), is(1L));
+        assertThat(subscribeService.countSubscriptionsByEPerson(context, thirdSubscriber), is(2L));
 
 
     }
 
-    @Test(expected = SQLException.class)
-    public void exceptionWhileAddingParameters() throws Exception {
-        int subscriptionId = 43123;
-
-        SubscriptionParameter firstParameter = getSubscriptionParameter("key1", "value1");
-        SubscriptionParameter secondParameter = getSubscriptionParameter("key2", "value2");
-
-        Subscription existingSubscription = createSubscription("type",
-                                                               firstParameter, secondParameter);
-
-        when(subscriptionDAO.findByID(context, Subscription.class, subscriptionId))
-            .thenReturn(existingSubscription);
-
-
-        doThrow(new SQLException()).when(subscriptionDAO).save(eq(context), any(Subscription.class));
-
-        subscribeService.addSubscriptionParameter(context, subscriptionId,
-                                                  getSubscriptionParameter("added", "add"));
+    private static SubscriptionParameter weekly() {
+        return createSubscriptionParameter("frequency", "W");
     }
 
-    @Test(expected = SQLException.class)
-    public void exceptionWhileRemovingParameters() throws Exception {
-        int subscriptionId = 43127;
-
-        SubscriptionParameter firstParameter = getSubscriptionParameter("key1", "value1");
-        SubscriptionParameter secondParameter = getSubscriptionParameter("key2", "value2");
-
-        Subscription existingSubscription = createSubscription("type",
-                                                               firstParameter, secondParameter);
-
-        when(subscriptionDAO.findByID(context, Subscription.class, subscriptionId))
-            .thenReturn(existingSubscription);
-
-
-        doThrow(new SQLException()).when(subscriptionDAO).save(eq(context), any(Subscription.class));
-
-        subscribeService.removeSubscriptionParameter(context, subscriptionId,
-                                                  secondParameter);
+    private Subscription createSubscription(String type, DSpaceObject dso, EPerson ePerson,
+                                            SubscriptionParameter... parameters) {
+        return subscribeBuilder(context, type,
+                                dso, ePerson,
+                                Arrays.stream(parameters).collect(Collectors.toList())).build();
     }
 
-    private static Subscription createSubscription(String type, SubscriptionParameter... parameters) {
-        Subscription subscription = new Subscription();
-        subscription.setSubscriptionType(type);
 
-        subscription.setSubscriptionParameterList
-                        (new ArrayList<>(Arrays.asList(parameters)));
-        return subscription;
-    }
-
-    private void assertParametersAreUpdated(Subscription updatedSubscription,
-                                                                       List<SubscriptionParameter> expectedParameters)
-        throws SQLException {
-        ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
-
-        verify(subscriptionDAO, atLeastOnce()).save(eq(context), captor.capture());
-
-
-        assertEquals(captor.getValue().getSubscriptionParameterList(), expectedParameters);
-        assertEquals(updatedSubscription.getSubscriptionParameterList(), expectedParameters);
-    }
-
-    private static SubscriptionParameter getSubscriptionParameter(String name, String value) {
+    private static SubscriptionParameter createSubscriptionParameter(String name, String value) {
         SubscriptionParameter parameter = new SubscriptionParameter();
         parameter.setName(name);
         parameter.setValue(value);
         return parameter;
     }
 
-    private static EPerson getePerson() {
-        EPerson ePerson = mock(EPerson.class);
-        UUID uuid = UUID.randomUUID();
-        doReturn(uuid).when(ePerson).getID();
-        return ePerson;
-    }
 }
