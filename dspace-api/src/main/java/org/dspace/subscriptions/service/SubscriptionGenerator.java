@@ -20,6 +20,6 @@ import org.dspace.eperson.EPerson;
  */
 public interface SubscriptionGenerator<T> {
 
-    public void notifyForSubscriptions(Context c, EPerson ePerson, List<T> comm, List<T> coll, List<T> items);
+    public void notifyForSubscriptions(Context c, EPerson ePerson, List<T> comm, List<T> coll);
 
 }

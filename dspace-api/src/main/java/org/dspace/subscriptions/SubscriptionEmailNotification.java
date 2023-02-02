@@ -9,13 +9,13 @@ package org.dspace.subscriptions;
 
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.FrequencyType;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
@@ -52,10 +52,10 @@ public class SubscriptionEmailNotification
         if (StringUtils.isBlank(frequencyOption)) {
             throw new IllegalArgumentException("Option frequency f must be set");
         }
-        Set<String> supportedValues = subscriptionEmailNotificationService
-                                                 .getSubscriptionParameterValuesByName("frequency");
-        if (!supportedValues.contains(frequencyOption)) {
-            throw new IllegalArgumentException("Option f must be one of following values:" + supportedValues);
+
+        if (!FrequencyType.isSupportedFrequencyType(frequencyOption)) {
+            throw new IllegalArgumentException(
+                    "Option f must be one of following values D(Day), W(Week) or M(Month)");
         }
         subscriptionEmailNotificationService.perform(getContext(), handler, "content", frequencyOption);
     }

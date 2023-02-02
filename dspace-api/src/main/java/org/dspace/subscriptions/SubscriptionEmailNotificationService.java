@@ -21,8 +21,4 @@ public interface SubscriptionEmailNotificationService {
 
     public Set<String> getSupportedSubscriptionTypes();
 
-    public boolean isSupportedSubscriptionParameterName(String name);
-
-    public Set<String> getSubscriptionParameterValuesByName(String name);
-
 }

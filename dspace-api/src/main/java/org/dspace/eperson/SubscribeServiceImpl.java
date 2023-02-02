@@ -152,15 +152,13 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Subscription updateSubscription(Context context, Integer id, EPerson eperson, DSpaceObject dSpaceObject,
-                                           List<SubscriptionParameter> subscriptionParameterList, String type)
+    public Subscription updateSubscription(Context context, Integer id, String subscriptionType,
+                                           List<SubscriptionParameter> subscriptionParameterList)
                                            throws SQLException {
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         subscriptionDB.removeParameterList();
-        subscriptionDB.setSubscriptionType(type);
-        subscriptionDB.setDSpaceObject(dSpaceObject);
+        subscriptionDB.setSubscriptionType(subscriptionType);
         subscriptionParameterList.forEach(x -> subscriptionDB.addParameter(x));
-        subscriptionDB.setEPerson(eperson);
         subscriptionDAO.save(context, subscriptionDB);
         return subscriptionDB;
     }

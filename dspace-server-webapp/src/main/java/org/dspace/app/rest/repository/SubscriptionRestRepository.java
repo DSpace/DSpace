@@ -9,6 +9,8 @@ package org.dspace.app.rest.repository;
 
 import static org.dspace.app.rest.model.SubscriptionRest.CATEGORY;
 import static org.dspace.app.rest.model.SubscriptionRest.NAME;
+import static org.dspace.core.Constants.COLLECTION;
+import static org.dspace.core.Constants.COMMUNITY;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -24,6 +26,7 @@ import javax.ws.rs.BadRequestException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -33,11 +36,10 @@ import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.FrequencyType;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
 import org.dspace.eperson.service.EPersonService;
@@ -65,8 +67,6 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     private ConverterService converter;
     @Autowired
     private EPersonService ePersonService;
-    @Autowired
-    private AuthorizeService authorizeService;
     @Autowired
     private SubscribeService subscribeService;
     @Autowired
@@ -103,7 +103,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @SearchRestMethod(name = "findByEPerson")
-    @PreAuthorize("hasPermission(#epersonId, 'AdminOrOwner', 'READ')")
+    @PreAuthorize("hasPermission(#epersonId, 'EPERSON', 'READ')")
     public Page<SubscriptionRest> findSubscriptionsByEPerson(@Parameter(value = "uuid", required = true) UUID epersonId,
                                                               Pageable pageable) throws Exception {
         Long total = null;
@@ -122,7 +122,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @SearchRestMethod(name = "findByEPersonAndDso")
-    @PreAuthorize("hasPermission(#epersonId, 'AdminOrOwner', 'READ')")
+    @PreAuthorize("hasPermission(#epersonId, 'EPERSON', 'READ')")
     public Page<SubscriptionRest> findByEPersonAndDso(@Parameter(value = "eperson_id", required = true) UUID epersonId,
                                                       @Parameter(value = "resource",required = true) UUID dsoId,
                                                        Pageable pageable) throws Exception {
@@ -143,6 +143,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
+    @PreAuthorize("@subscriptionSecurity.isEnabelToCreateSubscription(#context) && hasAuthority('AUTHENTICATED')")
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
@@ -159,31 +160,23 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 throw new BadRequestException("Id of person or dspace object must represents reals ids");
             }
 
-            // user must have read permissions to dataspace object
-            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,  Constants.READ, true)) {
-                throw new AuthorizeException("The user has not READ rights on this DSO");
-            }
-
-            // if user is admin do not make this control,
-            // otherwise make this control because normal user can only subscribe with their own ID of user.
-            if (!authorizeService.isAdmin(context)) {
-                if (!ePerson.equals(context.getCurrentUser())) {
-                    throw new AuthorizeException("Only administrator can subscribe for other persons");
+            if (dSpaceObject.getType() == COMMUNITY || dSpaceObject.getType() == COLLECTION) {
+                Subscription subscription = null;
+                ServletInputStream input = req.getInputStream();
+                SubscriptionRest subscriptionRest = new ObjectMapper().readValue(input, SubscriptionRest.class);
+                List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest
+                        .getSubscriptionParameterList();
+                if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
+                    List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
+                    validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
+                    subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters,
+                                                              subscriptionRest.getSubscriptionType());
                 }
+                context.commit();
+                return converter.toRest(subscription, utils.obtainProjection());
+            } else {
+                throw new BadRequestException("Currently subscription is supported only for Community and Collection");
             }
-
-            Subscription subscription = null;
-            ServletInputStream input = req.getInputStream();
-            SubscriptionRest subscriptionRest = new ObjectMapper().readValue(input, SubscriptionRest.class);
-            List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
-            if (CollectionUtils.isNotEmpty(subscriptionParameterList)) {
-                List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
-                validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
-                subscription = subscribeService.subscribe(context, ePerson, dSpaceObject, subscriptionParameters,
-                                                          subscriptionRest.getSubscriptionType());
-            }
-            context.commit();
-            return converter.toRest(subscription, utils.obtainProjection());
         } catch (SQLException sqlException) {
             throw new SQLException(sqlException.getMessage(), sqlException);
         } catch (IOException ioException) {
@@ -198,7 +191,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
             var name = subscriptionParameterRest.getName();
             var value = subscriptionParameterRest.getValue();
-            if (!nameAndValueAreSupported(name, value)) {
+            if (!StringUtils.equals("frequency", name) || !FrequencyType.isSupportedFrequencyType(value)) {
                 throw new UnprocessableEntityException("Provided SubscriptionParameter name:" + name +
                                                        " or value: " + value + " is not supported!");
             }
@@ -214,19 +207,10 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         }
     }
 
-    private boolean nameAndValueAreSupported(String name, String value) {
-        return subscriptionEmailNotificationService.isSupportedSubscriptionParameterName(name) &&
-               subscriptionEmailNotificationService.getSubscriptionParameterValuesByName(name).contains(value);
-    }
-
     @Override
     @PreAuthorize("hasPermission(#id, 'subscription', 'WRITE')")
     protected SubscriptionRest put(Context context, HttpServletRequest request, String apiCategory, String model,
                                    Integer id, JsonNode jsonNode) throws SQLException {
-
-        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        String epersonId = req.getParameter("eperson_id");
-        String dsoId = req.getParameter("resource");
 
         SubscriptionRest subscriptionRest;
         try {
@@ -240,22 +224,12 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
 
-        EPerson ePerson = ePersonService.findByIdOrLegacyId(context, epersonId);
-        if (Objects.isNull(ePerson)) {
-            throw new ResourceNotFoundException("There is not ePerson with uuid:" + epersonId);
-        }
-
-        DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
-        if (Objects.isNull(dSpaceObject)) {
-            throw new ResourceNotFoundException("There is not DSpaceObject with uuid:" + dsoId);
-        }
-
         if (id.equals(subscription.getID())) {
             List<SubscriptionParameter> subscriptionParameters = new ArrayList<>();
             List<SubscriptionParameterRest> subscriptionParameterList = subscriptionRest.getSubscriptionParameterList();
             validateParameters(subscriptionRest, subscriptionParameterList, subscriptionParameters);
-            subscription = subscribeService.updateSubscription(context, id, ePerson, dSpaceObject,
-                                            subscriptionParameters, subscriptionRest.getSubscriptionType());
+            subscription = subscribeService.updateSubscription(context, id, subscriptionRest.getSubscriptionType(),
+                                                               subscriptionParameters);
             context.commit();
             return converter.toRest(subscription, utils.obtainProjection());
         } else {

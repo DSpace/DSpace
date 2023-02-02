@@ -51,8 +51,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     @Override
     public void notifyForSubscriptions(Context context, EPerson ePerson,
                                        List<IndexableObject> indexableComm,
-                                       List<IndexableObject> indexableColl,
-                                       List<IndexableObject> indexableItems) {
+                                       List<IndexableObject> indexableColl) {
         try {
             if (Objects.nonNull(ePerson)) {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ePerson);
@@ -60,7 +59,6 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 email.addRecipient(ePerson.getEmail());
                 email.addArgument(generateBodyMail(context, indexableComm));
                 email.addArgument(generateBodyMail(context, indexableColl));
-                email.addArgument(generateBodyMail(context, indexableItems));
                 email.send();
             }
         } catch (Exception e) {

@@ -26,21 +26,9 @@
             <map>
                 <entry key="community" value-ref="communityUpdates"/>
                 <entry key="collection" value-ref="collectionUpdates"/>
-                <entry key="item" value-ref="itemUpdates"/>
-            </map>
-        </constructor-arg>
-        <constructor-arg name="param2values">
-            <map>
-                <entry key="frequency" value-ref="frequencyValues"/>
             </map>
         </constructor-arg>
     </bean>
-
-    <util:set id="frequencyValues">
-        <value>D</value>
-        <value>W</value>
-        <value>M</value>
-    </util:set>
 
     <util:map id="generators">
         <entry key="content" value-ref="contentNotifyGenerator"/>
@@ -51,7 +39,6 @@
     <util:map id="contentUpdates">
         <entry key="community" value-ref="communityUpdates"/>
         <entry key="collection" value-ref="collectionUpdates"/>
-        <entry key="item" value-ref="itemUpdates"/>
     </util:map>
 
     <util:list id="generalMetadataEntity">
@@ -75,7 +62,5 @@
     <bean id="communityUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CommunityUpdates" />
 
     <bean id="collectionUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CollectionsUpdates" />
-
-    <bean id="itemUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.ItemUpdates" />
 
 </beans>

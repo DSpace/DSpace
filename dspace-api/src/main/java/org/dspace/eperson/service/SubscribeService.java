@@ -159,14 +159,12 @@ public interface SubscribeService {
      *
      * @param context                   DSpace context
      * @param id                        Integer id
-     * @param eperson                   EPerson eperson
-     * @param dSpaceObject              DSpaceObject dSpaceObject
      * @param subscriptionParameterList List<SubscriptionParameter>  subscriptionParameterList
-     * @param type                      String  type
+     * @param subscriptionType          type
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Subscription updateSubscription(Context context, Integer id, EPerson eperson, DSpaceObject dSpaceObject,
-            List<SubscriptionParameter> subscriptionParameterList, String type) throws SQLException;
+    public Subscription updateSubscription(Context context, Integer id, String subscriptionType,
+            List<SubscriptionParameter> subscriptionParameterList) throws SQLException;
 
     /**
      * Adds a parameter to a subscription

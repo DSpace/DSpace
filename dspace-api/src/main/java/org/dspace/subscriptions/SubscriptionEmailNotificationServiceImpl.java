@@ -9,11 +9,9 @@ package org.dspace.subscriptions;
 
 import static org.dspace.core.Constants.COLLECTION;
 import static org.dspace.core.Constants.COMMUNITY;
-import static org.dspace.core.Constants.ITEM;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +24,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Subscription;
@@ -46,13 +43,6 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
 
     private static final Logger log = LogManager.getLogger(SubscriptionEmailNotificationServiceImpl.class);
 
-    /**
-     * The map contains supported {SubscriptionParameter}
-     * into the key configured {SubscriptionParameter.name}
-     * instead into value configured a set of values {SubscriptionParameter.value}
-     * related to {SubscriptionParameter.name}
-     */
-    private Map<String, Set<String>> param2values = new HashMap<>();
     private Map<String, DSpaceObjectUpdates> contentUpdates = new HashMap<>();
     @SuppressWarnings("rawtypes")
     private Map<String, SubscriptionGenerator> subscriptionType2generators = new HashMap<>();
@@ -61,17 +51,14 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     private SubscribeService subscribeService;
 
     @SuppressWarnings("rawtypes")
-    public SubscriptionEmailNotificationServiceImpl(Map<String, Set<String>> param2values,
-                                                    Map<String, DSpaceObjectUpdates> contentUpdates,
+    public SubscriptionEmailNotificationServiceImpl(Map<String, DSpaceObjectUpdates> contentUpdates,
                                                     Map<String, SubscriptionGenerator> subscriptionType2generators) {
-        this.param2values = param2values;
         this.contentUpdates = contentUpdates;
         this.subscriptionType2generators = subscriptionType2generators;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
-        List<IndexableObject> items = new ArrayList<>();
         List<IndexableObject> communities = new ArrayList<>();
         List<IndexableObject> collections = new ArrayList<>();
         try {
@@ -90,9 +77,6 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                     } else if (dSpaceObject.getType() == COLLECTION) {
                         collections.addAll(contentUpdates.get(Collection.class.getSimpleName())
                                                          .findUpdates(context, dSpaceObject, frequency));
-                    } else if (dSpaceObject.getType() == ITEM) {
-                        items.addAll(contentUpdates.get(Item.class.getSimpleName())
-                                                   .findUpdates(context, dSpaceObject, frequency));
                     }
 
                     var ePerson = subscription.getEPerson();
@@ -103,15 +87,14 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                             continue;
                         } else {
                             subscriptionType2generators.get(subscriptionType)
-                                      .notifyForSubscriptions(context, ePerson, communities, collections, items);
+                                      .notifyForSubscriptions(context, ePerson, communities, collections);
                             communities.clear();
                             collections.clear();
-                            items.clear();
                         }
                     } else {
                         //in the end of the iteration
                         subscriptionType2generators.get(subscriptionType)
-                                        .notifyForSubscriptions(context, ePerson, communities, collections, items);
+                                        .notifyForSubscriptions(context, ePerson, communities, collections);
                     }
                     iterator++;
                 }
@@ -152,16 +135,6 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     @Override
     public Set<String> getSupportedSubscriptionTypes() {
         return subscriptionType2generators.keySet();
-    }
-
-    @Override
-    public Set<String> getSubscriptionParameterValuesByName(String name) {
-        return param2values.containsKey(name) ? param2values.get(name) : Collections.emptySet();
-    }
-
-    @Override
-    public boolean isSupportedSubscriptionParameterName(String name) {
-        return param2values.containsKey(name);
     }
 
 }
