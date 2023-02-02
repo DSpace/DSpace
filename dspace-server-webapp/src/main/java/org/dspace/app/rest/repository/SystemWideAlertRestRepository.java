@@ -80,7 +80,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
                 throw new ResourceNotFoundException(
                         "systemWideAlert with id " + systemWideAlert.getID() + " was not found");
             }
-            if (!authorizeService.isAdmin(context) && !systemWideAlert.isActive()) {
+            if (!systemWideAlert.isActive() && !authorizeService.isAdmin(context)) {
                 throw new AuthorizeException("Non admin users are not allowed to retrieve inactive alerts");
             }
             return converter.toRest(systemWideAlert, utils.obtainProjection());
@@ -125,7 +125,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
         }
 
         systemWideAlert.setMessage(systemWideAlertRest.getMessage());
-        systemWideAlert.setAllowSessions(AllowSessionsEnum.fromInt(systemWideAlertRest.getAllowSessions()));
+        systemWideAlert.setAllowSessions(AllowSessionsEnum.fromString(systemWideAlertRest.getAllowSessions()));
         systemWideAlert.setCountdownTo(systemWideAlertRest.getCountdownTo());
         systemWideAlert.setActive(systemWideAlertRest.isActive());
 
@@ -166,7 +166,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
 
         try {
             systemWideAlert = systemWideAlertService.create(context, systemWideAlertRest.getMessage(),
-                                                            AllowSessionsEnum.fromInt(
+                                                            AllowSessionsEnum.fromString(
                                                                     systemWideAlertRest.getAllowSessions()),
                                                             systemWideAlertRest.getCountdownTo(),
                                                             systemWideAlertRest.isActive());

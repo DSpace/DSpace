@@ -68,7 +68,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                            allOf(
                                    hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                    hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
-                                   hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions())),
+                                   hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions().getValue())),
                                    hasJsonPath("$.countdownTo",
                                                startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
                                    hasJsonPath("$.active", is(systemWideAlert1.isActive()))
@@ -76,7 +76,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                            allOf(
                                    hasJsonPath("$.alertId", is(systemWideAlert2.getID())),
                                    hasJsonPath("$.message", is(systemWideAlert2.getMessage())),
-                                   hasJsonPath("$.allowSessions", is(systemWideAlert2.getAllowSessions())),
+                                   hasJsonPath("$.allowSessions", is(systemWideAlert2.getAllowSessions().getValue())),
                                    hasJsonPath("$.countdownTo", is(systemWideAlert2.getCountdownTo())),
                                    hasJsonPath("$.active", is(systemWideAlert2.isActive()))
                            )
@@ -168,7 +168,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                              hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                              hasJsonPath("$.allowSessions",
-                                                         is(systemWideAlert1.getAllowSessions())),
+                                                         is(systemWideAlert1.getAllowSessions().getValue())),
                                              hasJsonPath("$.countdownTo",
                                                          startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
@@ -209,7 +209,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                              hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                              hasJsonPath("$.allowSessions",
-                                                         is(systemWideAlert1.getAllowSessions())),
+                                                         is(systemWideAlert1.getAllowSessions().getValue())),
                                              hasJsonPath("$.countdownTo",
                                                          startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
@@ -255,7 +255,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                              hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                              hasJsonPath("$.allowSessions",
-                                                         is(systemWideAlert1.getAllowSessions())),
+                                                         is(systemWideAlert1.getAllowSessions().getValue())),
                                              hasJsonPath("$.countdownTo",
                                                          startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
@@ -303,19 +303,19 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$._embedded.systemwidealerts", containsInAnyOrder(
                                     allOf(
-                                            hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
-                                            hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
-                                            hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions())),
-                                            hasJsonPath("$.countdownTo",
-                                                        startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
-                                            hasJsonPath("$.active", is(systemWideAlert1.isActive()))
+                                    hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
+                                    hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
+                                    hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions().getValue())),
+                                    hasJsonPath("$.countdownTo",
+                                                startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                    hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                     ),
                                     allOf(
-                                            hasJsonPath("$.alertId", is(systemWideAlert3.getID())),
-                                            hasJsonPath("$.message", is(systemWideAlert3.getMessage())),
-                                            hasJsonPath("$.allowSessions", is(systemWideAlert3.getAllowSessions())),
-                                            hasJsonPath("$.countdownTo", is(systemWideAlert3.getCountdownTo())),
-                                            hasJsonPath("$.active", is(systemWideAlert3.isActive()))
+                                    hasJsonPath("$.alertId", is(systemWideAlert3.getID())),
+                                    hasJsonPath("$.message", is(systemWideAlert3.getMessage())),
+                                    hasJsonPath("$.allowSessions", is(systemWideAlert3.getAllowSessions().getValue())),
+                                    hasJsonPath("$.countdownTo", is(systemWideAlert3.getCountdownTo())),
+                                    hasJsonPath("$.active", is(systemWideAlert3.isActive()))
                                     )
                             )));
 
@@ -326,7 +326,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
         systemWideAlertRest.setCountdownTo(new Date());
-        systemWideAlertRest.setAllowSessions(1);
+        systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -376,7 +376,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
         systemWideAlertRest.setCountdownTo(new Date());
-        systemWideAlertRest.setAllowSessions(1);
+        systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -396,7 +396,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
         systemWideAlertRest.setCountdownTo(new Date());
-        systemWideAlertRest.setAllowSessions(1);
+        systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -425,7 +425,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
         systemWideAlertRest.setCountdownTo(new Date());
-        systemWideAlertRest.setAllowSessions(1);
+        systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -454,7 +454,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         systemWideAlertRest.setAlertId(systemWideAlert.getID());
         systemWideAlertRest.setMessage("Updated alert test message");
         systemWideAlertRest.setCountdownTo(new Date());
-        systemWideAlertRest.setAllowSessions(1);
+        systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
         ObjectMapper mapper = new ObjectMapper();

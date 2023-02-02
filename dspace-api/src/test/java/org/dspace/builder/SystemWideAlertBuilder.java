@@ -7,7 +7,6 @@
  */
 package org.dspace.builder;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -16,7 +15,6 @@ import org.dspace.alerts.SystemWideAlert;
 import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.scripts.Process;
 
 public class SystemWideAlertBuilder extends AbstractBuilder<SystemWideAlert, SystemWideAlertService> {
 
@@ -91,22 +89,6 @@ public class SystemWideAlertBuilder extends AbstractBuilder<SystemWideAlert, Sys
     public void delete(Context c, SystemWideAlert alert) throws Exception {
         if (alert != null) {
             getService().delete(c, alert);
-        }
-    }
-
-    public static void deleteProcess(Integer integer) throws SQLException, IOException {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Process process = processService.find(c, integer);
-            if (process != null) {
-                try {
-                    processService.delete(c, process);
-                } catch (AuthorizeException e) {
-                    // cannot occur, just wrap it to make the compiler happy
-                    throw new RuntimeException(e);
-                }
-            }
-            c.complete();
         }
     }
 }

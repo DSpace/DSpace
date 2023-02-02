@@ -26,7 +26,7 @@ public class SystemWideAlertConverter implements DSpaceConverter<SystemWideAlert
         systemWideAlertRest.setId(systemWideAlert.getID());
         systemWideAlertRest.setAlertId(systemWideAlert.getID());
         systemWideAlertRest.setMessage(systemWideAlert.getMessage());
-        systemWideAlertRest.setAllowSessions(systemWideAlert.getAllowSessions());
+        systemWideAlertRest.setAllowSessions(systemWideAlert.getAllowSessions().getValue());
         systemWideAlertRest.setCountdownTo(systemWideAlert.getCountdownTo());
         systemWideAlertRest.setActive(systemWideAlert.isActive());
         return systemWideAlertRest;

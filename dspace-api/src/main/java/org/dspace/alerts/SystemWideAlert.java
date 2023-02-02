@@ -43,7 +43,7 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
     private String message;
 
     @Column(name = "allow_sessions")
-    private int allowSessions;
+    private String allowSessions;
 
     @Column(name = "countdown_to")
     @Temporal(TemporalType.TIMESTAMP)
@@ -97,8 +97,8 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
      *
      * @return what kind of sessions are allowed while the system-wide alert is active
      */
-    public int getAllowSessions() {
-        return allowSessions;
+    public AllowSessionsEnum getAllowSessions() {
+        return AllowSessionsEnum.fromString(allowSessions);
     }
 
     /**

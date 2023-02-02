@@ -133,7 +133,7 @@ public class SystemWideAlertServiceTest {
     @Test
     public void canNonAdminUserLoginTrueTest() throws Exception {
         // Mock the alert state
-        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_ALL_SESSIONS.getValue());
+        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_ALL_SESSIONS);
 
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
@@ -147,7 +147,7 @@ public class SystemWideAlertServiceTest {
     @Test
     public void canNonAdminUserLoginFalseTest() throws Exception {
         // Mock the alert state
-        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY.getValue());
+        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY);
 
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
@@ -169,7 +169,7 @@ public class SystemWideAlertServiceTest {
         when(authorizeService.isAdmin(context, eperson)).thenReturn(false);
 
         // Mock the alert state
-        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
+        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY);
 
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
@@ -186,7 +186,7 @@ public class SystemWideAlertServiceTest {
         when(authorizeService.isAdmin(context, eperson)).thenReturn(false);
 
         // Mock the alert state
-        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY.getValue());
+        when(systemWideAlert.getAllowSessions()).thenReturn(AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY);
 
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();

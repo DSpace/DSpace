@@ -112,7 +112,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         if (active == null || active.isEmpty()) {
             return true;
         }
-        return active.get(0).getAllowSessions() == AllowSessionsEnum.ALLOW_ALL_SESSIONS.getValue();
+        return active.get(0).getAllowSessions() == AllowSessionsEnum.ALLOW_ALL_SESSIONS;
     }
 
     @Override
@@ -124,6 +124,6 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         if (active == null || active.isEmpty()) {
             return true;
         }
-        return active.get(0).getAllowSessions() != AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY.getValue();
+        return active.get(0).getAllowSessions() != AllowSessionsEnum.ALLOW_ADMIN_SESSIONS_ONLY;
     }
 }

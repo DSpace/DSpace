@@ -16,7 +16,7 @@ CREATE TABLE systemwidealert
 (
     alert_id        INTEGER NOT NULL PRIMARY KEY,
     message         VARCHAR(512),
-    allow_sessions  INTEGER,
+    allow_sessions  VARCHAR(64),
     countdown_to    TIMESTAMP,
     active          BOOLEAN
 );

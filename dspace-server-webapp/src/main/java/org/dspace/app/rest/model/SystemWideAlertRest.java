@@ -36,7 +36,7 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
 
     private Integer alertId;
     private String message;
-    private Integer allowSessions;
+    private String allowSessions;
     private Date countdownTo;
     private boolean active;
 
@@ -56,11 +56,11 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
         this.message = message;
     }
 
-    public Integer getAllowSessions() {
+    public String getAllowSessions() {
         return allowSessions;
     }
 
-    public void setAllowSessions(final Integer allowSessions) {
+    public void setAllowSessions(final String allowSessions) {
         this.allowSessions = allowSessions;
     }
 
