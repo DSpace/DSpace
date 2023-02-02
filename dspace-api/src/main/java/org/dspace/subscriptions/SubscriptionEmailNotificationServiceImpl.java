@@ -23,7 +23,10 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.Subscription;
@@ -82,13 +85,14 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                     DSpaceObject dSpaceObject = subscription.getDSpaceObject();
 
                     if (dSpaceObject.getType() == COMMUNITY) {
-                        communities.addAll(contentUpdates.get("community")
+                        communities.addAll(contentUpdates.get(Community.class.getSimpleName())
                                                          .findUpdates(context, dSpaceObject, frequency));
                     } else if (dSpaceObject.getType() == COLLECTION) {
-                        collections.addAll(contentUpdates.get("collection")
+                        collections.addAll(contentUpdates.get(Collection.class.getSimpleName())
                                                          .findUpdates(context, dSpaceObject, frequency));
                     } else if (dSpaceObject.getType() == ITEM) {
-                        items.addAll(contentUpdates.get("item").findUpdates(context, dSpaceObject, frequency));
+                        items.addAll(contentUpdates.get(Item.class.getSimpleName())
+                                                   .findUpdates(context, dSpaceObject, frequency));
                     }
 
                     var ePerson = subscription.getEPerson();

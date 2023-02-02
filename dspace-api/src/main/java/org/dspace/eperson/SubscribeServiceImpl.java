@@ -17,7 +17,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -49,7 +51,9 @@ public class SubscribeServiceImpl implements SubscribeService {
         if (StringUtils.isBlank(resourceType)) {
             return subscriptionDAO.findAllOrderedByDSO(context, limit, offset);
         } else {
-            if (resourceType.equals("Item") || resourceType.equals("Collection") || resourceType.equals("Community")) {
+            if (resourceType.equals(Item.class.getSimpleName()) ||
+                resourceType.equals(Collection.class.getSimpleName()) ||
+                resourceType.equals(Community.class.getSimpleName())) {
                 return subscriptionDAO.findAllOrderedByIDAndResourceType(context, resourceType, limit, offset);
             } else {
                 log.error("Resource type must be Item, Collection or Community");
@@ -71,7 +75,7 @@ public class SubscribeServiceImpl implements SubscribeService {
             subscriptionParameterList.forEach(subscriptionParameter ->
                     newSubscription.addParameter(subscriptionParameter));
             newSubscription.setEPerson(eperson);
-            newSubscription.setdSpaceObject(dSpaceObject);
+            newSubscription.setDSpaceObject(dSpaceObject);
             newSubscription.setSubscriptionType(type);
             return newSubscription;
         } else {
@@ -154,7 +158,7 @@ public class SubscribeServiceImpl implements SubscribeService {
         Subscription subscriptionDB = subscriptionDAO.findByID(context, Subscription.class, id);
         subscriptionDB.removeParameterList();
         subscriptionDB.setSubscriptionType(type);
-        subscriptionDB.setdSpaceObject(dSpaceObject);
+        subscriptionDB.setDSpaceObject(dSpaceObject);
         subscriptionParameterList.forEach(x -> subscriptionDB.addParameter(x));
         subscriptionDB.setEPerson(eperson);
         subscriptionDAO.save(context, subscriptionDB);

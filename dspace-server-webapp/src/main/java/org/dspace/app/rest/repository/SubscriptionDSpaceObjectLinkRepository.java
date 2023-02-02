@@ -15,13 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
-import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -45,15 +40,7 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
             if (Objects.isNull(subscription)) {
                 throw new ResourceNotFoundException("No such subscription: " + subscriptionId);
             }
-            if (subscription.getDSpaceObject() instanceof Item ||
-                subscription.getDSpaceObject() instanceof Community ||
-                subscription.getDSpaceObject() instanceof Collection) {
-                return converter.toRest(subscription.getDSpaceObject(), projection);
-            } else {
-                HibernateProxy hibernateProxy = (HibernateProxy) subscription.getDSpaceObject();
-                LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-                return converter.toRest(initializer.getImplementation(), projection);
-            }
+            return converter.toRest(subscription.getDSpaceObject(), projection);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

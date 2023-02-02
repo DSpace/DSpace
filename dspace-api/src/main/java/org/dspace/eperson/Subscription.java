@@ -87,10 +87,6 @@ public class Subscription implements ReloadableEntity<Integer> {
         this.ePerson = ePerson;
     }
 
-    public void setdSpaceObject(DSpaceObject dSpaceObject) {
-        this.dSpaceObject = dSpaceObject;
-    }
-
     public String getSubscriptionType() {
         return subscriptionType;
     }
