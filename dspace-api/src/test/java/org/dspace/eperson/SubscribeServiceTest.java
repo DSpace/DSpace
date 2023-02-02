@@ -250,8 +250,8 @@ public class SubscribeServiceTest extends AbstractDSpaceTest {
             getSubscriptionParameter("frequency", "A")
         );
 
-        Subscription updated = subscribeService.updateSubscription(context, subscriptionId, null, null,
-                                                                        updatedParameters, updatedType);
+        Subscription updated = subscribeService.updateSubscription(context, subscriptionId, updatedType,
+                                                                   updatedParameters);
 
         ArgumentCaptor<Subscription> captor = ArgumentCaptor.forClass(Subscription.class);
         verify(subscriptionDAO).save(eq(context), captor.capture());
@@ -282,9 +282,7 @@ public class SubscribeServiceTest extends AbstractDSpaceTest {
             getSubscriptionParameter("frequency", "A")
         );
 
-        subscribeService.updateSubscription(context, subscriptionId, null, null,
-                                                                   updatedParameters, updatedType);
-
+        subscribeService.updateSubscription(context, subscriptionId, updatedType, updatedParameters);
     }
 
     @Test
