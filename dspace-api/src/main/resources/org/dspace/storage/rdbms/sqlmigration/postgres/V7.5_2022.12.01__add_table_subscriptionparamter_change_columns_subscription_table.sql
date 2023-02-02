@@ -24,10 +24,6 @@ CREATE TABLE  subscription_parameter
   CONSTRAINT subscription_parameter_pkey PRIMARY KEY (subscription_parameter_id),
   CONSTRAINT subscription_parameter_subscription_fkey  FOREIGN KEY  (subscription_id) REFERENCES subscription (subscription_id)  ON DELETE CASCADE
 );
- --
-ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;
--- --
-ALTER TABLE subscription DROP COLUMN collection_id;
 --
 ALTER TABLE subscription ADD COLUMN dspace_object_id UUID;
 -- --
@@ -35,6 +31,12 @@ ALTER TABLE subscription ADD COLUMN type CHARACTER VARYING(255);
 ---- --
 ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject (uuid);
 --
-
-
+UPDATE subscription SET dspace_object_id = collection_id , type = 'content';
+--
+ALTER TABLE subscription DROP CONSTRAINT subscription_collection_id_fkey;
+-- --
+ALTER TABLE subscription DROP COLUMN collection_id;
+-- --
+INSERT INTO subscription_parameter (subscription_parameter_id, name, value, subscription_id)
+SELECT getnextid('subscription_parameter'), 'frequency', 'D', subscription_id from "subscription" ;
 
