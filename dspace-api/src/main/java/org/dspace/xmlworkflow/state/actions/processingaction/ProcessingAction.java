@@ -41,7 +41,7 @@ public abstract class ProcessingAction extends Action {
     public static final String SUBMIT_CANCEL = "submit_cancel";
     protected static final String SUBMIT_APPROVE = "submit_approve";
     protected static final String SUBMIT_REJECT = "submit_reject";
-
+    protected static final String RETURN_TO_POOL = "return_to_pool";
     protected static final String REJECT_REASON = "reason";
 
     @Override

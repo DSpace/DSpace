@@ -66,6 +66,7 @@ public class ReviewAction extends ProcessingAction {
         List<String> options = new ArrayList<>();
         options.add(SUBMIT_APPROVE);
         options.add(SUBMIT_REJECT);
+        options.add(RETURN_TO_POOL);
         return options;
     }
 

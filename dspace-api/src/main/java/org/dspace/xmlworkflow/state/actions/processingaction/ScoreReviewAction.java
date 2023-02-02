@@ -118,7 +118,7 @@ public class ScoreReviewAction extends ProcessingAction {
 
     @Override
     public List<String> getOptions() {
-        return Arrays.asList(SUBMIT_SCORE);
+        return List.of(SUBMIT_SCORE, RETURN_TO_POOL);
     }
 
     @Override

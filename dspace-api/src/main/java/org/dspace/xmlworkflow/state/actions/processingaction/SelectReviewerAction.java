@@ -145,6 +145,7 @@ public class SelectReviewerAction extends ProcessingAction {
     public List<String> getOptions() {
         List<String> options = new ArrayList<>();
         options.add(SUBMIT_SELECT_REVIEWER);
+        options.add(RETURN_TO_POOL);
         return options;
     }
 
