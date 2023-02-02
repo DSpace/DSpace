@@ -29,6 +29,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -77,6 +78,9 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private HandleService handleService;
 
     @SuppressWarnings("rawtypes")
     @Autowired(required = true)
@@ -148,6 +152,23 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         Version version = StringUtils.isNotBlank(summary) ?
                           versioningService.createNewVersion(context, item, summary) :
                           versioningService.createNewVersion(context, item);
+
+        if (Objects.isNull(version)) {
+            throw new RuntimeException("Cannot create the new version for the item with id: " + item.getID());
+        }
+        if (Objects.isNull(version.getItem())) {
+            throw new RuntimeException("Add metadata `dc.relation.isreplacedby` to the previous version item " +
+                    "because the new item wasn't assigned to the version object.");
+        }
+
+        // Add metadata `dc.relation.isreplacedby` to the previous version item.
+        // The metadata value is: `dc.identifier.uri` from the new item.
+        String handleref = handleService.getCanonicalForm(version.getItem().getHandle());
+        if (org.apache.commons.lang3.StringUtils.isBlank(handleref)) {
+            throw new RuntimeException("Cannot get handle in canonical form.");
+        }
+        itemService.addMetadata(context, item, "dc", "relation", "isreplacedby", null,
+                handleref);
         return converter.toRest(version, utils.obtainProjection());
     }
 
