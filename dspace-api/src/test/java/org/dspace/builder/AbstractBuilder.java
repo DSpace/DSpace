@@ -52,6 +52,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.handle.service.HandleClarinService;
+import org.dspace.license.factory.LicenseServiceFactory;
+import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -116,6 +118,7 @@ public abstract class AbstractBuilder<T, S> {
     static ClarinUserRegistrationService clarinUserRegistrationService;
     static ClarinUserMetadataService clarinUserMetadataService;
     static ClarinLicenseResourceUserAllowanceService clarinLicenseResourceUserAllowanceService;
+    static CreativeCommonsService creativeCommonsService;
 
     protected Context context;
 
@@ -181,6 +184,7 @@ public abstract class AbstractBuilder<T, S> {
         clarinUserMetadataService = ClarinServiceFactory.getInstance().getClarinUserMetadata();
         clarinLicenseResourceUserAllowanceService = ClarinServiceFactory.getInstance()
                 .getClarinLicenseResourceUserAllowance();
+        creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
     }
 
 
@@ -220,7 +224,7 @@ public abstract class AbstractBuilder<T, S> {
         clarinUserRegistrationService = null;
         clarinUserMetadataService = null;
         clarinLicenseResourceUserAllowanceService = null;
-
+        creativeCommonsService = null;
     }
 
     public static void cleanupObjects() throws Exception {

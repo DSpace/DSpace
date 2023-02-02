@@ -31,6 +31,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
+import org.dspace.builder.VersionHistoryBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -44,7 +45,6 @@ import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,45 +74,38 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
     @Before
     public void setup() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
-        versionHistory = versionHistoryService.create(context);
+        versionHistory = VersionHistoryBuilder.createVersionHistory(context).build();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
+                .withName("Sub Community")
+                .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
         item = ItemBuilder.createItem(context, col1)
-                          .withTitle("Public item 1")
-                          .withIssueDate("2017-10-17")
-                          .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                          .withSubject("ExtraEntry")
-                          .build();
-        context.restoreAuthSystemState();
-    }
-
-    @After
-    public void cleanup() throws SQLException, AuthorizeException {
-        context.turnOffAuthorisationSystem();
-        versionHistoryService.delete(context, versionHistory);
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
         context.restoreAuthSystemState();
     }
 
     @Test
     public void findOnePublicVersionHistoryTest() throws Exception {
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", is(VersionHistoryMatcher.matchEntry(versionHistory))))
-                   .andExpect(jsonPath("$._links.versions.href", Matchers.allOf(Matchers.containsString(
-                                       "api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))))
-                   .andExpect(jsonPath("$._links.draftVersion.href", Matchers.allOf(Matchers.containsString(
-                                       "api/versioning/versionhistories/" + versionHistory.getID() + "/draftVersion"))))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
-                                       "api/versioning/versionhistories/" + versionHistory.getID()))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(VersionHistoryMatcher.matchEntry(versionHistory))))
+                .andExpect(jsonPath("$._links.versions.href", Matchers.allOf(Matchers.containsString(
+                        "api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))))
+                .andExpect(jsonPath("$._links.draftVersion.href", Matchers.allOf(Matchers.containsString(
+                        "api/versioning/versionhistories/" + versionHistory.getID() + "/draftVersion"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
+                        "api/versioning/versionhistories/" + versionHistory.getID()))));
     }
 
     @Test
@@ -123,13 +116,13 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(adminToken).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE))
-                             .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
 
         getClient(epersonToken).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE))
-                               .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
 
         getClient().perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE))
-                   .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -138,19 +131,19 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
@@ -158,9 +151,9 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/versioning/versionhistories/" + versionHistory.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.draftVersion", Matchers.is(true)))
-                             .andExpect(jsonPath("$", is(VersionHistoryMatcher.matchEntry(versionHistory))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.draftVersion", Matchers.is(true)))
+                .andExpect(jsonPath("$", is(VersionHistoryMatcher.matchEntry(versionHistory))));
     }
 
     @Test
@@ -169,41 +162,41 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/versioning/versionhistories/" + versionHistory.getID()))
-                        .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void findOneWrongIDTest() throws Exception {
         int wrongVersionHistoryId = (versionHistory.getID() + 5) * 57;
         getClient().perform(get("/api/versioning/versionhistories/" + wrongVersionHistoryId))
-                   .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
 
     }
     @Test
     public void findVersionsOneWrongIDTest() throws Exception {
         int wrongVersionHistoryId = (versionHistory.getID() + 5) * 57;
         getClient().perform(get("/api/versioning/versionhistories/" + wrongVersionHistoryId + "/versions"))
-                   .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
 
     }
 
     @Test
-    public void findVersionsOfVersionHistoryAdminTest() throws Exception {
+    public void  findVersionsOfVersionHistoryAdminTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version version2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
@@ -212,23 +205,23 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", containsInRelativeOrder(
-                                                 VersionMatcher.matchEntry(version2),
-                                                 VersionMatcher.matchEntry(version)
-                                                 )));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", containsInRelativeOrder(
+                        VersionMatcher.matchEntry(version2),
+                        VersionMatcher.matchEntry(version)
+                )));
 
         context.turnOffAuthorisationSystem();
         Version version3 = VersionBuilder.createVersion(context, item, "test3").build();
         context.restoreAuthSystemState();
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", containsInRelativeOrder(
-                                                 VersionMatcher.matchEntry(version3),
-                                                 VersionMatcher.matchEntry(version2),
-                                                 VersionMatcher.matchEntry(version)
-                                                 )));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", containsInRelativeOrder(
+                        VersionMatcher.matchEntry(version3),
+                        VersionMatcher.matchEntry(version2),
+                        VersionMatcher.matchEntry(version)
+                )));
     }
 
     @Test
@@ -236,45 +229,45 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         configurationService.setProperty("versioning.item.history.view.admin", true);
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
         context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                   .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findVersionsOfVersionHistoryLoggedUserTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
@@ -283,30 +276,30 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                               .andExpect(status().isOk())
-                               .andExpect(jsonPath("$._embedded.versions", containsInAnyOrder(
-                                                   VersionMatcher.matchEntry(version),
-                                                   VersionMatcher.matchEntry(version2)
-                                                   )));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", containsInAnyOrder(
+                        VersionMatcher.matchEntry(version),
+                        VersionMatcher.matchEntry(version2)
+                )));
     }
 
     @Test
     public void findVersionsOfVersionHistoryPaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
@@ -316,33 +309,33 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions")
-                             .param("size", "1"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v3))))
-                             .andExpect(jsonPath("$.page.size", is(1)))
-                             .andExpect(jsonPath("$.page.number", is(0)))
-                             .andExpect(jsonPath("$.page.totalPages", is(3)))
-                             .andExpect(jsonPath("$.page.totalElements", is(3)));
+                        .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v3))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(3)));
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions")
-                             .param("size", "1")
-                             .param("page", "1"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v2))))
-                             .andExpect(jsonPath("$.page.size", is(1)))
-                             .andExpect(jsonPath("$.page.number", is(1)))
-                             .andExpect(jsonPath("$.page.totalPages", is(3)))
-                             .andExpect(jsonPath("$.page.totalElements", is(3)));
+                        .param("size", "1")
+                        .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v2))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(3)));
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions")
-                             .param("size", "1")
-                             .param("page", "2"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v1))))
-                             .andExpect(jsonPath("$.page.size", is(1)))
-                             .andExpect(jsonPath("$.page.number", is(2)))
-                             .andExpect(jsonPath("$.page.totalPages", is(3)))
-                             .andExpect(jsonPath("$.page.totalElements", is(3)));
+                        .param("size", "1")
+                        .param("page", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v1))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(2)))
+                .andExpect(jsonPath("$.page.totalPages", is(3)))
+                .andExpect(jsonPath("$.page.totalElements", is(3)));
     }
 
     @Test
@@ -353,32 +346,32 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                             .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
 
         getClient(tokenEPerson).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                               .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
 
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
-                   .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findWorkspaceItemOfDraftVersionAdminTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory vh = versionHistoryService.findByItem(context, item);
@@ -387,36 +380,36 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$",Matchers.is(WorkspaceItemMatcher
-                                        .matchItemWithTitleAndDateIssuedAndSubject(witem,
-                                         "Public test item", "2021-04-27", "ExtraEntry"))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",Matchers.is(WorkspaceItemMatcher
+                        .matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                "Public test item", "2021-04-27", "ExtraEntry"))));
     }
 
     @Test
     public void findWorkspaceItemOfDraftVersionUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory vh = versionHistoryService.findByItem(context, item);
         context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
-                   .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -424,26 +417,26 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
         context.turnOffAuthorisationSystem();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
-                             .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -454,21 +447,20 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .withSubmitterGroup(admin)
-                                          .build();
+                .withName("Collection test")
+                .withSubmitterGroup(admin)
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .grantLicense()
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory vh = versionHistoryService.findByItem(context, version.getItem());
@@ -479,18 +471,18 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         // retrieve the workspace item
         getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/search/item")
-                             .param("uuid", String.valueOf(version.getItem().getID())))
-                             .andExpect(status().isOk())
-                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+                        .param("uuid", String.valueOf(version.getItem().getID())))
+                .andExpect(status().isOk())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // submit the workspaceitem to complete the deposit
         getClient(tokenAdmin).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
-                             .content("/api/submission/workspaceitems/" + idRef.get())
-                             .contentType(textUriContentType))
-                             .andExpect(status().isCreated());
+                        .content("/api/submission/workspaceitems/" + idRef.get())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
-                             .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -498,27 +490,27 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection 1")
-                                          .withWorkflowGroup(1, admin)
-                                          .build();
+                .withName("Collection 1")
+                .withWorkflowGroup(1, admin)
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col)
-                                                   .withTitle("Workflow Item 1")
-                                                   .withIssueDate("2017-10-17")
-                                                   .withAuthor("Doe, John")
-                                                   .withSubject("ExtraEntry")
-                                                   .build();
+                .withTitle("Workflow Item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "test").build();
         version.setItem(witem.getItem());
@@ -528,28 +520,28 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
-                             .andExpect(jsonPath("$", Matchers.is(
-                                        WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
-                                        "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
+                .andExpect(jsonPath("$", Matchers.is(
+                        WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
     }
 
     @Test
     public void findWorkspaceItemOfDraftVersionLoggedUserTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .build();
+                .withName("Collection test")
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-04-27")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-04-27")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory vh = versionHistoryService.findByItem(context, item);
@@ -558,10 +550,10 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         String ePersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(ePersonToken).perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
-                               .andExpect(status().isOk())
-                               .andExpect(jsonPath("$",Matchers.is(WorkspaceItemMatcher
-                                          .matchItemWithTitleAndDateIssuedAndSubject(witem,
-                                           "Public test item", "2021-04-27", "ExtraEntry"))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",Matchers.is(WorkspaceItemMatcher
+                        .matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                "Public test item", "2021-04-27", "ExtraEntry"))));
     }
 
     @Test
@@ -572,13 +564,13 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
 
         getClient(tokenAdmin).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
-                             .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
 
         getClient(tokenEPerson).perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
-                               .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
 
         getClient().perform(get("/api/versioning/versionhistories/" + Integer.MAX_VALUE + "/draftVersion"))
-                   .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -588,21 +580,20 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
 
         Collection col = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Collection test")
-                                          .withSubmitterGroup(admin)
-                                          .build();
+                .withName("Collection test")
+                .withSubmitterGroup(admin)
+                .build();
 
         Item item = ItemBuilder.createItem(context, col)
-                               .withTitle("Public test item")
-                               .withIssueDate("2021-03-20")
-                               .withAuthor("Doe, John")
-                               .withSubject("ExtraEntry")
-                               .grantLicense()
-                               .build();
+                .withTitle("Public test item")
+                .withIssueDate("2021-03-20")
+                .withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
@@ -617,57 +608,57 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         // item that linked last version is not archived
         getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.inArchive", Matchers.is(false)));
 
         // retrieve the workspace item
         getClient(adminToken).perform(get("/api/submission/workspaceitems/search/item")
-                             .param("uuid", String.valueOf(lastVersionItem.getID())))
-                             .andExpect(status().isOk())
-                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+                        .param("uuid", String.valueOf(lastVersionItem.getID())))
+                .andExpect(status().isOk())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // submit the workspaceitem to complete the deposit
         getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
-                             .content("/api/submission/workspaceitems/" + idRef.get())
-                             .contentType(textUriContentType))
-                             .andExpect(status().isCreated());
+                        .content("/api/submission/workspaceitems/" + idRef.get())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
 
         // now the item is archived
         getClient(adminToken).perform(get("/api/core/items/" + lastVersionItem.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.inArchive", Matchers.is(true)));
 
         getClient(adminToken).perform(get("/api/versioning/versions/" + versionID))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(v2))))
-                             .andExpect(jsonPath("$._links.versionhistory.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v2.getID() + "/versionhistory"))))
-                             .andExpect(jsonPath("$._links.item.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v2.getID() + "/item"))))
-                             .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
-                                                 "api/versioning/versions/" + v2.getID()))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(v2))))
+                .andExpect(jsonPath("$._links.versionhistory.href", Matchers.allOf(Matchers.containsString(
+                        "api/versioning/versions/" + v2.getID() + "/versionhistory"))))
+                .andExpect(jsonPath("$._links.item.href", Matchers.allOf(Matchers.containsString(
+                        "api/versioning/versions/" + v2.getID() + "/item"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.allOf(Matchers.containsString(
+                        "api/versioning/versions/" + v2.getID()))));
 
         getClient(adminToken).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions")
-                             .param("size", "1"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v2))))
-                             .andExpect(jsonPath("$.page.size", is(1)))
-                             .andExpect(jsonPath("$.page.number", is(0)))
-                             .andExpect(jsonPath("$.page.totalPages", is(2)))
-                             .andExpect(jsonPath("$.page.totalElements", is(2)));
+                        .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v2))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
 
         // To delete a version you need to delete the item linked to it.
         getClient(adminToken).perform(delete("/api/core/items/" + versionItem.getID()))
-                             .andExpect(status().is(204));
+                .andExpect(status().is(204));
 
         getClient(adminToken).perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions")
-                             .param("size", "1"))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v1))))
-                             .andExpect(jsonPath("$.page.size", is(1)))
-                             .andExpect(jsonPath("$.page.number", is(0)))
-                             .andExpect(jsonPath("$.page.totalPages", is(1)))
-                             .andExpect(jsonPath("$.page.totalElements", is(1)));
+                        .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.versions", contains(VersionMatcher.matchEntry(v1))))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$.page.totalPages", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
 }

@@ -364,8 +364,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setAdminPermission(item, ePerson, null);
     }
 
-    public ItemBuilder withPersonEmail(String email) {
-        return addMetadataValue(item, "person", "email", null, email);
+    public ItemBuilder withCCLicense(String uri) throws SQLException, AuthorizeException {
+        creativeCommonsService.updateLicense(context, uri, item);
+        return this;
     }
 
     @Override
