@@ -27,21 +27,19 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.AbstractDSpaceTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.dao.SubscriptionDAO;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SubscribeServiceTest {
+public class SubscribeServiceTest extends AbstractDSpaceTest {
 
     @Mock
     private SubscriptionDAO subscriptionDAO;
