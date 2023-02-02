@@ -38,9 +38,6 @@ UPDATE subscription set dspace_object_id = collection_id , type = 'content';
 ALTER TABLE subscription DROP CONSTRAINT Subscription_collection_id_fk;
 --
 ALTER TABLE subscription DROP COLUMN collection_id;
---
-INSERT INTO subscription_parameter (subscription_parameter_id, name, value, subscription_id)
-SELECT getnextid('subscription_parameter'), 'frequency', 'D', subscription_id from "subscription" ;
 
 
 
