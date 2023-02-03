@@ -46,7 +46,6 @@ import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
-import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
@@ -56,7 +55,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
@@ -2124,143 +2122,4 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
         }
     }
-
-    @Test
-    public void createSupervisionOnWorkspaceThenSubmitToBeWorkflowTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity =
-            CommunityBuilder.createCommunity(context)
-                            .withName("Parent Community")
-                            .build();
-
-        EPerson reviewer =
-            EPersonBuilder.createEPerson(context)
-                          .withEmail("reviewer1@example.com")
-                          .withPassword(password)
-                          .build();
-
-        Collection collection =
-            CollectionBuilder.createCollection(context, parentCommunity)
-                             .withName("Collection 1")
-                             .withWorkflowGroup("reviewer", reviewer)
-                             .build();
-
-        EPerson userA =
-            EPersonBuilder.createEPerson(context)
-                          .withCanLogin(true)
-                          .withEmail("userA@test.com")
-                          .withPassword(password)
-                          .build();
-
-        Group groupA =
-            GroupBuilder.createGroup(context)
-                        .withName("group A")
-                        .addMember(userA)
-                        .build();
-
-        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-
-        WorkspaceItem witem =
-            WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                .withTitle("Workspace Item 1")
-                                .withIssueDate("2017-10-17")
-                                .withSubject("ExtraEntry")
-                                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
-                                .grantLicense()
-                                .build();
-
-        context.restoreAuthSystemState();
-
-        // create a supervision order on workspaceItem to groupA
-        getClient(getAuthToken(admin.getEmail(), password))
-            .perform(post("/api/core/supervisionorders/")
-                .param("uuid", witem.getItem().getID().toString())
-                .param("group", groupA.getID().toString())
-                .param("type", "EDITOR")
-                .contentType(contentType))
-            .andExpect(status().isCreated());
-
-        String authTokenA = getAuthToken(userA.getEmail(), password);
-
-        // a simple patch to update an existent metadata
-        String patchBody =
-            getPatchContent(List.of(
-                new ReplaceOperation("/sections/traditionalpageone/dc.title/0", Map.of("value", "New Title"))
-            ));
-
-        // supervisor update the title of the workspaceItem
-        getClient(authTokenA).perform(patch("/api/submission/workspaceitems/" + witem.getID())
-                                 .content(patchBody)
-                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.errors").doesNotExist())
-                             .andExpect(jsonPath("$",
-                                 // check the new title and untouched values
-                                 Matchers.is(
-                                     WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                     witem, "New Title", "2017-10-17", "ExtraEntry"
-                                 ))));
-
-        // supervisor check that title has been updated
-        getClient(authTokenA).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$.errors").doesNotExist())
-                             .andExpect(jsonPath("$", Matchers.is(
-                                 WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                     witem, "New Title", "2017-10-17", "ExtraEntry"
-                                 ))));
-
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
-        try {
-            String adminToken = getAuthToken(admin.getEmail(), password);
-            String reviewerToken = getAuthToken(reviewer.getEmail(), password);
-
-            // submit the workspaceitem to start the workflow
-            getClient(adminToken).perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
-                                         .content("/api/submission/workspaceitems/" + witem.getID())
-                                         .contentType(textUriContentType))
-                                     .andExpect(status().isCreated())
-                                     .andDo(result ->
-                                         idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
-
-            // supervisor can read the workflowitem
-            getClient(authTokenA)
-                .perform(get("/api/workflow/workflowitems/" + idRef.get()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
-                    null, "New Title", "2017-10-17"))))
-                .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)));
-
-            // reviewer can read the workflowitem
-            getClient(reviewerToken)
-                .perform(get("/api/workflow/workflowitems/" + idRef.get()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
-                    null, "New Title", "2017-10-17"))))
-                .andExpect(jsonPath("$.sections.defaultAC.discoverable", is(true)));
-
-            // a simple patch to update an existent metadata
-            String patchBodyTwo =
-                getPatchContent(List.of(new ReplaceOperation("/metadata/dc.title", Map.of("value", "edited title"))));
-
-            // supervisor can't edit item in workflow
-            getClient(authTokenA).perform(patch("/api/core/items/" + witem.getItem().getID())
-                                .content(patchBodyTwo)
-                                .contentType(contentType))
-                            .andExpect(status().isForbidden());
-
-            // supervisor can't edit the workflow item
-            getClient(authTokenA).perform(patch("/api/workflow/workflowitems/" + idRef.get())
-                                .content(patchBody)
-                                .contentType(contentType))
-                            .andExpect(status().isUnprocessableEntity());
-
-        } finally {
-            if (idRef.get() != null) {
-                WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
-            }
-        }
-    }
-
 }
