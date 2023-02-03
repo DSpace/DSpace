@@ -50,7 +50,7 @@ public class SubscriptionEmailNotification
         assignSpecialGroupsInContext();
         String frequencyOption = commandLine.getOptionValue("f");
         if (StringUtils.isBlank(frequencyOption)) {
-            throw new IllegalArgumentException("Option frequency f must be set");
+            throw new IllegalArgumentException("Option --frequency (-f) must be set");
         }
 
         if (!FrequencyType.isSupportedFrequencyType(frequencyOption)) {

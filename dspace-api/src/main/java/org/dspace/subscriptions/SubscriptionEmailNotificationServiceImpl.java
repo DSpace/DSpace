@@ -72,11 +72,15 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                     DSpaceObject dSpaceObject = subscription.getDSpaceObject();
 
                     if (dSpaceObject.getType() == COMMUNITY) {
-                        communities.addAll(contentUpdates.get(Community.class.getSimpleName())
+                        communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase())
                                                          .findUpdates(context, dSpaceObject, frequency));
                     } else if (dSpaceObject.getType() == COLLECTION) {
-                        collections.addAll(contentUpdates.get(Collection.class.getSimpleName())
+                        collections.addAll(contentUpdates.get(Collection.class.getSimpleName().toLowerCase())
                                                          .findUpdates(context, dSpaceObject, frequency));
+                    } else {
+                        log.warn("found an invalid DSpace Object type ({}) among subscriptions to send",
+                                 dSpaceObject.getType());
+                        continue;
                     }
 
                     var ePerson = subscription.getEPerson();
