@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Service
-public class  IIIFServiceFacade {
+public class IIIFServiceFacade {
 
     @Autowired
     ItemService itemService;

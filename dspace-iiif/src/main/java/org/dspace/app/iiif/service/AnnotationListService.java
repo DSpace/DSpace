@@ -7,18 +7,23 @@
  */
 package org.dspace.app.iiif.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.iiif.model.generator.AnnotationListGenerator;
 import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -42,6 +47,10 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 public class AnnotationListService extends AbstractResourceService {
 
+    /**
+     * Bundle used for canvas annotations.
+     */
+    public static final String ANNOTATION_BUNDLE = "ANNOTATIONS";
 
     @Autowired
     IIIFUtils utils;
@@ -83,15 +92,7 @@ public class AnnotationListService extends AbstractResourceService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        List<MetadataValue> metadata = bitstreamService.getMetadata(bitstream, "iiif", "media",
-            "annotations", Item.ANY);
-
-        // If annotations exist, the JSON formatted list will be found in the first, non-repeating metadata field.
-        if (metadata.size() > 0) {
-            return metadata.get(0).getValue();
-        } else {
-            throw new ResourceNotFoundException("IIIF Annotation List not found for  id " + uuid);
-        }
+        return getAnnotation(bitstream, context);
     }
 
     /**
@@ -148,5 +149,32 @@ public class AnnotationListService extends AbstractResourceService {
         return new ExternalLinksGenerator(identifier)
                 .setFormat(mimetype)
                 .setLabel(bitstream.getName());
+    }
+
+    /**
+     * Returns the JSON formatted IIIF annotation if found.
+     * @param bitstream Bitstream
+     * @param context DSpace context
+     * @return json annotation
+     */
+    private String getAnnotation(Bitstream bitstream, Context context)  {
+        Pattern pattern = Pattern.compile("^" + bitstream.getID() + ".json");
+        try {
+            for (Bundle bundle : bitstream.getBundles()) {
+                for (Item item : bundle.getItems()) {
+                    for (Bundle annotationsBundle : itemService.getBundles(item, ANNOTATION_BUNDLE)) {
+                        for (Bitstream annotationFile : annotationsBundle.getBitstreams()) {
+                            if (pattern.matcher(annotationFile.getName()).matches()) {
+                                InputStream iiifAnnotation = bitstreamService.retrieve(context, annotationFile);
+                                return new String(iiifAnnotation.readAllBytes(), StandardCharsets.UTF_8);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException | IOException | AuthorizeException e) {
+            throw new RuntimeException(e);
+        }
+        return "{}";
     }
 }

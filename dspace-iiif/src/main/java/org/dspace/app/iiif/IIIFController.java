@@ -46,7 +46,7 @@ public class IIIFController {
      * Called with GET to retrieve the manifest for a single DSpace item.
      *
      * @param id DSpace Item uuid
-     * @return Manifest
+     * @return Manifest as JSON
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest")
     public String findOne(@PathVariable UUID id) {
@@ -68,7 +68,7 @@ public class IIIFController {
      *
      * @param id DSpace Item uuid
      * @param query query terms
-     * @return Annotation List
+     * @return Annotation List as JSON
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/search")
     public String searchInManifest(@PathVariable UUID id,
@@ -86,7 +86,7 @@ public class IIIFController {
      * scope is the entire manifest (or DSpace Item).
      *
      * @param id DSpace Item uuid
-     * @return Annotation List
+     * @return Annotation List as JSON
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/manifest/seeAlso")
     public String findSeeAlsoList(@PathVariable UUID id) {
@@ -103,7 +103,7 @@ public class IIIFController {
      * are stored in the "iiif.image.annotations" bitstream metadata field.
      *
      * @param id DSpace Bitstream uuid
-     * @return Annotation List
+     * @return Annotation List as JSON
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/list/annotation")
     public String findAnnotations(@PathVariable UUID id) {
@@ -121,7 +121,7 @@ public class IIIFController {
      *
      * @param id DSpace Item uuid
      * @param cid canvas identifier
-     * @return Canvas
+     * @return Canvas as JSON
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/canvas/{cid}")
     public String findCanvas(@PathVariable UUID id, @PathVariable String cid) {

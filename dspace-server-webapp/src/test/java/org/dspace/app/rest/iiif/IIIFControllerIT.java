@@ -44,6 +44,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     public static final String IIIFBundle = "RANGETEST";
 
+    protected static final String ANNOTATION_BUNDLE = "ANNOTATIONS";
+
     @Autowired
     ItemService itemService;
 
@@ -195,14 +197,18 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                     .withIIIFCanvasHeight(4220)
                     .build();
         }
+        Bitstream annotationBitstream;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            BitstreamBuilder
+            annotationBitstream = BitstreamBuilder
                     .createBitstream(context, publicItem1, is)
-                    .withName("Bitstream2.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
+
+        annotationBitstream.setName(context,annotationBitstream.getID() + ".json");
+
         context.restoreAuthSystemState();
+
         // Expect canvas label, width and height to match bitstream description.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
@@ -240,23 +246,24 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                                       .enableIIIFSearch()
                                       .build();
 
-        String bitstreamContent = "ThisIsSomeText";
+        String bitstreamContent = "{\"id\":\"https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d" +
+            "-3jj168356191/canvas/c1\",\"items\":" +
+            "[{\"body\":{\"type\":\"TextualBody\",\"value\":\"annotation test\"}," +
+            "\"id\":\"998994af-93ab-48c6-a8ae-63672658b16d\",\"motivation\":\"commenting\"," +
+            "\"target\":{\"source\":\"https://demo" +
+            ".edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1\"," +
+            "\"selector\":[{\"type\":\"FragmentSelector\",\"value\":\"xywh=304,612,1194,2011\"}]}}]}";
+
         Bitstream bitstream;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             bitstream = BitstreamBuilder
-                .createBitstream(context, publicItem1, is)
-                .withName("Bitstream2.jpg")
-                .withMimeType("image/jpeg")
-                .withIiifImageAnnotatiion("{\"id\":\"https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d" +
-                    "-3jj168356191/canvas/c1\",\"items\":" +
-                    "[{\"body\":{\"type\":\"TextualBody\",\"value\":\"annotation test\"}," +
-                    "\"id\":\"998994af-93ab-48c6-a8ae-63672658b16d\",\"motivation\":\"commenting\"," +
-                    "\"target\":{\"source\":\"https://demo" +
-                    ".edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1\"," +
-                    "\"selector\":[{\"type\":\"FragmentSelector\",\"value\":\"xywh=304,612,1194,2011\"}]}}]}")
+                .createBitstream(context, publicItem1, is, ANNOTATION_BUNDLE)
+                .withMimeType("application/json")
                 .build();
         }
+        bitstream.setName(context,bitstream.getID() + ".json");
         context.restoreAuthSystemState();
+
         // Expect annotation list
         getClient().perform(get("/iiif/" + bitstream.getID() + "/list/annotation"))
                    .andExpect(status().isOk())
@@ -285,7 +292,14 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                                       .enableIIIFSearch()
                                       .build();
 
-        String bitstreamContent = "ThisIsSomeText";
+        String bitstreamContent = "dummy text";
+        String bitstreamAnnotationContent = "{\"id\":\"https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d" +
+            "-3jj168356191/canvas/c1\",\"items\":[{\"body\":{\"type\":\"TextualBody\",\"value\":\"test\"}," +
+            "\"id\":\"998994af-93ab-48c6-a8ae-63672658b16d\",\"motivation\":\"commenting\"," +
+            "\"target\":{\"source\":\"https://demo" +
+            ".edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1\"," +
+            "\"selector\":[{\"type\":\"FragmentSelector\",\"value\":\"xywh=304,612,1194,2011\"}]}}]}";
+
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
@@ -296,22 +310,32 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withIIIFCanvasHeight(4220)
                 .build();
         }
+        Bitstream annotatedBitstream;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            BitstreamBuilder
+            annotatedBitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Bitstream2.jpg")
                 .withMimeType("image/jpeg")
-                .withIiifImageAnnotatiion("{\"id\":\"https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d" +
-                    "-3jj168356191/canvas/c1\",\"items\":[{\"body\":{\"type\":\"TextualBody\",\"value\":\"test\"}," +
-                    "\"id\":\"998994af-93ab-48c6-a8ae-63672658b16d\",\"motivation\":\"commenting\"," +
-                    "\"target\":{\"source\":\"https://demo" +
-                    ".edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1\"," +
-                    "\"selector\":[{\"type\":\"FragmentSelector\",\"value\":\"xywh=304,612,1194,2011\"}]}}]}")
+                .withIIIFLabel("Global 2")
+                .withIIIFCanvasWidth(2000)
+                .withIIIFCanvasHeight(3000)
                 .build();
         }
+
+        // Add JSON bitstream to ANNOTATIONS Bundle.
+        Bitstream annotation;
+        try (InputStream is = IOUtils.toInputStream(bitstreamAnnotationContent, CharEncoding.UTF_8)) {
+            annotation = BitstreamBuilder
+                .createBitstream(context, publicItem1, is, ANNOTATION_BUNDLE)
+                .withMimeType("application/json")
+                .build();
+        }
+        // Set name of the JSON file
+        annotation.setName(context,annotatedBitstream.getID() + ".json");
+
         context.restoreAuthSystemState();
 
-        // Expect second canvas to include OtherContent
+        // Expect second canvas to include AnnotationList
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.@context",

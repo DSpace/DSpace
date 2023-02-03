@@ -7,11 +7,14 @@
  */
 package org.dspace.app.iiif.service;
 
+import static org.dspace.app.iiif.service.AnnotationListService.ANNOTATION_BUNDLE;
 import static org.dspace.app.iiif.service.utils.IIIFUtils.METADATA_IMAGE_WIDTH;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +28,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
@@ -49,6 +53,9 @@ public class CanvasService extends AbstractResourceService {
 
     @Autowired
     ImageContentService imageContentService;
+
+    @Autowired
+    ItemService itemService;
 
     @Autowired
     IIIFUtils utils;
@@ -203,7 +210,7 @@ public class CanvasService extends AbstractResourceService {
                     .setWidth(canvasWidth).setLabel(label));
 
         // Add annotation list to the canvas if annotations exist in the bitstream metadata.
-        addAnnotations(bitstream, canvasGenerator);
+        addAnnotations(bitstream, canvasGenerator, context);
 
         return canvasGenerator;
     }
@@ -281,18 +288,24 @@ public class CanvasService extends AbstractResourceService {
      * @param canvasGenerator canvas generator
      * @return canvas generator
      */
-    private CanvasGenerator addAnnotations(Bitstream bitstream, CanvasGenerator canvasGenerator) {
-        bitstream.getMetadata().stream()
-                 .filter((m) -> {
-                     String q = m.getMetadataField().getQualifier();
-                     return q != null && q.contentEquals("annotations");
-                 })
-                 .findFirst()
-                 .ifPresent(s -> {
-                     ImageAnnotationService is = new ImageAnnotationService(configurationService);
-                     canvasGenerator.addAnnotations(is.getImageAnnotations(bitstream));
-                 });
-
+    private CanvasGenerator addAnnotations(Bitstream bitstream, CanvasGenerator canvasGenerator, Context context) {
+        Pattern pattern = Pattern.compile("^" + bitstream.getID() + ".json");
+        try {
+            for (Bundle bundle : bitstream.getBundles()) {
+                for (Item item : bundle.getItems()) {
+                    for (Bundle annotationsBundle : itemService.getBundles(item, ANNOTATION_BUNDLE)) {
+                        for (Bitstream annotationFile : annotationsBundle.getBitstreams()) {
+                            if (pattern.matcher(annotationFile.getName()).matches()) {
+                                ImageAnnotationService is = new ImageAnnotationService(configurationService);
+                                canvasGenerator.addAnnotations(is.getImageAnnotations(bitstream));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return canvasGenerator;
     }
 
