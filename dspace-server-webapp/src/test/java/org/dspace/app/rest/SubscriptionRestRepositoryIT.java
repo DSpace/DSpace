@@ -51,7 +51,6 @@ import org.springframework.http.MediaType;
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-
     private Collection collection;
 
     @Before

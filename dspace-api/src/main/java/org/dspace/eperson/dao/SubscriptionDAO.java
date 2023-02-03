@@ -85,7 +85,7 @@ public interface SubscriptionDAO extends GenericDAO<Subscription> {
      * Return a paginated list of all subscriptions ordered by ID and resourceType
      * 
      * @param context        DSpace context object
-     * @param resourceType   Could be Item, Collection or Community
+     * @param resourceType   Could be Collection or Community
      * @param limit          Paging limit
      * @param offset         The position of the first result to return
      * @return

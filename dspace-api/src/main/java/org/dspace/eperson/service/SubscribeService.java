@@ -42,17 +42,22 @@ public interface SubscribeService {
             throws Exception;
 
     /**
-     * Subscribe an e-person to a collection. An e-mail will be sent every day a
-     * new item appears in the collection.
-     *
-     * @param context DSpace context
-     * @throws SQLException       An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
+     * Subscribe an EPerson to a dSpaceObject (Collection or Community). An e-mail will be sent every day a
+     * new item appears in the Collection or Community.
+     * 
+     * @param context                 DSpace context object
+     * @param eperson                 EPerson to subscribe
+     * @param dSpaceObject            DSpaceObject to subscribe
+     * @param subscriptionParameters  list of @SubscriptionParameter
+     * @param subscriptionType        Currently supported only "content"
+     * @return
+     * @throws SQLException           An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException     Exception indicating the current user of the context does not have permission
+     *                                to perform a particular action.
      */
     public Subscription subscribe(Context context, EPerson eperson, DSpaceObject dSpaceObject,
-                                  List<SubscriptionParameter> subscriptionParameterList,
-                                  String type) throws SQLException, AuthorizeException;
+                                  List<SubscriptionParameter> subscriptionParameters,
+                                  String subscriptionType) throws SQLException, AuthorizeException;
 
     /**
      * Unsubscribe an e-person to a collection. Passing in <code>null</code>
