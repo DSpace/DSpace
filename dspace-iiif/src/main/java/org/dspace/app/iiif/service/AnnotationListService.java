@@ -75,15 +75,15 @@ public class AnnotationListService extends AbstractResourceService {
 
     /**
      * Returns image annotation list from the bitstream metadata field. The
-     * JSON annotation list is created outside DSpace and added to bitstream
-     * metadata by the user.
+     * JSON annotation list is created outside DSpace and added as a bitstream
+     * to the ANNOTATIONS bundle.
      * @param context DSpace context
      * @param uuid bitstream UUID
      * @return IIIF annotation list
      */
     public String getImageAnnotations(Context context, UUID uuid) throws RuntimeException {
         BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-        Bitstream bitstream = null;
+        Bitstream bitstream;
         try {
             bitstream = bitstreamService.find(context, uuid);
             if (bitstream == null) {
