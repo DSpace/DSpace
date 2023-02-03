@@ -116,7 +116,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             throw new UnprocessableEntityException("Item with uuid: " + itemId + " not found");
         }
 
-        if (item.isArchived()) {
+        if (item.isArchived() || item.isWithdrawn()) {
             throw new UnprocessableEntityException("An archived Item with uuid: " + itemId + " can't be supervised");
         }
 
