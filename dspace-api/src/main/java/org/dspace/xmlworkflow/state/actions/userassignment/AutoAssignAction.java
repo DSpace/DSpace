@@ -80,7 +80,7 @@ public class AutoAssignAction extends UserSelectionAction {
                         }
                         //Delete our workflow item role since the users have been assigned
                         workflowItemRoleService.delete(c, workflowItemRole);
-                        if (role.isDeleteTemporaryGroup()) {
+                        if (role.isDeleteTemporaryGroup() && workflowItemRole.getGroup() != null) {
                             // Delete temporary groups created after members have workflow task assigned
                             groupService.delete(c, workflowItemRole.getGroup());
                         }

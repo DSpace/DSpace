@@ -22,7 +22,6 @@ public class SelectReviewerActionAdvancedInfoConverter
     public SelectReviewerActionAdvancedInfoRest convert(SelectReviewerActionAdvancedInfo modelObject,
                                                         Projection projection) {
         SelectReviewerActionAdvancedInfoRest restModel = new SelectReviewerActionAdvancedInfoRest();
-        restModel.setProjection(projection);
         restModel.setGroup(modelObject.getGroup());
         restModel.setType(modelObject.getType());
         restModel.setId(modelObject.getId());

@@ -7,27 +7,29 @@
  */
 package org.dspace.xmlworkflow.state.actions;
 
-public interface ActionAdvancedInfo {
-    /**
-     * Getter for the type of Action
-     *
-     * @return String of format "action_info_" + Action type
-     */
-    String getType();
+/**
+ * Interface for the shared properties of an 'advancedInfo' section of an advanced workflow {@link Action}
+ * Implementations of this class will define the specific fields per action that will need to be defined/configured
+ * to pass along this info to REST endpoint
+ */
+public abstract class ActionAdvancedInfo {
 
-    /**
-     * Setter for the Action type to be set in format "action_info_" + type
-     *
-     * @param type The type to be set
-     */
-    void setType(String type);
+    protected String type;
+    protected String id;
 
-    /**
-     * Getter for the id of Action
-     *
-     * @return MD5 hash String of this Action
-     */
-    String getId();
+    protected final static String TYPE_PREFIX = "action_info_";
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = TYPE_PREFIX + type;
+    }
+
+    public String getId() {
+        return id;
+    }
 
     /**
      * Setter for the Action id to be set.
@@ -35,6 +37,6 @@ public interface ActionAdvancedInfo {
      *
      * @param type The type of this Action to be included in the MD5 hash
      */
-    void setId(String type);
+    protected abstract void generateId(String type);
 
 }

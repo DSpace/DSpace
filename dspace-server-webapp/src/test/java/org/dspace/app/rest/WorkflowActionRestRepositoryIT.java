@@ -19,6 +19,7 @@ import org.dspace.app.rest.matcher.WorkflowActionMatcher;
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.repository.WorkflowActionRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -27,7 +28,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-import org.dspace.xmlworkflow.state.actions.processingaction.RatingReviewActionAdvancedInfo;
+import org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewActionAdvancedInfo;
+import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerActionAdvancedInfo;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -145,12 +147,12 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
         String nameActionWithOptions = "scorereviewaction";
         WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
 
-        // create RatingReviewActionAdvancedInfo to compare with output
-        RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
-        ratingReviewActionAdvancedInfo.setDescriptionRequired(true);
-        ratingReviewActionAdvancedInfo.setMaxValue(5);
-        ratingReviewActionAdvancedInfo.setType(SUBMIT_SCORE);
-        ratingReviewActionAdvancedInfo.setId(SUBMIT_SCORE);
+        // create ScoreReviewActionAdvancedInfo to compare with output
+        ScoreReviewActionAdvancedInfo scoreReviewActionAdvancedInfo = new ScoreReviewActionAdvancedInfo();
+        scoreReviewActionAdvancedInfo.setDescriptionRequired(true);
+        scoreReviewActionAdvancedInfo.setMaxValue(5);
+        scoreReviewActionAdvancedInfo.setType(SUBMIT_SCORE);
+        scoreReviewActionAdvancedInfo.generateId(SUBMIT_SCORE);
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameActionWithOptions))
@@ -161,7 +163,7 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$.advancedOptions", not(empty())))
             .andExpect(jsonPath("$.advanced", is(true)))
             .andExpect(jsonPath("$.advancedInfo", Matchers.contains(
-                WorkflowActionMatcher.matchRatingReviewActionAdvancedInfo(ratingReviewActionAdvancedInfo))))
+                WorkflowActionMatcher.matchScoreReviewActionAdvancedInfo(scoreReviewActionAdvancedInfo))))
             //Matches expected corresponding rest action values
             .andExpect(jsonPath("$", Matchers.is(
                 WorkflowActionMatcher.matchWorkflowActionEntry(existentWorkflow)
@@ -173,8 +175,9 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
         String token = getAuthToken(eperson.getEmail(), password);
         String nameActionWithOptions = "selectrevieweraction";
         // create reviewers group
+        SelectReviewerAction.resetGroup();
         context.turnOffAuthorisationSystem();
-        Group group = groupService.create(context);
+        Group group = GroupBuilder.createGroup(context).withName("ReviewersUUIDConfig").build();
         configurationService.setProperty("action.selectrevieweraction.group", group.getID());
         context.restoreAuthSystemState();
 
@@ -182,8 +185,7 @@ public class WorkflowActionRestRepositoryIT extends AbstractControllerIntegratio
         SelectReviewerActionAdvancedInfo selectReviewerActionAdvancedInfo = new SelectReviewerActionAdvancedInfo();
         selectReviewerActionAdvancedInfo.setGroup(group.getID().toString());
         selectReviewerActionAdvancedInfo.setType("submit_select_reviewer");
-        selectReviewerActionAdvancedInfo.setId("submit_select_reviewer");
-
+        selectReviewerActionAdvancedInfo.generateId("submit_select_reviewer");
 
         WorkflowActionConfig existentWorkflow = xmlWorkflowFactory.getActionByName(nameActionWithOptions);
         //When we call this facets endpoint

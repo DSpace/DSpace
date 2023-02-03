@@ -34,9 +34,7 @@ public class ReviewAction extends ProcessingAction {
     public static final int MAIN_PAGE = 0;
     public static final int REJECT_PAGE = 1;
 
-    private static final String SUBMIT_APPROVE = "submit_approve";
     private static final String SUBMITTER_IS_DELETED_PAGE = "submitter_deleted";
-
 
     @Override
     public void activate(Context c, XmlWorkflowItem wfItem) {
@@ -51,7 +49,7 @@ public class ReviewAction extends ProcessingAction {
                 case SUBMIT_APPROVE:
                     return processAccept(c, wfi);
                 case SUBMIT_REJECT:
-                    return processRejectPage(c, wfi, step, request);
+                    return super.processRejectPage(c, wfi, request);
                 case SUBMITTER_IS_DELETED_PAGE:
                     return processSubmitterIsDeletedPage(c, wfi, request);
                 default:
@@ -73,24 +71,6 @@ public class ReviewAction extends ProcessingAction {
     public ActionResult processAccept(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
         super.addApprovedProvenance(c, wfi);
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-    }
-
-    public ActionResult processRejectPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
-        String reason = request.getParameter("reason");
-        if (reason == null || 0 == reason.trim().length()) {
-            request.setAttribute("page", REJECT_PAGE);
-            addErrorField(request, "reason");
-            return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
-        }
-
-        //We have pressed reject, so remove the task the user has & put it back to a workspace item
-        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
-            .sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(),
-                this.getProvenanceStartId(), reason);
-
-
-        return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
     }
 
     public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)

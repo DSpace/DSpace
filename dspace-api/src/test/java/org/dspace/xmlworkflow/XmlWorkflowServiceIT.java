@@ -38,6 +38,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.junit.After;
 import org.junit.Test;
@@ -131,6 +132,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         ClaimedTask task = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, reviewManager)
             .withTitle("Test workflow item to reject").build();
         // Set reviewer group property and add reviewer to group
+        SelectReviewerAction.resetGroup();
         configurationService.setProperty("action.selectrevieweraction.group", "Reviewers");
         Group reviewerGroup = GroupBuilder.createGroup(context).withName("Reviewers").build();
         EPerson reviewer = EPersonBuilder.createEPerson(context).withEmail("reviewer@example.org").build();
@@ -172,6 +174,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         ClaimedTask task = ClaimedTaskBuilder.createClaimedTask(context, colWithWorkflow, reviewManager)
             .withTitle("Test workflow item to reject").build();
         // Set reviewer group property and add reviewer to group
+        SelectReviewerAction.resetGroup();
         configurationService.setProperty("action.selectrevieweraction.group", "Reviewers");
         Group reviewerGroup = GroupBuilder.createGroup(context).withName("Reviewers").build();
         EPerson reviewer1 = EPersonBuilder.createEPerson(context).withEmail("reviewer1@example.org").build();

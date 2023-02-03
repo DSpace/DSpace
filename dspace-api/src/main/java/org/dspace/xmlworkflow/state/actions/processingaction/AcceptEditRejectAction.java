@@ -32,9 +32,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class AcceptEditRejectAction extends ProcessingAction {
 
-    private static final String SUBMIT_APPROVE = "submit_approve";
     private static final String SUBMITTER_IS_DELETED_PAGE = "submitter_deleted";
-
 
     //TODO: rename to AcceptAndEditMetadataAction
 

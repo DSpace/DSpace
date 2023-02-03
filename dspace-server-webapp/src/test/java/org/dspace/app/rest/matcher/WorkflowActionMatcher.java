@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
-import org.dspace.xmlworkflow.state.actions.processingaction.RatingReviewActionAdvancedInfo;
+import org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewActionAdvancedInfo;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerActionAdvancedInfo;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -42,15 +42,15 @@ public class WorkflowActionMatcher {
 
     /**
      * Matcher to check the contents of the advancedInfo for "ratingreviewaction"
-     * @param ratingReviewActionAdvancedInfo identical RatingReviewActionAdvancedInfo object
+     * @param scoreReviewActionAdvancedInfo identical ScoreReviewActionAdvancedInfo object
      */
-    public static Matcher<? super Object> matchRatingReviewActionAdvancedInfo(
-        RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo) {
+    public static Matcher<? super Object> matchScoreReviewActionAdvancedInfo(
+        ScoreReviewActionAdvancedInfo scoreReviewActionAdvancedInfo) {
         return Matchers.allOf(
-            hasJsonPath("$.descriptionRequired", is(ratingReviewActionAdvancedInfo.isDescriptionRequired())),
-            hasJsonPath("$.maxValue", is(ratingReviewActionAdvancedInfo.getMaxValue())),
-            hasJsonPath("$.type", is(ratingReviewActionAdvancedInfo.getType())),
-            hasJsonPath("$.id", is(ratingReviewActionAdvancedInfo.getId()))
+            hasJsonPath("$.descriptionRequired", is(scoreReviewActionAdvancedInfo.isDescriptionRequired())),
+            hasJsonPath("$.maxValue", is(scoreReviewActionAdvancedInfo.getMaxValue())),
+            hasJsonPath("$.type", is(scoreReviewActionAdvancedInfo.getType())),
+            hasJsonPath("$.id", is(scoreReviewActionAdvancedInfo.getId()))
         );
     }
 

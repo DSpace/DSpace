@@ -44,67 +44,32 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
         return NAME;
     }
 
-    /**
-     * Generic getter for the options
-     *
-     * @return the options value of this WorkflowActionRest
-     */
     public List<String> getOptions() {
         return options;
     }
 
-    /**
-     * Generic setter for the options
-     *
-     * @param options The options to be set on this WorkflowActionRest
-     */
     public void setOptions(List<String> options) {
         this.options = options;
     }
 
-    /**
-     * Generic getter for the advanced options
-     *
-     * @return the advanced options value of this WorkflowActionRest
-     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<String> getAdvancedOptions() {
         return advancedOptions;
     }
 
-    /**
-     * Generic setter for the advanced options
-     *
-     * @param advancedOptions The advanced options to be set on this WorkflowActionRest
-     */
     public void setAdvancedOptions(List<String> advancedOptions) {
         this.advancedOptions = advancedOptions;
     }
 
-    /**
-     * Generic getter for advanced boolean
-     *
-     * @return the advanced boolean value of this WorkflowActionRest
-     */
     public boolean getAdvanced() {
         return CollectionUtils.isNotEmpty(getAdvancedOptions());
     }
 
-    /**
-     * Generic getter for advanced info
-     *
-     * @return the advanced info value of this WorkflowActionRest
-     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public List<ActionAdvancedInfo> getAdvancedInfo() {
         return advancedInfo;
     }
 
-    /**
-     * Generic setter for advanced info
-     *
-     * @param advancedInfo The advanced info to be set on this WorkflowActionRest
-     */
     public void setAdvancedInfo(List<ActionAdvancedInfo> advancedInfo) {
         this.advancedInfo = advancedInfo;
     }

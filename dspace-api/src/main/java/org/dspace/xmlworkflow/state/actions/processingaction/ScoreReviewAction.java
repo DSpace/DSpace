@@ -8,8 +8,8 @@
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,13 +60,9 @@ public class ScoreReviewAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException {
-        if (super.isOptionInParam(request)) {
-            switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
-                case SUBMIT_SCORE:
-                    return processSetRating(c, wfi, request);
-                default:
-                    return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-            }
+        if (super.isOptionInParam(request) &&
+            StringUtils.equalsIgnoreCase(Util.getSubmitButton(request, SUBMIT_CANCEL), SUBMIT_SCORE)) {
+            return processSetRating(c, wfi, request);
         }
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
     }
@@ -103,14 +99,14 @@ public class ScoreReviewAction extends ProcessingAction {
      */
     private boolean checkRequestValid(int score, String review) {
         if (score > this.maxValue) {
-            log.error(String.format("%s only allows max rating %s (config workflow-actions.xml), given rating of " +
-                "%s not allowed.", this.getClass().toString(), this.maxValue, score));
+            log.error("{} only allows max rating {} (config workflow-actions.xml), given rating of " +
+                "{} not allowed.", this.getClass().toString(), this.maxValue, score);
             return false;
         }
         if (StringUtils.isBlank(review) && this.descriptionRequired) {
-            log.error(String.format("%s has config descriptionRequired=%s (workflow-actions.xml), so rating " +
+            log.error("{} has config descriptionRequired=true (workflow-actions.xml), so rating " +
                 "requests without 'review' query param containing description are not allowed",
-                this.getClass().toString(), this.descriptionRequired));
+                this.getClass().toString());
             return false;
         }
         return true;
@@ -128,14 +124,12 @@ public class ScoreReviewAction extends ProcessingAction {
 
     @Override
     protected List<ActionAdvancedInfo> getAdvancedInfo() {
-        List<ActionAdvancedInfo> advancedInfo = new ArrayList<>();
-        RatingReviewActionAdvancedInfo ratingReviewActionAdvancedInfo = new RatingReviewActionAdvancedInfo();
-        ratingReviewActionAdvancedInfo.setDescriptionRequired(descriptionRequired);
-        ratingReviewActionAdvancedInfo.setMaxValue(maxValue);
-        ratingReviewActionAdvancedInfo.setType(SUBMIT_SCORE);
-        ratingReviewActionAdvancedInfo.setId(SUBMIT_SCORE);
-        advancedInfo.add(ratingReviewActionAdvancedInfo);
-        return advancedInfo;
+        ScoreReviewActionAdvancedInfo scoreReviewActionAdvancedInfo = new ScoreReviewActionAdvancedInfo();
+        scoreReviewActionAdvancedInfo.setDescriptionRequired(descriptionRequired);
+        scoreReviewActionAdvancedInfo.setMaxValue(maxValue);
+        scoreReviewActionAdvancedInfo.setType(SUBMIT_SCORE);
+        scoreReviewActionAdvancedInfo.generateId(SUBMIT_SCORE);
+        return Collections.singletonList(scoreReviewActionAdvancedInfo);
     }
 
     /**
