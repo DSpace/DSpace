@@ -913,7 +913,7 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <!--The other workspace configuration settings for discovery -->
+    <!--The supervised workspace configuration settings for discovery -->
     <bean id="supervisedWorkspaceConfiguration"
           class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
