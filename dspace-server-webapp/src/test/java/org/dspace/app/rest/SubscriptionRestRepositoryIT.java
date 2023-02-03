@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,8 +34,11 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.SubscribeBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
@@ -51,6 +55,7 @@ import org.springframework.http.MediaType;
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    private Community subCommunity;
     private Collection collection;
 
     @Before
@@ -62,6 +67,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
+        subCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                       .withName("Test Sub Community")
+                                       .build();
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                                       .withName("Collection 1")
                                       .withSubmitterGroup(eperson)
@@ -326,6 +334,124 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void findByEPersonAndDsoAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription1 = SubscribeBuilder.subscribeBuilder(context,
+                                      "content", collection, eperson, subscriptionParameterList).build();
+
+        List<SubscriptionParameter> subscriptionParameterList2 = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter2 = new SubscriptionParameter();
+        subscriptionParameter2.setName("frequency");
+        subscriptionParameter2.setValue("W");
+        subscriptionParameterList2.add(subscriptionParameter2);
+        Subscription subscription2 = SubscribeBuilder.subscribeBuilder(context,
+                                     "content", collection, eperson, subscriptionParameterList2).build();
+
+        List<SubscriptionParameter> subscriptionParameterList3 = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter3 = new SubscriptionParameter();
+        subscriptionParameter3.setName("frequency");
+        subscriptionParameter3.setValue("M");
+        subscriptionParameterList3.add(subscriptionParameter3);
+        Subscription subscription3 = SubscribeBuilder.subscribeBuilder(context,
+                                     "content", subCommunity, eperson, subscriptionParameterList3).build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/search/findByEPersonAndDso")
+                             .param("eperson_id", eperson.getID().toString())
+                             .param("resource", collection.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.subscriptions", Matchers.containsInAnyOrder(
+                                            SubscriptionMatcher.matchSubscription(subscription1),
+                                            SubscriptionMatcher.matchSubscription(subscription2)
+                                            )))
+                             .andExpect(jsonPath("$.page.size", is(20)))
+                             .andExpect(jsonPath("$.page.totalElements", is(2)))
+                             .andExpect(jsonPath("$.page.totalPages", is(1)))
+                             .andExpect(jsonPath("$.page.number", is(0)));
+
+        getClient(tokenAdmin).perform(get("/api/core/subscriptions/search/findByEPersonAndDso")
+                             .param("eperson_id", eperson.getID().toString())
+                             .param("resource", subCommunity.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.subscriptions", Matchers.contains(
+                                           SubscriptionMatcher.matchSubscription(subscription3)
+                                           )))
+                             .andExpect(jsonPath("$.page.size", is(20)))
+                             .andExpect(jsonPath("$.page.totalElements", is(1)))
+                             .andExpect(jsonPath("$.page.totalPages", is(1)))
+                             .andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    public void findByEPersonAndDsoOwnerTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription1 = SubscribeBuilder.subscribeBuilder(context,
+                                      "content", subCommunity, eperson, subscriptionParameterList).build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/search/findByEPersonAndDso")
+                               .param("eperson_id", eperson.getID().toString())
+                               .param("resource", subCommunity.getID().toString()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$._embedded.subscriptions", Matchers.contains(
+                                          SubscriptionMatcher.matchSubscription(subscription1)
+                                          )))
+                               .andExpect(jsonPath("$.page.size", is(20)))
+                               .andExpect(jsonPath("$.page.totalElements", is(1)))
+                               .andExpect(jsonPath("$.page.totalPages", is(1)))
+                               .andExpect(jsonPath("$.page.number", is(0)));
+    }
+
+    @Test
+    public void findByEPersonAndDsoUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        SubscribeBuilder.subscribeBuilder(context, "content", subCommunity, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/subscriptions/search/findByEPersonAndDso")
+                   .param("eperson_id", eperson.getID().toString())
+                   .param("resource", subCommunity.getID().toString()))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findByEPersonAndDsoForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        SubscribeBuilder.subscribeBuilder(context, "content", subCommunity, admin, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/search/findByEPersonAndDso")
+                               .param("eperson_id", admin.getID().toString())
+                               .param("resource", subCommunity.getID().toString()))
+                               .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void createSubscriptionUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -420,6 +546,109 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         } finally {
             SubscribeBuilder.deleteSubscription(idRef.get());
         }
+    }
+
+    @Test
+    public void createSubscriptionForItemByEPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item1 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Public item")
+                                .build();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(post("/api/core/subscriptions")
+                               .param("resource", item1.getID().toString())
+                               .param("eperson_id", eperson.getID().toString())
+                               .content(new ObjectMapper().writeValueAsString(map))
+                               .contentType(MediaType.APPLICATION_JSON_VALUE))
+                               .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createSubscriptionForItemByAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item1 = ItemBuilder.createItem(context, collection)
+                                .withTitle("Public item")
+                                .build();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/core/subscriptions")
+                             .param("resource", item1.getID().toString())
+                             .param("eperson_id", eperson.getID().toString())
+                             .content(new ObjectMapper().writeValueAsString(map))
+                             .contentType(MediaType.APPLICATION_JSON_VALUE))
+                             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createSubscriptionWrongResourceUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/core/subscriptions")
+                             .param("resource", UUID.randomUUID().toString())
+                             .param("eperson_id", eperson.getID().toString())
+                             .content(new ObjectMapper().writeValueAsString(map))
+                             .contentType(MediaType.APPLICATION_JSON_VALUE))
+                             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createSubscriptionMissingResourceUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptionType", "content");
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> sub_list = new HashMap<>();
+        sub_list.put("name", "frequency");
+        sub_list.put("value", "W");
+        list.add(sub_list);
+        map.put("subscriptionParameterList", list);
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/core/subscriptions")
+                             .param("eperson_id", eperson.getID().toString())
+                             .content(new ObjectMapper().writeValueAsString(map))
+                             .contentType(MediaType.APPLICATION_JSON_VALUE))
+                             .andExpect(status().isUnprocessableEntity());
     }
 
     @Test

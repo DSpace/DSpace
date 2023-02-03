@@ -551,6 +551,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, community.getID(), community.getHandle(),
                                    getIdentifiers(context, community)));
 
+        subscribeService.deleteByDspaceObject(context, community);
+
         // Remove collections
         Iterator<Collection> collections = community.getCollections().iterator();
 

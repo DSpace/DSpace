@@ -19,7 +19,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -51,13 +50,12 @@ public class SubscribeServiceImpl implements SubscribeService {
         if (StringUtils.isBlank(resourceType)) {
             return subscriptionDAO.findAllOrderedByDSO(context, limit, offset);
         } else {
-            if (resourceType.equals(Item.class.getSimpleName()) ||
-                resourceType.equals(Collection.class.getSimpleName()) ||
+            if (resourceType.equals(Collection.class.getSimpleName()) ||
                 resourceType.equals(Community.class.getSimpleName())) {
                 return subscriptionDAO.findAllOrderedByIDAndResourceType(context, resourceType, limit, offset);
             } else {
-                log.error("Resource type must be Item, Collection or Community");
-                throw new Exception("Resource type must be Item, Collection or Community");
+                log.error("Resource type must be Collection or Community");
+                throw new Exception("Resource type must be Collection or Community");
             }
         }
     }

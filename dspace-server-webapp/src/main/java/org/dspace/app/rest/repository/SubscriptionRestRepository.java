@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +30,7 @@ import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
@@ -149,7 +149,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         String epersonId = req.getParameter("eperson_id");
         String dsoId = req.getParameter("resource");
 
-        if (Objects.isNull(dsoId) || Objects.isNull(epersonId)) {
+        if (StringUtils.isBlank(dsoId) || StringUtils.isBlank(epersonId)) {
             throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provieded!");
         }
 
@@ -157,7 +157,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
             EPerson ePerson = ePersonService.findByIdOrLegacyId(context, epersonId);
             if (Objects.isNull(ePerson) || Objects.isNull(dSpaceObject)) {
-                throw new BadRequestException("Id of person or dspace object must represents reals ids");
+                throw new DSpaceBadRequestException("Id of person or dspace object must represents reals ids");
             }
 
             if (dSpaceObject.getType() == COMMUNITY || dSpaceObject.getType() == COLLECTION) {
@@ -175,7 +175,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
                 context.commit();
                 return converter.toRest(subscription, utils.obtainProjection());
             } else {
-                throw new BadRequestException("Currently subscription is supported only for Community and Collection");
+                throw new DSpaceBadRequestException(
+                        "Currently subscription is supported only for Community and Collection");
             }
         } catch (SQLException sqlException) {
             throw new SQLException(sqlException.getMessage(), sqlException);
