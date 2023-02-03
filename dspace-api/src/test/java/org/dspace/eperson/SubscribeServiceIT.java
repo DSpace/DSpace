@@ -39,7 +39,7 @@ import org.dspace.eperson.service.SubscribeService;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SubscribeServiceTest extends AbstractIntegrationTestWithDatabase {
+public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
 
     private final SubscribeService subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
 
