@@ -25,6 +25,8 @@ import org.dspace.supervision.SupervisionOrder;
 public interface SupervisionOrderService extends DSpaceCRUDService<SupervisionOrder> {
 
     /**
+     * Creates a new SupervisionOrder
+     *
      * @param context The DSpace context
      * @param item the item
      * @param group the group
@@ -34,6 +36,8 @@ public interface SupervisionOrderService extends DSpaceCRUDService<SupervisionOr
     SupervisionOrder create(Context context, Item item, Group group) throws SQLException;
 
     /**
+     * Find all supervision orders currently stored
+     *
      * @param context The DSpace context
      * @return all Supervision Orders
      * @throws SQLException If something goes wrong in the database
@@ -41,6 +45,8 @@ public interface SupervisionOrderService extends DSpaceCRUDService<SupervisionOr
     List<SupervisionOrder> findAll(Context context) throws SQLException;
 
     /**
+     * Find all supervision orders for a given Item
+     *
      * @param context The DSpace context
      * @param item the item
      * @return all Supervision Orders related to the item
@@ -49,6 +55,9 @@ public interface SupervisionOrderService extends DSpaceCRUDService<SupervisionOr
     List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException;
 
     /**
+     *
+     * Find a supervision order depending on given Item and Group
+     *
      * @param context The DSpace context
      * @param item the item
      * @param group the group
@@ -58,6 +67,9 @@ public interface SupervisionOrderService extends DSpaceCRUDService<SupervisionOr
     SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException;
 
     /**
+     *
+     * Checks if an EPerson is supervisor of an Item
+     *
      * @param context The DSpace context
      * @param ePerson the ePerson to be checked
      * @param item the item

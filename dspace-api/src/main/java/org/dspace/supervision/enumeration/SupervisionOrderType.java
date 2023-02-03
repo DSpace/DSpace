@@ -11,8 +11,8 @@ package org.dspace.supervision.enumeration;
 /**
  * This Enum holds a representation of all the possible supervision order types
  * <p>
- * OBSERVER: grant READ permission to the item
- * EDITOR: grant READ and WRITE permissions to the item
+ * OBSERVER: grant READ permission to the supervised item
+ * EDITOR: grant READ and WRITE permissions to the supervised item
  * NONE: no grants
  * </p>
  *
