@@ -42,6 +42,7 @@ public class RegisterDOI extends AbstractCurationTask {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RegisterDOI.class);
     // DOI provider
     private DOIIdentifierProvider provider;
+    private Filter trueFilter;
 
     /**
      * Initialise the curation task and read configuration, instantiate the DOI provider
@@ -55,6 +56,7 @@ public class RegisterDOI extends AbstractCurationTask {
             ", distributed = " + distributed);
         // Instantiate DOI provider singleton
         provider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+        trueFilter = new DSpace().getSingletonService(TrueFilter.class);
     }
 
     /**
@@ -120,7 +122,7 @@ public class RegisterDOI extends AbstractCurationTask {
         // Attempt DOI registration and report successes and failures
         try {
             Filter filter = FilterUtils.getFilterFromConfiguration("identifiers.submission.filter.curation",
-                    new TrueFilter());
+                    trueFilter);
             doi = provider.register(Curator.curationContext(), item, filter);
             if (doi != null) {
                 String message = "New DOI minted in database for item " + item.getHandle() + ": " + doi

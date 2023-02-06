@@ -9,11 +9,13 @@
 package org.dspace.identifier;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.TrueFilter;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 
 /**
  * This abstract class adds extra method signatures so that implementing IdentifierProviders can
@@ -24,16 +26,15 @@ import org.dspace.core.Context;
  */
 public abstract class FilteredIdentifierProvider extends IdentifierProvider {
 
-    protected Filter filter = new TrueFilter();
+    protected Filter filter = new DSpace().getSingletonService(TrueFilter.class);
 
     /**
      * Setter for spring to set the default filter from the property in configuration XML
      * @param filter - an object implementing the org.dspace.content.logic.Filter interface
      */
     public void setFilter(Filter filter) {
-        this.filter = filter;
         if (this.filter == null) {
-            this.filter = new TrueFilter();
+            this.filter = filter;
         }
     }
 

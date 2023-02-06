@@ -94,9 +94,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     RelationshipTypeService relationshipTypeService;
 
     @Autowired
-    IdentifierService identifierService;
-
-    @Autowired
     private UriListHandlerService uriListHandlerService;
 
     public ItemRestRepository(ItemService dsoService) {

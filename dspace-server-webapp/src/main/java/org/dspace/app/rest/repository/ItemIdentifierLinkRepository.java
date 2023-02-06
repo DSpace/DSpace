@@ -66,9 +66,8 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
         try {
             if (doi != null) {
                 String doiUrl = doiService.DOIToExternalForm(doi.getDoi());
-                IdentifierRest identifierRest = new IdentifierRest(
-                        doiUrl, "doi", DOIIdentifierProvider.statusText[doi.getStatus()]);
-                identifierRestList.add(identifierRest);
+                identifierRestList.add(new IdentifierRest(
+                        doiUrl, "doi", DOIIdentifierProvider.statusText[doi.getStatus()]));
             }
             if (handle != null) {
                 identifierRestList.add(new IdentifierRest(handle, "handle", null));

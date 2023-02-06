@@ -46,7 +46,6 @@ public class IdentifierServiceImpl implements IdentifierService {
     protected HandleService handleService;
 
     protected IdentifierServiceImpl() {
-
     }
 
     @Autowired(required = true)

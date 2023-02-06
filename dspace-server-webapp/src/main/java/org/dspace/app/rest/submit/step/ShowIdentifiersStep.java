@@ -101,7 +101,7 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
         try {
             doi = IdentifierServiceFactory.getInstance().getDOIService().findDOIByDSpaceObject(context, obj.getItem());
             if (doi != null && !DOIIdentifierProvider.MINTED.equals(doi.getStatus())
-                    && !DOIIdentifierProvider.MINTED.equals(doi.getStatus())) {
+                    && !DOIIdentifierProvider.DELETED.equals(doi.getStatus())) {
                 doiString = doi.getDoi();
             }
         } catch (SQLException e) {
