@@ -85,12 +85,10 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
     private HandleService handleService;
     @Autowired
     private ItemService itemService;
-    @Autowired
-    private IdentifierService identifierService;
 
     // Set category and name for routing
     public static final String CATEGORY = "pid";
-    public static final String NAME = "identifier";
+    public static final String NAME = IdentifierRest.NAME;
 
     /**
      * Register /api/pid/find?id=... as a discoverable endpoint service
@@ -108,16 +106,25 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                                         CATEGORY)));
     }
 
+    /**
+     * Find all identifiers. Not implemented.
+     * @param context
+     *            the dspace context
+     * @param pageable
+     *            object embedding the requested pagination info
+     * @return
+     */
     @PreAuthorize("permitAll()")
     @Override
     public Page<IdentifierRest> findAll(Context context, Pageable pageable) {
-        List<IdentifierRest> results = new ArrayList<>();
-        //return converter.toRestPage(results, pageable, utils.obtainProjection());
-        return new PageImpl<>(results, pageable, 0);
+        throw new RepositoryMethodNotImplementedException(IdentifierRest.NAME, "findAll");
     }
 
     /**
-     * Find the identifier object for a given identifier string (eg. doi)
+     * Find the identifier object for a given identifier string (eg. doi).
+     * Not implemented -- Tomcat interprets %2F as path separators which means
+     * parameters are a safer way to handle these operations
+     *
      * @param context
      *            the dspace context
      * @param identifier
@@ -125,42 +132,9 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
      * @return
      */
     @PreAuthorize("permitAll()")
-    @RequestMapping(method = RequestMethod.GET)
     @Override
     public IdentifierRest findOne(Context context, String identifier) {
-        DSpaceObject dso;
-        IdentifierRest identifierRest = new IdentifierRest();
-        try {
-            // Resolve to an object first - if that fails then this is not a valid identifier anyway.
-            dso = identifierService.resolve(context, identifier);
-            if (dso != null) {
-                // DSpace has no concept of a higher-level Identifier object, so in order to detect the type
-                // and return sufficient information, we have to try the identifier types we know are currently
-                // supported.
-                // First, try to resolve to a handle.
-                dso = handleService.resolveToObject(context, identifier);
-                if (dso == null) {
-                    // No object found for a handle, try DOI
-                    DOI doi = doiService.findByDoi(context, identifier);
-                    if (doi != null) {
-                        String doiUrl = doiService.DOIToExternalForm(doi.getDoi());
-                        identifierRest.setIdentifierType("doi");
-                        identifierRest.setIdentifierStatus(DOIIdentifierProvider.statusText[doi.getStatus()]);
-                        identifierRest.setValue(doiUrl);
-                    }
-                } else {
-                    // Handle found
-                    identifierRest.setIdentifierType("handle");
-                    identifierRest.setIdentifierStatus(null);
-                    identifierRest.setValue(handleService.getCanonicalForm(dso.getHandle()));
-                }
-            } else {
-                throw new LinkNotFoundException(IdentifierRestRepository.CATEGORY, IdentifierRest.NAME, identifier);
-            }
-        } catch (SQLException | IdentifierException e) {
-            throw new LinkNotFoundException(IdentifierRestRepository.CATEGORY, IdentifierRest.NAME, identifier);
-        }
-        return identifierRest;
+        throw new RepositoryMethodNotImplementedException(IdentifierRest.NAME, "findOne");
     }
 
     /**
