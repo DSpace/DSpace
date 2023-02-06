@@ -9,7 +9,6 @@
 package org.dspace.identifier;
 
 import java.sql.SQLException;
-import java.util.Optional;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.logic.Filter;
