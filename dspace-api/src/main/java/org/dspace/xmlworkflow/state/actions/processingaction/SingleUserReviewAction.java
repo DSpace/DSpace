@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceItem;
@@ -37,6 +39,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class SingleUserReviewAction extends ProcessingAction {
+    private static final Logger log = LogManager.getLogger(SingleUserReviewAction.class);
 
     public static final int OUTCOME_REJECT = 1;
 
@@ -50,24 +53,34 @@ public class SingleUserReviewAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException, WorkflowException {
-        if (super.isOptionInParam(request)) {
-            switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
-                case SUBMIT_APPROVE:
-                    return processAccept(c, wfi);
-                case SUBMIT_REJECT:
-                    if (wfi.getSubmitter() == null) {
-                        // If the original submitter is no longer there, delete the task
-                        return processDelete(c, wfi);
-                    } else {
-                        return super.processRejectPage(c, wfi, request);
-                    }
-                case SUBMIT_DECLINE_TASK:
-                    return processDecline(c, wfi);
-                default:
-                    return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-            }
+        if (!super.isOptionInParam(request)) {
+            return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
         }
-        return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
+        switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
+            case SUBMIT_APPROVE:
+                return processAccept(c, wfi);
+            case SUBMIT_REJECT:
+                return processReject(c, wfi, request);
+            case SUBMIT_DECLINE_TASK:
+                return processDecline(c, wfi);
+            default:
+                return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
+        }
+    }
+
+    /**
+     * Process {@link super#SUBMIT_REJECT} on this action, will either:
+     * - If submitter of item no longer exists => Permanently delete corresponding item (no wfi/wsi remaining)
+     * - Otherwise: reject item back to submission => becomes wsi of submitter again
+     */
+    private ActionResult processReject(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
+        throws SQLException, IOException, AuthorizeException {
+        if (wfi.getSubmitter() == null) {
+            // If the original submitter is no longer there, delete the task
+            return processDelete(c, wfi);
+        } else {
+            return super.processRejectPage(c, wfi, request);
+        }
     }
 
     /**

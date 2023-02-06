@@ -12,25 +12,34 @@ import org.springframework.util.DigestUtils;
 
 /**
  * Class that holds the advanced information needed for the
- * {@link org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction}
+ * {@link org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction}
  * See config {@code workflow-actions.cfg}
  */
-public class SelectReviewerActionAdvancedInfo extends ActionAdvancedInfo {
-    private String group;
+public class ScoreReviewActionAdvancedInfo extends ActionAdvancedInfo {
+    private boolean descriptionRequired;
+    private int maxValue;
 
-    public String getGroup() {
-        return group;
+    public boolean isDescriptionRequired() {
+        return descriptionRequired;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setDescriptionRequired(boolean descriptionRequired) {
+        this.descriptionRequired = descriptionRequired;
+    }
+
+    public int getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(int maxValue) {
+        this.maxValue = maxValue;
     }
 
     @Override
     public void generateId(String type) {
         String idString = type
-            + ";group," + group;
+            + ";descriptionRequired," + descriptionRequired
+            + ";maxValue," + maxValue;
         super.id = DigestUtils.md5DigestAsHex(idString.getBytes());
     }
 }
-

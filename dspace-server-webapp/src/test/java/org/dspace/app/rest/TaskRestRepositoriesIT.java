@@ -57,6 +57,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -4484,7 +4485,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // Test for single reviewer
-
+        SelectReviewerAction.resetGroup();
         // Select reviewer1 as a reviewer, wf step 1
         getClient(reviewManager1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
                                                    .param("submit_select_reviewer", "true")

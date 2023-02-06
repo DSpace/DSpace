@@ -105,7 +105,9 @@ public class ScoreEvaluationAction extends ProcessingAction {
 
     @Override
     public List<String> getOptions() {
-        return new ArrayList<>();
+        List<String> options = new ArrayList<>();
+        options.add(RETURN_TO_POOL);
+        return options;
     }
 
     public int getMinimumAcceptanceScore() {

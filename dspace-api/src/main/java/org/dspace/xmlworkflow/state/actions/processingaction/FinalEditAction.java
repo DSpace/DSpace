@@ -64,6 +64,7 @@ public class FinalEditAction extends ProcessingAction {
         List<String> options = new ArrayList<>();
         options.add(SUBMIT_APPROVE);
         options.add(ProcessingAction.SUBMIT_EDIT_METADATA);
+        options.add(RETURN_TO_POOL);
         return options;
     }
 
