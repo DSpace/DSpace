@@ -8,10 +8,8 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -60,33 +58,6 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
     }
 
     /**
-     * Find a browse index by a specific field
-     * @param field
-     * @return
-     * @throws SQLException
-     */
-    @SearchRestMethod(name = "byField")
-    public BrowseIndexRest findByField(@Parameter(value = "field", required = true) String field)
-            throws SQLException {
-        BrowseIndexRest bi = null;
-        BrowseIndex bix = null;
-        try {
-            CrossLinks cl = new CrossLinks();
-            if (cl.hasLink(field)) {
-                // Get the index name for this
-                String browseIndexName = cl.getLinkType(field);
-                bix = BrowseIndex.getBrowseIndex(browseIndexName);
-            }
-        } catch (BrowseException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        if (bix != null) {
-            bi = converter.toRest(bix, utils.obtainProjection());
-        }
-        return bi;
-    }
-
-    /**
      * Find a browse index by a list of fields (first match will be returned)
      * @param fields
      * @return
@@ -115,38 +86,6 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
             bi = converter.toRest(bix, utils.obtainProjection());
         }
         return bi;
-    }
-
-    /**
-     * Get paginated list of all browse index definitions for configured browse links
-     *
-     * @param context
-     *            the dspace context
-     * @param pageable
-     *            object embedding the requested pagination info
-     * @return
-     */
-    @SearchRestMethod(name = "allLinked")
-    public Page<BrowseIndexRest> findAllLinked(Context context, Pageable pageable) {
-        try {
-            CrossLinks cl = new CrossLinks();
-            List<BrowseIndex> linkedIndexes = new ArrayList<>();
-            Map<String, String> links = cl.getLinks();
-            for (String field : links.keySet()) {
-                if (cl.hasLink(field)) {
-                    String indexName = cl.getLinkType(field);
-                    if (indexName != null) {
-                        BrowseIndex bix = BrowseIndex.getBrowseIndex(indexName);
-                        if (bix != null) {
-                            linkedIndexes.add(bix);
-                        }
-                    }
-                }
-            }
-            return converter.toRestPage(linkedIndexes, pageable, linkedIndexes.size(), utils.obtainProjection());
-        } catch (BrowseException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
     }
 
     @Override

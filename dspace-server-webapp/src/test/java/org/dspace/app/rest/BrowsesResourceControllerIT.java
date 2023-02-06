@@ -2132,24 +2132,23 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
      */
     @Test
     public void findOneLinked() throws Exception {
-        //When we call the root endpoint
-        getClient().perform(get("/api/discover/browses/search/byField?field=dc.contributor.author"))
-                //The status has to be 200 OK
+        // When we call the search endpoint
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.contributor.author"))
+                // The status has to be 200 OK
                 .andExpect(status().isOk())
-                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
-
-                //The array of browse index should have a size 1
+                // The browse definition ID should be "author"
                 .andExpect(jsonPath("$.id", is("author")))
-
-                //Check that all (and only) the default browse indexes are present
+                // It should be configured as a metadata browse
                 .andExpect(jsonPath("$.metadataBrowse", is(true)))
         ;
     }
 
     @Test
     public void findOneLinkedPassingTwoFields() throws Exception {
-        //When we call the root endpoint
+        // When we call the search endpoint
         getClient().perform(get("/api/discover/browses/search/byFields")
                         .param("fields", "dc.contributor.author")
                         .param("fields", "dc.date.issued"))
@@ -2157,42 +2156,26 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(status().isOk())
                 // We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
-                // The array of browse index should have a size 1 because 'author' was the first
-                // field we passed, and we only expect the first index returned
-                // (this method is used by field components to find out if / how to link a value to a browse
-                // index, and this could mean multiple metadata fields)
+                // The browse definition ID should be "author"
                 .andExpect(jsonPath("$.id", is("author")))
-                // Check that all (and only) the default browse indexes are present
+                // It should be configured as a metadata browse
                 .andExpect(jsonPath("$.metadataBrowse", is(true)));
     }
 
-    /**
-     * Expect a list of browse definitions that are also configured for link rendering
-     * @throws Exception
-     */
     @Test
-    public void findAllLinked() throws Exception {
-        //When we call the root endpoint
-        getClient().perform(get("/api/discover/browses/search/allLinked"))
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //We expect the content type to be "application/hal+json;charset=UTF-8"
-                .andExpect(content().contentType(contentType))
+    public void findUnconfiguredFields() throws Exception {
+        // When we call the search endpoint with a field that isn't configured for any browse links
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.identifier.uri"))
+                // The status has to be 204 NO CONTENT
+                .andExpect(status().isNoContent());
+    }
 
-                // Expect TWO results, author and browse (see dspace-api test data local.cfg_
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(2)))
-                .andExpect(jsonPath("$.page.totalPages", is(1)))
-                .andExpect(jsonPath("$.page.number", is(0)))
-
-                //The array of browse index should have a size 2
-                .andExpect(jsonPath("$._embedded.browses", hasSize(2)))
-
-                //Check that all (and only) the default browse indexes are present
-                .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
-                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
-                        BrowseIndexMatcher.subjectBrowseIndex("asc")
-                )))
-        ;
+    @Test
+    public void findBrowseLinksWithMissingParameter() throws Exception {
+        // When we call the search endpoint with a field that isn't configured for any browse links
+        getClient().perform(get("/api/discover/browses/search/byFields"))
+                // The status has to be 400 BAD REQUEST
+                .andExpect(status().isBadRequest());
     }
 }
