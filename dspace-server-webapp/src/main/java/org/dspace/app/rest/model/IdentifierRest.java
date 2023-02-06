@@ -111,6 +111,11 @@ public class IdentifierRest extends BaseObjectRest<String> implements RestModel 
     }
 
     @Override
+    public String getId() {
+        return getValue();
+    }
+
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }
