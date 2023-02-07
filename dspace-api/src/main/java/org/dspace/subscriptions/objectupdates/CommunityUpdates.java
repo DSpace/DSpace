@@ -38,7 +38,7 @@ public class CommunityUpdates implements DSpaceObjectUpdates {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries("search.resourcetype:" + Item.class.getSimpleName());
         discoverQuery.addFilterQueries("location.comm:(" + dSpaceObject.getID() + ")");
-        discoverQuery.addFilterQueries("lastModified_dt:" + this.findLastFrequency(frequency));
+        discoverQuery.addFilterQueries("lastModified:" + this.findLastFrequency(frequency));
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         return discoverResult.getIndexableObjects();
     }

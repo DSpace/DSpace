@@ -38,7 +38,7 @@ public class CollectionUpdates implements DSpaceObjectUpdates {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries("search.resourcetype:" + Item.class.getSimpleName());
         discoverQuery.addFilterQueries("location.coll:(" + dSpaceObject.getID() + ")");
-        discoverQuery.addFilterQueries("lastModified_dt:" + findLastFrequency(frequency));
+        discoverQuery.addFilterQueries("lastModified:" + findLastFrequency(frequency));
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         return discoverResult.getIndexableObjects();
     }
