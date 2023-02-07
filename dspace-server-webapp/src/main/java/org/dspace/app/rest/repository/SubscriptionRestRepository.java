@@ -143,7 +143,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
-    @PreAuthorize("@subscriptionSecurity.isEnabelToCreateSubscription(#context) && hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("@subscriptionSecurity.isAbleToCreateSubscription(#context) && hasAuthority('AUTHENTICATED')")
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");

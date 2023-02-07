@@ -40,7 +40,7 @@ public class SubscriptionSecurityBean {
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
 
-    public boolean isEnabelToCreateSubscription(Context context) throws SQLException {
+    public boolean isAbleToCreateSubscription(Context context) throws SQLException {
         RequestService requestService = new DSpace().getRequestService();
         HttpServletRequest req = requestService.getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
