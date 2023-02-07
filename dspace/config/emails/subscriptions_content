@@ -2,6 +2,7 @@
 ##
 ## Parameters: {0} Collections updates
 ##             {1} Communities updates
+#set($subject = 'DSpace Subscription')
 
 This email is sent from DSpace based on the chosen subscription preferences.
 
