@@ -11,12 +11,12 @@
 -----------------------------------------------------------------------------------
 
 
-CREATE SEQUENCE subscription_parameter_seq;
+CREATE SEQUENCE if NOT EXISTS subscription_parameter_seq;
 -------------------------------------------------------
 -- Create the subscription_parameter table
 -------------------------------------------------------
 
-CREATE TABLE  subscription_parameter
+CREATE TABLE if NOT EXISTS subscription_parameter
 (
   subscription_parameter_id  INTEGER NOT NULL,
   name    CHARACTER VARYING(255),
@@ -27,17 +27,18 @@ CREATE TABLE  subscription_parameter
 );
 
 --
-ALTER TABLE subscription ADD COLUMN dspace_object_id UUID;
+ALTER TABLE subscription ADD COLUMN if NOT EXISTS dspace_object_id UUID;
 --
-ALTER TABLE subscription ADD COLUMN type CHARACTER VARYING(255);
+ALTER TABLE subscription ADD COLUMN if NOT EXISTS type CHARACTER VARYING(255);
 --
+ALTER TABLE subscription DROP CONSTRAINT IF EXISTS subscription_dspaceobject_fkey;
 ALTER TABLE subscription ADD CONSTRAINT subscription_dspaceobject_fkey FOREIGN KEY (dspace_object_id) REFERENCES dspaceobject (uuid);
 -- --
 UPDATE subscription set dspace_object_id = collection_id , type = 'content';
 --
-ALTER TABLE subscription DROP CONSTRAINT Subscription_collection_id_fk;
+ALTER TABLE subscription DROP CONSTRAINT IF EXISTS Subscription_collection_id_fk;
 --
-ALTER TABLE subscription DROP COLUMN collection_id;
+ALTER TABLE subscription DROP COLUMN IF EXISTS collection_id;
 
 
 
