@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,8 +41,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     private final Logger log = LogManager.getLogger(ContentGenerator.class);
 
     @SuppressWarnings("unchecked")
-    @Resource(name = "entityDissemination")
-    private Map<String, StreamDisseminationCrosswalk> mapEntityDisseminatorProperty = new HashMap();
+    private Map<String, StreamDisseminationCrosswalk> entityType2Disseminator = new HashMap();
 
     @Autowired
     private ItemService itemService;
@@ -76,7 +74,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                     out.write("\n".getBytes(UTF_8));
                     Item item = (Item) indexableObject.getIndexedObject();
                     String entityType = itemService.getEntityTypeLabel(item);
-                    mapEntityDisseminatorProperty.get(entityType).disseminate(context, item, out);
+                    entityType2Disseminator.get(entityType).disseminate(context, item, out);
                 }
                 return out.toString();
             } else {
@@ -87,6 +85,10 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
             log.error(e.getMessage(), e);
         }
         return EMPTY;
+    }
+
+    public void setEntityType2Disseminator(Map<String, StreamDisseminationCrosswalk> entityType2Disseminator) {
+        this.entityType2Disseminator = entityType2Disseminator;
     }
 
 }

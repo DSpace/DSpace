@@ -30,16 +30,9 @@
         </constructor-arg>
     </bean>
 
-    <bean id="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" />
-
-    <util:map id="contentUpdates">
-        <entry key="community" value-ref="communityUpdates"/>
-        <entry key="collection" value-ref="collectionUpdates"/>
-    </util:map>
-
-    <util:list id="generalMetadataEntity">
-        <value>dc.title</value>
-    </util:list>
+    <bean id="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" >
+         <property name="entityType2Disseminator" ref ="entityDissemination"/>
+    </bean>
 
     <util:map id="entityDissemination">
         <entry key="Publication" value-ref="subscriptionDsoMetadataForEmailCompose"/>
@@ -54,6 +47,10 @@
     <bean id="subscriptionDsoMetadataForEmailCompose" class="org.dspace.content.crosswalk.SubscriptionDsoMetadataForEmailCompose" >
         <property name="metadata" ref ="generalMetadataEntity"/>
     </bean>
+
+    <util:list id="generalMetadataEntity">
+        <value>dc.title</value>
+    </util:list>
 
     <bean id="communityUpdates" class="org.dspace.subscriptions.objectupdates.CommunityUpdates" />
 
