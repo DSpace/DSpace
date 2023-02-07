@@ -658,7 +658,9 @@ public class DOIIdentifierProviderTest
         Item item = newItem();
 
         // Register, skipping the filter
-        String doi = provider.register(context, item, new TrueFilter());
+        String doi = provider.register(context, item,
+                DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                        "always_true_filter", TrueFilter.class));
 
         // we want the created DOI to be returned in the following format:
         // doi:10.<prefix>/<suffix>.

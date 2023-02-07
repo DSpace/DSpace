@@ -29,6 +29,8 @@ import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
 import org.dspace.identifier.service.DOIService;
+import org.dspace.servicemanager.DSpaceServiceManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -493,7 +495,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             // We can skip the filter here since we know the DOI already exists for the item
             log.debug("updateMetadata: found DOIByDSpaceObject: " +
                 doiService.findDOIByDSpaceObject(context, dso).getDoi());
-            updateFilter = new TrueFilter();
+            updateFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                    "always_true_filter", TrueFilter.class);
         }
 
         DOI doiRow = loadOrCreateDOI(context, dso, doi, updateFilter);
@@ -1118,9 +1121,15 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     public void checkMintable(Context context, Filter filter, DSpaceObject dso)
             throws DOIIdentifierNotApplicableException {
         if (filter == null) {
-            // If a null filter was passed and we have a good default filter to apply, apply it.
-            // Otherwise set to TrueFilter which means "no filtering"
-            filter = Objects.requireNonNullElseGet(this.filter, TrueFilter::new);
+            Filter trueFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                    "always_true_filter", TrueFilter.class);
+            // If a null filter was passed, and we have a good default filter to apply, apply it.
+            // Otherwise, set to TrueFilter which means "no filtering"
+            if (this.filter != null) {
+                filter = this.filter;
+            } else {
+                filter = trueFilter;
+            }
         }
         // If the check fails, an exception will be thrown to be caught by the calling method
         if (contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso).equals("ITEM")) {

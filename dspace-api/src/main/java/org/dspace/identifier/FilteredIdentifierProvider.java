@@ -14,7 +14,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.TrueFilter;
 import org.dspace.core.Context;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This abstract class adds extra method signatures so that implementing IdentifierProviders can
@@ -25,14 +25,15 @@ import org.dspace.utils.DSpace;
  */
 public abstract class FilteredIdentifierProvider extends IdentifierProvider {
 
-    protected Filter filter = new DSpace().getSingletonService(TrueFilter.class);
+    protected Filter filter = DSpaceServicesFactory.getInstance()
+            .getServiceManager().getServiceByName("always_true_filter", TrueFilter.class);
 
     /**
      * Setter for spring to set the default filter from the property in configuration XML
      * @param filter - an object implementing the org.dspace.content.logic.Filter interface
      */
     public void setFilter(Filter filter) {
-        if (this.filter == null) {
+        if (filter != null) {
             this.filter = filter;
         }
     }

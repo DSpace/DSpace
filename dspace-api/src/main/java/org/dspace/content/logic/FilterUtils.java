@@ -68,7 +68,8 @@ public class FilterUtils {
         filters.put(DOI.class, filter);
         // This won't have an affect until handle providers implement filtering, but is an example of
         // how the filters can be used for other types
-        filters.put(Handle.class, new TrueFilter());
+        filters.put(Handle.class, DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                "always_true_filter", TrueFilter.class));
         return filters;
     }
 }

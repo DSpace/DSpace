@@ -21,6 +21,7 @@ import org.dspace.curate.Curator;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
@@ -56,7 +57,8 @@ public class RegisterDOI extends AbstractCurationTask {
             ", distributed = " + distributed);
         // Instantiate DOI provider singleton
         provider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-        trueFilter = new DSpace().getSingletonService(TrueFilter.class);
+        trueFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                "always_true_filter", TrueFilter.class);
     }
 
     /**

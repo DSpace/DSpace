@@ -80,7 +80,8 @@ public class DOIOrganiser {
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.doiService = IdentifierServiceFactory.getInstance().getDOIService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        this.filter = new TrueFilter();
+        this.filter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                "always_true_filter", TrueFilter.class);
     }
 
     /**

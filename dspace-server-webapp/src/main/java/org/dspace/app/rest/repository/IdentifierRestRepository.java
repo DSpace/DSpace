@@ -24,6 +24,7 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.LinkNotFoundException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -176,7 +177,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
      *            the dspace context
      * @param list
      *            A uri-list with the item URI for which to create an identifier
-     * @return
+     * @return  201 Created with object JSON on success
      * @throws AuthorizeException
      * @throws SQLException
      * @throws RepositoryMethodNotImplementedException
@@ -212,8 +213,6 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             }
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
-        } catch (IdentifierException e) {
-            throw new UnprocessableEntityException(e.getMessage());
         }
         return identifierRest;
     }
@@ -236,7 +235,9 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
             if (doiIdentifierProvider != null) {
-                String doiValue = doiIdentifierProvider.register(context, item, new TrueFilter());
+                String doiValue = doiIdentifierProvider.register(context, item,
+                        DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                        "always_true_filter", TrueFilter.class));
                 identifierRest.setValue(doiValue);
                 // Get new status
                 DOI doi = doiService.findByDoi(context, doiValue);
