@@ -17,7 +17,6 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -56,8 +55,7 @@ public class CanSubscribeFeature implements AuthorizationFeature {
     public String[] getSupportedTypes() {
         return new String[]{
             CommunityRest.CATEGORY + "." + CommunityRest.NAME,
-            CollectionRest.CATEGORY + "." + CollectionRest.NAME,
-            ItemRest.CATEGORY + "." + ItemRest.NAME
+            CollectionRest.CATEGORY + "." + CollectionRest.NAME
         };
     }
 

@@ -140,41 +140,6 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void canSubscribeItemTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collectionAuthorized)
-                               .withTitle("Test item")
-                               .build();
-
-        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
-
-        // define authorizations that we know must exists
-        Authorization epersonToItem = new Authorization(eperson, canSubscribeFeature, itemRest);
-        Authorization adminToItem = new Authorization(admin, canSubscribeFeature, itemRest);
-
-        // define authorization that we know not exists
-        Authorization anonymousToItem = new Authorization(null, canSubscribeFeature, itemRest);
-
-        context.restoreAuthSystemState();
-
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-
-        getClient(tokenEPerson).perform(get("/api/authz/authorizations/" + epersonToItem.getID()))
-                               .andExpect(status().isOk())
-                               .andExpect(jsonPath("$", Matchers.is(
-                                          AuthorizationMatcher.matchAuthorization(epersonToItem))));
-
-        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + adminToItem.getID()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", Matchers.is(
-                                        AuthorizationMatcher.matchAuthorization(adminToItem))));
-
-        getClient().perform(get("/api/authz/authorizations/" + anonymousToItem.getID()))
-                   .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void canNotSubscribeItemTest() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson ePersonNotSubscribePermission = EPersonBuilder.createEPerson(context)
@@ -196,11 +161,10 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
 
-        // define authorizations that we know must exists
+        // define authorization that we know not exists
+        Authorization anonymousToItem = new Authorization(null, canSubscribeFeature, itemRest);
         Authorization epersonToItem = new Authorization(eperson, canSubscribeFeature, itemRest);
         Authorization adminToItem = new Authorization(admin, canSubscribeFeature, itemRest);
-
-        // define authorization that we know not exists
         Authorization ePersonNotSubscribePermissionToItem = new Authorization(ePersonNotSubscribePermission,
                                                                               canSubscribeFeature, itemRest);
 
@@ -211,17 +175,16 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
         String token3 = getAuthToken(ePersonNotSubscribePermission.getEmail(), password);
 
         getClient(token1).perform(get("/api/authz/authorizations/" + epersonToItem.getID()))
-                         .andExpect(status().isOk())
-                         .andExpect(jsonPath("$", Matchers.is(
-                                    AuthorizationMatcher.matchAuthorization(epersonToItem))));
+                         .andExpect(status().isNotFound());
 
         getClient(token2).perform(get("/api/authz/authorizations/" + adminToItem.getID()))
-                         .andExpect(status().isOk())
-                         .andExpect(jsonPath("$", Matchers.is(
-                                    AuthorizationMatcher.matchAuthorization(adminToItem))));
+                         .andExpect(status().isNotFound());
 
         getClient(token3).perform(get("/api/authz/authorizations/" + ePersonNotSubscribePermissionToItem.getID()))
                          .andExpect(status().isNotFound());
+
+        getClient().perform(get("/api/authz/authorizations/" + anonymousToItem.getID()))
+                   .andExpect(status().isNotFound());
     }
 
     @Test

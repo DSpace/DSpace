@@ -30,10 +30,6 @@
         </constructor-arg>
     </bean>
 
-    <util:map id="generators">
-        <entry key="content" value-ref="contentNotifyGenerator"/>
-    </util:map>
-
     <bean id="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" />
 
     <util:map id="contentUpdates">
@@ -55,12 +51,12 @@
         <entry key="JournalIssue" value-ref="subscriptionDsoMetadataForEmailCompose"/>
     </util:map>
 
-    <bean class="org.dspace.content.crosswalk.SubscriptionDsoMetadataForEmailCompose" id="subscriptionDsoMetadataForEmailCompose">
+    <bean id="subscriptionDsoMetadataForEmailCompose" class="org.dspace.content.crosswalk.SubscriptionDsoMetadataForEmailCompose" >
         <property name="metadata" ref ="generalMetadataEntity"/>
     </bean>
 
-    <bean id="communityUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CommunityUpdates" />
+    <bean id="communityUpdates" class="org.dspace.subscriptions.objectupdates.CommunityUpdates" />
 
-    <bean id="collectionUpdates" class="org.dspace.subscriptions.dSpaceObjectsUpdates.CollectionsUpdates" />
+    <bean id="collectionUpdates" class="org.dspace.subscriptions.objectupdates.CollectionUpdates" />
 
 </beans>

@@ -11,6 +11,12 @@ import java.util.Arrays;
 
 import org.apache.commons.codec.binary.StringUtils;
 
+/**
+ * This enum holds all the possible frequency types
+ * that can be used in "subscription-send" script
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public enum FrequencyType {
     DAY("D"),
     WEEK("W"),

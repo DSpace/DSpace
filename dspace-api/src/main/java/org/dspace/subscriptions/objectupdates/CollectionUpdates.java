@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.subscriptions.dSpaceObjectsUpdates;
+package org.dspace.subscriptions.objectupdates;
 
 import java.util.List;
 
@@ -22,11 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class which will be used to find
- * all community objects updated related with subscribed DSO
+ * all collection objects updated related with subscribed DSO
  *
  * @author Alba Aliu
  */
-public class CommunityUpdates implements DSpaceObjectUpdates {
+public class CollectionUpdates implements DSpaceObjectUpdates {
 
     @Autowired
     private SearchService searchService;
@@ -37,8 +37,8 @@ public class CommunityUpdates implements DSpaceObjectUpdates {
             throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries("search.resourcetype:" + Item.class.getSimpleName());
-        discoverQuery.addFilterQueries("location.comm:(" + dSpaceObject.getID() + ")");
-        discoverQuery.addFilterQueries("lastModified_dt:" + this.findLastFrequency(frequency));
+        discoverQuery.addFilterQueries("location.coll:(" + dSpaceObject.getID() + ")");
+        discoverQuery.addFilterQueries("lastModified_dt:" + findLastFrequency(frequency));
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         return discoverResult.getIndexableObjects();
     }

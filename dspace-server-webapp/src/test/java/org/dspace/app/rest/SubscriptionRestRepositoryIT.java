@@ -859,8 +859,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         newSubscription.put("subscriptionParameterList", list);
 
         getClient().perform(put("/api/core/subscriptions/" + subscription.getID())
-                   .param("resource", collection.getID().toString())
-                   .param("eperson_id", admin.getID().toString())
                    .content(objectMapper.writeValueAsString(newSubscription))
                    .contentType(MediaType.APPLICATION_JSON_VALUE))
                    .andExpect(status().isUnauthorized());
@@ -890,8 +888,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(put("/api/core/subscriptions/" + subscription.getID())
-                        .param("eperson_id", admin.getID().toString())
-                        .param("resource", collection.getID().toString())
                         .content(objectMapper.writeValueAsString(newSubscription))
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                         .andExpect(status().isForbidden());
@@ -921,8 +917,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
-                                  .param("resource", collection.getID().toString())
-                                  .param("eperson_id", eperson.getID().toString())
                                   .content(objectMapper.writeValueAsString(newSubscription))
                                   .contentType(MediaType.APPLICATION_JSON_VALUE))
                                   .andExpect(status().isOk())
@@ -958,8 +952,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
-                                  .param("resource", collection.getID().toString())
-                                  .param("eperson_id", eperson.getID().toString())
                                   .content(objectMapper.writeValueAsString(newSubscription))
                                   .contentType(MediaType.APPLICATION_JSON_VALUE))
                                   .andExpect(status().isUnprocessableEntity());
@@ -989,8 +981,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
-                                  .param("resource", collection.getID().toString())
-                                  .param("eperson_id", eperson.getID().toString())
                                   .content(objectMapper.writeValueAsString(newSubscription))
                                   .contentType(MediaType.APPLICATION_JSON_VALUE))
                                   .andExpect(status().isUnprocessableEntity());
@@ -1020,8 +1010,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenSubscriber = getAuthToken(eperson.getEmail(), password);
         getClient(tokenSubscriber).perform(put("/api/core/subscriptions/" + subscription.getID())
-                                  .param("resource", collection.getID().toString())
-                                  .param("eperson_id", eperson.getID().toString())
                                   .content(objectMapper.writeValueAsString(newSubscription))
                                   .contentType(MediaType.APPLICATION_JSON_VALUE))
                                   .andExpect(status().isUnprocessableEntity());
@@ -1051,8 +1039,6 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(put("/api/core/subscriptions/" + subscription.getID())
-                             .param("resource", collection.getID().toString())
-                             .param("eperson_id", eperson.getID().toString())
                              .content(objectMapper.writeValueAsString(newSubscription))
                              .contentType(MediaType.APPLICATION_JSON_VALUE))
                              .andExpect(status().isOk())
