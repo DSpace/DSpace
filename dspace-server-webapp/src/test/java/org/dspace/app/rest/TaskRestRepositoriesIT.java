@@ -4353,7 +4353,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withEmail("creator@example.com")
             .withPassword(password).build();
 
-        // Create with some members to be added to "ReviewManagers" on collection creation
+        // Create with some members to be added to "ReviewManagers"
         EPerson reviewManager1 = EPersonBuilder.createEPerson(context)
             .withEmail("reviewManager1@example.com")
             .withPassword(password).build();
@@ -4365,6 +4365,15 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         EPerson reviewManager3 = EPersonBuilder.createEPerson(context)
             .withEmail("reviewManager3@example.com")
             .withPassword(password).build();
+
+        // The "selectSingleReviewer" requires the "ReviewManagers" repository group to be present with at least 1
+        // member
+        GroupBuilder.createGroup(context)
+            .withName("ReviewManagers")
+            .addMember(reviewManager1)
+            .addMember(reviewManager2)
+            .addMember(reviewManager3)
+            .build();
 
         // Create "Reviewers" with some members
         Group reviewerGroup = GroupBuilder.createGroup(context).withName("Reviewers").build();
@@ -4391,12 +4400,11 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         Collection collection =
             CollectionBuilder.createCollection(context, parentCommunity, "123456789/workflow-test-1")
                 .withName("Collection 1")
-                .withWorkflowGroup("reviewmanagers", reviewManager1, reviewManager2, reviewManager3, creator)
                 .build();
 
         // Create 3 pool tasks
         // First one for selecting a single reviewer
-        PoolTask poolTask1 = PoolTaskBuilder.createPoolTask(context, collection, creator)
+        PoolTask poolTask1 = PoolTaskBuilder.createPoolTask(context, collection, reviewManager1)
             .withTitle("Workflow Item 1")
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald")
@@ -4404,7 +4412,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withSubject("ExtraEntry").build();
         XmlWorkflowItem witem1 = poolTask1.getWorkflowItem();
         // Second one for selecting multiple reviewers
-        PoolTask poolTask2 = PoolTaskBuilder.createPoolTask(context, collection, creator)
+        PoolTask poolTask2 = PoolTaskBuilder.createPoolTask(context, collection, reviewManager2)
             .withTitle("Workflow Item 2")
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald")
@@ -4412,7 +4420,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .withSubject("ExtraEntry").build();
         XmlWorkflowItem witem2 = poolTask2.getWorkflowItem();
         // Third one for trying to add user not in "Reviewers" group
-        PoolTask poolTask3 = PoolTaskBuilder.createPoolTask(context, collection, creator)
+        PoolTask poolTask3 = PoolTaskBuilder.createPoolTask(context, collection, reviewManager3)
             .withTitle("Workflow Item 3")
             .withIssueDate("2017-10-17")
             .withAuthor("Smith, Donald")
@@ -4446,9 +4454,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify as member of "ReviewManagers" you can claim in this tasks
         getClient(reviewManager1Token).perform(post("/api/workflow/claimedtasks")
-                                                   .contentType(
-                                                       MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                                                   .content("/api/workflow/pooltasks/" + poolTask1.getID()))
+            .contentType(
+                MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+            .content("/api/workflow/pooltasks/" + poolTask1.getID()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
@@ -4459,18 +4467,18 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify items now in claimed tasks /api/workflow/claimedtasks for user reviewManager1
         getClient(reviewManager1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager1.getID().toString()))
+            .param("uuid", reviewManager1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
                     hasJsonPath("$._embedded.owner",
-                                Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewManager1.getEmail()))),
+                        Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewManager1.getEmail()))),
                     hasJsonPath("$._embedded.action.id", Matchers.is("selectrevieweraction")),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
                 ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4478,7 +4486,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify items now not in claimed tasks /api/workflow/claimedtasks for user reviewer1
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer1.getID().toString()))
+            .param("uuid", reviewer1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4488,25 +4496,25 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         SelectReviewerAction.resetGroup();
         // Select reviewer1 as a reviewer, wf step 1
         getClient(reviewManager1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
-                                                   .param("submit_select_reviewer", "true")
-                                                   .param("eperson", reviewer1.getID().toString())
-                                                   .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .param("submit_select_reviewer", "true")
+            .param("eperson", reviewer1.getID().toString())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
         // Verify reviewer1 has the claimed task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer1.getID().toString()))
+            .param("uuid", reviewer1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
                     hasJsonPath("$._embedded.owner",
-                                Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer1.getEmail()))),
+                        Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer1.getEmail()))),
                     hasJsonPath("$._embedded.action.id", Matchers.is("singleuserreviewaction")),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry")))
                 ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4514,39 +4522,39 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify other members of "Reviewers" don't have this task claimed
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer2.getID().toString()))
+            .param("uuid", reviewer2.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer3.getID().toString()))
+            .param("uuid", reviewer3.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         // Verify members of "ReviewManagers" don't have this task claimed
         getClient(reviewManager1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager1.getID().toString()))
+            .param("uuid", reviewManager1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         getClient(reviewManager2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager2.getID().toString()))
+            .param("uuid", reviewManager2.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         getClient(reviewManager3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager3.getID().toString()))
+            .param("uuid", reviewManager3.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         // Verify other users don't have this task claimed
         getClient(userToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                         .param("uuid", user.getID().toString()))
+            .param("uuid", user.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4556,35 +4564,35 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Claim pooltask2 as member of "ReviewManagers"
         getClient(reviewManager2Token).perform(post("/api/workflow/claimedtasks")
-                                                   .contentType(
-                                                       MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                                                   .content("/api/workflow/pooltasks/" + poolTask2.getID()))
+            .contentType(
+                MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+            .content("/api/workflow/pooltasks/" + poolTask2.getID()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // Select reviewer2 and reviewer3 as reviewers, wf step 1
         getClient(reviewManager2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
-                                                   .param("submit_select_reviewer", "true")
-                                                   .param("eperson", reviewer2.getID().toString())
-                                                   .param("eperson", reviewer3.getID().toString())
-                                                   .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .param("submit_select_reviewer", "true")
+            .param("eperson", reviewer2.getID().toString())
+            .param("eperson", reviewer3.getID().toString())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
         // Verify reviewer2 has the claimed task
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer2.getID().toString()))
+            .param("uuid", reviewer2.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
                     hasJsonPath("$._embedded.owner",
-                                Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer2.getEmail()))),
+                        Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer2.getEmail()))),
                     hasJsonPath("$._embedded.action.id", Matchers.is("singleuserreviewaction")),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem2, "Workflow Item 2", "2017-10-17", "ExtraEntry")))
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem2, "Workflow Item 2", "2017-10-17", "ExtraEntry")))
                 ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4592,18 +4600,18 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify reviewer3 has the claimed task too
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer3.getID().toString()))
+            .param("uuid", reviewer3.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
                     hasJsonPath("$._embedded.owner",
-                                Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer3.getEmail()))),
+                        Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer3.getEmail()))),
                     hasJsonPath("$._embedded.action.id", Matchers.is("singleuserreviewaction")),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem2, "Workflow Item 2", "2017-10-17", "ExtraEntry")))
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem2, "Workflow Item 2", "2017-10-17", "ExtraEntry")))
                 ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4611,47 +4619,47 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify reviewer1 of "Reviewers" doesn't have this task claimed, only the first task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                              .param("uuid", reviewer1.getID().toString()))
+            .param("uuid", reviewer1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
                     hasJsonPath("$._embedded.owner",
-                                Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer1.getEmail()))),
+                        Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewer1.getEmail()))),
                     hasJsonPath("$._embedded.action.id", Matchers.is("singleuserreviewaction")),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry"))),
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem1, "Workflow Item 1", "2017-10-17", "ExtraEntry"))),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.not(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem2, "Workflow Item 2", "2017-10-17", "ExtraEntry")))
+                        Matchers.not(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem2, "Workflow Item 2", "2017-10-17", "ExtraEntry")))
                 ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
         // Verify members of "ReviewManagers" don't have this task claimed
         getClient(reviewManager1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager1.getID().toString()))
+            .param("uuid", reviewManager1.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         getClient(reviewManager2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager2.getID().toString()))
+            .param("uuid", reviewManager2.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         getClient(reviewManager3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager3.getID().toString()))
+            .param("uuid", reviewManager3.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
         // Verify other users don't have this task claimed
         getClient(userToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                         .param("uuid", user.getID().toString()))
+            .param("uuid", user.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4661,23 +4669,23 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Claim pooltask3 as member of "ReviewManagers"
         getClient(reviewManager3Token).perform(post("/api/workflow/claimedtasks")
-                                                   .contentType(
-                                                       MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
-                                                   .content("/api/workflow/pooltasks/" + poolTask3.getID()))
+            .contentType(
+                MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+            .content("/api/workflow/pooltasks/" + poolTask3.getID()))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$", Matchers.allOf(hasJsonPath("$.type", is("claimedtask")))))
             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // Select (non-reviewer) user as a reviewer, wf step 1
         getClient(reviewManager3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
-                                                   .param("submit_select_reviewer", "true")
-                                                   .param("eperson", user.getID().toString())
-                                                   .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .param("submit_select_reviewer", "true")
+            .param("eperson", user.getID().toString())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
         // Verify user does not have this task claimed
         getClient(userToken).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                         .param("uuid", user.getID().toString()))
+            .param("uuid", user.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -4685,18 +4693,18 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // Verify item still in claimed tasks for user reviewManager3 on step "selectrevieweraction"
         getClient(reviewManager3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                                                   .param("uuid", reviewManager3.getID().toString()))
+            .param("uuid", reviewManager3.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                 Matchers.allOf(
                     hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                     hasJsonPath("$.type", Matchers.is("claimedtask")),
                     hasJsonPath("$._embedded.owner",
-                                Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewManager3.getEmail()))),
+                        Matchers.is(EPersonMatcher.matchEPersonOnEmail(reviewManager3.getEmail()))),
                     hasJsonPath("$._embedded.action.id", Matchers.is("selectrevieweraction")),
                     hasJsonPath("$._embedded.workflowitem",
-                                Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                    witem3, "Workflow Item 3", "2017-10-17", "ExtraEntry")))
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem3, "Workflow Item 3", "2017-10-17", "ExtraEntry")))
                 ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
