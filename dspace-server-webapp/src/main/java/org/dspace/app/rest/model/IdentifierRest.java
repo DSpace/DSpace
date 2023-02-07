@@ -107,7 +107,7 @@ public class IdentifierRest extends BaseObjectRest<String> implements RestModel 
 
     @Override
     public String getCategory() {
-        return "ppid";
+        return "pid";
     }
 
     @Override
