@@ -36,6 +36,7 @@
 
     <util:map id="entityDissemination">
         <entry key="Publication" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Item" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="Person" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="Project" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="OrgUnit" value-ref="subscriptionDsoMetadataForEmailCompose"/>
