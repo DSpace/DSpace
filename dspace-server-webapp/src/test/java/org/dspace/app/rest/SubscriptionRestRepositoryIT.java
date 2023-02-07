@@ -31,6 +31,7 @@ import org.dspace.app.rest.matcher.SubscriptionMatcher;
 import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -45,6 +46,7 @@ import org.dspace.eperson.SubscriptionParameter;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 /**
@@ -54,6 +56,9 @@ import org.springframework.http.MediaType;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ResourcePolicyService resourcePolicyService;
 
     private Community subCommunity;
     private Collection collection;
@@ -1197,6 +1202,41 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void linkedDSpaceObjectAndRestrictedAccessAfterYouHaveSubscriptionToItTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1 Test")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        List<SubscriptionParameter> subscriptionParameterList = new ArrayList<>();
+        SubscriptionParameter subscriptionParameter = new SubscriptionParameter();
+        subscriptionParameter.setName("frequency");
+        subscriptionParameter.setValue("D");
+        subscriptionParameterList.add(subscriptionParameter);
+        Subscription subscription = SubscribeBuilder.subscribeBuilder(context,
+                                    "content", col1, eperson, subscriptionParameterList).build();
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.uuid", Matchers.is(col1.getID().toString())))
+                               .andExpect(jsonPath("$.name", Matchers.is(col1.getName())))
+                               .andExpect(jsonPath("$.type", Matchers.is("collection")));
+
+        context.turnOffAuthorisationSystem();
+        // remove all policies for col1
+        resourcePolicyService.removeAllPolicies(context, col1);
+        context.restoreAuthSystemState();
+
+        // prove that col1 become not accessible
+        getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
+                               .andExpect(status().isNoContent());
     }
 
     @Test
