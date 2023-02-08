@@ -18,11 +18,16 @@
 
     <bean class="org.dspace.subscriptions.SubscriptionEmailNotificationServiceImpl">
         <constructor-arg name="subscriptionType2generators">
+            <!-- The keys of the map used by the script "subscription-send"
+             org.dspace.subscriptions.SubscriptionEmailNotification
+             currently we support only 'content' type.   
+              --> 
             <map>
                 <entry key="content" value-ref="contentNotifyGenerator"/>
             </map>
         </constructor-arg>
         <constructor-arg name="contentUpdates">
+            <!-- Currently we support subscriptions ONLY for Community & Collection -->
             <map>
                 <entry key="community" value-ref="communityUpdates"/>
                 <entry key="collection" value-ref="collectionUpdates"/>
@@ -34,6 +39,8 @@
          <property name="entityType2Disseminator" ref ="entityDissemination"/>
     </bean>
 
+    <!-- This map allows configuring custom generators for e-mail body by EntityType.
+    currently, we support only 'subscriptionDsoMetadataForEmailCompose' for all EntityType  -->
     <util:map id="entityDissemination">
         <entry key="Publication" value-ref="subscriptionDsoMetadataForEmailCompose"/>
         <entry key="Item" value-ref="subscriptionDsoMetadataForEmailCompose"/>
@@ -49,6 +56,7 @@
         <property name="metadata" ref ="generalMetadataEntity"/>
     </bean>
 
+    <!-- This list includes metadata values we want to include on the e-mail body of the notification -->
     <util:list id="generalMetadataEntity">
         <value>dc.title</value>
     </util:list>
