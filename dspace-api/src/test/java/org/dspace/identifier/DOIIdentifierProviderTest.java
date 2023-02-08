@@ -759,7 +759,8 @@ public class DOIIdentifierProviderTest
     }
 
     @Test
-    public void testUpdateMetadataSkippedForPending() throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+    public void testUpdateMetadataSkippedForPending()
+            throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
             WorkflowException  {
         context.turnOffAuthorisationSystem();
         Item item = newItem();
@@ -778,7 +779,8 @@ public class DOIIdentifierProviderTest
     }
 
     @Test
-    public void testUpdateMetadataSkippedForMinted() throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+    public void testUpdateMetadataSkippedForMinted()
+            throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
             WorkflowException  {
         context.turnOffAuthorisationSystem();
         Item item = newItem();
@@ -797,7 +799,8 @@ public class DOIIdentifierProviderTest
     }
 
     @Test
-    public void testLoadOrCreateDOIReturnsMintedStatus() throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+    public void testLoadOrCreateDOIReturnsMintedStatus()
+            throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
             WorkflowException {
         Item item = newItem();
         // Mint a DOI without an explicit reserve or register context
