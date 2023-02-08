@@ -33,6 +33,7 @@
                   ref="org.dspace.services.ConfigurationService"/>
         <property name="DOIConnector"
                   ref="org.dspace.identifier.doi.DOIConnector"/>
+        <property name="filter" ref="always_true_filter"/>
     </bean>
 
     <bean id="org.dspace.identifier.doi.DOIConnector"
