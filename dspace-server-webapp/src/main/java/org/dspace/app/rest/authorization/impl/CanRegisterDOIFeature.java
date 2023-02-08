@@ -6,7 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.authorization.impl;
-import javax.ws.rs.NotAllowedException;
 import java.sql.SQLException;
 
 import org.dspace.app.rest.authorization.AuthorizationFeature;
