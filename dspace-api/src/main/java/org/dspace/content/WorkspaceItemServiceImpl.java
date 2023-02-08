@@ -177,8 +177,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
                 .getBooleanProperty("identifiers.submission.register", false)) {
             try {
-                // Get map of filters to use for identifier types
-                Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters("workspace");
+                // Get map of filters to use for identifier types, while the item is in progress
+                Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters(true);
                 IdentifierServiceFactory.getInstance().getIdentifierService().register(context, item, filters);
                 // Look for a DOI and move it to PENDING
                 DOI doi = doiService.findDOIByDSpaceObject(context, item);

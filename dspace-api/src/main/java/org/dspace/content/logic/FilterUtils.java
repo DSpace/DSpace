@@ -61,18 +61,19 @@ public class FilterUtils {
      * Get a map of identifier types and filters to use when creating workspace or archived items
      * This is used by services installing new archived or workspace items to filter by identifier type
      * as some filters should apply to DOI creation but not Handle creation, and so on.
-     *
-     * Status
-     * @param status is a suffix used when finding the appropriate filter from configuration
+     * The in progress or archived status will be used to load the appropriate filter from configuration
+     * <p>
+     * @param inProgress
      * @return
      */
-    public static Map<Class<? extends Identifier>, Filter> getIdentifierFilters(String status) {
-        if (status == null) {
-            status = "install";
+    public static Map<Class<? extends Identifier>, Filter> getIdentifierFilters(boolean inProgress) {
+        String configurationSuffix = "install";
+        if (inProgress) {
+            configurationSuffix = "workspace";
         }
         Map<Class<? extends Identifier>, Filter> filters = new HashMap<>();
         // Put DOI 'can we create DOI on install / workspace?' filter
-        Filter filter = FilterUtils.getFilterFromConfiguration("identifiers.submission.filter." + status);
+        Filter filter = FilterUtils.getFilterFromConfiguration("identifiers.submission.filter." + configurationSuffix);
         // A null filter should be handled safely by the identifier provier (default, or "always true")
         filters.put(DOI.class, filter);
         // This won't have an affect until handle providers implement filtering, but is an example of

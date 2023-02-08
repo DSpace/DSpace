@@ -17,7 +17,6 @@ import org.dspace.core.Context;
  * A condition that returns true if the item is archived
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class IsArchivedCondition extends AbstractCondition {
     private final static Logger log = LogManager.getLogger();

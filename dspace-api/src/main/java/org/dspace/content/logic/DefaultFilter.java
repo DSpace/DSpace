@@ -18,7 +18,6 @@ import org.dspace.core.Context;
  * statement as a property (unlike an operator) and takes no parameters (unlike a condition)
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class DefaultFilter implements Filter {
     private LogicalStatement statement;

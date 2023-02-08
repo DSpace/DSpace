@@ -106,6 +106,10 @@ public interface IdentifierService {
     void register(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
 
     /**
+     *
+     * Register identifiers for a DSO, with a map of logical filters for each Identifier class to apply
+     * at the time of local registration.
+     *
      * @param context The relevant DSpace Context.
      * @param dso     DSpace object to be registered
      * @param typeFilters   If a service supports a given Identifier implementation, apply the associated filter
@@ -117,6 +121,10 @@ public interface IdentifierService {
         throws AuthorizeException, SQLException, IdentifierException;
 
     /**
+     *
+     * Register identifier(s) for the given DSO just with providers that support that Identifier class, and
+     * apply the given filter if that provider extends FilteredIdentifierProvider
+     *
      * @param context The relevant DSpace Context.
      * @param dso     DSpace object to be registered
      * @param type    Type of identifier to register
@@ -129,6 +137,10 @@ public interface IdentifierService {
             throws AuthorizeException, SQLException, IdentifierException;
 
     /**
+     *
+     * Register identifier(s) for the given DSO just with providers that support that Identifier class, and
+     * apply the given filter if that provider extends FilteredIdentifierProvider
+     *
      * @param context The relevant DSpace Context.
      * @param dso     DSpace object to be registered
      * @param type    Type of identifier to register
