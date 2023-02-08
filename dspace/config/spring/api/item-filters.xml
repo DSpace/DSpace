@@ -20,7 +20,7 @@
     <!--   default-autowire-candidates="*Service,*DAO,javax.sql.DataSource"> -->
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
-    <bean id="always_true_filter" class="org.dspace.content.logic.TrueFilter"/>
+    <bean id="always_true_filter" scope="singleton" class="org.dspace.content.logic.TrueFilter"/>
 
     <!-- DEFINE CONDITIONS
         Define condition beans below for use as sub-statements in operator and filter beans
@@ -345,28 +345,5 @@
             </bean>
         </property>
     </bean>
-
-    <bean id="example-doi_filter" class="org.dspace.content.logic.DefaultFilter">
-        <property name="statement">
-            <bean class="org.dspace.content.logic.operator.And">
-                <property name="statements">
-                <list>
-                    <!-- Has a non-empty title -->
-                    <bean id="has-title_condition"
-                          class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
-                        <property name="parameters">
-                            <map>
-                                <entry key="field" value="dc.title" />
-                                <entry key="pattern" value=".*" />
-                            </map>
-                        </property>
-                    </bean>
-                </list>
-                </property>
-            </bean>
-        </property>
-    </bean>
-
-
 
 </beans>
