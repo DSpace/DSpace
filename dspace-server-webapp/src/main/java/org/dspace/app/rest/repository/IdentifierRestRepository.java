@@ -207,9 +207,8 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                 // Register things
                 identifierRest = registerDOI(context, item);
             } else {
-                // Nothing to do here, return existing DOI
-                identifierRest = new IdentifierRest(doiService.DOIToExternalForm(doi.getDoi()),
-                        "doi", DOIIdentifierProvider.statusText[doi.getStatus()]);
+                // Return bad request exception, as per other createAndReturn implementations (eg EPerson)
+                throw new DSpaceBadRequestException("The DOI is already registered or queued to be registered");
             }
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
@@ -235,9 +234,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
             if (doiIdentifierProvider != null) {
-                String doiValue = doiIdentifierProvider.register(context, item,
-                        DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
-                        "always_true_filter", TrueFilter.class));
+                String doiValue = doiIdentifierProvider.register(context, item, new TrueFilter());
                 identifierRest.setValue(doiValue);
                 // Get new status
                 DOI doi = doiService.findByDoi(context, doiValue);

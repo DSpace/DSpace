@@ -24,6 +24,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
@@ -48,6 +49,8 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
 
     @Autowired
     DOIService doiService;
+    @Autowired
+    HandleService handleService;
 
     @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
     public IdentifiersRest getIdentifiers(@Nullable HttpServletRequest request,
@@ -70,7 +73,7 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
                         doiUrl, "doi", DOIIdentifierProvider.statusText[doi.getStatus()]));
             }
             if (handle != null) {
-                identifierRestList.add(new IdentifierRest(handle, "handle", null));
+                identifierRestList.add(new IdentifierRest(handleService.getCanonicalForm(handle), "handle", null));
             }
         } catch (IdentifierException e) {
             throw new IllegalStateException("Failed to register identifier: " + e.getMessage());
