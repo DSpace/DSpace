@@ -11,6 +11,7 @@ import static org.dspace.app.rest.model.SubscriptionRest.CATEGORY;
 import static org.dspace.app.rest.model.SubscriptionRest.NAME;
 import static org.dspace.core.Constants.COLLECTION;
 import static org.dspace.core.Constants.COMMUNITY;
+import static org.dspace.core.Constants.READ;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,6 +37,7 @@ import org.dspace.app.rest.model.SubscriptionParameterRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -67,6 +69,8 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     private ConverterService converter;
     @Autowired
     private EPersonService ePersonService;
+    @Autowired
+    private AuthorizeService authorizeService;
     @Autowired
     private SubscribeService subscribeService;
     @Autowired
@@ -143,7 +147,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     }
 
     @Override
-    @PreAuthorize("@subscriptionSecurity.isAbleToCreateSubscription(#context) && hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("isAuthenticated()")
     protected SubscriptionRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         String epersonId = req.getParameter("eperson_id");
@@ -158,6 +162,19 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             EPerson ePerson = ePersonService.findByIdOrLegacyId(context, epersonId);
             if (Objects.isNull(ePerson) || Objects.isNull(dSpaceObject)) {
                 throw new DSpaceBadRequestException("Id of person or dspace object must represents reals ids");
+            }
+
+            // user must have read permissions to dSpaceObject object
+            if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, READ, true)) {
+                throw new AuthorizeException("The user has not READ rights on this DSO");
+            }
+
+            // if user is Admin don't make this control,
+            // otherwise make this control because normal user can only subscribe with their own ID of user.
+            if (!authorizeService.isAdmin(context)) {
+                if (!ePerson.equals(context.getCurrentUser())) {
+                    throw new AuthorizeException("Only administrator can subscribe for other persons");
+                }
             }
 
             if (dSpaceObject.getType() == COMMUNITY || dSpaceObject.getType() == COLLECTION) {
