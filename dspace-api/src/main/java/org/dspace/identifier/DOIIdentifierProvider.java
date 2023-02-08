@@ -500,8 +500,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
         DOI doiRow = loadOrCreateDOI(context, dso, doi, updateFilter);
 
-        if (PENDING.equals(doiRow.getStatus())) {
-            log.info("Not updating metadata for PENDING doi: " + doi);
+        if (PENDING.equals(doiRow.getStatus()) || MINTED.equals(doiRow.getStatus())) {
+            log.info("Not updating metadata for PENDING or MINTED doi: " + doi);
             return;
         }
 

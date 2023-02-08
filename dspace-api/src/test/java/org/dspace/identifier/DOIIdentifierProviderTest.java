@@ -758,6 +758,61 @@ public class DOIIdentifierProviderTest
                    DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow2.getStatus()));
     }
 
+    @Test
+    public void testUpdateMetadataSkippedForPending() throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+            WorkflowException  {
+        context.turnOffAuthorisationSystem();
+        Item item = newItem();
+        // Mint a new DOI with PENDING status
+        String doi1 = this.createDOI(item, DOIIdentifierProvider.PENDING, true);
+        // Update metadata for the item.
+        // This would normally shift status to UPDATE_REGISTERED, UPDATE_BEFORE_REGISTERING or UPDATE_RESERVED.
+        // But if the DOI is just pending, it should return without changing anything.
+        provider.updateMetadata(context, item, doi1);
+        // Get the DOI from the service
+        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        // Ensure it is still PENDING
+        assertEquals("Status of updated DOI did not remain PENDING",
+                DOIIdentifierProvider.PENDING, doi.getStatus());
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void testUpdateMetadataSkippedForMinted() throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+            WorkflowException  {
+        context.turnOffAuthorisationSystem();
+        Item item = newItem();
+        // Mint a new DOI with MINTED status
+        String doi1 = this.createDOI(item, DOIIdentifierProvider.MINTED, true);
+        // Update metadata for the item.
+        // This would normally shift status to UPDATE_REGISTERED, UPDATE_BEFORE_REGISTERING or UPDATE_RESERVED.
+        // But if the DOI is just minted, it should return without changing anything.
+        provider.updateMetadata(context, item, doi1);
+        // Get the DOI from the service
+        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        // Ensure it is still MINTED
+        assertEquals("Status of updated DOI did not remain PENDING",
+                DOIIdentifierProvider.MINTED, doi.getStatus());
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void testLoadOrCreateDOIReturnsMintedStatus() throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+            WorkflowException {
+        Item item = newItem();
+        // Mint a DOI without an explicit reserve or register context
+        String mintedDoi = provider.mint(context, item, DSpaceServicesFactory.getInstance()
+                .getServiceManager().getServiceByName("always_true_filter", TrueFilter.class));
+        DOI doi = doiService.findByDoi(context, mintedDoi.substring(DOI.SCHEME.length()));
+        // This should be minted
+        assertEquals("DOI is not of 'minted' status", DOIIdentifierProvider.MINTED, doi.getStatus());
+        provider.updateMetadata(context, item, mintedDoi);
+        DOI secondFind = doiService.findByDoi(context, mintedDoi.substring(DOI.SCHEME.length()));
+        // After an update, this should still be minted
+        assertEquals("DOI is not of 'minted' status",
+                DOIIdentifierProvider.MINTED, secondFind.getStatus());
+
+    }
 
     // test the following methods using the MockDOIConnector.
     // updateMetadataOnline

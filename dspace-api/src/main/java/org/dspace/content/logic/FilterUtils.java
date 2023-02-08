@@ -28,9 +28,11 @@ public class FilterUtils {
     ConfigurationService configurationService;
 
     /**
-     * Get a Filter by name
+     * Get a Filter by configuration property name
+     * For example, if a module has implemented "my-feature.filter" configuration property
+     * this method will return a filter with the ID specified by the configuration property
      * @param property  DSpace configuration property name (Apache Commons config)
-     * @return  Filter or null
+     * @return  Filter object, with a bean ID configured for this property key, or null
      */
     public static Filter getFilterFromConfiguration(String property) {
         String filterName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(property);
@@ -41,9 +43,11 @@ public class FilterUtils {
     }
 
     /**
-     * Get a Filter by name
+     * Get a Filter by configuration property name
+     * For example, if a module has implemented "my-feature.filter" configuration property
+     * this method will return a filter with the ID specified by the configuration property
      * @param property  DSpace configuration property name (Apache Commons config)
-     * @return  Filter or null
+     * @return  Filter object, with a bean ID configured for this property key, or default filter
      */
     public static Filter getFilterFromConfiguration(String property, Filter defaultFilter) {
         Filter filter = getFilterFromConfiguration(property);
@@ -55,6 +59,11 @@ public class FilterUtils {
 
     /**
      * Get a map of identifier types and filters to use when creating workspace or archived items
+     * This is used by services installing new archived or workspace items to filter by identifier type
+     * as some filters should apply to DOI creation but not Handle creation, and so on.
+     *
+     * Status
+     * @param status is a suffix used when finding the appropriate filter from configuration
      * @return
      */
     public static Map<Class<? extends Identifier>, Filter> getIdentifierFilters(String status) {

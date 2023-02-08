@@ -34,5 +34,10 @@ public interface Filter extends LogicalStatement, BeanNameAware {
     @Override
     boolean getResult(Context context, Item item) throws LogicalStatementException;
 
+    /**
+     * Get the name of a filter. This can be used by filters which make use of BeanNameAware
+     * to return the bean name.
+     * @return the id/name of this spring bean
+     */
     String getName();
 }
