@@ -9,6 +9,7 @@ package org.dspace.subscriptions;
 
 import static org.dspace.core.Constants.COLLECTION;
 import static org.dspace.core.Constants.COMMUNITY;
+import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,11 +22,14 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.scripts.DSpaceRunnable;
@@ -48,6 +52,8 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     private Map<String, SubscriptionGenerator> subscriptionType2generators = new HashMap<>();
 
     @Autowired
+    private AuthorizeService authorizeService;
+    @Autowired
     private SubscribeService subscribeService;
 
     @SuppressWarnings("rawtypes")
@@ -59,8 +65,8 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
-        List<IndexableObject> communities = new ArrayList<>();
-        List<IndexableObject> collections = new ArrayList<>();
+        List<IndexableObject> communityItems = new ArrayList<>();
+        List<IndexableObject> collectionsItems = new ArrayList<>();
         try {
             List<Subscription> subscriptions =
                                findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType, frequency);
@@ -70,20 +76,29 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                 int iterator = 0;
                 for (Subscription subscription : subscriptions) {
                     DSpaceObject dSpaceObject = subscription.getDSpaceObject();
+                    EPerson ePerson = subscription.getEPerson();
+
+                    if (!authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject, READ, true)) {
+                        iterator++;
+                        continue;
+                    }
 
                     if (dSpaceObject.getType() == COMMUNITY) {
-                        communities.addAll(contentUpdates.get(Community.class.getSimpleName().toLowerCase())
-                                                         .findUpdates(context, dSpaceObject, frequency));
+                        List<IndexableObject> indexableCommunityItems = contentUpdates
+                                .get(Community.class.getSimpleName().toLowerCase())
+                                .findUpdates(context, dSpaceObject, frequency);
+                        communityItems.addAll(getItems(context, ePerson, indexableCommunityItems));
                     } else if (dSpaceObject.getType() == COLLECTION) {
-                        collections.addAll(contentUpdates.get(Collection.class.getSimpleName().toLowerCase())
-                                                         .findUpdates(context, dSpaceObject, frequency));
+                        List<IndexableObject> indexableCollectionItems = contentUpdates
+                                .get(Collection.class.getSimpleName().toLowerCase())
+                                .findUpdates(context, dSpaceObject, frequency);
+                        collectionsItems.addAll(getItems(context, ePerson, indexableCollectionItems));
                     } else {
                         log.warn("found an invalid DSpace Object type ({}) among subscriptions to send",
                                  dSpaceObject.getType());
                         continue;
                     }
 
-                    var ePerson = subscription.getEPerson();
                     if (iterator < subscriptions.size() - 1) {
                         // as the subscriptions are ordered by eperson id, so we send them by ePerson
                         if (ePerson.equals(subscriptions.get(iterator + 1).getEPerson())) {
@@ -91,14 +106,14 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
                             continue;
                         } else {
                             subscriptionType2generators.get(subscriptionType)
-                                      .notifyForSubscriptions(context, ePerson, communities, collections);
-                            communities.clear();
-                            collections.clear();
+                                      .notifyForSubscriptions(context, ePerson, communityItems, collectionsItems);
+                            communityItems.clear();
+                            collectionsItems.clear();
                         }
                     } else {
                         //in the end of the iteration
                         subscriptionType2generators.get(subscriptionType)
-                                        .notifyForSubscriptions(context, ePerson, communities, collections);
+                                        .notifyForSubscriptions(context, ePerson, communityItems, collectionsItems);
                     }
                     iterator++;
                 }
@@ -111,6 +126,19 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
             handler.handleException(e);
             context.abort();
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private List<IndexableObject> getItems(Context context, EPerson ePerson, List<IndexableObject> indexableItems)
+            throws SQLException {
+        List<IndexableObject> items = new ArrayList<IndexableObject>();
+        for (IndexableObject indexableitem : indexableItems) {
+            Item item = (Item) indexableitem.getIndexedObject();
+            if (authorizeService.authorizeActionBoolean(context, ePerson, item, READ, true)) {
+                items.add(indexableitem);
+            }
+        }
+        return items;
     }
 
     /**
