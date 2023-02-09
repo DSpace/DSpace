@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -44,6 +45,9 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
 
     @Autowired
     private SupervisionOrderService supervisionOrderService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
@@ -89,7 +93,9 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
 
             if (witem.getItem() != null) {
                 if (supervisionOrderService.isSupervisor(context, ePerson, witem.getItem())) {
-                    return true;
+                    return authorizeService.authorizeActionBoolean(context, ePerson, witem.getItem(),
+                                                                   restPermission.getDspaceApiActionId(),
+                                                                   true);
                 }
             }
 

@@ -698,6 +698,13 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                           .withPassword(password)
                           .build();
 
+        EPerson userC =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("test3@email.com")
+                          .withPassword(password)
+                          .build();
+
         parentCommunity =
             CommunityBuilder.createCommunity(context)
                             .withName("Parent Community")
@@ -734,10 +741,17 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                         .addMember(userB)
                         .build();
 
+        Group groupC =
+            GroupBuilder.createGroup(context)
+                        .withName("group C")
+                        .addMember(userC)
+                        .build();
+
         context.restoreAuthSystemState();
 
         AtomicInteger supervisionOrderIdOne = new AtomicInteger();
         AtomicInteger supervisionOrderIdTwo = new AtomicInteger();
+        AtomicInteger supervisionOrderIdThree = new AtomicInteger();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -759,11 +773,23 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                              .andDo(result -> supervisionOrderIdTwo
                                  .set(read(result.getResponse().getContentAsString(), "$.id")));
 
+        getClient(adminToken).perform(post("/api/core/supervisionorders/")
+                                          .param("uuid", itemOne.getID().toString())
+                                          .param("group", groupC.getID().toString())
+                                          .param("type", "NONE")
+                                          .contentType(contentType))
+                             .andExpect(status().isCreated())
+                             .andDo(result -> supervisionOrderIdThree
+                                 .set(read(result.getResponse().getContentAsString(), "$.id")));
+
         SupervisionOrder supervisionOrderOne =
             supervisionOrderService.find(context, supervisionOrderIdOne.get());
 
         SupervisionOrder supervisionOrderTwo =
             supervisionOrderService.find(context, supervisionOrderIdTwo.get());
+
+        SupervisionOrder supervisionOrderThree =
+            supervisionOrderService.find(context, supervisionOrderIdThree.get());
 
         getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrderOne.getID()))
                              .andExpect(status().isOk())
@@ -775,8 +801,14 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                              .andExpect(jsonPath("$",
                                  matchSuperVisionOrder(context.reloadEntity(supervisionOrderTwo))));
 
+        getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrderThree.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$",
+                                                 matchSuperVisionOrder(context.reloadEntity(supervisionOrderThree))));
+
         String authTokenA = getAuthToken(userA.getEmail(), password);
         String authTokenB = getAuthToken(userB.getEmail(), password);
+        String authTokenC = getAuthToken(userC.getEmail(), password);
 
         String patchBody = getPatchContent(List.of(
             new ReplaceOperation("/sections/traditionalpageone/dc.title/0", Map.of("value", "New Title"))
@@ -808,11 +840,21 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                                              "ExtraEntry")
                                  )));
 
+        // supervisor of a NONE type cannot see workspace item
+        getClient(authTokenC).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isForbidden());
+
 
         // update title of workspace item by userB is Forbidden
         getClient(authTokenB).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                                  .content(patchBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isForbidden());
+
+        // supervisor of a NONE type cannot patch workspace item
+        getClient(authTokenC).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                          .content(patchBody)
+                                          .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isForbidden());
     }
 
