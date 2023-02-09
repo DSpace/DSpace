@@ -9,7 +9,9 @@ package org.dspace.identifier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeNotNull;
@@ -775,6 +777,46 @@ public class DOIIdentifierProviderTest
         // Ensure it is still PENDING
         assertEquals("Status of updated DOI did not remain PENDING",
                 DOIIdentifierProvider.PENDING, doi.getStatus());
+        context.restoreAuthSystemState();
+    }
+
+
+    @Test
+    public void testMintDoiAfterOrphanedPendingDOI()
+        throws SQLException, AuthorizeException, IOException, IdentifierException, IllegalAccessException,
+            WorkflowException {
+        context.turnOffAuthorisationSystem();
+        Item item1 = newItem();
+        // Mint a new DOI with PENDING status
+        String doi1 = this.createDOI(item1, DOIIdentifierProvider.PENDING, true);
+        // remove the item
+        itemService.delete(context, item1);
+        // Get the DOI from the service
+        DOI doi = doiService.findDOIByDSpaceObject(context, item1);
+        // ensure DOI has no state
+        assertNull("Orphaned DOI was not set deleted", doi);
+        // create a new item and a new DOI
+        Item item2 = newItem();
+        String doi2 = null;
+        try {
+            // get a DOI (skipping any filters)
+            doi2 = provider.mint(context, item2);
+        } catch (IdentifierException e) {
+            e.printStackTrace(System.err);
+            fail("Got an IdentifierException: " + e.getMessage());
+        }
+
+        assertNotNull("Minted DOI is null?!", doi2);
+        assertFalse("Minted DOI is empty!", doi2.isEmpty());
+        assertNotEquals("Minted DOI equals previously orphaned DOI.", doi1, doi2);
+
+        try {
+            doiService.formatIdentifier(doi2);
+        } catch (DOIIdentifierException e) {
+            e.printStackTrace(System.err);
+            fail("Minted an unrecognizable DOI: " + e.getMessage());
+        }
+
         context.restoreAuthSystemState();
     }
 
