@@ -23,7 +23,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -120,11 +119,8 @@ public class SingleUserReviewAction extends ProcessingAction {
      */
     private ActionResult processDecline(Context c, XmlWorkflowItem wfi)
         throws SQLException, IOException, AuthorizeException, WorkflowException {
-        EPerson user = c.getCurrentUser();
         c.turnOffAuthorisationSystem();
-        XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-        WorkspaceItem workspaceItem = xmlWorkflowService.abort(c, wfi, user);
-        xmlWorkflowService.start(c, workspaceItem);
+        xmlWorkflowService.restartWorkflow(c, wfi, c.getCurrentUser(), this.getProvenanceStartId());
         c.restoreAuthSystemState();
         return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
     }
