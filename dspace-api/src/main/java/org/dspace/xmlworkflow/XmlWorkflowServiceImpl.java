@@ -1110,6 +1110,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(context, wi);
 
+        // Because of issue of xmlWorkflowItemService not realising wfi wrapper has been deleted
+        context.commit();
+        wsi = context.reloadEntity(wsi);
+
         log.info(LogHelper.getHeader(context, "decline_workflow", "workflow_item_id="
             + wi.getID() + "item_id=" + wi.getItem().getID() + "collection_id=" + wi.getCollection().getID() +
             "eperson_id=" + decliner.getID()));
