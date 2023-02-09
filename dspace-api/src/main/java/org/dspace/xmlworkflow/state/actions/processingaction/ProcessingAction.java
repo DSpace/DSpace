@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
@@ -36,6 +36,8 @@ public abstract class ProcessingAction extends Action {
     protected ClaimedTaskService claimedTaskService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired
+    protected XmlWorkflowService xmlWorkflowService;
 
     public static final String SUBMIT_EDIT_METADATA = "submit_edit_metadata";
     public static final String SUBMIT_CANCEL = "submit_cancel";
@@ -73,8 +75,8 @@ public abstract class ProcessingAction extends Action {
 
         // We have pressed reject, so remove the task the user has & put it back
         // to a workspace item
-        XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().sendWorkflowItemBackSubmission(c, wfi,
-            c.getCurrentUser(), this.getProvenanceStartId(), reason);
+        xmlWorkflowService.sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(), this.getProvenanceStartId(),
+            reason);
 
         return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
     }
