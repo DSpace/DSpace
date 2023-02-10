@@ -18,6 +18,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Service interface class for the WorkflowService framework.
@@ -99,6 +100,9 @@ public interface WorkflowService<T extends WorkflowItem> {
     public WorkspaceItem sendWorkflowItemBackSubmission(Context c, T workflowItem, EPerson e, String provenance,
                                                         String rejection_message)
         throws SQLException, AuthorizeException, IOException;
+
+    public void restartWorkflow(Context context, XmlWorkflowItem wi, EPerson decliner, String provenance)
+        throws SQLException, AuthorizeException, IOException, WorkflowException;
 
     public String getMyDSpaceLink();
 
