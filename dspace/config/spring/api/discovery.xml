@@ -31,6 +31,7 @@
     <bean id="solrServicePrivateItemPlugin" class="org.dspace.discovery.SolrServicePrivateItemPlugin" scope="prototype"/>
     <bean id="SolrServiceParentObjectIndexingPlugin" class="org.dspace.discovery.SolrServiceParentObjectIndexingPlugin" scope="prototype"/>
     <bean id="SolrServiceIndexCollectionSubmittersPlugin" class="org.dspace.discovery.SolrServiceIndexCollectionSubmittersPlugin" scope="prototype"/>
+    <bean id="SolrServiceIndexItemEditorsPlugin" class="org.dspace.discovery.SolrServiceIndexItemEditorsPlugin" scope="prototype"/>
 
     <alias name="solrServiceResourceIndexPlugin" alias="org.dspace.discovery.SolrServiceResourceRestrictionPlugin"/>
 
@@ -245,6 +246,18 @@
                         </bean>
                         <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
                             <property name="field" value="dc.title"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="organization.legalName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.givenName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.familyName"/>
                             <property name="snippets" value="5"/>
                         </bean>
                         <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams

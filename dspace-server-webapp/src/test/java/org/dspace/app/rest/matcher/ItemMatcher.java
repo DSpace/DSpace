@@ -52,6 +52,7 @@ public class ItemMatcher {
         return matchEmbeds(
                 "accessStatus",
                 "bundles[]",
+                "identifiers",
                 "mappedCollections[]",
                 "owningCollection",
                 "version",
@@ -68,6 +69,7 @@ public class ItemMatcher {
         return HalMatcher.matchLinks(REST_SERVER_URL + "core/items/" + uuid,
                 "accessStatus",
                 "bundles",
+                "identifiers",
                 "mappedCollections",
                 "owningCollection",
                 "relationships",

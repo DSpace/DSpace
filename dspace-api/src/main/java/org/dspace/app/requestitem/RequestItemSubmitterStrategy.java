@@ -22,7 +22,6 @@ import org.springframework.lang.NonNull;
  * @author Andrea Bollini
  */
 public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor {
-
     public RequestItemSubmitterStrategy() {
     }
 

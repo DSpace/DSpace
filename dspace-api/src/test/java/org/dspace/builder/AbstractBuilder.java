@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
@@ -102,6 +103,7 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
+    static SystemWideAlertService systemWideAlertService;
 
     protected Context context;
 
@@ -161,6 +163,8 @@ public abstract class AbstractBuilder<T, S> {
         orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
         orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
+        systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                      .getServicesByType(SystemWideAlertService.class).get(0);
     }
 
 
@@ -194,6 +198,7 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = null;
         versioningService = null;
         orcidTokenService = null;
+        systemWideAlertService = null;
 
     }
 

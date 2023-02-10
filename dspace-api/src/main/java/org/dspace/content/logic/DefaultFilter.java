@@ -18,10 +18,10 @@ import org.dspace.core.Context;
  * statement as a property (unlike an operator) and takes no parameters (unlike a condition)
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class DefaultFilter implements Filter {
     private LogicalStatement statement;
+    private String name;
     private final static Logger log = LogManager.getLogger();
 
     /**
@@ -43,5 +43,16 @@ public class DefaultFilter implements Filter {
      */
     public boolean getResult(Context context, Item item) throws LogicalStatementException {
         return this.statement.getResult(context, item);
+    }
+
+    @Override
+    public void setBeanName(String name) {
+        log.debug("Initialize bean " + name);
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

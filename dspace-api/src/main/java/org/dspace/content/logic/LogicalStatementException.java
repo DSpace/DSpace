@@ -12,7 +12,6 @@ package org.dspace.content.logic;
  * defined as spring beans.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class LogicalStatementException extends RuntimeException {
 

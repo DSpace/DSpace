@@ -15,10 +15,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +28,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -75,7 +73,7 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
-    @Autowired(required = true)
+    @Resource(name = "requestItemAuthorExtractor")
     protected RequestItemAuthorExtractor requestItemAuthorExtractor;
 
     @Autowired(required = true)
@@ -199,7 +197,7 @@ public class RequestItemRepository
             responseLink = getLinkTokenEmail(ri.getToken());
         } catch (URISyntaxException | MalformedURLException e) {
             LOG.warn("Impossible URL error while composing email:  {}",
-                    e.getMessage());
+                    e::getMessage);
             throw new RuntimeException("Request not sent:  " + e.getMessage());
         }
 
@@ -221,31 +219,13 @@ public class RequestItemRepository
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
         RequestItem ri = requestItemService.findByToken(context, token);
         if (null == ri) {
             throw new UnprocessableEntityException("Item request not found");
-        }
-
-        // Check for authorized user
-        List<RequestItemAuthor> authorizers;
-        try {
-            authorizers = requestItemAuthorExtractor.getRequestItemAuthor(context, ri.getItem());
-        } catch (SQLException ex) {
-            LOG.warn("Failed to find an authorizer:  {}", ex.getMessage());
-            authorizers = Collections.EMPTY_LIST;
-        }
-
-        boolean authorized = false;
-        String requester = context.getCurrentUser().getEmail();
-        for (RequestItemAuthor authorizer : authorizers) {
-            authorized |= authorizer.getEmail().equals(requester);
-        }
-        if (!authorized) {
-            throw new AuthorizeException("Not authorized to approve this request");
         }
 
         // Do not permit updates after a decision has been given.
@@ -275,7 +255,7 @@ public class RequestItemRepository
         try {
             RequestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
-            LOG.warn("Response not sent:  {}", ex.getMessage());
+            LOG.warn("Response not sent:  {}", ex::getMessage);
             throw new RuntimeException("Response not sent", ex);
         }
 
@@ -284,7 +264,7 @@ public class RequestItemRepository
             try {
                 RequestItemEmailNotifier.requestOpenAccess(context, ri);
             } catch (IOException ex) {
-                LOG.warn("Open access request not sent:  {}", ex.getMessage());
+                LOG.warn("Open access request not sent:  {}", ex::getMessage);
                 throw new RuntimeException("Open access request not sent", ex);
             }
         }

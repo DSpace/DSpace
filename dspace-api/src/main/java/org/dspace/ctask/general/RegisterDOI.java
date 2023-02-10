@@ -13,11 +13,15 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.logic.Filter;
+import org.dspace.content.logic.FilterUtils;
+import org.dspace.content.logic.TrueFilter;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
@@ -39,6 +43,7 @@ public class RegisterDOI extends AbstractCurationTask {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RegisterDOI.class);
     // DOI provider
     private DOIIdentifierProvider provider;
+    private Filter trueFilter;
 
     /**
      * Initialise the curation task and read configuration, instantiate the DOI provider
@@ -46,14 +51,14 @@ public class RegisterDOI extends AbstractCurationTask {
     @Override
     public void init(Curator curator, String taskId) throws IOException {
         super.init(curator, taskId);
-        // Get 'skip filter' behaviour from configuration, with a default value of 'true'
-        skipFilter = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".skip-filter", true);
         // Get distribution behaviour from configuration, with a default value of 'false'
         distributed = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".distributed", false);
         log.debug("PLUGIN_PREFIX = " + PLUGIN_PREFIX + ", skipFilter = " + skipFilter +
             ", distributed = " + distributed);
         // Instantiate DOI provider singleton
         provider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+        trueFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                "always_true_filter", TrueFilter.class);
     }
 
     /**
@@ -118,8 +123,9 @@ public class RegisterDOI extends AbstractCurationTask {
         String doi = null;
         // Attempt DOI registration and report successes and failures
         try {
-            log.debug("Registering DOI with skipFilter = " + skipFilter);
-            doi = provider.register(Curator.curationContext(), item, skipFilter);
+            Filter filter = FilterUtils.getFilterFromConfiguration("identifiers.submission.filter.curation",
+                    trueFilter);
+            doi = provider.register(Curator.curationContext(), item, filter);
             if (doi != null) {
                 String message = "New DOI minted in database for item " + item.getHandle() + ": " + doi
                     + ". This DOI will be registered online with the DOI provider when the queue is next run";
