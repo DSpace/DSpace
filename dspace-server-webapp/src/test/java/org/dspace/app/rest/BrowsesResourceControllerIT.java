@@ -980,7 +980,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     /**
      * This test was introduced to reproduce the bug DS-4269 Pagination links must be consistent also when there is not
      * explicit pagination parameters in the request (i.e. defaults apply)
-     * 
+     *
      * @throws Exception
      */
     public void browsePaginationWithoutExplicitParams() throws Exception {
@@ -2124,5 +2124,58 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
                                                  nullValue()));
+    }
+
+    /**
+     * Expect a single author browse definition
+     * @throws Exception
+     */
+    @Test
+    public void findOneLinked() throws Exception {
+        // When we call the search endpoint
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.contributor.author"))
+                // The status has to be 200 OK
+                .andExpect(status().isOk())
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // The browse definition ID should be "author"
+                .andExpect(jsonPath("$.id", is("author")))
+                // It should be configured as a metadata browse
+                .andExpect(jsonPath("$.metadataBrowse", is(true)))
+        ;
+    }
+
+    @Test
+    public void findOneLinkedPassingTwoFields() throws Exception {
+        // When we call the search endpoint
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.contributor.author")
+                        .param("fields", "dc.date.issued"))
+                // The status has to be 200 OK
+                .andExpect(status().isOk())
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // The browse definition ID should be "author"
+                .andExpect(jsonPath("$.id", is("author")))
+                // It should be configured as a metadata browse
+                .andExpect(jsonPath("$.metadataBrowse", is(true)));
+    }
+
+    @Test
+    public void findUnconfiguredFields() throws Exception {
+        // When we call the search endpoint with a field that isn't configured for any browse links
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.identifier.uri"))
+                // The status has to be 204 NO CONTENT
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findBrowseLinksWithMissingParameter() throws Exception {
+        // When we call the search endpoint with a field that isn't configured for any browse links
+        getClient().perform(get("/api/discover/browses/search/byFields"))
+                // The status has to be 400 BAD REQUEST
+                .andExpect(status().isBadRequest());
     }
 }
