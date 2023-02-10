@@ -54,6 +54,7 @@
         <mapping class="org.dspace.content.EntityType"/>
 
         <mapping class="org.dspace.scripts.Process"/>
+        <mapping class="org.dspace.alerts.SystemWideAlert"/>
 
         <mapping class="org.dspace.content.MetadataField"/>
         <mapping class="org.dspace.content.MetadataSchema"/>
