@@ -24,7 +24,6 @@ import org.dspace.core.Context;
  * if the item belongs to any of them.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class InCommunityCondition extends AbstractCondition {
     private final static Logger log = LogManager.getLogger();

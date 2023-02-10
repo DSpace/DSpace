@@ -30,6 +30,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.Filter;
+import org.dspace.content.logic.FilterUtils;
+import org.dspace.content.logic.TrueFilter;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -61,7 +64,8 @@ public class DOIOrganiser {
     protected ItemService itemService;
     protected DOIService doiService;
     protected ConfigurationService configurationService;
-    protected boolean skipFilter;
+    // This filter will override the default provider filter / behaviour
+    protected Filter filter;
 
     /**
      * Constructor to be called within the main() method
@@ -76,7 +80,8 @@ public class DOIOrganiser {
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.doiService = IdentifierServiceFactory.getInstance().getDOIService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        this.skipFilter = false;
+        this.filter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                "always_true_filter", TrueFilter.class);
     }
 
     /**
@@ -121,12 +126,13 @@ public class DOIOrganiser {
                           "Perform online metadata update for all identifiers queued for metadata update.");
         options.addOption("d", "delete-all", false,
                           "Perform online deletion for all identifiers queued for deletion.");
-
         options.addOption("q", "quiet", false,
                           "Turn the command line output off.");
 
-        options.addOption(null, "skip-filter", false,
-                          "Skip the configured item filter when registering or reserving.");
+        Option filterDoi = Option.builder().optionalArg(true).longOpt("filter").hasArg().argName("filterName")
+                .desc("Use the specified filter name instead of the provider's filter. Defaults to a special " +
+                "'always true' filter to force operations").build();
+        options.addOption(filterDoi);
 
         Option registerDoi = Option.builder()
                 .longOpt("register-doi")
@@ -203,10 +209,12 @@ public class DOIOrganiser {
         }
 
         DOIService doiService = IdentifierServiceFactory.getInstance().getDOIService();
-        // Should we skip the filter?
-        if (line.hasOption("skip-filter")) {
-            System.out.println("Skipping the item filter");
-            organiser.skipFilter = true;
+        // Do we get a filter?
+        if (line.hasOption("filter")) {
+            String filter = line.getOptionValue("filter");
+            if (null != filter) {
+                organiser.filter = FilterUtils.getFilterFromConfiguration(filter);
+            }
         }
 
         if (line.hasOption('s')) {
@@ -394,19 +402,18 @@ public class DOIOrganiser {
     /**
      * Register DOI with the provider
      * @param doiRow        - doi to register
-     * @param skipFilter    - whether filters should be skipped before registration
+     * @param filter        - logical item filter to override
      * @throws SQLException
      * @throws DOIIdentifierException
      */
-    public void register(DOI doiRow, boolean skipFilter) throws SQLException, DOIIdentifierException {
+    public void register(DOI doiRow, Filter filter) throws SQLException, DOIIdentifierException {
         DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType()) {
             throw new IllegalArgumentException("Currenty DSpace supports DOIs for Items only.");
         }
 
         try {
-            provider.registerOnline(context, dso,
-                                    DOI.SCHEME + doiRow.getDoi());
+            provider.registerOnline(context, dso, DOI.SCHEME + doiRow.getDoi(), filter);
 
             if (!quiet) {
                 System.out.println("This identifier: "
@@ -466,29 +473,23 @@ public class DOIOrganiser {
     }
 
     /**
-     * Register DOI with the provider, always applying (ie. never skipping) any configured filters
+     * Register DOI with the provider
      * @param doiRow        - doi to register
      * @throws SQLException
      * @throws DOIIdentifierException
      */
     public void register(DOI doiRow) throws SQLException, DOIIdentifierException {
-        if (this.skipFilter) {
-            System.out.println("Skipping the filter for " + doiRow.getDoi());
-        }
-        register(doiRow, this.skipFilter);
+        register(doiRow, this.filter);
     }
 
     /**
-     * Reserve DOI with the provider, always applying (ie. never skipping) any configured filters
+     * Reserve DOI with the provider,
      * @param doiRow        - doi to reserve
      * @throws SQLException
      * @throws DOIIdentifierException
      */
     public void reserve(DOI doiRow) {
-        if (this.skipFilter) {
-            System.out.println("Skipping the filter for " + doiRow.getDoi());
-        }
-        reserve(doiRow, this.skipFilter);
+        reserve(doiRow, this.filter);
     }
 
     /**
@@ -497,14 +498,14 @@ public class DOIOrganiser {
      * @throws SQLException
      * @throws DOIIdentifierException
      */
-    public void reserve(DOI doiRow, boolean skipFilter) {
+    public void reserve(DOI doiRow, Filter filter) {
         DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType()) {
             throw new IllegalArgumentException("Currently DSpace supports DOIs for Items only.");
         }
 
         try {
-            provider.reserveOnline(context, dso, DOI.SCHEME + doiRow.getDoi(), skipFilter);
+            provider.reserveOnline(context, dso, DOI.SCHEME + doiRow.getDoi(), filter);
 
             if (!quiet) {
                 System.out.println("This identifier : " + DOI.SCHEME + doiRow.getDoi() + " is successfully reserved.");
@@ -699,7 +700,7 @@ public class DOIOrganiser {
 
                 //Check if this Item has an Identifier, mint one if it doesn't
                 if (null == doiRow) {
-                    doi = provider.mint(context, dso, this.skipFilter);
+                    doi = provider.mint(context, dso, this.filter);
                     doiRow = doiService.findByDoi(context,
                                                   doi.substring(DOI.SCHEME.length()));
                     return doiRow;
@@ -723,7 +724,7 @@ public class DOIOrganiser {
             doiRow = doiService.findDOIByDSpaceObject(context, dso);
 
             if (null == doiRow) {
-                doi = provider.mint(context, dso, this.skipFilter);
+                doi = provider.mint(context, dso, this.filter);
                 doiRow = doiService.findByDoi(context,
                                               doi.substring(DOI.SCHEME.length()));
             }

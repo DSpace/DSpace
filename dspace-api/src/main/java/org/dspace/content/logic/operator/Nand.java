@@ -18,7 +18,6 @@ import org.dspace.core.Context;
  * An operator that implements NAND by negating an AND operation
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class Nand extends AbstractOperator {
 

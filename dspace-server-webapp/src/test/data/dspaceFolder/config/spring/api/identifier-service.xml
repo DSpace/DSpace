@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://www.dspace.org/license
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!-- Identifier Service Application Interface.  Will be autowired with
+         any Identifier Providers present in Spring context.
+    -->
+    <bean id="org.dspace.identifier.service.IdentifierService"
+          class="org.dspace.identifier.IdentifierServiceImpl"
+          autowire="byType"
+          scope="singleton"/>
+
+    <!-- provider to mint and register DOIs with DSpace.
+         To mint DOIs you need a registration agency. The DOIIdentifierProvider
+         maintains the doi database table and handling of DSpaceObject. It uses
+         a DOIConnector that handles all API calls to your DOI registration
+         agency. Please configure a DOIConnector as well! -->
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+          class="org.dspace.identifier.DOIIdentifierProvider"
+          scope="singleton">
+        <property name="configurationService"
+                  ref="org.dspace.services.ConfigurationService"/>
+        <property name="DOIConnector"
+                  ref="org.dspace.identifier.doi.DOIConnector"/>
+        <property name="filter" ref="always_true_filter"/>
+    </bean>
+
+    <bean id="org.dspace.identifier.doi.DOIConnector"
+          class="org.dspace.identifier.doi.DataCiteConnector">
+      <property name='DATACITE_SCHEME' value='https'/>
+      <property name='DATACITE_HOST' value='mds.test.datacite.org'/>
+      <property name='DATACITE_DOI_PATH' value='/doi/'/>
+      <property name='DATACITE_METADATA_PATH' value='/metadata/'/>
+      <property name='disseminationCrosswalkName' value="DataCite"/>
+    </bean>
+</beans>
