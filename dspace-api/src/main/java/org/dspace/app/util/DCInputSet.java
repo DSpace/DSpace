@@ -120,6 +120,9 @@ public class DCInputSet {
                             return true;
                         }
                     }
+                } else if (field.isRelationshipField() &&
+                    ("relation." + field.getRelationshipType()).equals(fieldName)) {
+                    return true;
                 } else {
                     String fullName = field.getFieldName();
                     if (Objects.equals(fullName, fieldName)) {
