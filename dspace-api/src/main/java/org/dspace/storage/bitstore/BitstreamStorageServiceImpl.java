@@ -304,9 +304,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                 if (commitCounter % 100 == 0) {
                     context.dispatchEvents();
                     // Commit actual changes to DB after dispatch events
-                    System.out.print("Committing changes to the database...");
+                    System.out.print("Performing incremental commit to the database...");
                     context.commit();
-                    System.out.println(" Done!");
+                    System.out.println(" Incremental commit done!");
                 }
 
                 context.uncacheEntity(bitstream);
