@@ -162,6 +162,13 @@
             <type>submission-form</type>
         </step-definition>
 
+        <!-- New step for show / mint identifiers -->
+        <step-definition id="identifiers">
+            <heading>submit.progressbar.identifiers</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
+            <type>identifiers</type>
+        </step-definition>
+
         <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
         <step-definition id="sample">
             <heading>Sample</heading>
@@ -193,6 +200,8 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
+
+            <step id="identifiers"/>
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
