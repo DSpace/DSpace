@@ -10,13 +10,13 @@ package org.dspace.subscriptions.objectupdates;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.eperson.FrequencyType;
 import org.dspace.subscriptions.service.DSpaceObjectUpdates;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,9 +36,9 @@ public class CommunityUpdates implements DSpaceObjectUpdates {
     public List<IndexableObject> findUpdates(Context context, DSpaceObject dSpaceObject, String frequency)
             throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.addFilterQueries("search.resourcetype:" + Item.class.getSimpleName());
+        getDefaultFilterQueries().stream().forEach(fq -> discoverQuery.addFilterQueries(fq));
         discoverQuery.addFilterQueries("location.comm:(" + dSpaceObject.getID() + ")");
-        discoverQuery.addFilterQueries("lastModified:" + this.findLastFrequency(frequency));
+        discoverQuery.addFilterQueries("lastModified:" + FrequencyType.findLastFrequency(frequency));
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         return discoverResult.getIndexableObjects();
     }
