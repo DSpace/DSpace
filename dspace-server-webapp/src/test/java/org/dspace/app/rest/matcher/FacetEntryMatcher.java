@@ -100,6 +100,19 @@ public class FacetEntryMatcher {
     }
 
     /**
+     *  Not the same as resourceTypeFacet. Used for ResourceType entity dc.type virtual metadata values.
+     */
+    public static Matcher<? super Object> resourceTypeNameFacet(boolean hasNext) {
+        return allOf(
+            hasJsonPath("$.name", is("resourceTypeName")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/resourceTypeName")),
+            hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/resourceTypeName"))
+        );
+    }
+
+    /**
      * Check that a facet over the dc.type exists and match the default configuration
      * 
      * @param b

@@ -369,6 +369,22 @@
                     <required></required>
                 </field>
             </row>
+            <!-- Use this field instead of the previous one for entity based publications types -->
+            <!-- <row>
+                <relation-field>
+                    <relationship-type>isResourceTypeOfPublication</relationship-type>
+                    <search-configuration>resourcetype</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Resource type</label>
+                    <hint>Select the resource type for this publication</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>type</dc-element>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <visibility>workflow</visibility>
+                </relation-field>
+            </row> -->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -818,6 +834,109 @@
             </row>
 
         </form>
+        
+       	
+       	<!-- Form which defines the metadata page/section for depositing new resource types Entities -->
+        <form name="resourceTypeStep">
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>name</dc-element>
+                    <repeatable>false</repeatable>
+                    <label>Resource type</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the name of the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>uri</dc-element>
+                    <repeatable>false</repeatable>
+                    <label>Resource type URI</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the URI of the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>definition</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Definition</label>
+                    <input-type>textarea</input-type>
+                    <hint>Enter the definition of the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>broaderConcepts</dc-element>
+                    <repeatable>false</repeatable>
+                    <label>Broader concepts</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the broader concepts of the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>narrowerConcepts</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Narrower concepts</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the narrower concepts of the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>relatedTerms</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Related terms</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the related terms of the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>preferredLabels</dc-element>
+                    <language value-pairs-name="common_iso_languages">true</language>
+                    <repeatable>true</repeatable>
+                    <label>Preferred labels</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the preferred labels for the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>resourcetypes</dc-schema>
+                    <dc-element>alternateLabels</dc-element>
+                    <language value-pairs-name="common_iso_languages">true</language>
+                    <repeatable>true</repeatable>
+                    <label>Alternate labels</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the alternate labels for the ressource type</hint>
+                </field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isResourceTypeOfPublication</relationship-type>
+                    <search-configuration>resourcetype</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Publications related to this resource type</label>
+                    <hint>Select publications related to this resource type.</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>title</dc-element>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                </relation-field>
+            </row>
+        </form>
+        
+        
 
         <!-- OpenAIRE specific forms -->
 

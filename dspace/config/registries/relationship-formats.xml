@@ -237,6 +237,18 @@
         <scope_note>Contains all uuids of PUBLICATIONS which link to the current ISSUE via a "latest" relationship. In other words, this stores all relationships pointing to the current ISSUE from any PUBLICATION, implying that the ISSUE is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>relation</schema>
+        <element>isResourceTypeOfPublication</element>
+        <scope_note>Contains all uuids of the "latest" RESOURCETYPE that the current PUBLICATION links to via a relationship. In other words, this stores all relationships pointing from the current PUBLICATION to any RESOURCETYPE where the RESOURCETYPE is marked as "latest". Internally used by DSpace. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isResourceTypeOfPublication</element>
+        <qualifier>latestForDiscovery</qualifier>
+        <scope_note>Contains all uuids of RESOURCETYPE which link to the current RESOURCETYPE via a "latest" relationship. In other words, this stores all relationships pointing to the current PUBLICATION from any RESOURCETYPE, implying that the PUBLICATION is marked as "latest". Internally used by DSpace to support versioning. Do not manually add, remove or edit values.</scope_note>
+    </dc-type>
+
     <!-- OpenAIRE4 Guidelines - required relationships -->
 
     <dc-type>

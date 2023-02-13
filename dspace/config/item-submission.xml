@@ -46,6 +46,7 @@
         <name-map collection-handle="123456789/28" submission-name="Journal"/>
         <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
         <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
+        <name-map collection-handle="123456789/1209" submission-name="ResourceType" />
         -->
     </submission-map>
 
@@ -125,6 +126,11 @@
             <type>submission-form</type>
         </step-definition>
         <step-definition id="journalIssueStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="resourceTypeStep" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -344,6 +350,15 @@
             <step id="journalIssueStep"/>
             <step id="upload"/>
             <step id="license"/>
+        </submission-process>
+        
+        <!--
+        Submission Process for 'ResourceType' Entities
+        To enable: create a collection for ResourceType and add it to the <submission-map> tag linking to this process
+         -->
+        <submission-process name="ResourceType">
+            <step id="collection" />
+            <step id="resourceTypeStep" />
         </submission-process>
 
         <!-- OpenAIRE submission processes -->

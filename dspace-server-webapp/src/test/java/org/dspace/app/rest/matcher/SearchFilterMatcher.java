@@ -156,4 +156,31 @@ public class SearchFilterMatcher {
             checkOperators()
         );
     }
+    public static Matcher<? super Object> resourceTypeNameFilter() {
+        return allOf(
+            hasJsonPath("$.filter", is("resourceTypeName")),
+            hasJsonPath("$.hasFacets", is(true)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+    public static Matcher<? super Object> isResourceTypeOfPublication() {
+        return allOf(
+            hasJsonPath("$.filter", is("isResourceTypeOfPublication")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
+    public static Matcher<? super Object> isPublicationOfResourceType() {
+        return allOf(
+            hasJsonPath("$.filter", is("isPublicationOfResourceType")),
+            hasJsonPath("$.hasFacets", is(false)),
+            hasJsonPath("$.type", is("text")),
+            hasJsonPath("$.openByDefault", is(false)),
+            checkOperators()
+        );
+    }
 }

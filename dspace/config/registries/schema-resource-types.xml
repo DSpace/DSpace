@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<dspace-dc-types>
+
+  <dspace-header>
+      <title>Metadata fields registry for the resource type entity of publications</title>
+  </dspace-header>
+
+  <dc-schema>
+    <name>resourcetypes</name>
+    <namespace>https://schema.org/Resource</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>name</element>
+    <qualifier></qualifier>
+    <scope_note>Resource type</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>uri</element>
+    <qualifier></qualifier>
+    <scope_note>Resource type URI</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>definition</element>
+    <qualifier></qualifier>
+    <scope_note>Definition</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>broaderConcepts</element>
+    <qualifier></qualifier>
+    <scope_note>Broader concepts</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>narrowerConcepts</element>
+    <qualifier></qualifier>
+    <scope_note>Narrower concepts</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>relatedTerms</element>
+    <qualifier></qualifier>
+    <scope_note>Related terms</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>preferredLabels</element>
+    <qualifier></qualifier>
+    <scope_note>Preferred labels</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>resourcetypes</schema>
+    <element>alternateLabels</element>
+    <qualifier></qualifier>
+    <scope_note>Alternate labels</scope_note>
+  </dc-type>
+
+</dspace-dc-types>
