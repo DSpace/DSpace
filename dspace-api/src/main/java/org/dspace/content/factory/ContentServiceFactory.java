@@ -33,6 +33,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
@@ -75,6 +76,8 @@ public abstract class ContentServiceFactory {
 
     public abstract SiteService getSiteService();
 
+    public abstract SubscribeService getSubscribeService();
+
     /**
      * Return the implementation of the RelationshipTypeService interface
      *
@@ -114,11 +117,7 @@ public abstract class ContentServiceFactory {
     }
 
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(T dso) {
-        // No need to worry when supressing, as long as our "getDSpaceObjectManager" method is properly implemented
-        // no casting issues should occur
-        @SuppressWarnings("unchecked")
-        DSpaceObjectService<T> manager = getDSpaceObjectService(dso.getType());
-        return manager;
+        return getDSpaceObjectService(dso.getType());
     }
 
     @SuppressWarnings("unchecked")
