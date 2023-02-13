@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Michal Josífko
  * Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace) and modified by
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 
 @Component

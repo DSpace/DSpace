@@ -652,7 +652,7 @@ public class DCInput {
     /**
      * Class representing a Map of the ComplexDefinition object
      * Class is copied from UFAL/CLARIN-DSPACE (https://github.com/ufal/clarin-dspace) and modified by
-     * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+     * @author Milan Majchrak (milan.majchrak at dataquest.sk)
      */
     public static class ComplexDefinitions {
         /**
@@ -684,7 +684,7 @@ public class DCInput {
     /**
      * Class representing a complex input field - multiple lines in input form
      * Class is copied from UFAL/CLARIN-DSPACE (https://github.com/ufal/clarin-dspace) and modified by
-     * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+     * @author Milan Majchrak (milan.majchrak at dataquest.sk)
      */
     public static class ComplexDefinition {
         /**

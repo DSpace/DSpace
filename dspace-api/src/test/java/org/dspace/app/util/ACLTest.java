@@ -28,7 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * Test ACL for admin and user.
  *
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class ACLTest extends AbstractUnitTest {
 

@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * Unit Tests for class LocalMetadataTest
  *
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class LocalMetadataTest extends AbstractUnitTest {
 

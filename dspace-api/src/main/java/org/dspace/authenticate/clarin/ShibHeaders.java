@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
  *
  * Parses all headers in ctor.
  * Class is copied from UFAL/CLARIN-DSPACE (https://github.com/ufal/clarin-dspace) and modified by
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class ShibHeaders {
     // constants
