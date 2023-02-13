@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.6.1</version>
+    <version>7.2.1</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -19,15 +19,15 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.3.27</spring.version>
-        <spring-boot.version>2.7.12</spring-boot.version>
-        <spring-security.version>5.7.8</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.6.15.Final</hibernate.version>
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.6.0</postgresql.driver.version>
-        <solr.client.version>8.11.2</solr.client.version>
+        <spring.version>5.2.20.RELEASE</spring.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
+        <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>5.4.10.Final</hibernate.version>
+        <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.2.25</postgresql.driver.version>
+        <solr.client.version>8.8.1</solr.client.version>
 
-        <ehcache.version>3.4.0</ehcache.version>
+        <axiom.version>1.2.22</axiom.version>
         <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.13.4</jackson.version>
@@ -872,14 +872,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.6.1</version>
+                       <version>7.2.1</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.6.1</version>
+                       <version>7.2.1</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1030,69 +1030,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.6.1</version>
+                <version>7.2.1</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1227,6 +1227,12 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
                 <version>${spring.version}</version>
             </dependency>
 
@@ -1977,7 +1983,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>dspace-7.6.1</tag>
+        <tag>dspace-7.2.1</tag>
     </scm>
 
 
