@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Helper class for request headers.
  * Class is copied from UFAL/CLARIN-DSPACE (https://github.com/ufal/clarin-dspace) and modified by
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class Headers {
 

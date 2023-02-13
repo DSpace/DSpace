@@ -22,7 +22,7 @@ import org.dspace.handle.HandlePlugin;
  * Created by
  * @author okosarko on 13.10.15.
  * Modified by
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class Handle {
 

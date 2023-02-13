@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  *
  * @author Michal Josífko
  * Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace) and modified by
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 
 public class ACE {

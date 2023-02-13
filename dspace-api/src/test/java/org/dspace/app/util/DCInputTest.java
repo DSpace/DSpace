@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * Unit Tests for class DCInputTest
  *
- * @author Milan Majchrak (milan.majchrak at dataquest dot sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class DCInputTest extends AbstractUnitTest {
 
