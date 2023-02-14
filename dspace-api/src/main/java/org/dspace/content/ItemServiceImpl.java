@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -159,6 +161,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private ResearcherProfileService researcherProfileService;
+    @Autowired(required = true)
+    private RequestItemService requestItemService;
 
     @Autowired(required = true)
     protected SubscribeService subscribeService;
@@ -785,6 +789,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // remove version attached to the item
         removeVersion(context, item);
 
+        removeRequest(context, item);
+
         removeOrcidSynchronizationStuff(context, item);
 
         // Also delete the item if it appears in a harvested collection.
@@ -805,6 +811,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Finally remove item row
         itemDAO.delete(context, item);
+    }
+
+    protected void removeRequest(Context context, Item item) throws SQLException {
+        Iterator<RequestItem> requestItems = requestItemService.findByItem(context, item);
+        while (requestItems.hasNext()) {
+            RequestItem requestItem = requestItems.next();
+            requestItemService.delete(context, requestItem);
+        }
     }
 
     @Override
