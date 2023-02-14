@@ -67,5 +67,7 @@
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 
+    <bean class="org.dspace.supervision.dao.impl.SupervisionOrderDaoImpl"/>
+
 
 </beans>

@@ -23,7 +23,6 @@ import javax.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -82,9 +81,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
     private final List<Group> parentGroups = new ArrayList<>();
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "supervisorGroups")
-    private final List<WorkspaceItem> supervisedItems = new ArrayList<>();
 
     @Transient
     private boolean groupsChanged;
@@ -216,10 +212,6 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Override
     public Integer getLegacyId() {
         return legacyId;
-    }
-
-    public List<WorkspaceItem> getSupervisedItems() {
-        return supervisedItems;
     }
 
     /**

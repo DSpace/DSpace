@@ -94,5 +94,7 @@
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
+        <mapping class="org.dspace.supervision.SupervisionOrder"/>
+
     </session-factory>
 </hibernate-configuration>

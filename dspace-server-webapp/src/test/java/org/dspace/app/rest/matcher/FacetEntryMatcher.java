@@ -67,6 +67,17 @@ public class FacetEntryMatcher {
         );
     }
 
+    public static Matcher<? super Object> supervisedByFacet(boolean hasNext) {
+        return allOf(
+            hasJsonPath("$.name", is("supervisedBy")),
+            hasJsonPath("$.facetType", is("authority")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/supervisedBy")),
+            hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/supervisedBy"))
+
+        );
+    }
+
     public static Matcher<? super Object> dateIssuedFacet(boolean hasNext) {
         return allOf(
             hasJsonPath("$.name", is("dateIssued")),

@@ -55,4 +55,6 @@
     
     <bean id="orcidServiceFactory" class="org.dspace.orcid.factory.OrcidServiceFactoryImpl"/>
 
+    <bean id="supervisionOrderServiceFactory" class="org.dspace.supervision.factory.SupervisionOrderServiceFactoryImpl"/>
+
 </beans>

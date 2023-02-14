@@ -244,16 +244,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public List<WorkspaceItem> findAllSupervisedItems(Context context) throws SQLException {
-        return workspaceItemDAO.findWithSupervisedGroup(context);
-    }
-
-    @Override
-    public List<WorkspaceItem> findSupervisedItemsByEPerson(Context context, EPerson ePerson) throws SQLException {
-        return workspaceItemDAO.findBySupervisedGroupMember(context, ePerson);
-    }
-
-    @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         return workspaceItemDAO.findAll(context);
     }
@@ -299,10 +289,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
 
-        // Need to delete the epersongroup2workspaceitem row first since it refers
-        // to workspaceitem ID
-        workspaceItem.getSupervisorGroups().clear();
-
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         workspaceItemDAO.delete(context, workspaceItem);
@@ -337,14 +323,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
 
         //        deleteSubmitPermissions();
-
-        // Need to delete the workspaceitem row first since it refers
-        // to item ID
-        try {
-            workspaceItem.getSupervisorGroups().clear();
-        } catch (Exception e) {
-            log.error("failed to clear supervisor group", e);
-        }
 
         workspaceItemDAO.delete(context, workspaceItem);
 

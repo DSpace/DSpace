@@ -15,7 +15,6 @@ import java.util.Map;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.dspace.content.Collection;
@@ -26,8 +25,6 @@ import org.dspace.content.dao.WorkspaceItemDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.EPerson_;
-import org.dspace.eperson.Group;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the WorkspaceItem object.
@@ -112,33 +109,6 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
 
         return list(context, criteriaQuery, false, WorkspaceItem.class, limit, offset);
-    }
-
-    @Override
-    public List<WorkspaceItem> findWithSupervisedGroup(Context context) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
-        Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
-        criteriaQuery.select(workspaceItemRoot);
-        criteriaQuery.where(criteriaBuilder.isNotEmpty(workspaceItemRoot.get(WorkspaceItem_.supervisorGroups)));
-
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
-        criteriaQuery.orderBy(orderList);
-        return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
-    }
-
-    @Override
-    public List<WorkspaceItem> findBySupervisedGroupMember(Context context, EPerson ePerson) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
-        Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
-        Join<WorkspaceItem, Group> join = workspaceItemRoot.join("supervisorGroups");
-        Join<Group, EPerson> secondJoin = join.join("epeople");
-        criteriaQuery.select(workspaceItemRoot);
-        criteriaQuery.where(criteriaBuilder.equal(secondJoin.get(EPerson_.id), ePerson.getID()));
-        criteriaQuery.orderBy(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
-        return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
     }
 
     @Override
