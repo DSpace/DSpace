@@ -812,7 +812,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         Iterator<RequestItem> requestItems = requestItemService.findByItem(context, item);
         while (requestItems.hasNext()) {
             RequestItem requestItem = requestItems.next();
-            log.info("Remove Request Item: " + requestItem.getID());
             requestItemService.delete(context, requestItem);
         }
     }
