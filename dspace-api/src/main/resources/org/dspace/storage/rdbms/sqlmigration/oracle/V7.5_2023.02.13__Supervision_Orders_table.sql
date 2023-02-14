@@ -10,14 +10,14 @@
 -- Table to store supervision orders
 -------------------------------------------------------------------------------
 
-CREATE TABLE supervision_orders
+CREATE TABLE if NOT EXISTS supervision_orders
 (
   id INTEGER PRIMARY KEY,
   item_id UUID REFERENCES Item(uuid) ON DELETE CASCADE,
   eperson_group_id UUID REFERENCES epersongroup(uuid) ON DELETE CASCADE
 );
 
-CREATE SEQUENCE supervision_orders_seq;
+CREATE SEQUENCE if NOT EXISTS supervision_orders_seq;
 
 INSERT INTO supervision_orders (id, item_id, eperson_group_id)
 SELECT supervision_orders_seq.nextval AS id, w.item_id, e.uuid
