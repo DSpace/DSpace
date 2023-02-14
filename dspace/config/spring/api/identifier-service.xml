@@ -13,7 +13,7 @@
           scope="singleton"/>
 
       <!-- If you enabled versioning, you should use one of the versioned
-           handle identifier provider instead of the default one. 
+           handle identifier provider instead of the default one.
            The VersionedHandleIdentifierProvider creates a new versioned
            handle for every new version.
            -->
@@ -42,7 +42,7 @@
          a DOIConnector that handles all API calls to your DOI registration
          agency. Please configure a DOIConnector as well! -->
 
-    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI 
+    <!-- In order to mint DOIs with DSpace, get an agreement with a DOI
          registration agency,  take a look into dspace.cfg, and activate either
          the DOIIdentifierProvider or the VersionedDOIIdentifierProvider,
          depending on whether you have Item Level Versioning activated or not.
@@ -55,6 +55,7 @@
             ref="org.dspace.services.ConfigurationService" />
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
+        <property name="filter" ref="doi-filter" />
     </bean>
     -->
     <!--
@@ -78,11 +79,11 @@
             ref="org.dspace.services.ConfigurationService" />
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
-        <property name="filterService" ref="openaire_filter" />
+        <property name="filter" ref="doi-filter" />
     </bean>
     -->
 
-    
+
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency
          tells you to use the DataCite API directly, you can use the
@@ -105,9 +106,9 @@
 
     <!-- Provider to mint and register DOIs using EZID as the registrar.
     -->
-    <!-- 
+    <!--
          Set generateDataciteXML to true to send metadata in DataCite xml schema for EZID DOI mint requests.
-         When generateDataciteXML is enabled, EZIDIdentifierProvider uses 
+         When generateDataciteXML is enabled, EZIDIdentifierProvider uses
          dspace.cfg:crosswalk.dissemination.DataCite.stylesheet XSL configuration for metadata mapping
     -->
     <!-- Uncomment to enable DOI using EZID
