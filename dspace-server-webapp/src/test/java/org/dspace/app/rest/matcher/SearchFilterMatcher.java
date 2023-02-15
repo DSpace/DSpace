@@ -165,4 +165,24 @@ public class SearchFilterMatcher {
                 checkOperators()
         );
     }
+
+    public static Matcher<? super Object> clarinItemsLanguageFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("language")),
+                hasJsonPath("$.hasFacets", is(true)),
+                hasJsonPath("$.type", is("standard")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
+        );
+    }
+
+    public static Matcher<? super Object> clarinItemsCommunityFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("items_owning_community")),
+                hasJsonPath("$.hasFacets", is(true)),
+                hasJsonPath("$.type", is("standard")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
+        );
+    }
 }
