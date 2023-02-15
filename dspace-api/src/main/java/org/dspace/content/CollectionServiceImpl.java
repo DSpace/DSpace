@@ -736,7 +736,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                    collection.getID(), collection.getHandle(), getIdentifiers(context, collection)));
 
         // remove subscriptions - hmm, should this be in Subscription.java?
-        subscribeService.deleteByCollection(context, collection);
+        subscribeService.deleteByDspaceObject(context, collection);
 
         // Remove Template Item
         removeTemplateItem(context, collection);

@@ -2122,5 +2122,4 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             WorkflowItemBuilder.deleteWorkflowItem(idRef.get());
         }
     }
-
 }

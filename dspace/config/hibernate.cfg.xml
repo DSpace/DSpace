@@ -67,7 +67,7 @@
         <mapping class="org.dspace.eperson.Group2GroupCache"/>
         <mapping class="org.dspace.eperson.RegistrationData"/>
         <mapping class="org.dspace.eperson.Subscription"/>
-
+        <mapping class="org.dspace.eperson.SubscriptionParameter"/>
         <mapping class="org.dspace.handle.Handle"/>
 
         <mapping class="org.dspace.harvest.HarvestedCollection"/>
@@ -93,6 +93,8 @@
         <mapping class="org.dspace.orcid.OrcidQueue" />
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
+
+        <mapping class="org.dspace.supervision.SupervisionOrder"/>
 
     </session-factory>
 </hibernate-configuration>

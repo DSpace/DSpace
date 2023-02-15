@@ -41,6 +41,7 @@
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.SubscriptionParameterDAOImpl"/>
 
     <bean class="org.dspace.handle.dao.impl.HandleDAOImpl"/>
 
@@ -65,6 +66,8 @@
  	
     <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
     <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
+
+    <bean class="org.dspace.supervision.dao.impl.SupervisionOrderDaoImpl"/>
 
 
 </beans>
