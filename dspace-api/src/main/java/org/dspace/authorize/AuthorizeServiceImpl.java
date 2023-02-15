@@ -524,6 +524,15 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Override
+    public void replaceAllPolicies(Context context, DSpaceObject source, DSpaceObject dest)
+            throws SQLException, AuthorizeException {
+        // find all policies for the source object
+        List<ResourcePolicy> policies = getPolicies(context, source);
+        removeAllPolicies(context, dest);
+        addPolicies(context, policies, dest);
+    }
+
+    @Override
     public void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
         throws SQLException, AuthorizeException {
         List<ResourcePolicy> rps = getPoliciesActionFilter(context, dso, fromAction);
