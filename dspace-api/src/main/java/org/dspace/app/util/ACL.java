@@ -23,7 +23,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.springframework.stereotype.Component;
 
 /**
  * Class that represents Access Control List
@@ -32,8 +31,6 @@ import org.springframework.stereotype.Component;
  * Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace) and modified by
  * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
-
-@Component
 public class ACL {
 
     /** Logger */
