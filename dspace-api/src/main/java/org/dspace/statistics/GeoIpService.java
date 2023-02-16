@@ -37,7 +37,7 @@ public class GeoIpService {
     public DatabaseReader getDatabaseReader() throws IllegalStateException {
         String dbPath = configurationService.getProperty("usage-statistics.dbfile");
         if (StringUtils.isBlank(dbPath)) {
-            throw new IllegalStateException("The required 'dbfile' configuration is missing in usage-statistics.cfg!");
+            throw new IllegalStateException("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
         }
 
         try {
@@ -45,13 +45,13 @@ public class GeoIpService {
             return new DatabaseReader.Builder(dbFile).build();
         } catch (FileNotFoundException fe) {
             throw new IllegalStateException(
-                "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
-                    "based reports! Please see the DSpace installation instructions for instructions to install " +
-                    "this file.",fe);
+                    "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
+                        "based reports! Please see the DSpace installation instructions for instructions to install " +
+                        "this file.",fe);
         } catch (IOException e) {
             throw new IllegalStateException(
-                "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
-                    "DSpace installation instructions for more details.", e);
+                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
+                        "DSpace installation instructions for more details.", e);
         }
     }
 }
