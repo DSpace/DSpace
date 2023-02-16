@@ -700,12 +700,14 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             // `dc.rights`
             List<MetadataValue> dcRights =
                     itemService.getMetadata(newItem, "dc", "rights", null, Item.ANY);
-            if (CollectionUtils.isEmpty(dcRights) && Objects.nonNull(dcRights.get(0))) {
+            if (CollectionUtils.isEmpty(dcRights) || Objects.isNull(dcRights.get(0))) {
+                log.error("Item doesn't have the Clarin License name in the metadata `dc.rights`.");
                 continue;
             }
 
             final String licenseName = dcRights.get(0).getValue();
             if (Objects.isNull(licenseName)) {
+                log.error("License name loaded from the `dc.rights` is null.");
                 continue;
             }
 
