@@ -227,8 +227,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Create a table row
         EPerson e = ePersonDAO.create(context, new EPerson());
 
-        log.info(LogHelper.getHeader(context, "create_eperson", "eperson_id="
-                + e.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_eperson", "eperson_id=" + e.getID()));
+        }
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
                 null, getIdentifiers(context, e)));
@@ -394,8 +395,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Remove ourself
         ePersonDAO.delete(context, ePerson);
 
-        log.info(LogHelper.getHeader(context, "delete_eperson",
-                "eperson_id=" + ePerson.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_eperson", "eperson_id=" + ePerson.getID()));
+        }
     }
 
     private Set<Group> getAllWorkFlowGroups(Context context, EPerson ePerson) throws SQLException {
@@ -495,8 +497,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         ePersonDAO.save(context, ePerson);
 
-        log.info(LogHelper.getHeader(context, "update_eperson",
-                "eperson_id=" + ePerson.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_eperson", "eperson_id=" + ePerson.getID()));
+        }
 
         if (ePerson.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.EPERSON,

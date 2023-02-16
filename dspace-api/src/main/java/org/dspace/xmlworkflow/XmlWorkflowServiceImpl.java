@@ -317,22 +317,26 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // current step cannot be completed and we must exit immediately.
         if (!xmlWorkflowCuratorService.doCuration(context, wfi)) {
             // don't proceed - either curation tasks queued, or item rejected
-            log.info(LogHelper.getHeader(context, "start_workflow",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "start_workflow",
                     "workflow_item_id=" + wfi.getID()
                             + ",item_id=" + wfi.getItem().getID()
                             + ",collection_id=" + wfi.getCollection().getID()
                             + ",current_action=" + firstActionConfig.getId()
                             + ",doCuration=false"));
+            }
             return;
         }
 
         // Activate the step.
         firstActionConfig.getProcessingAction().activate(context, wfi);
-        log.info(LogHelper.getHeader(context, "start_workflow",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "start_workflow",
                 firstActionConfig.getProcessingAction()
                         + " workflow_item_id=" + wfi.getID()
                         + "item_id=" + wfi.getItem().getID()
                         + "collection_id=" + wfi.getCollection().getID()));
+        }
 
         // record the start of the workflow w/provenance message
         recordStart(context, wfi.getItem(), firstActionConfig.getProcessingAction());
@@ -366,12 +370,14 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // current step cannot be completed and we must exit immediately.
         if (!xmlWorkflowCuratorService.doCuration(c, wi)) {
             // don't proceed - either curation tasks queued, or item rejected
-            log.info(LogHelper.getHeader(c, "advance_workflow",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(c, "advance_workflow",
                     "workflow_item_id=" + wi.getID()
                             + ",item_id=" + wi.getItem().getID()
                             + ",collection_id=" + wi.getCollection().getID()
                             + ",current_action=" + currentActionConfig.getId()
                             + ",doCuration=false"));
+            }
             return currentActionConfig;
         }
 
@@ -615,9 +621,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // Remove (if any) the workflowItemroles for this item
         workflowItemRoleService.deleteForWorkflowItem(context, wfi);
 
-        log.info(LogHelper.getHeader(context, "archive_item", "workflow_item_id="
-            + wfi.getID() + "item_id=" + item.getID() + "collection_id="
-            + collection.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "archive_item", "workflow_item_id="
+                + wfi.getID() + "item_id=" + item.getID() + "collection_id="
+                + collection.getID()));
+        }
 
         installItemService.installItem(context, wfi);
 
@@ -630,8 +638,10 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         itemService.update(context, item);
 
         // Log the event
-        log.info(LogHelper.getHeader(context, "install_item", "workflow_item_id="
-            + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "install_item", "workflow_item_id="
+                + wfi.getID() + ", item_id=" + item.getID() + "handle=FIXME"));
+        }
 
         return item;
     }
@@ -981,10 +991,12 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         xmlWorkflowItemService.deleteWrapper(context, wi);
         // Now delete the item
         itemService.delete(context, myitem);
-        log.info(LogHelper.getHeader(context, "delete_workflow", "workflow_item_id="
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_workflow", "workflow_item_id="
                 + workflowID + "item_id=" + itemID
                 + "collection_id=" + collID + "eperson_id="
                 + e.getID()));
+        }
         context.restoreAuthSystemState();
     }
 
@@ -1040,10 +1052,12 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
         // notify that it's been rejected
         notifyOfReject(context, wi, e, rejection_message);
-        log.info(LogHelper.getHeader(context, "reject_workflow", "workflow_item_id="
-            + wi.getID() + "item_id=" + wi.getItem().getID()
-            + "collection_id=" + wi.getCollection().getID() + "eperson_id="
-            + e.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "reject_workflow", "workflow_item_id="
+                + wi.getID() + "item_id=" + wi.getItem().getID()
+                + "collection_id=" + wi.getCollection().getID() + "eperson_id="
+                + e.getID()));
+        }
 
         logWorkflowEvent(context, workflowID, currentStepId, currentActionConfigId, wi, e, null, null);
 
@@ -1064,10 +1078,12 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(c, wi);
 
-        log.info(LogHelper.getHeader(c, "abort_workflow", "workflow_item_id="
-            + wi.getID() + "item_id=" + wsi.getItem().getID()
-            + "collection_id=" + wi.getCollection().getID() + "eperson_id="
-            + e.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(c, "abort_workflow", "workflow_item_id="
+                + wi.getID() + "item_id=" + wsi.getItem().getID()
+                + "collection_id=" + wi.getCollection().getID() + "eperson_id="
+                + e.getID()));
+        }
 
         c.addEvent(new Event(Event.MODIFY, Constants.ITEM, wsi.getItem().getID(), null,
                 itemService.getIdentifiers(c, wsi.getItem())));
@@ -1162,9 +1178,11 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         workspaceItemService.update(c, workspaceItem);
 
         //myitem.update();
-        log.info(LogHelper.getHeader(c, "return_to_workspace",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(c, "return_to_workspace",
                                       "workflow_item_id=" + wfi.getID() + "workspace_item_id="
                                           + workspaceItem.getID()));
+        }
 
         // Now remove the workflow object manually from the database
         xmlWorkflowItemService.deleteWrapper(c, wfi);

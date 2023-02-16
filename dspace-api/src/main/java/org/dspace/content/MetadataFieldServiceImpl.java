@@ -83,8 +83,10 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         metadataField = metadataFieldDAO.create(context, metadataField);
         metadataFieldDAO.save(context, metadataField);
 
-        log.info(LogHelper.getHeader(context, "create_metadata_field",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_metadata_field",
                                       "metadata_field_id=" + metadataField.getID()));
+        }
         // Update the index of type metadatafield
         this.triggerEventToUpdateIndex(context, metadataField.getID());
         return metadataField;
@@ -155,10 +157,11 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
 
         metadataFieldDAO.save(context, metadataField);
 
-        log.info(LogHelper.getHeader(context, "update_metadatafieldregistry",
-                                      "metadata_field_id=" + metadataField.getID() + "element=" + metadataField
-                                          .getElement()
-                                          + "qualifier=" + metadataField.getQualifier()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_metadatafieldregistry",
+                "metadata_field_id=" + metadataField.getID() + "element=" + metadataField.getElement()
+                    + "qualifier=" + metadataField.getQualifier()));
+        }
         // Update the index of type metadatafield
         this.triggerEventToUpdateIndex(context, metadataField.getID());
     }
@@ -187,8 +190,10 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
                 .toString() + " cannot be deleted as it is currently used by one or more objects.");
         }
 
-        log.info(LogHelper.getHeader(context, "delete_metadata_field",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_metadata_field",
                                       "metadata_field_id=" + metadataField.getID()));
+        }
         // Update the index of type metadatafield
         this.triggerEventToUpdateIndex(context, metadataField.getID());
     }

@@ -74,9 +74,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
         metadataSchema.setNamespace(namespace);
         metadataSchema.setName(name);
         metadataSchemaDAO.save(context, metadataSchema);
-        log.info(LogHelper.getHeader(context, "create_metadata_schema",
-                                      "metadata_schema_id="
-                                          + metadataSchema.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_metadata_schema",
+                                      "metadata_schema_id=" + metadataSchema.getID()));
+        }
         return metadataSchema;
     }
 
@@ -106,9 +107,11 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
                                                      + " unique");
         }
         metadataSchemaDAO.save(context, metadataSchema);
-        log.info(LogHelper.getHeader(context, "update_metadata_schema",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_metadata_schema",
                                       "metadata_schema_id=" + metadataSchema.getID() + "namespace="
                                           + metadataSchema.getNamespace() + "name=" + metadataSchema.getName()));
+        }
     }
 
     @Override
@@ -125,8 +128,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
 
         metadataSchemaDAO.delete(context, metadataSchema);
 
-        log.info(LogHelper.getHeader(context, "delete_metadata_schema",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_metadata_schema",
                 "metadata_schema_id=" + metadataSchema.getID()));
+        }
     }
 
     @Override

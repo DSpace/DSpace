@@ -81,7 +81,9 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
                 referrer = "unknown";
             }
         }
-        logger.info(message + " originated from " + referrer);
+        if (isBeforeRequestLoggingEnabled()) {
+            logger.info(message + " originated from " + referrer);
+        }
     }
 
     @Override
@@ -90,6 +92,10 @@ public class DSpaceAPIRequestLoggingFilter extends AbstractRequestLoggingFilter 
             logger.info(message);
         }
         ThreadContext.clearAll();
+    }
+
+    private boolean isBeforeRequestLoggingEnabled() {
+        return configurationService.getBooleanProperty("logging.server.include-before-request");
     }
 
     private boolean isAfterRequestLoggingEnabled() {

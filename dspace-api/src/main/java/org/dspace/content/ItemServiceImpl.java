@@ -244,9 +244,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
         workspaceItem.setItem(item);
 
-
-        log.info(LogHelper.getHeader(context, "create_item", "item_id="
-                + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
+        }
 
         return item;
     }
@@ -263,9 +263,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             collection.setTemplateItem(template);
             template.setTemplateItemOf(collection);
 
-            log.info(LogHelper.getHeader(context, "create_template_item",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "create_template_item",
                                           "collection_id=" + collection.getID() + ",template_item_id="
                                               + template.getID()));
+            }
 
             return template;
         } else {
@@ -405,8 +407,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Check authorisation
         authorizeService.authorizeAction(context, item, Constants.ADD);
 
-        log.info(LogHelper.getHeader(context, "add_bundle", "item_id="
-            + item.getID() + ",bundle_id=" + bundle.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "add_bundle", "item_id=" + item.getID()
+                + ",bundle_id=" + bundle.getID()));
+        }
 
         // Check it's not already there
         if (item.getBundles().contains(bundle)) {
@@ -433,8 +437,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Check authorisation
         authorizeService.authorizeAction(context, item, Constants.REMOVE);
 
-        log.info(LogHelper.getHeader(context, "remove_bundle", "item_id="
-            + item.getID() + ",bundle_id=" + bundle.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "remove_bundle", "item_id="
+                + item.getID() + ",bundle_id=" + bundle.getID()));
+        }
 
         context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
                                    Constants.BUNDLE, bundle.getID(), bundle.getName(), getIdentifiers(context, item)));
@@ -502,7 +508,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.CREATE, Constants.ITEM, item.getID(),
                 null, getIdentifiers(context, item)));
 
-        log.info(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_item", "item_id=" + item.getID()));
+        }
 
         return item;
     }
@@ -579,8 +587,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.authorizeAction(context, item, Constants.WRITE);
         }
 
-        log.info(LogHelper.getHeader(context, "update_item", "item_id="
-            + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_item", "item_id=" + item.getID()));
+        }
 
         super.update(context, item);
 
@@ -683,9 +692,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             }
         }
 
-        // Write log
-        log.info(LogHelper.getHeader(context, "withdraw_item", "user="
-            + e.getEmail() + ",item_id=" + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "withdraw_item", "user="
+                + e.getEmail() + ",item_id=" + item.getID()));
+        }
     }
 
     @Override
@@ -749,9 +759,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             }
         }
 
-        // Write log
-        log.info(LogHelper.getHeader(context, "reinstate_item", "user="
-            + e.getEmail() + ",item_id=" + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "reinstate_item", "user="
+                + e.getEmail() + ",item_id=" + item.getID()));
+        }
     }
 
     @Override
@@ -771,8 +782,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         context.addEvent(new Event(Event.DELETE, Constants.ITEM, item.getID(),
                                    item.getHandle(), getIdentifiers(context, item)));
 
-        log.info(LogHelper.getHeader(context, "delete_item", "item_id="
-            + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_item", "item_id=" + item.getID()));
+        }
+
         //remove subscription related with it
         subscribeService.deleteByDspaceObject(context, item);
         // Remove relationships
@@ -838,8 +851,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         bundleService.delete(context, b);
 
-        log.info(LogHelper.getHeader(context, "remove_bundle", "item_id="
-            + item.getID() + ",bundle_id=" + b.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "remove_bundle", "item_id="
+                + item.getID() + ",bundle_id=" + b.getID()));
+        }
+
         context
             .addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, b.getID(), b.getName()));
     }
@@ -909,8 +925,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         adjustItemPolicies(context, item, collection);
         adjustBundleBitstreamPolicies(context, item, collection);
 
-        log.debug(LogHelper.getHeader(context, "item_inheritCollectionDefaultPolicies",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "item_inheritCollectionDefaultPolicies",
                                        "item_id=" + item.getID()));
+        }
     }
 
     @Override
@@ -1007,16 +1025,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // If we are moving from the owning collection, update that too
         if (isOwningCollection(item, from)) {
             // Update the owning collection
-            log.info(LogHelper.getHeader(context, "move_item",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "move_item",
                                           "item_id=" + item.getID() + ", from " +
                                               "collection_id=" + from.getID() + " to " +
                                               "collection_id=" + to.getID()));
+            }
             item.setOwningCollection(to);
 
             // If applicable, update the item policies
             if (inheritDefaultPolicies) {
-                log.info(LogHelper.getHeader(context, "move_item",
+                if (log.isDebugEnabled()) {
+                    log.debug(LogHelper.getHeader(context, "move_item",
                                               "Updating item with inherited policies"));
+                }
                 inheritCollectionDefaultPolicies(context, item, to);
             }
 
@@ -1465,7 +1487,9 @@ prevent the generation of resource policy entry values with null dspace_object a
                     return true;
                 }
             }
-            log.debug("item(" + item.getID() + ") " + item.getName() + " is unlisted.");
+            if (log.isDebugEnabled()) {
+                log.debug("item(" + item.getID() + ") " + item.getName() + " is unlisted.");
+            }
             return false;
         } catch (SQLException e) {
             log.error(e.getMessage());
@@ -1599,11 +1623,15 @@ prevent the generation of resource policy entry values with null dspace_object a
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
         if (!enableVirtualMetadata) {
-            log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
+            if (log.isDebugEnabled()) {
+                log.debug("Called getMetadata for " + item.getID() + " without enableVirtualMetadata");
+            }
             return super.getMetadata(item, schema, element, qualifier, lang);
         }
         if (item.isModifiedMetadataCache()) {
-            log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
+            if (log.isDebugEnabled()) {
+                log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
+            }
             //rebuild cache
             List<MetadataValue> dbMetadataValues = item.getMetadata();
 
@@ -1614,7 +1642,9 @@ prevent the generation of resource policy entry values with null dspace_object a
             item.setCachedMetadata(sortMetadataValueList(fullMetadataValueList));
         }
 
-        log.debug("Called getMetadata for " + item.getID() + " based on cache");
+        if (log.isDebugEnabled()) {
+            log.debug("Called getMetadata for " + item.getID() + " based on cache");
+        }
         // Build up list of matching values based on the cache
         List<MetadataValue> values = new ArrayList<>();
         for (MetadataValue dcv : item.getCachedMetadata()) {

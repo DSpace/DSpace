@@ -202,7 +202,7 @@ public class PasswordAuthentication
         throws SQLException {
         if (username != null && password != null) {
             EPerson eperson = null;
-            log.info(LogHelper.getHeader(context, "authenticate", "attempting password auth of user=" + username));
+            log.debug(LogHelper.getHeader(context, "authenticate", "attempting password auth of user=" + username));
             eperson = EPersonServiceFactory.getInstance().getEPersonService()
                                            .findByEmail(context, username.toLowerCase());
 

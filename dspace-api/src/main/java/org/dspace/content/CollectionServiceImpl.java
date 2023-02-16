@@ -181,9 +181,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 newCollection.getID(), newCollection.getHandle(),
                 getIdentifiers(context, newCollection)));
 
-        log.info(LogHelper.getHeader(context, "create_collection",
-                "collection_id=" + newCollection.getID())
-                + ",handle=" + newCollection.getHandle());
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_collection",
+                "collection_id=" + newCollection.getID()) + ",handle=" + newCollection.getHandle());
+        }
 
         return newCollection;
     }
@@ -359,8 +360,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (is == null) {
             collection.setLogo(null);
-            log.info(LogHelper.getHeader(context, "remove_logo",
-                                          "collection_id=" + collection.getID()));
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "remove_logo", "collection_id=" + collection.getID()));
+            }
         } else {
             Bitstream newLogo = bitstreamService.create(context, is);
             collection.setLogo(newLogo);
@@ -371,9 +373,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 .getPoliciesActionFilter(context, collection, Constants.READ);
             authorizeService.addPolicies(context, policies, newLogo);
 
-            log.info(LogHelper.getHeader(context, "set_logo",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "set_logo",
                                           "collection_id=" + collection.getID() + "logo_bitstream_id="
                                               + newLogo.getID()));
+            }
         }
 
         collection.setModified();
@@ -587,9 +591,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             Item template = itemService.createTemplateItem(context, collection);
             collection.setTemplateItem(template);
 
-            log.info(LogHelper.getHeader(context, "create_template_item",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "create_template_item",
                                           "collection_id=" + collection.getID() + ",template_item_id="
                                               + template.getID()));
+            }
         }
     }
 
@@ -602,9 +608,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Item template = collection.getTemplateItem();
 
         if (template != null) {
-            log.info(LogHelper.getHeader(context, "remove_template_item",
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(context, "remove_template_item",
                                           "collection_id=" + collection.getID() + ",template_item_id="
                                               + template.getID()));
+            }
             // temporarily turn off auth system, we have already checked the permission on the top of the method
             // check it again will fail because we have already broken the relation between the collection and the item
             context.turnOffAuthorisationSystem();
@@ -622,8 +630,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.ADD);
 
-        log.info(LogHelper.getHeader(context, "add_item", "collection_id="
-            + collection.getID() + ",item_id=" + item.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "add_item", "collection_id="
+                + collection.getID() + ",item_id=" + item.getID()));
+        }
 
         // Create mapping
         // We do NOT add the item to the collection template since we would have to load in all our items
@@ -663,8 +673,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Check authorisation
         canEdit(context, collection, true);
 
-        log.info(LogHelper.getHeader(context, "update_collection",
-                                      "collection_id=" + collection.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_collection", "collection_id=" + collection.getID()));
+        }
 
         super.update(context, collection);
         collectionDAO.save(context, collection);
@@ -723,8 +734,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void delete(Context context, Collection collection) throws SQLException, AuthorizeException, IOException {
-        log.info(LogHelper.getHeader(context, "delete_collection",
-                                      "collection_id=" + collection.getID()));
+
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_collection", "collection_id=" + collection.getID()));
+        }
 
         // remove harvested collections.
         HarvestedCollection hc = harvestedCollectionService.find(context, collection);

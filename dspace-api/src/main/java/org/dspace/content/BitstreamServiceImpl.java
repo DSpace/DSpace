@@ -121,8 +121,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Store the bits
         UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
 
-        log.info(LogHelper.getHeader(context, "create_bitstream",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_bitstream",
                                       "bitstream_id=" + bitstreamID));
+        }
 
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
@@ -181,9 +183,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         bitstreamStorageService.register(
             context, bitstream, assetstore, bitstreamPath);
 
-        log.info(LogHelper.getHeader(context,
-                                      "create_bitstream",
-                                      "bitstream_id=" + bitstream.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_bitstream", "bitstream_id=" + bitstream.getID()));
+        }
 
         // Set the format to "unknown"
         setFormat(context, bitstream, null);
@@ -238,8 +240,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.WRITE);
 
-        log.info(LogHelper.getHeader(context, "update_bitstream",
-                                      "bitstream_id=" + bitstream.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_bitstream", "bitstream_id=" + bitstream.getID()));
+        }
+
         super.update(context, bitstream);
         if (bitstream.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null,
@@ -263,8 +267,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // changed to a check on delete
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
-        log.info(LogHelper.getHeader(context, "delete_bitstream",
-                                      "bitstream_id=" + bitstream.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_bitstream", "bitstream_id=" + bitstream.getID()));
+        }
 
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
                                    String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));

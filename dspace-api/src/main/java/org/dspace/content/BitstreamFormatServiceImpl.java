@@ -129,9 +129,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         BitstreamFormat bitstreamFormat = bitstreamFormatDAO.create(context, new BitstreamFormat());
 
 
-        log.info(LogHelper.getHeader(context, "create_bitstream_format",
-                                      "bitstream_format_id="
-                                          + bitstreamFormat.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_bitstream_format",
+                                      "bitstream_format_id="  + bitstreamFormat.getID()));
+        }
 
         return bitstreamFormat;
     }
@@ -189,8 +190,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
             }
 
             for (BitstreamFormat bitstreamFormat : bitstreamFormats) {
-                log.info(LogHelper.getHeader(context, "update_bitstream_format",
+                if (log.isDebugEnabled()) {
+                    log.debug(LogHelper.getHeader(context, "update_bitstream_format",
                                               "bitstream_format_id=" + bitstreamFormat.getID()));
+                }
 
                 bitstreamFormatDAO.save(context, bitstreamFormat);
             }
@@ -218,9 +221,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         // Delete this format from database
         bitstreamFormatDAO.delete(context, bitstreamFormat);
 
-        log.info(LogHelper.getHeader(context, "delete_bitstream_format",
-                                      "bitstream_format_id=" + bitstreamFormat.getID() + ",bitstreams_changed="
-                                          + numberChanged));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_bitstream_format",
+                "bitstream_format_id=" + bitstreamFormat.getID() + ",bitstreams_changed=" + numberChanged));
+        }
     }
 
     @Override
