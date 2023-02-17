@@ -160,7 +160,9 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterContentInOriginalBundle"/>
+                <!-- UMD Customization -->
+                <!-- <ref bean="searchFilterContentInOriginalBundle"/> -->
+                <!-- End UMD Customization -->
                 <ref bean="searchFilterEntityType"/>
             </list>
         </property>
@@ -725,7 +727,9 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterContentInOriginalBundle"/>
+                <!-- UMD Customization -->
+                <!-- <ref bean="searchFilterContentInOriginalBundle"/> -->
+                <!-- End UMD Customization-->
                 <ref bean="searchFilterEntityType"/>
             </list>
         </property>
@@ -2806,7 +2810,7 @@
         <property name="isOpenByDefault" value="false"/>
         <property name="pageSize" value="10"/>
     </bean>
-    
+
     <bean id="searchFilterKeyword" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="keyword"/>
         <property name="metadataFields">
@@ -2820,7 +2824,7 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
-    
+
     <bean id="searchFilterDepartment" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="department"/>
         <property name="metadataFields">
@@ -2832,7 +2836,7 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
-    
+
     <bean id="searchFilterAbstract" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="abstract"/>
         <property name="metadataFields">
@@ -2845,7 +2849,7 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
-    
+
     <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="language"/>
         <property name="metadataFields">
@@ -2857,7 +2861,7 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
-    
+
     <bean id="searchFilterAdvisor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="advisor"/>
         <property name="metadataFields">
