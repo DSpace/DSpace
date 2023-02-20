@@ -56,7 +56,7 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
 
     public static final String OPERATION_PATH_LICENSE_RESOURCE = "license";
 
-    public static final String OPERATION_PATH_LICENSE_GRANTED = "granted-license";
+    public static final String OPERATION_PATH_LICENSE_GRANTED = "granted";
 
     @Autowired
     ClarinLicenseService clarinLicenseService;
