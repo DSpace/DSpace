@@ -1,0 +1,26 @@
+# E-mail with a download link
+#
+# Parameters: {0} is expanded to filename
+#             {1} to a download URL 
+#             {2} to license url
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: ${lr.dspace.name.short}: Download instructions for {0}
+To download the file you have requested, please click the link below:
+ {1}
+  
+Remember, the file is distributed under specific license:
+ {2}
+
+If you have trouble downloading the file or if you did not request this download please contact
+${lr.help.mail} or call us at ${lr.help.phone}
+
+
+${lr.dspace.name.short} Team
+
+_____________________________________
+${dspace.name},
+WWW: ${dspace.url}
+Email: ${lr.help.mail}
+Tel.: ${lr.help.phone}
