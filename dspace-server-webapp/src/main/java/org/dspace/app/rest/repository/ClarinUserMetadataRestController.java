@@ -18,29 +18,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ClarinUserMetadataRest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseResourceMapping;
 import org.dspace.content.clarin.ClarinLicenseResourceUserAllowance;
 import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.content.clarin.ClarinUserRegistration;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceUserAllowanceService;
 import org.dspace.content.service.clarin.ClarinUserMetadataService;
 import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,6 +62,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + ClarinUserMetadataRest.CATEGORY + "/" + ClarinUserMetadataRest.NAME + "/" + "manage")
 public class ClarinUserMetadataRestController {
+    private static final Logger log = LoggerFactory.getLogger(ClarinUserMetadataRestController.class);
 
     public static final String CHECK_EMAIL_RESPONSE_CONTENT = "checkEmail";
 
@@ -62,12 +74,16 @@ public class ClarinUserMetadataRestController {
     ClarinLicenseResourceUserAllowanceService clarinLicenseResourceUserAllowanceService;
     @Autowired
     ClarinUserRegistrationService clarinUserRegistrationService;
+    @Autowired
+    BitstreamService bitstreamService;
+    @Autowired
+    ConfigurationService configurationService;
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON)
     @PreAuthorize("permitAll()")
     public ResponseEntity manageUserMetadata(@RequestParam("bitstreamUUID") UUID bitstreamUUID,
                                                      HttpServletRequest request)
-            throws SQLException, ParseException, IOException, AuthorizeException {
+            throws SQLException, ParseException, IOException, AuthorizeException, MessagingException {
 
         // Get context from the request
         Context context = obtainContext(request);
@@ -118,12 +134,75 @@ public class ClarinUserMetadataRestController {
         context.commit();
         if (shouldEmailToken) {
             // If yes - send token to e-mail
-            // @TODO send download token to e-mail
+            try {
+                this.sendEmailWithDownloadLink(context, bitstreamUUID, clarinLicenseResourceMapping,
+                        clarinUserMetadataRestList, downloadToken);
+            } catch (MessagingException e) {
+                throw new RuntimeException("Cannot send the download email because: " + e.getMessage());
+            }
+
             return ResponseEntity.ok().body(CHECK_EMAIL_RESPONSE_CONTENT);
         } else {
             // If no - send token in the response to download the bitstream immediately
             return ResponseEntity.ok().body(downloadToken);
         }
+    }
+
+    private void sendEmailWithDownloadLink(Context context, UUID bitstreamUUID,
+                                           ClarinLicenseResourceMapping clarinLicenseResourceMapping,
+                                           List<ClarinUserMetadataRest> clarinUserMetadataRestList,
+                                           String downloadToken)
+            throws IOException, SQLException, MessagingException {
+        // Get the recipient email
+        String email = getEmailFromUserMetadata(clarinUserMetadataRestList);
+        if (StringUtils.isBlank(email)) {
+            log.error("Cannot send email with download link because the email is empty.");
+            throw new BadRequestException("Cannot send email with download link because the email is empty.");
+        }
+
+        // Get the file name
+        Bitstream bitstream = bitstreamService.find(context, bitstreamUUID);
+        if (Objects.isNull(bitstream)) {
+            log.error("Cannot find bitstream with ID: " + bitstreamUUID);
+            throw new BadRequestException("Cannot find bitstream with ID: " + bitstreamUUID);
+        }
+
+        // Get Clarin License
+        ClarinLicense clarinLicense = getClarinLicense(context, bitstreamUUID, clarinLicenseResourceMapping);
+        if (Objects.isNull(clarinLicense)) {
+            log.error("Cannot find the clarin license for the bitstream with ID: " + bitstreamUUID);
+            throw new BadRequestException("Cannot find the clarin license for the bitstream with ID: " + bitstreamUUID);
+        }
+
+        // Compose download link
+        // Get UI url
+        String uiUrl = configurationService.getProperty("dspace.ui.url");
+        String downloadLink = uiUrl + "/" + BitstreamRest.PLURAL_NAME + "/" + bitstream.getID() + "/download?dtoken=" +
+                downloadToken;
+
+        try {
+            Locale locale = context.getCurrentLocale();
+            Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, "clarin_download_link"));
+            bean.addArgument(bitstream.getName());
+            bean.addArgument(downloadLink);
+            bean.addArgument(clarinLicense.getDefinition());
+            bean.addRecipient(email);
+            bean.send();
+        } catch (MessagingException e) {
+            log.error("Cannot send the email because: " + e.getMessage());
+            throw new MessagingException(e.getMessage());
+        }
+
+    }
+
+    private String getEmailFromUserMetadata(List<ClarinUserMetadataRest> clarinUserMetadataRestList) {
+        String email = "";
+        for (ClarinUserMetadataRest clarinUserMetadataRest : clarinUserMetadataRestList) {
+            if (StringUtils.equals(clarinUserMetadataRest.getMetadataKey(), SEND_TOKEN)) {
+                email = clarinUserMetadataRest.getMetadataValue();
+            }
+        }
+        return email;
     }
 
     public void processSignedInUser(Context context, EPerson currentUser,
