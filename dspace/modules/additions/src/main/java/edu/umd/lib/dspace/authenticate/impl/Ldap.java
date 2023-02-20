@@ -204,37 +204,50 @@ public class Ldap {
         List<String> l = getAttributeAll("umappointment");
 
         if (l != null) {
-            Iterator<String> i = l.iterator();
-
-            while (i.hasNext()) {
-                String strAppt = (String) i.next();
-                String strInst = strAppt.substring(0, 2);
-                String strCat = strAppt.substring(24, 26);
-                String strStatus = strAppt.substring(27, 28);
-
-                if ((strCat.equals("01") ||
-                        strCat.equals("02") ||
-                        strCat.equals("03") ||
-                        strCat.equals("15") ||
-                        strCat.equals("25") ||
-                        strCat.equals("36") ||
-                        strCat.equals("37") ||
-                        strCat.equals("EA"))
-                        &&
-                        (strStatus.equals("A") ||
-                                strStatus.equals("E") ||
-                                strStatus.equals("N") ||
-                                strStatus.equals("Q") ||
-                                strStatus.equals("T") ||
-                                strStatus.equals("F"))
-                        &&
-                        strInst.equals("01")) {
+            for (String umAppointment : l) {
+                if (isFaculty(umAppointment)) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Returns true if the given umAppointment string matches the criteria for
+     * a faculty member, false otherwise.
+     *
+     * @param umAppointment the LDAP "umAppointment" string to check
+     * @return true if the given umAppointment string matches the criteria for
+     * a faculty member, false otherwise.
+     */
+    protected boolean isFaculty(String umAppointment) {
+        String strInst = umAppointment.substring(0, 2);
+        String strCat = umAppointment.substring(24, 26);
+        String strStatus = umAppointment.substring(27, 28);
+
+        final List<String> facultyCategories = List.of(
+            "01", // Tenured Fac
+            "02", // Ten Trk Fac
+            "03", // NT-Term Fac
+            "15", // NT-Cont. Fac
+            "25", // Post-Doctoral Scholar
+            "36", // Hrly Faculty
+            "37", // NT-NonRg Fac
+            "EA"  // Not sure what it corresponds to, or if actually used.
+        );
+
+        final List<String> employmentStatuses = List.of(
+            "A", // Active
+            "Q", // non-paid
+            // If is unclear what the following correspond to, or if they
+            // are even still used
+            "E", "N", "T", "F"
+        );
+
+        return strInst.equals("01") && facultyCategories.contains(strCat) &&
+            employmentStatuses.contains(strStatus);
     }
 
     /**
