@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.dspace.app.rest.repository.ClarinLicenseRestRepository.OPERATION_PATH_LICENSE_GRANTED;
 import static org.dspace.app.rest.repository.ClarinLicenseRestRepository.OPERATION_PATH_LICENSE_RESOURCE;
 
 import java.io.File;
@@ -233,6 +234,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_LICENSE_RESOURCE.equals(path[0])) {
                 this.maintainLicensesForItem(context, source, op);
+                continue;
+            }
+            if (OPERATION_PATH_LICENSE_GRANTED.equals(path[0])) {
+                this.grantDistributionLicense(context, source, op);
                 continue;
             }
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
@@ -547,15 +552,44 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
         // Save changes to database
         itemService.update(context, item);
+    }
 
+    private void grantDistributionLicense(Context context, WorkspaceItem source, Operation op)
+            throws SQLException, AuthorizeException {
         // For Default License between user and repo
         EPerson submitter = context.getCurrentUser();
 
+        // Get item
+        Item item = source.getItem();
         try {
             // remove any existing DSpace license (just in case the user
             // accepted it previously)
             itemService.removeDSpaceLicense(context, item);
 
+            if (op instanceof ReplaceOperation) {
+                // It must be AddOperation
+                return;
+            }
+
+            if (op.getValue() instanceof String) {
+                log.error("Cannot set distribution license value because value is not string, it must be" +
+                        "'true' or 'false' wrapped into string.");
+                return;
+            }
+            String opValue = (String) op.getValue();
+
+            // Validate if OP value is 'true' or 'false'
+            if (!StringUtils.equalsAny("true", "false")) {
+                log.error("Operation value is not 'true' or 'false'.");
+                return;
+            }
+
+            // It is unsigned, do not continue for signing.
+            if (StringUtils.equals("false", opValue)) {
+                return;
+            }
+
+            // Sign the license
             String license = LicenseUtils.getLicenseText(context.getCurrentLocale(), source.getCollection(), item,
                     submitter);
 
