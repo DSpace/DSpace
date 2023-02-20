@@ -10,6 +10,8 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
@@ -20,6 +22,9 @@ import org.dspace.eperson.service.UnitService;
  * Class representing an LDAP result for a particular user
  */
 public class Ldap {
+    /** log4j category */
+    private static Logger log = LogManager.getLogger(Ldap.class);
+
     private String strUid;
     private SearchResult entry;
 
@@ -197,7 +202,7 @@ public class Ldap {
      * value.
      */
     public boolean isFaculty() throws NamingException {
-        if (strUid.equals("tstusr2")) {
+        if ("tstusr2".equals(strUid)) {
             return true;
         }
 
@@ -218,24 +223,34 @@ public class Ldap {
      * Returns true if the given umAppointment string matches the criteria for
      * a faculty member, false otherwise.
      *
-     * @param umAppointment the LDAP "umAppointment" string to check
+     * @param umAppointment the LDAP "umappointment" string to check
      * @return true if the given umAppointment string matches the criteria for
      * a faculty member, false otherwise.
      */
     protected boolean isFaculty(String umAppointment) {
-        String strInst = umAppointment.substring(0, 2);
-        String strCat = umAppointment.substring(24, 26);
-        String strStatus = umAppointment.substring(27, 28);
+
+        String[] components = umAppointment.split("\\$");
+        // Don't look for exactly 7 (or 8), because last term may be blank, and so not be present
+        if (components.length < 7) {
+            log.warn(
+                "The given umAppointment '{}' did not have the expected format",
+                umAppointment
+            );
+            return false;
+        }
+
+        String strInst = components[0]; // umInstitutionCode
+        String strCat = components[3]; // umCatStatus
+        String strStatus = components[4]; // EMP_STAT_CD
 
         final List<String> facultyCategories = List.of(
-            "01", // Tenured Fac
-            "02", // Ten Trk Fac
-            "03", // NT-Term Fac
-            "15", // NT-Cont. Fac
-            "25", // Post-Doctoral Scholar
-            "36", // Hrly Faculty
-            "37", // NT-NonRg Fac
-            "EA"  // Not sure what it corresponds to, or if actually used.
+            "Tenured Fac",
+            "Ten Trk Fac",
+            "NT-Term Fac",
+            "NT-Cont. Fac",
+            "Post-Doctoral Scholar",
+            "Hrly Faculty",
+            "NT-NonRg Fac"
         );
 
         final List<String> employmentStatuses = List.of(
@@ -246,7 +261,7 @@ public class Ldap {
             "E", "N", "T", "F"
         );
 
-        return strInst.equals("01") && facultyCategories.contains(strCat) &&
+        return "01".equals(strInst) && facultyCategories.contains(strCat) &&
             employmentStatuses.contains(strStatus);
     }
 
