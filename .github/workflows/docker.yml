@@ -170,3 +170,29 @@ jobs:
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build_cli.outputs.tags }}
           labels: ${{ steps.meta_build_cli.outputs.labels }}
+
+      ###########################################
+      # Build/Push the 'dspace/dspace-solr' image
+      ###########################################
+      # Get Metadata for docker_build_solr step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-solr' image
+        id: meta_build_solr
+        uses: docker/metadata-action@v4
+        with:
+          images: dspace/dspace-solr
+          tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
+
+      - name: Build and push 'dspace-solr' image
+        id: docker_build_solr
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./dspace/src/main/docker/dspace-solr/Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_solr.outputs.tags }}
+          labels: ${{ steps.meta_build_solr.outputs.labels }}
