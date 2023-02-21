@@ -9,31 +9,35 @@
 		<property name="metadata" value="bitstream-metadata" />
         <property name="options">
             <list>
-                <ref bean="openAccess"/>
+                <!-- UMD Customization -->
+                <!-- Commenting out to disable ability of user to set embargo -->
+                <!-- <ref bean="openAccess"/>
                 <ref bean="lease"/>
                 <ref bean="embargoed" />
-                <ref bean="administrator"/>
+                <ref bean="administrator"/> -->
+                <!-- End UMD Customization -->
                 <!-- <ref bean="networkAdministration"/> -->
             </list>
         </property>
     </bean>
 
-  <!-- Customization for LIBDRUM-684 -->
+  <!-- UMD Customization -->
   <bean id="uploadConfigurationOptional" class="org.dspace.submit.model.UploadConfiguration">
     <property name="name" value="upload"/>
     <property name="metadata" value="bitstream-metadata" />
     <property name="options">
       <list>
-          <ref bean="openAccess"/>
+          <!-- Commenting out to disable ability of user to set embargo -->
+          <!-- <ref bean="openAccess"/>
           <ref bean="lease"/>
           <ref bean="embargoed" />
-          <ref bean="administrator"/>
+          <ref bean="administrator"/> -->
            <!-- <ref bean="networkAdministration"/> -->
       </list>
     </property>
     <property name="required" value="false"/>
   </bean>
-  <!-- Customization for LIBDRUM-684 -->
+  <!-- UMD Customization -->
 
     <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
