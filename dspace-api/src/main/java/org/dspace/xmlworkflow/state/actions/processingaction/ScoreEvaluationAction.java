@@ -7,6 +7,9 @@
  */
 package org.dspace.xmlworkflow.state.actions.processingaction;
 
+import static org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction.REVIEW_FIELD;
+import static org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction.SCORE_FIELD;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,7 +22,6 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -37,6 +39,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class ScoreEvaluationAction extends ProcessingAction {
 
+    // Minimum aggregate of scores
     private int minimumAcceptanceScore;
 
     @Override
@@ -47,43 +50,64 @@ public class ScoreEvaluationAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
-        boolean hasPassed = false;
-        //Retrieve all our scores from the metadata & add em up
+        // Retrieve all our scores from the metadata & add em up
+        int scoreMean = getMeanScore(wfi);
+        //We have passed if we have at least gained our minimum score
+        boolean hasPassed = getMinimumAcceptanceScore() <= scoreMean;
+        //Whether or not we have passed, clear our score information
+        itemService.clearMetadata(c, wfi.getItem(), SCORE_FIELD.schema, SCORE_FIELD.element, SCORE_FIELD.qualifier,
+            Item.ANY);
+        if (hasPassed) {
+            this.addRatingInfoToProv(c, wfi, scoreMean);
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+        } else {
+            //We haven't passed, reject our item
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                .sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(), this.getProvenanceStartId(),
+                    "The item was reject due to a bad review score.");
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        }
+    }
+
+    private int getMeanScore(XmlWorkflowItem wfi) {
         List<MetadataValue> scores = itemService
-            .getMetadata(wfi.getItem(), WorkflowRequirementsService.WORKFLOW_SCHEMA, "score", null, Item.ANY);
+            .getMetadata(wfi.getItem(), SCORE_FIELD.schema, SCORE_FIELD.element, SCORE_FIELD.qualifier, Item.ANY);
+        int scoreMean = 0;
         if (0 < scores.size()) {
             int totalScoreCount = 0;
             for (MetadataValue score : scores) {
                 totalScoreCount += Integer.parseInt(score.getValue());
             }
-            int scoreMean = totalScoreCount / scores.size();
-            //We have passed if we have at least gained our minimum score
-            hasPassed = getMinimumAcceptanceScore() <= scoreMean;
-            //Wether or not we have passed, clear our score information
-            itemService
-                .clearMetadata(c, wfi.getItem(), WorkflowRequirementsService.WORKFLOW_SCHEMA, "score", null, Item.ANY);
+            scoreMean = totalScoreCount / scores.size();
+        }
+        return scoreMean;
+    }
 
-            String provDescription = getProvenanceStartId() + " Approved for entry into archive with a score of: " +
-                scoreMean;
-            itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(),
-                                    "description", "provenance", "en", provDescription);
-            itemService.update(c, wfi.getItem());
+    private void addRatingInfoToProv(Context c, XmlWorkflowItem wfi, int scoreMean)
+        throws SQLException, AuthorizeException {
+        StringBuilder provDescription = new StringBuilder();
+        provDescription.append(String.format("%s Approved for entry into archive with a score of: %s",
+            getProvenanceStartId(), scoreMean));
+        List<MetadataValue> reviews = itemService
+            .getMetadata(wfi.getItem(), REVIEW_FIELD.schema, REVIEW_FIELD.element, REVIEW_FIELD.qualifier, Item.ANY);
+        if (!reviews.isEmpty()) {
+            provDescription.append(" | Reviews: ");
         }
-        if (hasPassed) {
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        } else {
-            //We haven't passed, reject our item
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
-                                     .sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(),
-                                                                     this.getProvenanceStartId(),
-                                                                     "The item was reject due to a bad review score.");
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        for (MetadataValue review : reviews) {
+            provDescription.append(String.format("; %s", review.getValue()));
         }
+        c.turnOffAuthorisationSystem();
+        itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(),
+            "description", "provenance", "en", provDescription.toString());
+        itemService.update(c, wfi.getItem());
+        c.restoreAuthSystemState();
     }
 
     @Override
     public List<String> getOptions() {
-        return new ArrayList<>();
+        List<String> options = new ArrayList<>();
+        options.add(RETURN_TO_POOL);
+        return options;
     }
 
     public int getMinimumAcceptanceScore() {

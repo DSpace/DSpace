@@ -14,9 +14,17 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = WorkspaceItemRest.SUPERVISION_ORDERS,
+        method = "getSupervisionOrders"
+    )
+})
 public class WorkspaceItemRest extends AInprogressSubmissionRest {
     public static final String NAME = "workspaceitem";
     public static final String CATEGORY = RestAddressableModel.SUBMISSION;
+
+    public static final String SUPERVISION_ORDERS = "supervisionOrders";
 
     @Override
     public String getCategory() {

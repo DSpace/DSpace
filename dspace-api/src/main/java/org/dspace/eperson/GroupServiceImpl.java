@@ -480,9 +480,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(),
                                    group.getName(), getIdentifiers(context, group)));
 
-        //Remove the supervised group from any workspace items linked to us.
-        group.getSupervisedItems().clear();
-
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
 

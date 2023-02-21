@@ -64,6 +64,7 @@ import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.SupervisionOrderRest;
 import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
@@ -295,6 +296,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "supervisionorders")) {
+            return SupervisionOrderRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }

@@ -17,7 +17,6 @@ import org.dspace.core.Context;
  * used as sub-statements in other Filters and Operators.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public interface LogicalStatement {
     /**
