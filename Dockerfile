@@ -53,7 +53,7 @@ ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Expose Tomcat port and AJP port
-EXPOSE 8080 8009
+EXPOSE 8080 8009 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 
