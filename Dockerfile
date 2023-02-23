@@ -8,7 +8,7 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7.5 as build
+FROM dspace/dspace-dependencies:dspace-7_x as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
