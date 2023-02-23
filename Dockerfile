@@ -65,3 +65,6 @@ RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
 # Please note that server webapp should only run on one path at a time.
 #RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
 #    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+
+WORKDIR /usr/local/tomcat/bin
+RUN chmod u+x catalina_debug.sh catalina_orig.sh redebug.sh undebug.sh catalina.sh
