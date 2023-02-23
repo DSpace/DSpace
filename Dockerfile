@@ -8,7 +8,7 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM dspace/dspace-dependencies:dspace-7.5 as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -53,9 +53,9 @@ ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' containger to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Expose Tomcat port and AJP port
-EXPOSE 8080 8009
+EXPOSE 8085
 # Give java extra memory (2GB)
-ENV JAVA_OPTS=-Xmx2000m
+ENV JAVA_OPTS=-Xmx5000m
 
 # Link the DSpace 'server' webapp into Tomcat's webapps directory.
 # This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
