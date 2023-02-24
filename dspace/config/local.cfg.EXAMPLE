@@ -354,6 +354,14 @@ webui.itemlist.columns = thumbnail, dc.date.issued(date), dc.title, dc.contribut
 # LIBDRUM-481 - Disable request-copy feature
 request.item.type =
 
+####################
+# USAGE STATISTICS #
+####################
+# Override settings in dspace/config/modules/usage-statistics.cfg
+
+# Suppress "Statistics" menu entry in the navbar for non-admins
+usage-statistics.authorization.admin.usage=true
+
 #######################
 # OTHER CONFIGURATION #
 #######################
