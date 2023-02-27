@@ -51,8 +51,7 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh run
-  deploy:
-      mode: replicated
+  deploy:     
       restart_policy:
         condition: on-failure
       labels:
@@ -88,8 +87,7 @@ services:
     stdin_open: true
     tty: true
 
-    deploy:
-      mode: replicated
+    deploy:   
       restart_policy:
         condition: on-failure
       labels:
@@ -119,8 +117,7 @@ services:
     volumes:
     - pgdata:/pgdata
 
-    deploy:
-      mode: replicated
+    deploy: 
       restart_policy:
         condition: on-failure
       labels:
@@ -172,8 +169,7 @@ services:
       cp -r -u /opt/solr/server/solr/configsets/statistics/* statistics
       exec solr -f
 
-    deploy:
-      mode: replicated
+    deploy:   
       restart_policy:
         condition: on-failure
       labels:
