@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 m-40">
+      <h2>{{'subscriptions.title' | translate}}</h2>
+      <div class="row">
+        <div class="col-md-12 m-40">
+          <ds-themed-loading *ngIf="loading$ | async"></ds-themed-loading>
+          <ng-container *ngVar="(subscriptions$ | async) as subscriptions">
+
+            <ds-pagination *ngIf="subscriptions?.pageInfo?.totalElements > 0 && !(loading$ | async)"
+                           [paginationOptions]="config"
+                           [collectionSize]="subscriptions?.pageInfo?.totalElements"
+                           [hideGear]="true"
+                           [hidePagerWhenSinglePage]="true">
+              <div class="table-responsive">
+                <table id="formats" class="table table-striped table-hover" data-test="subscription-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50%" scope="col">{{'subscriptions.table.dso' | translate}}</th>
+                      <th scope="col">{{'subscriptions.table.subscription_type' | translate}}</th>
+                      <th scope="col">{{'subscriptions.table.subscription_frequency' | translate}}</th>
+                      <th scope="col">{{'subscriptions.table.action' | translate}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ds-subscription-view *ngFor="let subscription of subscriptions?.page"
+                                             [dso]="(subscription?.resource | async)?.payload"
+                                             [eperson]="(subscription?.eperson | async)?.payload?.id"
+                                             [subscription]="subscription"
+                                             (reload)="refresh()">
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </ds-pagination>
+
+            <ds-alert *ngIf="subscriptions?.pageInfo?.totalElements == 0 && !(loading$ | async)" [type]="'alert-info'" data-test="empty-alert">
+              {{ 'subscriptions.table.empty.message' | translate }}
+            </ds-alert>
+
+          </ng-container>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

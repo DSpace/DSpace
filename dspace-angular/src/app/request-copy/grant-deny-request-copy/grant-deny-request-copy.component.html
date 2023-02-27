@@ -1,0 +1,30 @@
+<div class="container" *ngVar="(itemRequestRD$ | async) as itemRequestRD">
+  <h3 class="mb-4">{{'grant-deny-request-copy.header' | translate}}</h3>
+  <div *ngIf="itemRequestRD && itemRequestRD.hasSucceeded">
+    <div *ngIf="!itemRequestRD.payload.decisionDate">
+      <p [innerHTML]="'grant-deny-request-copy.intro1' | translate:{ url: (itemUrl$ | async), name: (itemName$ | async) }"></p>
+      <p>{{'grant-deny-request-copy.intro2' | translate}}</p>
+
+      <div class="btn-group ">
+        <a [routerLink]="grantRoute$ | async"
+           class="btn btn-outline-primary"
+           title="{{'grant-deny-request-copy.grant' | translate }}">
+          {{'grant-deny-request-copy.grant' | translate }}
+        </a>
+
+        <a [routerLink]="denyRoute$ | async"
+           class="btn btn-outline-danger"
+           title="{{'grant-deny-request-copy.deny' | translate }}">
+          {{'grant-deny-request-copy.deny' | translate }}
+        </a>
+      </div>
+    </div>
+    <div *ngIf="itemRequestRD.payload.decisionDate" class="processed-message">
+      <p>{{'grant-deny-request-copy.processed' | translate}}</p>
+      <p class="text-center">
+        <a routerLink="/home" class="btn btn-primary">{{'grant-deny-request-copy.home-page' | translate}}</a>
+      </p>
+    </div>
+  </div>
+  <ds-themed-loading *ngIf="!itemRequestRD || itemRequestRD?.isLoading"></ds-themed-loading>
+</div>

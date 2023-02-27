@@ -1,0 +1,11 @@
+.content:not(.truncated) ~ button.expandButton {
+  display: none;
+}
+
+.btn:focus {
+  box-shadow: none !important;
+}
+
+.removeFaded.content::after {
+  display: none;
+}

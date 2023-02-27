@@ -1,0 +1,55 @@
+<div ng2FileDrop
+     *ngIf="(isOverDocumentDropZone | async)"
+     class="ds-document-drop-zone position-fixed h-100 w-100"
+     [class.ds-document-drop-zone-active]="(isOverDocumentDropZone | async)"
+     [uploader]="uploader"
+     (fileOver)="fileOverDocument($event)">
+</div>
+<div *ngIf="(isOverDocumentDropZone | async)"
+     class="ds-document-drop-zone-inner position-fixed h-100 w-100 p-2">
+  <div class="ds-document-drop-zone-inner-content position-relative d-flex flex-column justify-content-center text-center h-100 w-100">
+    <p class="text-primary">{{dropOverDocumentMsg | translate}}</p>
+  </div>
+</div>
+<div [attr.id]="uploaderId" class="row">
+  <div class="col-md-12">
+    <div ng2FileDrop
+         [ngClass]="{'ds-base-drop-zone-file-over': (isOverBaseDropZone | async)}"
+         [uploader]="uploader"
+         (fileOver)="fileOverBase($event)"
+         class="well ds-base-drop-zone mt-1 mb-3 text-muted">
+      <div class="text-center m-0 p-2 d-flex justify-content-center align-items-center" *ngIf="uploader?.queue?.length === 0">
+        <span>
+          <i class="fas fa-upload" aria-hidden="true"></i>
+          {{dropMsg | translate}}{{'uploader.or' | translate}}
+          <label for="inputFileUploader" class="btn btn-link m-0 p-0 ml-1" tabindex="0" (keyup.enter)="$event.stopImmediatePropagation(); fileInput.click()">
+            <span role="button" [attr.aria-label]="'uploader.browse' | translate">{{'uploader.browse' | translate}}</span>
+          </label>
+          <input #fileInput id="inputFileUploader" class="d-none" type="file" ng2FileSelect [uploader]="uploader" multiple tabindex="0" />
+        </span>
+      </div>
+      <div *ngIf="(isOverBaseDropZone | async) || uploader?.queue?.length !== 0">
+        <div class="m-1">
+          <div class="upload-item-top">
+            <span class="filename">
+              <span *ngIf="!uploader.options.disableMultipart">{{'uploader.queue-length' | translate}}: {{ uploader?.queue?.length }} | </span>{{ uploader?.queue[0]?.file.name }}
+            </span>
+            <div class="btn-group btn-group-sm float-right" role="group">
+              <button type="button" class="btn btn-danger" title="{{'uploader.delete.btn-title' | translate}}" (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
+                <i class="fas fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+            <span *ngIf="uploader.progress < 100 && !(uploader.progress === 0 && !uploader.options.autoUpload)" class="float-right mr-3">{{ uploader.progress }}%</span>
+            <span *ngIf="uploader.progress === 100" class="float-right mr-3">{{'uploader.processing' | translate}}</span>
+          </div>
+          <div class="ds-base-drop-zone-progress clearfix mt-2">
+            <div role="progressbar"
+                 style="height: 5px; width: 0;"
+                 [ngStyle]="{ 'width': uploader.progress + '%' }"
+                 [ngClass]="{'progress-bar': true, 'bg-success progress-bar-striped progress-bar-animated': uploader.progress === 100}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

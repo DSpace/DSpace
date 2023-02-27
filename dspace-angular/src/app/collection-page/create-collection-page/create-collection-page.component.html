@@ -1,0 +1,10 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12 pb-4">
+            <h2 id="sub-header" class="border-bottom pb-2">{{'collection.create.sub-head' | translate:{ parent: (parentRD$| async)?.payload.name } }}</h2>
+        </div>
+    </div>
+    <ds-collection-form (submitForm)="onSubmit($event)"
+                        (back)="navigateToHome()"
+                        (finish)="navigateToNewPage()"></ds-collection-form>
+</div>

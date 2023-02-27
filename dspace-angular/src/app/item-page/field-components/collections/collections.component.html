@@ -1,0 +1,21 @@
+<ds-metadata-field-wrapper [label]="label | translate">
+    <div class="collections">
+        <a *ngFor="let collection of (this.collections$ | async); let last=last;" [routerLink]="['/collections', collection.id]">
+            <span>{{collection?.name}}</span><span *ngIf="!last" [innerHTML]="separator"></span>
+        </a>
+    </div>
+
+    <div *ngIf="isLoading$ | async">
+        {{'item.page.collections.loading' | translate}}
+    </div>
+
+    <a
+        *ngIf="!(isLoading$ | async) && (hasMore$ | async)"
+        (click)="$event.preventDefault(); handleLoadMore()"
+        class="load-more-btn btn btn-sm btn-outline-secondary"
+        role="button"
+        href="javascript:void(0);"
+    >
+        {{'item.page.collections.load-more' | translate}}
+    </a>
+</ds-metadata-field-wrapper>

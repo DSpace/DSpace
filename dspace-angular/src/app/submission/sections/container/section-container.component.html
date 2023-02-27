@@ -1,0 +1,51 @@
+<div dsSection #sectionRef="sectionRef" [attr.id]="'section_' + sectionData.id"
+  [ngClass]="{ 'section-focus' : sectionRef.isSectionActive() }" [mandatory]="sectionData.mandatory"
+  [submissionId]="submissionId" [sectionType]="sectionData.sectionType" [sectionId]="sectionData.id">
+  <ngb-accordion #acc="ngbAccordion" *ngIf="(sectionRef.isEnabled() | async)"
+    (panelChange)="sectionRef.sectionChange($event)" activeIds="{{ sectionData.id }}" [destroyOnHide]="false">
+    <ngb-panel id="{{ sectionData.id }}" [type]="sectionRef.isInfo() ? 'info' : ''">
+      <ng-template ngbPanelTitle>
+        <span [ngClass]="{ 'text-white' : sectionRef.isInfo()}" class="float-left section-title" tabindex="0">{{
+          'submission.sections.'+sectionData.header | translate
+          }}</span>
+        <div class="d-inline-block float-right">
+          <i *ngIf="!(sectionRef.isValid() | async) && !(sectionRef.hasErrors()) && !(sectionRef.isInfo())"
+            class="fas fa-exclamation-circle text-warning mr-3"
+            title="{{'submission.sections.status.warnings.title' | translate}}" role="img"
+            [attr.aria-label]="'submission.sections.status.warnings.aria' | translate"></i>
+          <i *ngIf="(sectionRef.hasErrors()) && !(sectionRef.isInfo())"
+            class="fas fa-exclamation-circle text-danger mr-3"
+            title="{{'submission.sections.status.errors.title' | translate}}" role="img"
+            [attr.aria-label]="'submission.sections.status.errors.aria' | translate"></i>
+          <i *ngIf="(sectionRef.isValid() | async) && !(sectionRef.hasErrors()) && !(sectionRef.isInfo())"
+            class="fas fa-check-circle text-success mr-3"
+            title="{{'submission.sections.status.valid.title' | translate}}" role="img"
+            [attr.aria-label]="'submission.sections.status.valid.aria' | translate"></i>
+          <i *ngIf="sectionRef.isInfo()" class="fas fa-info-circle mr-3 text-white"
+            title="{{'submission.sections.status.info.title' | translate}}" role="img"
+            [attr.aria-label]="'submission.sections.status.info.aria' | translate"></i>
+          <a class="close" tabindex="0" role="button"
+            [attr.aria-label]="(sectionRef.isOpen() ? 'submission.sections.toggle.aria.close' : 'submission.sections.toggle.aria.open') | translate: {sectionHeader: ('submission.sections.'+sectionData.header | translate)}"
+            [title]="(sectionRef.isOpen() ? 'submission.sections.toggle.close' : 'submission.sections.toggle.open') | translate">
+            <span *ngIf="sectionRef.isOpen()" [ngClass]="{ 'text-white' : sectionRef.isInfo()}"
+              class="fas fa-chevron-up fa-fw"></span>
+            <span *ngIf="!sectionRef.isOpen()" class="fas fa-chevron-down fa-fw"></span>
+          </a>
+          <a href="javascript:void(0);" class="close mr-3" *ngIf="!sectionRef.isMandatory()"
+            (click)="removeSection($event)">
+            <i class="fas fa-trash-o" aria-hidden="true" tabindex="0"></i>
+          </a>
+        </div>
+      </ng-template>
+      <ng-template ngbPanelContent>
+        <div id="sectionGenericError_{{sectionData.id}}" *ngIf="sectionRef.hasGenericErrors()">
+          <ds-alert *ngFor="let error of sectionRef.getErrors(); let i = index" [content]="error" [dismissible]="true"
+            [type]="AlertTypeEnum.Error" (close)="sectionRef.removeError(i)"></ds-alert>
+        </div>
+        <div id="sectionContent_{{sectionData.id}}" (click)="sectionRef.setFocus($event)">
+          <ng-container *ngComponentOutlet="getSectionContent(); injector: objectInjector;"></ng-container>
+        </div>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>

@@ -1,0 +1,54 @@
+<div *ngIf="currentPageState == undefined || currentPageState == (currentPage$|async)" [id]="'p-' + id">
+  <div *ngIf="(!hidePaginationDetail && collectionSize > 0) || !hideGear" class="pagination-masked clearfix top">
+    <div class="row">
+      <div *ngIf="!hidePaginationDetail && collectionSize > 0" class="col-auto pagination-info">
+          <span class="align-middle hidden-xs-down">{{ 'pagination.showing.label' | translate }}</span>
+          <span class="align-middle">{{ 'pagination.showing.detail' | translate:(getShowingDetails(collectionSize)|async)}}</span>
+      </div>
+      <div class="col">
+        <div *ngIf="!hideGear" ngbDropdown #paginationControls="ngbDropdown" placement="bottom-right" class="d-inline-block float-right">
+          <button class="btn btn-secondary" id="paginationControls" ngbDropdownToggle [title]="'pagination.options.description' | translate" [attr.aria-label]="'pagination.options.description' | translate"><i class="fas fa-cog" aria-hidden="true"></i></button>
+          <div id="paginationControlsDropdownMenu" aria-labelledby="paginationControls" ngbDropdownMenu>
+            <h6 class="dropdown-header">{{ 'pagination.results-per-page' | translate}}</h6>
+            <button class="dropdown-item" *ngFor="let item of pageSizeOptions" (click)="doPageSizeChange(item)"><i [ngClass]="{'invisible': item != (pageSize$|async)}" class="fas fa-check" aria-hidden="true"></i> {{item}} </button>
+            <h6 class="dropdown-header">{{ 'pagination.sort-direction' | translate}}</h6>
+            <button class="dropdown-item" *ngFor="let direction of (sortDirections | dsKeys)" (click)="doSortDirectionChange(direction.value)"><i [ngClass]="{'invisible': direction.value !== (sortDirection$ |async)}" class="fas fa-check" aria-hidden="true"></i> {{'sorting.' + direction.key | translate}} </button>
+          </div>
+        </div>
+        <ds-rss></ds-rss>
+      </div>
+    </div>
+  </div>
+  <ng-content></ng-content>
+
+  <div *ngIf="shouldShowBottomPager | async">
+    <div *ngIf="showPaginator" class="pagination justify-content-center clearfix bottom">
+      <ngb-pagination [boundaryLinks]="paginationOptions.boundaryLinks"
+                      [collectionSize]="collectionSize"
+                      [disabled]="paginationOptions.disabled"
+                      [ellipses]="paginationOptions.ellipses"
+                      [maxSize]="(isXs)?5:paginationOptions.maxSize"
+                      [page]="(currentPage$|async)"
+                      (pageChange)="doPageChange($event)"
+                      [pageSize]="(pageSize$ |async)"
+                      [rotate]="paginationOptions.rotate"
+                      [size]="(isXs)?'sm':paginationOptions.size">
+      </ngb-pagination>
+    </div>
+
+    <div *ngIf="!showPaginator" class="d-flex justify-content-between">
+        <button id="nav-prev" type="button" class="btn btn-outline-primary float-left"
+                (click)="goPrev()"
+                [disabled]="objects?.payload?.currentPage <= 1">
+          <i class="fas fa-angle-left"></i> {{'pagination.previous.button' |translate}}
+        </button>
+      <button id="nav-next" type="button" class="btn btn-outline-primary float-right"
+              (click)="goNext()"
+              [disabled]="objects?.payload?.currentPage >= objects?.payload?.totalPages">
+          <span [ngbTooltip]="objects?.payload?.currentPage >= objects?.payload?.totalPages ? ('pagination.next.button.disabled.tooltip' |translate) : null">
+            <i class="fas fa-angle-right"></i> {{'pagination.next.button' |translate}}
+          </span>
+      </button>
+    </div>
+  </div>
+</div>

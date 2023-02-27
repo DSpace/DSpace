@@ -1,0 +1,11 @@
+a {
+    color: var(--bs-link-color);
+    &:hover {
+        text-decoration: underline;
+        color: var(--bs-link-hover-color);
+
+    }
+    span.badge {
+        vertical-align: text-top;
+    }
+}

@@ -1,0 +1,10 @@
+<ds-alert class="mb-4" [type]="'alert-info'">{{FORM_PREFIX + 'info' | translate}}</ds-alert>
+<ds-form *ngIf="formModel"
+         [formId]="FORM_PREFIX"
+         [formModel]="formModel"
+         [formGroup]="formGroup"
+         [displaySubmit]="false"
+         [displayCancel]="false">
+</ds-form>
+<div id="notSame" class="container-fluid text-danger" *ngIf="formGroup.hasError('notSame')">{{FORM_PREFIX + 'error.matching-passwords' | translate}}</div>
+<div id="emptyPassword" class="container-fluid text-danger" *ngIf="(formGroup.dirty || formGroup.touched) && formGroup.hasError('emptyPassword')">{{FORM_PREFIX + 'error.empty-password' | translate}}</div>

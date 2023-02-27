@@ -1,0 +1,12 @@
+<ng-template dsListableObject>
+</ng-template>
+<div #badges class="position-absolute ml-1">
+    <div class="workflow-badge">
+        <span class="badge badge-info">{{ "admin.workflow.item.workflow" | translate }}</span>
+    </div>
+</div>
+<ul #buttons class="list-group list-group-flush">
+    <li class="list-group-item">
+        <ds-workflow-item-admin-workflow-actions-element *ngIf="object" class="d-flex justify-content-between" [wfi]="dso" [small]="true"></ds-workflow-item-admin-workflow-actions-element>
+    </li>
+</ul>

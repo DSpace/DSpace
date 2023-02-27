@@ -1,0 +1,29 @@
+@import '../../../../form.component';
+
+.chips-left {
+  left: 0;
+  padding-right: 100%;
+}
+
+:host ::ng-deep .dropdown-menu {
+  width: 100% !important;
+  max-height: var(--ds-dropdown-menu-max-height);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  left: 0 !important;
+  margin-top: var(--bs-spacer) !important;
+}
+
+:host ::ng-deep .dropdown-item.active,
+:host ::ng-deep .dropdown-item:active,
+:host ::ng-deep .dropdown-item:focus,
+:host ::ng-deep .dropdown-item:hover {
+  color: var(--bs-dropdown-link-hover-color) !important;
+  background-color: var(--bs-dropdown-link-hover-bg) !important;
+}
+
+.tag-input {
+  flex-grow: 1;
+  outline: none;
+  width: auto !important;
+}

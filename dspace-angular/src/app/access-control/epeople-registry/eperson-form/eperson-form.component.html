@@ -1,0 +1,84 @@
+<div *ngIf="epersonService.getActiveEPerson() | async; then editheader; else createHeader"></div>
+
+<ng-template #createHeader>
+  <h4>{{messagePrefix + '.create' | translate}}</h4>
+</ng-template>
+
+<ng-template #editheader>
+  <h4>{{messagePrefix + '.edit' | translate}}</h4>
+</ng-template>
+
+<ds-form [formId]="formId"
+         [formModel]="formModel"
+         [formGroup]="formGroup"
+         [formLayout]="formLayout"
+         [displayCancel]="false"
+         (submitForm)="onSubmit()">
+  <div before class="btn-group">
+    <button (click)="onCancel()"
+            class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> {{messagePrefix + '.return' | translate}}</button>
+  </div>
+  <div between class="btn-group">
+    <button class="btn btn-primary" [disabled]="!(canReset$ | async)" (click)="resetPassword()">
+      <i class="fa fa-key"></i> {{'admin.access-control.epeople.actions.reset' | translate}}
+    </button>
+  </div>
+  <div between class="btn-group ml-1">
+    <button *ngIf="!isImpersonated" class="btn btn-primary" [ngClass]="{'d-none' : !(canImpersonate$ | async)}" (click)="impersonate()">
+      <i class="fa fa-user-secret"></i> {{'admin.access-control.epeople.actions.impersonate' | translate}}
+    </button>
+    <button *ngIf="isImpersonated" class="btn btn-primary" (click)="stopImpersonating()">
+      <i class="fa fa-user-secret"></i> {{'admin.access-control.epeople.actions.stop-impersonating' | translate}}
+    </button>
+  </div>
+  <button after class="btn btn-danger delete-button" [disabled]="!(canDelete$ | async)" (click)="delete()">
+    <i class="fas fa-trash"></i> {{'admin.access-control.epeople.actions.delete' | translate}}
+  </button>
+</ds-form>
+
+<ds-themed-loading [showMessage]="false" *ngIf="!formGroup"></ds-themed-loading>
+
+<div *ngIf="epersonService.getActiveEPerson() | async">
+  <h5>{{messagePrefix + '.groupsEPersonIsMemberOf' | translate}}</h5>
+
+  <ds-themed-loading [showMessage]="false" *ngIf="!(groups | async)"></ds-themed-loading>
+
+  <ds-pagination
+    *ngIf="(groups | async)?.payload?.totalElements > 0"
+    [paginationOptions]="config"
+    [pageInfoState]="(groups | async)?.payload"
+    [collectionSize]="(groups | async)?.payload?.totalElements"
+    [hideGear]="true"
+    [hidePagerWhenSinglePage]="true"
+    (pageChange)="onPageChange($event)">
+
+    <div class="table-responsive">
+      <table id="groups" class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.id' | translate}}</th>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.name' | translate}}</th>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.collectionOrCommunity' | translate}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let group of (groups | async)?.payload?.page">
+          <td class="align-middle">{{group.id}}</td>
+          <td class="align-middle"><a (click)="groupsDataService.startEditingNewGroup(group)"
+                 [routerLink]="[groupsDataService.getGroupEditPageRouterLink(group)]">{{group.name}}</a></td>
+          <td class="align-middle">{{(group.object | async)?.payload?.name}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ds-pagination>
+
+  <div *ngIf="(groups | async)?.payload?.totalElements == 0" class="alert alert-info w-100 mb-2" role="alert">
+    <div>{{messagePrefix + '.memberOfNoGroups' | translate}}</div>
+    <div>
+      <button [routerLink]="[groupsDataService.getGroupRegistryRouterLink()]"
+              class="btn btn-primary">{{messagePrefix + '.goToGroups' | translate}}</button>
+    </div>
+  </div>
+</div>

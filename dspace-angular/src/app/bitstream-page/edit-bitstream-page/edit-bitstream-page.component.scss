@@ -1,0 +1,12 @@
+:host {
+  ::ng-deep {
+    .switch {
+      position: absolute;
+      top: calc(var(--bs-spacer) * 2.5);
+    }
+  }
+}
+:host ::ng-deep ds-dynamic-form-control-container > div > label {
+  margin-top: 1.75rem;
+}
+

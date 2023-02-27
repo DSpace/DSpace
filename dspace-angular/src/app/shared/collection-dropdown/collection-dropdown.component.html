@@ -1,0 +1,42 @@
+<div *ngIf="searchField" class="form-group w-100 pr-2 pl-2">
+  <input type="search"
+         class="form-control w-100"
+         (click)="$event.stopPropagation();"
+         placeholder="{{ 'submission.sections.general.search-collection' | translate }}"
+         [formControl]="searchField"
+         #searchFieldEl>
+</div>
+<div class="dropdown-divider"></div>
+<div class="scrollable-menu"
+     aria-labelledby="dropdownMenuButton"
+     (scroll)="onScroll($event)"
+     infiniteScroll
+     [infiniteScrollDistance]="1.5"
+     [infiniteScrollThrottle]="0"
+     [infiniteScrollUpDistance]="1.5"
+     [fromRoot]="true"
+     [scrollWindow]="false"
+     (scrolled)="onScrollDown()">
+
+  <button class="dropdown-item disabled" *ngIf="searchListCollection?.length == 0 && !(isLoading | async)">
+    {{'submission.sections.general.no-collection' | translate}}
+  </button>
+  <ng-container *ngIf="searchListCollection?.length > 0">
+    <button *ngFor="let listItem of searchListCollection"
+            class="dropdown-item collection-item"
+            title="{{ listItem.collection.name }}"
+            (click)="onSelect(listItem)">
+      <ul class="list-unstyled mb-0">
+        <li class="list-item text-truncate text-secondary" *ngFor="let item of listItem.communities">
+          {{ item.name}} <i class="fa fa-level-down" aria-hidden="true"></i>
+        </li>
+        <li class="list-item text-truncate text-primary font-weight-bold">{{ listItem.collection.name}}</li>
+      </ul>
+    </button>
+  </ng-container>
+  <button class="dropdown-item disabled" *ngIf="(isLoading | async)">
+    <ds-themed-loading message="{{'loading.default' | translate}}">
+    </ds-themed-loading>
+  </button>
+
+</div>

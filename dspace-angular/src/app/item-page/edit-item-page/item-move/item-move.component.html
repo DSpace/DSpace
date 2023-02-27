@@ -1,0 +1,53 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>{{'item.edit.move.head' | translate: {id: (itemRD$ | async)?.payload?.handle} }}</h2>
+            <p>{{'item.edit.move.description' | translate}}</p>
+            <div class="row">
+                <div class="col-12">
+                  <div class="card mb-3">
+                    <div class="card-header">{{'dso-selector.placeholder' | translate: { type: 'collection' } }}</div>
+                    <div class="card-body">
+                      <ds-authorized-collection-selector [types]="COLLECTIONS"
+                                                         [currentDSOId]="selectedCollection ? selectedCollection.id : originalCollection.id"
+                                                         (onSelect)="selectDso($event)">
+                      </ds-authorized-collection-selector>
+                    </div>
+                    <div></div>
+                  </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <p>
+                        <input type="checkbox" name="tc" [(ngModel)]="inheritPolicies" id="inheritPoliciesCheckbox">
+                        <label for="inheritPoliciesCheckbox">{{'item.edit.move.inheritpolicies.checkbox' |
+                                translate}}</label>
+                    </p>
+                    <p>
+                        {{'item.edit.move.inheritpolicies.description' | translate}}
+                    </p>
+                </div>
+            </div>
+
+          <div class="button-row bottom">
+            <div class="float-right space-children-mr">
+              <button [routerLink]="[(itemPageRoute$ | async), 'edit']" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> {{'item.edit.move.cancel' | translate}}
+              </button>
+              <button class="btn btn-primary" [disabled]="!canMove" (click)="moveToCollection()">
+              <span *ngIf="!processing">
+                <i class="fas fa-save"></i> {{'item.edit.move.save-button' | translate}}
+              </span>
+              <span *ngIf="processing">
+                <i class="fas fa-circle-notch fa-spin"></i> {{'item.edit.move.processing' | translate}}
+              </span>
+              </button>
+              <button class="btn btn-danger" [disabled]="!canSubmit" (click)="discard()">
+                <i class="fas fa-times"></i> {{"item.edit.move.discard-button" | translate}}
+              </button>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>

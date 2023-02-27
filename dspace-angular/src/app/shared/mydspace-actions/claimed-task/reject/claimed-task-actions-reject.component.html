@@ -1,0 +1,38 @@
+<ng-template #rejectTipContent><p [innerHTML]="'submission.workflow.tasks.claimed.reject_help' | translate"></p></ng-template>
+<button [className]="'btn btn-danger'"
+        [ngbTooltip]="rejectTipContent"
+        [disabled]="processing$ | async"
+        (click)="openRejectModal(rejectModal)" >
+  <span *ngIf="processing$ | async"><i class='fas fa-circle-notch fa-spin'></i> {{'submission.workflow.tasks.generic.processing' | translate}}</span>
+  <span *ngIf="!(processing$ | async)"><i class="fa fa-trash"></i> {{'submission.workflow.tasks.claimed.reject.submit' | translate}}</span>
+</button>
+
+<ng-template #rejectModal let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">{{'submission.workflow.tasks.claimed.reject.reason.title' | translate}}</h4>
+    <button type="button"
+            class="close"
+            aria-label="Close"
+            (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-info" role="alert">
+      {{'submission.workflow.tasks.claimed.reject.reason.info' | translate}}
+    </div>
+    <form (ngSubmit)="submitTask();" [formGroup]="rejectForm" >
+      <textarea style="width: 100%"
+                formControlName="reason"
+                rows="4"
+                placeholder="{{'submission.workflow.tasks.claimed.reject.reason.placeholder' | translate}}"></textarea>
+      <button id="btn-chat"
+              class="btn btn-danger btn-lg btn-block mt-3"
+              [disabled]="!rejectForm.valid || (processing$ | async)"
+              type="submit">
+        <span *ngIf="processing$ | async"><i class='fas fa-circle-notch fa-spin'></i> {{'submission.workflow.tasks.generic.processing' | translate}}</span>
+        <span *ngIf="!(processing$ | async)">{{'submission.workflow.tasks.claimed.reject.reason.submit' | translate}}</span>
+      </button>
+    </form>
+  </div>
+</ng-template>

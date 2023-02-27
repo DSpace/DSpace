@@ -1,0 +1,28 @@
+# DSpace configuration for Codecov.io coverage reports
+# These override the default YAML settings at
+# https://docs.codecov.io/docs/codecov-yaml#section-default-yaml
+# Can be validated via instructions at:
+# https://docs.codecov.io/docs/codecov-yaml#validate-your-repository-yaml
+
+# Settings related to code coverage analysis
+coverage:
+  status:
+    # Configuration for project-level checks. This checks how the PR changes overall coverage.
+    project:
+      default:
+        # For each PR, auto compare coverage to previous commit.
+        # Require that overall (project) coverage does NOT drop more than 0.5%
+        target: auto
+        threshold: 0.5%
+    # Configuration for patch-level checks. This checks the relative coverage of the new PR code ONLY.
+    patch:
+      default:
+         # Enable informational mode, which just provides info to reviewers & always passes
+         # https://docs.codecov.io/docs/commit-status#section-informational
+         informational: true
+
+# Turn PR comments "off". This feature adds the code coverage summary as a
+# comment on each PR. See https://docs.codecov.io/docs/pull-request-comments
+# However, this same info is available from the Codecov checks in the PR's
+# "Checks" tab in GitHub. So, the comment is unnecessary.
+comment: false

@@ -1,0 +1,12 @@
+// This file combines the other scss files in to one. You usually shouldn't edit this file directly
+
+@import './_theme_sass_variable_overrides.scss';
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+@import '../../../styles/helpers/font_awesome_imports.scss';
+@import '../../../styles/_vendor.scss';
+@import '../../../styles/_custom_variables.scss';
+@import './_theme_css_variable_overrides.scss';
+@import '../../../styles/bootstrap_variables_mapping.scss';
+@import '../../../styles/_truncatable-part.component.scss';
+@import './_global-styles.scss';

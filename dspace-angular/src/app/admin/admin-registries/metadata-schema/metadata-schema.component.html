@@ -1,0 +1,64 @@
+<div class="container">
+  <div class="metadata-schema row">
+    <div class="col-12" *ngVar="(metadataSchema$ | async) as schema">
+
+      <h2 id="header" class="border-bottom pb-2">{{'admin.registries.schema.head' | translate}}: "{{schema?.prefix}}"</h2>
+
+      <p id="description" class="pb-2">{{'admin.registries.schema.description' | translate:{ namespace: schema?.namespace } }}</p>
+
+      <ds-metadata-field-form
+        [metadataSchema]="schema"
+        (submitForm)="forceUpdateFields()"></ds-metadata-field-form>
+
+      <h3>{{'admin.registries.schema.fields.head' | translate}}</h3>
+
+      <ng-container *ngVar="(metadataFields$ | async)?.payload as fields">
+        <ds-pagination
+          *ngIf="fields?.totalElements > 0"
+          [paginationOptions]="config"
+          [pageInfoState]="fields"
+          [collectionSize]="fields?.totalElements"
+          [hideGear]="false"
+          [hidePagerWhenSinglePage]="true">
+          <div class="table-responsive">
+            <table id="metadata-fields" class="table table-striped table-hover">
+              <thead>
+              <tr>
+                <th></th>
+                <th scope="col">{{'admin.registries.schema.fields.table.id' | translate}}</th>
+                <th scope="col">{{'admin.registries.schema.fields.table.field' | translate}}</th>
+                <th scope="col">{{'admin.registries.schema.fields.table.scopenote' | translate}}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let field of fields?.page"
+                  [ngClass]="{'table-primary' : isActive(field) | async}">
+                <td>
+                  <label>
+                    <input type="checkbox"
+                           [checked]="isSelected(field) | async"
+                           (change)="selectMetadataField(field, $event)">
+                  </label>
+                </td>
+                <td class="selectable-row" (click)="editField(field)">{{field.id}}</td>
+                <td class="selectable-row" (click)="editField(field)">{{schema?.prefix}}.{{field.element}}<label *ngIf="field.qualifier">.</label>{{field.qualifier}}</td>
+                <td class="selectable-row" (click)="editField(field)">{{field.scopeNote}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </ds-pagination>
+
+        <div *ngIf="fields?.totalElements == 0" class="alert alert-info w-100 mb-2" role="alert">
+          {{'admin.registries.schema.fields.no-items' | translate}}
+        </div>
+
+        <div>
+          <button [routerLink]="['/admin/registries/metadata']" class="btn btn-primary">{{'admin.registries.schema.return' | translate}}</button>
+          <button *ngIf="fields?.page?.length > 0" type="submit" class="btn btn-danger float-right" (click)="deleteFields()">{{'admin.registries.schema.fields.table.delete' | translate}}</button>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<ds-metadata-field-wrapper [label]="label">
+  <ng-container *ngFor="let objectPage of objects; let i = index">
+    <ng-container *ngVar="(objectPage | async) as representations">
+      <ds-metadata-representation-loader *ngFor="let rep of representations"
+                                         [mdRepresentation]="rep">
+      </ds-metadata-representation-loader>
+      <ds-themed-loading *ngIf="(i + 1) === objects.length && (i > 0) && (!representations || representations?.length === 0)" message="{{'loading.default' | translate}}"></ds-themed-loading>
+      <div class="d-inline-block w-100 mt-2" *ngIf="(i + 1) === objects.length && representations?.length > 0">
+        <div *ngIf="(objects.length * incrementBy) < total" class="float-left">
+          <a [routerLink]="[]" (click)="increase()">{{'item.page.related-items.view-more' |
+            translate:{ amount: (total - (objects.length * incrementBy) < incrementBy) ? total - (objects.length * incrementBy) : incrementBy } }}</a>
+        </div>
+        <div *ngIf="objects.length > 1" class="float-right">
+          <a [routerLink]="[]" (click)="decrease()">{{'item.page.related-items.view-less' |
+            translate:{ amount: representations?.length } }}</a>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</ds-metadata-field-wrapper>

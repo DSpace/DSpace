@@ -1,0 +1,22 @@
+<div class="nav-item dropdown expandable-navbar-section text-md-center"
+    *ngVar="(active | async) as isActive"
+    (keyup.enter)="isActive ? deactivateSection($event) : activateSection($event)"
+    (keyup.space)="isActive ? deactivateSection($event) : activateSection($event)"
+    (keydown.space)="$event.preventDefault()"
+    (mouseenter)="activateSection($event)"
+    (mouseleave)="deactivateSection($event)">
+    <a href="javascript:void(0);" class="nav-link dropdown-toggle" routerLinkActive="active"
+       [class.disabled]="section.model?.disabled"
+       id="browseDropdown" (click)="toggleSection($event)"
+       data-toggle="dropdown">
+        <ng-container
+                *ngComponentOutlet="(sectionMap$ | async).get(section.id).component; injector: (sectionMap$ | async).get(section.id).injector;"></ng-container>
+    </a>
+    <ul @slide *ngIf="(active | async)" (click)="deactivateSection($event)"
+        class="m-0 shadow-none border-top-0 dropdown-menu show">
+        <ng-container *ngFor="let subSection of (subSections$ | async)">
+            <ng-container
+                    *ngComponentOutlet="(sectionMap$ | async).get(subSection.id).component; injector: (sectionMap$ | async).get(subSection.id).injector;"></ng-container>
+        </ng-container>
+    </ul>
+</div>

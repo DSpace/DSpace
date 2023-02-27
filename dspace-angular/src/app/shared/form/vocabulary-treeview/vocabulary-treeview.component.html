@@ -1,0 +1,77 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{'vocabulary-treeview.header' | translate}}</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="p-3">
+    <ds-alert *ngIf="description | async" [content]="description | async" [type]="'alert-info'"></ds-alert>
+    <div class="treeview-header row">
+      <div class="col-12">
+        <div class="input-group">
+          <input type="text" class="form-control" [(ngModel)]="searchText" (keyup.enter)="search()">
+          <div class="input-group-append" id="button-addon4">
+            <button class="btn btn-outline-primary" type="button" (click)="search()" [disabled]="!isSearchEnabled()">
+              {{'vocabulary-treeview.search.form.search' | translate}}
+            </button>
+            <button class="btn btn-outline-secondary" type="button" (click)="reset()">
+              {{'vocabulary-treeview.search.form.reset' | translate}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="treeview-container">
+      <ds-themed-loading *ngIf="loading | async" [showMessage]="false"></ds-themed-loading>
+      <h4 *ngIf="!(loading | async) && dataSource.data.length === 0" class="text-center text-muted mt-4" >
+        <span>{{'vocabulary-treeview.search.no-result' | translate}}</span>
+      </h4>
+      <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+        <!-- Leaf node -->
+        <cdk-tree-node *cdkTreeNodeDef="let node" cdkTreeNodePadding class="d-flex">
+            <button type="button" class="btn btn-default" cdkTreeNodeToggle>
+              <span class="fas fa-angle-right fa-2x invisible" aria-hidden="true"></span>
+            </button>
+            <button class="btn btn-outline-link btn-sm text-left"
+                    [class.text-success]="node.item?.value === selectedItem?.value"
+                    [disabled]="!node.item?.selectable"
+                    [ngbTooltip]="node.item?.otherInformation?.note"
+                    [openDelay]="500"
+                    container="body"
+                    (click)="onSelect(node.item)">{{node.item.display}}</button>
+        </cdk-tree-node>
+
+        <!-- expandable node -->
+        <cdk-tree-node *cdkTreeNodeDef="let node; when: hasChildren" cdkTreeNodePadding class="d-flex">
+            <button type="button" class="btn btn-default" cdkTreeNodeToggle
+                    [attr.aria-label]="'toggle ' + node.name"
+                    (click)="loadChildren(node)">
+              <span class="fas {{treeControl.isExpanded(node) ? 'fa-angle-down' : 'fa-angle-right'}} fa-2x"
+                    aria-hidden="true"></span>
+            </button>
+
+            <button class="btn btn-outline-link btn-sm text-left"
+                    [class.text-success]="node.item?.value === selectedItem?.value"
+                    [disabled]="!node.item?.selectable"
+                    [ngbTooltip]="node.item?.otherInformation?.note"
+                    [openDelay]="500"
+                    container="body"
+                    (click)="onSelect(node.item)">{{node.item.display}}</button>
+        </cdk-tree-node>
+
+        <cdk-tree-node *cdkTreeNodeDef="let node; when: isLoadMore" cdkTreeNodePadding>
+          <button class="btn btn-outline-secondary btn-sm" (click)="loadMore(node.loadMoreParentItem)">
+            {{'vocabulary-treeview.load-more' | translate}}...
+          </button>
+        </cdk-tree-node>
+
+        <cdk-tree-node *cdkTreeNodeDef="let node; when: isLoadMoreRoot">
+          <button class="btn btn-outline-secondary btn-sm" (click)="loadMoreRoot(node)">
+            {{'vocabulary-treeview.load-more' | translate}}...
+          </button>
+        </cdk-tree-node>
+      </cdk-tree>
+    </div>
+  </div>
+</div>

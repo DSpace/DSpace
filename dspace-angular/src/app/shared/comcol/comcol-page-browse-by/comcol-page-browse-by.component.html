@@ -1,0 +1,24 @@
+<h2 class="comcol-browse-label h5">{{'browse.comcol.head' | translate}}</h2>
+<nav class="comcol-browse mb-4" aria-label="Browse Community or Collection">
+  <div class="d-none d-sm-block">
+
+    <div class="list-group list-group-horizontal">
+      <a *ngFor="let option of allOptions"
+         class="list-group-item"
+         [routerLink]="option.routerLink"
+         [queryParams]="option.params"
+         routerLinkActive="active">{{ option.label | translate }}</a>
+    </div>
+  </div>
+
+  <div class="d-block d-sm-none">
+    <select name="browse-type"
+            class="form-control"
+            aria-label="Browse Community or Collection"
+            (ngModelChange)="onSelectChange($event)" [ngModel]="currentOptionId$ | async">
+      <option *ngFor="let option of allOptions"
+              [ngValue]="option.id"
+              [attr.selected]="(currentOptionId$ | async) === option.id ? 'selected' : null">{{ option.label | translate }}</option>
+    </select>
+  </div>
+</nav>

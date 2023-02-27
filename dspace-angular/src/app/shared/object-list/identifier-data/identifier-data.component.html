@@ -1,0 +1,5 @@
+<ng-container>
+  <div *ngIf="identifiers$ | async as identifiers">
+    <span class="">{{ identifiers[0].value | translate }}</span>
+  </div>
+</ng-container>

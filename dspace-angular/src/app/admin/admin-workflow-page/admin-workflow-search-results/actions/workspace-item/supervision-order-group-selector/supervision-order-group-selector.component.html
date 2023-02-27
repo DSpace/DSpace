@@ -1,0 +1,44 @@
+<div>
+    <div class="modal-header">{{'supervision-group-selector.header' | translate}}
+        <button type="button" class="close" (click)="close()" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="control-group col-sm-12">
+                <label for="supervisionOrder">{{'supervision-group-selector.select.type-of-order.label' | translate}}</label>
+                <select name="supervisionOrder" id="supervisionOrder" class="form-control"
+                        [(ngModel)]="selectedOrderType"
+                        attr.aria-label="{{'supervision-group-selector.select.type-of-order.label' | translate}}">
+                    <option value="EDITOR">{{'supervision-group-selector.select.type-of-order.option.editor' | translate}}</option>
+                    <option value="OBSERVER">{{'supervision-group-selector.select.type-of-order.option.observer' | translate}}</option>
+                </select>
+                <ds-error *ngIf="isSubmitted && (!selectedOrderType || selectedOrderType === '')"
+                          message="{{'supervision-group-selector.select.type-of-order.error' | translate}}"></ds-error>
+            </div>
+        </div>
+        <div class="row">
+            <div class="control-group col-sm-12">
+                <label for="supervisionGroup">{{'supervision-group-selector.select.group.label' | translate}}</label>
+                <ng-container class="mb-3">
+                    <input id="supervisionGroup" class="form-control" type="text" [value]="selectedGroup ? dsoNameService.getName(selectedGroup) : ''" disabled>
+                    <ds-error *ngIf="isSubmitted && !selectedGroup" message="{{'supervision-group-selector.select.group.error' | translate}}"></ds-error>
+                </ng-container>
+                <ds-eperson-group-list [isListOfEPerson]="false"
+                                       (select)="updateGroupObjectSelected($event)"></ds-eperson-group-list>
+            </div>
+        </div>
+<!--        <div class="d-flex flex-row-reverse m-2">          -->
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary"
+                  (click)="close()">
+            <i class="fas fa-times"></i> {{"supervision-group-selector.button.cancel" | translate}}
+          </button>
+          <button class="btn btn-primary save"
+                  (click)="save()">
+            <i class="fas fa-save"></i> {{"supervision-group-selector.button.save" | translate}}
+          </button>
+        </div>
+    </div>
+</div>

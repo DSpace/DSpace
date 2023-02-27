@@ -1,0 +1,3 @@
+<div *ngIf="logo" class="dso-logo mb-3">
+    <img [src]="logo._links.content.href" class="img-fluid" [attr.alt]="alternateText ? alternateText : null" (error)="errorHandler($event)"/>
+</div>

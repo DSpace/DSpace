@@ -1,0 +1,8 @@
+<button *ngIf="isAuthorized$ | async" data-test="subscription-button"
+        (click)="openSubscriptionModal()"
+        [ngbTooltip]="'subscriptions.tooltip' | translate"
+        [title]="'subscriptions.tooltip' | translate"
+        [attr.aria-label]="'subscriptions.tooltip' | translate"
+        class="subscription-button btn btn-dark btn-sm">
+  <i class="fas fa-bell fa-fw"></i>
+</button>

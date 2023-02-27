@@ -1,0 +1,20 @@
+.filters {
+    a {
+        color: var(--bs-body-color);
+        &:hover, &:focus {
+          text-decoration: none;
+        }
+        span.badge {
+            vertical-align: text-top;
+        }
+    }
+    .toggle-more-filters a {
+        color: var(--bs-link-color);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+::ng-deep em {
+    font-weight: bold;
+    font-style: normal;
+}

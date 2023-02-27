@@ -1,0 +1,27 @@
+<div class="container" *ngIf="(healthResponseInitialised | async) && (healthInfoResponseInitialised | async)">
+  <h2>{{'health-page.heading' | translate}}</h2>
+  <div *ngIf="(healthResponse | async) && (healthInfoResponse | async)">
+    <ul ngbNav #nav="ngbNav" [activeId]="'status'" class="nav-tabs">
+      <li [ngbNavItem]="'status'">
+        <a ngbNavLink>{{'health-page.status-tab' | translate}}</a>
+        <ng-template ngbNavContent>
+          <div id="status">
+            <ds-health-panel [healthResponse]="(healthResponse | async)"></ds-health-panel>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="'info'">
+        <a ngbNavLink>{{'health-page.info-tab' | translate}}</a>
+        <ng-template ngbNavContent>
+          <div id="info">
+            <ds-health-info [healthInfoResponse]="(healthInfoResponse | async)"></ds-health-info>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  </div>
+  <ds-alert *ngIf="!(healthResponse | async) || !(healthInfoResponse | async)" [type]="'alert-danger'" [content]="'health-page.error.msg'"></ds-alert>
+</div>
+
+

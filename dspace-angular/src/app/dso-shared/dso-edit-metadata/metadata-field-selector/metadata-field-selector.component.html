@@ -1,0 +1,19 @@
+<div class="w-100 position-relative">
+  <input type="text" #mdFieldInput
+         class="form-control" [ngClass]="{ 'is-invalid': showInvalid }"
+         [value]="mdField"
+         [formControl]="input"
+         (focusin)="query$.next(mdField)"
+         (dsClickOutside)="query$.next(null)"
+         (click)="$event.stopPropagation();" />
+  <div class="invalid-feedback show-feedback" *ngIf="showInvalid">{{ dsoType + '.edit.metadata.metadatafield.invalid' | translate }}</div>
+  <div class="autocomplete dropdown-menu" [ngClass]="{'show': (mdFieldOptions$ | async)?.length > 0}">
+    <div class="dropdown-list">
+      <div *ngFor="let mdFieldOption of (mdFieldOptions$ | async)">
+        <a href="javascript:void(0);" class="d-block dropdown-item" (click)="select(mdFieldOption)">
+          <span [innerHTML]="mdFieldOption"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<ng-container *ngVar="(bitstreams$ | async) as bitstreams">
+  <ds-metadata-field-wrapper *ngIf="bitstreams?.length > 0" [label]="label | translate">
+    <div class="file-section">
+      <ds-themed-file-download-link *ngFor="let file of bitstreams; let last=last;" [bitstream]="file" [item]="item">
+        <span>{{file?.name}}</span>
+        <span>({{(file?.sizeBytes) | dsFileSize }})</span>
+        <span *ngIf="!last" innerHTML="{{separator}}"></span>
+      </ds-themed-file-download-link>
+      <ds-themed-loading *ngIf="isLoading" message="{{'loading.default' | translate}}" [showMessage]="false"></ds-themed-loading>
+      <div *ngIf="!isLastPage" class="mt-1" id="view-more">
+        <a class="bitstream-view-more btn btn-outline-secondary btn-sm" [routerLink]="[]" (click)="getNextPage()">{{'item.page.bitstreams.view-more' | translate}}</a>
+      </div>
+      <div *ngIf="isLastPage && currentPage != 1" class="mt-1" id="collapse">
+        <a class="bitstream-collapse btn btn-outline-secondary btn-sm" [routerLink]="[]" (click)="currentPage = undefined; getNextPage();">{{'item.page.bitstreams.collapse' | translate}}</a>
+      </div>
+    </div>
+  </ds-metadata-field-wrapper>
+</ng-container>

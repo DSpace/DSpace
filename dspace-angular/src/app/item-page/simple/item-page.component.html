@@ -1,0 +1,13 @@
+<div class="container" *ngVar="(itemRD$ | async) as itemRD">
+  <div class="item-page" *ngIf="itemRD?.hasSucceeded" @fadeInOut>
+    <div *ngIf="itemRD?.payload as item">
+      <ds-item-alerts [item]="item"></ds-item-alerts>
+      <ds-item-versions-notice [item]="item"></ds-item-versions-notice>
+      <ds-view-tracker [object]="item"></ds-view-tracker>
+      <ds-listable-object-component-loader *ngIf="!item.isWithdrawn || (isAdmin$|async)" [object]="item" [viewMode]="viewMode"></ds-listable-object-component-loader>
+      <ds-item-versions class="mt-2" [item]="item" [displayActions]="false"></ds-item-versions>
+    </div>
+  </div>
+  <ds-error *ngIf="itemRD?.hasFailed" message="{{'error.item' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="itemRD?.isLoading" message="{{'loading.item' | translate}}"></ds-themed-loading>
+</div>

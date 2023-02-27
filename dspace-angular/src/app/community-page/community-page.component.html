@@ -1,0 +1,47 @@
+<div class="container" *ngVar="(communityRD$ | async) as communityRD">
+  <div class="community-page" *ngIf="communityRD?.hasSucceeded" @fadeInOut>
+    <div *ngIf="communityRD?.payload; let communityPayload">
+      <ds-view-tracker [object]="communityPayload"></ds-view-tracker>
+      <div class="d-flex flex-row border-bottom mb-4 pb-4">
+        <header class="comcol-header mr-auto">
+          <!-- Community name -->
+          <ds-comcol-page-header [name]="communityPayload.name"></ds-comcol-page-header>
+          <!-- Community logo -->
+          <ds-comcol-page-logo *ngIf="logoRD$" [logo]="(logoRD$ | async)?.payload" [alternateText]="'Community Logo'">
+          </ds-comcol-page-logo>
+          <!-- Handle -->
+          <ds-themed-comcol-page-handle [content]="communityPayload.handle" [title]="'community.page.handle'">
+          </ds-themed-comcol-page-handle>
+          <!-- Introductory text -->
+          <ds-comcol-page-content [content]="communityPayload.introductoryText" [hasInnerHtml]="true">
+          </ds-comcol-page-content>
+          <!-- News -->
+          <ds-comcol-page-content [content]="communityPayload.sidebarText" [hasInnerHtml]="true"
+            [title]="'community.page.news'">
+          </ds-comcol-page-content>
+        </header>
+        <ds-dso-edit-menu></ds-dso-edit-menu>
+        <div class="pl-2 space-children-mr">
+          <ds-dso-page-subscription-button [dso]="communityPayload"></ds-dso-page-subscription-button>
+        </div>
+      </div>
+      <section class="comcol-page-browse-section">
+
+        <!-- Browse-By Links -->
+        <ds-themed-comcol-page-browse-by [id]="communityPayload.id" [contentType]="communityPayload.type">
+        </ds-themed-comcol-page-browse-by>
+
+        <ds-themed-community-page-sub-community-list [community]="communityPayload"></ds-themed-community-page-sub-community-list>
+        <ds-themed-community-page-sub-collection-list [community]="communityPayload"></ds-themed-community-page-sub-collection-list>
+      </section>
+      <footer  *ngIf="communityPayload.copyrightText"  class="border-top my-5 pt-4">
+        <!-- Copyright -->
+        <ds-comcol-page-content [content]="communityPayload.copyrightText" [hasInnerHtml]="true">
+        </ds-comcol-page-content>
+      </footer>
+    </div>
+  </div>
+
+  <ds-error *ngIf="communityRD?.hasFailed" message="{{'error.community' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="communityRD?.isLoading" message="{{'loading.community' | translate}}"></ds-themed-loading>
+</div>

@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-4">
+    <h3>{{ 'submission.sections.describe.relationship-lookup.selection-tab.settings' | translate}}</h3>
+    <ds-page-size-selector></ds-page-size-selector>
+  </div>
+  <div class="col-8">
+    <ds-search-form [query]="(searchConfigService.paginatedSearchOptions | async)?.query"
+                    [inPlaceSearch]="true"
+                    [searchPlaceholder]="'submission.sections.describe.relationship-lookup.selection-tab.search-form.placeholder' | translate">
+    </ds-search-form>
+    <div>
+      <h3>{{ 'submission.sections.describe.relationship-lookup.selection-tab.title.' + externalSource.id | translate}}</h3>
+      <ng-container *ngVar="(entriesRD$ | async) as entriesRD">
+        <ds-viewable-collection *ngIf="entriesRD?.hasSucceeded && !entriesRD?.isLoading && entriesRD?.payload?.page?.length > 0" @fadeIn
+                                [objects]="entriesRD"
+                                [selectionConfig]="{ repeatable: repeatable, listId: listId }"
+                                [config]="(currentPagination$ |async)"
+                                [hideGear]="true"
+                                [context]="context"
+                                [importable]="true"
+                                [importConfig]="importConfig"
+                                (importObject)="import($event)">
+        </ds-viewable-collection>
+        <ds-themed-loading *ngIf="!entriesRD || entriesRD?.isLoading"
+                    message="{{'loading.search-results' | translate}}"></ds-themed-loading>
+        <ds-error   *ngIf="entriesRD?.hasFailed && (!entriesRD?.errorMessage || entriesRD?.statusCode != 400)"
+                    message="{{'error.search-results' | translate}}"></ds-error>
+        <div *ngIf="entriesRD?.payload?.page?.length == 0 || entriesRD?.statusCode == 400" id="empty-external-entry-list">
+          {{ 'search.results.empty' | translate }}
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

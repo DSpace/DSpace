@@ -1,0 +1,21 @@
+.lbl-cell {
+  min-width: var(--ds-dso-edit-field-width);
+  max-width: var(--ds-dso-edit-field-width);
+  background-color: var(--bs-gray-100);
+  font-weight: bold;
+  padding: 1rem;
+  border: 1px solid var(--bs-gray-200);
+
+  &.ds-success {
+    background-color: var(--bs-success-bg);
+    border: 1px solid var(--bs-success);
+  }
+}
+
+.ds-field-row {
+  border: 1px solid var(--bs-gray-400);
+}
+
+.reset-order-button:hover {
+  cursor: pointer;
+}

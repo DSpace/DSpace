@@ -1,0 +1,39 @@
+.limit-width {
+  max-width: var(--ds-thumbnail-max-width);
+}
+
+img {
+  max-width: 100%;
+}
+
+.outer {  // .outer/.inner generated ~ https://ratiobuddy.com/
+  position: relative;
+  &:before {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: calc((297 / 210) * 100%);  // A4 ratio
+  }
+  > .inner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    > .thumbnail-placeholder {
+      background: var(--ds-thumbnail-placeholder-background);
+      border: var(--ds-thumbnail-placeholder-border);
+      color: var(--ds-thumbnail-placeholder-color);
+      font-weight: bold;
+    }
+    > .centered {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+  }
+}

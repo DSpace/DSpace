@@ -1,0 +1,28 @@
+<div class="container">
+  <h2 id="header">{{'admin.metadata-import.page.header' | translate}}</h2>
+  <p>{{'admin.metadata-import.page.help' | translate}}</p>
+  <div class="form-group">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="validateOnly" [(ngModel)]="validateOnly">
+      <label class="form-check-label" for="validateOnly">
+        {{'admin.metadata-import.page.validateOnly' | translate}}
+      </label>
+    </div>
+    <small id="validateOnlyHelpBlock" class="form-text text-muted">
+      {{'admin.metadata-import.page.validateOnly.hint' | translate}}
+    </small>
+  </div>
+
+  <ds-file-dropzone-no-uploader
+    (onFileAdded)="setFile($event)"
+    [dropMessageLabel]="'admin.metadata-import.page.dropMsg'"
+    [dropMessageLabelReplacement]="'admin.metadata-import.page.dropMsgReplace'">
+  </ds-file-dropzone-no-uploader>
+
+  <div class="space-children-mr">
+    <button class="btn btn-secondary" id="backButton"
+            (click)="this.onReturn();">{{'admin.metadata-import.page.button.return' | translate}}</button>
+    <button class="btn btn-primary" id="proceedButton"
+            (click)="this.importMetadata();">{{'admin.metadata-import.page.button.proceed' | translate}}</button>
+  </div>
+</div>

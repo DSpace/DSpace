@@ -1,0 +1,91 @@
+<div class="item-metadata" *ngIf="form">
+  <div class="button-row top d-flex my-2 space-children-mr ml-gap">
+    <button class="mr-auto btn btn-success" id="dso-add-btn" [disabled]="form.newValue || (saving$ | async)"
+            [title]="dsoType + '.edit.metadata.add-button' | translate"
+            (click)="add()"><i class="fas fa-plus"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{ dsoType + '.edit.metadata.add-button' | translate }}</span>
+    </button>
+    <button class="btn btn-warning ml-1" id="dso-reinstate-btn" *ngIf="isReinstatable" [disabled]="(saving$ | async)"
+            [title]="dsoType + '.edit.metadata.reinstate-button' | translate"
+            (click)="reinstate()"><i class="fas fa-undo-alt"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{ dsoType + '.edit.metadata.reinstate-button' | translate }}</span>
+    </button>
+    <button class="btn btn-primary ml-1" id="dso-save-btn" [disabled]="!hasChanges || (saving$ | async)"
+            [title]="dsoType + '.edit.metadata.save-button' | translate"
+            (click)="submit()"><i class="fas fa-save"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{ dsoType + '.edit.metadata.save-button' | translate }}</span>
+    </button>
+    <button class="btn btn-danger ml-1" id="dso-discard-btn" *ngIf="!isReinstatable"
+            [title]="dsoType + '.edit.metadata.discard-button' | translate"
+            [disabled]="!hasChanges || (saving$ | async)"
+            (click)="discard()"><i class="fas fa-times"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{ dsoType + '.edit.metadata.discard-button' | translate }}</span>
+    </button>
+  </div>
+
+  <div role="table" [attr.aria-label]="'item.edit.head' | translate">
+    <ds-dso-edit-metadata-headers [dsoType]="dsoType"></ds-dso-edit-metadata-headers>
+    <div class="d-flex flex-row ds-field-row" role="row" *ngIf="form.newValue">
+      <div class="lbl-cell ds-success" role="rowheader">
+        <ds-metadata-field-selector [dsoType]="dsoType"
+                                    [(mdField)]="newMdField"
+                                    [autofocus]="true">
+        </ds-metadata-field-selector>
+      </div>
+      <div class="flex-grow-1 ds-drop-list" role="cell">
+        <div role="table">
+          <ds-dso-edit-metadata-value-headers role="presentation" [dsoType]="dsoType"></ds-dso-edit-metadata-value-headers>
+          <ds-dso-edit-metadata-value [dso]="dso"
+                                      [mdValue]="form.newValue"
+                                      [dsoType]="dsoType"
+                                      [saving$]="savingOrLoadingFieldValidation$"
+                                      [isOnlyValue]="true"
+                                      (confirm)="confirmNewValue($event)"
+                                      (remove)="form.newValue = undefined"
+                                      (undo)="form.newValue = undefined">
+          </ds-dso-edit-metadata-value>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex flex-row ds-field-row" role="row" *ngFor="let mdField of form.fieldKeys">
+      <div class="lbl-cell" role="rowheader">
+        <span class="dont-break-out preserve-line-breaks">{{ mdField }}</span>
+        <div class="btn btn-warning reset-order-button mt-2 w-100" *ngIf="form.hasOrderChanges(mdField)"
+             (click)="form.resetOrder(mdField); onValueSaved()">
+          {{ dsoType + '.edit.metadata.reset-order-button' | translate }}
+        </div>
+      </div>
+      <ds-dso-edit-metadata-field-values class="flex-grow-1" role="cell"
+                                         [dso]="dso"
+                                         [form]="form"
+                                         [dsoType]="dsoType"
+                                         [saving$]="saving$"
+                                         [draggingMdField$]="draggingMdField$"
+                                         [mdField]="mdField"
+                                         (valueSaved)="onValueSaved()">
+      </ds-dso-edit-metadata-field-values>
+    </div>
+  </div>
+
+  <div *ngIf="isEmpty && !form.newValue">
+    <ds-alert [content]="dsoType + '.edit.metadata.empty'" [type]="AlertTypeEnum.Info"></ds-alert>
+  </div>
+  <div class="button-row bottom d-inline-block w-100">
+    <div class="mt-2 float-right space-children-mr ml-gap">
+      <button class="btn btn-warning" *ngIf="isReinstatable" [disabled]="(saving$ | async)"
+              [title]="dsoType + '.edit.metadata.reinstate-button' | translate"
+              (click)="reinstate()"><i class="fas fa-undo-alt"></i> {{ dsoType + '.edit.metadata.reinstate-button' | translate }}
+      </button>
+      <button class="btn btn-primary" [disabled]="!hasChanges || (saving$ | async)"
+              [title]="dsoType + '.edit.metadata.save-button' | translate"
+              (click)="submit()"><i class="fas fa-save"></i> {{ dsoType + '.edit.metadata.save-button' | translate }}
+      </button>
+      <button class="btn btn-danger" *ngIf="!isReinstatable"
+              [title]="dsoType + '.edit.metadata.discard-button' | translate"
+              [disabled]="!hasChanges || (saving$ | async)"
+              (click)="discard()"><i class="fas fa-times"></i> {{ dsoType + '.edit.metadata.discard-button' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+<ds-loading *ngIf="!form"></ds-loading>

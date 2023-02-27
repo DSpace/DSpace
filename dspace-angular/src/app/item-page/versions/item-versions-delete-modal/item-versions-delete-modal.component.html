@@ -1,0 +1,22 @@
+<div>
+  <div class="modal-header">{{'item.version.delete.modal.header' | translate}}
+    <button type="button" class="close" (click)="onModalClose()" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p class="pb-2">{{ "item.version.delete.modal.text" | translate : {version: versionNumber} }}</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-outline-secondary btn-sm cancel"
+            (click)="onModalClose()"
+            title="{{'item.version.delete.modal.button.cancel.tooltip' | translate}}">
+      <i class="fas fa-times fa-fw"></i> {{'item.version.delete.modal.button.cancel' | translate}}
+    </button>
+    <button class="btn btn-danger btn-sm confirm"
+            (click)="onModalSubmit()"
+            title="{{'item.version.delete.modal.button.confirm.tooltip' | translate}}">
+      <i class="fas fa-check fa-fw"></i> {{'item.version.delete.modal.button.confirm' | translate}}
+    </button>
+  </div>
+</div>

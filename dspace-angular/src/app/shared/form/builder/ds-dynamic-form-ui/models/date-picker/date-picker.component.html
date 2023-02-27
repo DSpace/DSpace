@@ -1,0 +1,57 @@
+<div>
+  <fieldset class="d-flex">
+    <legend [id]="'legend_' + model.id" [ngClass]="[getClass('element', 'label'), getClass('grid', 'label')]">
+      {{model.placeholder}} <span *ngIf="model.required">*</span>
+    </legend>
+    <ds-number-picker
+      tabindex="1"
+      [id]="model.id + '_year'"
+      [disabled]="model.disabled"
+      [min]="minYear"
+      [max]="maxYear"
+      [name]="'year'"
+      [size]="4"
+      [(ngModel)]="initialYear"
+      [value]="year"
+      [invalid]="showErrorMessages"
+      [placeholder]='yearPlaceholder'
+      (blur)="onBlur($event)"
+      (change)="onChange($event)"
+      (focus)="onFocus($event)"
+    ></ds-number-picker>
+
+    <ds-number-picker
+      tabindex="2"
+      [id]="model.id + '_month'"
+      [min]="minMonth"
+      [max]="maxMonth"
+      [name]="'month'"
+      [size]="6"
+      [(ngModel)]="initialMonth"
+      [value]="month"
+      [placeholder]="monthPlaceholder"
+      [disabled]="!year || model.disabled"
+      (blur)="onBlur($event)"
+      (change)="onChange($event)"
+      (focus)="onFocus($event)"
+    ></ds-number-picker>
+
+    <ds-number-picker
+      tabindex="3"
+      [id]="model.id + '_day'"
+      [min]="minDay"
+      [max]="maxDay"
+      [name]="'day'"
+      [size]="2"
+      [(ngModel)]="initialDay"
+      [value]="day"
+      [placeholder]="dayPlaceholder"
+      [disabled]="!month || model.disabled"
+      (blur)="onBlur($event)"
+      (change)="onChange($event)"
+      (focus)="onFocus($event)"
+    ></ds-number-picker>
+  </fieldset>
+</div>
+
+<div class="clearfix"></div>

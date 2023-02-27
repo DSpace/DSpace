@@ -1,0 +1,25 @@
+<form #form="ngForm" (ngSubmit)="onSubmit(inputField.value)"
+      [action]="action" (keydown)="onKeydown($event)"
+      (keydown.arrowdown)="shiftFocusDown($event)"
+      (keydown.arrowup)="shiftFocusUp($event)" (keydown.esc)="close()"
+      (dsClickOutside)="close();">
+    <input #inputField type="text" [ngModel]="value" [name]="name"
+           class="form-control suggestion_input"
+           (focus)="open()"
+           (blur)="onSubmit(inputField.value)"
+           (click)="open()"
+           [ngClass]="{'is-invalid': !valid}"
+           [dsDebounce]="debounceTime" (onDebounce)="find($event)"
+           [placeholder]="placeholder"
+           [ngModelOptions]="{standalone: true}" autocomplete="off"/>
+    <input type="submit" class="d-none"/>
+    <div class="autocomplete dropdown-menu" [ngClass]="{'show': (show | async) && isNotEmpty(suggestions)}">
+        <div class="dropdown-list">
+            <div *ngFor="let suggestionOption of suggestions">
+                <a href="javascript:void(0);" class="d-block dropdown-item"  (click)="onClickSuggestion(suggestionOption)" #suggestion>
+                    <span [innerHTML]="suggestionOption"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</form>

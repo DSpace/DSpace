@@ -1,0 +1,16 @@
+.ds-success {
+  background-color: var(--bs-success-bg);
+  border: 1px solid var(--bs-success);
+}
+
+.ds-drag-handle:not(.disabled) {
+  cursor: grab;
+}
+
+::ng-deep .edit-field>ngb-tooltip-window .tooltip-inner {
+  min-width: var(--ds-dso-edit-virtual-tooltip-min-width);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}

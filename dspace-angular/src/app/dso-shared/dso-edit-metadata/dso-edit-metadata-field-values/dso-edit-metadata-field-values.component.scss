@@ -1,0 +1,7 @@
+.ds-drop-list {
+  background-color: var(--bs-gray-500);
+
+  &.disabled {
+    opacity: 0.3;
+  }
+}

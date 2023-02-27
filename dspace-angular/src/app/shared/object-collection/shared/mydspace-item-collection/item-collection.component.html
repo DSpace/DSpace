@@ -1,0 +1,7 @@
+<div class="mt-2 mb-2" *ngIf="(collection$ | async)">
+  <span class="text-muted">{{'collection.listelement.badge' | translate}}:
+    <a [routerLink]="['/collections', (collection$ | async)?.id]">
+      {{(collection$ | async)?.name}}
+    </a>
+    </span>
+</div>

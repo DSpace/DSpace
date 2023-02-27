@@ -1,0 +1,13 @@
+<button type="button" class="btn btn-info mt-1 mb-3"
+  ngbTooltip="{{'submission.workflow.tasks.pool.claim_help' | translate}}" [disabled]="(processing$ | async)"
+  (click)="claim()">
+  <span *ngIf="(processing$ | async)"><i class='fas fa-circle-notch fa-spin'></i>
+    {{'submission.workflow.tasks.generic.processing' | translate}}</span>
+  <span *ngIf="!(processing$ | async)"><i class="fas fa-hand-paper"></i> {{'submission.workflow.tasks.pool.claim' |
+    translate}}</span>
+</button>
+<button class="btn btn-primary workflow-view ml-1 mt-1 mb-3" data-test="view-btn"
+  ngbTooltip="{{'submission.workflow.generic.view-help' | translate}}"
+  [routerLink]="[getWorkflowItemViewRoute(workflowitem)]">
+  <i class="fa fa-info-circle"></i> {{"submission.workflow.generic.view" | translate}}
+</button>

@@ -1,0 +1,39 @@
+<td class="text-center">
+  <div class="custom-control custom-checkbox">
+    <input type="checkbox"
+           class="custom-control-input"
+           [id]="entry.id"
+           [ngModel]="entry.checked"
+           (ngModelChange)="this.toggleCheckbox.emit($event);">
+    <label class="custom-control-label" [for]="entry.id"></label>
+  </div>
+</td>
+<th scope="row">
+  {{entry.id}}
+</th>
+<td>{{entry.policy.name}}</td>
+<td>{{entry.policy.policyType}}</td>
+<td>{{entry.policy.action}}</td>
+<td>
+  {{ epersonName$ | async }}
+</td>
+<td>
+  {{ groupName$ | async }}
+</td>
+<td>{{formatDate(entry.policy.startDate)}}</td>
+<td>{{formatDate(entry.policy.endDate)}}</td>
+<td class="text-center">
+
+  <div class="btn-group edit-field">
+    <button class="btn btn-outline-primary btn-sm"
+            [title]="'resource-policies.table.headers.edit.policy' | translate"
+            (click)="redirectToResourcePolicyEditPage()">
+      <i class="fas fa-edit fa-fw"></i>
+    </button>
+    <button *ngIf="(groupName$ | async) !== undefined" class="btn btn-outline-primary btn-sm"
+            [title]="'resource-policies.table.headers.edit.group' | translate"
+            (click)="redirectToGroupEditPage()">
+      <i class="fas fa-users fa-fw"></i>
+    </button>
+  </div>
+</td>

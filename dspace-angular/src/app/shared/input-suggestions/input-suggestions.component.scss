@@ -1,0 +1,16 @@
+.autocomplete {
+    width: 100%;
+
+    .dropdown-item {
+        white-space: normal;
+        word-break: break-word;
+        padding: var(--bs-input-padding-y) var(--bs-input-padding-x);
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+form {
+    position: relative;
+}

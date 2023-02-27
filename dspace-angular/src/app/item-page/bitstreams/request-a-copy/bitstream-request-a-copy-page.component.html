@@ -1,0 +1,87 @@
+<div class="container">
+    <h3 class="mb-4">{{'bitstream-request-a-copy.header' | translate}}</h3>
+    <div *ngIf="canDownload$|async" class="alert alert-success">
+        <span>{{'bitstream-request-a-copy.alert.canDownload1' | translate}}</span>
+        <a [routerLink]="getBitstreamLink()">{{'bitstream-request-a-copy.alert.canDownload2'| translate}}</a>
+    </div>
+    <div>
+        <p>{{'bitstream-request-a-copy.intro' | translate}} <a [routerLink]="getItemPath()">{{itemName}}</a></p>
+        <p *ngIf="bitstream != undefined && allfiles.value === 'false'">{{'bitstream-request-a-copy.intro.bitstream.one' | translate}} {{bitstreamName}}</p>
+        <p *ngIf="allfiles.value === 'true'">{{'bitstream-request-a-copy.intro.bitstream.all' | translate}}</p>
+    </div>
+    <form [class]="'ng-invalid'" [formGroup]="requestCopyForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <label for="name">{{'bitstream-request-a-copy.name.label' | translate}}</label>
+                    <input [className]="(name.invalid) && (name.dirty || name.touched) ? 'form-control is-invalid' :'form-control'"
+                           type="text" id="name" formControlName="name"/>
+                    <div *ngIf="name.invalid && (name.dirty || name.touched)"
+                         class="invalid-feedback show-feedback">
+                    <span *ngIf="name.errors && name.errors.required">
+                        {{ 'bitstream-request-a-copy.name.error' | translate }}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <label
+                            for="email">{{'bitstream-request-a-copy.email.label' | translate}}</label>
+                    <input
+                            [className]="(email.invalid) && (email.dirty || email.touched) ? 'form-control is-invalid' :'form-control'"
+                            id="email" formControlName="email">
+                    <div *ngIf="email.invalid && (email.dirty || email.touched)"
+                         class="invalid-feedback show-feedback">
+                    <span *ngIf="email.errors">
+                        {{ 'bitstream-request-a-copy.email.error' | translate }}
+                    </span>
+                    </div>
+                    <small class="text-muted ds-hint">{{'bitstream-request-a-copy.email.hint' |translate}}</small>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div>{{'bitstream-request-a-copy.allfiles.label' |translate}}</div>
+                    <div class="ml-4">
+                        <input [className]="'form-check-input'" type="radio"
+                               id="allfiles-true" formControlName="allfiles" value="true">
+                        <label class="form-check-label"
+                               for="allfiles-true">{{'bitstream-request-a-copy.files-all-true.label' | translate}}</label>
+                    </div>
+                    <div class="ml-4">
+                        <input [className]="'form-check-input'" type="radio"
+                               id="allfiles-false" formControlName="allfiles" value="false" [attr.disabled]="bitstream === undefined ? true : null ">
+                        <label class="form-check-label"
+                               for="allfiles-false">{{'bitstream-request-a-copy.files-all-false.label' | translate}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <label
+                            for="message">{{'bitstream-request-a-copy.message.label' | translate}}</label>
+                    <textarea rows="5"
+                              [className]="'form-control'"
+                              id="message" formControlName="message"></textarea>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <hr>
+    <div class="row">
+        <div class="col-12 text-right">
+
+            <a (click)="navigateBack()" role="button" class="btn btn-outline-secondary mr-1">
+                <i class="fas fa-arrow-left"></i> {{'bitstream-request-a-copy.return' | translate}}
+            </a>
+
+            <button
+                    [disabled]="requestCopyForm.invalid"
+                    class="btn btn-default btn-primary"
+                    (click)="onSubmit()">{{'bitstream-request-a-copy.submit' | translate}}</button>
+        </div>
+    </div>
+</div>

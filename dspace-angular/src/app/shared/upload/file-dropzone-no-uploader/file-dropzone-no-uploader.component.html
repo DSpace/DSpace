@@ -1,0 +1,28 @@
+<div ng2FileDrop
+     class="ds-document-drop-zone position-fixed h-100 w-100"
+     [class.ds-document-drop-zone-active]="(isOverDocumentDropZone | async)"
+     [uploader]="uploader"
+     (onFileDrop)="setFile($event)"
+     (fileOver)="fileOverDocument($event)">
+</div>
+<div *ngIf="(isOverDocumentDropZone | async)"
+     class="ds-document-drop-zone-inner position-fixed h-100 w-100 p-2">
+  <div
+    class="ds-document-drop-zone-inner-content position-relative d-flex flex-column justify-content-center text-center h-100 w-100">
+    <p class="text-primary">{{ dropMessageLabel | translate}}</p>
+  </div>
+</div>
+<div class="well ds-base-drop-zone mt-1 mb-3 text-muted p-2">
+  <p class="text-center m-0 p-0 d-flex justify-content-center align-items-center"
+     *ngIf="fileObject!=null">  {{ fileObject.name }} </p>
+  <p class="text-center m-0 p-0 d-flex justify-content-center align-items-center">
+      <span><i class="fas fa-cloud-upload"
+               aria-hidden="true"></i> {{ (fileObject == null ? dropMessageLabel : dropMessageLabelReplacement) | translate}} {{'uploader.or' | translate}}</span>
+    <label class="btn btn-link m-0 p-0 ml-1">
+      <input class="form-control-file d-none" requireFile #file="ngModel" type="file" name="file-upload"
+             id="file-upload"
+             [ngModel]="fileObject" (ngModelChange)="setFile($event)">
+      {{'uploader.browse' | translate}}
+    </label>
+  </p>
+</div>

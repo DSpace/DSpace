@@ -1,0 +1,18 @@
+<div>
+  <div class="modal-header" id="idle-modal.header">{{ "idle-modal.header" | translate }}
+    <button type="button" class="close" (click)="closePressed()" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{ "idle-modal.info" | translate:{timeToExpire: timeToExpire} }}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="cancel btn btn-danger" (click)="logOutPressed()" aria-label="Log out">
+      <i class="fas fa-sign-out-alt"></i> {{ "idle-modal.log-out" | translate }}
+    </button>
+    <button type="button" class="confirm btn btn-primary" (click)="extendSessionPressed()" aria-label="Extend session" ngbAutofocus>
+      <i class="fas fa-redo-alt"></i> {{ "idle-modal.extend-session" | translate }}
+    </button>
+  </div>
+</div>

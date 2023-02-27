@@ -1,0 +1,22 @@
+<div class="container-fluid mb-2" *ngVar="(itemTemplateRD$ | async) as itemTemplateRD">
+  <label>{{ 'collection.edit.template.label' | translate}}</label>
+  <div class="button-row space-children-mr">
+    <button *ngIf="!itemTemplateRD?.payload" class="btn btn-success" (click)="addItemTemplate()">
+      <i class="fas fa-plus"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"collection.edit.template.add-button" | translate}}</span>
+    </button>
+    <button *ngIf="itemTemplateRD?.payload" class="btn btn-danger" (click)="deleteItemTemplate()">
+      <i class="fas fa-trash-alt"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"collection.edit.template.delete-button" | translate}}</span>
+    </button>
+    <button *ngIf="itemTemplateRD?.payload" class="btn btn-primary"
+            [routerLink]="'/collections/' + (dsoRD$ | async)?.payload.uuid + '/itemtemplate'">
+      <i class="fas fa-edit"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"collection.edit.template.edit-button" | translate}}</span>
+    </button>
+  </div>
+</div>
+<ds-collection-form [dso]="(dsoRD$ | async)?.payload"
+                    (submitForm)="onSubmit($event)"
+                    (back)="navigateToHomePage()"
+                    (finish)="navigateToHomePage()"></ds-collection-form>

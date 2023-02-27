@@ -1,0 +1,46 @@
+:host {
+  outline: none;
+}
+
+.chevron::before {
+  border-style: solid;
+  border-width: 0.29em 0.29em 0 0;
+  content: '';
+  display: inline-block;
+  height: 0.69em;
+  left: 0.05em;
+  position: relative;
+  top: 0.15em;
+  transform: rotate(-45deg);
+  vertical-align: middle;
+  width: 0.71em;
+}
+.chevron.bottom:before {
+  top: -.3em;
+  transform: rotate(135deg);
+}
+
+input {
+  max-width: 80px !important;
+}
+
+.btn-link-focus {
+  // behave as btn-link but does not override box-shadow of btn-link:focus
+  font-weight: $font-weight-normal;
+  color: $link-color;
+  text-decoration: $link-decoration;
+  @include hover {
+    color: $link-hover-color;
+    text-decoration: $link-hover-decoration;
+  }
+  &:disabled,
+  &.disabled {
+    color: $btn-link-disabled-color;
+    pointer-events: none;
+  }
+
+  &:focus,
+  &.focus {
+    text-decoration: $link-hover-decoration;
+  }
+}

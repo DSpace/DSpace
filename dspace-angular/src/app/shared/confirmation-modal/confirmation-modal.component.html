@@ -1,0 +1,18 @@
+<div>
+  <div class="modal-header">{{ headerLabel | translate:{dsoName: dso?.name} }}
+    <button type="button" class="close" (click)="close()" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{ infoLabel | translate:{dsoName: dso?.name} }}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="cancel btn btn-outline-secondary" (click)="cancelPressed()" aria-label="Cancel">
+      <i class="fas fa-times"></i> {{ cancelLabel | translate:{dsoName: dso?.name} }}
+    </button>
+    <button type="button" class="confirm btn btn-{{brandColor}}" (click)="confirmPressed()" aria-label="Confirm" ngbAutofocus>
+      <i *ngIf="confirmIcon" class="{{confirmIcon}}"></i> {{ confirmLabel | translate:{dsoName: dso?.name} }}
+    </button>
+  </div>
+</div>

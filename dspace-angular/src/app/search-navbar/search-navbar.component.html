@@ -1,0 +1,12 @@
+<div id="search-navbar-container" [title]="'nav.search' | translate" (dsClickOutside)="collapse()">
+  <div class="d-inline-block position-relative">
+    <form [formGroup]="searchForm" (ngSubmit)="onSubmit(searchForm.value)" autocomplete="on">
+      <input #searchInput [@toggleAnimation]="isExpanded" [attr.aria-label]="('nav.search' | translate)" name="query"
+             formControlName="query" type="text" placeholder="{{searchExpanded ? ('nav.search' | translate) : ''}}"
+             class="d-inline-block bg-transparent position-absolute form-control dropdown-menu-right p-1" [attr.data-test]="'header-search-box' | dsBrowserOnly">
+      <a class="submit-icon" [routerLink]="" (click)="searchExpanded ? onSubmit(searchForm.value) : expand()" [attr.data-test]="'header-search-icon' | dsBrowserOnly">
+        <em class="fas fa-search fa-lg fa-fw"></em>
+      </a>
+    </form>
+  </div>
+</div>

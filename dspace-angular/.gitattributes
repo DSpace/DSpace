@@ -1,0 +1,16 @@
+# By default, auto detect text files and perform LF normalization
+# This ensures code is always checked in with LF line endings
+* text=auto
+
+# JS and TS files must always use LF for Angular tools to work
+# Some Angular tools expect LF line endings, even on Windows.
+# This ensures Windows always checks out these files with LF line endings
+# We've copied many of these rules from https://github.com/angular/angular-cli/
+*.js eol=lf
+*.ts eol=lf
+*.json eol=lf
+*.json5 eol=lf
+*.css eol=lf
+*.scss eol=lf
+*.html eol=lf
+*.svg eol=lf

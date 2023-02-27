@@ -1,0 +1,21 @@
+<div class="thumbnail" [class.limit-width]="limitWidth" *ngVar="(isLoading$ | async) as isLoading">
+  <div *ngIf="isLoading" class="thumbnail-content outer">
+    <div class="inner">
+      <div class="centered">
+        <ds-themed-loading [spinner]="true"></ds-themed-loading>
+      </div>
+    </div>
+  </div>
+  <ng-container *ngVar="(src$ | async) as src">
+    <!-- don't use *ngIf="!isLoading" so the thumbnail can load in while the animation is playing -->
+    <img *ngIf="src !== null" class="thumbnail-content img-fluid" [ngClass]="{'d-none': isLoading}"
+         [src]="src | dsSafeUrl" [alt]="alt | translate" (error)="errorHandler()" (load)="successHandler()">
+    <div *ngIf="src === null && !isLoading" class="thumbnail-content outer">
+      <div class="inner">
+        <div class="thumbnail-placeholder centered lead">
+          {{ placeholder | translate }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,54 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title">{{ (labelPrefix + label + '.title') | translate }}</h4>
+  <button type="button" class="close" aria-label="Close button" aria-describedby="modal-title"
+          (click)="modal.dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <h4>{{ (labelPrefix + 'head.' + externalSourceEntry.externalSource | translate) }}</h4>
+  <div id="external-source-entry-information" class="mb-3">
+    <div><span>{{externalSourceEntry.display}}</span></div>
+    <div *ngIf="uri"><a href="{{uri.value}}">{{uri.value}}</a></div>
+  </div>
+
+  <h4>{{ (labelPrefix + 'select' | translate) }}</h4>
+
+  <div id="external-source-entry-entities" class="mb-3">
+    <h5 class="font-weight-bold">{{ (labelPrefix + 'entities' | translate) }}</h5>
+
+    <ds-search-results *ngIf="(localEntitiesRD$ | async)?.payload?.page?.length > 0"
+                       [searchResults]="(localEntitiesRD$ | async)"
+                       [sortConfig]="this.lookupRelationService.searchConfig?.sort"
+                       [searchConfig]="this.lookupRelationService.searchConfig"
+                       [selectable]="true"
+                       [disableHeader]="true"
+                       [hidePaginationDetail]="true"
+                       [selectionConfig]="{ repeatable: false, listId: entityListId }"
+                       [linkType]="linkTypes.ExternalLink"
+                       [context]="context"
+                       (deselectObject)="deselectEntity()"
+                       (selectObject)="selectEntity($event)">
+    </ds-search-results>
+    <div class="ml-4">
+      <input class="form-check-input" type="radio" name="new-entity" id="new-entity" value="new-entity" (click)="selectNewEntity()" [checked]="selectedImportType === importType.NewEntity" />
+      <label class="form-check-label" for="new-entity">{{ (labelPrefix + 'entities.new' | translate) }}</label>
+    </div>
+  </div>
+  <div id="external-source-entry-authority" *ngIf="authorityEnabled">
+    <h5 class="font-weight-bold">{{ (labelPrefix + 'authority' | translate) }}</h5>
+
+    <div class="ml-4">
+      <input class="form-check-input" type="radio" name="new-authority" id="new-authority" value="new-authority" (click)="selectNewAuthority()" [checked]="selectedImportType === importType.NewAuthority" />
+      <label class="form-check-label" for="new-authority">{{ (labelPrefix + 'authority.new' | translate) }}</label>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <div>
+    <button type="button" class="btn btn-outline-secondary" (click)="close()">{{ (labelPrefix + 'cancel' | translate) }}</button>
+  </div>
+  <div>
+    <button type="button" class="btn btn-primary" [disabled]="selectedImportType === importType.None" (click)="import()">{{ (labelPrefix + 'import' | translate) }}</button>
+  </div>
+</div>

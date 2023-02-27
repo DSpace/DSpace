@@ -1,0 +1,7 @@
+<div [class.change-gallery]="isAuthenticated$ | async">
+  <ngx-gallery
+    class="ngx-gallery"
+    [options]="galleryOptions"
+    [images]="galleryImages"
+  ></ngx-gallery>
+</div>

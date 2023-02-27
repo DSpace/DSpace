@@ -1,0 +1,19 @@
+form {
+    z-index: 1;
+    &:before {
+        pointer-events: none; // prevent the icon from ‘catching‘ the click
+        position: absolute;
+        font-weight: 900;
+        font-family: "Font Awesome 5 Free";
+        content: "\f0d7";
+        top: 7px;
+        right: 0;
+        height: 20px;
+        width: 20px;
+        z-index: -1;
+    }
+
+    input.suggestion_input {
+        background: transparent;
+    }
+}

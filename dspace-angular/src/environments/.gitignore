@@ -1,0 +1,5 @@
+environment.*.ts
+
+!environment.production.ts
+!environment.test.ts
+!environment.ts

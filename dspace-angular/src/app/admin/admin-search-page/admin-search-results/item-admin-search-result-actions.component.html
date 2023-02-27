@@ -1,0 +1,30 @@
+<div class="space-children-mr my-1">
+  <a [ngClass]="{'btn-sm': small}" class="btn btn-secondary move-link" [routerLink]="[getMoveRoute()]" [title]="'admin.search.item.move' | translate">
+    <i class="fa fa-arrow-circle-right"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.move" | translate}}</span>
+  </a>
+
+  <a [ngClass]="{'btn-sm': small}" *ngIf="item && item.isDiscoverable" class="btn btn-secondary private-link" [routerLink]="[getPrivateRoute()]" [title]="'admin.search.item.make-private' | translate">
+    <i class="fa fa-eye-slash"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.make-private" | translate}}</span>
+  </a>
+
+  <a [ngClass]="{'btn-sm': small}" *ngIf="item && !item.isDiscoverable" class="btn btn-secondary public-link" [routerLink]="[getPublicRoute()]" [title]="'admin.search.item.make-public' | translate">
+    <i class="fa fa-eye"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.make-public" | translate}}</span>
+  </a>
+
+  <a [ngClass]="{'btn-sm': small}" class="btn btn-secondary edit-link" [routerLink]="[getEditRoute()]" [title]="'admin.search.item.edit' | translate">
+    <i class="fa fa-edit"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.edit" | translate}}</span>
+  </a>
+
+  <a [ngClass]="{'btn-sm': small}" *ngIf="item && !item.isWithdrawn" class="btn btn-warning t withdraw-link" [routerLink]="[getWithdrawRoute()]" [title]="'admin.search.item.withdraw' | translate">
+    <i class="fa fa-ban"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.withdraw" | translate}}</span>
+  </a>
+
+  <a [ngClass]="{'btn-sm': small}" *ngIf="item && item.isWithdrawn" class="btn btn-warning reinstate-link" [routerLink]="[getReinstateRoute()]" [title]="'admin.search.item.reinstate' | translate">
+    <i class="fa fa-undo"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.reinstate" | translate}}</span>
+  </a>
+
+  <a [ngClass]="{'btn-sm': small}" class="btn btn-danger delete-link" [routerLink]="[getDeleteRoute()]" [title]="'admin.search.item.delete' | translate">
+    <i class="fa fa-trash"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.search.item.delete" | translate}}</span>
+  </a>
+</div>
+

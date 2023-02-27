@@ -1,0 +1,32 @@
+.expandable-navbar-section {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dropdown-menu {
+    overflow: hidden;
+    min-width: 100%;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    ::ng-deep a.nav-link {
+        padding-right: var(--bs-spacer);
+        padding-left: var(--bs-spacer);
+        white-space: nowrap;
+    }
+}
+
+/** Mobile menu styling **/
+@media screen and (max-width: map-get($grid-breakpoints, md)) {
+    .dropdown-toggle {
+        &:after {
+            float: right;
+            margin-top: calc(var(--bs-spacer) / 2);
+        }
+    }
+    .dropdown-menu {
+        border: 0;
+
+    }
+}

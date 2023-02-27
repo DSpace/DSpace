@@ -1,0 +1,100 @@
+<div class="container">
+  <div class="epeople-registry row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between border-bottom mb-3">
+        <h2 id="header" class="pb-2">{{labelPrefix + 'head' | translate}}</h2>
+
+        <div *ngIf="!isEPersonFormShown">
+          <button class="mr-auto btn btn-success addEPerson-button"
+                  (click)="isEPersonFormShown = true">
+            <i class="fas fa-plus"></i>
+            <span class="d-none d-sm-inline">{{labelPrefix + 'button.add' | translate}}</span>
+          </button>
+        </div>
+      </div>
+
+      <ds-eperson-form *ngIf="isEPersonFormShown" (submitForm)="reset()"
+                       (cancelForm)="isEPersonFormShown = false"></ds-eperson-form>
+
+      <div *ngIf="!isEPersonFormShown">
+        <h3 id="search" class="border-bottom pb-2">{{labelPrefix + 'search.head' | translate}}
+
+        </h3>
+        <form [formGroup]="searchForm" (ngSubmit)="search(searchForm.value)" class="d-flex justify-content-between">
+          <div>
+            <select name="scope" id="scope" formControlName="scope" class="form-control" aria-label="Search scope">
+              <option value="metadata">{{labelPrefix + 'search.scope.metadata' | translate}}</option>
+              <option value="email">{{labelPrefix + 'search.scope.email' | translate}}</option>
+            </select>
+          </div>
+          <div class="flex-grow-1 mr-3 ml-3">
+            <div class="form-group input-group">
+              <input type="text" name="query" id="query" formControlName="query"
+                    class="form-control" attr.aria-label="{{labelPrefix + 'search.placeholder' | translate}}"
+                     [placeholder]="(labelPrefix + 'search.placeholder' | translate)">
+              <span class="input-group-append">
+                <button type="submit" class="search-button btn btn-primary">
+                  <i class="fas fa-search"></i> {{ labelPrefix + 'search.button' | translate }}
+                </button>
+              </span>
+            </div>
+          </div>
+          <div>
+            <button (click)="clearFormAndResetResult();"
+                    class="search-button btn btn-secondary">{{labelPrefix + 'button.see-all' | translate}}</button>
+          </div>
+        </form>
+
+        <ds-themed-loading *ngIf="searching$ | async"></ds-themed-loading>
+        <ds-pagination
+          *ngIf="(pageInfoState$ | async)?.totalElements > 0 && !(searching$ | async)"
+          [paginationOptions]="config"
+          [pageInfoState]="pageInfoState$"
+          [collectionSize]="(pageInfoState$ | async)?.totalElements"
+          [hideGear]="true"
+          [hidePagerWhenSinglePage]="true">
+
+          <div class="table-responsive">
+            <table id="epeople" class="table table-striped table-hover table-bordered">
+              <thead>
+              <tr>
+                <th scope="col">{{labelPrefix + 'table.id' | translate}}</th>
+                <th scope="col">{{labelPrefix + 'table.name' | translate}}</th>
+                <th scope="col">{{labelPrefix + 'table.email' | translate}}</th>
+                <th>{{labelPrefix + 'table.edit' | translate}}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let epersonDto of (ePeopleDto$ | async)?.page"
+                  [ngClass]="{'table-primary' : isActive(epersonDto.eperson) | async}">
+                <td>{{epersonDto.eperson.id}}</td>
+                <td>{{epersonDto.eperson.name}}</td>
+                <td>{{epersonDto.eperson.email}}</td>
+                <td>
+                  <div class="btn-group edit-field">
+                    <button class="delete-button" (click)="toggleEditEPerson(epersonDto.eperson)"
+                            class="btn btn-outline-primary btn-sm access-control-editEPersonButton"
+                            title="{{labelPrefix + 'table.edit.buttons.edit' | translate: {name: epersonDto.eperson.name} }}">
+                      <i class="fas fa-edit fa-fw"></i>
+                    </button>
+                    <button [disabled]="!epersonDto.ableToDelete" (click)="deleteEPerson(epersonDto.eperson)"
+                            class="btn btn-outline-danger btn-sm access-control-deleteEPersonButton"
+                            title="{{labelPrefix + 'table.edit.buttons.remove' | translate: {name: epersonDto.eperson.name} }}">
+                      <i class="fas fa-trash-alt fa-fw"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </ds-pagination>
+
+        <div *ngIf="(pageInfoState$ | async)?.totalElements == 0" class="alert alert-info w-100 mb-2" role="alert">
+          {{labelPrefix + 'no-items' | translate}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

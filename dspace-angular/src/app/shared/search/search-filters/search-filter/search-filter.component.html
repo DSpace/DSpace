@@ -1,0 +1,26 @@
+<div class="facet-filter d-block mb-3 p-3" *ngIf="active$ | async"
+     [id]="regionId" [attr.aria-labelledby]="toggleId" [ngClass]="{ 'focus': focusBox }" role="region">
+  <button (click)="toggle()" (focusin)="focusBox = true" (focusout)="focusBox = false"
+          class="filter-name d-flex" [attr.aria-controls]="regionId" [id]="toggleId"
+          [attr.aria-expanded]="false"
+          [attr.aria-label]="((collapsed$ | async) ? 'search.filters.filter.expand' : 'search.filters.filter.collapse') | translate"
+          [attr.data-test]="'filter-toggle' | dsBrowserOnly"
+  >
+    <h5 class="d-inline-block mb-0">
+      {{'search.filters.filter.' + filter.name + '.head'| translate}}
+    </h5>
+    <span class="filter-toggle flex-grow-1 fas p-auto"
+          [ngClass]="(collapsed$ | async) ? 'fa-plus' : 'fa-minus'"
+          [title]="((collapsed$ | async) ? 'search.filters.filter.expand' : 'search.filters.filter.collapse') | translate">
+    </span>
+  </button>
+  <div [@slide]="(collapsed$ | async) ? 'collapsed' : 'expanded'"
+       (@slide.start)="startSlide($event)" (@slide.done)="finishSlide($event)"
+       class="search-filter-wrapper" [ngClass]="{ 'closed' : closed, 'notab': notab }">
+    <ds-search-facet-filter-wrapper
+      [filterConfig]="filter"
+      [inPlaceSearch]="inPlaceSearch"
+      [refreshFilters]="refreshFilters" >
+    </ds-search-facet-filter-wrapper>
+  </div>
+</div>

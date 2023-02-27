@@ -1,0 +1,4 @@
+<p class="full-text-op">{{'iiifviewer.fullscreen.notice' | translate}}</p>
+<p *ngIf="!isViewerAvailable" id="viewer-message">{{viewerMessage}}</p>
+<iframe title="Mirador Viewer" allowtransparency="true" *ngIf="isViewerAvailable" [src]="iframeViewerUrl | async" id="mirador-viewer"></iframe>
+

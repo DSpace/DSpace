@@ -1,0 +1,21 @@
+:host {
+    display: block;
+    margin-top: calc(-1 * var(--ds-content-spacing));
+    margin-bottom: calc(-1 * var(--ds-content-spacing));
+}
+
+.display-3 {
+    word-break: break-word;
+}
+
+.jumbotron {
+  background-color: var(--ds-home-news-background-color);
+}
+
+a {
+  color: var(--ds-home-news-link-color);
+
+  @include hover {
+    color: var(--ds-home-news-link-hover-color);
+  }
+}

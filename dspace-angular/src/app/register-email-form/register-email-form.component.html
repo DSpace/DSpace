@@ -1,0 +1,63 @@
+<div class="container">
+    <h2>{{MESSAGE_PREFIX + '.header'|translate}}</h2>
+    <p>{{MESSAGE_PREFIX + '.info' | translate}}</p>
+
+    <p *ngIf="validMailDomains.length != 0 && typeRequest === TYPE_REQUEST_REGISTER">
+      {{ MESSAGE_PREFIX + '.info.maildomain' | translate}} {{ validMailDomains.join(', ')}}
+    </p>
+
+    <form [class]="'ng-invalid'" [formGroup]="form">
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-12">
+                    <label class="font-weight-bold"
+                           for="email">{{MESSAGE_PREFIX + '.email' | translate}}</label>
+                    <input [className]="(email.invalid) && (email.dirty || email.touched) ? 'form-control is-invalid' :'form-control'"
+                           type="text" id="email" formControlName="email"/>
+                    <div *ngIf="email.invalid && (email.dirty || email.touched)"
+                         class="invalid-feedback show-feedback">
+                    <span *ngIf="email.errors && email.errors.required">
+                        {{ MESSAGE_PREFIX + '.email.error.required' | translate }}
+                    </span>
+                    <span *ngIf="email.errors && ((email.errors.pattern && this.typeRequest === TYPE_REQUEST_REGISTER) || email.errors.email)">
+                        {{ MESSAGE_PREFIX + '.email.error.not-email-form' | translate }}
+                        <ng-container *ngIf="validMailDomains.length > 0">
+                          {{ MESSAGE_PREFIX + '.email.error.not-valid-domain' | translate: { domains: validMailDomains.join(', ') } }}
+                        </ng-container>
+                    </span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    {{MESSAGE_PREFIX + '.email.hint' |translate}}
+                </div>
+
+            </div>
+
+        </div>
+
+    <ds-alert [type]="AlertTypeEnum.Warning" *ngIf="registrationVerification && !isRecaptchaCookieAccepted()">
+      <p class="m-0" [innerHTML]="MESSAGE_PREFIX + '.google-recaptcha.must-accept-cookies' | translate"></p>
+      <p class="m-0"><a href="javascript:void(0);" (click)="this.klaroService.showSettings()">{{ MESSAGE_PREFIX + '.google-recaptcha.open-cookie-settings' | translate }}</a></p>
+    </ds-alert>
+
+    <div class="my-3" *ngIf="isRecaptchaCookieAccepted() && (googleRecaptchaService.captchaVersion() | async) === 'v2'">
+      <ds-google-recaptcha [captchaMode]="(googleRecaptchaService.captchaMode() | async)"
+                           (executeRecaptcha)="register($event)" (checkboxChecked)="onCheckboxChecked($event)"
+                           (showNotification)="showNotification($event)"></ds-google-recaptcha>
+    </div>
+
+    <ng-container *ngIf="!((googleRecaptchaService.captchaVersion() | async) === 'v2' && (googleRecaptchaService.captchaMode() | async) === 'invisible'); else v2Invisible">
+      <button class="btn btn-primary" [disabled]="form.invalid || registrationVerification && !isRecaptchaCookieAccepted() || disableUntilChecked" (click)="register()">
+        {{ MESSAGE_PREFIX + '.submit' | translate }}
+      </button>
+    </ng-container>
+
+    <ng-template #v2Invisible>
+      <button class="btn btn-primary" [disabled]="form.invalid" (click)="executeRecaptcha()">
+        {{ MESSAGE_PREFIX + '.submit' | translate }}
+      </button>
+    </ng-template>
+    </form>
+
+</div>

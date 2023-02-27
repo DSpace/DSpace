@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="group-form row">
+    <div class="col-12">
+
+      <div *ngIf="groupDataService.getActiveGroup() | async; then editheader; else createHeader"></div>
+
+      <ng-template #createHeader>
+        <h2 class="border-bottom pb-2">{{messagePrefix + '.head.create' | translate}}</h2>
+      </ng-template>
+
+      <ng-template #editheader>
+        <h2 class="border-bottom pb-2">
+          <span
+            *dsContextHelp="{
+              content: 'admin.access-control.groups.form.tooltip.editGroupPage',
+              id: 'edit-group-page',
+              iconPlacement: 'right',
+              tooltipPlacement: ['right', 'bottom']
+            }"
+          >
+            {{messagePrefix + '.head.edit' | translate}}
+          </span>
+        </h2>
+      </ng-template>
+
+      <ds-alert *ngIf="groupBeingEdited?.permanent" [type]="AlertTypeEnum.Warning"
+                [content]="messagePrefix + '.alert.permanent'"></ds-alert>
+      <ds-alert *ngIf="!(canEdit$ | async) && (groupDataService.getActiveGroup() | async)" [type]="AlertTypeEnum.Warning"
+                [content]="(messagePrefix + '.alert.workflowGroup' | translate:{ name: (getLinkedDSO(groupBeingEdited) | async)?.payload?.name, comcol: (getLinkedDSO(groupBeingEdited) | async)?.payload?.type, comcolEditRolesRoute: (getLinkedEditRolesRoute(groupBeingEdited) | async) })">
+      </ds-alert>
+
+      <ds-form [formId]="formId"
+               [formModel]="formModel"
+               [formGroup]="formGroup"
+               [formLayout]="formLayout"
+               [displayCancel]="false"
+               (submitForm)="onSubmit()">
+        <div before class="btn-group">
+          <button (click)="onCancel()"
+                  class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> {{messagePrefix + '.return' | translate}}</button>
+        </div>
+        <div after *ngIf="groupBeingEdited != null" class="btn-group">
+          <button class="btn btn-danger delete-button" [disabled]="!(canEdit$ | async) || groupBeingEdited.permanent"
+                  (click)="delete()">
+            <i class="fa fa-trash"></i> {{ messagePrefix + '.actions.delete' | translate}}
+          </button>
+        </div>
+      </ds-form>
+
+      <div class="mb-5">
+        <ds-members-list *ngIf="groupBeingEdited != null"
+                         [messagePrefix]="messagePrefix + '.members-list'"></ds-members-list>
+      </div>
+      <ds-subgroups-list *ngIf="groupBeingEdited != null"
+                         [messagePrefix]="messagePrefix + '.subgroups-list'"></ds-subgroups-list>
+
+
+
+    </div>
+  </div>
+</div>

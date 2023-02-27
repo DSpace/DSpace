@@ -1,0 +1,9 @@
+<div class="row">
+  <div *ngIf="showThumbnails" class="offset-3 offset-md-2 "></div>
+  <div [ngClass]="showThumbnails ? 'col-9' : 'col-md-12'">
+    <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer" [routerLink]="['/collections/' + dso.id]" class="lead" [innerHTML]="dsoTitle"></a>
+    <span *ngIf="linkType == linkTypes.None" class="lead" [innerHTML]="dsoTitle"></span>
+    <div *ngIf="dso.shortDescription" class="text-muted abstract-text" [innerHTML]="firstMetadataValue('dc.description.abstract')"></div>
+  </div>
+</div>

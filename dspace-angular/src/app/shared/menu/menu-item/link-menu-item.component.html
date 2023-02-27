@@ -1,0 +1,12 @@
+
+<a class="nav-item nav-link"
+   [ngClass]="{ 'disabled': !hasLink || item.disabled }"
+   [attr.aria-disabled]="!hasLink || item.disabled"
+   [title]="item.text | translate"
+   [routerLink]="getRouterLink()"
+   [queryParams]="item.queryParams"
+   (click)="$event.stopPropagation()"
+   (keyup.space)="navigate($event)"
+   (keyup.enter)="navigate($event)"
+   href="javascript:void(0);"
+>{{item.text | translate}}</a>

@@ -1,0 +1,198 @@
+{
+  "id": "0136fe00-43ca-439e-ae6c-b2b08c2b8f5e",
+  "uuid": "0136fe00-43ca-439e-ae6c-b2b08c2b8f5e",
+  "name": "The pathogenesis of dengue",
+  "handle": "123456789/156",
+  "metadata": {
+    "dc.contributor.author": [
+      {
+        "value": "Simmons, Cameron",
+        "language": null,
+        "authority": "virtual::1586",
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.date.accessioned": [
+      {
+        "value": "2018-09-14T11:15:00Z",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.date.available": [
+      {
+        "value": "2017-07-12T04:44:34Z",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 1
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 2
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 3
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 4
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 5
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 6
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 7
+      },
+      {
+        "value": "2011-07-06",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 8
+      },
+      {
+        "value": "2018-09-14T11:15:00Z",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 9
+      }
+    ],
+    "dc.date.issued": [
+      {
+        "value": "2011-09-23",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.description.abstract": [
+      {
+        "value": "Dengue is an important cause of childhood and adult morbidity in Asian and Latin American countries and its geographic footprint is growing. The clinical manifestations of dengue are the expression of a constellation of host and viral factors, some acquired, others intrinsic to the individual. The virulence of the virus plus the flavivirus infection history, age, gender and genotype of the host all appear to help shape the severity of infection. Similarly, the characteristics of the innate and acquired host immune response subsequent to infection are also likely determinants of outcome. This review summarises recent developments in the understanding of dengue pathogenesis and their relevance to dengue vaccine development.",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.identifier.uri": [
+      {
+        "value": "http://localhost:8080/dspace7/handle/123456789/156",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.language": [
+      {
+        "value": "English",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.title": [
+      {
+        "value": "The pathogenesis of dengue",
+        "language": "en_US",
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dc.type": [
+      {
+        "value": "Journal Article",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "relation.isAuthorOfPublication": [
+      {
+        "value": "b1b2c768-bda1-448a-a073-fc541e8b24d9",
+        "language": null,
+        "authority": "virtual::1586",
+        "confidence": -1,
+        "place": 0
+      }
+    ],
+    "dspace.entity.type": [
+      {
+        "value": "Publication",
+        "language": null,
+        "authority": null,
+        "confidence": -1,
+        "place": 0
+      }
+    ]
+  },
+  "inArchive": true,
+  "discoverable": true,
+  "withdrawn": false,
+  "lastModified": "2019-05-06T15:24:25.037+0000",
+  "type": "item",
+  "_links": {
+    "bundles": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e/bundles"
+    },
+    "mappedCollections": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e/mappedCollections"
+    },
+    "owningCollection": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e/owningCollection"
+    },
+    "relationships": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e/relationships"
+    },
+    "version": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e/version"
+    },
+    "templateItemOf": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e/templateItemOf"
+    },
+    "self": {
+      "href": "https://dspace7.4science.cloud/server/api/core/items/0136fe00-43ca-439e-ae6c-b2b08c2b8f5e"
+    }
+  }
+}

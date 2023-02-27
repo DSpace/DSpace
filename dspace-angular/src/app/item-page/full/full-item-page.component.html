@@ -1,0 +1,45 @@
+<div class="container" *ngVar="(itemRD$ | async) as itemRD">
+  <div class="item-page" *ngIf="itemRD?.hasSucceeded" @fadeInOut>
+    <div *ngIf="itemRD?.payload as item">
+      <ds-item-alerts [item]="item"></ds-item-alerts>
+      <ds-item-versions-notice [item]="item"></ds-item-versions-notice>
+      <ds-view-tracker [object]="item"></ds-view-tracker>
+      <div *ngIf="!item.isWithdrawn || (isAdmin$|async)" class="full-item-info">
+        <div class="d-flex flex-row">
+          <ds-item-page-title-field class="mr-auto" [item]="item"></ds-item-page-title-field>
+        <ds-dso-edit-menu></ds-dso-edit-menu>
+
+        </div>
+        <div class="simple-view-link my-3" *ngIf="!fromSubmissionObject">
+          <a class="btn btn-outline-primary" [routerLink]="[(itemPageRoute$ | async)]">
+            {{"item.page.link.simple" | translate}}
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table  table-striped">
+            <tbody>
+            <ng-container *ngFor="let mdEntry of (metadata$ | async) | keyvalue">
+              <tr *ngFor="let mdValue of mdEntry.value">
+                <td>{{mdEntry.key}}</td>
+                <td>{{mdValue.value}}</td>
+                <td>{{mdValue.language}}</td>
+              </tr>
+            </ng-container>
+            </tbody>
+          </table>
+        </div>
+        <ds-item-page-full-file-section [item]="item"></ds-item-page-full-file-section>
+        <ds-item-page-collections [item]="item"></ds-item-page-collections>
+        <ds-item-versions class="mt-2" [item]="item"></ds-item-versions>
+        <div class="button-row bottom" *ngIf="fromSubmissionObject">
+          <div class="text-right">
+            <button class="btn btn-outline-secondary mr-1" (click)="back()"><i
+                    class="fas fa-arrow-left"></i> {{'item.page.return' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ds-error *ngIf="itemRD?.hasFailed" message="{{'error.item' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="itemRD?.isLoading" message="{{'loading.item' | translate}}"></ds-themed-loading>
+</div>

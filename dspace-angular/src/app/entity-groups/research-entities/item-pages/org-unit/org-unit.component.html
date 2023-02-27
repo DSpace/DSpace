@@ -1,0 +1,64 @@
+<ds-themed-results-back-button *ngIf="showBackButton | async" [back]="back"></ds-themed-results-back-button>
+<div class="d-flex flex-row">
+  <ds-item-page-title-field [item]="object" class="mr-auto">
+  </ds-item-page-title-field>
+  <ds-dso-edit-menu></ds-dso-edit-menu>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-md-4">
+    <ds-metadata-field-wrapper [hideIfNoTextContent]="false">
+      <ds-thumbnail [thumbnail]="object?.thumbnail | async"
+                    [defaultImage]="'assets/images/orgunit-placeholder.svg'"
+                    [alt]="'thumbnail.orgunit.alt'"
+                    [placeholder]="'thumbnail.orgunit.placeholder'"
+      >
+      </ds-thumbnail>
+    </ds-metadata-field-wrapper>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['organization.foundingDate']"
+      [label]="'orgunit.page.dateestablished'">
+    </ds-generic-item-page-field>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['organization.address.addressLocality']"
+      [label]="'orgunit.page.city'">
+    </ds-generic-item-page-field>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['organization.adress.addressCountry']"
+      [label]="'orgunit.page.country'">
+    </ds-generic-item-page-field>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['dc.identifier']"
+      [label]="'orgunit.page.id'">
+    </ds-generic-item-page-field>
+  </div>
+  <div class="col-xs-12 col-md-7">
+    <ds-related-items
+      [parentItem]="object"
+      [relationType]="'isPublicationOfOrgUnit'"
+      [label]="'relationships.isPublicationOf' | translate">
+    </ds-related-items>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['dc.description']"
+      [label]="'orgunit.page.description'">
+    </ds-generic-item-page-field>
+    <div>
+      <a class="btn btn-outline-primary" [routerLink]="[itemPageRoute + '/full']">
+        {{"item.page.link.full" | translate}}
+      </a>
+    </div>
+  </div>
+  <div class="mt-5 w-100">
+    <ds-tabbed-related-entities-search  [item]="object"
+                                        [relationTypes]="[{
+                                          label: 'isOrgUnitOfPerson',
+                                          filter: 'isOrgUnitOfPerson',
+                                          configuration: 'person-relationships'
+                                        },
+                                        {
+                                          label: 'isOrgUnitOfProject',
+                                          filter: 'isOrgUnitOfProject',
+                                          configuration: 'project-relationships'
+                                        }]">
+    </ds-tabbed-related-entities-search>
+  </div>
+</div>

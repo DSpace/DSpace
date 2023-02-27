@@ -1,0 +1,25 @@
+<ng-container *ngIf="healthInfoResponse">
+  <ngb-accordion #acc="ngbAccordion" [activeIds]="activeId">
+    <ngb-panel [id]="entry.key" *ngFor="let entry of healthInfoResponse | dsObjNgFor">
+      <ng-template ngbPanelHeader>
+        <div class="w-100 d-flex justify-content-between collapse-toggle" ngbPanelToggle (click)="acc.toggle(entry.key)" data-test="info-component">
+          <button type="button" class="btn btn-link p-0" (click)="$event.preventDefault()" [attr.aria-expanded]="!acc.isExpanded(entry.key)"
+                  aria-controls="collapsePanels">
+            {{ getPanelLabel(entry.key) | titlecase }}
+          </button>
+          <div class="text-right d-flex">
+            <ds-health-status [status]="entry.value?.status"></ds-health-status>
+            <div class="ml-3 d-inline-block">
+              <span *ngIf="acc.isExpanded(entry.key)" class="fas fa-chevron-up fa-fw"></span>
+              <span *ngIf="!acc.isExpanded(entry.key)" class="fas fa-chevron-down fa-fw"></span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template ngbPanelContent>
+        <ds-health-info-component [healthInfoComponentName]="entry.key"
+                                  [healthInfoComponent]="entry.value"></ds-health-info-component>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</ng-container>

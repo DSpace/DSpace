@@ -1,0 +1,42 @@
+<ds-themed-results-back-button *ngIf="showBackButton | async" [back]="back"></ds-themed-results-back-button>
+<div class="d-flex flex-row">
+  <ds-item-page-title-field [item]="object" class="mr-auto">
+  </ds-item-page-title-field>
+  <ds-dso-edit-menu></ds-dso-edit-menu>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-md-4">
+    <ds-metadata-field-wrapper [hideIfNoTextContent]="false">
+      <ds-thumbnail [thumbnail]="object?.thumbnail | async"></ds-thumbnail>
+    </ds-metadata-field-wrapper>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['publicationvolume.volumeNumber']"
+      [label]="'journalvolume.page.volume'">
+    </ds-generic-item-page-field>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['creativework.datePublished']"
+      [label]="'journalvolume.page.issuedate'">
+    </ds-generic-item-page-field>
+  </div>
+  <div class="col-xs-12 col-md-6">
+    <ds-related-items
+      [parentItem]="object"
+      [relationType]="'isJournalOfVolume'"
+      [label]="'relationships.isSingleJournalOf' | translate">
+    </ds-related-items>
+    <ds-related-items
+      [parentItem]="object"
+      [relationType]="'isIssueOfJournalVolume'"
+      [label]="'relationships.isIssueOf' | translate">
+    </ds-related-items>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['dc.description']"
+      [label]="'journalvolume.page.description'">
+    </ds-generic-item-page-field>
+    <div>
+      <a class="btn btn-outline-primary" [routerLink]="[itemPageRoute + '/full']">
+        {{"item.page.link.full" | translate}}
+      </a>
+    </div>
+  </div>
+</div>

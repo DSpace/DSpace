@@ -1,0 +1,49 @@
+<div [className]="'float-left w-100 ' + wrapperClass">
+  <ul class="nav nav-pills d-flex flex-column flex-sm-row" [sortablejs]="chips.getChips()" [sortablejsOptions]="options">
+    <ng-container *ngFor="let c of chips.getChips(); let i = index">
+      <ng-template #tipContent>
+        <p class="text-left p-0 m-0" *ngFor="let tip of tipText">
+          {{tip}}
+        </p>
+      </ng-template>
+
+      <li class="nav-item mr-2 mb-1"
+          #t="ngbTooltip"
+          triggers="manual"
+          [ngbTooltip]="tipContent"
+          (dragstart)="t.close();onDragStart(i)"
+          (dragend)="onDragEnd(i)"
+          (mouseover)="showTooltip(t, i)"
+          (mouseout)="t.close()">
+        <a class="flex-sm-fill text-sm-center nav-link active bg-info"
+           href="javascript:void(0);"
+           [ngClass]="{'chip-selected disabled': (editable && c.editMode) || dragged == i}"
+           (click)="chipsSelected($event, i);">
+          <span>
+            <i *ngIf="showIcons && !c.isNestedItem()" dsAuthorityConfidenceState [authorityValue]="c.item" class="far fa-circle" aria-hidden="true"></i>
+            <ng-container *ngIf="showIcons && c.hasVisibleIcons()">
+              <i *ngFor="let icon of c.icons; let l = last"
+                 [ngbTooltip]="tipContent"
+                 triggers="manual"
+                 #t="ngbTooltip"
+                 class="{{icon.style}}"
+                 [class.mr-1]="!l"
+                 [class.mr-2]="l"
+                 dsAuthorityConfidenceState
+                 [authorityValue]="c.item[icon.metadata] || c.item"
+                 [visibleWhenAuthorityEmpty]="icon.visibleWhenAuthorityEmpty"
+                 aria-hidden="true"
+                 (dragstart)="t.close();"
+                 (mouseover)="showTooltip(t, i, icon.metadata)"
+                 (mouseout)="t.close()"></i>
+            </ng-container>
+            <p class="chip-label text-truncate d-table-cell">{{c.display}}</p><i class="fas fa-times ml-2" (click)="removeChips($event, i)" [title]="'chips.remove' | translate"></i>
+          </span>
+        </a>
+      </li>
+    </ng-container>
+    <div [class.chips-sort-ignore]="(isDragging | async)" class="flex-grow-1">
+      <ng-content ></ng-content>
+    </div>
+  </ul>
+</div>

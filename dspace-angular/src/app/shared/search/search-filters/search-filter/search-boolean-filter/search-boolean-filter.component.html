@@ -1,0 +1,21 @@
+<div>
+    <div class="filters py-2">
+        <ds-search-facet-selected-option *ngFor="let value of (selectedValues$ | async)" [selectedValue]="value" [filterConfig]="filterConfig" [selectedValues$]="selectedValues$" [inPlaceSearch]="inPlaceSearch"></ds-search-facet-selected-option>
+      <ng-container *ngFor="let page of (filterValues$ | async)?.payload">
+        <div [@facetLoad]="animationState">
+            <ds-search-facet-option *ngFor="let value of page.page; trackBy: trackUpdate" [filterConfig]="filterConfig" [filterValue]="value" [selectedValues$]="selectedValues$" [inPlaceSearch]="inPlaceSearch"></ds-search-facet-option>
+        </div>
+        </ng-container>
+        <div class="clearfix toggle-more-filters">
+            <a class="float-left" *ngIf="!(isLastPage$ | async)"
+               (click)="showMore()" href="javascript:void(0);">
+              {{"search.filters.filter.show-more" | translate}}
+            </a>
+            <a class="float-right" *ngIf="(currentPage | async) > 1"
+               (click)="showFirstPageOnly()" href="javascript:void(0);">
+              {{"search.filters.filter.show-less" | translate}}
+            </a>
+        </div>
+    </div>
+
+</div>

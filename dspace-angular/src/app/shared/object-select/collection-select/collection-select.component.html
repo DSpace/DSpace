@@ -1,0 +1,43 @@
+<ng-container *ngVar="(dsoRD$ | async) as collectionsRD">
+  <ds-pagination
+    *ngIf="collectionsRD?.payload?.totalElements > 0 || collectionsRD?.payload?.page?.length > 0"
+    [paginationOptions]="paginationOptions"
+    [sortOptions]="sortOptions"
+    [pageInfoState]="collectionsRD?.payload"
+    [collectionSize]="collectionsRD?.payload?.totalElements"
+    [hidePagerWhenSinglePage]="true"
+    [hideGear]="true">
+    <div class="table-responsive mt-2">
+      <table id="collection-select" class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th></th>
+            <th scope="col">{{'collection.select.table.title' | translate}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let collection of collectionsRD?.payload?.page">
+            <td><input class="collection-checkbox" [ngModel]="getSelected(collection.id) | async" (change)="switch(collection.id)" type="checkbox" name="{{collection.id}}"></td>
+            <td><a [routerLink]="['/collections', collection.id]">{{collection.name}}</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ds-pagination>
+  <div *ngIf="collectionsRD?.payload?.totalElements === 0 || collectionsRD?.payload?.page?.length === 0" class="alert alert-info w-100" role="alert">
+    {{'collection.select.empty' | translate}}
+  </div>
+  <ds-error *ngIf="collectionsRD?.hasFailed" message="{{'error.collections' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="!collectionsRD || collectionsRD?.isLoading" message="{{'loading.collections' | translate}}"></ds-themed-loading>
+  <div class="space-children-mr float-right" *ngVar="(selectedIds$ | async) as selectedIds">
+    <button class="btn btn-outline-secondary collection-cancel" (click)="onCancel()">
+      <i class="fas fa-times"></i> {{cancelButton | translate}}
+    </button>
+    <button class="btn collection-confirm"
+            [ngClass]="{'btn-danger': dangerConfirm, 'btn-primary': !dangerConfirm}"
+            [disabled]="selectedIds?.length === 0"
+            (click)="confirmSelected()">
+      <i class="fas fa-trash"></i> {{confirmButton | translate}}
+    </button>
+  </div>
+</ng-container>

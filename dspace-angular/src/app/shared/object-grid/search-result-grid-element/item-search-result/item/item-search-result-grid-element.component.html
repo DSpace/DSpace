@@ -1,0 +1,45 @@
+  <div class="card" [@focusShadow]="(isCollapsed$ | async)?'blur':'focus'">
+    <div class="position-absolute ml-1">
+        <ng-content></ng-content>
+    </div>
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+        class="card-img-top full-width" [attr.title]="'search.results.view-result' | translate">
+        <div>
+            <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+            </ds-thumbnail>
+        </div>
+    </a>
+    <span *ngIf="linkType == linkTypes.None" class="card-img-top full-width">
+        <div>
+            <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+            </ds-thumbnail>
+        </div>
+    </span>
+    <div class="card-body">
+        <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+        <ds-access-status-badge [item]="dso"></ds-access-status-badge>
+        <ds-truncatable [id]="dso.id">
+            <ds-truncatable-part [id]="dso.id" [minLines]="3" type="h4">
+                <h4 class="card-title" [innerHTML]="dsoTitle"></h4>
+            </ds-truncatable-part>
+            <ds-truncatable-part [id]="dso.id" [minLines]="1" *ngIf="dso.hasMetadata(['dc.contributor.author', 'dc.creator', 'dc.contributor.*'])">
+                <p class="item-authors card-text text-muted">
+                    <span *ngIf="dso.hasMetadata('dc.date.issued')" class="item-date">{{firstMetadataValue('dc.date.issued')}}</span>
+                    <span *ngFor="let author of allMetadataValues(['dc.contributor.author', 'dc.creator', 'dc.contributor.*']);">,
+                        <span [innerHTML]="author"></span>
+                    </span>
+                </p>
+            </ds-truncatable-part>
+            <ds-truncatable-part *ngIf="dso.hasMetadata('dc.description.abstract')" [id]="dso.id" [minLines]="3">
+                <p class="item-abstract card-text">
+                    <span [innerHTML]="firstMetadataValue('dc.description.abstract')"></span>
+                </p>
+            </ds-truncatable-part>
+        </ds-truncatable>
+        <div *ngIf="linkType != linkTypes.None" class="text-center">
+            <a [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+                class="lead btn btn-primary viewButton">{{ 'search.results.view-result' | translate}}</a>
+        </div>
+    </div>
+    <ng-content></ng-content>
+  </div>

@@ -1,0 +1,9 @@
+<span class="mb-5" [innerHTML]="licenseText$ | async"></span>
+<br> <br>
+<ds-form *ngIf="formModel" #formRef="formComponent"
+         [formId]="formId"
+         [formModel]="formModel"
+         [formLayout]="formLayout"
+         [displaySubmit]="displaySubmit"
+         [displayCancel]="false"
+         (dfChange)="onChange($event)"></ds-form>

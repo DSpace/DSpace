@@ -1,0 +1,17 @@
+<div class="container" *ngVar="(itemRequestRD$ | async) as itemRequestRD">
+  <h3 class="mb-4">{{'grant-request-copy.header' | translate}}</h3>
+  <div *ngIf="itemRequestRD && itemRequestRD.hasSucceeded">
+    <p>{{'grant-request-copy.intro' | translate}}</p>
+
+    <ds-email-request-copy [subject]="subject$ | async" [message]="message$ | async" (send)="grant($event)">
+      <p>{{ 'grant-deny-request-copy.email.permissions.info' | translate }}</p>
+      <form class="mb-3">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="permissions" [(ngModel)]="suggestOpenAccess" name="permissions">
+          <label class="form-check-label" for="permissions">{{ 'grant-deny-request-copy.email.permissions.label' | translate }}</label>
+        </div>
+      </form>
+    </ds-email-request-copy>
+  </div>
+  <ds-themed-loading *ngIf="!itemRequestRD || itemRequestRD?.isLoading"></ds-themed-loading>
+</div>

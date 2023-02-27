@@ -1,0 +1,20 @@
+<div [formGroup]="group" class="form-check custom-control custom-switch" [class.disabled]="model.disabled">
+  <input type="checkbox" class="form-check-input custom-control-input"
+         [checked]="model.checked"
+         [class.is-invalid]="showErrorMessages"
+         [id]="id"
+         [formControlName]="model.id"
+         [indeterminate]="model.indeterminate"
+         [name]="model.name"
+         [ngClass]="getClass('element', 'control')"
+         [required]="model.required"
+         [tabindex]="model.tabIndex"
+         [value]="model.value"
+         (blur)="onBlur($event)"
+         (change)="onChange($event)"
+         (focus)="onFocus($event)"/>
+  <label class="form-check-label custom-control-label" [for]="bindId && model.id">
+    <span [innerHTML]="model.label"
+          [ngClass]="[getClass('element', 'label'), getClass('grid', 'label')]"></span>
+  </label>
+</div>

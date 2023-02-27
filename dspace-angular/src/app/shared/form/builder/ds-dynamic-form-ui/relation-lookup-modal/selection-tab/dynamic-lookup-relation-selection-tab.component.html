@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-4">
+        <h3>{{ 'submission.sections.describe.relationship-lookup.selection-tab.settings' | translate}}</h3>
+        <ds-page-size-selector></ds-page-size-selector>
+    </div>
+    <div class="col-8">
+        <div *ngIf="(selectionRD$ | async)?.payload.page < 1">
+            {{'submission.sections.describe.relationship-lookup.selection-tab.no-selection' | translate}}
+        </div>
+        <div *ngIf="(selectionRD$ | async)?.payload.page.length >= 1">
+            <h3>{{ 'submission.sections.describe.relationship-lookup.selection-tab.title.' + relationshipType | translate}}</h3>
+            <ds-viewable-collection [objects]="selectionRD$ | async"
+                                    [selectable]="true"
+                                    [selectionConfig]="{ repeatable: repeatable, listId: listId }"
+                                    [config]="(currentPagination$ |async)"
+                                    [hideGear]="true"
+                                    [context]="context"
+                                    (deselectObject)="deselectObject.emit($event)"
+                                    (selectObject)="selectObject.emit($event)"
+            ></ds-viewable-collection>
+        </div>
+    </div>
+</div>

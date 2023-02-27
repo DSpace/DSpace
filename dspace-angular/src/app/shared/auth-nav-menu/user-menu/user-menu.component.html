@@ -1,0 +1,15 @@
+<ds-themed-loading *ngIf="(loading$ | async)"></ds-themed-loading>
+<div *ngIf="!(loading$ | async)">
+  <span class="dropdown-item-text" [class.pl-0]="inExpandableNavbar">
+    {{(user$ | async)?.name}}<br>
+    <span class="text-muted">{{(user$ | async)?.email}}</span>
+  </span>
+  <a [ngClass]="inExpandableNavbar ? 'nav-item nav-link' : 'dropdown-item'" [routerLink]="[profileRoute]" routerLinkActive="active">{{'nav.profile' | translate}}</a>
+  <a [ngClass]="inExpandableNavbar ? 'nav-item nav-link' : 'dropdown-item'" [routerLink]="[mydspaceRoute]" routerLinkActive="active">{{'nav.mydspace' | translate}}</a>
+  <a [ngClass]="inExpandableNavbar ? 'nav-item nav-link' : 'dropdown-item'" [routerLink]="[subscriptionsRoute]" routerLinkActive="active">{{'nav.subscriptions' | translate}}</a>
+
+  <div class="dropdown-divider"></div>
+  <ds-log-out *ngIf="!inExpandableNavbar" data-test="log-out-component"></ds-log-out>
+</div>
+
+

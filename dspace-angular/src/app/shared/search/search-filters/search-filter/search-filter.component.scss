@@ -1,0 +1,36 @@
+:host .facet-filter {
+  border: 1px solid var(--bs-light);
+  cursor: pointer;
+  line-height: 0;
+
+  .search-filter-wrapper {
+    line-height: var(--bs-line-height-base);
+    &.closed {
+      overflow: hidden;
+    }
+    &.notab {
+      visibility: hidden;
+    }
+  }
+
+  .filter-toggle {
+    line-height: var(--bs-line-height-base);
+    text-align: right;
+    position: relative;
+    top: -0.125rem;           // Fix weird outline shape in Chrome
+  }
+
+  > button {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    outline: none !important;
+  }
+
+  &.focus {
+    outline: none;
+    box-shadow: var(--bs-input-btn-focus-box-shadow);
+  }
+}

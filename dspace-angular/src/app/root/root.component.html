@@ -1,0 +1,29 @@
+<div class="outer-wrapper" [class.d-none]="shouldShowFullscreenLoader" [@slideSidebarPadding]="{
+     value: (!(sidebarVisible | async) ? 'hidden' : (slideSidebarOver | async) ? 'shown' : 'expanded'),
+     params: {collapsedSidebarWidth: (collapsedSidebarWidth | async), totalSidebarWidth: (totalSidebarWidth | async)}
+    }">
+  <ds-themed-admin-sidebar></ds-themed-admin-sidebar>
+  <div class="inner-wrapper">
+    <ds-system-wide-alert-banner></ds-system-wide-alert-banner>
+    <ds-themed-header-navbar-wrapper></ds-themed-header-navbar-wrapper>
+    <main class="main-content">
+      <ds-themed-breadcrumbs></ds-themed-breadcrumbs>
+
+      <div class="container d-flex justify-content-center align-items-center h-100" *ngIf="shouldShowRouteLoader">
+        <ds-themed-loading [showMessage]="false"></ds-themed-loading>
+      </div>
+      <div [class.d-none]="shouldShowRouteLoader">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+
+    <ds-themed-footer></ds-themed-footer>
+  </div>
+</div>
+
+<ds-notifications-board [options]="notificationOptions">
+</ds-notifications-board>
+
+<div class="ds-full-screen-loader" *ngIf="shouldShowFullscreenLoader">
+  <ds-themed-loading [showMessage]="false"></ds-themed-loading>
+</div>

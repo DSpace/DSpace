@@ -1,0 +1,266 @@
+{
+  "id": "traditionalpageone",
+  "name": "traditionalpageone",
+  "rows": [
+    {
+      "fields": [
+        {
+          "input": {},
+          "label": "Journal",
+          "mandatory": false,
+          "repeatable": false,
+          "hints": "Select the journal related to this volume.",
+          "selectableRelationship": {
+            "relationshipType": "isVolumeOfJournal",
+            "filter": "creativework.publisher:somepublishername",
+            "searchConfiguration": "periodicalConfiguration"
+          },
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "onebox"
+          },
+          "label": "Title",
+          "mandatory": true,
+          "repeatable": false,
+          "mandatoryMessage": "You must enter a main title for this item.",
+          "hints": "Enter the main title of the item.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.title",
+              "label": null,
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": [
+            "en",
+            "nl"
+          ]
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "onebox"
+          },
+          "label": "Other Titles",
+          "mandatory": false,
+          "repeatable": true,
+          "hints": "If the item has any alternative titles, please enter them here.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.title.alternative",
+              "label": null,
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "date"
+          },
+          "label": "Date of Issue",
+          "mandatory": true,
+          "repeatable": false,
+          "mandatoryMessage": "You must enter at least the year.",
+          "hints": "Please give the date of previous publication or public distribution.\n                        You can leave out the day and/or month if they aren't\n                        applicable.",
+          "style": "col-sm-4",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.date.issued",
+              "label": null,
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": []
+        },
+        {
+          "input": {
+            "type": "onebox"
+          },
+          "label": "Publisher",
+          "mandatory": false,
+          "repeatable": false,
+          "hints": "Enter the name of the publisher of the previously issued instance of this item.",
+          "style": "col-sm-8",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.publisher",
+              "label": null,
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "onebox"
+          },
+          "label": "Citation",
+          "mandatory": false,
+          "repeatable": false,
+          "hints": "Enter the standard citation for the previously issued instance of this item.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.identifier.citation",
+              "label": null,
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "series"
+          },
+          "label": "Series/Report No.",
+          "mandatory": false,
+          "repeatable": true,
+          "hints": "Enter the series and number assigned to this item by your community.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.relation.ispartofseries",
+              "label": null,
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "onebox"
+          },
+          "label": "Identifiers",
+          "mandatory": false,
+          "repeatable": true,
+          "hints": "If the item has any identification numbers or codes associated with\nit, please enter the types and the actual numbers or codes.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.identifier.issn",
+              "label": "ISSN",
+              "authority": null,
+              "closed": null
+            },
+            {
+              "metadata": "dc.identifier.other",
+              "label": "Other",
+              "authority": null,
+              "closed": null
+            },
+            {
+              "metadata": "dc.identifier.ismn",
+              "label": "ISMN",
+              "authority": null,
+              "closed": null
+            },
+            {
+              "metadata": "dc.identifier.govdoc",
+              "label": "Gov't Doc #",
+              "authority": null,
+              "closed": null
+            },
+            {
+              "metadata": "dc.identifier.uri",
+              "label": "URI",
+              "authority": null,
+              "closed": null
+            },
+            {
+              "metadata": "dc.identifier.isbn",
+              "label": "ISBN",
+              "authority": null,
+              "closed": null
+            },
+            {
+              "metadata": "dc.identifier.doi",
+              "label": "DOI",
+              "authority": null,
+              "closed": null
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "dropdown"
+          },
+          "label": "Type",
+          "mandatory": false,
+          "repeatable": true,
+          "hints": "Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the \"CTRL\" or \"Shift\" key.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.type",
+              "label": null,
+              "authority": "common_types",
+              "closed": false
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    },
+    {
+      "fields": [
+        {
+          "input": {
+            "type": "dropdown"
+          },
+          "label": "Language",
+          "mandatory": false,
+          "repeatable": false,
+          "hints": "Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.",
+          "selectableMetadata": [
+            {
+              "metadata": "dc.language.iso",
+              "label": null,
+              "authority": "common_iso_languages",
+              "closed": false
+            }
+          ],
+          "languageCodes": []
+        }
+      ]
+    }
+  ],
+  "type": "submissionform",
+  "_links": {
+    "self": {
+      "href": "https://dspace7.4science.cloud/dspace-spring-rest/api/core/config/submissionforms/traditionalpageone"
+    }
+  }
+}

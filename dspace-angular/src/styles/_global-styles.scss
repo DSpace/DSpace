@@ -1,0 +1,248 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+// Sticky Footer
+.outer-wrapper {
+  display: flex;
+  margin: 0;
+}
+
+.inner-wrapper {
+  flex: 1 1 auto;
+  flex-flow: column nowrap;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.main-content {
+  z-index: var(--ds-main-z-index);
+  flex: 1 1 100%;
+  margin-top: var(--ds-content-spacing);
+  margin-bottom: var(--ds-content-spacing);
+}
+
+.alert.hide {
+  padding: 0;
+  margin: 0;
+}
+
+ds-admin-sidebar {
+  position: fixed;
+  z-index: var(--ds-sidebar-z-index);
+}
+
+.sticky-top {
+  z-index: 0;
+}
+
+.media-viewer
+  .change-gallery
+  .ngx-gallery
+  ngx-gallery-preview.ngx-gallery-active {
+  right: 0;
+  left: auto;
+  width: calc(100% - 53px);
+}
+
+.ds-submission-reorder-dragging {
+  .ds-hint,
+  button {
+    display: none;
+  }
+}
+
+ngb-modal-backdrop {
+  // ng-bootsrap animates opacity, causing the fully opaque background to flash briefly before the transition starts
+  // animating background-color between transparent & a RGBA color instead looks smoother
+  &.fade {
+    opacity: 1 !important;
+    background-color: transparent;
+    transition: background-color 0.15s linear;
+
+    &.show {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
+.dont-break-out {
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+
+}
+
+.researcher-profile-switch button:focus{
+  outline: none !important;
+}
+.researcher-profile-switch .switch.checked{
+  color: #fff;
+}
+
+/* Replicate default spacing look ~ preserveWhitespace=true
+   To be used e.g. on a div containing buttons that should have a bit of spacing in between
+ */
+.space-children-mr > :not(:last-child) {
+  margin-right: var(--ds-gap);
+}
+
+/* Complement .space-children-mr when spaced elements are not on the same level */
+.mr-gap {
+  margin-right: var(--ds-gap);
+}
+
+.ml-gap {
+  margin-left: var(--ds-gap);
+}
+
+.custom-accordion .card-header button {
+  -webkit-box-shadow: none!important;
+  box-shadow: none!important;
+  width: 100%;
+}
+.custom-accordion .card:first-of-type {
+  border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color) !important;
+  border-bottom-left-radius: var(--bs-card-border-radius) !important;
+  border-bottom-right-radius: var(--bs-card-border-radius) !important;
+}
+
+ds-dynamic-form-control-container.d-none {
+  /* Ensures that form-control containers hidden and disabled by type binding collapse and let other fields in
+     the same row expand accordingly
+   */
+  visibility: collapse;
+}
+
+/* Used for dso administrative functionality */
+.btn-dark {
+  background-color: var(--ds-admin-sidebar-bg);
+}
+
+.preserve-line-breaks {
+  white-space: pre-line;
+}
+
+/* Thumbnail styles */
+.hide-placeholder-text {
+  .thumbnail-placeholder {
+    color: transparent !important;
+  }
+}
+
+/* Used to hide the thumbnail column in modals. */
+.hide-modal-thumbnail-column {
+  .modal-body ds-listable-object-component-loader div.row > div:first-child {
+    display: none;
+  }
+  .modal-body ds-listable-object-component-loader div.row > div:nth-child(2) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* The font sizes used in "no thumbnail" placeholder */
+.thumb-font-0 {
+  .thumbnail-placeholder {
+    @media screen and (max-width: map-get($grid-breakpoints, lg)) {
+      font-size: 0.7rem;
+      padding: 0.2rem;
+    }
+    @media screen and (max-width: map-get($grid-breakpoints, sm)) {
+      font-size: 0.6rem;
+      padding: 0.1rem;
+    }
+    font-size: 0.4rem;
+    padding: 0.1rem;
+  }
+}
+.thumb-font-1 {
+  .thumbnail-placeholder {
+    @media screen and (max-width: map-get($grid-breakpoints, sm)) {
+      font-size: 0.9rem;
+      padding: 0.1rem;
+    }
+    @media screen and (max-width: 950px) {
+      font-size: 0.4rem;
+      padding: 0.1rem;
+    }
+    font-size: 0.5rem;
+    padding: 0.125rem;
+  }
+}
+.thumb-font-2 {
+  .thumbnail-placeholder {
+    font-size: 0.9rem;
+    padding: 0.125rem;
+  }
+}
+.thumb-font-3 {
+  .thumbnail-placeholder {
+    font-size: 1.25rem;
+    padding: 0.5rem;
+  }
+}
+
+
+
+.badge-validation {
+  background-color: #{map-get($theme-colors, warning)};
+}
+
+.badge-waiting-controller {
+  background-color: #{map-get($theme-colors, info)};
+}
+
+.badge-workspace {
+  background-color: #{map-get($theme-colors, primary)};
+}
+
+.badge-archived {
+  background-color: #{map-get($theme-colors, success)};
+}
+
+.badge-workflow {
+  background-color: #{map-get($theme-colors, info)};
+}
+
+.badge-item-type {
+  background-color: #{map-get($theme-colors, info)};
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+ul.dso-edit-menu-dropdown > li .nav-item.nav-link {
+  // ensure that links in DSO edit menu dropdowns are unstyled (li elements are styled instead to support icons)
+  padding: 0;
+  display: inline;
+}

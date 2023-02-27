@@ -1,0 +1,12 @@
+<ng-container *ngVar="selectionService?.isObjectSelected(selectionConfig?.listId, object) | async as checked">
+    <input *ngIf="selectionConfig.repeatable" class="form-check-input" type="checkbox"
+           [name]="'checkbox' + index"
+           [id]="'object' + index"
+           [ngModel]="selected$ | async"
+           (ngModelChange)="selectCheckbox($event)">
+    <input *ngIf="!selectionConfig.repeatable" class="form-check-input mt-2" type="radio"
+           [name]="'radio' + index"
+           [id]="'object' + index"
+           [checked]="selected$ | async"
+           (click)="selectRadio(!checked)">
+</ng-container>

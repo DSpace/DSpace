@@ -1,0 +1,89 @@
+@mixin clamp($lines, $bg, $size-factor: 1, $line-height: $line-height-base) {
+  $height: $line-height * $font-size-base * $size-factor;
+  &.fixedHeight {
+    height: $lines * $height;
+  }
+  .content {
+    max-height: $lines * $height;
+    position: relative;
+    overflow: hidden;
+    line-height: $line-height;
+    overflow-wrap: break-word;
+    &:after {
+      content: "";
+      position: absolute;
+      padding-right: 15px;
+      top: ($lines - 1) * $height;
+      right: 0;
+      width: 30%;
+      min-width: 75px;
+      max-width: 150px;
+      height: $height;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba($bg, 1) 70%);
+      pointer-events: none;
+    }
+  }
+
+}
+
+@mixin min($lines, $size-factor: 1, $line-height: $line-height-base) {
+  $height: $line-height * $font-size-base * $size-factor;
+  min-height: $lines * $height;
+}
+
+$h4-factor: strip-unit($h4-font-size);
+
+@mixin clamp-with-titles($i, $bg) {
+  transition: height 1s;
+  @include clamp($i, $bg);
+  &.title {
+    @include clamp($i, $bg, 1.25);
+  }
+  &.h4 {
+    @include clamp($i, $bg, $h4-factor, $headings-line-height);
+  }
+}
+
+@for $i from 1 through 15 {
+  .clamp-default-#{$i} {
+    @include clamp-with-titles($i, $body-bg);
+  }
+  :focus .clamp-default-#{$i},
+  .ds-hover .clamp-default-#{$i} {
+    @include clamp-with-titles($i, $list-group-hover-bg);
+  }
+
+  .clamp-primary-#{$i} {
+    @include clamp-with-titles($i, $primary);
+  }
+
+  :focus .clamp-primary-#{$i},
+  .ds-hover .clamp-primary-#{$i} {
+    @include clamp-with-titles($i, darken($primary, 10%));
+  }
+
+  .clamp-light-#{$i} {
+    @include clamp-with-titles($i, $light);
+  }
+
+  :focus .clamp-light-#{$i},
+  .ds-hover .clamp-light-#{$i} {
+    @include clamp-with-titles($i, darken($light, 10%));
+  }
+}
+
+.clamp-none {
+  overflow: hidden;
+  @for $i from 1 through 15 {
+    &.fixedHeight.min-#{$i} {
+      transition: height 1s;
+      @include min($i);
+      &.title {
+        @include min($i, 1.25);
+      }
+      &.h4 {
+        @include min($i, $h4-factor, $headings-line-height);
+      }
+    }
+  }
+}

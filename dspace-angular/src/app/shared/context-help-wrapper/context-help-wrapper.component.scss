@@ -1,0 +1,31 @@
+:host {
+    position: relative;
+}
+
+.ds-context-help-icon {
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+    color: var(--bs-info);
+    background-color: var(--bs-white);
+    font-size: 16px; // not relative, because we don't want the icon to resize based on the container
+    line-height: 1;
+    border-radius: 50%;
+}
+
+.ds-context-help-icon-left {
+    left: var(--ds-context-x-offset);
+}
+
+.ds-context-help-icon-right {
+    right: calc(-1 * var(--ds-context-help-icon-size));
+}
+
+::ng-deep .tooltip-inner {
+    width: var(--ds-context-help-tooltip-width);
+    max-width: var(--ds-context-help-tooltip-width);
+    a {
+      color: var(--ds-context-help-tooltip-link-color);
+      text-decoration: underline;
+    }
+}

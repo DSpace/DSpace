@@ -1,0 +1,37 @@
+<div class="sidebar-section" [ngClass]="{'expanded': (expanded | async)}"
+    [@bgColor]="{
+     value: ((expanded | async) ? 'endBackground' : 'startBackground'),
+     params: {endColor: (sidebarActiveBg | async)}}">
+  <div class="nav-item nav-link d-flex flex-row flex-nowrap"
+     role="button" tabindex="0"
+     [attr.aria-labelledby]="'sidebarName-' + section.id"
+     [attr.aria-expanded]="expanded | async"
+     [title]="('menu.section.icon.' + section.id) | translate"
+       [class.disabled]="section.model?.disabled"
+     (click)="toggleSection($event)"
+     (keyup.space)="toggleSection($event)"
+     (keyup.enter)="toggleSection($event)"
+  >
+    <div class="shortcut-icon h-100">
+      <i class="fas fa-{{section.icon}} fa-fw"></i>
+    </div>
+    <div class="sidebar-collapsible">
+      <div class="toggle">
+        <span id="sidebarName-{{section.id}}" class="section-header-text">
+          <ng-container
+            *ngComponentOutlet="(sectionMap$ | async).get(section.id).component; injector: (sectionMap$ | async).get(section.id).injector;"></ng-container>
+        </span>
+        <i class="fas fa-chevron-right fa-pull-right"
+           [@rotate]="(expanded | async) ? 'expanded' : 'collapsed'"
+           [title]="('menu.section.toggle.' + section.id) | translate"
+        ></i>
+      </div>
+      <ul class="sidebar-sub-level-items list-unstyled" @slide *ngIf="(expanded | async)">
+        <li *ngFor="let subSection of (subSections$ | async)">
+          <ng-container
+            *ngComponentOutlet="(sectionMap$ | async).get(subSection.id).component; injector: (sectionMap$ | async).get(subSection.id).injector;"></ng-container>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="ml-4">
+    <div class="row" *ngIf="!!journal?.titles && journal.titles.length > 0">
+        <div class="col-4">
+            <p class="m-1">{{'submission.sections.sherpa.publication.information.title' | translate}}</p>
+        </div>
+        <div class="col-4">
+            <p class="m-1" *ngFor="let title of journal.titles">{{title}}
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!journal?.issns && journal.issns.length > 0">
+        <div class="col-4">
+            <p class="m-1">{{'submission.sections.sherpa.publication.information.issns' | translate}}</p>
+        </div>
+        <div class="col-4">
+            <p class="m-1" *ngFor="let issn of journal.issns">{{issn}}
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!journal?.url">
+        <div class="col-4">
+            <p class="m-1">{{'submission.sections.sherpa.publication.information.url' | translate}}</p>
+        </div>
+        <div class="col-4">
+            <p class="m-1">
+                <a href="{{journal.url}}" target="_blank">
+                    {{journal.url}}
+                </a>
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!journal?.publishers && journal.publishers.length > 0">
+        <div class="col-4">
+            <p class="m-1">{{'submission.sections.sherpa.publication.information.publishers' | translate}}</p>
+        </div>
+        <div class="col-4" *ngFor="let publisher of journal.publishers">
+            <p class="m-1">
+                <a href="{{publisher.uri}}" target="_blank">
+                    {{publisher.name}}
+                </a>
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!journal?.romeoPub">
+        <div class="col-4">
+            <p class="m-1">{{'submission.sections.sherpa.publication.information.romeoPub' | translate}}</p>
+        </div>
+        <div class="col-4">
+            <p class="m-1">
+                {{journal.romeoPub}}
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!journal?.zetoPub">
+        <div class="col-4">
+            <p class="m-1">{{'submission.sections.sherpa.publication.information.zetoPub' | translate}}</p>
+        </div>
+        <div class="col-4">
+            <p class="m-1">
+                {{journal.zetoPub}}
+            </p>
+        </div>
+    </div>
+</div>

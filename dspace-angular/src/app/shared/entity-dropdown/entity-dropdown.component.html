@@ -1,0 +1,28 @@
+<div
+    class="scrollable-menu"
+    aria-labelledby="dropdownMenuButton"
+    (scroll)="onScroll($event)"
+    infiniteScroll
+    [infiniteScrollDistance]="5"
+    [infiniteScrollThrottle]="300"
+    [infiniteScrollUpDistance]="1.5"
+    [fromRoot]="true"
+    [scrollWindow]="false"
+    (scrolled)="onScrollDown()">
+    <button class="dropdown-item disabled" *ngIf="searchListEntity?.length == 0 && !(isLoadingList | async)">
+      {{'submission.sections.general.no-entity' | translate}}
+    </button>
+    <button *ngFor="let listItem of searchListEntity"
+            class="dropdown-item entity-item"
+            title="{{ listItem.label }}"
+            (click)="onSelect(listItem)">
+      <ul class="list-unstyled mb-0">
+        <li class="list-item text-truncate text-primary font-weight-bold">{{ listItem.label.toLowerCase() + '.listelement.badge' | translate }}</li>
+      </ul>
+    </button>
+    <button class="dropdown-item disabled" *ngIf="(isLoadingList | async)" >
+      <ds-themed-loading message="{{'loading.default' | translate}}">
+      </ds-themed-loading>
+    </button>
+
+</div>

@@ -1,0 +1,21 @@
+<div>
+  <div class="modal-header">
+    <h4 class="modal-title">{{'submission.sections.upload.edit.title' | translate}}</h4>
+    <button type="button" class="close" (click)="onModalClose()" aria-label="Close" [disabled]="isSaving">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <ds-form *ngIf="formModel"
+             #formRef="formComponent"
+             [formId]="formId"
+             [formModel]="formModel"
+             [displaySubmit]="!isSaving"
+             [displayCancel]="!isSaving"
+             (submitForm)="onSubmit()"
+             (cancel)="onModalClose()"
+             (dfChange)="onChange($event)"></ds-form>
+
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<ng-container *ngIf="(workflowitem$ | async) && (item$ | async)">
+  <ds-themed-item-list-preview [item]="item$.value"
+                               [object]="object"
+                               [showSubmitter]="showSubmitter"
+                               [workflowItem]="workflowitem$.value"
+                               [status]="status"></ds-themed-item-list-preview>
+
+  <div class="row">
+    <div [ngClass]="showThumbnails ? 'offset-3 offset-md-2 pl-3' : ''">
+      <ds-claimed-task-actions [item]="item$.value"
+                               [object]="dso"
+                               [workflowitem]="workflowitem$.value"
+                               (processCompleted)="reloadedObject.emit($event.reloadedObject)"></ds-claimed-task-actions>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,100 @@
+:root {
+  --ds-content-spacing: #{$spacer * 1.5};
+
+  --ds-button-height: #{$input-btn-padding-y * 2 + $input-btn-line-height + calculateRem($input-btn-border-width*2)};
+
+  --ds-card-height-percentage:98%;
+  --ds-card-thumbnail-height:240px;
+  --ds-dropdown-menu-max-height: 200px;
+  --ds-drop-zone-area-height: 44px;
+  --ds-drop-zone-area-z-index: 1025;
+  --ds-drop-zone-area-inner-z-index: 1021;
+  --ds-login-logo-height:72px;
+  --ds-login-logo-width:72px;
+  --ds-submission-header-z-index: 1001;
+  --ds-submission-footer-z-index: 999;
+
+  --ds-main-z-index: 1;
+  --ds-nav-z-index: 10;
+  --ds-footer-z-index: 0;
+  --ds-sidebar-z-index: 20;
+
+  --ds-header-bg: #{$white};
+  --ds-header-logo-height: 50px;
+  --ds-header-logo-height-xs: 50px;
+  --ds-header-icon-color: #{$link-color};
+  --ds-header-icon-color-hover: #{$link-hover-color};
+  --ds-header-navbar-border-top-color: #{$white};
+  --ds-header-navbar-border-bottom-color: #{$gray-400};
+  --ds-navbar-link-color: #{$cyan};
+  --ds-navbar-link-color-hover: #{darken($cyan, 15%)};
+
+  $admin-sidebar-bg: darken(#2B4E72, 17%);
+  $admin-sidebar-active-bg: darken($admin-sidebar-bg, 3%);
+  --ds-admin-sidebar-bg: #{$admin-sidebar-bg};
+  --ds-admin-sidebar-active-bg: #{$admin-sidebar-active-bg};
+  --ds-admin-sidebar-header-bg: #{darken($admin-sidebar-bg, 7%)};
+
+  --ds-dark-scrollbar-bg: #{$admin-sidebar-active-bg};
+  --ds-dark-scrollbar-alt-bg: #{lighten($admin-sidebar-active-bg, 2%)};
+  --ds-dark-scrollbar-fg: #47495d;
+
+  --ds-submission-sections-margin-bottom: .5rem;
+
+  --ds-edit-item-button-min-width: 100px;
+  --ds-edit-item-metadata-field-width: 190px;
+  --ds-edit-item-language-field-width: 43px;
+
+  --ds-thumbnail-max-width: 125px;
+  --ds-thumbnail-placeholder-background: #{$gray-100};
+  --ds-thumbnail-placeholder-border: 1px solid #{$gray-300};
+  --ds-thumbnail-placeholder-color: #{lighten($gray-800, 7%)};
+
+  --ds-dso-selector-list-max-height: 475px;
+  --ds-dso-selector-current-background-color: #eeeeee;
+  --ds-dso-selector-current-background-hover-color: #{darken(#eeeeee, 10%)};
+  --ds-notification-bg-success: #{darken(adjust-hue($success, -10), 10%)};
+  --ds-notification-bg-danger: #{darken(adjust-hue($danger, -10), 10%)};
+  --ds-notification-bg-info: #{darken(adjust-hue($info, -10), 10%)};
+  --ds-notification-bg-warning: #{darken(adjust-hue($warning, -10), 10%)};
+
+  --ds-fa-fixed-width: #{$fa-fixed-width};
+  --ds-icon-padding: #{$icon-padding};
+  --ds-collapsed-sidebar-width: #{$collapsed-sidebar-width};
+  --ds-sidebar-items-width: #{$sidebar-items-width};
+  --ds-total-sidebar-width: #{$total-sidebar-width};
+
+  --ds-top-footer-bg: #{$gray-200};
+  --ds-footer-bg: #{theme-color('primary')};
+  --ds-footer-border: 1px solid var(--bs-gray-400);
+  --ds-footer-padding: 0;
+  --ds-footer-padding-bottom: 0;
+  --ds-footer-logo-height: 50px;
+
+  $home-news-link-color: $cyan;
+  --ds-home-news-link-color: #{$home-news-link-color};
+  --ds-home-news-link-hover-color: #{darken($home-news-link-color, 15%)};
+  --ds-home-news-background-color: #{$gray-200};
+
+  --ds-breadcrumb-bg: #{$gray-200} !important;
+  --ds-breadcrumb-link-color: #{$cyan};
+  --ds-breadcrumb-link-active-color: #{darken($cyan, 30%)};
+  --ds-breadcrumb-max-length: 200px;
+
+  --ds-slider-color: #{$green};
+  --ds-slider-handle-width: 18px;
+
+  --ds-search-form-scope-max-width: 150px;
+
+  --ds-context-x-offset: -16px;
+  --ds-context-help-icon-size: 16px;
+  --ds-context-help-tooltip-width: 300px;
+  --ds-context-help-tooltip-link-color: $white;
+
+  --ds-gap: 0.25rem;
+
+  --ds-dso-edit-field-width: 210px;
+  --ds-dso-edit-lang-width: 90px;
+  --ds-dso-edit-actions-width: 173px;
+  --ds-dso-edit-virtual-tooltip-min-width: 300px;
+}

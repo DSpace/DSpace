@@ -1,0 +1,32 @@
+.notification {
+  display: inline-block;
+  min-width: var(--bs-modal-sm);
+  text-align: left;
+}
+
+.close {
+  outline: none !important
+}
+
+.notification-icon {
+  min-width: 3rem;
+}
+
+.notification-progress-loader {
+  top: -1px;
+  left: 0;
+  height: 1px;
+}
+
+.alert-success .notification-progress-loader span {
+  background: var(--ds-notification-bg-success);
+}
+.alert-danger .notification-progress-loader span {
+  background: var(--ds-notification-bg-danger);
+}
+.alert-info .notification-progress-loader span {
+  background: var(--ds-notification-bg-info);
+}
+.alert-warning .notification-progress-loader span {
+  background: var(--ds-notification-bg-warning);
+}

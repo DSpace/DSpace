@@ -1,0 +1,50 @@
+<ds-themed-results-back-button *ngIf="showBackButton | async" [back]="back"></ds-themed-results-back-button>
+<div class="d-flex flex-row">
+  <ds-item-page-title-field [item]="object" class="mr-auto">
+  </ds-item-page-title-field>
+  <ds-dso-edit-menu></ds-dso-edit-menu>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-md-4">
+    <ds-metadata-field-wrapper [hideIfNoTextContent]="false">
+      <ds-thumbnail [thumbnail]="object?.thumbnail | async"></ds-thumbnail>
+    </ds-metadata-field-wrapper>
+    <ds-generic-item-page-field class="item-page-fields" [item]="object"
+      [fields]="['creativeworkseries.issn']"
+      [label]="'journal.page.issn'">
+    </ds-generic-item-page-field>
+    <ds-generic-item-page-field class="item-page-fields" [item]="object"
+      [fields]="['creativework.publisher']"
+      [label]="'journal.page.publisher'">
+    </ds-generic-item-page-field>
+    <ds-generic-item-page-field [item]="object"
+      [fields]="['creativework.editor']"
+      [label]="'journal.page.editor'">
+    </ds-generic-item-page-field>
+  </div>
+  <div class="col-xs-12 col-md-6">
+    <ds-related-items
+      [parentItem]="object"
+      [relationType]="'isVolumeOfJournal'"
+      [label]="'relationships.isVolumeOf' | translate">
+    </ds-related-items>
+    <ds-generic-item-page-field class="item-page-fields" [item]="object"
+      [fields]="['dc.description']"
+      [label]="'journal.page.description'">
+    </ds-generic-item-page-field>
+    <div>
+      <a class="btn btn-outline-primary" [routerLink]="[itemPageRoute + '/full']">
+        {{"item.page.link.full" | translate}}
+      </a>
+    </div>
+  </div>
+  <div class="mt-5 w-100">
+    <ds-tabbed-related-entities-search  [item]="object"
+                                        [relationTypes]="[{
+                                          label: 'isJournalOfPublication',
+                                          filter: 'isJournalOfPublication',
+                                          configuration: 'default-relationships'
+                                        }]">
+    </ds-tabbed-related-entities-search>
+  </div>
+</div>

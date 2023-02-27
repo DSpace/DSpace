@@ -1,0 +1,35 @@
+<td class="dso-info">
+  <ng-container *ngIf="!!dso">
+    <ds-type-badge [object]="dso"></ds-type-badge>
+    <p><a [routerLink]="[getPageRoutePrefix(), dso.id]">{{dso.name}}</a></p>
+  </ng-container>
+  <ng-container *ngIf="!dso">
+    <p class="my-0">{{ 'subscriptions.table.not-available' | translate }}</p>
+    <p class="text-muted my-0">{{ 'subscriptions.table.not-available-message' | translate }}</p>
+  </ng-container>
+</td>
+<td>
+  <span *ngIf="!!subscription" class="subscription-type">{{subscription.subscriptionType}}</span>
+</td>
+<td class="subscription-parameters">
+  <ng-container *ngIf="!!subscription">
+		<span *ngFor="let parameterList of subscription.subscriptionParameterList; let i = index">
+			{{ 'subscriptions.frequency.' + parameterList.value  | translate}}<span
+      *ngIf="i < subscription.subscriptionParameterList.length-1 ">,</span>
+		</span>
+  </ng-container>
+</td>
+<td class="subscription-actions">
+  <div class="btn-group edit-field">
+    <button (click)="$event.preventDefault();openSubscriptionModal();" [disabled]="!dso"
+            [title]="'subscriptions.table.edit' | translate"
+            class="btn btn-outline-primary btn-sm access-control-editEPersonButton">
+      <i class="fas fa-edit fa-fw"></i>
+    </button>
+    <button (click)="deleteSubscriptionPopup(subscription)"
+            [title]="'subscriptions.table.delete' | translate"
+            class="btn btn-outline-danger btn-sm access-control-deleteEPersonButton">
+      <i class="fas fa-trash-alt fa-fw"></i>
+    </button>
+  </div>
+</td>

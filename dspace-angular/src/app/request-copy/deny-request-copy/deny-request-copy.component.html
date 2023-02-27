@@ -1,0 +1,9 @@
+<div class="container" *ngVar="(itemRequestRD$ | async) as itemRequestRD">
+  <h3 class="mb-4">{{'deny-request-copy.header' | translate}}</h3>
+  <div *ngIf="itemRequestRD && itemRequestRD.hasSucceeded">
+    <p>{{'deny-request-copy.intro' | translate}}</p>
+
+    <ds-email-request-copy [subject]="subject$ | async" [message]="message$ | async" (send)="deny($event)"></ds-email-request-copy>
+  </div>
+  <ds-themed-loading *ngIf="!itemRequestRD || itemRequestRD?.isLoading"></ds-themed-loading>
+</div>

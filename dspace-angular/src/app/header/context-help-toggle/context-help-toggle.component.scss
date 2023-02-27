@@ -1,0 +1,8 @@
+.ds-context-help-toggle {
+  color: var(--ds-header-icon-color);
+  background-color: var(--ds-header-bg);
+
+  &:hover, &:focus {
+    color: var(--ds-header-icon-color-hover);
+  }
+}

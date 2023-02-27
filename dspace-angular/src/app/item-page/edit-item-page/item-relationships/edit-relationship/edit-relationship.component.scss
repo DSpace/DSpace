@@ -1,0 +1,13 @@
+.btn[disabled] {
+  color: var(--bs-gray-600);
+  border-color: var(--bs-gray-600);
+  z-index: 0; // prevent border colors jumping on hover
+}
+
+.relationship-action-buttons {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

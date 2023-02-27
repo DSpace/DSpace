@@ -1,0 +1,18 @@
+<div *ngIf="!spinner">
+  <label *ngIf="showMessage && message">{{ message }}</label>
+  <div class="loader">
+    <span class="l-1"></span>
+    <span class="l-2"></span>
+    <span class="l-3"></span>
+    <span class="l-4"></span>
+    <span class="l-5"></span>
+    <span class="l-6"></span>
+    <span class="l-7"></span>
+    <span class="l-8"></span>
+    <span class="l-9"></span>
+    <span class="l-10"></span>
+  </div>
+</div>
+<div *ngIf='spinner' class="spinner spinner-border" role="status">
+  <span class="sr-only">{{ message }}</span>
+</div>

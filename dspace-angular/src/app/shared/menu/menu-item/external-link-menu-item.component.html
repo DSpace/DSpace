@@ -1,0 +1,7 @@
+<a class="nav-item nav-link"
+   [ngClass]="{'disabled': !hasLink }"
+   [attr.aria-disabled]="!hasLink"
+   [href]="href"
+   [title]="item.text | translate"
+   (click)="$event.stopPropagation()"
+>{{item.text | translate}}</a>

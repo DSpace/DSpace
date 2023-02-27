@@ -1,0 +1,90 @@
+<div class="mb-3 border-bottom" data-test="collapse">
+    <div class="w-100 d-flex justify-content-between collapse-toggle" (click)="collapse.toggle()">
+        <div class="d-flex">
+            <button type="button" class="btn btn-link p-0 mr-4" (click)="$event.preventDefault()"
+                [attr.aria-expanded]="!collapse.collapsed" aria-controls="collapseExample">
+                {{version.articleVersion | titlecase}} {{ 'submission.sections.sherpa.publisher.policy.version' |
+                translate
+                }}
+            </button>
+            <div>
+                <span *ngIf="!!version?.embargo && !!version?.embargo.amount;else noEmbargoTitle"> <i
+                        class="fas fa-hourglass-half"></i> {{version.embargo.amount}}
+                    {{version.embargo?.units[0]}}</span>
+                <ng-template #noEmbargoTitle>
+                    <span><i class="fas fa-hourglass-half"></i> {{
+                        'submission.sections.sherpa.publisher.policy.noembargo' | translate }}</span>
+                </ng-template>
+
+                <span class="m-1 ml-4">
+                    <i class="far fa-folder-open"></i>
+                    <span *ngIf="!!version?.locations && version.locations.length > 0; else noLocations">
+                        {{version.locations[0]}} <span
+                            *ngIf="version.locations.length > 1">+{{version.locations.length-1}}</span>
+                    </span>
+                    <ng-template #noLocations>
+                        <span>{{
+                            'submission.sections.sherpa.publisher.policy.nolocation' | translate }}</span>
+                    </ng-template>
+                </span>
+            </div>
+        </div>
+        <div class="d-inline-block">
+            <span *ngIf="collapse.collapsed" class="fas fa-chevron-down"></span>
+            <span *ngIf="!collapse.collapsed" class="fas fa-chevron-up"></span>
+        </div>
+    </div>
+    <div #collapse="ngbCollapse" [ngbCollapse]="isCollapsed">
+        <div *ngIf="!!version" class="ml-4">
+            <div class="row" *ngIf="!!version?.embargo && !!version?.embargo.amount">
+                <div class="col-4">
+                    <p class="m-1"><i class="fas fa-hourglass-half"></i> {{
+                        'submission.sections.sherpa.publisher.policy.embargo' | translate }}</p>
+                </div>
+                <div class="col-6">
+                    <p class="m-1" *ngIf="!!version.embargo;else noEmbargo">{{version.embargo.amount}}
+                        {{version.embargo.units}}</p>
+                    <ng-template #noEmbargo>
+                        <p class="m-1">{{ 'submission.sections.sherpa.publisher.policy.noembargo' | translate }}</p>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="row" *ngIf="!!version?.licenses && version.licenses.length > 0">
+                <div class="col-4">
+                    <p class="m-1"><i class="fas fa-certificate"></i> {{
+                        'submission.sections.sherpa.publisher.policy.license' | translate }}</p>
+                </div>
+                <div class="col-6">
+                    <p class="m-1" *ngFor="let license of version.licenses">{{license}}</p>
+                </div>
+            </div>
+            <div class="row" *ngIf="!!version?.prerequisites && version.prerequisites.length > 0">
+                <div class="col-4">
+                    <p class="m-1"><i class="fas fa-exclamation-circle"></i> {{
+                        'submission.sections.sherpa.publisher.policy.prerequisites' | translate }}</p>
+                </div>
+                <div class="col-6">
+                    <p class="m-1" *ngFor="let prerequisite of version.prerequisites">{{prerequisite}}</p>
+                </div>
+            </div>
+            <div class="row" *ngIf="!!version?.locations && version.locations.length > 0">
+                <div class="col-4">
+                    <p class="m-1"><i class="far fa-folder-open"></i> {{
+                        'submission.sections.sherpa.publisher.policy.location' | translate }}</p>
+                </div>
+                <div class="col-6">
+                    <p class="m-1" *ngFor="let location of version.locations">{{location}}</p>
+                </div>
+            </div>
+            <div class="row" *ngIf="!!version?.conditions && version.conditions.length > 0">
+                <div class="col-4">
+                    <p class="m-1"><i class="fas fa-tasks"></i> {{
+                        'submission.sections.sherpa.publisher.policy.conditions' | translate }}</p>
+                </div>
+                <div class="col-6">
+                    <p class="m-1" *ngFor="let condition of version.conditions">{{condition}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

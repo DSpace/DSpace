@@ -1,0 +1,9 @@
+<div *ngIf="!dismissed" class="alert {{type}} alert-dismissible fade show w-100 p-3" role="alert" [@enterLeave]="animate">
+  <span *ngIf="content" [innerHTML]="content | translate"></span>
+
+  <ng-content></ng-content>
+
+  <button *ngIf="dismissible" type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>

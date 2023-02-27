@@ -1,0 +1,5 @@
+<div class="labels">
+    <ng-container *ngFor="let key of ((appliedFilters | async) | dsObjectKeys)">
+        <ds-search-label *ngFor="let value of (appliedFilters | async)[key]" [inPlaceSearch]="inPlaceSearch" [key]="key" [value]="value" [appliedFilters]="appliedFilters"></ds-search-label>
+    </ng-container>
+</div>

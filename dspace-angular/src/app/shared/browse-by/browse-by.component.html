@@ -1,0 +1,28 @@
+<ng-container *ngVar="(objects$ | async) as objects">
+  <h3 [ngClass]="{'sr-only': parentname }">{{title | translate}}</h3>
+  <ng-container *ngComponentOutlet="getStartsWithComponent(); injector: objectInjector;"></ng-container>
+  <div *ngIf="objects?.hasSucceeded && !objects?.isLoading && objects?.payload?.page.length > 0" @fadeIn>
+      <div *ngIf="shouldDisplayResetButton$ |async" class="mb-2 reset">
+        <ds-themed-results-back-button [back]="back" [buttonLabel]="buttonLabel"></ds-themed-results-back-button>
+      </div>
+    <ds-viewable-collection
+      [config]="paginationConfig"
+      [sortConfig]="sortConfig"
+      [showPaginator]="showPaginator"
+      [objects]="objects"
+      (prev)="goPrev()"
+      (next)="goNext()">
+    </ds-viewable-collection>
+  </div>
+  <ds-themed-loading *ngIf="!objects || objects?.isLoading" message="{{'loading.browse-by' | translate}}"></ds-themed-loading>
+  <ds-error *ngIf="objects?.hasFailed" message="{{'error.browse-by' | translate}}"></ds-error>
+  <div *ngIf="!objects?.isLoading && objects?.payload?.page.length === 0">
+    <div *ngIf="shouldDisplayResetButton$ |async" class="d-inline-block mb-4 reset">
+      <ds-themed-results-back-button [back]="back" [buttonLabel]="buttonLabel"></ds-themed-results-back-button>
+    </div>
+    <div class="alert alert-info w-100" role="alert">
+      {{'browse.empty' | translate}}
+    </div>
+  </div>
+</ng-container>
+

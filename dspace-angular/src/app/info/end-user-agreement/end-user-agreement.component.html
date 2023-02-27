@@ -1,0 +1,13 @@
+<div class="container">
+  <ds-end-user-agreement-content></ds-end-user-agreement-content>
+
+  <form class="form-user-agreement-accept mt-4" (ngSubmit)="submit()" novalidate>
+    <input class="ml-1 mr-2" type="checkbox" id="user-agreement-accept" [(ngModel)]="accepted" [ngModelOptions]="{standalone: true}">
+    <label class="col-form-label-lg" for="user-agreement-accept">{{ 'info.end-user-agreement.accept' | translate }}</label>
+
+    <div class="d-flex mt-4">
+      <button id="button-cancel" type="button" (click)="cancel()" class="btn btn-outline-secondary mr-auto">{{ 'info.end-user-agreement.buttons.cancel' | translate }}</button>
+      <button id="button-save" type="submit" class="btn btn-primary" [disabled]="!accepted">{{ 'info.end-user-agreement.buttons.save' | translate }}</button>
+    </div>
+  </form>
+</div>

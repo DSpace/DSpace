@@ -1,0 +1,33 @@
+<ng-container *ngVar="(bitstreamRD$ | async) as bitstreamRD">
+  <div class="container" *ngVar="(bitstreamFormatsRD$ | async) as formatsRD">
+    <div class="row" *ngIf="bitstreamRD?.hasSucceeded && formatsRD?.hasSucceeded">
+      <div class="col-md-2">
+        <ds-thumbnail [thumbnail]="bitstreamRD?.payload"></ds-thumbnail>
+      </div>
+      <div class="col-md-10">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <h3>{{bitstreamRD?.payload?.name}} <span class="text-muted">({{bitstreamRD?.payload?.sizeBytes | dsFileSize}})</span></h3>
+            </div>
+          </div>
+        </div>
+        <ds-form *ngIf="formGroup" [formId]="'edit-bitstream-form-id'"
+                  [formGroup]="formGroup"
+                  [formModel]="formModel"
+                  [formLayout]="formLayout"
+                  [submitLabel]="'form.save'"
+                  (submitForm)="onSubmit()"
+                  (cancel)="onCancel()"
+                  (dfChange)="onChange($event)">
+          <div additional class="container py-3">
+            <a [routerLink]="['/bitstreams', bitstreamRD?.payload?.id, 'authorizations']">{{'bitstream.edit.authorizations.link' | translate}}</a>
+          </div>
+        </ds-form>
+      </div>
+    </div>
+    <ds-error *ngIf="bitstreamRD?.hasFailed" message="{{'error.bitstream' | translate}}"></ds-error>
+    <ds-themed-loading *ngIf="!bitstreamRD || !formatsRD || bitstreamRD?.isLoading || formatsRD?.isLoading"
+                message="{{'loading.bitstream' | translate}}"></ds-themed-loading>
+  </div>
+</ng-container>

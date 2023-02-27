@@ -1,0 +1,39 @@
+<div class="ml-4">
+    <div class="row" *ngIf="!!metadata?.id">
+        <div class="col-4">
+            <p class="m-1">{{ 'submission.sections.sherpa.record.information.id' | translate }}</p>
+        </div>
+        <div class="col-8">
+            <p class="m-1">{{metadata.id}}
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!metadata?.dateCreated">
+        <div class="col-4">
+            <p class="m-1">{{ 'submission.sections.sherpa.record.information.date.created' | translate }}</p>
+        </div>
+        <div class="col-8">
+            <p class="m-1">{{metadata.dateCreated | date: 'd MMMM Y H:mm:ss zzzz' }}
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!metadata?.dateModified">
+        <div class="col-4">
+            <p class="m-1">{{ 'submission.sections.sherpa.record.information.date.modified' | translate }}</p>
+        </div>
+        <div class="col-8">
+            <p class="m-1">{{metadata.dateModified| date: 'd MMMM Y H:mm:ss zzzz' }}
+            </p>
+        </div>
+    </div>
+    <div class="row" *ngIf="!!metadata?.uri">
+        <div class="col-4">
+            <p class="m-1">{{ 'submission.sections.sherpa.record.information.uri' | translate }}</p>
+        </div>
+        <div class="col-8">
+            <p class="m-1">
+                <a [href]="metadata.uri" target="_blank">{{metadata.uri}}</a>
+            </p>
+        </div>
+    </div>
+</div>

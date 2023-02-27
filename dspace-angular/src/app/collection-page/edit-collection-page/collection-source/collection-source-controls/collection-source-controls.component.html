@@ -1,0 +1,54 @@
+<div *ngVar="(contentSource$ |async) as contentSource">
+    <div class="container-fluid space-children-mr" *ngIf="shouldShow">
+        <h4>{{ 'collection.source.controls.head' | translate }}</h4>
+        <div>
+            <span class="font-weight-bold">{{'collection.source.controls.harvest.status' | translate}}</span>
+            <span>{{contentSource?.harvestStatus}}</span>
+        </div>
+        <div>
+            <span class="font-weight-bold">{{'collection.source.controls.harvest.start' | translate}}</span>
+            <span>{{contentSource?.harvestStartTime ? contentSource?.harvestStartTime : 'collection.source.controls.harvest.no-information'|translate }}</span>
+        </div>
+        <div>
+            <span class="font-weight-bold">{{'collection.source.controls.harvest.last' | translate}}</span>
+            <span>{{contentSource?.lastHarvested ? contentSource?.lastHarvested : 'collection.source.controls.harvest.no-information'|translate }}</span>
+        </div>
+        <div>
+            <span class="font-weight-bold">{{'collection.source.controls.harvest.message' | translate}}</span>
+            <span>{{contentSource?.message ? contentSource?.message: 'collection.source.controls.harvest.no-information'|translate }}</span>
+        </div>
+
+        <button *ngIf="!(testConfigRunning$ |async)" class="btn btn-secondary"
+                [disabled]="!(isEnabled)"
+                (click)="testConfiguration(contentSource)">
+            <span>{{'collection.source.controls.test.submit' | translate}}</span>
+        </button>
+        <button *ngIf="(testConfigRunning$ |async)" class="btn btn-secondary"
+                [disabled]="true">
+            <span class="spinner-border spinner-border-sm spinner-button" role="status" aria-hidden="true"></span>
+            <span>{{'collection.source.controls.test.running' | translate}}</span>
+        </button>
+        <button *ngIf="!(importRunning$ |async)" class="btn btn-primary"
+                [disabled]="!(isEnabled)"
+                (click)="importNow()">
+            <span class="d-none d-sm-inline">{{'collection.source.controls.import.submit' | translate}}</span>
+        </button>
+        <button *ngIf="(importRunning$ |async)" class="btn btn-primary"
+                [disabled]="true">
+            <span class="spinner-border spinner-border-sm spinner-button" role="status" aria-hidden="true"></span>
+            <span class="d-none d-sm-inline">{{'collection.source.controls.import.running' | translate}}</span>
+        </button>
+        <button *ngIf="!(reImportRunning$ |async)" class="btn btn-primary"
+                [disabled]="!(isEnabled)"
+                (click)="resetAndReimport()">
+            <span class="d-none d-sm-inline">&nbsp;{{'collection.source.controls.reset.submit' | translate}}</span>
+        </button>
+        <button *ngIf="(reImportRunning$ |async)" class="btn btn-primary"
+                [disabled]="true">
+            <span class="spinner-border spinner-border-sm spinner-button" role="status" aria-hidden="true"></span>
+            <span class="d-none d-sm-inline">&nbsp;{{'collection.source.controls.reset.running' | translate}}</span>
+        </button>
+
+
+    </div>
+</div>

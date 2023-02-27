@@ -1,0 +1,58 @@
+<div class="notification alert {{notification.type}} alert-dismissible m-3 shadow" role="alert"
+     [@enterLeave]="animate">
+
+  <div class="notification-progress-loader position-absolute w-100" *ngIf="showProgressBar">
+    <span [ngStyle]="{'width': progressWidth + '%'}" class="h-100 float-left"></span>
+  </div>
+
+    <button *ngIf="notification.options.clickToClose"
+            (click)="remove()"
+            type="button" class="close pt-0 pr-1 pl-0 pb-0" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+
+
+  <div class="d-flex flex-row">
+    <div class="d-flex flex-column justify-content-center align-items-center">
+      <div class="notification-icon d-flex justify-content-center"><i
+        [ngClass]="{'fas fa-2x': true,
+      'fa-check-circle': notification.type == 'alert-success',
+      'fa-times-circle': notification.type == 'alert-danger',
+      'fa-exclamation-triangle': notification.type == 'alert-warning',
+      'fa-info-circle': notification.type == 'alert-info'
+      }"></i></div>
+    </div>
+    <div class="d-flex flex-column justify-content-center align-content-stretch">
+      <div class="p-2 mr-3"  *ngIf="title">
+        <strong>
+          <div class="notification-title pl-1" *ngIf="titleIsTemplate; else regularTitle">
+            <ng-container *ngTemplateOutlet="title"></ng-container>
+          </div>
+          <ng-template #regularTitle>
+            <div class="notification-title pl-1">{{(title | async)}}</div>
+          </ng-template>
+        </strong>
+      </div>
+
+      <div class="p-2 mr-3"  *ngIf="content && !html">
+        <div class="notification-content pl-1" *ngIf="contentIsTemplate; else regularContent">
+          <ng-container *ngTemplateOutlet="content"></ng-container>
+        </div>
+        <ng-template #regularContent>
+          <div class="notification-content pl-1">{{(content | async)}}</div>
+        </ng-template>
+      </div>
+
+      <div class="p-2 mr-3" *ngIf="content && html">
+        <div class="notification-html pl-1" *ngIf="contentIsTemplate; else regularHtml">
+          <ng-container *ngTemplateOutlet="content"></ng-container>
+        </div>
+        <ng-template #regularHtml>
+          <div class="notification-html pl-1" [innerHTML]="content"></div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+
+</div>

@@ -1,0 +1,46 @@
+<ng-container [formGroup]="group">
+    <div [id]="id"
+         [formArrayName]="model.id"
+         [class.d-none]="model.hidden"
+         [ngClass]="getClass('element', 'control')">
+
+      <!-- Draggable Container -->
+      <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="moveSelection($event)">
+        <!-- Draggable Items -->
+        <div *ngFor="let groupModel of model.groups; let idx = index"
+             role="group"
+             [formGroupName]="idx"
+             [ngClass]="[getClass('element', 'group'), getClass('grid', 'group')]"
+             cdkDrag
+             cdkDragHandle
+             [cdkDragDisabled]="dragDisabled"
+             [cdkDragPreviewClass]="'ds-submission-reorder-dragging'"
+             [class.grey-background]="model.isInlineGroupArray">
+          <!-- Item content -->
+          <div class="drag-handle" [class.drag-disable]="dragDisabled" tabindex="0">
+            <i class="drag-icon fas fa-grip-vertical fa-fw" [class.drag-disable]="dragDisabled" ></i>
+          </div>
+          <ng-container *ngTemplateOutlet="startTemplate?.templateRef; context: groupModel"></ng-container>
+          <ds-dynamic-form-control-container *ngFor="let _model of groupModel.group"
+                                             [bindId]="false"
+                                             [formGroup]="group"
+                                             [formModel]="formModel"
+                                             [context]="groupModel"
+                                             [group]="control.get([idx])"
+                                             [hidden]="_model.hidden"
+                                             [class.d-none]="_model.hidden"
+                                             [layout]="formLayout"
+                                             [model]="_model"
+                                             [templates]="templates"
+                                             [ngClass]="[getClass('element', 'host', _model), getClass('grid', 'host', _model)]"
+                                             (dfBlur)="onBlur($event)"
+                                             (dfChange)="onChange($event)"
+                                             (dfFocus)="onFocus($event)"
+                                             (ngbEvent)="onCustomEvent($event, null, true)"></ds-dynamic-form-control-container>
+
+          <ng-container *ngTemplateOutlet="endTemplate?.templateRef; context: groupModel"></ng-container>
+        </div>
+      </div>
+    </div>
+
+</ng-container>

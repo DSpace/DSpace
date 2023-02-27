@@ -1,0 +1,144 @@
+<div class="mb-4 ccLicense-select">
+  <ds-select
+    [disabled]="!submissionCcLicenses">
+
+    <ng-container class="selection">
+      <span *ngIf="!submissionCcLicenses">
+        <ds-themed-loading></ds-themed-loading>
+      </span>
+      <span *ngIf="getSelectedCcLicense()">
+        {{ getSelectedCcLicense().name }}
+      </span>
+      <span *ngIf="submissionCcLicenses && !getSelectedCcLicense()">
+        <ng-container *ngIf="storedCcLicenseLink">
+          {{ 'submission.sections.ccLicense.change' | translate }}
+        </ng-container>
+        <ng-container *ngIf="!storedCcLicenseLink">
+          {{ 'submission.sections.ccLicense.select' | translate }}
+        </ng-container>
+      </span>
+    </ng-container>
+
+    <ng-container class="menu">
+      <button *ngIf="submissionCcLicenses?.length == 0"
+              class="dropdown-item disabled">
+        {{ 'submission.sections.ccLicense.none' | translate }}
+      </button>
+      <button *ngFor="let license of submissionCcLicenses"
+              class="dropdown-item"
+              (click)="selectCcLicense(license)">
+        {{ license.name }}
+      </button>
+    </ng-container>
+
+  </ds-select>
+</div>
+
+<ng-container *ngIf="getSelectedCcLicense()">
+
+  <div *ngFor="let field of getSelectedCcLicense().fields"
+       class="mb-4">
+
+    <div class="d-flex flex-row">
+      <div class="font-weight-bold {{ field.id }}">
+        {{ field.label }}
+      </div>
+      <button
+        class="btn btn-outline-info btn-sm ml-2"
+        (click)="openInfoModal(infoModal)">
+        <i class="fas fa-question"></i>
+      </button>
+    </div>
+
+    <ng-template #infoModal>
+
+      <div>
+
+        <div class="modal-header mb-4 ">
+          <div>
+            <h4>
+              {{ field.label }}
+            </h4>
+            <div [innerHTML]="field.description"></div>
+          </div>
+          <button type="button" class="close"
+                  (click)="closeInfoModal()" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div *ngFor="let value of field.enums"
+               class="mb-4">
+            <h5>
+              {{ value.label }}
+            </h5>
+            <div [innerHTML]="value.description" class="font-weight-light"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </ng-template>
+
+    <ds-select *ngIf="field.enums?.length > 5" [disabled]="field.id === 'jurisdiction' && defaultJurisdiction !== undefined && defaultJurisdiction !== 'none'">
+      <ng-container class="selection" *ngVar="getSelectedOption(getSelectedCcLicense(), field) as option">
+        <span *ngIf="option">
+          {{ option.label }}
+        </span>
+        <span *ngIf="!option">
+          {{ 'submission.sections.ccLicense.option.select' | translate }}
+        </span>
+      </ng-container>
+      <ng-container class="menu">
+        <div class="options-select-menu overflow-auto">
+          <button *ngFor="let option of field.enums"
+                  class="dropdown-item"
+                  (click)="selectOption(getSelectedCcLicense(), field, option)">
+            {{ option.label }}
+          </button>
+        </div>
+      </ng-container>
+    </ds-select>
+
+    <ng-container *ngIf="field.enums?.length <= 5">
+      <div *ngFor="let option of field.enums"
+           class="d-flex flex-row m-1">
+        <div (click)="selectOption(getSelectedCcLicense(), field, option)">
+          <input type="radio"
+                 title="{{ option.label }}"
+                 class="mr-1"
+                 [checked]="isSelectedOption(getSelectedCcLicense(), field, option)">
+          <span>{{ option.label }}</span>
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+
+</ng-container>
+
+<ng-container *ngIf="getCcLicenseLink$()">
+  <ng-container *ngVar="getCcLicenseLink$() | async as licenseLink">
+    <div *ngIf="!licenseLink">
+      <ds-themed-loading></ds-themed-loading>
+    </div>
+    <div *ngIf="licenseLink"
+         class="mt-2 p-4 bg-light text-dark">
+      <div>
+        {{ 'submission.sections.ccLicense.link' | translate }}
+      </div>
+      <a class="license-link" href="{{ licenseLink }}" target="_blank" rel="noopener noreferrer">
+        {{ licenseLink }}
+      </a>
+      <div class="m-2">
+        <div (click)="setAccepted(!accepted)">
+          <input type="checkbox"
+                 title="accepted"
+                 [checked]="accepted">
+          <span> {{ 'submission.sections.ccLicense.confirmation' | translate }}</span>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

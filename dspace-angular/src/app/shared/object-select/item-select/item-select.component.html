@@ -1,0 +1,49 @@
+<ng-container *ngVar="(dsoRD$ | async) as itemsRD">
+  <ds-pagination
+    *ngIf="itemsRD?.payload?.totalElements > 0"
+    [paginationOptions]="paginationOptions"
+    [sortOptions]="sortOptions"
+    [pageInfoState]="itemsRD?.payload"
+    [collectionSize]="itemsRD?.payload?.totalElements"
+    [hidePagerWhenSinglePage]="true"
+    [hideGear]="true">
+    <div class="table-responsive mt-2">
+      <table id="item-select" class="table table-striped table-hover">
+        <thead>
+        <tr>
+          <th></th>
+          <th *ngIf="!hideCollection" scope="col">{{'item.select.table.collection' | translate}}</th>
+          <th scope="col">{{'item.select.table.author' | translate}}</th>
+          <th scope="col">{{'item.select.table.title' | translate}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of itemsRD?.payload?.page">
+          <td><input [disabled]="!(canSelect(item) | async)" class="item-checkbox" [ngModel]="getSelected(item.id) | async" (change)="switch(item.id)" type="checkbox" name="{{item.id}}"></td>
+          <td *ngIf="!hideCollection">
+            <span *ngVar="(item.owningCollection | async)?.payload as collection">
+              <a *ngIf="collection" [routerLink]="['/collections', collection?.id]">{{collection?.name}}</a>
+            </span>
+          </td>
+          <td><span *ngIf="item.hasMetadata(['dc.contributor.author', 'dc.creator', 'dc.contributor.*'])">{{item.firstMetadataValue(['dc.contributor.author', 'dc.creator', 'dc.contributor.*'])}}</span></td>
+          <td><a [routerLink]="[(itemPageRoutes$ | async)[item.id]]">{{item.firstMetadataValue("dc.title")}}</a></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </ds-pagination>
+  <div *ngIf="itemsRD?.payload?.totalElements === 0 || itemsRD?.payload?.page?.length === 0" class="alert alert-info w-100" role="alert">
+    {{'item.select.empty' | translate}}
+  </div>
+  <ds-error *ngIf="itemsRD?.hasFailed" message="{{'error.items' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="!itemsRD || itemsRD?.isLoading" message="{{'loading.items' | translate}}"></ds-themed-loading>
+  <div *ngVar="(selectedIds$ | async) as selectedIds">
+    <button class="btn btn-outline-secondary item-cancel float-left" (click)="onCancel()">{{cancelButton | translate}}</button>
+    <button class="btn item-confirm float-right"
+            [ngClass]="{'btn-danger': dangerConfirm, 'btn-primary': !dangerConfirm}"
+            [disabled]="selectedIds?.length === 0"
+            (click)="confirmSelected()">
+      {{confirmButton | translate}}
+    </button>
+  </div>
+</ng-container>

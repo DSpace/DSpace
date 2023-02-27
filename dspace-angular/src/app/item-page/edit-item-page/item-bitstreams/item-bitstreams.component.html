@@ -1,0 +1,69 @@
+<div class="item-bitstreams" *ngVar="(bundles$ | async) as bundles">
+  <div class="button-row top d-flex mt-2 space-children-mr">
+    <button class="mr-auto btn btn-success"
+            [routerLink]="[itemPageRoute, 'bitstreams', 'new']"><i
+            class="fas fa-upload"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.upload-button" | translate}}</span>
+    </button>
+    <button class="btn btn-warning" *ngIf="isReinstatable() | async"
+            (click)="reinstate()"><i
+            class="fas fa-undo-alt"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.reinstate-button" | translate}}</span>
+    </button>
+    <button class="btn btn-primary" [disabled]="!(hasChanges() | async) || submitting"
+            (click)="submit()"><i
+            class="fas fa-save"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.save-button" | translate}}</span>
+    </button>
+    <button class="btn btn-danger" *ngIf="!(isReinstatable() | async)"
+            [disabled]="!(hasChanges() | async) || submitting"
+            (click)="discard()"><i
+            class="fas fa-times"></i>
+      <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.discard-button" | translate}}</span>
+    </button>
+  </div>
+
+  <div *ngIf="item && bundles?.length > 0" class="container table-bordered mt-4">
+    <div class="row header-row font-weight-bold">
+      <div class="{{columnSizes.columns[0].buildClasses()}} row-element">
+        <ds-item-edit-bitstream-drag-handle></ds-item-edit-bitstream-drag-handle>
+        {{'item.edit.bitstreams.headers.name' | translate}}
+      </div>
+      <div class="{{columnSizes.columns[1].buildClasses()}} row-element">{{'item.edit.bitstreams.headers.description' | translate}}</div>
+      <div class="{{columnSizes.columns[2].buildClasses()}} text-center row-element">{{'item.edit.bitstreams.headers.format' | translate}}</div>
+      <div class="{{columnSizes.columns[3].buildClasses()}} text-center row-element">{{'item.edit.bitstreams.headers.actions' | translate}}</div>
+    </div>
+    <ds-item-edit-bitstream-bundle *ngFor="let bundle of bundles"
+                                   [bundle]="bundle"
+                                   [item]="item"
+                                   [columnSizes]="columnSizes"
+                                   (dropObject)="dropBitstream(bundle, $event)">
+    </ds-item-edit-bitstream-bundle>
+  </div>
+  <div *ngIf="bundles?.length === 0"
+       class="alert alert-info w-100 d-inline-block mt-4" role="alert">
+    {{'item.edit.bitstreams.empty' | translate}}
+  </div>
+  <ds-themed-loading *ngIf="!bundles" message="{{'loading.bitstreams' | translate}}"></ds-themed-loading>
+
+  <div class="button-row bottom">
+    <div class="mt-4 float-right space-children-mr ml-gap">
+      <button class="btn btn-warning" *ngIf="isReinstatable() | async"
+              (click)="reinstate()"><i
+        class="fas fa-undo-alt"></i>
+        <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.reinstate-button" | translate}}</span>
+      </button>
+      <button class="btn btn-primary" [disabled]="!(hasChanges() | async) || submitting"
+              (click)="submit()"><i
+        class="fas fa-save"></i>
+        <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.save-button" | translate}}</span>
+      </button>
+      <button class="btn btn-danger" *ngIf="!(isReinstatable() | async)"
+              [disabled]="!(hasChanges() | async) || submitting"
+              (click)="discard()"><i
+        class="fas fa-times"></i>
+        <span class="d-none d-sm-inline">&nbsp;{{"item.edit.bitstreams.discard-button" | translate}}</span>
+      </button>
+    </div>
+  </div>
+</div>

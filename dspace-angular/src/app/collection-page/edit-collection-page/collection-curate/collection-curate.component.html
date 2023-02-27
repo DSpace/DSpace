@@ -1,0 +1,6 @@
+<div class="container">
+    <h3>{{'collection.curate.header' |translate:{collection: (collectionName$ |async)} }}</h3>
+    <ds-curation-form
+            [dsoHandle]="(dsoRD$|async)?.payload.handle"
+    ></ds-curation-form>
+</div>

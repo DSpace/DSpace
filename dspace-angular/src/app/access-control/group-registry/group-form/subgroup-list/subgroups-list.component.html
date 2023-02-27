@@ -1,0 +1,134 @@
+<ng-container>
+  <h3 class="border-bottom pb-2">{{messagePrefix + '.head' | translate}}</h3>
+
+  <h4 id="search" class="border-bottom pb-2">
+    <span *dsContextHelp="{
+            content: 'admin.access-control.groups.form.tooltip.editGroup.addSubgroups',
+            id: 'edit-group-add-subgroups',
+            iconPlacement: 'right',
+            tooltipPlacement: ['top', 'right', 'bottom']
+          }"
+    >
+      {{messagePrefix + '.search.head' | translate}}
+    </span>
+
+  </h4>
+  <form [formGroup]="searchForm" (ngSubmit)="search(searchForm.value)" class="d-flex justify-content-between">
+    <div class="flex-grow-1 mr-3">
+      <div class="form-group input-group mr-3">
+        <input type="text" name="query" id="query" formControlName="query"
+               class="form-control" aria-label="Search input">
+        <span class="input-group-append">
+            <button type="submit" class="search-button btn btn-primary">
+              <i class="fas fa-search"></i> {{ messagePrefix + '.search.button' | translate }}
+            </button>
+        </span>
+
+      </div>
+    </div>
+    <div>
+      <button (click)="clearFormAndResetResult();" class="btn btn-secondary float-right">
+        {{messagePrefix + '.button.see-all' | translate}}
+      </button>
+    </div>
+  </form>
+
+  <ds-pagination *ngIf="(searchResults$ | async)?.payload?.totalElements > 0"
+                 [paginationOptions]="configSearch"
+                 [pageInfoState]="(searchResults$ | async)?.payload"
+                 [collectionSize]="(searchResults$ | async)?.payload?.totalElements"
+                 [hideGear]="true"
+                 [hidePagerWhenSinglePage]="true">
+
+    <div class="table-responsive">
+      <table id="groupsSearch" class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.id' | translate}}</th>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.name' | translate}}</th>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.collectionOrCommunity' | translate}}</th>
+          <th class="align-middle">{{messagePrefix + '.table.edit' | translate}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let group of (searchResults$ | async)?.payload?.page">
+          <td class="align-middle">{{group.id}}</td>
+          <td class="align-middle"><a (click)="groupDataService.startEditingNewGroup(group)"
+                 [routerLink]="[groupDataService.getGroupEditPageRouterLink(group)]">{{group.name}}</a></td>
+          <td class="align-middle">{{(group.object | async)?.payload?.name}}</td>
+          <td class="align-middle">
+            <div class="btn-group edit-field">
+              <button *ngIf="(isSubgroupOfGroup(group) | async) && !(isActiveGroup(group) | async)"
+                      (click)="deleteSubgroupFromGroup(group)"
+                      class="btn btn-outline-danger btn-sm deleteButton"
+                      title="{{messagePrefix + '.table.edit.buttons.remove' | translate: {name: group.name} }}">
+                <i class="fas fa-trash-alt fa-fw"></i>
+              </button>
+
+              <p *ngIf="(isActiveGroup(group) | async)">{{ messagePrefix + '.table.edit.currentGroup' | translate }}</p>
+
+              <button *ngIf="!(isSubgroupOfGroup(group) | async) && !(isActiveGroup(group) | async)"
+                      (click)="addSubgroupToGroup(group)"
+                      class="btn btn-outline-primary btn-sm addButton"
+                      title="{{messagePrefix + '.table.edit.buttons.add' | translate: {name: group.name} }}">
+                <i class="fas fa-plus fa-fw"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </ds-pagination>
+
+  <div *ngIf="(searchResults$ | async)?.payload?.totalElements == 0 && searchDone" class="alert alert-info w-100 mb-2"
+       role="alert">
+    {{messagePrefix + '.no-items' | translate}}
+  </div>
+
+  <h4>{{messagePrefix + '.headSubgroups' | translate}}</h4>
+
+  <ds-pagination *ngIf="(subGroups$ | async)?.payload?.totalElements > 0"
+                 [paginationOptions]="config"
+                 [pageInfoState]="(subGroups$ | async)?.payload"
+                 [collectionSize]="(subGroups$ | async)?.payload?.totalElements"
+                 [hideGear]="true"
+                 [hidePagerWhenSinglePage]="true">
+
+    <div class="table-responsive">
+      <table id="subgroupsOfGroup" class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.id' | translate}}</th>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.name' | translate}}</th>
+          <th scope="col" class="align-middle">{{messagePrefix + '.table.collectionOrCommunity' | translate}}</th>
+          <th>{{messagePrefix + '.table.edit' | translate}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let group of (subGroups$ | async)?.payload?.page">
+          <td class="align-middle">{{group.id}}</td>
+          <td class="align-middle"><a (click)="groupDataService.startEditingNewGroup(group)"
+                 [routerLink]="[groupDataService.getGroupEditPageRouterLink(group)]">{{group.name}}</a></td>
+          <td class="align-middle">{{(group.object | async)?.payload?.name}}</td>
+          <td class="align-middle">
+            <div class="btn-group edit-field">
+              <button (click)="deleteSubgroupFromGroup(group)"
+                      class="btn btn-outline-danger btn-sm deleteButton"
+                      title="{{messagePrefix + '.table.edit.buttons.remove' | translate: {name: group.name} }}">
+                <i class="fas fa-trash-alt fa-fw"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </ds-pagination>
+
+  <div *ngIf="(subGroups$ | async)?.payload?.totalElements == 0" class="alert alert-info w-100 mb-2"
+       role="alert">
+    {{messagePrefix + '.no-subgroups-yet' | translate}}
+  </div>
+
+</ng-container>

@@ -1,0 +1,51 @@
+<div class="card" [@focusShadow]="(isCollapsed$ | async)?'blur':'focus'">
+  <ds-truncatable [id]="dso.id">
+    <div class="position-absolute ml-1">
+      <ng-content></ng-content>
+    </div>
+    <a *ngIf="linkType != linkTypes.None"
+       [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+       rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+       class="card-img-top full-width" [attr.title]="'search.results.view-result' | translate">
+      <div>
+        <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+        </ds-thumbnail>
+      </div>
+    </a>
+    <span *ngIf="linkType == linkTypes.None" class="card-img-top full-width">
+            <div>
+                <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+                </ds-thumbnail>
+            </div>
+        </span>
+    <div class="card-body">
+      <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+      <ds-truncatable-part [id]="dso.id" [minLines]="3" type="h4">
+        <h4 class="card-title" [innerHTML]="dsoTitle"></h4>
+      </ds-truncatable-part>
+      <p *ngIf="dso.hasMetadata('organization.foundingDate')"
+         class="item-date card-text text-muted">
+        <ds-truncatable-part [id]="dso.id" [minLines]="1">
+          <span [innerHTML]="firstMetadataValue('organization.foundingDate')"></span>
+        </ds-truncatable-part>
+      </p>
+      <p *ngIf="dso.hasMetadata('organization.address.addressCountry')"
+         class="item-location card-text">
+        <ds-truncatable-part [id]="dso.id" [minLines]="3">
+          <span
+            class="item-country">{{firstMetadataValue('organization.address.addressCountry')}}</span>
+          <span *ngIf="dso.hasMetadata('organization.address.addressLocality')" class="item-city">
+            <span>, </span>
+            {{firstMetadataValue('organization.address.addressLocality')}}
+          </span>
+        </ds-truncatable-part>
+      </p>
+      <div *ngIf="linkType != linkTypes.None" class="text-center">
+        <a [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+           rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+           class="lead btn btn-primary viewButton">{{ 'search.results.view-result' | translate}}</a>
+      </div>
+    </div>
+  </ds-truncatable>
+  <ng-content></ng-content>
+</div>

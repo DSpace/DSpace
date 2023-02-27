@@ -1,0 +1,23 @@
+.navbar-brand img {
+  max-height: var(--ds-header-logo-height);
+  max-width: 100%;
+  @media screen and (max-width: map-get($grid-breakpoints, sm)) {
+    max-height: var(--ds-header-logo-height-xs);
+  }
+}
+
+.navbar-toggler .navbar-toggler-icon {
+  background-image: none !important;
+  line-height: 1.5;
+}
+
+.navbar ::ng-deep {
+  a {
+    color: var(--ds-header-icon-color);
+
+    &:hover, &:focus {
+      color: var(--ds-header-icon-color-hover);
+    }
+  }
+}
+

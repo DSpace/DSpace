@@ -1,0 +1,15 @@
+<ng-template #descTemplate>
+  <span class="text-muted">
+      <span *ngIf="metadataRepresentation.allMetadata(['person.jobTitle']).length > 0"
+            class="item-list-job-title">
+              <span *ngFor="let value of metadataRepresentation.allMetadataValues(['person.jobTitle']); let last=last;">
+                  <span [innerHTML]="value"><span [innerHTML]="value"></span></span>
+              </span>
+      </span>
+  </span>
+</ng-template>
+<ds-truncatable [id]="metadataRepresentation.id">
+  <a [routerLink]="[itemPageRoute]"
+     [innerHTML]="metadataRepresentation.getValue()"
+     [ngbTooltip]="metadataRepresentation.allMetadata(['person.jobTitle']).length > 0 ? descTemplate : null"></a>
+</ds-truncatable>

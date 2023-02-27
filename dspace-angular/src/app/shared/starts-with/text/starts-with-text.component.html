@@ -1,0 +1,10 @@
+<form class="w-100" [formGroup]="formData" (ngSubmit)="submitForm(formData.value)">
+  <div class="row">
+    <div class="form-group input-group col-8 col-sm-12 col-md-6">
+      <input class="form-control" placeholder="{{'browse.startsWith.type_text' | translate}}" type="text" name="startsWith" formControlName="startsWith" [value]="getStartsWith()" />
+      <span class="input-group-append">
+        <button class="btn btn-primary" type="submit"><i class="fas fa-book-open"></i> {{'browse.startsWith.submit' | translate}}</button>
+      </span>
+    </div>
+  </div>
+</form>

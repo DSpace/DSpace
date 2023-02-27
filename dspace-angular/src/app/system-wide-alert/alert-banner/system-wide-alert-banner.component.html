@@ -1,0 +1,27 @@
+<div *ngIf="(systemWideAlert$ |async)?.active">
+    <div class="rounded-0 alert alert-warning w100">
+        <div class="container">
+            <span class="font-weight-bold">
+        <span *ngIf="(countDownDays|async) > 0 || (countDownHours| async) > 0 || (countDownMinutes|async) > 0 ">
+            {{'system-wide-alert-banner.countdown.prefix' | translate }}
+        </span>
+            <span *ngIf="(countDownDays|async) > 0">
+            {{'system-wide-alert-banner.countdown.days' | translate: {
+                days: countDownDays|async
+            } }}
+        </span>
+            <span *ngIf="(countDownDays|async) > 0 || (countDownHours| async) > 0 ">
+            {{'system-wide-alert-banner.countdown.hours' | translate: {
+                hours: countDownHours| async
+            } }}
+        </span>
+            <span *ngIf="(countDownDays|async) > 0 || (countDownHours| async) > 0 || (countDownMinutes|async) > 0 ">
+            {{'system-wide-alert-banner.countdown.minutes' | translate: {
+                minutes: countDownMinutes|async
+            } }}
+        </span>
+            </span>
+            <span>{{(systemWideAlert$ |async)?.message}}</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<form *ngIf="subscriptionForm" [formGroup]="subscriptionForm" (ngSubmit)="submit()" data-test="subscription-form">
+  <div class="modal-header">
+    <h4 class="modal-title">{{'subscriptions.modal.title' | translate}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.close()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p class="mb-3"><strong>{{dso.name}}</strong>
+      <span *ngIf="!!dso" class="float-right"><ds-type-badge *ngIf="!!dso" [object]="dso"></ds-type-badge></span>
+    </p>
+    <div>
+      <fieldset *ngFor="let subscriptionType of subscriptionForm?.controls | keyvalue" formGroupName="{{subscriptionType.key}}" class="form-group form-row">
+        <legend class="col-md-4 col-form-label float-md-left pt-0">
+          {{ 'subscriptions.modal.new-subscription-form.type.' + subscriptionType.key | translate }}:
+        </legend>
+        <div class="col-md-8">
+          <input type="hidden" formControlName="subscriptionId" [value]="subscriptionType?.value?.controls['subscriptionId'].value" >
+          <div class="form-check" formGroupName="frequencies" *ngFor="let frequency of frequencyDefaultValues">
+            <input type="checkbox" [id]="'checkbox-' + frequency" class="form-check-input" [formControlName]="frequency"/>
+            <label class="form-check-label"
+                   [for]="'checkbox-' + frequency">{{ 'subscriptions.modal.new-subscription-form.frequency.' + frequency | translate }}</label>
+          </div>
+        </div>
+        <ds-alert *ngIf="!!submitted && subscriptionType?.value?.controls['frequencies'].errors?.required" [type]="'alert-danger'">
+          {{ 'context-menu.actions.subscription.frequency.required' | translate }}
+        </ds-alert>
+      </fieldset>
+    </div>
+    <p class="text-muted" *ngIf="(showDeleteInfo$ | async)">{{'subscriptions.modal.delete-info' | translate}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary"
+            (click)="activeModal.close()">
+      {{'subscriptions.modal.close' | translate}}
+    </button>
+    <button type="submit" class="btn btn-success" [disabled]="(processing$ | async) || !isValid">
+        <span *ngIf="(processing$ | async)">
+          <i class='fas fa-circle-notch fa-spin'></i> {{'subscriptions.modal.new-subscription-form.processing' | translate}}
+        </span>
+      <span *ngIf="!(processing$ | async)">
+        {{'subscriptions.modal.new-subscription-form.submit' | translate}}
+      </span>
+    </button>
+  </div>
+</form>

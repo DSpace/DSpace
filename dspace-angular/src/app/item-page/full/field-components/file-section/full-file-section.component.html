@@ -1,0 +1,85 @@
+<ds-metadata-field-wrapper [label]="label | translate">
+    <div *ngVar="(originals$ | async)?.payload as originals">
+        <div *ngIf="hasValuesInBundle(originals)">
+            <h5 class="simple-view-element-header">{{"item.page.filesection.original.bundle" | translate}}</h5>
+            <ds-pagination *ngIf="originals?.page?.length > 0"
+                           [hideGear]="true"
+                           [hidePagerWhenSinglePage]="true"
+                           [paginationOptions]="originalOptions"
+                           [pageInfoState]="originals"
+                           [collectionSize]="originals?.totalElements"
+                           [retainScrollPosition]="true">
+
+
+                <div class="file-section row mb-3" *ngFor="let file of originals?.page;">
+                    <div class="col-3">
+                        <ds-thumbnail [thumbnail]="(file.thumbnail | async)?.payload"></ds-thumbnail>
+                    </div>
+                    <div class="col-7">
+                        <dl class="row">
+                            <dt class="col-md-4">{{"item.page.filesection.name" | translate}}</dt>
+                            <dd class="col-md-8">{{file.name}}</dd>
+
+                            <dt class="col-md-4">{{"item.page.filesection.size" | translate}}</dt>
+                            <dd class="col-md-8">{{(file.sizeBytes) | dsFileSize }}</dd>
+
+
+                            <dt class="col-md-4">{{"item.page.filesection.format" | translate}}</dt>
+                            <dd class="col-md-8">{{(file.format | async)?.payload?.description}}</dd>
+
+
+                            <dt class="col-md-4">{{"item.page.filesection.description" | translate}}</dt>
+                            <dd class="col-md-8">{{file.firstMetadataValue("dc.description")}}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-2">
+                        <ds-themed-file-download-link [bitstream]="file" [item]="item">
+                            {{"item.page.filesection.download" | translate}}
+                        </ds-themed-file-download-link>
+                    </div>
+                </div>
+            </ds-pagination>
+        </div>
+    </div>
+    <div *ngVar="(licenses$ | async)?.payload as licenses">
+        <div *ngIf="hasValuesInBundle(licenses)">
+            <h5 class="simple-view-element-header">{{"item.page.filesection.license.bundle" | translate}}</h5>
+            <ds-pagination *ngIf="licenses?.page?.length > 0"
+                           [hideGear]="true"
+                           [hidePagerWhenSinglePage]="true"
+                           [paginationOptions]="licenseOptions"
+                           [pageInfoState]="licenses"
+                           [collectionSize]="licenses?.totalElements"
+                           [retainScrollPosition]="true">
+
+
+                <div class="file-section row" *ngFor="let file of licenses?.page;">
+                    <div class="col-3">
+                        <ds-thumbnail [thumbnail]="(file.thumbnail | async)?.payload"></ds-thumbnail>
+                    </div>
+                    <div class="col-7">
+                        <dl class="row">
+                            <dt class="col-md-4">{{"item.page.filesection.name" | translate}}</dt>
+                            <dd class="col-md-8">{{file.name}}</dd>
+
+                            <dt class="col-md-4">{{"item.page.filesection.size" | translate}}</dt>
+                            <dd class="col-md-8">{{(file.sizeBytes) | dsFileSize }}</dd>
+
+                            <dt class="col-md-4">{{"item.page.filesection.format" | translate}}</dt>
+                            <dd class="col-md-8">{{(file.format | async)?.payload?.description}}</dd>
+
+
+                            <dt class="col-md-4">{{"item.page.filesection.description" | translate}}</dt>
+                            <dd class="col-md-8">{{file.firstMetadataValue("dc.description")}}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-2">
+                        <ds-themed-file-download-link [bitstream]="file" [item]="item">
+                            {{"item.page.filesection.download" | translate}}
+                        </ds-themed-file-download-link>
+                    </div>
+                </div>
+            </ds-pagination>
+        </div>
+    </div>
+</ds-metadata-field-wrapper>

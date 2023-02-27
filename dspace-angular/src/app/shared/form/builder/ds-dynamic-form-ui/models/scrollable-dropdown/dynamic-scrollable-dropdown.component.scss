@@ -1,0 +1,34 @@
+@import '../../../../form.component';
+
+.scrollable-menu {
+  height: auto;
+  max-height: var(--ds-dropdown-menu-max-height);
+  overflow-x: hidden;
+}
+
+.collection-item {
+  border-bottom: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color);
+}
+
+.scrollable-dropdown-loading {
+  background-color: var(--bs-primary);
+  color: white;
+  height: calc(var(--bs-spacer) * 2) !important;
+  line-height: calc(var(--bs-spacer) * 2);
+  position: sticky;
+  bottom: 0;
+}
+
+.scrollable-dropdown-menu {
+  left: 0 !important;
+  margin-bottom: var(--bs-spacer);
+  z-index: 1000;
+}
+
+.scrollable-dropdown-toggle {
+  padding:  0.70rem 0.70rem 0 0.70rem ;
+}
+
+.scrollable-dropdown-input[readonly]{
+  background-color: #fff;
+}

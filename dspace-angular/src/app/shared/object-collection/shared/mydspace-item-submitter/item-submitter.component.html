@@ -1,0 +1,3 @@
+<div class="mt-2 mb-2" *ngIf="(submitter$ | async)">
+  <span class="text-muted">{{'submission.workflow.tasks.generic.submitter' | translate}}: <span class="badge badge-info">{{(submitter$ | async)?.name}}</span></span>
+</div>

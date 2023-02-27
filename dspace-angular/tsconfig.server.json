@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app-server",
+    "target": "es2016",
+    "types": [
+      "node",
+      "grecaptcha"
+    ]
+  },
+  "files": [
+    "src/main.server.ts",
+    "server.ts"
+  ],
+  "angularCompilerOptions": {
+    "entryModule": "./src/modules/app/server-app.module#ServerAppModule"
+  }
+}

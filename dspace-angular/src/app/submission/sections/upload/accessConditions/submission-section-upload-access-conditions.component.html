@@ -1,0 +1,8 @@
+<ng-container *ngFor="let accessCondition of accessConditionsList">
+  <span *ngIf="accessCondition.action == 'DEFAULT_BITSTREAM_READ'" class="badge badge-primary mt-3 mr-2">
+    {{accessCondition.name}} {{accessCondition.startDate}} {{accessCondition.endDate}}
+  </span>
+  <span *ngIf="accessCondition.name == 'lease'" class="badge badge-primary mt-3 mr-2">{{accessCondition.name}} from {{accessCondition.endDate}}</span>
+  <span *ngIf="accessCondition.name == 'embargo'" class="badge badge-dark mt-3 mr-2">{{accessCondition.name}} until {{accessCondition.startDate}}</span>
+  <br>
+</ng-container>

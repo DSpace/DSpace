@@ -1,0 +1,6 @@
+<div class="dso-edit-menu d-flex">
+    <div *ngFor="let section of (sections | async)" class="ml-1">
+        <ng-container
+                *ngComponentOutlet="(sectionMap$ | async).get(section.id)?.component; injector: (sectionMap$ | async).get(section.id)?.injector;"></ng-container>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+<div>
+  <div class="modal-header"><h4>{{'dso-selector.claim.item.head' | translate}}</h4>
+    <button type="button" class="close" (click)="close()" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-info" role="alert">
+      {{'dso-selector.claim.item.body' | translate}}
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="scrollable-menu list-group container">
+      <div *ngFor="let listEntry of (listEntries$ | async)?.payload.page" class="row">
+        <button class="list-group-item list-group-item-action border-0 list-entry"
+                title="{{ listEntry.indexableObject.name }}"
+                (click)="selectItem(listEntry.indexableObject)" #listEntryElement>
+          <ds-listable-object-component-loader [object]="listEntry" [viewMode]="viewMode"
+                                               [linkType]=linkTypes.None></ds-listable-object-component-loader>
+        </button>
+      </div>
+      <div class="row">
+        <div class="col-md mt-2">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="mr-5">
+      <input type="checkbox" [checked]="checked" (change)="toggleCheckbox()"/>
+      {{ 'dso-selector.claim.item.not-mine-label' | translate }}
+    </div>
+    <button type="submit" class="btn btn-primary ml-5 mr-2" (click)="createFromScratch()" [disabled]="!checked">
+      <i class="fas fa-plus"></i>
+      {{ 'dso-selector.claim.item.create-from-scratch' | translate }}
+    </button>
+  </div>
+</div>

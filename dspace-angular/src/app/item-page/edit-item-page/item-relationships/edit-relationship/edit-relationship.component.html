@@ -1,0 +1,35 @@
+<div class="row" *ngIf="relatedItem$ | async">
+  <div class="col-10 relationship">
+    <ds-listable-object-component-loader
+      [object]="relatedItem$ | async"
+      [viewMode]="viewMode"
+      [value]="nameVariant"
+    >
+    </ds-listable-object-component-loader>
+  </div>
+  <div class="col-2">
+    <div class="btn-group relationship-action-buttons">
+      <button [disabled]="!canRemove()" (click)="openVirtualMetadataModal(virtualMetadataModal)"
+              class="btn btn-outline-danger btn-sm"
+              title="{{'item.edit.metadata.edit.buttons.remove' | translate}}">
+        <i class="fas fa-trash-alt fa-fw"></i>
+      </button>
+      <button [disabled]="!canUndo()" (click)="undo()"
+              class="btn btn-outline-warning btn-sm"
+              title="{{'item.edit.metadata.edit.buttons.undo' | translate}}">
+        <i class="fas fa-undo-alt fa-fw"></i>
+      </button>
+    </div>
+  </div>
+</div>
+<ng-template #virtualMetadataModal>
+  <ds-virtual-metadata
+          [relationshipId]="relationship.id"
+          [leftItem]="leftItem$ | async"
+          [rightItem]="rightItem$ | async"
+          [url]="url"
+          (close)="closeVirtualMetadataModal()"
+          (save)="remove()"
+  >
+  </ds-virtual-metadata>
+</ng-template>

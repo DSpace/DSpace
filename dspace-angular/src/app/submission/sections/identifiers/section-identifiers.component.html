@@ -1,0 +1,20 @@
+<!--
+Template for the identifiers submission section component
+@author Kim Shepherd
+-->
+<!-- Main identifier data -->
+<ng-container *ngVar="(getIdentifierData() | async) as identifierData">
+  <ng-container *ngIf="identifierData && identifierData.identifiers">
+  <div>
+  <span>{{'submission.sections.identifiers.info' | translate}}</span>
+  <ul>
+    <ng-container *ngFor="let identifier of identifierData.identifiers">
+      <ng-container *ngIf="identifierData.displayTypes.includes(identifier.identifierType) && identifier.value">
+        <li>{{'submission.sections.identifiers.' + identifier.identifierType + '_label' | translate}}
+          {{identifier.value}}</li>
+      </ng-container>
+    </ng-container>
+  </ul>
+ </div>
+ </ng-container>
+</ng-container>

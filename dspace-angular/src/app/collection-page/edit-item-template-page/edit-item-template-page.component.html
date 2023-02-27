@@ -1,0 +1,13 @@
+<div class="container" *ngVar="(collectionRD$ | async)?.payload as collection">
+  <div class="row">
+    <div class="col-12" *ngVar="(itemRD$ | async) as itemRD">
+      <ng-container *ngIf="itemRD?.hasSucceeded">
+        <h2 class="border-bottom">{{ 'collection.edit.template.head' | translate:{ collection: collection?.name } }}</h2>
+        <ds-themed-dso-edit-metadata [updateDataService]="itemTemplateService" [dso]="itemRD?.payload"></ds-themed-dso-edit-metadata>
+        <button [routerLink]="getCollectionEditUrl(collection)" class="btn btn-outline-secondary">{{ 'collection.edit.template.cancel' | translate }}</button>
+      </ng-container>
+      <ds-themed-loading *ngIf="itemRD?.isLoading" [message]="'collection.edit.template.loading' | translate"></ds-themed-loading>
+      <ds-alert *ngIf="itemRD?.hasFailed" [type]="AlertTypeEnum.Error" [content]="'collection.edit.template.error' | translate"></ds-alert>
+    </div>
+  </div>
+</div>

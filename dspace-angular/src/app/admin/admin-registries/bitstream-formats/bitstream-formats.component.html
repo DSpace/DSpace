@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="bitstream-formats row">
+    <div class="col-12">
+
+      <h2 id="header" class="border-bottom pb-2 ">{{'admin.registries.bitstream-formats.head' | translate}}</h2>
+
+      <p id="description">{{'admin.registries.bitstream-formats.description' | translate}}</p>
+      <p id="create-new" class="mb-2"><a [routerLink]="'add'" class="btn btn-success">{{'admin.registries.bitstream-formats.create.new' | translate}}</a></p>
+
+
+      <ds-pagination
+        *ngIf="(bitstreamFormats | async)?.payload?.totalElements > 0"
+        [paginationOptions]="pageConfig"
+        [pageInfoState]="(bitstreamFormats | async)?.payload"
+        [collectionSize]="(bitstreamFormats | async)?.payload?.totalElements"
+        [hideGear]="false"
+        [hidePagerWhenSinglePage]="true">
+        <div class="table-responsive">
+          <table id="formats" class="table table-striped table-hover">
+            <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">{{'admin.registries.bitstream-formats.table.id' | translate}}</th>
+              <th scope="col">{{'admin.registries.bitstream-formats.table.name' | translate}}</th>
+              <th scope="col">{{'admin.registries.bitstream-formats.table.mimetype' | translate}}</th>
+              <th scope="col">{{'admin.registries.bitstream-formats.table.supportLevel.head' | translate}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let bitstreamFormat of (bitstreamFormats | async)?.payload?.page">
+              <td>
+                <label>
+                  <input type="checkbox"
+                         [checked]="isSelected(bitstreamFormat) | async"
+                         (change)="selectBitStreamFormat(bitstreamFormat, $event)"
+                  >
+                </label>
+              </td>
+              <td><a [routerLink]="['/admin/registries/bitstream-formats', bitstreamFormat.id, 'edit']">{{bitstreamFormat.id}}</a></td>
+              <td><a [routerLink]="['/admin/registries/bitstream-formats', bitstreamFormat.id, 'edit']">{{bitstreamFormat.shortDescription}}</a></td>
+              <td><a [routerLink]="['/admin/registries/bitstream-formats', bitstreamFormat.id, 'edit']">{{bitstreamFormat.mimetype}} <span *ngIf="bitstreamFormat.internal">({{'admin.registries.bitstream-formats.table.internal' | translate}})</span></a></td>
+              <td><a [routerLink]="['/admin/registries/bitstream-formats', bitstreamFormat.id, 'edit']">{{'admin.registries.bitstream-formats.table.supportLevel.'+bitstreamFormat.supportLevel | translate}}</a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </ds-pagination>
+      <div *ngIf="(bitstreamFormats | async)?.payload?.totalElements == 0" class="alert alert-info" role="alert">
+        {{'admin.registries.bitstream-formats.no-items' | translate}}
+      </div>
+
+      <div>
+        <button *ngIf="(bitstreamFormats | async)?.payload?.page?.length > 0" class="btn btn-primary deselect" (click)="deselectAll()">{{'admin.registries.bitstream-formats.table.deselect-all' | translate}}</button>
+        <button *ngIf="(bitstreamFormats | async)?.payload?.page?.length > 0" type="submit" class="btn btn-danger float-right" (click)="deleteFormats()">{{'admin.registries.bitstream-formats.table.delete' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>

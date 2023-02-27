@@ -1,0 +1,27 @@
+.input-group-append:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
+  margin-left: -1px;
+  border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.input-group-append .dropdown-toggle {
+  border-radius: 0;
+}
+
+.w-fx {
+  min-width: 200px;
+}
+
+.scrollable-menu {
+  height: auto;
+  max-height: calc(var(--ds-dropdown-menu-max-height) / 2);
+  overflow-x: hidden;
+}
+
+.scrollable-dropdown-loading {
+  background-color: var(--bs-primary);
+  color: white;
+  height: calc(var(--bs-spacer) * 2) !important;
+  line-height: calc(var(--bs-spacer) * 2);
+  position: sticky;
+  bottom: 0;
+}

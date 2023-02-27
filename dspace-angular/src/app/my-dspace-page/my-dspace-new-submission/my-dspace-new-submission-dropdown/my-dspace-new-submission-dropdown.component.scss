@@ -1,0 +1,16 @@
+.parent {
+  display: flex;
+}
+
+.upload {
+  flex: auto;
+}
+
+.add {
+  flex: initial;
+}
+
+#entityControlsDropdownMenu {
+  min-width: 18rem;
+  box-shadow: $btn-focus-box-shadow;
+}

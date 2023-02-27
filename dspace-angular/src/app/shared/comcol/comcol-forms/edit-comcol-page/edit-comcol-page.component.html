@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between border-bottom">
+        <h2>{{ type + '.edit.head' | translate }}</h2>
+        <div>
+          <a class="btn btn-danger"
+             [routerLink]="((type === 'community') ? '/communities/' : '/collections/') + (dsoRD$ | async)?.payload.uuid + '/delete'">
+            <i class="fas fa-trash"></i> {{type + '.edit.delete' | translate}}</a>
+        </div>
+      </div>
+      <div class="pt-2">
+        <ul class="nav nav-tabs justify-content-start mb-2">
+          <li *ngFor="let page of pages" class="nav-item">
+            <a class="nav-link"
+               [ngClass]="{'active' : page === currentPage}"
+               [routerLink]="['./' + page]">
+              {{ type + '.edit.tabs.' + page + '.head' | translate}}
+            </a>
+          </li>
+        </ul>
+        <div class="tab-pane active">
+          <div class="mb-4">
+            <router-outlet></router-outlet>
+          </div>
+          <div class="col-12 text-right">
+            <a *ngIf="!hideReturnButton" [routerLink]="getPageUrl((dsoRD$ | async)?.payload)" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left"></i> {{ type + '.edit.return' | translate }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

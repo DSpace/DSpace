@@ -1,0 +1,25 @@
+<header class="header">
+  <nav role="navigation" [attr.aria-label]="'nav.user.description' | translate" class="container navbar navbar-expand-md px-0">
+    <div class="d-flex flex-grow-1">
+      <a class="navbar-brand m-2" routerLink="/home">
+        <img src="assets/images/dspace-logo.svg" [attr.alt]="'menu.header.image.logo' | translate"/>
+      </a>
+    </div>
+    <div class="d-flex flex-grow-1 ml-auto justify-content-end align-items-center">
+      <ds-search-navbar class="navbar-search"></ds-search-navbar>
+      <ds-lang-switch></ds-lang-switch>
+      <ds-context-help-toggle></ds-context-help-toggle>
+      <ds-themed-auth-nav-menu></ds-themed-auth-nav-menu>
+      <ds-impersonate-navbar></ds-impersonate-navbar>
+      <div class="pl-2">
+        <button class="navbar-toggler" type="button" (click)="toggleNavbar()"
+                aria-controls="collapsingNav"
+                aria-expanded="false" [attr.aria-label]="'nav.toggle' | translate">
+          <span class="navbar-toggler-icon fas fa-bars fa-fw" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <ds-themed-navbar></ds-themed-navbar>
+
+</header>

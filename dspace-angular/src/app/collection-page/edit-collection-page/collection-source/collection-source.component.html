@@ -1,0 +1,74 @@
+<div class="container-fluid">
+    <div class="d-inline-block float-right space-children-mr">
+        <button class=" btn btn-danger" *ngIf="!(isReinstatable() | async)"
+                [disabled]="!(hasChanges() | async)"
+                (click)="discard()"><i
+                class="fas fa-times"></i>
+            <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.discard-button" | translate}}</span>
+        </button>
+        <button class="btn btn-warning" *ngIf="isReinstatable() | async"
+                (click)="reinstate()"><i
+                class="fas fa-undo-alt"></i>
+            <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.reinstate-button" | translate}}</span>
+        </button>
+        <button class="btn btn-primary"
+                [disabled]="!(hasChanges() | async) || !isValid() || (initialHarvestType === harvestTypeNone && contentSource.harvestType === initialHarvestType)"
+                (click)="onSubmit()"><i
+                class="fas fa-save"></i>
+            <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.save-button" | translate}}</span>
+        </button>
+    </div>
+    <h4>{{ 'collection.edit.tabs.source.head' | translate }}</h4>
+    <div *ngIf="contentSource" class="form-check mb-4">
+        <input type="checkbox" class="form-check-input" id="externalSourceCheck"
+               [checked]="(contentSource?.harvestType !== harvestTypeNone)" (change)="changeExternalSource()">
+        <label class="form-check-label"
+               for="externalSourceCheck">{{ 'collection.edit.tabs.source.external' | translate }}</label>
+    </div>
+    <ds-themed-loading *ngIf="!contentSource" [message]="'loading.content-source' | translate"></ds-themed-loading>
+    <h4 *ngIf="contentSource && (contentSource?.harvestType !== harvestTypeNone)">{{ 'collection.edit.tabs.source.form.head' | translate }}</h4>
+</div>
+<div class="row">
+    <ds-form *ngIf="formGroup && contentSource && (contentSource?.harvestType !== harvestTypeNone)"
+             [formId]="'collection-source-form-id'"
+             [formGroup]="formGroup"
+             [formModel]="formModel"
+             [formLayout]="formLayout"
+             [displaySubmit]="false"
+             [displayCancel]="false"
+             (dfChange)="onChange($event)"
+             (submitForm)="onSubmit()"
+             (cancel)="onCancel()"></ds-form>
+</div>
+<div class="container mt-2" *ngIf="(contentSource?.harvestType !== harvestTypeNone)">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-inline-block float-right ml-1 space-children-mr">
+                <button class=" btn btn-danger" *ngIf="!(isReinstatable() | async)"
+                        [disabled]="!(hasChanges() | async)"
+                        (click)="discard()"><i
+                        class="fas fa-times"></i>
+                    <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.discard-button" | translate}}</span>
+                </button>
+                <button class="btn btn-warning" *ngIf="isReinstatable() | async"
+                        (click)="reinstate()"><i
+                        class="fas fa-undo-alt"></i>
+                    <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.reinstate-button" | translate}}</span>
+                </button>
+                <button class="btn btn-primary"
+                        [disabled]="!(hasChanges() | async) || !isValid() || (initialHarvestType === harvestTypeNone && contentSource.harvestType === initialHarvestType)"
+                        (click)="onSubmit()"><i
+                        class="fas fa-save"></i>
+                    <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.save-button" | translate}}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<ds-collection-source-controls
+        [isEnabled]="!(hasChanges()|async)"
+        [shouldShow]="contentSource?.harvestType !== harvestTypeNone"
+        [collection]="(collectionRD$ |async)?.payload"
+>
+</ds-collection-source-controls>
+

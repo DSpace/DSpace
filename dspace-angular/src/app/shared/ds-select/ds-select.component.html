@@ -1,0 +1,31 @@
+<div>
+
+  <div ngbDropdown class="btn-group" (openChange)="toggled.emit($event)">
+
+    <div class="input-group-prepend" *ngIf="label">
+      <span id="dsSelectMenuLabel" class="input-group-text">
+        {{ label | translate }}
+      </span>
+    </div>
+
+    <button aria-describedby="dsSelectMenuLabel"
+            id="dsSelectMenuButton"
+            class="btn btn-outline-primary selection"
+            (blur)="close.emit($event)"
+            (click)="close.emit($event)"
+            [disabled]="disabled"
+            ngbDropdownToggle>
+      <ng-content select=".selection"></ng-content>
+    </button>
+
+    <div ngbDropdownMenu
+         class="dropdown-menu"
+         id="dsSelectDropdownMenu"
+         aria-labelledby="dsSelectMenuButton">
+      <div aria-labelledby="dropdownMenuButton">
+        <ng-content select=".menu"></ng-content>
+      </div>
+    </div>
+  </div>
+
+</div>

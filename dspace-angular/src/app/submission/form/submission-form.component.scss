@@ -1,0 +1,39 @@
+.submission-form-header {
+  background-color: rgba(255, 255, 255, .97);
+  padding: calc(var(--bs-spacer) / 2) 0 calc(var(--bs-spacer) / 2) 0;
+  top: 0;
+  z-index: var(--ds-submission-header-z-index);
+}
+
+.submission-form-header-item {
+  flex-grow: 1;
+}
+
+.submission-form-footer {
+  border-radius: var(--bs-card-border-radius);
+  bottom: 0;
+  background-color: var(--bs-gray-400);
+  padding: calc(var(--bs-spacer) / 2);
+  z-index: var(--ds-submission-footer-z-index);
+}
+
+.btn-link-focus {
+  // behave as btn-link but does not override box-shadow of btn-link:focus
+  font-weight: $font-weight-normal;
+  color: $link-color;
+  text-decoration: $link-decoration;
+  @include hover {
+    color: $link-hover-color;
+    text-decoration: $link-hover-decoration;
+  }
+  &:disabled,
+  &.disabled {
+    color: $btn-link-disabled-color;
+    pointer-events: none;
+  }
+
+  &:focus,
+  &.focus {
+    text-decoration: $link-hover-decoration;
+  }
+}

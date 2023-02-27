@@ -1,0 +1,37 @@
+<ds-pagination
+        [paginationOptions]="config"
+        [pageInfoState]="objects?.payload"
+        [collectionSize]="objects?.payload?.totalElements"
+        [objects]="objects"
+        [sortOptions]="sortConfig"
+        [hideGear]="hideGear"
+        [hidePagerWhenSinglePage]="hidePagerWhenSinglePage"
+        [hidePaginationDetail]="hidePaginationDetail"
+        [showPaginator]="showPaginator"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (sortDirectionChange)="onSortDirectionChange($event)"
+        (sortFieldChange)="onSortFieldChange($event)"
+        (paginationChange)="onPaginationChange($event)"
+        (prev)="goPrev()"
+        (next)="goNext()">
+    <ul *ngIf="objects?.hasSucceeded" class="list-unstyled" [ngClass]="{'ml-4': selectable}">
+        <li *ngFor="let object of objects?.payload?.page; let i = index; let last = last" class="mt-4 mb-4 d-flex" [class.border-bottom]="hasBorder && !last" [attr.data-test]="'list-object' | dsBrowserOnly">
+          <ds-selectable-list-item-control *ngIf="selectable" [index]="i"
+                                           [object]="object"
+                                           [selectionConfig]="selectionConfig"
+                                           (deselectObject)="deselectObject.emit($event)"
+                                           (selectObject)="selectObject.emit($event)"></ds-selectable-list-item-control>
+          <ds-importable-list-item-control *ngIf="importable" [object]="object"
+                                           [importConfig]="importConfig"
+                                           (importObject)="importObject.emit($event)"></ds-importable-list-item-control>
+          <ds-listable-object-component-loader [object]="object"
+                                               [viewMode]="viewMode"
+                                               [index]="i"
+                                               [context]="context"
+                                               [linkType]="linkType"
+                                               [listID]="selectionConfig?.listId"
+                                               (contentChange)="contentChange.emit($event)"></ds-listable-object-component-loader>
+        </li>
+    </ul>
+</ds-pagination>

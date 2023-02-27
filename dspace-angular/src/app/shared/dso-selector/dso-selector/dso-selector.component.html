@@ -1,0 +1,37 @@
+<div class="form-group w-100 pr-2 pl-2">
+    <input type="search"
+           class="form-control"
+           (click)="$event.stopPropagation();"
+           placeholder="{{'dso-selector.placeholder' | translate: { type: typesString } }}"
+           [formControl]="input" ngbAutofocus (keyup.enter)="selectSingleResult()">
+</div>
+<div class="dropdown-divider"></div>
+<div class="scrollable-menu list-group">
+  <div
+    infiniteScroll
+    [infiniteScrollDistance]="1"
+    [infiniteScrollThrottle]="0"
+    [infiniteScrollContainer]="'.scrollable-menu'"
+    [fromRoot]="true"
+    (scrolled)="onScrollDown()">
+    <ng-container *ngIf="listEntries$ | async">
+      <button class="list-group-item list-group-item-action border-0 disabled"
+              *ngIf="(listEntries$ | async).length == 0">
+        {{'dso-selector.no-results' | translate: { type: typesString } }}
+      </button>
+      <button *ngFor="let listEntry of (listEntries$ | async)"
+              class="list-group-item list-group-item-action border-0 list-entry"
+              [ngClass]="{'bg-primary': listEntry['id'] === currentDSOId}"
+              title="{{ getName(listEntry) }}"
+              dsHoverClass="ds-hover"
+              (click)="onClick(listEntry)" #listEntryElement>
+        <ds-listable-object-component-loader [object]="listEntry" [viewMode]="viewMode"
+                                             [linkType]=linkTypes.None [context]="getContext(listEntry['id'])"></ds-listable-object-component-loader>
+      </button>
+    </ng-container>
+    <button *ngIf="loading"
+            class="list-group-item list-group-item-action border-0 list-entry">
+      <ds-themed-loading [showMessage]="false"></ds-themed-loading>
+    </button>
+  </div>
+</div>

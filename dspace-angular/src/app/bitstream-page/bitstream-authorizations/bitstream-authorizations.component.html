@@ -1,0 +1,10 @@
+<div class="container">
+  <ds-resource-policies [resourceType]="'bitstream'" [resourceUUID]="(dsoRD$ | async)?.payload?.id"></ds-resource-policies>
+  <div class="button-row bottom">
+    <div class="text-right">
+      <a [routerLink]="['/bitstreams', (dsoRD$ | async)?.payload?.id, 'edit']" role="button" class="btn btn-outline-secondary mr-1">
+        <i class="fas fa-arrow-left"></i> {{'bitstream.edit.return' | translate}}
+      </a>
+    </div>
+  </div>
+</div>

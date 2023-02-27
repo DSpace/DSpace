@@ -1,0 +1,46 @@
+.notifications-wrapper {
+  z-index: var(--bs-zindex-popover);
+  text-align: right;
+  @include word-wrap;
+  .notification {
+    display: block;
+  }
+}
+
+.notifications-wrapper.left {
+  left: 0;
+}
+
+.notifications-wrapper.top {
+  top:0;
+}
+
+.notifications-wrapper.right {
+  right: 0;
+}
+
+.notifications-wrapper.bottom {
+  bottom: 0;
+}
+
+.notifications-wrapper.center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.notifications-wrapper.middle {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.notifications-wrapper.middle.center {
+  transform: translate(-50%, -50%);
+}
+
+@media screen and (max-width: map-get($grid-breakpoints, sm)) {
+  .notifications-wrapper {
+    width: auto;
+    left: 0;
+    right: 0;
+  }
+}

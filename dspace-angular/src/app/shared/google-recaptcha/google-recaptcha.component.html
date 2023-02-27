@@ -1,0 +1,6 @@
+<div class="g-recaptcha"
+     [attr.data-callback]="'dataCallback'"
+     [attr.data-expired-callback]="'expiredCallback'"
+     [attr.data-error-callback]="'errorCallback'"
+     [attr.data-sitekey]="(recaptchaKey$ | async)?.values[0]"
+     [attr.data-size]="captchaMode === 'invisible' ? 'invisible' : null"></div>

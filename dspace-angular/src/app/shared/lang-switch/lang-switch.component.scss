@@ -1,0 +1,11 @@
+.dropdown-toggle::after {
+  display:none;
+}
+
+.dropdown-toggle {
+  color: var(--ds-header-icon-color);
+
+  &:hover, &:focus {
+    color: var(--ds-header-icon-color-hover);
+  }
+}

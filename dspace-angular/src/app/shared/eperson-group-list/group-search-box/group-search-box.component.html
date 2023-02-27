@@ -1,0 +1,20 @@
+<form class="d-flex justify-content-between"
+      [formGroup]="searchForm"
+      (ngSubmit)="submit(searchForm.value); $event.stopImmediatePropagation();" >
+  <div class="flex-grow-1 mr-3">
+    <div class="form-group input-group">
+      <input type="text" name="query" id="query" formControlName="query"
+             class="form-control" aria-label="Search input">
+      <span class="input-group-append">
+        <button type="submit" class="search-button btn btn-primary">
+          <i class="fas fa-search"></i> {{ labelPrefix + 'search.button' | translate }}
+        </button>
+      </span>
+    </div>
+  </div>
+  <div>
+    <button type="button" class="search-button btn btn-secondary" (click)="submit(null); reset()">
+      {{ labelPrefix + 'button.see-all' | translate }}
+    </button>
+  </div>
+</form>

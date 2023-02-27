@@ -1,0 +1,14 @@
+@import '_variables.scss';
+
+// These CSS variables are picked up by CSSVariableService to and made available as JS variables as
+// well.
+:export {
+    xlMin: var(--bs-xl);
+    mdMin: var(--bs-md);
+    lgMin: var(--bs-lg);
+    smMin: var(--bs-sm);
+    adminSidebarActiveBg: var(--ds-admin-sidebar-active-bg);
+    sidebarItemsWidth: var(--ds-sidebar-items-width);
+    collapsedSidebarWidth: var(--ds-collapsed-sidebar-width);
+    totalSidebarWidth: var(--ds-total-sidebar-width);
+}

@@ -1,0 +1,45 @@
+#
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+#
+# http://www.dspace.org/license/
+#
+
+#
+# This is a copy of the docker-compose-cli.yml that is available in the DSpace/DSpace
+# (Backend) at:
+# https://github.com/DSpace/DSpace/blob/main/docker-compose-cli.yml
+#
+# Therefore, it should be kept in sync with that file
+version: "3.7"
+
+services:
+  dspace-cli:
+    image: "${DOCKER_OWNER:-dspace}/dspace-cli:${DSPACE_VER:-dspace-7_x}"
+    container_name: dspace-cli
+    environment:
+      # Below syntax may look odd, but it is how to override dspace.cfg settings via env variables.
+      # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
+      # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
+      # __D__ => "-" (e.g. google__D__metadata => google-metadata)
+      # dspace.dir
+      dspace__P__dir: /dspace
+      # db.url: Ensure we are using the 'dspacedb' image for our database
+      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
+      # solr.server: Ensure we are using the 'dspacesolr' image for Solr
+      solr__P__server: http://dspacesolr:8983/solr
+    volumes:
+    - "assetstore:/dspace/assetstore"
+    entrypoint: /dspace/bin/dspace
+    command: help
+    networks:
+      - dspacenet
+    tty: true
+    stdin_open: true
+
+volumes:
+  assetstore:
+
+networks:
+  dspacenet:

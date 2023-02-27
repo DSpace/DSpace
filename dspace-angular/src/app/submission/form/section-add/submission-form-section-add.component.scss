@@ -1,0 +1,7 @@
+.dropdown-toggle::after {
+  display:none
+}
+
+.sections-dropdown-menu {
+  z-index: var(--ds-submission-header-z-index);
+}

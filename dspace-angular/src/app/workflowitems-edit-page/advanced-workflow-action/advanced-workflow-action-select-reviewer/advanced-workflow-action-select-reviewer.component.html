@@ -1,0 +1,29 @@
+<div>
+  <p *ngIf="multipleReviewers">{{ 'advanced-workflow-action.select-reviewer.description-multiple' | translate }}</p>
+  <p *ngIf="!multipleReviewers">{{ 'advanced-workflow-action.select-reviewer.description-single' | translate }}</p>
+
+  <ds-reviewers-list *ngIf="groupId !== undefined"
+                     [actionConfig]="reviewersListActionConfig"
+                     [groupId]="groupId"
+                     [ngClass]="groupId ? 'reviewersListWithGroup' : ''"
+                     [multipleReviewers]="multipleReviewers"
+                     (selectedReviewersUpdated)="selectedReviewers = $event; displayError = false"
+                     messagePrefix="advanced-workflow-action-select-reviewer.groups.form.reviewers-list"
+  ></ds-reviewers-list>
+  <small *ngIf="displayError" class="invalid-feedback d-block mb-3">
+    {{ 'advanced-workflow-action.select-reviewer.no-reviewer-selected.error' | translate }}
+  </small>
+
+  <ds-modify-item-overview *ngIf="item$ | async"
+                           [item]="item$ | async">
+  </ds-modify-item-overview>
+
+  <div class="d-flex flex-wrap justify-content-end">
+    <button class="btn btn-default" (click)="previousPage()">
+      {{'workflow-item.' + getType() + '.button.cancel' | translate}}
+    </button>
+    <button class="btn btn-primary" (click)="performAction()">
+      {{'workflow-item.' + getType() + '.button.confirm' | translate}}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+.btn-dark {
+    background-color: var(--ds-admin-sidebar-bg);
+}
+
+.dso-button-menu {
+    .dropdown-toggle::after {
+        display: none;
+    }
+}
+
+ul.dropdown-menu {
+    background-color: var(--ds-admin-sidebar-bg);
+    color: white;
+
+    ::ng-deep a {
+        color: white;
+
+        &.disabled {
+            color: var(--bs-btn-link-disabled-color);
+        }
+    }
+
+    .disabled {
+        color: var(--bs-btn-link-disabled-color);
+    }
+}
+
+.dso-edit-menu-dropdown {
+  max-width: calc(min(600px, 75vw));
+}

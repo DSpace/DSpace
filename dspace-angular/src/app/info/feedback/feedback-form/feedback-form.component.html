@@ -1,0 +1,45 @@
+<div class="row row-offcanvas row-offcanvas-right">
+  <div class="col-xs-12 col-sm-12 col-md-9 main-content">
+    <form class="primary" [formGroup]="feedbackForm" (ngSubmit)="createFeedback()">
+      <h2>{{ 'info.feedback.head' | translate }}</h2>
+      <p>{{ 'info.feedback.info' | translate }}</p>
+      <fieldset class="col p-0">
+        <div class="row">
+          <div class="control-group col-sm-12">
+            <label class="control-label" for="email">{{ 'info.feedback.email-label' | translate }}&nbsp;</label>
+            <input id="email" class="form-control" name="email" type="text" value="" formControlName="email" autofocus="autofocus" title="{{ 'info.feedback.email_help' | translate }}">
+            <small class="text-muted">{{ 'info.feedback.email_help' | translate }}</small>
+          </div>
+        </div>
+
+        <ng-container *ngIf="feedbackForm.controls.email.invalid && (feedbackForm.controls.email.dirty || feedbackForm.controls.email.touched)"
+          class="alert">
+          <ds-error *ngIf="feedbackForm.controls.email.errors?.required" message="{{'info.feedback.error.email.required' | translate}}"></ds-error>
+          <ds-error *ngIf="feedbackForm.controls.email.errors?.pattern" message="{{'info.feedback.error.email.required' | translate}}"></ds-error>
+        </ng-container>
+        <div class="row">
+          <div class="control-group col-sm-12">
+            <label class="control-label" for="comments">{{ 'info.feedback.comments' | translate }}:&nbsp;</label>
+            <textarea id="comments" formControlName="message" class="form-control" name="message" cols="20" rows="5"> </textarea>
+          </div>
+        </div>
+        <ng-container *ngIf="feedbackForm.controls.message.invalid && (feedbackForm.controls.message.dirty || feedbackForm.controls.message.touched)"
+          class="alert">
+          <ds-error *ngIf="feedbackForm.controls.message.errors?.required" message="{{'info.feedback.error.message.required' | translate}}"></ds-error>
+        </ng-container>
+        <div class="row">
+          <div class="control-group col-sm-12">
+            <label class="control-label" for="page">{{ 'info.feedback.page-label' | translate }}&nbsp;</label>
+            <input id="page" readonly class="form-control" name="page" type="text" value="" formControlName="page" autofocus="autofocus" title="{{ 'info.feedback.page_help' | translate }}">
+            <small class="text-muted">{{ 'info.feedback.page_help' | translate }}</small>
+          </div>
+        </div>
+        <div class="row py-2">
+          <div class="control-group col-sm-12 text-right">
+            <button [disabled]="!feedbackForm.valid" class="btn btn-primary" name="submit" type="submit">{{ 'info.feedback.send' | translate }}</button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>

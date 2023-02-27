@@ -1,0 +1,52 @@
+<ng-template #rt let-r="result" let-t="term">
+  {{ r.display }}
+</ng-template>
+
+
+  <ds-chips [chips]="chips"
+            [editable]="false"
+            [showIcons]="model.hasAuthority"
+            [wrapperClass]="'border-bottom border-light'">
+
+  <input *ngIf="!model.hasAuthority"
+         class="border-0 form-control-plaintext tag-input flex-grow-1 mt-1 mb-1"
+         type="text"
+         role="textbox"
+         [class.pl-3]="chips.hasItems()"
+         [placeholder]="model.placeholder"
+         [readonly]="model.readOnly"
+         [(ngModel)]="currentValue"
+         (blur)="onBlur($event)"
+         (keypress)="preventEventsPropagation($event)"
+         (keydown)="preventEventsPropagation($event)"
+         (keyup)="onKeyUp($event)" />
+
+  <div *ngIf="model.hasAuthority" class="position-relative right-addon">
+    <i *ngIf="searching" class="fas fa-circle-notch fa-spin fa-2x fa-fw text-primary position-absolute mt-1 p-0" aria-hidden="true"></i>
+    <input class="border-0 form-control-plaintext tag-input flex-grow-1 mt-1 mb-1"
+           type="text"
+           [attr.aria-labelledby]="'label_' + model.id"
+           [(ngModel)]="currentValue"
+           [attr.autoComplete]="model.autoComplete"
+           [class.is-invalid]="showErrorMessages"
+           [class.pl-3]="chips.hasItems()"
+           [id]="id"
+           [inputFormatter]="formatter"
+           [name]="model.name"
+           [ngbTypeahead]="search"
+           [placeholder]="model.placeholder"
+           [readonly]="model.readOnly"
+           [resultTemplate]="rt"
+           [type]="model.inputType"
+           (blur)="onBlur($event)"
+           (focus)="onFocus($event)"
+           (change)="$event.stopPropagation()"
+           (input)="onInput($event)"
+           (selectItem)="onSelectItem($event)"
+           (keypress)="preventEventsPropagation($event)"
+           (keydown)="preventEventsPropagation($event)"
+           (keyup)="onKeyUp($event)"
+           #instance="ngbTypeahead"/>
+    </div>
+  </ds-chips>
+

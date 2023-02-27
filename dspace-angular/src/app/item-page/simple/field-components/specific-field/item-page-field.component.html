@@ -1,0 +1,10 @@
+<div class="item-page-field">
+  <ds-metadata-values
+    [mdValues]="item?.allMetadata(fields)"
+    [separator]="separator"
+    [label]="label"
+    [enableMarkdown]="enableMarkdown"
+    [urlRegex]="urlRegex"
+    [browseDefinition]="browseDefinition|async"
+  ></ds-metadata-values>
+</div>

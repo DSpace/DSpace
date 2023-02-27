@@ -1,0 +1,16 @@
+:host {
+    .results {
+        line-height: var(--ds-button-height);
+    }
+    ds-view-mode-switch {
+        margin-bottom: var(--bs-spacer);
+    }
+    .sidebar-content > *:not(:last-child):not(ds-search-switch-configuration) {
+        margin-bottom: calc(4 * var(--bs-spacer));
+        display: block;
+    }
+    ds-search-switch-configuration {
+      margin-bottom: calc(2 * var(--bs-spacer));
+      display: block;
+    }
+}

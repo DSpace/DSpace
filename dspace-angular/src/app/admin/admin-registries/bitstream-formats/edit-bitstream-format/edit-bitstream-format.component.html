@@ -1,0 +1,11 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2 id="sub-header"
+                class="border-bottom mb-2">{{'admin.registries.bitstream-formats.edit.head' | translate:{format: (bitstreamFormatRD$ | async)?.payload.shortDescription} }}</h2>
+
+             <ds-bitstream-format-form [bitstreamFormat]="(bitstreamFormatRD$ | async)?.payload" (updatedFormat)="updateFormat($event)"></ds-bitstream-format-form>
+
+        </div>
+    </div>
+</div>

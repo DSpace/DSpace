@@ -1,0 +1,19 @@
+<ng-container *ngIf="derivedSearchResult$ | async">
+    <div class="row">
+        <div [ngClass]="showThumbnails ? 'offset-3 offset-md-2  pl-3' : ''">
+            <ds-mydspace-item-status [status]="status"></ds-mydspace-item-status>
+        </div>
+    </div>
+    <ds-listable-object-component-loader
+            [viewMode]="ViewModes.ListElement"
+            [object]="derivedSearchResult$ | async" [linkType]="LinkTypes.None"></ds-listable-object-component-loader>
+    <div class="row">
+        <div [ngClass]="showThumbnails ? 'offset-3 offset-md-2  pl-3' : ''">
+            <ds-workflowitem-actions [object]="dso" (processCompleted)="reloadedObject.emit($event.reloadedObject)"></ds-workflowitem-actions>
+        </div>
+    </div>
+</ng-container>
+
+<ds-themed-loading
+        *ngIf="!(derivedSearchResult$ | async)"
+        [showMessage]="false"></ds-themed-loading>

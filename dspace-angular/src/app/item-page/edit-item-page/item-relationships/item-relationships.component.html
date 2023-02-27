@@ -1,0 +1,63 @@
+<div class="item-relationships">
+  <ng-container *ngVar="entityType$ | async as entityType">
+    <ng-container *ngIf="entityType">
+      <div class="button-row top d-flex space-children-mr">
+        <button class="btn btn-danger ml-auto" *ngIf="!(isReinstatable() | async)"
+                [disabled]="!(hasChanges() | async)"
+                (click)="discard()"><i
+          class="fas fa-times"></i>
+          <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.discard-button" | translate}}</span>
+        </button>
+        <button class="btn btn-warning ml-auto" *ngIf="isReinstatable() | async"
+                (click)="reinstate()"><i
+          class="fas fa-undo-alt"></i>
+          <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.reinstate-button" | translate}}</span>
+        </button>
+        <button class="btn btn-primary" [disabled]="!(hasChanges() | async)"
+                (click)="submit()"><i
+          class="fas fa-save"></i>
+          <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.save-button" | translate}}</span>
+        </button>
+      </div>
+      <ng-container *ngVar="relationshipTypes$ | async as relationshipTypes">
+        <ng-container *ngIf="relationshipTypes">
+          <div *ngFor="let relationshipType of relationshipTypes" class="mb-4">
+            <ds-edit-relationship-list
+              [url]="url"
+              [item]="item"
+              [itemType]="entityType$ | async"
+              [relationshipType]="relationshipType"
+              [hasChanges] = hasChanges()
+              (submit) = submit()
+            ></ds-edit-relationship-list>
+          </div>
+        </ng-container>
+        <ds-themed-loading *ngIf="!relationshipTypes"></ds-themed-loading>
+      </ng-container>
+      <div class="button-row bottom">
+        <div class="float-right space-children-mr ml-gap">
+          <button class="btn btn-danger" *ngIf="!(isReinstatable() | async)"
+                  [disabled]="!(hasChanges() | async)"
+                  (click)="discard()"><i
+            class="fas fa-times"></i>
+            <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.discard-button" | translate}}</span>
+          </button>
+          <button class="btn btn-warning" *ngIf="isReinstatable() | async"
+                  (click)="reinstate()"><i
+            class="fas fa-undo-alt"></i>
+            <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.reinstate-button" | translate}}</span>
+          </button>
+          <button class="btn btn-primary" [disabled]="!(hasChanges() | async)"
+                  (click)="submit()"><i
+            class="fas fa-save"></i>
+            <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.save-button" | translate}}</span>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <div *ngIf="!entityType"
+         class="alert alert-info mt-2" role="alert">
+      {{ 'item.edit.relationships.no-entity-type' | translate }}
+    </div>
+  </ng-container>
+</div>

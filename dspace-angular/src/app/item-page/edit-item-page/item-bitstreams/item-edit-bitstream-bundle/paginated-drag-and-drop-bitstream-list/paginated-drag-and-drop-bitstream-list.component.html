@@ -1,0 +1,33 @@
+<ds-pagination *ngIf="(objectsRD$ | async)?.payload"
+               [hideGear]="true"
+               [hidePagerWhenSinglePage]="true"
+               [hidePaginationDetail]="true"
+               [paginationOptions]="options"
+               [pageInfoState]="(objectsRD$ | async)?.payload"
+               [collectionSize]="(objectsRD$ | async)?.payload?.totalElements">
+  <ng-container *ngIf="!(loading$ | async)">
+    <div [id]="bundle.id" class="bundle-bitstreams-list"
+         [ngClass]="{'mb-3': (objectsRD$ | async)?.payload?.totalElements > pageSize}"
+         *ngVar="(updates$ | async) as updates" cdkDropList (cdkDropListDropped)="drop($event)">
+      <ng-container *ngIf="updates">
+        <div class="row bitstream-row" *ngFor="let uuid of customOrder" cdkDrag
+             [id]="uuid"
+             [ngClass]="{
+                  'table-warning': updates[uuid].changeType === 0,
+                  'table-danger': updates[uuid].changeType === 2,
+                  'table-success': updates[uuid].changeType === 1,
+                  'bg-white': updates[uuid].changeType === undefined
+                }">
+          <ds-item-edit-bitstream [fieldUpdate]="updates[uuid]"
+                                  [bundleUrl]="bundle.self"
+                                  [columnSizes]="columnSizes">
+            <div class="d-flex align-items-center bitstream-row-drag-handle" slot="drag-handle" cdkDragHandle tabindex="0">
+              <ds-item-edit-bitstream-drag-handle></ds-item-edit-bitstream-drag-handle>
+            </div>
+          </ds-item-edit-bitstream>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+  <ds-themed-loading *ngIf="(loading$ | async)" [message]="'loading.bitstreams' | translate"></ds-themed-loading>
+</ds-pagination>

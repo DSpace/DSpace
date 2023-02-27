@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-group">
+        <div class="row mb-2">
+            <div class="col-12 col-sm-6">
+                <label class="font-weight-bold" for="task">{{'curation.form.task-select.label' |translate }}</label>
+                <select id="task" formControlName="task" class="form-control">
+                    <option *ngFor="let task of tasks" [value]="task">
+                        {{ 'curation-task.task.' + task + '.label' | translate }}
+                    </option>
+                </select>
+            </div>
+            <div *ngIf="!hasHandleValue()" class="col-12 col-sm-6">
+                <label class="font-weight-bold" for="handle">{{'curation.form.handle.label' |translate }}</label>
+                <input id="handle" class="form-control" formControlName="handle">
+                <small class="text-muted">{{'curation.form.handle.hint' |translate }}</small>
+            </div>
+        </div>
+        <button class="btn btn-default btn-primary" type="submit">{{'curation.form.submit' |translate }}</button>
+    </div>
+</form>

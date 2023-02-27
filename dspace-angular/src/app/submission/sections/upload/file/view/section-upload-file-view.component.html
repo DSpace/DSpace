@@ -1,0 +1,29 @@
+<div>
+  <ng-container *ngIf="metadata">
+    <ng-container *ngFor="let entry of getAllMetadataValue(fileTitleKey)">
+      <ng-container *ngIf="entry.value !== ''">
+        <h5>
+          {{entry.value}}
+        </h5>
+      </ng-container>
+      <ng-container *ngIf="entry.value === ''">
+        <h5 *ngIf="metadata[fileTitleKey].indexOf(entry) === 0">
+          <span class="text-muted">{{'submission.sections.upload.no-entry' | translate}} {{fileTitleKey}}</span>
+        </h5>
+      </ng-container>
+      <span class="clearfix"></span>
+    </ng-container>
+    <ng-container *ngFor="let entry of getAllMetadataValue(fileDescrKey)">
+      <ng-container *ngIf="entry.value !== ''">
+          {{entry.value | dsTruncate:['150']}}
+      </ng-container>
+      <ng-container *ngIf="entry.value === ''">
+        <span *ngIf="metadata[fileDescrKey].indexOf(entry) === 0" class="text-muted">{{'submission.sections.upload.no-entry' | translate}} {{fileDescrKey}}</span>
+      </ng-container>
+      <span class="clearfix"></span>
+    </ng-container>
+  </ng-container>
+
+  <span class="clearfix"></span>
+  <ds-submission-section-upload-access-conditions [accessConditions]="fileData.accessConditions"></ds-submission-section-upload-access-conditions>
+</div>

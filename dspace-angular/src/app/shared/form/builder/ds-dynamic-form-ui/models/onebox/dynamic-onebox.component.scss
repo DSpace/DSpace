@@ -1,0 +1,33 @@
+@import '../../../../form.component';
+
+:host ::ng-deep .dropdown-menu {
+  width: 100% !important;
+  max-height: var(--ds-dropdown-menu-max-height);
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+
+:host ::ng-deep .dropdown-item {
+  border-bottom: var(--bs-dropdown-border-width) solid var(--bs-dropdown-border-color);
+}
+
+:host ::ng-deep .dropdown-item.active,
+:host ::ng-deep .dropdown-item:active,
+:host ::ng-deep .dropdown-item:focus,
+:host ::ng-deep .dropdown-item:hover {
+  color: var(--bs-dropdown-link-hover-color) !important;
+  background-color: var(--bs-dropdown-link-hover-bg) !important;
+}
+
+.treeview .modal-body {
+  max-height: 85vh !important;
+  overflow-y: auto;
+}
+
+.tree-toggle {
+  padding:  0.70rem 0.70rem 0 0.70rem ;
+}
+
+.tree-input[readonly]{
+  background-color: #fff;
+}

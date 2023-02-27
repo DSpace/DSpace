@@ -1,0 +1,38 @@
+<ds-metadata-field-wrapper [label]="label | translate">
+    <ng-container *ngFor="let mdValue of mdValues; let last=last;">
+      <!--
+      Choose a template. Priority: markdown, link, browse link.
+      -->
+      <ng-container *ngTemplateOutlet="(renderMarkdown ? markdown : (hasLink(mdValue) ? link : (hasBrowseDefinition() ? browselink : simple)));
+        context: {value: mdValue.value}">
+      </ng-container>
+      <span class="separator" *ngIf="!last" [innerHTML]="separator"></span>
+    </ng-container>
+</ds-metadata-field-wrapper>
+
+<!-- Render value as markdown -->
+<ng-template #markdown let-value="value">
+  <span class="dont-break-out" [innerHTML]="value | dsMarkdown | async">
+  </span>
+</ng-template>
+
+<!-- Render value as a link (href and label) -->
+<ng-template #link let-value="value">
+    <a class="dont-break-out ds-simple-metadata-link" target="_blank" [href]="value">
+      {{value}}
+    </a>
+</ng-template>
+
+<!-- Render simple value in a span  -->
+<ng-template #simple let-value="value">
+  <span class="dont-break-out preserve-line-breaks">{{value}}</span>
+</ng-template>
+
+<!-- Render value as a link to browse index -->
+<ng-template #browselink let-value="value">
+  <a class="dont-break-out preserve-line-breaks ds-browse-link"
+     [routerLink]="['/browse', browseDefinition.id]"
+     [queryParams]="getQueryParams(value)">
+    {{value}}
+  </a>
+</ng-template>

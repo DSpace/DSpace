@@ -1,0 +1,40 @@
+#
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+#
+# http://www.dspace.org/license/
+#
+
+#
+# This is a copy of the cli.ingest.yml that is available in the DSpace/DSpace
+# (Backend) at:
+# https://github.com/DSpace/DSpace/blob/main/dspace/src/main/docker-compose/cli.assetstore.yml
+#
+# Therefore, it should be kept in sync with that file
+version: "3.7"
+
+networks:
+  dspacenet:
+
+services:
+  dspace-cli:
+    networks:
+      dspacenet: {}
+    environment:
+      # This assetstore zip is available from https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
+      - LOADASSETS=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/assetstore.tar.gz
+    entrypoint:
+      - /bin/bash
+      - '-c'
+      - |
+        if [ ! -z $${LOADASSETS} ]
+        then
+          curl $${LOADASSETS} -L -s --output /tmp/assetstore.tar.gz
+          cd /dspace
+          tar xvfz /tmp/assetstore.tar.gz
+        fi
+
+        /dspace/bin/dspace index-discovery -b
+        /dspace/bin/dspace oai import
+        /dspace/bin/dspace oai clean-cache

@@ -1,0 +1,60 @@
+<div *ngIf="item" class="item-page" @fadeInOut>
+  <ng-container *ngIf="status">
+    <ds-mydspace-item-status [status]="status"></ds-mydspace-item-status>
+  </ng-container>
+  <div *ngIf="item">
+    <ds-item-page-title-field [item]="item">
+    </ds-item-page-title-field>
+    <div class="row mb-1">
+      <div class="col-xs-12 col-md-4">
+        <ds-metadata-field-wrapper [hideIfNoTextContent]="false">
+          <ds-thumbnail [thumbnail]="item?.thumbnail | async"></ds-thumbnail>
+        </ds-metadata-field-wrapper>
+        <ng-container *ngVar="(getFiles() | async) as bitstreams">
+          <ds-metadata-field-wrapper [label]="('item.page.files' | translate)">
+            <div *ngIf="bitstreams?.length > 0" class="file-section">
+              <button class="btn btn-link" *ngFor="let file of bitstreams; let last=last;" (click)="downloadBitstreamFile(file?.uuid)">
+                <span>{{file?.name}}</span>
+                <span>({{(file?.sizeBytes) | dsFileSize }})</span>
+                <span *ngIf="!last" innerHTML="{{separator}}"></span>
+              </button>
+            </div>
+            <ng-container *ngIf="bitstreams?.length === 0">
+              <span class="text-muted">{{('mydspace.results.no-files' | translate)}}</span>
+            </ng-container>
+          </ds-metadata-field-wrapper>
+        </ng-container>
+        <ds-item-detail-preview-field [item]="item"
+                                      [object]="object"
+                                      [label]="('item.page.date' | translate)"
+                                      [metadata]="'dc.date.issued'"
+                                      [separator]="separator"
+                                      [placeholder]="('mydspace.results.no-date' | translate)"></ds-item-detail-preview-field>
+        <ds-item-detail-preview-field [item]="item"
+                                      [object]="object"
+                                      [label]="('item.page.author' | translate)"
+                                      [metadata]="['dc.contributor', 'dc.creator', 'dc.contributor.*']"
+                                      [separator]="separator"
+                                      [placeholder]="('mydspace.results.no-authors' | translate)"></ds-item-detail-preview-field>
+      </div>
+      <div class="col-xs-12 col-md-6">
+        <ds-item-detail-preview-field [item]="item"
+                                      [object]="object"
+                                      [label]="('item.page.abstract' | translate)"
+                                      [metadata]="'dc.description.abstract'"
+                                      [separator]="separator"
+                                      [placeholder]="('mydspace.results.no-abstract' | translate)"></ds-item-detail-preview-field>
+        <ds-item-detail-preview-field [item]="item"
+                                      [object]="object"
+                                      [label]="('item.page.uri' | translate)"
+                                      [metadata]="'dc.identifier.uri'"
+                                      [separator]="separator"
+                                      [placeholder]="('mydspace.results.no-uri' | translate)"></ds-item-detail-preview-field>
+        <div>
+          <ng-content></ng-content>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ds-item-submitter *ngIf="showSubmitter" [object]="object.indexableObject"></ds-item-submitter>

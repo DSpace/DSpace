@@ -1,0 +1,8 @@
+:host {
+    .dropdown-toggle::after {
+        display: none;
+    }
+    .dropdown-item {
+        padding-left: 20px;
+    }
+}

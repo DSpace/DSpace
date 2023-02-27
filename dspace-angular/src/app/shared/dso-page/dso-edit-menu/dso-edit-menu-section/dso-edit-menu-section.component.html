@@ -1,0 +1,25 @@
+<div *ngIf="!canActivate" class="dso-button-menu mb-1"
+     [title]="itemModel.text | translate"
+     [ngbTooltip]="itemModel.text | translate">
+    <a *ngIf="!section.model.disabled" class="d-flex flex-row flex-nowrap"
+       [routerLink]="itemModel.link"
+       href="javascript:void(0);">
+        <button [attr.aria-label]="itemModel.text | translate" [title]="itemModel.text | translate" class="btn btn-dark btn-sm" [disabled]="section.model.disabled">
+            <i class="fas fa-{{section.icon}} fa-fw"></i>
+        </button>
+    </a>
+    <div *ngIf="section.model.disabled" class="d-flex flex-row flex-nowrap">
+        <button [attr.aria-label]="itemModel.text | translate" [title]="itemModel.text | translate" class="btn btn-dark btn-sm" [disabled]="section.model.disabled">
+            <i class="fas fa-{{section.icon}} fa-fw"></i>
+        </button>
+    </div>
+</div>
+
+<div *ngIf="canActivate" class="dso-button-menu mb-1"
+     [title]="itemModel.text | translate"
+     [ngbTooltip]="itemModel.text | translate">
+    <button [attr.aria-label]="itemModel.text | translate" [title]="itemModel.text | translate" class="btn btn-dark btn-sm" [disabled]="section.model.disabled"
+            (click)="activate($event)">
+        <i class="fas fa-{{section.icon}} fa-fw"></i>
+    </button>
+</div>

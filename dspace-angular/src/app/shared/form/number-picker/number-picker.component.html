@@ -1,0 +1,37 @@
+<div class="d-flex flex-column align-items-center justify-content-around mr-3">
+    <button
+      class="btn btn-link-focus"
+      type="button"
+      tabindex="0"
+      [disabled]="disabled"
+      (click)="toggleUp()">
+      <span class="chevron"></span>
+      <span class="sr-only">Increment</span>
+    </button>
+    <input
+      id="{{id}}"
+      type="text"
+      class="form-control d-inline-block text-center"
+      maxlength="{{size}}"
+      size="{{size}}"
+      placeholder="{{placeholder}}"
+      [name]="name"
+      [(ngModel)]="value"
+      (blur)="onBlur($event); $event.stopPropagation();"
+      (change)="update($event); $event.stopPropagation();"
+      (focus)="onFocus($event); $event.stopPropagation();"
+      [readonly]="disabled"
+      [disabled]="disabled"
+      [ngClass]="{'is-invalid': invalid}"
+      title="{{placeholder}}"
+    >
+    <button
+      class="btn btn-link-focus"
+      type="button"
+      tabindex="0"
+      [disabled]="disabled"
+      (click)="toggleDown()">
+      <span class="chevron bottom"></span>
+      <span class="sr-only">Decrement</span>
+    </button>
+</div>

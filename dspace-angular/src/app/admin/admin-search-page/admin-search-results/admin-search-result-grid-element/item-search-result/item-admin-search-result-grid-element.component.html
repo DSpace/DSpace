@@ -1,0 +1,10 @@
+<ng-template dsListableObject>
+</ng-template>
+<div #badges>
+  <ng-content></ng-content>
+</div>
+<ul #buttons class="list-group list-group-flush">
+  <li class="list-group-item">
+      <ds-item-admin-search-result-actions-element class="d-flex justify-content-between" [item]="dso" [small]="true"></ds-item-admin-search-result-actions-element>
+  </li>
+</ul>

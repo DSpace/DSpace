@@ -1,0 +1,16 @@
+<div class="my-1">
+  <ds-supervision-order-status [supervisionOrderList]="supervisionOrderList"
+                               (delete)="deleteSupervisionOrder($event)"></ds-supervision-order-status>
+</div>
+
+<div class="space-children-mr">
+  <a [ngClass]="{'btn-sm': small}" class="btn btn-light my-1 delete-link" [routerLink]="[getDeleteRoute()]" [title]="'admin.workflow.item.delete' | translate">
+    <i class="fa fa-trash"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{"admin.workflow.item.delete" | translate}}</span>
+  </a>
+  <a [ngClass]="{'btn-sm': small}" class="btn btn-light my-1 policies-link" [routerLink]="resourcePoliciesPageRoute" [title]="'admin.workflow.item.policies' | translate">
+    <i class="fas fa-edit"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{'admin.workflow.item.policies' | translate}}</span>
+  </a>
+  <a [ngClass]="{'btn-sm': small}" class="btn btn-light my-1 supervision-group-selector" [title]="'admin.workflow.item.supervision' | translate" (click)="openSupervisionModal()">
+    <i class="fas fa-users-cog"></i><span *ngIf="!small" class="d-none d-sm-inline"> {{'admin.workflow.item.supervision' | translate}}</span>
+  </a>
+</div>

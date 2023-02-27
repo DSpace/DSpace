@@ -1,0 +1,15 @@
+
+DSpace uses third-party libraries which may be distributed under different licenses.
+A summary of all third-party, production dependencies used by this user interface may be found by running:
+
+    npx license-checker --production --summary
+
+(Additional license-checker options may be found in its documentation: https://github.com/davglass/license-checker)
+
+You must agree to the terms of these licenses, in addition to the DSpace source code license, in order to use this
+software.
+
+PLEASE NOTE: Some third-party dependencies may be listed under multiple licenses if they are dual-licensed.
+This is especially true of anything listed as GPL (or similar), as DSpace does NOT allow for the inclusion of
+any dependencies that are solely released under GPL (or similar) terms. For more info see:
+https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-LicensingofContributions

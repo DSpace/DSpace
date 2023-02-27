@@ -1,0 +1,42 @@
+<div class="row">
+  <div *ngIf="showThumbnails" class="col-3 col-md-2">
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+       rel="noopener noreferrer"
+       [routerLink]="[itemPageRoute]" class="dont-break-out">
+      <ds-thumbnail [thumbnail]="dso?.thumbnail | async"
+                    [defaultImage]="'assets/images/project-placeholder.svg'"
+                    [alt]="'thumbnail.project.alt'"
+                    [placeholder]="'thumbnail.project.placeholder'">
+      </ds-thumbnail>
+    </a>
+    <span *ngIf="linkType == linkTypes.None" class="dont-break-out">
+      <ds-thumbnail [thumbnail]="dso?.thumbnail | async"
+                    [defaultImage]="'assets/images/project-placeholder.svg'"
+                    [alt]="'thumbnail.project.alt'"
+                    [placeholder]="'thumbnail.project.placeholder'">
+      </ds-thumbnail>
+    </span>
+  </div>
+  <div [ngClass]="showThumbnails ? 'col-9' : 'col-md-12'">
+    <ds-truncatable [id]="dso.id">
+      <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+      <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+         rel="noopener noreferrer"
+         [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out"
+         [innerHTML]="dsoTitle"></a>
+      <span *ngIf="linkType == linkTypes.None"
+            class="lead item-list-title dont-break-out"
+            [innerHTML]="dsoTitle"></span>
+      <!--<span class="text-muted">-->
+      <!--<ds-truncatable-part [id]="dso.id" [minLines]="1">-->
+      <!--<span *ngIf="dso.allMetadata(['project.identifier.status']).length > 0"-->
+      <!--class="item-list-status">-->
+      <!--<span *ngFor="let value of allMetadataValues(['project.identifier.status']); let last=last;">-->
+      <!--<span [innerHTML]="value"><span [innerHTML]="value"></span></span>-->
+      <!--</span>-->
+      <!--</span>-->
+      <!--</ds-truncatable-part>-->
+      <!--</span>-->
+    </ds-truncatable>
+  </div>
+</div>

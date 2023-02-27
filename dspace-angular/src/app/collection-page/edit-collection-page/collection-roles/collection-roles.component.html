@@ -1,0 +1,6 @@
+<ds-comcol-role
+  *ngFor="let comcolRole of comcolRoles$ | async"
+  [dso]="collection$ | async"
+  [comcolRole]="comcolRole"
+>
+</ds-comcol-role>

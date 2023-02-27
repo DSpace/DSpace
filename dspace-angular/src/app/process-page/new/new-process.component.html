@@ -1,0 +1,6 @@
+<ng-container *ngIf="fromExisting$ && (fromExisting$ | async)">
+    <ds-process-form *ngVar="fromExisting$ | async as process" headerKey="process.new.header" [selectedScript]="script$ | async" [parameters]="process.parameters"></ds-process-form>
+</ng-container>
+<ng-container *ngIf="!fromExisting$ || !(fromExisting$ | async)">
+    <ds-process-form headerKey="process.new.header"></ds-process-form>
+</ng-container>

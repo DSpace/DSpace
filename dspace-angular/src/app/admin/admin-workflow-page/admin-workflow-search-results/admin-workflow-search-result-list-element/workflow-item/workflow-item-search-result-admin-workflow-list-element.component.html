@@ -1,0 +1,10 @@
+<div class="workflow-badge">
+    <span class="badge badge-info">{{ "admin.workflow.item.workflow" | translate }}</span>
+</div>
+<ds-listable-object-component-loader *ngIf="item$ | async"
+                                     [object]="item$ | async"
+                                     [viewMode]="viewModes.ListElement"
+                                     [index]="index"
+                                     [linkType]="linkType"
+                                     [listID]="listID"></ds-listable-object-component-loader>
+<ds-workflow-item-admin-workflow-actions-element [wfi]="dso" [small]="false"></ds-workflow-item-admin-workflow-actions-element>

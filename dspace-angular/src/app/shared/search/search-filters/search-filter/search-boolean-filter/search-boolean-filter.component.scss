@@ -1,0 +1,13 @@
+.filters {
+    .toggle-more-filters a {
+        color: var(--bs-link-color);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+::ng-deep em {
+    font-weight: bold;
+    font-style: normal;
+}
+
+

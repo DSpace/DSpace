@@ -1,0 +1,74 @@
+<ng-template #rt let-listEntry="result" let-t="term">
+  <ng-container
+    [ngTemplateOutlet]="(listEntry.hasOtherInformation()) ? hasInfo : noInfo"
+    [ngTemplateOutletContext]="{entry: listEntry}">
+  </ng-container>
+</ng-template>
+
+<ng-template #hasInfo let-entry="entry">
+  <ul class="list-unstyled mb-0">
+    <li class="list-item text-truncate text-primary font-weight-bold">{{entry.value}}</li>
+    <li class="list-item text-truncate text-secondary" *ngFor="let item of entry.otherInformation | dsObjNgFor" >
+      {{ 'form.other-information.' + item.key | translate }} : {{item.value}}
+    </li>
+  </ul>
+</ng-template>
+
+<ng-template #noInfo let-entry="entry">
+  <ul class="list-unstyled mb-0">
+    <li class="list-item text-truncate text-primary font-weight-bold">{{entry.value}}</li>
+  </ul>
+</ng-template>
+
+<div *ngIf="!(isHierarchicalVocabulary() | async)" class="position-relative right-addon">
+  <i *ngIf="searching" class="fas fa-circle-notch fa-spin fa-2x fa-fw text-primary position-absolute mt-1 p-0" aria-hidden="true"></i>
+  <i *ngIf="!searching"
+     dsAuthorityConfidenceState
+     class="far fa-circle fa-2x fa-fw position-absolute mt-1 p-0"
+     aria-hidden="true"
+     [authorityValue]="currentValue"
+     (whenClickOnConfidenceNotAccepted)="whenClickOnConfidenceNotAccepted($event)"></i>
+  <input #instance="ngbTypeahead"
+         class="form-control"
+         [attr.aria-labelledby]="'label_' + model.id"
+         [attr.autoComplete]="model.autoComplete"
+         [class.is-invalid]="showErrorMessages"
+         [id]="model.id"
+         [inputFormatter]="formatter"
+         [name]="model.name"
+         [ngbTypeahead]="search"
+         [placeholder]="model.placeholder"
+         [readonly]="model.readOnly"
+         [resultTemplate]="rt"
+         [type]="model.inputType"
+         [(ngModel)]="currentValue"
+         (blur)="onBlur($event)"
+         (focus)="onFocus($event)"
+         (change)="onChange($event)"
+         (input)="onInput($event)"
+         (selectItem)="onSelectItem($event)">
+
+  <div class="invalid-feedback" *ngIf="searchFailed">Sorry, suggestions could not be loaded.</div>
+</div>
+
+<div *ngIf="(isHierarchicalVocabulary() | async)" class="position-relative right-addon">
+  <i class="dropdown-toggle position-absolute tree-toggle" (click)="openTree($event)"
+     aria-hidden="true"></i>
+  <input class="form-control"
+         [attr.aria-labelledby]="'label_' + model.id"
+         [attr.autoComplete]="model.autoComplete"
+         [class.is-invalid]="showErrorMessages"
+         [class.tree-input]="!model.readOnly"
+         [id]="id"
+         [name]="model.name"
+         [placeholder]="model.placeholder"
+         [readonly]="true"
+         [type]="model.inputType"
+         [value]="currentValue?.display"
+         (focus)="onFocus($event)"
+         (change)="onChange($event)"
+         (click)="openTree($event)"
+         (keydown)="$event.preventDefault()"
+         (keypress)="$event.preventDefault()"
+         (keyup)="$event.preventDefault()">
+</div>

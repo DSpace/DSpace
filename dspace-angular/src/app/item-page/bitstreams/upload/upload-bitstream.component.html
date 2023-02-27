@@ -1,0 +1,41 @@
+<div class="container">
+  <ng-container *ngIf="bundles">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <h2>{{'item.bitstreams.upload.title' | translate}}</h2>
+        <ng-container *ngVar="(itemRD$ | async)?.payload as item">
+          <div *ngIf="item">
+            <span class="font-weight-bold">{{'item.bitstreams.upload.item' | translate}}</span>
+            <span>{{item.name}}</span>
+          </div>
+        </ng-container>
+      </div>
+      <div class="col-12">
+        <label class="font-weight-bold">{{'item.bitstreams.upload.bundle' | translate}}</label>
+        <ds-dso-input-suggestions #f id="search-form"
+                                  [suggestions]="bundles"
+                                  [placeholder]="'item.bitstreams.upload.bundle.placeholder' | translate"
+                                  [action]="getCurrentUrl()"
+                                  [name]="'bundle-select'"
+                                  [debounceTime]="50"
+                                  [(ngModel)]="selectedBundleName"
+                                  (typeSuggestion)="bundleNameChange()"
+                                  (clickSuggestion)="onClick($event)"
+                                  (click)="f.open()"
+                                  ngDefaultControl>
+        </ds-dso-input-suggestions>
+        <button *ngIf="!selectedBundleId && selectedBundleName?.length > 0" class="btn btn-success" (click)="createBundle()">
+          <i class="fa fa-plus"></i> {{ 'item.bitstreams.upload.bundle.new' | translate }}
+        </button>
+        <ds-uploader  class="w-100" *ngIf="selectedBundleId"
+                      [dropMsg]="'item.bitstreams.upload.drop-message'"
+                      [dropOverDocumentMsg]="'item.bitstreams.upload.drop-message'"
+                      [enableDragOverDocument]="true"
+                      [uploadFilesOptions]="uploadFilesOptions"
+                      (onCompleteItem)="onCompleteItem($event)"
+                      (onUploadError)="onUploadError()"></ds-uploader>
+        <button class="btn btn-outline-secondary" (click)="onCancel()">{{'item.bitstreams.upload.cancel' | translate}}</button>
+      </div>
+    </div>
+  </ng-container>
+</div>

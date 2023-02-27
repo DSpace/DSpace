@@ -1,0 +1,832 @@
+// this file maps all bootstrap variables to css variables.
+
+:root {
+  // Variables
+  //
+  // Variables should follow the `$component-state-property-size` formula for
+  // consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+
+  // Color system
+  --bs-white: #{$white};
+  --bs-gray-100: #{$gray-100};
+  --bs-gray-200: #{$gray-200};
+  --bs-gray-300: #{$gray-300};
+  --bs-gray-400: #{$gray-400};
+  --bs-gray-500: #{$gray-500};
+  --bs-gray-600: #{$gray-600};
+  --bs-gray-700: #{$gray-700};
+  --bs-gray-800: #{$gray-800};
+  --bs-gray-900: #{$gray-900};
+  --bs-black: #{$black};
+  --bs-blue: #{$blue};
+  --bs-indigo: #{$indigo};
+  --bs-purple: #{$purple};
+  --bs-pink: #{$pink};
+  --bs-red: #{$red};
+  --bs-orange: #{$orange};
+  --bs-yellow: #{$yellow};
+  --bs-green: #{$green};
+  --bs-teal: #{$teal};
+  --bs-cyan: #{$cyan};
+  --bs-primary: #{$primary};
+  --bs-primary-bg: #{lighten($primary, 30%)};
+  --bs-secondary: #{$secondary};
+  --bs-secondary-bg: #{lighten($secondary, 30%)};
+  --bs-success: #{$success};
+  --bs-success-bg: #{lighten($success, 30%)};
+  --bs-info: #{$info};
+  --bs-info-bg: #{lighten($info, 30%)};
+  --bs-warning: #{$warning};
+  --bs-warning-bg: #{lighten($warning, 30%)};
+  --bs-danger: #{$danger};
+  --bs-danger-bg: #{lighten($danger, 30%)};
+  --bs-light: #{$light};
+  --bs-dark: #{$dark};
+
+
+  // Set a specific jump point for requesting color jumps
+  --bs-theme-color-interval: #{$theme-color-interval};
+
+  // The yiq lightness value that determines when the lightness of color changes from "dark" to "light". Acceptable values are between 0 and 255.
+  --bs-yiq-contrasted-threshold: #{$yiq-contrasted-threshold};
+
+  // Customize the light and dark text colors for use in our YIQ color contrast function.
+  --bs-yiq-text-dark: #{$yiq-text-dark};
+  --bs-yiq-text-light: #{$yiq-text-light};
+
+
+  // Options
+  //
+  // Quickly modify global styling by enabling or disabling optional features.
+  --bs-enable-caret: #{$enable-caret};
+  --bs-enable-rounded: #{$enable-rounded};
+  --bs-enable-shadows: #{$enable-shadows};
+  --bs-enable-gradients: #{$enable-gradients};
+  --bs-enable-transitions: #{$enable-transitions};
+  --bs-enable-prefers-reduced-motion-media-query: #{$enable-prefers-reduced-motion-media-query};
+  --bs-enable-grid-classes: #{$enable-grid-classes};
+  --bs-enable-pointer-cursor-for-buttons: #{$enable-pointer-cursor-for-buttons};
+  --bs-enable-print-styles: #{$enable-print-styles};
+  --bs-enable-responsive-font-sizes: #{$enable-responsive-font-sizes};
+  --bs-enable-validation-icons: #{$enable-validation-icons};
+  --bs-enable-deprecation-messages: #{$enable-deprecation-messages};
+  --bs-spacer: #{$spacer};
+  --bs-spacer-0: #{map-get($spacers, 0)};
+  --bs-spacer-1: #{map-get($spacers, 1)};
+  --bs-spacer-2: #{map-get($spacers, 2)};
+  --bs-spacer-3: #{map-get($spacers, 3)};
+  --bs-spacer-4: #{map-get($spacers, 4)};
+  --bs-spacer-5: #{map-get($spacers, 5)};
+  --bs-sizes-25: #{map-get($sizes, 25)};
+  --bs-sizes-50: #{map-get($sizes, 50)};
+  --bs-sizes-75: #{map-get($sizes, 75)};
+  --bs-sizes-100: #{map-get($sizes, 100)};
+  --bs-sizes-auto: #{map-get($sizes, auto)};
+
+  // Body
+  //
+  // Settings for the `<body>` element.
+  --bsbody-bg: #{$body-bg};
+  --bs-body-color: #{$body-color};
+
+
+  // Links
+  //
+  // Style anchor elements.
+  --bs-link-color: #{$link-color};
+  --bs-link-decoration: #{$link-decoration};
+  --bs-link-hover-color: #{$link-hover-color};
+  --bs-link-hover-decoration: #{$link-hover-decoration};
+  // Darken percentage for links with `.text-*` class (e.g. `.text-success`)
+  --bs-emphasized-link-hover-darken-percentage: #{$emphasized-link-hover-darken-percentage};
+
+  // Paragraphs
+  //
+  // Style p element.
+  --bs-paragraph-margin-bottom: #{$paragraph-margin-bottom};
+
+
+  // Grid breakpoints
+  //
+  // Define the minimum dimensions at which your layout will change,
+  // adapting to different screen sizes, for use in media queries.
+
+  --bs-xs-min: #{map-get($grid-breakpoints, xs)};
+  --bs-sm-min: #{map-get($grid-breakpoints, sm)};
+  --bs-md-min: #{map-get($grid-breakpoints, md)};
+  --bs-lg-min: #{map-get($grid-breakpoints, lg)};
+  --bs-xl-min: #{map-get($grid-breakpoints, xl)};
+
+  --bs-xs-max: #{map-get($container-max-widths, xs)};
+  --bs-sm-max: #{map-get($container-max-widths, sm)};
+  --bs-md-max: #{map-get($container-max-widths, md)};
+  --bs-lg-max: #{map-get($container-max-widths, lg)};
+  --bs-xl-max: #{map-get($container-max-widths, xl)};
+
+  // Grid columns
+  //
+  // Set the number of columns and specify the width of the gutters.
+  --bs-grid-columns: #{$grid-columns};
+  --bs-grid-gutter-width: #{$grid-gutter-width};
+
+
+  // Components
+  //
+  // Define common padding and border radius sizes and more.
+  --bs-line-height-lg: #{$line-height-lg};
+  --bs-line-height-sm: #{$line-height-sm};
+  --bs-border-width: #{$border-width};
+  --bs-border-color: #{$border-color};
+  --bs-border-radius: #{$border-radius};
+  --bs-border-radius-lg: #{$border-radius-lg};
+  --bs-border-radius-sm: #{$border-radius-sm};
+  --bs-rounded-pill: #{$rounded-pill};
+  --bs-box-shadow-sm: #{$box-shadow-sm};
+  --bs-box-shadow: #{$box-shadow};
+  --bs-box-shadow-lg: #{$box-shadow-lg};
+  --bs-component-active-color: #{$component-active-color};
+  --bs-component-active-bg: #{$component-active-bg};
+  --bs-caret-width: #{$caret-width};
+  --bs-caret-vertical-align: #{$caret-vertical-align};
+  --bs-caret-spacing: #{$caret-spacing};
+  --bs-transition-base: #{$transition-base};
+  --bs-transition-fade: #{$transition-fade};
+  --bs-transition-collapse: #{$transition-collapse};
+
+  --bs-font-family-sans-serif: #{$font-family-sans-serif};
+  --bs-font-family-monospace: #{$font-family-monospace};
+  --bs-font-family-base: #{$font-family-base};
+  // stylelint-enable value-keyword-case
+  --bs-font-size-base: #{$font-size-base};
+  --bs-font-size-lg: #{$font-size-lg};
+  --bs-font-size-sm: #{$font-size-sm};
+  --bs-font-weight-lighter: #{$font-weight-lighter};
+  --bs-font-weight-light: #{$font-weight-light};
+  --bs-font-weight-normal: #{$font-weight-normal};
+  --bs-font-weight-bold: #{$font-weight-bold};
+  --bs-font-weight-bolder: #{$font-weight-bolder};
+  --bs-font-weight-base: #{$font-weight-base};
+  --bs-line-height-base: #{$line-height-base};
+  --bs-h1-font-size: #{$h1-font-size};
+  --bs-h2-font-size: #{$h2-font-size};
+  --bs-h3-font-size: #{$h3-font-size};
+  --bs-h4-font-size: #{$h4-font-size};
+  --bs-h5-font-size: #{$h5-font-size};
+  --bs-h6-font-size: #{$h6-font-size};
+  --bs-headings-margin-bottom: #{$headings-margin-bottom};
+  --bs-headings-font-family: #{$headings-font-family};
+  --bs-headings-font-weight: #{$headings-font-weight};
+  --bs-headings-line-height: #{$headings-line-height};
+  --bs-headings-color: #{$headings-color};
+  --bs-display1-size: #{$display1-size};
+  --bs-display2-size: #{$display2-size};
+  --bs-display3-size: #{$display3-size};
+  --bs-display4-size: #{$display4-size};
+  --bs-display1-weight: #{$display1-weight};
+  --bs-display2-weight: #{$display2-weight};
+  --bs-display3-weight: #{$display3-weight};
+  --bs-display4-weight: #{$display4-weight};
+  --bs-display-line-height: #{$display-line-height};
+  --bs-lead-font-size: #{$lead-font-size};
+  --bs-lead-font-weight: #{$lead-font-weight};
+  --bs-small-font-size: #{$small-font-size};
+  --bs-text-muted: #{$text-muted};
+  --bs-blockquote-small-color: #{$blockquote-small-color};
+  --bs-blockquote-small-font-size: #{$blockquote-small-font-size};
+  --bs-blockquote-font-size: #{$blockquote-font-size};
+  --bs-hr-border-color: #{$hr-border-color};
+  --bs-hr-border-width: #{$hr-border-width};
+  --bs-mark-padding: #{$mark-padding};
+  --bs-dt-font-weight: #{$dt-font-weight};
+  --bs-kbd-box-shadow: #{$kbd-box-shadow};
+  --bs-nested-kbd-font-weight: #{$nested-kbd-font-weight};
+  --bs-list-inline-padding: #{$list-inline-padding};
+  --bs-mark-bg: #{$mark-bg};
+  --bs-hr-margin-y: #{$hr-margin-y};
+
+
+  // Tables
+  //
+  // Customizes the `.table` component with basic values, each used across all table variations.
+  --bs-table-cell-padding: #{$table-cell-padding};
+  --bs-table-cell-padding-sm: #{$table-cell-padding-sm};
+  --bs-table-color: #{$table-color};
+  --bs-table-bg: #{$table-bg};
+  --bs-table-accent-bg: #{$table-accent-bg};
+  --bs-table-hover-color: #{$table-hover-color};
+  --bs-table-hover-bg: #{$table-hover-bg};
+  --bs-table-active-bg: #{$table-active-bg};
+  --bs-table-border-width: #{$table-border-width};
+  --bs-table-border-color: #{$table-border-color};
+  --bs-table-head-bg: #{$table-head-bg};
+  --bs-table-head-color: #{$table-head-color};
+  --bs-table-dark-color: #{$table-dark-color};
+  --bs-table-dark-bg: #{$table-dark-bg};
+  --bs-table-dark-accent-bg: #{$table-dark-accent-bg};
+  --bs-table-dark-hover-color: #{$table-dark-hover-color};
+  --bs-table-dark-hover-bg: #{$table-dark-hover-bg};
+  --bs-table-dark-border-color: #{$table-dark-border-color};
+  --bs-table-dark-color: #{$table-dark-color};
+  --bs-table-striped-order: #{$table-striped-order};
+  --bs-table-caption-color: #{$table-caption-color};
+  --bs-table-bg-level: #{$table-bg-level};
+  --bs-table-border-level: #{$table-border-level};
+
+
+  // Buttons + Forms
+  //
+  // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+  --bs-input-btn-padding-y: #{$input-btn-padding-y};
+  --bs-input-btn-padding-x: #{$input-btn-padding-x};
+  --bs-input-btn-font-family: #{$input-btn-font-family};
+  --bs-input-btn-font-size: #{$input-btn-font-size};
+  --bs-input-btn-line-height: #{$input-btn-line-height};
+  --bs-input-btn-focus-width: #{$input-btn-focus-width};
+  --bs-input-btn-focus-color: #{$input-btn-focus-color};
+  --bs-input-btn-focus-box-shadow: #{$input-btn-focus-box-shadow};
+  --bs-input-btn-padding-y-sm: #{$input-btn-padding-y-sm};
+  --bs-input-btn-padding-x-sm: #{$input-btn-padding-x-sm};
+  --bs-input-btn-font-size-sm: #{$input-btn-font-size-sm};
+  --bs-input-btn-line-height-sm: #{$input-btn-line-height-sm};
+  --bs-input-btn-padding-y-lg: #{$input-btn-padding-y-lg};
+  --bs-input-btn-padding-x-lg: #{$input-btn-padding-x-lg};
+  --bs-input-btn-font-size-lg: #{$input-btn-font-size-lg};
+  --bs-input-btn-line-height-lg: #{$input-btn-line-height-lg};
+  --bs-input-btn-border-width: #{$input-btn-border-width};
+
+
+  // Buttons
+  //
+  // For each of Bootstrap's buttons, define text, background, and border color.
+  --bs-btn-padding-y: #{$btn-padding-y};
+  --bs-btn-padding-x: #{$btn-padding-x};
+  --bs-btn-font-family: #{$btn-font-family};
+  --bs-btn-font-size: #{$btn-font-size};
+  --bs-btn-line-height: #{$btn-line-height};
+  --bs-btn-padding-y-sm: #{$btn-padding-y-sm};
+  --bs-btn-padding-x-sm: #{$btn-padding-x-sm};
+  --bs-btn-font-size-sm: #{$btn-font-size-sm};
+  --bs-btn-line-height-sm: #{$btn-line-height-sm};
+  --bs-btn-padding-y-lg: #{$btn-padding-y-lg};
+  --bs-btn-padding-x-lg: #{$btn-padding-x-lg};
+  --bs-btn-font-size-lg: #{$btn-font-size-lg};
+  --bs-btn-line-height-lg: #{$btn-line-height-lg};
+  --bs-btn-border-width: #{$btn-border-width};
+  --bs-btn-font-weight: #{$btn-font-weight};
+  --bs-btn-box-shadow: #{$btn-box-shadow};
+  --bs-btn-focus-width: #{$btn-focus-width};
+  --bs-btn-focus-box-shadow: #{$btn-focus-box-shadow};
+  --bs-btn-disabled-opacity: #{$btn-disabled-opacity};
+  --bs-btn-active-box-shadow: #{$btn-active-box-shadow};
+  --bs-btn-link-disabled-color: #{$btn-link-disabled-color};
+  --bs-btn-block-spacing-y: #{$btn-block-spacing-y};
+
+  // Allows for customizing button radius independently from global border radius
+  --bs-btn-border-radius: #{$btn-border-radius};
+  --bs-btn-border-radius-lg: #{$btn-border-radius-lg};
+  --bs-btn-border-radius-sm: #{$btn-border-radius-sm};
+  --bs-btn-transition: #{$btn-transition};
+
+
+  // Forms
+  --bs-label-margin-bottom: #{$label-margin-bottom};
+  --bs-input-padding-y: #{$input-padding-y};
+  --bs-input-padding-x: #{$input-padding-x};
+  --bs-input-font-family: #{$input-font-family};
+  --bs-input-font-size: #{$input-font-size};
+  --bs-input-font-weight: #{$input-font-weight};
+  --bs-input-line-height: #{$input-line-height};
+  --bs-input-padding-y-sm: #{$input-padding-y-sm};
+  --bs-input-padding-x-sm: #{$input-padding-x-sm};
+  --bs-input-font-size-sm: #{$input-font-size-sm};
+  --bs-input-line-height-sm: #{$input-line-height-sm};
+  --bs-input-padding-y-lg: #{$input-padding-y-lg};
+  --bs-input-padding-x-lg: #{$input-padding-x-lg};
+  --bs-input-font-size-lg: #{$input-font-size-lg};
+  --bs-input-line-height-lg: #{$input-line-height-lg};
+  --bs-input-bg: #{$input-bg};
+  --bs-input-disabled-bg: #{$input-disabled-bg};
+  --bs-input-color: #{$input-color};
+  --bs-input-border-color: #{$input-border-color};
+  --bs-input-border-width: #{$input-border-width};
+  --bs-input-box-shadow: #{$input-box-shadow};
+  --bs-input-border-radius: #{$input-border-radius};
+  --bs-input-border-radius-lg: #{$input-border-radius-lg};
+  --bs-input-border-radius-sm: #{$input-border-radius-sm};
+  --bs-input-focus-bg: #{$input-focus-bg};
+  --bs-input-focus-border-color: #{$input-focus-border-color};
+  --bs-input-focus-color: #{$input-focus-color};
+  --bs-input-focus-width: #{$input-focus-width};
+  --bs-input-focus-box-shadow: #{$input-focus-box-shadow};
+  --bs-input-placeholder-color: #{$input-placeholder-color};
+  --bs-input-plaintext-color: #{$input-plaintext-color};
+  --bs-input-height-border: #{$input-height-border};
+  --bs-input-height-inner: #{$input-height-inner};
+  --bs-input-height-inner-half: #{$input-height-inner-half};
+  --bs-input-height-inner-quarter: #{$input-height-inner-quarter};
+  --bs-input-height: #{$input-height};
+  --bs-input-height-sm: #{$input-height-sm};
+  --bs-input-height-lg: #{$input-height-lg};
+  --bs-input-transition: #{$input-transition};
+  --bs-form-text-margin-top: #{$form-text-margin-top};
+  --bs-form-check-input-gutter: #{$form-check-input-gutter};
+  --bs-form-check-input-margin-y: #{$form-check-input-margin-y};
+  --bs-form-check-input-margin-x: #{$form-check-input-margin-x};
+  --bs-form-check-inline-margin-x: #{$form-check-inline-margin-x};
+  --bs-form-check-inline-input-margin-x: #{$form-check-inline-input-margin-x};
+  --bs-form-grid-gutter-width: #{$form-grid-gutter-width};
+  --bs-form-group-margin-bottom: #{$form-group-margin-bottom};
+  --bs-input-group-addon-color: #{$input-group-addon-color};
+  --bs-input-group-addon-bg: #{$input-group-addon-bg};
+  --bs-input-group-addon-border-color: #{$input-group-addon-border-color};
+  --bs-custom-forms-transition: #{$custom-forms-transition};
+  --bs-custom-control-gutter: #{$custom-control-gutter};
+  --bs-custom-control-spacer-x: #{$custom-control-spacer-x};
+  --bs-custom-control-indicator-size: #{$custom-control-indicator-size};
+  --bs-custom-control-indicator-bg: #{$custom-control-indicator-bg};
+  --bs-custom-control-indicator-bg-size: #{$custom-control-indicator-bg-size};
+  --bs-custom-control-indicator-box-shadow: #{$custom-control-indicator-box-shadow};
+  --bs-custom-control-indicator-border-color: #{$custom-control-indicator-border-color};
+  --bs-custom-control-indicator-border-width: #{$custom-control-indicator-border-width};
+  --bs-custom-control-indicator-disabled-bg: #{$custom-control-indicator-disabled-bg};
+  --bs-custom-control-label-disabled-color: #{$custom-control-label-disabled-color};
+  --bs-custom-control-indicator-checked-color: #{$custom-control-indicator-checked-color};
+  --bs-custom-control-indicator-checked-bg: #{$custom-control-indicator-checked-bg};
+  --bs-custom-control-indicator-checked-disabled-bg: #{$custom-control-indicator-checked-disabled-bg};
+  --bs-custom-control-indicator-checked-box-shadow: #{$custom-control-indicator-checked-box-shadow};
+  --bs-custom-control-indicator-checked-border-color: #{$custom-control-indicator-checked-border-color};
+  --bs-custom-control-indicator-focus-box-shadow: #{$custom-control-indicator-focus-box-shadow};
+  --bs-custom-control-indicator-focus-border-color: #{$custom-control-indicator-focus-border-color};
+  --bs-custom-control-indicator-active-color: #{$custom-control-indicator-active-color};
+  --bs-custom-control-indicator-active-bg: #{$custom-control-indicator-active-bg};
+  --bs-custom-control-indicator-active-box-shadow: #{$custom-control-indicator-active-box-shadow};
+  --bs-custom-control-indicator-active-border-color: #{$custom-control-indicator-active-border-color};
+  --bs-custom-checkbox-indicator-border-radius: #{$custom-checkbox-indicator-border-radius};
+  --bs-custom-checkbox-indicator-icon-checked: #{$custom-checkbox-indicator-icon-checked};
+  --bs-custom-checkbox-indicator-indeterminate-bg: #{$custom-checkbox-indicator-indeterminate-bg};
+  --bs-custom-checkbox-indicator-indeterminate-color: #{$custom-checkbox-indicator-indeterminate-color};
+  --bs-custom-checkbox-indicator-icon-indeterminate: #{$custom-checkbox-indicator-icon-indeterminate};
+  --bs-custom-checkbox-indicator-indeterminate-box-shadow: #{$custom-checkbox-indicator-indeterminate-box-shadow};
+  --bs-custom-checkbox-indicator-indeterminate-border-color: #{$custom-checkbox-indicator-indeterminate-border-color};
+  --bs-custom-radio-indicator-border-radius: #{$custom-radio-indicator-border-radius};
+  --bs-custom-radio-indicator-icon-checked: #{$custom-radio-indicator-icon-checked};
+  --bs-custom-switch-width: #{$custom-switch-width};
+  --bs-custom-switch-indicator-border-radius: #{$custom-switch-indicator-border-radius};
+  --bs-custom-switch-indicator-size: #{$custom-switch-indicator-size};
+  --bs-custom-select-padding-y: #{$custom-select-padding-y};
+  --bs-custom-select-padding-x: #{$custom-select-padding-x};
+  --bs-custom-select-font-family: #{$custom-select-font-family};
+  --bs-custom-select-font-size: #{$custom-select-font-size};
+  --bs-custom-select-height: #{$custom-select-height};
+  --bs-custom-select-indicator-padding: #{$custom-select-indicator-padding};
+  --bs-custom-select-font-weight: #{$custom-select-font-weight};
+  --bs-custom-select-line-height: #{$custom-select-line-height};
+  --bs-custom-select-color: #{$custom-select-color};
+  --bs-custom-select-disabled-color: #{$custom-select-disabled-color};
+  --bs-custom-select-bg: #{$custom-select-bg};
+  --bs-custom-select-disabled-bg: #{$custom-select-disabled-bg};
+  --bs-custom-select-bg-size: #{$custom-select-bg-size};
+  --bs-custom-select-indicator-color: #{$custom-select-indicator-color};
+  --bs-custom-select-indicator: #{$custom-select-indicator};
+  --bs-custom-select-background: #{$custom-select-background};
+  --bs-custom-select-feedback-icon-padding-right: #{$custom-select-feedback-icon-padding-right};
+  --bs-custom-select-feedback-icon-position: #{$custom-select-feedback-icon-position};
+  --bs-custom-select-feedback-icon-size: #{$custom-select-feedback-icon-size};
+  --bs-custom-select-border-width: #{$custom-select-border-width};
+  --bs-custom-select-border-color: #{$custom-select-border-color};
+  --bs-custom-select-border-radius: #{$custom-select-border-radius};
+  --bs-custom-select-box-shadow: #{$custom-select-box-shadow};
+  --bs-custom-select-focus-border-color: #{$custom-select-focus-border-color};
+  --bs-custom-select-focus-width: #{$custom-select-focus-width};
+  --bs-custom-select-focus-box-shadow: #{$custom-select-focus-box-shadow};
+  --bs-custom-select-padding-y-sm: #{$custom-select-padding-y-sm};
+  --bs-custom-select-padding-x-sm: #{$custom-select-padding-x-sm};
+  --bs-custom-select-font-size-sm: #{$custom-select-font-size-sm};
+  --bs-custom-select-height-sm: #{$custom-select-height-sm};
+  --bs-custom-select-padding-y-lg: #{$custom-select-padding-y-lg};
+  --bs-custom-select-padding-x-lg: #{$custom-select-padding-x-lg};
+  --bs-custom-select-font-size-lg: #{$custom-select-font-size-lg};
+  --bs-custom-select-height-lg: #{$custom-select-height-lg};
+  --bs-custom-range-track-width: #{$custom-range-track-width};
+  --bs-custom-range-track-height: #{$custom-range-track-height};
+  --bs-custom-range-track-cursor: #{$custom-range-track-cursor};
+  --bs-custom-range-track-bg: #{$custom-range-track-bg};
+  --bs-custom-range-track-border-radius: #{$custom-range-track-border-radius};
+  --bs-custom-range-track-box-shadow: #{$custom-range-track-box-shadow};
+  --bs-custom-range-thumb-width: #{$custom-range-thumb-width};
+  --bs-custom-range-thumb-height: #{$custom-range-thumb-height};
+  --bs-custom-range-thumb-bg: #{$custom-range-thumb-bg};
+  --bs-custom-range-thumb-border: #{$custom-range-thumb-border};
+  --bs-custom-range-thumb-border-radius: #{$custom-range-thumb-border-radius};
+  --bs-custom-range-thumb-box-shadow: #{$custom-range-thumb-box-shadow};
+  --bs-custom-range-thumb-focus-box-shadow: #{$custom-range-thumb-focus-box-shadow};
+  --bs-custom-range-thumb-focus-box-shadow-width: #{$custom-range-thumb-focus-box-shadow-width};
+  --bs-custom-range-thumb-active-bg: #{$custom-range-thumb-active-bg};
+  --bs-custom-range-thumb-disabled-bg: #{$custom-range-thumb-disabled-bg};
+  --bs-custom-file-height: #{$custom-file-height};
+  --bs-custom-file-height-inner: #{$custom-file-height-inner};
+  --bs-custom-file-focus-border-color: #{$custom-file-focus-border-color};
+  --bs-custom-file-focus-box-shadow: #{$custom-file-focus-box-shadow};
+  --bs-custom-file-disabled-bg: #{$custom-file-disabled-bg};
+  --bs-custom-file-padding-y: #{$custom-file-padding-y};
+  --bs-custom-file-padding-x: #{$custom-file-padding-x};
+  --bs-custom-file-line-height: #{$custom-file-line-height};
+  --bs-custom-file-font-family: #{$custom-file-font-family};
+  --bs-custom-file-font-weight: #{$custom-file-font-weight};
+  --bs-custom-file-color: #{$custom-file-color};
+  --bs-custom-file-bg: #{$custom-file-bg};
+  --bs-custom-file-border-width: #{$custom-file-border-width};
+  --bs-custom-file-border-color: #{$custom-file-border-color};
+  --bs-custom-file-border-radius: #{$custom-file-border-radius};
+  --bs-custom-file-box-shadow: #{$custom-file-box-shadow};
+  --bs-custom-file-button-color: #{$custom-file-button-color};
+  --bs-custom-file-button-bg: #{$custom-file-button-bg};
+  //--bs-custom-file-text: #{$custom-file-text}; //mapping doesn't work
+
+
+  // Form validation
+  --bs-form-feedback-margin-top: #{$form-feedback-margin-top};
+  --bs-form-feedback-font-size: #{$form-feedback-font-size};
+  --bs-form-feedback-valid-color: #{$form-feedback-valid-color};
+  --bs-form-feedback-invalid-color: #{$form-feedback-invalid-color};
+  --bs-form-feedback-icon-valid-color: #{$form-feedback-icon-valid-color};
+  --bs-form-feedback-icon-valid: #{$form-feedback-icon-valid};
+  --bs-form-feedback-icon-invalid-color: #{$form-feedback-icon-invalid-color};
+  --bs-form-feedback-icon-invalid: #{$form-feedback-icon-invalid};
+  // Z-index master list
+  //
+  // Warning: Avoid customizing these values. They're used for a bird's eye view
+  // of components dependent on the z-axis and are designed to all work together.
+  --bs-zindex-dropdown: #{$zindex-dropdown};
+  --bs-zindex-sticky: #{$zindex-sticky};
+  --bs-zindex-fixed: #{$zindex-fixed};
+  --bs-zindex-modal-backdrop: #{$zindex-modal-backdrop};
+  --bs-zindex-modal: #{$zindex-modal};
+  --bs-zindex-popover: #{$zindex-popover};
+  --bs-zindex-tooltip: #{$zindex-tooltip};
+
+
+  // Navs
+  --bs-nav-link-padding-y: #{$nav-link-padding-y};
+  --bs-nav-link-padding-x: #{$nav-link-padding-x};
+  --bs-nav-link-disabled-color: #{$nav-link-disabled-color};
+  --bs-nav-tabs-border-color: #{$nav-tabs-border-color};
+  --bs-nav-tabs-border-width: #{$nav-tabs-border-width};
+  --bs-nav-tabs-border-radius: #{$nav-tabs-border-radius};
+  --bs-nav-tabs-link-hover-border-color: #{$nav-tabs-link-hover-border-color};
+  --bs-nav-tabs-link-active-color: #{$nav-tabs-link-active-color};
+  --bs-nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg};
+  --bs-nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color};
+  --bs-nav-pills-border-radius: #{$nav-pills-border-radius};
+  --bs-nav-pills-link-active-color: #{$nav-pills-link-active-color};
+  --bs-nav-pills-link-active-bg: #{$nav-pills-link-active-bg};
+  --bs-nav-divider-color: #{$nav-divider-color};
+  --bs-nav-divider-margin-y: #{$nav-divider-margin-y};
+
+
+  // Navbar
+  --bs-navbar-padding-y: #{$navbar-padding-y};
+  --bs-navbar-padding-x: #{$navbar-padding-x};
+  --bs-navbar-nav-link-padding-x: #{$navbar-nav-link-padding-x};
+  --bs-navbar-brand-font-size: #{$navbar-brand-font-size};
+  // Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
+  --bs-nav-link-height: #{$nav-link-height};
+  --bs-navbar-brand-height: #{$navbar-brand-height};
+  --bs-navbar-brand-padding-y: #{$navbar-brand-padding-y};
+  --bs-navbar-toggler-padding-y: #{$navbar-toggler-padding-y};
+  --bs-navbar-toggler-padding-x: #{$navbar-toggler-padding-x};
+  --bs-navbar-toggler-font-size: #{$navbar-toggler-font-size};
+  --bs-navbar-toggler-border-radius: #{$navbar-toggler-border-radius};
+  --bs-navbar-dark-color: #{$navbar-dark-color};
+  --bs-navbar-dark-hover-color: #{$navbar-dark-hover-color};
+  --bs-navbar-dark-active-color: #{$navbar-dark-active-color};
+  --bs-navbar-dark-disabled-color: #{$navbar-dark-disabled-color};
+  --bs-navbar-dark-toggler-icon-bg: #{$navbar-dark-toggler-icon-bg};
+  --bs-navbar-dark-toggler-border-color: #{$navbar-dark-toggler-border-color};
+  --bs-navbar-light-color: #{$navbar-light-color};
+  --bs-navbar-light-hover-color: #{$navbar-light-hover-color};
+  --bs-navbar-light-active-color: #{$navbar-light-active-color};
+  --bs-navbar-light-disabled-color: #{$navbar-light-disabled-color};
+  --bs-navbar-light-toggler-icon-bg: #{$navbar-light-toggler-icon-bg};
+  --bs-navbar-light-toggler-border-color: #{$navbar-light-toggler-border-color};
+  --bs-navbar-light-brand-color: #{$navbar-light-brand-color};
+  --bs-navbar-light-brand-hover-color: #{$navbar-light-brand-hover-color};
+  --bs-navbar-dark-brand-color: #{$navbar-dark-brand-color};
+  --bs-navbar-dark-brand-hover-color: #{$navbar-dark-brand-hover-color};
+
+
+  // Dropdowns
+  //
+  // Dropdown menu container and contents.
+  --bs-dropdown-min-width: #{$dropdown-min-width};
+  --bs-dropdown-padding-y: #{$dropdown-padding-y};
+  --bs-dropdown-spacer: #{$dropdown-spacer};
+  --bs-dropdown-font-size: #{$dropdown-font-size};
+  --bs-dropdown-color: #{$dropdown-color};
+  --bs-dropdown-bg: #{$dropdown-bg};
+  --bs-dropdown-border-color: #{$dropdown-border-color};
+  --bs-dropdown-border-radius: #{$dropdown-border-radius};
+  --bs-dropdown-border-width: #{$dropdown-border-width};
+  --bs-dropdown-inner-border-radius: #{$dropdown-inner-border-radius};
+  --bs-dropdown-divider-bg: #{$dropdown-divider-bg};
+  --bs-dropdown-divider-margin-y: #{$dropdown-divider-margin-y};
+  --bs-dropdown-box-shadow: #{$dropdown-box-shadow};
+  --bs-dropdown-link-color: #{$dropdown-link-color};
+  --bs-dropdown-link-hover-color: #{$dropdown-link-hover-color};
+  --bs-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+  --bs-dropdown-link-active-color: #{$dropdown-link-active-color};
+  --bs-dropdown-link-active-bg: #{$dropdown-link-active-bg};
+  --bs-dropdown-link-disabled-color: #{$dropdown-link-disabled-color};
+  --bs-dropdown-item-padding-y: #{$dropdown-item-padding-y};
+  --bs-dropdown-item-padding-x: #{$dropdown-item-padding-x};
+  --bs-dropdown-header-color: #{$dropdown-header-color};
+
+
+  // Pagination
+  --bs-pagination-padding-y: #{$pagination-padding-y};
+  --bs-pagination-padding-x: #{$pagination-padding-x};
+  --bs-pagination-padding-y-sm: #{$pagination-padding-y-sm};
+  --bs-pagination-padding-x-sm: #{$pagination-padding-x-sm};
+  --bs-pagination-padding-y-lg: #{$pagination-padding-y-lg};
+  --bs-pagination-padding-x-lg: #{$pagination-padding-x-lg};
+  --bs-pagination-line-height: #{$pagination-line-height};
+  --bs-pagination-color: #{$pagination-color};
+  --bs-pagination-bg: #{$pagination-bg};
+  --bs-pagination-border-width: #{$pagination-border-width};
+  --bs-pagination-border-color: #{$pagination-border-color};
+  --bs-pagination-focus-box-shadow: #{$pagination-focus-box-shadow};
+  --bs-pagination-focus-outline: #{$pagination-focus-outline};
+  --bs-pagination-hover-color: #{$pagination-hover-color};
+  --bs-pagination-hover-bg: #{$pagination-hover-bg};
+  --bs-pagination-hover-border-color: #{$pagination-hover-border-color};
+  --bs-pagination-active-color: #{$pagination-active-color};
+  --bs-pagination-active-bg: #{$pagination-active-bg};
+  --bs-pagination-active-border-color: #{$pagination-active-border-color};
+  --bs-pagination-disabled-color: #{$pagination-disabled-color};
+  --bs-pagination-disabled-bg: #{$pagination-disabled-bg};
+  --bs-pagination-disabled-border-color: #{$pagination-disabled-border-color};
+
+
+  // Jumbotron
+  --bs-jumbotron-padding: #{$jumbotron-padding};
+  --bs-jumbotron-color: #{$jumbotron-color};
+  --bs-jumbotron-bg: #{$jumbotron-bg};
+
+
+  // Cards
+  --bs-card-spacer-y: #{$card-spacer-y};
+  --bs-card-spacer-x: #{$card-spacer-x};
+  --bs-card-border-width: #{$card-border-width};
+  --bs-card-border-radius: #{$card-border-radius};
+  --bs-card-border-color: #{$card-border-color};
+  --bs-card-inner-border-radius: #{$card-inner-border-radius};
+  --bs-card-cap-bg: #{$card-cap-bg};
+  --bs-card-cap-color: #{$card-cap-color};
+  --bs-card-color: #{$card-color};
+  --bs-card-bg: #{$card-bg};
+  --bs-card-img-overlay-padding: #{$card-img-overlay-padding};
+  --bs-card-group-margin: #{$card-group-margin};
+  --bs-card-deck-margin: #{$card-deck-margin};
+  --bs-card-columns-count: #{$card-columns-count};
+  --bs-card-columns-gap: #{$card-columns-gap};
+  --bs-card-columns-margin: #{$card-columns-margin};
+
+
+  // Tooltips
+  --bs-tooltip-font-size: #{$tooltip-font-size};
+  --bs-tooltip-max-width: #{$tooltip-max-width};
+  --bs-tooltip-color: #{$tooltip-color};
+  --bs-tooltip-bg: #{$tooltip-bg};
+  --bs-tooltip-border-radius: #{$tooltip-border-radius};
+  --bs-tooltip-opacity: #{$tooltip-opacity};
+  --bs-tooltip-padding-y: #{$tooltip-padding-y};
+  --bs-tooltip-padding-x: #{$tooltip-padding-x};
+  --bs-tooltip-margin: #{$tooltip-margin};
+  --bs-tooltip-arrow-width: #{$tooltip-arrow-width};
+  --bs-tooltip-arrow-height: #{$tooltip-arrow-height};
+  --bs-tooltip-arrow-color: #{$tooltip-arrow-color};
+
+  // Form tooltips must come after regular tooltips
+  --bs-form-feedback-tooltip-padding-y: #{$form-feedback-tooltip-padding-y};
+  --bs-form-feedback-tooltip-padding-x: #{$form-feedback-tooltip-padding-x};
+  --bs-form-feedback-tooltip-font-size: #{$form-feedback-tooltip-font-size};
+  --bs-form-feedback-tooltip-line-height: #{$form-feedback-tooltip-line-height};
+  --bs-form-feedback-tooltip-opacity: #{$form-feedback-tooltip-opacity};
+  --bs-form-feedback-tooltip-border-radius: #{$form-feedback-tooltip-border-radius};
+
+
+  // Popovers
+  --bs-popover-font-size: #{$popover-font-size};
+  --bs-popover-bg: #{$popover-bg};
+  --bs-popover-max-width: #{$popover-max-width};
+  --bs-popover-border-width: #{$popover-border-width};
+  --bs-popover-border-color: #{$popover-border-color};
+  --bs-popover-border-radius: #{$popover-border-radius};
+  --bs-popover-box-shadow: #{$popover-box-shadow};
+  --bs-popover-header-bg: #{$popover-header-bg};
+  --bs-popover-header-color: #{$popover-header-color};
+  --bs-popover-header-padding-y: #{$popover-header-padding-y};
+  --bs-popover-header-padding-x: #{$popover-header-padding-x};
+  --bs-popover-body-color: #{$popover-body-color};
+  --bs-popover-body-padding-y: #{$popover-body-padding-y};
+  --bs-popover-body-padding-x: #{$popover-body-padding-x};
+  --bs-popover-arrow-width: #{$popover-arrow-width};
+  --bs-popover-arrow-height: #{$popover-arrow-height};
+  --bs-popover-arrow-color: #{$popover-arrow-color};
+  --bs-popover-arrow-outer-color: #{$popover-arrow-outer-color};
+
+
+  // Toasts
+  --bs-toast-max-width: #{$toast-max-width};
+  --bs-toast-padding-x: #{$toast-padding-x};
+  --bs-toast-padding-y: #{$toast-padding-y};
+  --bs-toast-font-size: #{$toast-font-size};
+  --bs-toast-color: #{$toast-color};
+  --bs-toast-background-color: #{$toast-background-color};
+  --bs-toast-border-width: #{$toast-border-width};
+  --bs-toast-border-color: #{$toast-border-color};
+  --bs-toast-border-radius: #{$toast-border-radius};
+  --bs-toast-box-shadow: #{$toast-box-shadow};
+  --bs-toast-header-color: #{$toast-header-color};
+  --bs-toast-header-background-color: #{$toast-header-background-color};
+  --bs-toast-header-border-color: #{$toast-header-border-color};
+
+
+  // Badges
+  --bs-badge-font-size: #{$badge-font-size};
+  --bs-badge-font-weight: #{$badge-font-weight};
+  --bs-badge-padding-y: #{$badge-padding-y};
+  --bs-badge-padding-x: #{$badge-padding-x};
+  --bs-badge-border-radius: #{$badge-border-radius};
+  --bs-badge-transition: #{$badge-transition};
+  --bs-badge-focus-width: #{$badge-focus-width};
+  --bs-badge-pill-padding-x: #{$badge-pill-padding-x};
+  // Use a higher than normal value to ensure completely rounded edges when
+  // customizing padding or font-size on labels.
+  --bs-badge-pill-border-radius: #{$badge-pill-border-radius};
+
+
+  // Modals
+
+  // Padding applied to the modal body
+  --bs-modal-inner-padding: #{$modal-inner-padding};
+  --bs-modal-dialog-margin: #{$modal-dialog-margin};
+  --bs-modal-dialog-margin-y-sm-up: #{$modal-dialog-margin-y-sm-up};
+  --bs-modal-title-line-height: #{$modal-title-line-height};
+  --bs-modal-content-color: #{$modal-content-color};
+  --bs-modal-content-bg: #{$modal-content-bg};
+  --bs-modal-content-border-color: #{$modal-content-border-color};
+  --bs-modal-content-border-width: #{$modal-content-border-width};
+  --bs-modal-content-border-radius: #{$modal-content-border-radius};
+  --bs-modal-content-box-shadow-xs: #{$modal-content-box-shadow-xs};
+  --bs-modal-content-box-shadow-sm-up: #{$modal-content-box-shadow-sm-up};
+  --bs-modal-backdrop-bg: #{$modal-backdrop-bg};
+  --bs-modal-backdrop-opacity: #{$modal-backdrop-opacity};
+  --bs-modal-header-border-color: #{$modal-header-border-color};
+  --bs-modal-footer-border-color: #{$modal-footer-border-color};
+  --bs-modal-header-border-width: #{$modal-header-border-width};
+  --bs-modal-footer-border-width: #{$modal-footer-border-width};
+  --bs-modal-header-padding-y: #{$modal-header-padding-y};
+  --bs-modal-header-padding-x: #{$modal-header-padding-x};
+  --bs-modal-header-padding: #{$modal-header-padding};
+  --bs-modal-xl: #{$modal-xl};
+  --bs-modal-lg: #{$modal-lg};
+  --bs-modal-md: #{$modal-md};
+  --bs-modal-sm: #{$modal-sm};
+  --bs-modal-fade-transform: #{$modal-fade-transform};
+  --bs-modal-show-transform: #{$modal-show-transform};
+  --bs-modal-transition: #{$modal-transition};
+
+
+  // Alerts
+  //
+  // Define alert colors, border radius, and padding.
+  --bs-alert-padding-y: #{$alert-padding-y};
+  --bs-alert-padding-x: #{$alert-padding-x};
+  --bs-alert-margin-bottom: #{$alert-margin-bottom};
+  --bs-alert-border-radius: #{$alert-border-radius};
+  --bs-alert-link-font-weight: #{$alert-link-font-weight};
+  --bs-alert-border-width: #{$alert-border-width};
+  --bs-alert-bg-level: #{$alert-bg-level};
+  --bs-alert-border-level: #{$alert-border-level};
+  --bs-alert-color-level: #{$alert-color-level};
+
+
+  // Progress bars
+  --bs-progress-height: #{$progress-height};
+  --bs-progress-font-size: #{$progress-font-size};
+  --bs-progress-bg: #{$progress-bg};
+  --bs-progress-border-radius: #{$progress-border-radius};
+  --bs-progress-box-shadow: #{$progress-box-shadow};
+  --bs-progress-bar-color: #{$progress-bar-color};
+  --bs-progress-bar-bg: #{$progress-bar-bg};
+  --bs-progress-bar-animation-timing: #{$progress-bar-animation-timing};
+  --bs-progress-bar-transition: #{$progress-bar-transition};
+
+
+  // List group
+  --bs-list-group-color: #{$list-group-color};
+  --bs-list-group-bg: #{$list-group-bg};
+  --bs-list-group-border-color: #{$list-group-border-color};
+  --bs-list-group-border-width: #{$list-group-border-width};
+  --bs-list-group-border-radius: #{$list-group-border-radius};
+  --bs-list-group-item-padding-y: #{$list-group-item-padding-y};
+  --bs-list-group-item-padding-x: #{$list-group-item-padding-x};
+  --bs-list-group-hover-bg: #{$list-group-hover-bg};
+  --bs-list-group-active-color: #{$list-group-active-color};
+  --bs-list-group-active-bg: #{$list-group-active-bg};
+  --bs-list-group-active-border-color: #{$list-group-active-border-color};
+  --bs-list-group-disabled-color: #{$list-group-disabled-color};
+  --bs-list-group-disabled-bg: #{$list-group-disabled-bg};
+  --bs-list-group-action-color: #{$list-group-action-color};
+  --bs-list-group-action-hover-color: #{$list-group-action-hover-color};
+  --bs-list-group-action-active-color: #{$list-group-action-active-color};
+  --bs-list-group-action-active-bg: #{$list-group-action-active-bg};
+
+
+  // Image thumbnails
+  --bs-thumbnail-padding: #{$thumbnail-padding};
+  --bs-thumbnail-bg: #{$thumbnail-bg};
+  --bs-thumbnail-border-width: #{$thumbnail-border-width};
+  --bs-thumbnail-border-color: #{$thumbnail-border-color};
+  --bs-thumbnail-border-radius: #{$thumbnail-border-radius};
+  --bs-thumbnail-box-shadow: #{$thumbnail-box-shadow};
+
+
+  // Figures
+  --bs-figure-caption-font-size: #{$figure-caption-font-size};
+  --bs-figure-caption-color: #{$figure-caption-color};
+
+
+  // Breadcrumbs
+  --bs-breadcrumb-padding-y: #{$breadcrumb-padding-y};
+  --bs-breadcrumb-padding-x: #{$breadcrumb-padding-x};
+  --bs-breadcrumb-item-padding: #{$breadcrumb-item-padding};
+  --bs-breadcrumb-margin-bottom: #{$breadcrumb-margin-bottom};
+  --bs-breadcrumb-bg: #{$breadcrumb-bg};
+  --bs-breadcrumb-divider-color: #{$breadcrumb-divider-color};
+  --bs-breadcrumb-active-color: #{$breadcrumb-active-color};
+  --bs-breadcrumb-divider: #{$breadcrumb-divider};
+  --bs-breadcrumb-border-radius: #{$breadcrumb-border-radius};
+
+
+  // Carousel
+  --bs-carousel-control-color: #{$carousel-control-color};
+  --bs-carousel-control-width: #{$carousel-control-width};
+  --bs-carousel-control-opacity: #{$carousel-control-opacity};
+  --bs-carousel-control-hover-opacity: #{$carousel-control-hover-opacity};
+  --bs-carousel-control-transition: #{$carousel-control-transition};
+  --bs-carousel-indicator-width: #{$carousel-indicator-width};
+  --bs-carousel-indicator-height: #{$carousel-indicator-height};
+  --bs-carousel-indicator-hit-area-height: #{$carousel-indicator-hit-area-height};
+  --bs-carousel-indicator-spacer: #{$carousel-indicator-spacer};
+  --bs-carousel-indicator-active-bg: #{$carousel-indicator-active-bg};
+  --bs-carousel-indicator-transition: #{$carousel-indicator-transition};
+  --bs-carousel-caption-width: #{$carousel-caption-width};
+  --bs-carousel-caption-color: #{$carousel-caption-color};
+  --bs-carousel-control-icon-width: #{$carousel-control-icon-width};
+  --bs-carousel-control-prev-icon-bg: #{$carousel-control-prev-icon-bg};
+  --bs-carousel-control-next-icon-bg: #{$carousel-control-next-icon-bg};
+  --bs-carousel-transition-duration: #{$carousel-transition-duration};
+  --bs-carousel-transition: #{$carousel-transition};
+
+
+  // Spinners
+  --bs-spinner-width: #{$spinner-width};
+  --bs-spinner-height: #{$spinner-height};
+  --bs-spinner-border-width: #{$spinner-border-width};
+  --bs-spinner-width-sm: #{$spinner-width-sm};
+  --bs-spinner-height-sm: #{$spinner-height-sm};
+  --bs-spinner-border-width-sm: #{$spinner-border-width-sm};
+
+
+  // Close
+  --bs-close-font-size: #{$close-font-size};
+  --bs-close-font-weight: #{$close-font-weight};
+  --bs-close-color: #{$close-color};
+  --bs-close-text-shadow: #{$close-text-shadow};
+
+
+  // Code
+  --bs-code-font-size: #{$code-font-size};
+  --bs-code-color: #{$code-color};
+  --bs-kbd-padding-y: #{$kbd-padding-y};
+  --bs-kbd-padding-x: #{$kbd-padding-x};
+  --bs-kbd-font-size: #{$kbd-font-size};
+  --bs-kbd-color: #{$kbd-color};
+  --bs-kbd-bg: #{$kbd-bg};
+  --bs-pre-color: #{$pre-color};
+  --bs-pre-scrollable-max-height: #{$pre-scrollable-max-height};
+
+
+  // Utilities
+  --bs-displays: #{$displays};
+  --bs-overflows: #{$overflows};
+  --bs-positions: #{$positions};
+
+
+  // Printing
+  --bs-print-page-size: #{$print-page-size};
+  --bs-print-body-min-width: #{$print-body-min-width};
+
+}

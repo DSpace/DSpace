@@ -1,0 +1,7 @@
+@media screen and (max-width: map-get($grid-breakpoints, md)) {
+    :host.open {
+        background-color: var(--bs-white);
+        top: 0;
+        position: sticky;
+    }
+}

@@ -1,0 +1,9 @@
+<div [ngClass]="{'d-none' : hideBadges}" #badges>
+  <div *ngIf="privateBadge" class="private-badge">
+    <span class="badge badge-danger">{{ "item.badge.private" | translate }}</span>
+  </div>
+  <div *ngIf="withdrawnBadge" class="withdrawn-badge">
+    <span class="badge badge-warning">{{ "item.badge.withdrawn" | translate }}</span>
+  </div>
+</div>
+<ng-template dsListableObject></ng-template>

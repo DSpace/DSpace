@@ -1,0 +1,72 @@
+<ds-alert [type]="'alert-info'" *ngIf="hasNoData()" [content]="'submission.sections.sherpa-policy.title-empty'">
+</ds-alert>
+
+<div *ngIf="!hasNoData()" class="d-flex flex-column flex-nowrap mt-2 mb-4">
+  <ds-alert [type]="'alert-info'" >
+    {{'submission.sections.sherpa.publisher.policy.description' | translate}}
+  </ds-alert>
+  <div>
+    <button type="button" class="btn btn-secondary float-right" (click)="refresh()" data-test="refresh-btn">
+      <span><i class="fas fa-sync"></i> {{'submission.sections.sherpa.publisher.policy.refresh' | translate}} </span>
+    </button>
+  </div>
+</div>
+
+<ng-container *ngVar="(sherpaPoliciesData$ | async)?.sherpaResponse as sherpaData">
+    <ng-container *ngIf="!hasNoData() && (!!sherpaData && !sherpaData.error)">
+        <ng-container *ngFor="let journal of sherpaData.journals;let j=index;">
+            <div class="mb-3 border-bottom" data-test="collapse">
+                <div class="w-100 d-flex justify-content-between collapse-toggle mb-3" (click)="collapse.toggle()">
+                    <button type="button" class="btn btn-link p-0" (click)="$event.preventDefault()"
+                        [attr.aria-expanded]="!collapse.collapsed" aria-controls="collapseExample">
+                        {{'submission.sections.sherpa.publication.information' | translate}}
+                    </button>
+                    <div class="d-inline-block">
+                        <span *ngIf="collapse.collapsed" class="fas fa-chevron-down"></span>
+                        <span *ngIf="!collapse.collapsed" class="fas fa-chevron-up"></span>
+                    </div>
+                </div>
+                <div #collapse="ngbCollapse" [ngbCollapse]="isCollapsed">
+                    <ds-publication-information [journal]="journal"></ds-publication-information>
+                </div>
+            </div>
+            <div *ngFor="let policy of journal.policies; let p=index;" class="mb-3 border-bottom" data-test="collapse">
+                <div class="w-100 d-flex justify-content-between collapse-toggle mb-3" (click)="collapse.toggle()">
+                    <button type="button" class="btn btn-link p-0" (click)="$event.preventDefault()"
+                        [attr.aria-expanded]="!collapse.collapsed" aria-controls="collapseExample">
+                        {{'submission.sections.sherpa.publisher.policy' | translate}}
+                    </button>
+                    <div class="d-inline-block">
+                        <span *ngIf="collapse.collapsed" class="fas fa-chevron-down"></span>
+                        <span *ngIf="!collapse.collapsed" class="fas fa-chevron-up"></span>
+                    </div>
+                </div>
+                <div #collapse="ngbCollapse" [ngbCollapse]="isCollapsed">
+                    <ds-publisher-policy [policy]="policy"></ds-publisher-policy>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="mb-3 border-bottom" data-test="collapse">
+            <div class="w-100 d-flex justify-content-between collapse-toggle mb-3" (click)="collapse.toggle()">
+                <button type="button" class="btn btn-link p-0" (click)="$event.preventDefault()"
+                    [attr.aria-expanded]="!collapse.collapsed" aria-controls="collapseExample">
+                    {{'submission.sections.sherpa.record.information' | translate}}
+                </button>
+                <div class="d-inline-block">
+                    <span *ngIf="collapse.collapsed" class="fas fa-chevron-down"></span>
+                    <span *ngIf="!collapse.collapsed" class="fas fa-chevron-up"></span>
+                </div>
+            </div>
+            <div #collapse="ngbCollapse" [ngbCollapse]="isCollapsed">
+                <ds-metadata-information [metadata]="sherpaData.metadata"></ds-metadata-information>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="!!sherpaData && sherpaData.error">
+        <ds-alert [type]="AlertTypeEnum.Error"
+            [content]="!!sherpaData.message ? sherpaData.message : 'submission.sections.sherpa.error.message'| translate">
+        </ds-alert>
+    </ng-container>
+</ng-container>

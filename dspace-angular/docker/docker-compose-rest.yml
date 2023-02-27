@@ -1,0 +1,127 @@
+#
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+#
+# http://www.dspace.org/license/
+#
+
+# Docker Compose for running the DSpace backend for testing/development
+# This is based heavily on the docker-compose.yml that is available in the DSpace/DSpace
+# (Backend) at:
+# https://github.com/DSpace/DSpace/blob/main/docker-compose.yml
+version: '3.7'
+networks:
+  dspacenet:
+    ipam:
+      config:
+        # Define a custom subnet for our DSpace network, so that we can easily trust requests from host to container.
+        # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
+        - subnet: 172.23.0.0/16
+services:
+  # DSpace (backend) webapp container
+  dspace:
+    container_name: dspace
+    environment:
+      # Below syntax may look odd, but it is how to override dspace.cfg settings via env variables.
+      # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
+      # __P__ => "." (e.g. dspace__P__dir => dspace.dir)
+      # __D__ => "-" (e.g. google__D__metadata => google-metadata)
+      # dspace.dir, dspace.server.url, dspace.ui.url and dspace.name
+      dspace__P__dir: /dspace
+      dspace__P__server__P__url: http://localhost:8080/server
+      dspace__P__ui__P__url: http://localhost:4000
+      dspace__P__name: 'DSpace Started with Docker Compose'
+      # db.url: Ensure we are using the 'dspacedb' image for our database
+      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
+      # solr.server: Ensure we are using the 'dspacesolr' image for Solr
+      solr__P__server: http://dspacesolr:8983/solr
+      # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests 
+      # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
+      proxies__P__trusted__P__ipranges: '172.23.0'
+    image: dspace/dspace:dspace-7_x-test
+    depends_on:
+    - dspacedb
+    networks:
+      dspacenet:
+    ports:
+    - published: 8080
+      target: 8080
+    stdin_open: true
+    tty: true
+    volumes:
+    - assetstore:/dspace/assetstore
+    # Mount DSpace's solr configs to a volume, so that we can share to 'dspacesolr' container (see below)
+    - solr_configs:/dspace/solr
+    # Ensure that the database is ready BEFORE starting tomcat
+    # 1. While a TCP connection to dspacedb port 5432 is not available, continue to sleep
+    # 2. Then, run database migration to init database tables
+    # 3. Finally, start Tomcat
+    entrypoint:
+    - /bin/bash
+    - '-c'
+    - |
+      while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
+      /dspace/bin/dspace database migrate
+      catalina.sh run
+  # DSpace database container    
+  dspacedb:
+    container_name: dspacedb
+    environment:
+      PGDATA: /pgdata
+    image: dspace/dspace-postgres-pgcrypto
+    networks:
+      dspacenet:
+    ports:
+    - published: 5432
+      target: 5432
+    stdin_open: true
+    tty: true
+    volumes:
+    - pgdata:/pgdata
+  # DSpace Solr container  
+  dspacesolr:
+    container_name: dspacesolr
+    # Uses official Solr image at https://hub.docker.com/_/solr/
+    image: solr:8.11-slim
+    # Needs main 'dspace' container to start first to guarantee access to solr_configs
+    depends_on:
+    - dspace
+    networks:
+      dspacenet:
+    ports:
+    - published: 8983
+      target: 8983
+    stdin_open: true
+    tty: true
+    working_dir: /var/solr/data
+    volumes:
+    # Mount our "solr_configs" volume available under the Solr's configsets folder (in a 'dspace' subfolder)
+    # This copies the Solr configs from main 'dspace' container into 'dspacesolr' via that volume
+    - solr_configs:/opt/solr/server/solr/configsets/dspace
+    # Keep Solr data directory between reboots
+    - solr_data:/var/solr/data
+    # Initialize all DSpace Solr cores using the mounted local configsets (see above), then start Solr
+    # * First, run precreate-core to create the core (if it doesn't yet exist). If exists already, this is a no-op
+    # * Second, copy updated configs from mounted configsets to this core. If it already existed, this updates core
+    #   to the latest configs. If it's a newly created core, this is a no-op.
+    entrypoint:
+    - /bin/bash
+    - '-c'
+    - |
+      init-var-solr
+      precreate-core authority /opt/solr/server/solr/configsets/dspace/authority
+      cp -r -u /opt/solr/server/solr/configsets/dspace/authority/* authority
+      precreate-core oai /opt/solr/server/solr/configsets/dspace/oai
+      cp -r -u /opt/solr/server/solr/configsets/dspace/oai/* oai
+      precreate-core search /opt/solr/server/solr/configsets/dspace/search
+      cp -r -u /opt/solr/server/solr/configsets/dspace/search/* search
+      precreate-core statistics /opt/solr/server/solr/configsets/dspace/statistics
+      cp -r -u /opt/solr/server/solr/configsets/dspace/statistics/* statistics
+      exec solr -f
+volumes:
+  assetstore:
+  pgdata:
+  solr_data:
+  # Special volume used to share Solr configs from 'dspace' to 'dspacesolr' container (see above)
+  solr_configs:

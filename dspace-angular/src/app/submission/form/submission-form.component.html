@@ -1,0 +1,35 @@
+<div class="container-fluid">
+    <div *ngIf="!(isLoading() | async)" class="submission-form-header mb-3 d-flex flex-wrap position-sticky">
+        <div *ngIf="(uploadEnabled$ | async)" class="w-100">
+            <ds-submission-upload-files [submissionId]="submissionId"
+                                        [collectionId]="collectionId"
+                                        [uploadFilesOptions]="uploadFilesOptions"></ds-submission-upload-files>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="submission-form-header-item mb-3 mb-sm-0 flex-sm-grow-1 flex-md-grow-0">
+            <ds-submission-form-collection [currentCollectionId]="collectionId"
+                                           [currentDefinition]="definitionId"
+                                           [submissionId]="submissionId"
+                                           (collectionChange)="onCollectionChange($event)">
+            </ds-submission-form-collection>
+        </div>
+        <div class="submission-form-header-item text-right">
+            <ds-submission-form-section-add [collectionId]="collectionId"
+                                            [submissionId]="submissionId">
+            </ds-submission-form-section-add>
+        </div>
+    </div>
+
+    <div class="submission-form-content">
+        <ds-themed-loading *ngIf="(isLoading() | async)" message="Loading..."></ds-themed-loading>
+        <ng-container *ngFor="let object of (submissionSections | async)">
+            <ds-submission-section-container [collectionId]="collectionId"
+                                             [submissionId]="submissionId"
+                                             [sectionData]="object"></ds-submission-section-container>
+        </ng-container>
+    </div>
+    <div *ngIf="!(isLoading() | async)" class="submission-form-footer mt-3 mb-3 position-sticky">
+        <ds-submission-form-footer [submissionId]="submissionId"></ds-submission-form-footer>
+    </div>
+</div>

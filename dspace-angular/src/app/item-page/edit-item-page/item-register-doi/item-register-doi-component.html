@@ -1,0 +1,24 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h2>{{headerMessage | translate: {id: item.handle} }}</h2>
+      <p>{{descriptionMessage | translate}}</p>
+      <div *ngFor="let identifier of (identifiers$ | async)" class="w-100 p">
+        <div *ngIf="(identifier.identifierType=='doi')">
+          <p class="float-left">{{doiToUpdateMessage | translate}}: {{identifier.value}}
+            ({{"item.edit.identifiers.doi.status."+identifier.identifierStatus|translate}})
+          </p>
+        </div>
+      </div>
+      <ds-modify-item-overview [item]="item"></ds-modify-item-overview>
+      <div class="space-children-mr">
+        <button (click)="performAction()" class="btn btn-outline-secondary perform-action">{{confirmMessage | translate}}
+        </button>
+        <button [routerLink]="[itemPageRoute, 'edit']" class="btn btn-outline-secondary cancel">
+          {{cancelMessage| translate}}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

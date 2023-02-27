@@ -1,0 +1,57 @@
+<ds-themed-object-list [ngClass]="placeholderFontClass"
+                [config]="config"
+                [sortConfig]="sortConfig"
+                [objects]="objects"
+                [hasBorder]="hasBorder"
+                [hideGear]="hideGear"
+                [linkType]="linkType"
+                [context]="context"
+                [hidePaginationDetail]="hidePaginationDetail"
+                [showPaginator]="showPaginator"
+                (paginationChange)="onPaginationChange($event)"
+                (pageChange)="onPageChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)"
+                (sortDirectionChange)="onSortDirectionChange($event)"
+                (deselectObject)="deselectObject.emit($event)"
+                (selectObject)="selectObject.emit($event)"
+                (sortFieldChange)="onSortFieldChange($event)"
+                [selectable]="selectable"
+                [selectionConfig]="selectionConfig"
+                [importable]="importable"
+                [importConfig]="importConfig"
+                (importObject)="importObject.emit($event)"
+                (contentChange)="contentChange.emit($event)"
+                (prev)="goPrev()"
+                (next)="goNext()"
+                *ngIf="(currentMode$ | async) === viewModeEnum.ListElement">
+</ds-themed-object-list>
+
+<ds-object-grid [config]="config"
+                [sortConfig]="sortConfig"
+                [objects]="objects"
+                [hideGear]="hideGear"
+                [linkType]="linkType"
+                [context]="context"
+                [hidePaginationDetail]="hidePaginationDetail"
+                [showPaginator]="showPaginator"
+                (paginationChange)="onPaginationChange($event)"
+                (pageChange)="onPageChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)"
+                (sortDirectionChange)="onSortDirectionChange($event)"
+                (sortFieldChange)="onSortFieldChange($event)"
+                *ngIf="(currentMode$ | async) === viewModeEnum.GridElement">
+</ds-object-grid>
+
+<ds-object-detail [config]="config"
+                  [sortConfig]="sortConfig"
+                  [objects]="objects"
+                  [hideGear]="hideGear"
+                  [linkType]="linkType"
+                  [context]="context"
+                  [hidePaginationDetail]="hidePaginationDetail"
+                  [showPaginator]="showPaginator"
+                  (contentChange)="contentChange.emit($event)"
+                  *ngIf="(currentMode$ | async) === viewModeEnum.DetailedListElement">
+</ds-object-detail>
+
+

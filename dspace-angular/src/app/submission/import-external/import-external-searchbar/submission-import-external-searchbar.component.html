@@ -1,0 +1,25 @@
+<div *ngIf="(isXsOrSm$ | async)" class="input-group mb-2">
+  <input type="text" class="form-control" (keyup.enter)="(searchString === '')?null:search()" [(ngModel)]="searchString" placeholder="{{'submission.import-external.search.placeholder' |translate}}" aria-label="" aria-describedby="">
+</div>
+<div class="input-group mb-5">
+  <input *ngIf="!(isXsOrSm$ | async)" type="text" class="form-control" (keyup.enter)="(searchString === '')?null:search()" [(ngModel)]="searchString" placeholder="{{'submission.import-external.search.placeholder' |translate}}" aria-label="" aria-describedby="">
+  <div [ngClass]="{'input-group-append': !(isXsOrSm$ | async)}" ngbDropdown role="group" aria-label="">
+    <button class="btn btn-outline-secondary w-fx" title="{{'submission.import-external.search.source.hint' |translate}}" ngbDropdownToggle>{{'submission.import-external.source.' + selectedElement?.name | translate}}</button>
+    <div ngbDropdownMenu class="dropdown-menu scrollable-dropdown-menu w-100"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-labelledby="scrollableDropdownMenuButton">
+      <div class="scrollable-menu"
+        aria-labelledby="scrollableDropdownMenuButton"
+        infiniteScroll
+        [infiniteScrollDistance]="2"
+        [infiniteScrollThrottle]="50"
+        (scrolled)="onScroll()"
+        [scrollWindow]="false">
+        <button ngbDropdownItem class="dropdown-item text-truncate" title="{{'submission.import-external.source.' + source?.name | translate}}" (click)="makeSourceSelection(source)" *ngFor="let source of sourceList">{{'submission.import-external.source.' + source?.name | translate}}</button>
+        <div ngbDropdownItem class="scrollable-dropdown-loading text-center" *ngIf="sourceListLoading"><p>{{'submission.import-external.source.loading' | translate}}</p></div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" [title]="(searchString === '')?('submission.import-external.search.button.hint' | translate):('submission.import-external.search.button' | translate)" [disabled]="searchString === ''" (click)="search()">{{'submission.import-external.search.button' | translate}}</button>
+  </div>
+</div>

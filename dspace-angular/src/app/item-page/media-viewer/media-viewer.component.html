@@ -1,0 +1,36 @@
+<ng-container *ngVar="mediaList$ | async as mediaList">
+  <ds-themed-loading
+    *ngIf="isLoading"
+    message="{{ 'loading.default' | translate }}"
+    [showMessage]="false"
+  ></ds-themed-loading>
+  <div class="media-viewer" *ngIf="!isLoading">
+    <ng-container *ngIf="mediaList.length > 0">
+      <ng-container *ngIf="videoOptions">
+        <ng-container
+          *ngIf="
+            mediaList[0]?.format === 'video' || mediaList[0]?.format === 'audio'
+          "
+        >
+          <ds-media-viewer-video [medias]="mediaList"></ds-media-viewer-video>
+        </ng-container>
+      </ng-container>
+        <ng-container *ngIf="mediaList[0]?.format === 'image'">
+          <ds-media-viewer-image [images]="mediaList"></ds-media-viewer-image>
+        </ng-container>
+    </ng-container>
+    <ng-container
+      *ngIf="
+        ((mediaList[0]?.format !== 'image') &&
+          (!videoOptions || mediaList[0]?.format !== 'video') &&
+          (!videoOptions || mediaList[0]?.format !== 'audio')) ||
+        mediaList.length === 0
+      "
+    >
+      <ds-media-viewer-image
+        [image]="mediaList[0]?.thumbnail || thumbnailPlaceholder"
+        [preview]="false"
+      ></ds-media-viewer-image>
+    </ng-container>
+  </div>
+</ng-container>

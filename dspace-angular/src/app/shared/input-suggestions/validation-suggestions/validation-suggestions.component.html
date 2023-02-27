@@ -1,0 +1,24 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit(value)"
+      [action]="action" (keydown)="onKeydown($event)"
+      (keydown.arrowdown)="shiftFocusDown($event)"
+      (keydown.arrowup)="shiftFocusUp($event)" (keydown.esc)="close()"
+      (dsClickOutside)="checkIfValidInput(form);close();">
+  <input [readonly]="disable" #inputField type="text" formControlName="metadataNameField" attr.aria-labelledby="fieldName" [(ngModel)]="value" id="name" [name]="name"
+         class="form-control suggestion_input"
+         [ngClass]="{'is-invalid': !valid}"
+         [dsDebounce]="debounceTime" (onDebounce)="find($event)"
+         [placeholder]="placeholder"
+         ng-model-options="{standalone: true}"
+         autocomplete="off">
+  <input type="submit" class="d-none"/>
+  <div class="autocomplete dropdown-menu" [ngClass]="{'show': (show | async) && isNotEmpty(suggestions)}">
+    <div class="dropdown-list">
+      <div *ngFor="let suggestionOption of suggestions">
+        <a href="javascript:void(0);" class="d-block dropdown-item"  (click)="onClickSuggestion(suggestionOption.value)" #suggestion>
+          <span [innerHTML]="suggestionOption.displayValue"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</form>
+

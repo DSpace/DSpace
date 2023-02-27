@@ -1,0 +1,49 @@
+.ds-form-input-addon {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: 0 !important;
+}
+
+.ds-form-input-btn {
+  border: var(--bs-input-btn-border-width) solid var(--bs-input-border-color);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+}
+
+.ds-form-input-btn:focus {
+  box-shadow: none !important;
+}
+
+button.ds-form-add-more:focus {
+  outline: none;
+  box-shadow: none !important;
+}
+
+.ds-form-input-value {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+/* style fa-spin */
+.fa-spin {
+  pointer-events: none;
+}
+
+/* align fa-spin */
+.left-addon .far, .left-addon .fas, .left-addon i {
+  left: 0;
+}
+
+.right-addon .far, .right-addon .fas, .right-addon i {
+  right: 0;
+}
+
+/* add padding  */
+.left-addon input {
+  padding-left: calc(var(--bs-spacer) * 2.25);
+}
+
+.right-addon input {
+  padding-right: calc(var(--bs-spacer) * 2.25);
+}

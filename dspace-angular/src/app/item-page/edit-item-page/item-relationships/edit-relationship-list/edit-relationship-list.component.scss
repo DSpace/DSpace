@@ -1,0 +1,10 @@
+.relationship-row:not(.alert) {
+  padding: var(--bs-alert-padding-y) 0;
+}
+
+.relationship-row.alert {
+  margin-left: calc(-1 * var(--bs-alert-padding-x));
+  margin-right: calc(-1 * var(--bs-alert-padding-x));
+  margin-top: -1px;
+  margin-bottom: -1px;
+}

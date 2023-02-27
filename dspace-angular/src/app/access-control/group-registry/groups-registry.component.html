@@ -1,0 +1,100 @@
+<div class="container">
+  <div class="groups-registry row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between border-bottom mb-3">
+        <h2 id="header" class="pb-2">{{messagePrefix + 'head' | translate}}</h2>
+        <div>
+          <button class="mr-auto btn btn-success"
+                  [routerLink]="['newGroup']">
+            <i class="fas fa-plus"></i>
+            <span class="d-none d-sm-inline">{{messagePrefix + 'button.add' | translate}}</span>
+          </button>
+        </div>
+      </div>
+
+      <h3 id="search" class="border-bottom pb-2">{{messagePrefix + 'search.head' | translate}}</h3>
+      <form [formGroup]="searchForm" (ngSubmit)="search(searchForm.value)" class="d-flex justify-content-between">
+        <div class="flex-grow-1 mr-3">
+          <div class="form-group input-group">
+            <input type="text" name="query" id="query" formControlName="query"
+                   class="form-control" attr.aria-label="{{messagePrefix + 'search.placeholder' | translate}}"
+                   [placeholder]="(messagePrefix + 'search.placeholder' | translate)" >
+            <span class="input-group-append">
+              <button type="submit" class="search-button btn btn-primary">
+                <i class="fas fa-search"></i> {{ messagePrefix + 'search.button' | translate }}
+              </button>
+            </span>
+          </div>
+        </div>
+        <div>
+          <button (click)="clearFormAndResetResult();" class="btn btn-secondary">
+            {{messagePrefix + 'button.see-all' | translate}}
+          </button>
+        </div>
+      </form>
+
+      <ds-themed-loading *ngIf="loading$ | async"></ds-themed-loading>
+      <ds-pagination
+        *ngIf="(pageInfoState$ | async)?.totalElements > 0 && !(loading$ | async)"
+        [paginationOptions]="config"
+        [pageInfoState]="pageInfoState$"
+        [collectionSize]="(pageInfoState$ | async)?.totalElements"
+        [hideGear]="true"
+        [hidePagerWhenSinglePage]="true">
+
+        <div  class="table-responsive">
+          <table id="groups" class="table table-striped table-hover table-bordered">
+            <thead>
+            <tr>
+              <th scope="col">{{messagePrefix + 'table.id' | translate}}</th>
+              <th scope="col">{{messagePrefix + 'table.name' | translate}}</th>
+              <th scope="col">{{messagePrefix + 'table.collectionOrCommunity' | translate}}</th>
+              <th scope="col">{{messagePrefix + 'table.members' | translate}}</th>
+              <th>{{messagePrefix + 'table.edit' | translate}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let groupDto of (groupsDto$ | async)?.page">
+              <td>{{groupDto.group.id}}</td>
+              <td>{{groupDto.group.name}}</td>
+              <td>{{(groupDto.group.object | async)?.payload?.name}}</td>
+              <td>{{groupDto.epersons?.totalElements + groupDto.subgroups?.totalElements}}</td>
+              <td>
+                <div class="btn-group edit-field">
+                  <ng-container [ngSwitch]="groupDto.ableToEdit">
+                    <button *ngSwitchCase="true"
+                      [routerLink]="groupService.getGroupEditPageRouterLink(groupDto.group)"
+                      class="btn btn-outline-primary btn-sm btn-edit"
+                      title="{{messagePrefix + 'table.edit.buttons.edit' | translate: {name: groupDto.group.name} }}"
+                    >
+                      <i class="fas fa-edit fa-fw"></i>
+                    </button>
+                    <button *ngSwitchCase="false"
+                      [disabled]="true"
+                      class="btn btn-outline-primary btn-sm btn-edit"
+                      placement="left"
+                      [ngbTooltip]="'admin.access-control.epeople.table.edit.buttons.edit-disabled' | translate"
+                    >
+                      <i class="fas fa-edit fa-fw"></i>
+                    </button>
+                  </ng-container>
+                  <button *ngIf="!groupDto.group?.permanent && groupDto.ableToDelete"
+                          (click)="deleteGroup(groupDto)" class="btn btn-outline-danger btn-sm btn-delete"
+                          title="{{messagePrefix + 'table.edit.buttons.remove' | translate: {name: groupDto.group.name} }}">
+                    <i class="fas fa-trash-alt fa-fw"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </ds-pagination>
+
+      <div *ngIf="(pageInfoState$ | async)?.totalElements == 0" class="alert alert-info w-100 mb-2" role="alert">
+        {{messagePrefix + 'no-items' | translate}}
+      </div>
+
+    </div>
+  </div>
+</div>

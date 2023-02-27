@@ -1,0 +1,53 @@
+<ng-container *ngVar="(user$ | async) as user">
+  <div class="container" *ngIf="user">
+    <ng-container *ngIf="isResearcherProfileEnabled() | async">
+      <h3 class="mb-4">{{'profile.head' | translate}}</h3>
+      <div class="card mb-4">
+        <div class="card-header">{{'profile.card.researcher' | translate}}</div>
+        <div class="card-body">
+          <div class="mb-4">
+            <ds-profile-page-researcher-form [user]="user" ></ds-profile-page-researcher-form>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <div class="card mb-4">
+      <div class="card-header">{{'profile.card.identify' | translate}}</div>
+      <div class="card-body">
+        <ds-profile-page-metadata-form [user]="user"></ds-profile-page-metadata-form>
+      </div>
+    </div>
+    <div *ngIf="canChangePassword$ | async" class="card mb-4 security-section">
+      <div class="card-header">{{'profile.card.security' | translate}}</div>
+      <div class="card-body">
+        <ds-profile-page-security-form
+                [FORM_PREFIX]="'profile.security.form.'"
+                (isInvalid)="setInvalid($event)"
+                (passwordValue)="setPasswordValue($event)"
+                (currentPasswordValue)="setCurrentPasswordValue($event)"
+        ></ds-profile-page-security-form>
+      </div>
+    </div>
+    <div class="col-12 text-right pr-0">
+      <button class="btn btn-primary" (click)="updateProfile()"><i class="fas fa-edit"></i> {{'profile.form.submit' | translate}}</button>
+    </div>
+
+    <ng-container *ngVar="(groupsRD$ | async)?.payload?.page as groups">
+      <div *ngIf="groups?.length > 0">
+        <h3 class="mt-4">{{'profile.groups.head' | translate}}</h3>
+        <ul class="list-group list-group-flush">
+          <li *ngFor="let group of groups" class="list-group-item">{{group.name}}</li>
+        </ul>
+      </div>
+    </ng-container>
+
+    <ng-container *ngVar="(specialGroupsRD$ | async)?.payload?.page as specialGroups">
+      <div *ngIf="specialGroups?.length > 0" data-test="specialGroups">
+        <h3 class="mt-4">{{'profile.special.groups.head' | translate}}</h3>
+        <ul class="list-group list-group-flush">
+          <li *ngFor="let specialGroup of specialGroups" class="list-group-item">{{specialGroup.name}}</li>
+        </ul>
+     </div>
+    </ng-container>
+  </div>
+</ng-container>

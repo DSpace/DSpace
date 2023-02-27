@@ -1,0 +1,23 @@
+<div class="sidebar-section">
+    <a class="nav-item nav-link d-flex flex-row flex-nowrap"
+       [ngClass]="{ disabled: isDisabled }"
+       [attr.aria-disabled]="isDisabled"
+       [attr.aria-labelledby]="'sidebarName-' + section.id"
+       [title]="('menu.section.icon.' + section.id) | translate"
+       [routerLink]="itemModel.link"
+       (keyup.space)="navigate($event)"
+       (keyup.enter)="navigate($event)"
+       href="javascript:void(0);"
+    >
+      <div class="shortcut-icon">
+        <i class="fas fa-{{section.icon}} fa-fw"></i>
+      </div>
+      <div class="sidebar-collapsible">
+        <div class="toggle">
+          <span id="sidebarName-{{section.id}}" class="section-header-text">
+            {{itemModel.text | translate}}
+          </span>
+        </div>
+      </div>
+    </a>
+</div>

@@ -1,0 +1,7 @@
+<div class="container">
+  <h4 class="mb-3">{{'resource-policies.create.page.heading' | translate}} {{targetResourceName}}</h4>
+
+  <ds-resource-policy-form [isProcessing]="isProcessing()"
+                           (reset)="redirectToAuthorizationsPage()"
+                           (submit)="createResourcePolicy($event)"></ds-resource-policy-form>
+</div>

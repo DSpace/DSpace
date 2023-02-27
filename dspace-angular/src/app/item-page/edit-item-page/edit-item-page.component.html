@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="border-bottom">{{'item.edit.head' | translate}}</h2>
+            <div class="pt-2">
+                <ul class="nav nav-tabs justify-content-start" role="tablist">
+                    <li *ngFor="let page of pages" class="nav-item" [attr.aria-selected]="page.page === currentPage" role="tab">
+                        <a *ngIf="(page.enabled | async)"
+                           class="nav-link"
+                           [ngClass]="{'active' : page.page === currentPage}"
+                           [routerLink]="['./' + page.page]">
+                            {{'item.edit.tabs.' + page.page + '.head' | translate}}
+                        </a>
+                        <span [ngbTooltip]="'item.edit.tabs.disabled.tooltip' | translate">
+                            <button *ngIf="!(page.enabled | async)"
+                                 class="nav-link disabled">
+                                {{'item.edit.tabs.' + page.page + '.head' | translate}}
+                            </button>
+                        </span>
+                    </li>
+                </ul>
+                <div class="tab-pane active">
+                    <div class="mb-4">
+                        <router-outlet></router-outlet>
+                    </div>
+                    <div class="button-row bottom">
+                      <div class="text-right">
+                        <a [routerLink]="getItemPage((itemRD$ | async)?.payload)" role="button" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> {{'item.edit.return' | translate}}</a>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

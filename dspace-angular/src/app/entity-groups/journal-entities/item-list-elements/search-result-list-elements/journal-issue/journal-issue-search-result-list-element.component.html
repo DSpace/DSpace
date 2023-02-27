@@ -1,0 +1,42 @@
+<div class="row">
+  <div *ngIf="showThumbnails" class="col-3 col-md-2">
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+       rel="noopener noreferrer"
+       [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out">
+      <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+      </ds-thumbnail>
+    </a>
+      <span *ngIf="linkType == linkTypes.None" class="lead item-list-title dont-break-out">
+      <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+      </ds-thumbnail>
+    </span>
+  </div>
+  <div [ngClass]="showThumbnails ? 'col-9' : 'col-md-12'">
+    <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+    <ds-truncatable [id]="dso.id">
+      <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+         rel="noopener noreferrer"
+         [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out"
+         [innerHTML]="dsoTitle"></a>
+      <span *ngIf="linkType == linkTypes.None"
+            class="lead item-list-title dont-break-out"
+            [innerHTML]="dsoTitle"></span>
+      <span class="text-muted">
+    <ds-truncatable-part [id]="dso.id" [minLines]="1">
+            <span *ngIf="dso.allMetadata(['publicationvolume.volumeNumber']).length > 0"
+                  class="item-list-journal-issues">
+                    <span *ngFor="let value of allMetadataValues(['publicationvolume.volumeNumber']); let last=last;">
+                        <span [innerHTML]="value"><span [innerHTML]="value"></span></span>
+                    </span>
+                <span *ngIf="dso.allMetadata(['publicationissue.issueNumber']).length > 0"
+                      class="item-list-journal-issue-numbers">
+                    <span *ngFor="let value of allMetadataValues(['publicationissue.issueNumber']); let last=last;">
+                        <span> - </span><span [innerHTML]="value"><span [innerHTML]="value"></span></span>
+                    </span>
+                </span>
+            </span>
+        </ds-truncatable-part>
+  </span>
+    </ds-truncatable>
+  </div>
+</div>

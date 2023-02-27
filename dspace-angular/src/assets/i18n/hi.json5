@@ -1,0 +1,4536 @@
+{
+  "401.help": "आप इस पृष्ठ का प्रयोग करने की अनुमति नहीं हैं। होम पेज पर वापस जाने के लिए आप नीचे दिए गए बटन का उपयोग कर सकते हैं।", 
+ 
+
+  "401.link.home-page": "मुझे होम पेज पर ले चलो", 
+ 
+
+  "401.unauthorized": "अनधिकृत", 
+ 
+
+  "403.forbidden": "वर्जित", 
+ 
+
+  "403.help": "आपको इस पृष्ठ का अभिगमन करने की अनुमति नहीं है। होम पेज पर वापस जाने के लिए आप नीचे दिए गए बटन का उपयोग कर सकते हैं।", 
+ 
+
+  "403.link.home-page": "मुझे होम पेज पर ले चलो", 
+ 
+
+  "404.help": "आप जिस पेज की तलाश कर रहे हैं, वह हमें नहीं मिल रहा है। हो सकता है कि पृष्ठ को स्थानांतरित या हटा दिया गया हो। होम पेज पर वापस जाने के लिए आप नीचे दिए गए बटन का उपयोग कर सकते हैं।", 
+
+  "404.link.home-page": "मुझे होम पेज पर ले जाएं", 
+
+  "404.page-not-found": "पृष्ठ नहीं मिला", 
+
+  "500.help": "रखरखाव डाउनटाइम या क्षमता समस्याओं के कारण सर्वर अस्थायी रूप से आपके अनुरोध को पूर्ण करने में असमर्थ है। कृपया बाद में पुन: प्रयास करें।  ", 
+
+  "500.link.home-page": "मुझे होम पेज पर ले चलो", 
+
+  "500.page-internal-server-error": "सेवा उप्लब्ध् नहीं है", 
+
+  "access-status.embargo.listelement.badge": "प्रतिबंध", 
+
+  "access-status.metadata.only.listelement.badge": "केवल मेटाडेटा", 
+
+  "access-status.open.access.listelement.badge": "खुली पहुंच", 
+
+  "access-status.restricted.listelement.badge": "प्रतिबंधित", 
+
+  "access-status.unknown.listelement.badge": "अपरिचित", 
+
+  "admin.access-control.epeople.actions.delete": "ई-व्यक्ति हटाएं", 
+
+  "admin.access-control.epeople.actions.impersonate": "प्रतिरूपण ई-व्यक्ति", 
+
+  "admin.access-control.epeople.actions.reset": "पासवर्ड रीसेट करें", 
+
+  "admin.access-control.epeople.actions.stop-impersonating": "ई-व्यक्ति का रूप धारण करना बंद करें", 
+
+  "admin.access-control.epeople.breadcrumbs": "ई लोग", 
+
+  "admin.access-control.epeople.button.add": "ई-व्यक्ति जोड़ें", 
+
+  "admin.access-control.epeople.button.see-all": "सब कुछ ब्राउज़ करें", 
+
+  "admin.access-control.epeople.form.canLogIn": "लॉग इन कर सकते हैं", 
+
+  "admin.access-control.epeople.form.create": "ई-व्यक्ति बनाएं", 
+
+  "admin.access-control.epeople.form.edit": "ई-व्यक्ति संपादित करें", 
+
+  "admin.access-control.epeople.form.email": "ईमेल", 
+
+  "admin.access-control.epeople.form.emailHint": "वैध ई-मेल पता होना चाहिए", 
+
+  "admin.access-control.epeople.form.firstName": "प्रथम नाम", 
+
+  "admin.access-control.epeople.form.goToGroups": "समूहों में जोड़ें", 
+
+  "admin.access-control.epeople.form.groupsEPersonIsMemberOf": "इन समूहों के सदस्य:", 
+
+  "admin.access-control.epeople.form.lastName": "उपनाम", 
+
+  "admin.access-control.epeople.form.memberOfNoGroups": "यह ई-व्यक्ति किसी भी समूह का सदस्य नहीं है", 
+
+  "admin.access-control.epeople.form.notification.created.failure": "\"{{name}}\" ई-व्यक्ति बनाने में विफल", 
+
+  "admin.access-control.epeople.form.notification.created.failure.emailInUse": "\"{{email}}\" ईमेल पहले से प्रयोग में होने के कारण \"{{name}}\" ई-व्यक्ति बनाना विफल हुआ। ", 
+
+  "admin.access-control.epeople.form.notification.created.success": "\"{{name}}\" ई-व्यक्ति सफलतापूर्वक बनाया गया  ", 
+
+  "admin.access-control.epeople.form.notification.deleted.failure": "ई-व्यक्ति \"{{name}}\" को हटाने में विफल", 
+
+  "admin.access-control.epeople.form.notification.deleted.success": "ई-व्यक्ति \"{{name}}\" को सफलतापूर्वक हटा दिया गया", 
+
+  "admin.access-control.epeople.form.notification.edited.failure": "\"{{name}}\" ई-व्यक्ति संपादित करने में विफल", 
+
+  "admin.access-control.epeople.form.notification.edited.failure.emailInUse": "ई-व्यक्ति \"{{name}}\", ईमेल \"{{email}}\" पहले से प्रयोग में संपादित करने में विफल।", 
+
+  "admin.access-control.epeople.form.notification.edited.success": "ई-व्यक्ति \"{{name}}\" को सफलतापूर्वक संपादित किया गया", 
+
+  "admin.access-control.epeople.form.requireCertificate": "प्रमाण पत्र की आवश्यकता है", 
+
+  "admin.access-control.epeople.form.return": "वापस", 
+
+  "admin.access-control.epeople.form.table.collectionOrCommunity": "संग्रह/समुदाय", 
+
+  "admin.access-control.epeople.form.table.id": "पहचान", 
+
+  "admin.access-control.epeople.form.table.name": "नाम", 
+
+  "admin.access-control.epeople.head": "ई लोग", 
+
+  "admin.access-control.epeople.no-items": "कोई ई-लोग दिखाने के लिए नहीं।", 
+
+  "admin.access-control.epeople.notification.deleted.failure": "ई-व्यक्ति को हटाने में विफल: \"{{name}}\"", 
+
+  "admin.access-control.epeople.notification.deleted.success": "ई-व्यक्ति को सफलतापूर्वक हटाया गया: \"{{name}}\"", 
+
+  "admin.access-control.epeople.search.button": "खोजें", 
+
+  "admin.access-control.epeople.search.head": "खोजें", 
+
+  "admin.access-control.epeople.search.placeholder": "लोगों को खोजें...", 
+
+  "admin.access-control.epeople.search.scope.email": "ईमेल (सटीक)", 
+
+  "admin.access-control.epeople.search.scope.metadata": "मेटाडेटा", 
+
+  "admin.access-control.epeople.table.edit": "संपादित करें", 
+
+  "admin.access-control.epeople.table.edit.buttons.edit": "\"{{name}}\" संपादित करें", 
+
+  "admin.access-control.epeople.table.edit.buttons.edit-disabled": "आप इस समूह को संपादित करने के लिए अधिकृत नहीं हैं", 
+
+  "admin.access-control.epeople.table.edit.buttons.remove": "\"{{name}}\" मिटाएं", 
+
+  "admin.access-control.epeople.table.email": "ईमेल (सटीक)", 
+
+  "admin.access-control.epeople.table.id": "पहचान", 
+
+  "admin.access-control.epeople.table.name": "नाम", 
+
+  "admin.access-control.epeople.title": "ई लोग", 
+
+  "admin.access-control.groups.addGroup.breadcrumbs": "नया समूह", 
+
+  "admin.access-control.groups.breadcrumbs": "समूह", 
+
+  "admin.access-control.groups.button.add": "समूह जोड़ें", 
+
+  "admin.access-control.groups.button.see-all": "सब कुछ ब्राउज़ करें", 
+
+  "admin.access-control.groups.form.actions.delete": "समूह हटाएं", 
+
+  "admin.access-control.groups.form.alert.permanent": "यह समूह स्थायी है, इसलिए इसे संपादित या हटाया नहीं जा सकता है। आप अभी भी इस  पृष्ठ का उपयोग करके समूह के सदस्यों को जोड़ और हटा सकते हैं।", 
+
+  "admin.access-control.groups.form.alert.workflowGroup": "इस समूह को संशोधित या हटाया नहीं जा सकता क्योंकि \"{{name}}\" {{comcol}}  प्रस्तुतीकरण और कार्यप्रवाह प्रक्रिया में एक भूमिका से संबंधित है। आप इसे हटाने के लिए {{comcol}} संपादन पृष्ठ पर <a href='{{comcolEditRolesRoute}}'>\"assign roles\"</a> टैब का प्रयोग कर सकते है। आप अभी भी इस पेज का उपयोग करके समूह के सदस्यों को जोड़ और हटा सकते हैं।", 
+
+  "admin.access-control.groups.form.delete-group.modal.cancel": "रद्द करें", 
+
+  "admin.access-control.groups.form.delete-group.modal.confirm": "हटाएं", 
+
+  "admin.access-control.groups.form.delete-group.modal.header": "\"{{dsoName}}\" समूह हटाएं", 
+
+  "admin.access-control.groups.form.delete-group.modal.info": "क्या आप वाकई \"{{dsoName}}\" समूह को हटाना चाहते हैं", 
+
+  "admin.access-control.groups.form.groupCommunity": "समुदाय या संग्रह", 
+
+  "admin.access-control.groups.form.groupDescription": "विवरण", 
+
+  "admin.access-control.groups.form.groupName": "समूह का नाम", 
+
+  "admin.access-control.groups.form.head.create": "समूह बनाएँ", 
+
+  "admin.access-control.groups.form.head.edit": "समूह संपादित करें", 
+
+  "admin.access-control.groups.form.members-list.button.see-all": "सब कुछ ब्राउज़ करें", 
+
+  "admin.access-control.groups.form.members-list.head": "ई लोग", 
+
+  "admin.access-control.groups.form.members-list.headMembers": "वर्तमान सदस्य", 
+
+  "admin.access-control.groups.form.members-list.no-items": "उस खोज में कोई ई-लोग नहीं मिले", 
+
+  "admin.access-control.groups.form.members-list.no-members-yet": "समूह में अभी तक कोई सदस्य नहीं है, सदस्य खोजें और जोड़ें।", 
+
+  "admin.access-control.groups.form.members-list.notification.failure.addMember": "सदस्य जोड़ने में विफल: \"{{name}}\"", 
+
+  "admin.access-control.groups.form.members-list.notification.failure.deleteMember": "सदस्य को हटाने में विफल: \"{{name}}\"", 
+
+  "admin.access-control.groups.form.members-list.notification.failure.noActiveGroup": "पहले एक नाम प्रस्तुत करें, कोई वर्तमान सक्रिय समूह नहीं है।", 
+
+  "admin.access-control.groups.form.members-list.notification.success.addMember": "\"{{name}}\" सदस्य सफलतापूर्वक जोड़ा गया", 
+
+  "admin.access-control.groups.form.members-list.notification.success.deleteMember": "\"{{name}}\" सदस्य को सफलतापूर्वक हटाया गया", 
+
+  "admin.access-control.groups.form.members-list.search.button": "खोजें", 
+
+  "admin.access-control.groups.form.members-list.search.head": "ई-लोगों को जोड़ें", 
+
+  "admin.access-control.groups.form.members-list.search.scope.email": "ईमेल (सटीक)", 
+
+  "admin.access-control.groups.form.members-list.search.scope.metadata": "मेटाडेटा", 
+
+  "admin.access-control.groups.form.members-list.table.edit": "हटाएं / जोड़ें", 
+
+  "admin.access-control.groups.form.members-list.table.edit.buttons.add": "\"{{name}}\" नाम वाले सदस्य को जोड़ें", 
+
+  "admin.access-control.groups.form.members-list.table.edit.buttons.remove": "\"{{name}}\" नाम वाले सदस्य को हटाएं", 
+
+  "admin.access-control.groups.form.members-list.table.email": "ईमेल", 
+
+  "admin.access-control.groups.form.members-list.table.id": "पहचान", 
+
+  "admin.access-control.groups.form.members-list.table.identity": "पहचान", 
+
+  "admin.access-control.groups.form.members-list.table.name": "नाम", 
+
+  "admin.access-control.groups.form.members-list.table.netid": "NetID", 
+
+  "admin.access-control.groups.form.notification.created.failure": "\"{{name}}\" समूह बनाने में विफल", 
+
+  "admin.access-control.groups.form.notification.created.failure.groupNameInUse": "\"{{name}}\" नाम के साथ समूह बनाने में विफल, सुनिश्चित करें कि नाम पहले से उपयोग में नहीं है।", 
+
+  "admin.access-control.groups.form.notification.created.success": "\"{{name}}\" समूह सफलतापूर्वक बनाया गया", 
+
+  "admin.access-control.groups.form.notification.deleted.failure.content": "कारण: \"{{ cause }}\"", 
+
+  "admin.access-control.groups.form.notification.deleted.failure.title": "\"{{ name }}\" समूह को हटाने में विफल", 
+
+  "admin.access-control.groups.form.notification.deleted.success": "\"{{ name }}\" समूह को सफलतापूर्वक हटाया गया", 
+
+  "admin.access-control.groups.form.notification.edited.failure": "\"{{name}}\" समूह को संपादित करने में विफल", 
+
+  "admin.access-control.groups.form.notification.edited.failure.groupNameInUse": "\"{{name}}\" नाम पहले से प्रयोग में है!", 
+
+  "admin.access-control.groups.form.notification.edited.success": "\"{{name}}\" समूह को सफलतापूर्वक संपादित किया गया", 
+
+  "admin.access-control.groups.form.return": "वापस", 
+
+  "admin.access-control.groups.form.subgroups-list.button.see-all": "सभी ब्राउज़ करें", 
+
+  "admin.access-control.groups.form.subgroups-list.head": "समूह", 
+
+  "admin.access-control.groups.form.subgroups-list.headSubgroups": "वर्तमान उपसमूह", 
+
+  "admin.access-control.groups.form.subgroups-list.no-items": "इसके नाम से कोई समूह नहीं मिला या यह UUID के रूप में नहीं है", 
+
+  "admin.access-control.groups.form.subgroups-list.no-subgroups-yet": "समूह में अभी तक कोई उपसमूह नहीं है।", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.failure": "कुछ गलत हुआ: \"{{cause}}\"", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.failure.addSubgroup": "उपसमूह जोड़ने में विफल: \"{{name}}\"", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.failure.deleteSubgroup": "\"{{name}}\" उपसमूह को हटाने में विफल", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.failure.noActiveGroup": "कोई वर्तमान सक्रिय समूह नहीं है, पहले एक नाम प्रस्तुत करें।", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.failure.subgroupToAddIsActiveGroup": "यह वर्तमान समूह है, जोड़ा नहीं जा सकता।", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.success.addSubgroup": "उपसमूह सफलतापूर्वक जोड़ा गया: \"{{name}}\"", 
+
+  "admin.access-control.groups.form.subgroups-list.notification.success.deleteSubgroup": "\"{{name}}\" उपसमूह को सफलतापूर्वक हटाया गया", 
+
+  "admin.access-control.groups.form.subgroups-list.search.button": "खोजें", 
+
+  "admin.access-control.groups.form.subgroups-list.search.head": "उपसमूह जोड़ें", 
+
+  "admin.access-control.groups.form.subgroups-list.table.collectionOrCommunity": "संग्रह/समुदाय", 
+
+  "admin.access-control.groups.form.subgroups-list.table.edit": "हटाएं / जोड़ें", 
+
+  "admin.access-control.groups.form.subgroups-list.table.edit.buttons.add": "\"{{name}}\" नाम से उपसमूह जोड़ें", 
+
+  "admin.access-control.groups.form.subgroups-list.table.edit.buttons.remove": "\"{{name}}\" नाम से उपसमूह हटाएं", 
+
+  "admin.access-control.groups.form.subgroups-list.table.edit.currentGroup": "वर्तमान समूह", 
+
+  "admin.access-control.groups.form.subgroups-list.table.id": "पहचान", 
+
+  "admin.access-control.groups.form.subgroups-list.table.name": "नाम", 
+
+  "admin.access-control.groups.head": "समूह", 
+
+  "admin.access-control.groups.no-items": "इसके नाम से कोई समूह नहीं मिला या यह UUID के रूप में नहीं है", 
+
+  "admin.access-control.groups.notification.deleted.failure.content": "कारण: \"{{cause}}\"", 
+
+  "admin.access-control.groups.notification.deleted.failure.title": "\"{{name}}\" समूह को हटाने में विफल", 
+
+  "admin.access-control.groups.notification.deleted.success": "समूह \"{{name}}\" को सफलतापूर्वक हटाया गया", 
+
+  "admin.access-control.groups.search.button": "खोजें", 
+
+  "admin.access-control.groups.search.head": "समूह खोजें", 
+
+  "admin.access-control.groups.search.placeholder": "समूह खोजें...", 
+
+  "admin.access-control.groups.singleGroup.breadcrumbs": "समूह संपादित करें", 
+
+  "admin.access-control.groups.table.collectionOrCommunity": "संग्रह/समुदाय", 
+
+  "admin.access-control.groups.table.edit": "संपादित करें", 
+
+  "admin.access-control.groups.table.edit.buttons.edit": "\"{{name}}\" संपादित करें", 
+
+  "admin.access-control.groups.table.edit.buttons.remove": "\"{{name}}\" हटाएं", 
+
+  "admin.access-control.groups.table.id": "पहचान", 
+
+  "admin.access-control.groups.table.members": "सदस्य", 
+
+  "admin.access-control.groups.table.name": "नाम", 
+
+  "admin.access-control.groups.title": "समूह", 
+
+  "admin.access-control.groups.title.addGroup": "नया समूह", 
+
+  "admin.access-control.groups.title.singleGroup": "समूह संपादित करें", 
+
+  "admin.curation-tasks.breadcrumbs": "प्रणाली क्यूरेशन कार्य", 
+
+  "admin.curation-tasks.header": "प्रणाली क्यूरेशन कार्य", 
+
+  "admin.curation-tasks.title": "प्रणाली क्यूरेशन कार्य", 
+
+  "admin.metadata-import.breadcrumbs": "मेटाडेटा आयात करें", 
+
+  "admin.metadata-import.page.button.proceed": "आगे बढ़ें", 
+
+  "admin.metadata-import.page.button.return": "वापस", 
+
+  "admin.metadata-import.page.dropMsg": "आयात करने के लिए मेटाडेटा CSV छोड़ें", 
+
+  "admin.metadata-import.page.dropMsgReplace": "आयात करने के लिए मेटाडेटा CSV को बदलने के लिए ड्रॉप करें", 
+
+  "admin.metadata-import.page.error.addFile": "पहले फ़ाइल का चयन करें!", 
+
+  "admin.metadata-import.page.header": "मेटाडेटा आयात करें", 
+
+  "admin.metadata-import.page.help": "आप उन CSV फ़ाइलों को छोड़ या ब्राउज़ कर सकते हैं जिनमें फ़ाइलों पर बैच मेटाडेटा संचालन शामिल हैं", 
+
+  "admin.metadata-import.page.validateOnly": "केवल मान्य करें", 
+
+  "admin.metadata-import.page.validateOnly.hint": "चुनी गयी CSV फाइल को उप्लोअडिंग उपरांत पुष्टिकृत किया जाएगा। आपको पाए गए परिवर्तनों की रिपोर्ट प्राप्त होगी, लेकिन कोई भी परिवर्तन सहेजा नहीं जाएगा।", 
+
+  "admin.metadata-import.title": "मेटाडेटा आयात करें", 
+
+  "admin.registries.bitstream-formats.breadcrumbs": "प्रारूप रजिस्ट्री", 
+
+  "admin.registries.bitstream-formats.create.breadcrumbs": "बिटस्ट्रीम प्रारूप", 
+
+  "admin.registries.bitstream-formats.create.failure.content": "नया बिटस्ट्रीम प्रारूप बनाते समय एक त्रुटि हुई।", 
+
+  "admin.registries.bitstream-formats.create.failure.head": "असफलता", 
+
+  "admin.registries.bitstream-formats.create.head": "बिटस्ट्रीम प्रारूप बनाएं", 
+
+  "admin.registries.bitstream-formats.create.new": "एक नया बिटस्ट्रीम प्रारूप जोड़ें", 
+
+  "admin.registries.bitstream-formats.create.success.content": "नया बिटस्ट्रीम स्वरूप सफलतापूर्वक बनाया गया।", 
+
+  "admin.registries.bitstream-formats.create.success.head": "सफलता", 
+
+  "admin.registries.bitstream-formats.delete.failure.amount": "{{ amount }} प्रारूप (प्रारूपों) को निकालने में विफल", 
+
+  "admin.registries.bitstream-formats.delete.failure.head": "असफलता", 
+
+  "admin.registries.bitstream-formats.delete.success.amount": "{{ amount}} प्रारूप (प्रारूपों) को सफलतापूर्वक हटा दिया गया हैं|", 
+
+  "admin.registries.bitstream-formats.delete.success.head": "सफलता", 
+
+  "admin.registries.bitstream-formats.description": "बिटस्ट्रीम प्रारूपों की यह सूची ज्ञात स्वरूपों और उनके समर्थन स्तर के बारे में जानकारी प्रदान करती है।", 
+
+  "admin.registries.bitstream-formats.edit.breadcrumbs": "बिटस्ट्रीम प्रारूप", 
+
+  "admin.registries.bitstream-formats.edit.description.hint": "", 
+
+  "admin.registries.bitstream-formats.edit.description.label": "विवरण", 
+
+  "admin.registries.bitstream-formats.edit.extensions.hint": "एक्सटेंशन का उपयोग अपलोड की गई फ़ाइलों के प्रारूप को स्वचालित रूप से पहचानने के लिए किया जाता है। आप प्रत्येक प्रारूप के लिए कई एक्सटेंशन दर्ज कर सकते हैं।", 
+
+  "admin.registries.bitstream-formats.edit.extensions.label": "फाइल एक्सटेंशन", 
+
+  "admin.registries.bitstream-formats.edit.extensions.placeholder": "बिंदु के बिना फ़ाइल एक्सटेंशन दर्ज करें", 
+
+  "admin.registries.bitstream-formats.edit.failure.content": "बिटस्ट्रीम प्रारूप को संपादित करते समय एक त्रुटि हुई।", 
+
+  "admin.registries.bitstream-formats.edit.failure.head": "असफलता", 
+
+  "admin.registries.bitstream-formats.edit.head": "बिटस्ट्रीम प्रारूप: {{ format }}", 
+
+  "admin.registries.bitstream-formats.edit.internal.hint": "आंतरिक के रूप में चिह्नित प्रारूप उपयोगकर्ता से छिपे हुए हैं, और प्रशासनिक उद्देश्यों के लिए उपयोग किए जाते हैं।", 
+
+  "admin.registries.bitstream-formats.edit.internal.label": "आंतरिक", 
+
+  "admin.registries.bitstream-formats.edit.mimetype.hint": "इस प्रारूप से जुड़े MIME प्रकार का अद्वितीय होना आवश्यक नहीं है।", 
+
+  "admin.registries.bitstream-formats.edit.mimetype.label": "माइम (MIME) प्रकार", 
+
+  "admin.registries.bitstream-formats.edit.shortDescription.hint": "इस प्रारूप के लिए एक अनूठा नाम, (जैसे माइक्रोसॉफ्ट वर्ड एक्सपी या माइक्रोसॉफ्ट वर्ड 2000)", 
+
+  "admin.registries.bitstream-formats.edit.shortDescription.label": "नाम", 
+
+  "admin.registries.bitstream-formats.edit.success.content": "बिटस्ट्रीम प्रारूप सफलतापूर्वक संपादित किया गया।", 
+
+  "admin.registries.bitstream-formats.edit.success.head": "सफलता", 
+
+  "admin.registries.bitstream-formats.edit.supportLevel.hint": "इस प्रारूप के लिए आपकी संस्था द्वारा दिए गए समर्थन का स्तर।", 
+
+  "admin.registries.bitstream-formats.edit.supportLevel.label": "समर्थन स्तर", 
+
+  "admin.registries.bitstream-formats.head": "बिटस्ट्रीम प्रारूप रजिस्ट्री", 
+
+  "admin.registries.bitstream-formats.no-items": "दिखाने के लिए कोई बिटस्ट्रीम प्रारूप नहीं।", 
+
+  "admin.registries.bitstream-formats.table.delete": "चयनित हटाएं", 
+
+  "admin.registries.bitstream-formats.table.deselect-all": "सभी को अचयनित करें", 
+
+  "admin.registries.bitstream-formats.table.internal": "आंतरिक", 
+
+  "admin.registries.bitstream-formats.table.mimetype": "माइम (MIME) प्रकार", 
+
+  "admin.registries.bitstream-formats.table.name": "नाम", 
+
+  "admin.registries.bitstream-formats.table.return": "पीछे", 
+
+  "admin.registries.bitstream-formats.table.supportLevel.head": "समर्थन स्तर", 
+
+  "admin.registries.bitstream-formats.table.supportLevel.KNOWN": "परिचित", 
+
+  "admin.registries.bitstream-formats.table.supportLevel.SUPPORTED": "समर्थित", 
+
+  "admin.registries.bitstream-formats.table.supportLevel.UNKNOWN": "अज्ञात", 
+
+  "admin.registries.bitstream-formats.title": "बिटस्ट्रीम प्रारूप रजिस्ट्री", 
+
+  "admin.registries.metadata.breadcrumbs": "मेटाडेटा रजिस्ट्री", 
+
+  "admin.registries.metadata.description": "मेटाडेटा रजिस्ट्री संग्रहालय में उपलब्ध सभी मेटाडेटा फ़ील्ड की एक सूची रखता है। इन क्षेत्रों को कई स्कीमाओं में विभाजित किया जा सकता है। हालांकि, डीस्पेस को योग्य डबलिन कोर स्कीमा की आवश्यकता है।", 
+
+  "admin.registries.metadata.form.create": "मेटाडेटा स्कीमा बनाएं", 
+
+  "admin.registries.metadata.form.edit": "मेटाडेटा स्कीमा संपादित करें", 
+
+  "admin.registries.metadata.form.name": "नाम", 
+
+  "admin.registries.metadata.form.namespace": "नाम स्थान", 
+
+  "admin.registries.metadata.head": "मेटाडेटा रजिस्ट्री", 
+
+  "admin.registries.metadata.schemas.no-items": "दिखाने के लिए कोई मेटाडेटा स्कीमा नहीं है।", 
+
+  "admin.registries.metadata.schemas.table.delete": "चयनित हटाएं", 
+
+  "admin.registries.metadata.schemas.table.id": "पहचान", 
+
+  "admin.registries.metadata.schemas.table.name": "नाम", 
+
+  "admin.registries.metadata.schemas.table.namespace": "नाम स्थान", 
+
+  "admin.registries.metadata.title": "मेटाडेटा रजिस्ट्री", 
+
+  "admin.registries.schema.breadcrumbs": "मेटाडेटा स्कीमा", 
+
+  "admin.registries.schema.description": "यह \"{{namespace}}\" के लिए मेटाडेटा स्कीमा है।", 
+
+  "admin.registries.schema.fields.head": "स्कीमा मेटाडेटा फ़ील्ड", 
+
+  "admin.registries.schema.fields.no-items": "दिखाने के लिए कोई मेटाडेटा फ़ील्ड नहीं है|", 
+
+  "admin.registries.schema.fields.table.delete": "चयनित हटाएं", 
+
+  "admin.registries.schema.fields.table.field": " फील्ड", 
+
+  "admin.registries.schema.fields.table.scopenote": "कार्यक्षेत्र नोट", 
+
+  "admin.registries.schema.form.create": "मेटाडेटा फ़ील्ड बनाएं", 
+
+  "admin.registries.schema.form.edit": "मेटाडेटा फ़ील्ड संपादित करें", 
+
+  "admin.registries.schema.form.element": "तत्व", 
+
+  "admin.registries.schema.form.qualifier": "क्वालीफायर", 
+
+  "admin.registries.schema.form.scopenote": "कार्यक्षेत्र नोट", 
+
+  "admin.registries.schema.head": "मेटाडेटा स्कीमा", 
+
+  "admin.registries.schema.notification.created": "\"{{prefix}}\" मेटाडेटा स्कीमा सफलतापूर्वक बनाया गया", 
+
+  "admin.registries.schema.notification.deleted.failure": "{{amount}} मेटाडेटा स्कीमा हटाने में विफल", 
+
+  "admin.registries.schema.notification.deleted.success": "{{amount}} मेटाडेटा स्कीमा सफलतापूर्वक हटा दिए गए", 
+
+  "admin.registries.schema.notification.edited": "\"{{prefix}}\" मेटाडेटा स्कीमा को सफलतापूर्वक संपादित किया गया", 
+
+  "admin.registries.schema.notification.failure": "त्रुटि", 
+
+  "admin.registries.schema.notification.field.created": "\"{{field}}\" मेटाडेटा फ़ील्ड को सफलतापूर्वक बनाया गया", 
+
+  "admin.registries.schema.notification.field.deleted.failure": "{{amount}} मेटाडेटा फ़ील्ड हटाने में विफल", 
+
+  "admin.registries.schema.notification.field.deleted.success": "{{amount}} मेटाडेटा फ़ील्ड को सफलतापूर्वक हटाया गया", 
+
+  "admin.registries.schema.notification.field.edited": "\"{{field}}\" मेटाडेटा फ़ील्ड को सफलतापूर्वक संपादित किया गया", 
+
+  "admin.registries.schema.notification.success": "सफलता", 
+
+  "admin.registries.schema.return": "वापस", 
+
+  "admin.registries.schema.title": "मेटाडेटा स्कीमा रजिस्ट्री", 
+
+  "admin.search.breadcrumbs": "प्रशासनिक खोज", 
+
+  "admin.search.collection.edit": "संपादित करें", 
+
+  "admin.search.community.edit": "संपादित करें", 
+
+  "admin.search.item.delete": "हटाएं", 
+
+  "admin.search.item.edit": "संपादित करें", 
+
+  "admin.search.item.make-private": "खोजे न जाने योग्य बनाएं", 
+
+  "admin.search.item.make-public": "खोजने योग्य बनाएं", 
+
+  "admin.search.item.move": "स्थान परिवर्तन", 
+
+  "admin.search.item.reinstate": "पुनर्स्थापित करें", 
+
+  "admin.search.item.withdraw": "वापस लेना", 
+
+  "admin.search.title": "प्रशासनिक खोज", 
+
+  "admin.workflow.breadcrumbs": "कार्यप्रवाह व्यवस्थापित करें", 
+
+  "admin.workflow.item.delete": "हटाएं", 
+
+  "admin.workflow.item.send-back": "वापस भेजे", 
+
+  "admin.workflow.item.workflow": "कार्यप्रवाह", 
+
+  "admin.workflow.title": "कार्यप्रवाह व्यवस्थापित करें", 
+
+  "administrativeView.search.results.head": "प्रशासनिक खोज", 
+
+  "auth.errors.invalid-user": "अमान्य ई - मेल पता अथवा पासवर्ड।", 
+
+  "auth.messages.expired": "आपका सत्र समाप्त हो गया है। कृपया फिर लॉगिन करें।", 
+
+  "auth.messages.token-refresh-failed": "आपका सत्र टोकन रीफ़्रेश करना विफल रहा। कृपया फिर लॉगिन करें।", 
+
+  "bitstream-request-a-copy.alert.canDownload1": "आपके पास पहले से ही इस फ़ाइल तक पहुंच है। अगर आप फ़ाइल डाउनलोड करना चाहते हैं, तो क्लिक करें", 
+
+  "bitstream-request-a-copy.alert.canDownload2": "यहां", 
+
+  "bitstream-request-a-copy.allfiles.label": "फ़ाइलें", 
+
+  "bitstream-request-a-copy.email.error": "कृपया वैध ई - मेल एड्रेस डालें।", 
+
+  "bitstream-request-a-copy.email.hint": "इस ईमेल पते का उपयोग फ़ाइल भेजने के लिए किया जाता है।", 
+
+  "bitstream-request-a-copy.email.label": "आपका ईमेल पता *", 
+
+  "bitstream-request-a-copy.files-all-false.label": "केवल अनुरोधित फ़ाइल", 
+
+  "bitstream-request-a-copy.files-all-true.label": "सभी फ़ाइलें (इस आइटम की) प्रतिबंधित पहुंच में हैं", 
+
+  "bitstream-request-a-copy.header": "फ़ाइल की एक प्रति का अनुरोध करें", 
+
+  "bitstream-request-a-copy.intro": "निम्नलिखित मद के लिए एक प्रति का अनुरोध करने के लिए निम्नलिखित जानकारी दर्ज करें:", 
+
+  "bitstream-request-a-copy.intro.bitstream.one": "Requesting the following file: ", 
+
+  "bitstream-request-a-copy.intro.bitstream.other": null, 
+
+  "bitstream-request-a-copy.intro.bitstream.zero": null, 
+
+  "bitstream-request-a-copy.intro.bitstream.all": "सभी फाइलों का अनुरोध।", 
+
+  "bitstream-request-a-copy.message.label": "संदेश", 
+
+  "bitstream-request-a-copy.name.error": "नाम आवश्यक है", 
+
+  "bitstream-request-a-copy.name.label": "नाम *", 
+
+  "bitstream-request-a-copy.return": "वापस", 
+
+  "bitstream-request-a-copy.submit": "प्रति अनुरोध ", 
+
+  "bitstream-request-a-copy.submit.error": "आइटम अनुरोध प्रस्तुत करने में कोई गड़बड़ी हुई|", 
+
+  "bitstream-request-a-copy.submit.success": "आइटम अनुरोध सफलतापूर्वक प्रस्तुत किया गया।  ", 
+
+  "bitstream.download.page": "अब {{bitstream}} डाउनलोड हो रहा है...", 
+
+  "bitstream.download.page.back": "वापस", 
+
+  "bitstream.edit.authorizations.link": "बिटस्ट्रीम की नीतियां संपादित करें", 
+
+  "bitstream.edit.authorizations.title": "बिटस्ट्रीम की नीतियां संपादित करें", 
+
+  "bitstream.edit.bitstream": "बिटस्ट्रीम: ", 
+
+  "bitstream.edit.form.description.hint": "वैकल्पिक रूप से, फ़ाइल का संक्षिप्त विवरण प्रदान करें, उदाहरण के लिए \"<i>मुख्य लेख</i>\" या \"<i>डेटा रीडिंग का प्रयोग करें</i>\"।", 
+
+  "bitstream.edit.form.description.label": "विवरण", 
+
+  "bitstream.edit.form.embargo.hint": "पहला दिन जब से प्रवेश की अनुमति है। <b>इस फॉर्म पर इस तिथि को संशोधित नहीं किया जा सकता है।</b> बिटस्ट्रीम के लिए एक प्रतिबंध तिथि निर्धारित करने के लिए, <i>आइटम स्थिति</i> टैब पर जाएं, <i>प्राधिकरण...</i> पर क्लिक करें, बिटस्ट्रीम की <i>READ</i> नीति बनाएं या संपादित करें, और वांछित के रूप में <i>प्रारंभ तिथि</i> सेट करें।", 
+
+  "bitstream.edit.form.embargo.label": "विशिष्ट तिथि तक प्रतिबंध", 
+
+  "bitstream.edit.form.fileName.hint": "बिटस्ट्रीम के लिए फ़ाइल नाम बदलें। ध्यान दें कि यह प्रदर्शन बिटस्ट्रीम URL को बदल देगा, लेकिन पुराने लिंक तब तक हल होंगे जब तक अनुक्रम आईडी नहीं बदलेगा।", 
+
+  "bitstream.edit.form.fileName.label": "फ़ाइल का नाम", 
+
+  "bitstream.edit.form.iiifHeight.hint": "कैनवास की चौड़ाई आमतौर पर छवि की चौड़ाई से मेल खाना चाहिए।", 
+
+  "bitstream.edit.form.iiifHeight.label": "IIIF Canvas Height", 
+
+  "bitstream.edit.form.iiifLabel.hint": "इस छवि के लिए कैनवास लेबल। यदि प्रदान नहीं किया गया है तो डिफ़ॉल्ट लेबल का उपयोग किया जाएगा।", 
+
+  "bitstream.edit.form.iiifLabel.label": "आईआईआईएफ लेबल", 
+
+  "bitstream.edit.form.iiifToc.hint": "यहां शब्द जोड़ने से यह सामग्री श्रेणी की एक नई तालिका की शुरुआत होगी।", 
+
+  "bitstream.edit.form.iiifToc.label": "आईआईआईएफ सामग्री तालिका", 
+
+  "bitstream.edit.form.iiifWidth.hint": "कैनवास की चौड़ाई आमतौर पर छवि की चौड़ाई से मेल खाना चाहिए।", 
+
+  "bitstream.edit.form.iiifWidth.label": "आईआईआईएफ कैनवास चौड़ाई", 
+
+  "bitstream.edit.form.newFormat.hint": "फ़ाइल बनाने के लिए आपके द्वारा उपयोग किया जाने वाला एप्लिकेशन, और संस्करण संख्या (उदाहरण के लिए, \"<i>ACMESoft SuperApp संस्करण 1.5</i>\")।", 
+
+  "bitstream.edit.form.newFormat.label": "नए प्रारूप का वर्णन करें", 
+
+  "bitstream.edit.form.primaryBitstream.label": "प्राथमिक बिटस्ट्रीम", 
+
+  "bitstream.edit.form.selectedFormat.hint": "यदि प्रारूप उपरोक्त सूची में नहीं है, तो <b>उपरोक्त \"प्रारूप सूची में नहीं है\" चुनें</b> और \"नए प्रारूप का वर्णन करें\" के तहत इसका वर्णन करें।", 
+
+  "bitstream.edit.form.selectedFormat.label": "चयनित प्रारूप", 
+
+  "bitstream.edit.form.selectedFormat.unknown": "प्रारूप सूची में नहीं है", 
+
+  "bitstream.edit.notifications.error.format.title": "बिटस्ट्रीम के प्रारूप को सहेजते समय एक त्रुटि हुई", 
+
+  "bitstream.edit.notifications.saved.content": "इस बिटस्ट्रीम में आपके परिवर्तन सहेजे गए।", 
+
+  "bitstream.edit.notifications.saved.title": "बिटस्ट्रीम सहेजा गया", 
+
+  "bitstream.edit.return": "वापस", 
+
+  "bitstream.edit.title": "बिटस्ट्रीम संपादित करें", 
+
+  "browse.back.all-results": "सभी ब्राउज़ परिणाम", 
+
+  "browse.comcol.by.author": "लेखक द्वारा", 
+
+  "browse.comcol.by.dateissued": "जारी करने की तिथि के द्वारा", 
+
+  "browse.comcol.by.subject": "विषय द्वारा", 
+
+  "browse.comcol.by.title": "शीर्षक के द्वारा", 
+
+  "browse.comcol.head": "ब्राउज़", 
+
+  "browse.empty": "दिखाने के लिए कोई आइटम नहीं है।", 
+
+  "browse.metadata.author": "लेखक", 
+
+  "browse.metadata.author.breadcrumbs": "लेखक द्वारा ब्राउज़ करें", 
+
+  "browse.metadata.dateissued": "जारी करने की तिथि", 
+
+  "browse.metadata.dateissued.breadcrumbs": "तिथि द्वारा ब्राउज़ करें", 
+
+  "browse.metadata.subject": "विषय", 
+
+  "browse.metadata.subject.breadcrumbs": "विषय द्वारा ब्राउज़ करें", 
+
+  "browse.metadata.title": "शीर्षक", 
+
+  "browse.metadata.title.breadcrumbs": "शीर्षक द्वारा ब्राउज़ करें", 
+
+  "browse.startsWith": ", {{ startWith }} से शुरू होता है", 
+
+  "browse.startsWith.choose_start": "(प्रारंभ चुनें)", 
+
+  "browse.startsWith.choose_year": "(वर्ष चुनें)", 
+
+  "browse.startsWith.choose_year.label": "जारी करने का वर्ष चुने", 
+
+  "browse.startsWith.jump": "साल या महीने के हिसाब से नतीजे फ़िल्टर करें", 
+
+  "browse.startsWith.months.april": "अप्रैल", 
+
+  "browse.startsWith.months.august": "अगस्त", 
+
+  "browse.startsWith.months.december": "दिसंबर", 
+
+  "browse.startsWith.months.february": "फ़रवरी", 
+
+  "browse.startsWith.months.january": "जनवरी", 
+
+  "browse.startsWith.months.july": "जुलाई", 
+
+  "browse.startsWith.months.june": "जून", 
+
+  "browse.startsWith.months.march": "मार्च", 
+
+  "browse.startsWith.months.may": "मई", 
+
+  "browse.startsWith.months.none": "(महीना चुनें)", 
+
+  "browse.startsWith.months.none.label": "प्रकाशन माह चुनें", 
+
+  "browse.startsWith.months.november": "नवंबर", 
+
+  "browse.startsWith.months.october": "अक्टूबर", 
+
+  "browse.startsWith.months.september": "सितंबर", 
+
+  "browse.startsWith.submit": "ब्राउज़", 
+
+  "browse.startsWith.type_date": "दिनांक के अनुसार परिणाम फ़िल्टर करें", 
+
+  "browse.startsWith.type_date.label": "या एक तिथि (वर्ष-माह) टाइप करें और ब्राउज़ बटन पर क्लिक करें", 
+
+  "browse.startsWith.type_text": "पहले कुछ अक्षर लिखकर परिणाम फ़िल्टर करें", 
+
+  "browse.title": "{{ collection }} को {{ field }}{{ startsWith }} {{ value }} द्वारा ब्राउज़ करें\n", 
+
+  "browse.title.page": "{{ collection }} को {{ field }} {{ value }} द्वारा ब्राउज़ करना", 
+
+  "chips.remove": "चिप निकालें", 
+
+  "collection.create.head": "एक संग्रह बनाएं", 
+
+  "collection.create.notifications.success": "संग्रह सफलतापूर्वक बनाया गया", 
+
+  "collection.create.sub-head": "{{ parent }} समुदाय के लिए एक संग्रह बनाएं", 
+
+  "collection.curate.header": "क्यूरेट संग्रह: {{collection}}", 
+
+  "collection.delete.cancel": "रद्द करें", 
+
+  "collection.delete.confirm": "पुष्टि करें", 
+
+  "collection.delete.head": "संग्रह हटाएं", 
+
+  "collection.delete.notification.fail": "संग्रह हटाया नहीं जा सका", 
+
+  "collection.delete.notification.success": "संग्रह को सफलतापूर्वक हटाया गया", 
+
+  "collection.delete.processing": "हटाया जा रहा है", 
+
+  "collection.delete.text": "क्या आप वाकई \"{{ dso }}\" संग्रह हटाना चाहते हैं", 
+
+  "collection.edit.breadcrumbs": "संग्रह संपादित करें", 
+
+  "collection.edit.delete": "इस संग्रह को हटाएं", 
+
+  "collection.edit.head": "संग्रह संपादित करें", 
+
+  "collection.edit.item-mapper.cancel": "रद्द करें", 
+
+  "collection.edit.item-mapper.collection": "संग्रह: \"<b>{{name}}</b>\"", 
+
+  "collection.edit.item-mapper.confirm": "चयनित आइटम मैप करें", 
+
+  "collection.edit.item-mapper.description": "यह आइटम मैपर उपकरण है जो संग्रह प्रशासकों को इस संग्रह में अन्य संग्रह से आइटम मैप करने की अनुमति देता है। आप अन्य संग्रहों से आइटम खोज सकते हैं और उन्हें मैप कर सकते हैं, या वर्तमान में मैप किए गए आइटम की सूची ब्राउज़ कर सकते हैं।", 
+
+  "collection.edit.item-mapper.head": "आइटम मैपर - अन्य संग्रहों से आइटम मैप करें", 
+
+  "collection.edit.item-mapper.no-search": "कृपया खोजने के लिए एक प्रश्न दर्ज करें", 
+
+  "collection.edit.item-mapper.notifications.map.error.content": "{{amount}} आइटम की मैपिंग में त्रुटियां हुईं।", 
+
+  "collection.edit.item-mapper.notifications.map.error.head": "संलग्न करने में त्रुटियां", 
+
+  "collection.edit.item-mapper.notifications.map.success.content": "{{amount}} आइटम सफलतापूर्वक मैप किए गए।", 
+
+  "collection.edit.item-mapper.notifications.map.success.head": "मैपिंग पूरी हुई", 
+
+  "collection.edit.item-mapper.notifications.unmap.error.content": "{{amount}} आइटम की मैपिंग निकालने में त्रुटियां हुईं।", 
+
+  "collection.edit.item-mapper.notifications.unmap.error.head": "मैपिंग त्रुटियां हटाएं", 
+
+  "collection.edit.item-mapper.notifications.unmap.success.content": "{{amount}} आइटम की मैपिंग सफलतापूर्वक निकाल दी गई।", 
+
+  "collection.edit.item-mapper.notifications.unmap.success.head": "मैपिंग हटाना पूर्ण हुआ", 
+
+  "collection.edit.item-mapper.remove": "चयनित आइटम मैपिंग हटाएं", 
+
+  "collection.edit.item-mapper.search-form.placeholder": "आइटम खोजें...", 
+
+  "collection.edit.item-mapper.tabs.browse": "मैप किए गए आइटम ब्राउज़ करें", 
+
+  "collection.edit.item-mapper.tabs.map": "नए आइटम मैप करें", 
+
+  "collection.edit.item.authorizations.load-bundle-button": "और बंडल लोड करें", 
+
+  "collection.edit.item.authorizations.load-more-button": "और लोड करें", 
+
+  "collection.edit.item.authorizations.show-bitstreams-button": "बंडल के लिए बिटस्ट्रीम नीतियां दिखाएं", 
+
+  "collection.edit.logo.delete-undo.title": "हटाना रद्द करें ", 
+
+  "collection.edit.logo.delete.title": "चिन्ह हटाएं", 
+
+  "collection.edit.logo.label": "संग्रह चिन्ह", 
+
+  "collection.edit.logo.notifications.add.error": "संग्रह लोगो अपलोड करना विफल रहा। कृपया पुनः प्रयास करने से पहले सामग्री को सत्यापित करें।", 
+
+  "collection.edit.logo.notifications.add.success": "संग्रह चिन्ह को सफलतापूर्वक अपलोड हुआ। ", 
+
+  "collection.edit.logo.notifications.delete.error.title": "चिन्ह हटाने में त्रुटि", 
+
+  "collection.edit.logo.notifications.delete.success.content": "संग्रह चिन्ह सफलतापूर्वक हटा दिया गया", 
+
+  "collection.edit.logo.notifications.delete.success.title": "चिन्ह हटा दिया गया", 
+
+  "collection.edit.logo.upload": "अपलोड करने के लिए संग्रह लोगो छोड़ें", 
+
+  "collection.edit.notifications.success": "संग्रह को सफलतापूर्वक संपादित किया गया", 
+
+  "collection.edit.return": "वापस", 
+
+  "collection.edit.tabs.authorizations.head": "प्राधिकरण", 
+
+  "collection.edit.tabs.authorizations.title": "संग्रह संपादन - प्राधिकरण", 
+
+  "collection.edit.tabs.curate.head": "क्यूरेट", 
+
+  "collection.edit.tabs.curate.title": "संग्रह संपादन - क्यूरेट", 
+
+  "collection.edit.tabs.item-mapper.title": "संग्रह संपादन - आइटम मैपर", 
+
+  "collection.edit.tabs.mapper.head": "आइटम मैपर", 
+
+  "collection.edit.tabs.metadata.head": "मेटाडेटा संपादित करें", 
+
+  "collection.edit.tabs.metadata.title": "संग्रह संपादन के लिए मेटाडेटा", 
+
+  "collection.edit.tabs.roles.head": "भूमिकाएँ निर्दिष्ट करें", 
+
+  "collection.edit.tabs.roles.title": "संग्रह संपादन - भूमिकाएं", 
+
+  "collection.edit.tabs.source.external": "यह संग्रह अपनी सामग्री को बाहरी स्रोत से एकत्रित करता है", 
+
+  "collection.edit.tabs.source.form.errors.oaiSource.required": "आपको लक्ष्य संग्रह की एक निर्धारित आईडी प्रदान करनी होगी।", 
+
+  "collection.edit.tabs.source.form.harvestType": "सामग्री हार्वेस्ट की जा रही है  ", 
+
+  "collection.edit.tabs.source.form.head": "बाहरी स्रोत कॉन्फ़िगर करें", 
+
+  "collection.edit.tabs.source.form.metadataConfigId": "मेटाडेटा प्रारूप", 
+
+  "collection.edit.tabs.source.form.oaiSetId": "OAI specific set id", 
+
+  "collection.edit.tabs.source.form.oaiSource": "OAI प्रदाता", 
+
+  "collection.edit.tabs.source.form.options.harvestType.METADATA_AND_BITSTREAMS": "हार्वेस्ट मेटाडेटा और बिटस्ट्रीम (ORE समर्थन की आवश्यकता है)", 
+
+  "collection.edit.tabs.source.form.options.harvestType.METADATA_AND_REF": "हार्वेस्ट मेटाडेटा और बिटस्ट्रीम के संदर्भ (ORE समर्थन की आवश्यकता है)", 
+
+  "collection.edit.tabs.source.form.options.harvestType.METADATA_ONLY": "केवल मेटाडेटा प्राप्त करें", 
+
+  "collection.edit.tabs.source.head": "सामग्री स्रोत", 
+
+  "collection.edit.tabs.source.notifications.discarded.content": "आपके परिवर्तन खारिज कर दिए गए थे। अपने परिवर्तनों को बहाल करने के लिए 'पूर्ववत करें' बटन पर क्लिक करें", 
+
+  "collection.edit.tabs.source.notifications.discarded.title": "परिवर्तन रद्द किये गए", 
+
+  "collection.edit.tabs.source.notifications.invalid.content": "आपके परिवर्तन सहेजे नहीं गए थे। कृपया सुनिश्चित करें कि आपके द्वारा सहेजने से पहले सभी फ़ील्ड मान्य हैं।", 
+
+  "collection.edit.tabs.source.notifications.invalid.title": "अमान्य मेटाडेटा ", 
+
+  "collection.edit.tabs.source.notifications.saved.content": "इस संग्रह के सामग्री स्रोत में आपके परिवर्तन सहेजे गए थे।", 
+
+  "collection.edit.tabs.source.notifications.saved.title": "सामग्री स्रोत सहेजा गया", 
+
+  "collection.edit.tabs.source.title": "संग्रह संपादन के लिए सामग्री स्रोत", 
+
+  "collection.edit.template.add-button": "जोड़ें", 
+
+  "collection.edit.template.breadcrumbs": "टेम्पलेट आइटम", 
+
+  "collection.edit.template.cancel": "रद्द करें", 
+
+  "collection.edit.template.delete-button": "हटाएं", 
+
+  "collection.edit.template.edit-button": "संपादित करें", 
+
+  "collection.edit.template.error": "टेम्पलेट आइटम प्राप्त करने में त्रुटि हुई", 
+
+  "collection.edit.template.head": "संग्रह के लिए टेम्पलेट आइटम संपादित करें \"{{ collection }}\"", 
+
+  "collection.edit.template.label": "टेम्पलेट आइटम", 
+
+  "collection.edit.template.loading": "टेम्प्लेट आइटम लोड हो रहा है...", 
+
+  "collection.edit.template.notifications.delete.error": "आइटम टेम्पलेट हटाने में विफल", 
+
+  "collection.edit.template.notifications.delete.success": "आइटम टेम्प्लेट को सफलतापूर्वक हटाया गया", 
+
+  "collection.edit.template.title": "आइटम संपादन टेम्पलेट", 
+
+  "collection.form.abstract": "संक्षिप्त वर्णन", 
+
+  "collection.form.description": "परिचयात्मक पाठ (एचटीएमएल)", 
+
+  "collection.form.entityType": "इकाई प्रकार", 
+
+  "collection.form.errors.title.required": "कृपया संग्रह का नाम दर्ज करें ", 
+
+  "collection.form.license": "अनुज्ञाप‍त्र", 
+
+  "collection.form.provenance": "उत्पत्ति", 
+
+  "collection.form.rights": "कॉपीराइट टेक्स्ट (एचटीएमएल)", 
+
+  "collection.form.tableofcontents": "समाचार (एचटीएमएल)", 
+
+  "collection.form.title": "नाम", 
+
+  "collection.listelement.badge": "संग्रह", 
+
+  "collection.page.browse.recent.empty": "दिखाने के लिए कोई आइटम नहीं", 
+
+  "collection.page.browse.recent.head": "हाल की प्रस्तुतियाँ", 
+
+  "collection.page.edit": "इस संग्रह को संपादित करें", 
+
+  "collection.page.handle": "इस संग्रह के लिए स्थायी यूआरआई (URI)", 
+
+  "collection.page.license": "अनुज्ञाप‍त्र", 
+
+  "collection.page.license (Copy)": "अनुज्ञाप‍त्र", 
+
+  "collection.page.news": "समाचार", 
+
+  "collection.select.confirm": "चयनित होने की पुष्टि करें", 
+
+  "collection.select.empty": "दिखाने के लिए कोई संग्रह नहीं है", 
+
+  "collection.select.table.title": "शीर्षक", 
+
+  "collection.source.controls.harvest.last": "पिछला हार्वेस्ट:", 
+
+  "collection.source.controls.harvest.message": "Harvest info:", 
+
+  "collection.source.controls.harvest.no-information": "लागू नहीं", 
+
+  "collection.source.controls.harvest.start": "हार्वेस्ट शुरू होने का समय:", 
+
+  "collection.source.controls.harvest.status": "हार्वेस्ट स्थिति:", 
+
+  "collection.source.controls.head": "हार्वेस्ट नियंत्रण", 
+
+  "collection.source.controls.import.completed": "आयात पूरा हुआ", 
+
+  "collection.source.controls.import.failed": "आयात के दौरान एक त्रुटि हुई", 
+
+  "collection.source.controls.import.running": "आयात किया जा रहा है...", 
+
+  "collection.source.controls.import.submit": "अभी आयात करें", 
+
+  "collection.source.controls.import.submit.error": "आयात शुरू करने में कुछ गलत हुआ", 
+
+  "collection.source.controls.import.submit.success": "आयात सफलतापूर्वक शुरू कर दिया गया है", 
+
+  "collection.source.controls.reset.completed": "रीसेट और पुनः आयात पूरा हुआ", 
+
+  "collection.source.controls.reset.failed": "रीसेट और पुन: आयात के दौरान एक त्रुटि हुई", 
+
+  "collection.source.controls.reset.running": "रीसेट किया जा रहा है और फिर से आयात किया जा रहा है...", 
+
+  "collection.source.controls.reset.submit": "रीसेट करें और पुनः आयात करें", 
+
+  "collection.source.controls.reset.submit.error": "रीसेट शुरू करने और पुन: आयात करने में कुछ गलत हुआ", 
+
+  "collection.source.controls.reset.submit.success": "रीसेट और पुनः आयात सफलतापूर्वक शुरू किया गया है", 
+
+  "collection.source.controls.test.completed": "सेटिंग्स का परीक्षण करने के लिए स्क्रिप्ट सफलतापूर्वक समाप्त हो गई है", 
+
+  "collection.source.controls.test.failed": "सेटिंग्स का परीक्षण करने की स्क्रिप्ट विफल हो गई है", 
+
+  "collection.source.controls.test.running": "Testing configuration...", 
+
+  "collection.source.controls.test.submit": "परीक्षण विन्यास", 
+
+  "collection.source.controls.test.submit.error": "सेटिंग्स का परीक्षण शुरू करने में कुछ गलत हुआ", 
+
+  "collection.source.update.notifications.error.content": "प्रदान की गई सेटिंग्स का परीक्षण किया गया है और काम नहीं किया है।", 
+
+  "collection.source.update.notifications.error.title": "सर्वर त्रुटि", 
+
+  "comcol-role.edit.bitstream_read.anonymous-group": "आने वाली बिटस्ट्रीम के लिए डिफ़ॉल्ट पठन वर्तमान में बेनामी पर सेट है।", 
+
+  "comcol-role.edit.bitstream_read.description": "सामुदायिक प्रशासक उप-समुदाय या संग्रह बना सकते हैं, और उन उप-समुदायों या संग्रहों के लिए प्रबंधन या प्रबंधन सौंप सकते हैं। इसके अलावा, वे तय करते हैं कि कौन किसी भी उप-संग्रह में आइटम प्रस्तुत कर सकता है, आइटम मेटाडेटा (प्रस्तुति के बाद) संपादित कर सकता है, और अन्य संग्रहों (प्राधिकरण के अधीन) से मौजूदा आइटम जोड़ सकता है (मैप)।", 
+
+  "comcol-role.edit.bitstream_read.name": "डिफ़ॉल्ट बिटस्ट्रीम पठन पहुंच", 
+
+  "comcol-role.edit.collection-admin.description": "संग्रह व्यवस्थापक यह तय करते हैं कि संग्रह में आइटम कौन प्रस्तुत कर सकता है, आइटम मेटाडेटा संपादित कर सकता है (प्रस्तुति के बाद), और अन्य संग्रह से मौजूदा आइटम को इस संग्रह में जोड़ सकता है (उस संग्रह के लिए प्राधिकरण के अधीन)।", 
+
+  "comcol-role.edit.collection-admin.name": "व्यवस्थापक", 
+
+  "comcol-role.edit.community-admin.description": "सामुदायिक प्रशासक उप-समुदाय या संग्रह बना सकते हैं, और उन उप-समुदायों या संग्रहों के लिए प्रबंधन या प्रबंधन नियुक्त कर सकते हैं। इसके अलावा, वे तय करते हैं कि कौन किसी भी उप-संग्रह में आइटम प्रस्तुत कर सकता है, आइटम मेटाडेटा (सबमिशन के बाद) संपादित कर सकता है, और अन्य संग्रहों (प्राधिकरण के अधीन) से मौजूदा आइटम जोड़ सकता है (मैप)।", 
+
+  "comcol-role.edit.community-admin.name": "व्यवस्थापक", 
+
+  "comcol-role.edit.create": "बनाएं", 
+
+  "comcol-role.edit.create.error.title": "'{{ role }}' भूमिका के लिए समूह बनाने में विफल", 
+
+  "comcol-role.edit.delete": "हटाएं", 
+
+  "comcol-role.edit.delete.error.title": "'{{ role }}' भूमिका के समूह को हटाने में विफल", 
+
+  "comcol-role.edit.editor.description": "संपादक आने वाले प्रस्तुतियों के मेटाडेटा को संपादित करने में सक्षम हैं, और फिर उन्हें स्वीकार या अस्वीकार कर सकते हैं।", 
+
+  "comcol-role.edit.editor.name": "संपादक", 
+
+  "comcol-role.edit.finaleditor.description": "अंतिम संपादक आने वाले प्रस्तुति के मेटाडेटा को संपादित करने में सक्षम हैं, लेकिन उन्हें अस्वीकार नहीं कर पाएंगे।", 
+
+  "comcol-role.edit.finaleditor.name": "अंतिम संपादक", 
+
+  "comcol-role.edit.item_read.anonymous-group": "आने वाली वस्तुओं के लिए मानक पठन वर्तमान में बेनामी पर सेट है।", 
+
+  "comcol-role.edit.item_read.description": "ई-लोग और समूह जो इस संग्रह में प्रस्तुत किए गए नए आइटम पढ़ सकते हैं। इस भूमिका में परिवर्तन पूर्वव्यापी नहीं हैं। सिस्टम में मौजूदा आइटम अभी भी उन लोगों द्वारा देखे जा सकेंगे जिनके पास जोड़ने के समय पढ़ने की पहुंच थी।", 
+
+  "comcol-role.edit.item_read.name": "डिफ़ॉल्ट आइटम पढ़ने की अनुमति", 
+
+  "comcol-role.edit.no-group": "कोई भी नहीं", 
+
+  "comcol-role.edit.restrict": "प्रतिबंधित करें", 
+
+  "comcol-role.edit.reviewer.description": "समीक्षक आने वाली प्रस्तुतियाँ स्वीकार या अस्वीकार करने में सक्षम हैं। हालांकि, वे प्रस्तुति के मेटाडेटा को संपादित करने में सक्षम नहीं हैं।", 
+
+  "comcol-role.edit.reviewer.name": "समीक्षक", 
+
+  "comcol-role.edit.submitters.description": "ई-व्यक्ति और समूह जिनके पास इस संग्रह में नए आइटम जमा करने की अनुमति है।", 
+
+  "comcol-role.edit.submitters.name": "प्रस्तुतकर्ता", 
+
+  "community.all-lists.head": "उपसमुदाय और संग्रह", 
+
+  "community.create.head": "समुदाय बनाएं", 
+
+  "community.create.notifications.success": "समुदाय सफलतापूर्वक बनाया गया", 
+
+  "community.create.sub-head": "{{parent }} समुदाय के लिए एक उप-समुदाय बनाएं", 
+
+  "community.curate.header": "क्यूरेट समुदाय: {{community}}", 
+
+  "community.delete.cancel": "रद्द करें", 
+
+  "community.delete.confirm": "पुष्टि करें", 
+
+  "community.delete.head": "समुदाय हटाएं", 
+
+  "community.delete.notification.fail": "समुदाय हटाया नहीं जा सका", 
+
+  "community.delete.notification.success": "समुदाय को सफलतापूर्वक हटाया गया", 
+
+  "community.delete.processing": "हटाया जा रहा है...", 
+
+  "community.delete.text": "क्या आप वाकई \"{{dso }}\" समुदाय को हटाना चाहते हैं?", 
+
+  "community.edit.breadcrumbs": "समुदाय संपादित करें", 
+
+  "community.edit.delete": "इस समुदाय को हटाएं", 
+
+  "community.edit.head": "समुदाय संपादित करें", 
+
+  "community.edit.logo.delete-undo.title": "हटाना पूर्ववत करें", 
+
+  "community.edit.logo.delete.title": "चिन्ह हटाएं", 
+
+  "community.edit.logo.label": "समुदाय चिन्ह", 
+
+  "community.edit.logo.notifications.add.error": "समुदाय का लोगो अपलोड करना विफल रहा। कृपया पुनः प्रयास करने से पहले सामग्री को सत्यापित करें।", 
+
+  "community.edit.logo.notifications.add.success": "समुदाय का चिन्ह अपलोड करना सफल रहा|", 
+
+  "community.edit.logo.notifications.delete.error.title": "चिन्ह हटाने में त्रुटि", 
+
+  "community.edit.logo.notifications.delete.success.content": "समुदाय का चिन्ह सफलतापूर्वक हटा दिया गया", 
+
+  "community.edit.logo.notifications.delete.success.title": "चिन्ह हटा दिया गया", 
+
+  "community.edit.logo.upload": "अपलोड करने के लिए समुदाय का चिन्ह छोड़ें", 
+
+  "community.edit.notifications.error": "समुदाय संपादित करते समय एक त्रुटि हुई", 
+
+  "community.edit.notifications.success": "समुदाय को सफलतापूर्वक संपादित किया गया", 
+
+  "community.edit.notifications.unauthorized": "आपके पास यह परिवर्तन करने के विशेषाधिकार नहीं हैं", 
+
+  "community.edit.return": "वापस", 
+
+  "community.edit.tabs.authorizations.head": "अनुज्ञा", 
+
+  "community.edit.tabs.authorizations.title": "समुदाय संपादन - प्राधिकरण", 
+
+  "community.edit.tabs.curate.head": "क्यूरेट", 
+
+  "community.edit.tabs.curate.title": "समुदाय संपादन - क्यूरेट ", 
+
+  "community.edit.tabs.metadata.head": "मेटाडेटा संपादित करें", 
+
+  "community.edit.tabs.metadata.title": "समुदाय संपादन - मेटाडेटा", 
+
+  "community.edit.tabs.roles.head": "भूमिकाएँ निर्दिष्ट करें", 
+
+  "community.edit.tabs.roles.title": "समुदाय संपादन - भूमिकाएँ ", 
+
+  "community.form.abstract": "संक्षिप्त वर्णन", 
+
+  "community.form.description": "परिचयात्मक पाठ (एचटीएमएल)", 
+
+  "community.form.errors.title.required": "कृपया समुदाय का नाम दर्ज करें", 
+
+  "community.form.rights": "कॉपीराइट टेक्स्ट (एचटीएमएल)", 
+
+  "community.form.tableofcontents": "समाचार (एचटीएमएल)", 
+
+  "community.form.title": "नाम", 
+
+  "community.listelement.badge": "समुदाय", 
+
+  "community.page.edit": "इस समुदाय को संपादित करें", 
+
+  "community.page.handle": "इस समुदाय के लिए स्थायी यूआरआई (URI)", 
+
+  "community.page.license": "अनुज्ञाप‍त्र", 
+
+  "community.page.news": "समाचार", 
+
+  "community.sub-collection-list.head": "इस समुदाय के संग्रह", 
+
+  "community.sub-community-list.head": "इस समुदाय के समुदाय", 
+
+  "communityList.breadcrumbs": "समुदाय सूची", 
+
+  "communityList.showMore": "और दिखाएं", 
+
+  "communityList.tabTitle": "समुदाय सूची", 
+
+  "communityList.title": "समुदायों की सूची", 
+
+  "confirmation-modal.delete-eperson.cancel": "रद्द करें", 
+
+  "confirmation-modal.delete-eperson.confirm": "हटाएं", 
+
+  "confirmation-modal.delete-eperson.header": "\"{{ dsoName }}\" ई-व्यक्ति हटाएं", 
+
+  "confirmation-modal.delete-eperson.info": "क्या आप वाकई ई-व्यक्ति \"{{dsoName}}\" को हटाना चाहते हैं", 
+
+  "confirmation-modal.delete-profile.cancel": "रद्द करें", 
+
+  "confirmation-modal.delete-profile.confirm": "हटाएं", 
+
+  "confirmation-modal.delete-profile.header": "प्रोफ़ाइल हटाएं", 
+
+  "confirmation-modal.delete-profile.info": "क्या आप वाकई अपनी प्रोफ़ाइल हटाना चाहते हैं", 
+
+  "confirmation-modal.export-metadata.cancel": "रद्द करें", 
+
+  "confirmation-modal.export-metadata.confirm": "निर्यात करें", 
+
+  "confirmation-modal.export-metadata.header": "{{ dsoName }} के लिए मेटाडेटा निर्यात करें", 
+
+  "confirmation-modal.export-metadata.info": "क्या आप वाकई {{ dsoName }} के लिए मेटाडेटा निर्यात करना चाहते हैं", 
+
+  "cookies.consent.accept-all": "सभी स्वीकार करें", 
+
+  "cookies.consent.accept-selected": "चयनित को स्वीकार करें", 
+
+  "cookies.consent.app.description.acknowledgement": "आपकी पावती और सहमति को सहेजने के लिए आवश्यक", 
+
+  "cookies.consent.app.description.authentication": "आपको साइन इन करने के लिए आवश्यक", 
+
+  "cookies.consent.app.description.google-analytics": "हमें सांख्यिकीय जानकारी पर नज़र रखने की अनुमति देता है", 
+
+  "cookies.consent.app.description.preferences": "आपकी प्राथमिकताएं सहेजने के लिए आवश्यक", 
+
+  "cookies.consent.app.opt-out.description": "यह ऐप डिफ़ॉल्ट रूप से लोड होता है (लेकिन आप ऑप्ट आउट कर सकते हैं)", 
+
+  "cookies.consent.app.opt-out.title": "(बाहर निकलें)", 
+
+  "cookies.consent.app.purpose": "उद्देश्य", 
+
+  "cookies.consent.app.required.description": "यह एप्लिकेशन हमेशा आवश्यक है", 
+
+  "cookies.consent.app.required.title": "(हमेशा आवश्यक)", 
+
+  "cookies.consent.app.title.acknowledgement": "स्वीकृति", 
+
+  "cookies.consent.app.title.authentication": "प्रमाणीकरण", 
+
+  "cookies.consent.app.title.google-analytics": "गूगल एनालिटिक्स", 
+
+  "cookies.consent.app.title.preferences": "प्राथमिकताएं", 
+
+  "cookies.consent.close": "बंद करें", 
+
+  "cookies.consent.content-modal.description": "यहां आप हमारे द्वारा आपके बारे में एकत्रित की गई जानकारी को देख और अनुकूलित कर सकते हैं।", 
+
+  "cookies.consent.content-modal.privacy-policy.name": "गोपनीयता नीति", 
+
+  "cookies.consent.content-modal.privacy-policy.text": "अधिक जानने के लिए, हमारी {privacyPolicy} पढ़ें।", 
+
+  "cookies.consent.content-modal.title": "जानकारी जो हम एकत्र करते हैं", 
+
+  "cookies.consent.content-notice.description": "हम निम्नलिखित उद्देश्यों के लिए आपकी व्यक्तिगत जानकारी एकत्र और संसाधित करते हैं: <strong>प्रमाणीकरण, प्राथमिकताएं, पावती और सांख्यिकी</strong>। <br/> अधिक जानने के लिए, कृपया हमारी {privacyPolicy} पढ़ें।", 
+
+  "cookies.consent.content-notice.description.no-privacy": "हम निम्नलिखित उद्देश्यों के लिए आपकी व्यक्तिगत जानकारी एकत्र और संसाधित करते हैं: <strong>प्रमाणीकरण, प्राथमिकताएं, पावती और सांख्यिकी</strong>।", 
+
+  "cookies.consent.content-notice.learnMore": "अनुकूलित करें", 
+
+  "cookies.consent.decline": "अस्वीकार", 
+
+  "cookies.consent.purpose.functional": "कार्यात्मक", 
+
+  "cookies.consent.purpose.statistical": "सांख्यिकीय", 
+
+  "cookies.consent.update": "आपकी पिछली विज़िट के बाद से परिवर्तन हुए हैं, कृपया अपनी सहमति अपडेट करें।", 
+
+  "curation-task.task.checklinks.label": "मेटाडेटा में लिंक जांचें", 
+
+  "curation-task.task.noop.label": "NOOP", 
+
+  "curation-task.task.profileformats.label": "प्रोफ़ाइल बिटस्ट्रीम प्रारूप", 
+
+  "curation-task.task.requiredmetadata.label": "आवश्यक मेटाडेटा की जाँच करें", 
+
+  "curation-task.task.translate.label": "माइक्रोसॉफ्ट अनुवादक", 
+
+  "curation-task.task.vscan.label": "वायरस जाँच", 
+
+  "curation.form.handle.hint": "संकेत: पूरी साइट पर कार्य चलाने के लिए [your-handle-prefix]/0 दर्ज करें (सभी कार्य इस क्षमता का समर्थन नहीं करते हैं)", 
+
+  "curation.form.handle.label": "हैंडल:", 
+
+  "curation.form.submit": "शुरू करें", 
+
+  "curation.form.submit.error.content": "क्यूरेशन कार्य प्रारंभ करने का प्रयास करते समय कोई त्रुटि उत्पन्न हुई।", 
+
+  "curation.form.submit.error.head": "क्यूरेशन टास्क चलाना विफल रहा", 
+
+  "curation.form.submit.error.invalid-handle": "इस ऑब्जेक्ट के लिए हैंडल निर्धारित नहीं किया जा सका", 
+
+  "curation.form.submit.success.content": "आपको संबंधित प्रक्रिया पृष्ठ पर पुनः निर्देशित किया जाएगा।", 
+
+  "curation.form.submit.success.head": "क्यूरेशन कार्य सफलतापूर्वक शुरू किया गया है", 
+
+  "curation.form.task-select.label": "कार्य:", 
+
+  "default-relationships.search.results.head": "खोज के परिणाम", 
+
+  "default.search.results.head": "खोज के परिणाम", 
+
+  "deny-request-copy.email.message": "प्रिय {{ recipientName }}, \nआपके अनुरोध के प्रत्युत्तर में मुझे आपको यह बताते हुए खेद हो रहा है कि आपके द्वारा अनुरोधित फ़ाइल (फ़ाइलों) की एक प्रति, दस्तावेज़ के संबंध में भेजना संभव नहीं है: \"{{itemUrl }}\" ({{itemName }}), जिनमें से मैं एक लेखक हूँ।\n\nसाभार, \n{{ authorName }} <{{ authorEmail }}>", 
+
+  "deny-request-copy.email.subject": "दस्तावेज़ की प्रति का अनुरोध करें", 
+
+  "deny-request-copy.error": "त्रुटि पाई गई", 
+
+  "deny-request-copy.header": "दस्तावेज़ की प्रतिलिपि अनुरोध अस्वीकार करें", 
+
+  "deny-request-copy.intro": "यह संदेश अनुरोध के आवेदक को भेजा जाएगा", 
+
+  "deny-request-copy.success": "आइटम अनुरोध को सफलतापूर्वक अस्वीकार कर दिया गया", 
+
+  "dso-selector.claim.item.body": "ये मौजूदा प्रोफ़ाइल हैं जो आपसे संबंधित हो सकती हैं। यदि आप इनमें से किसी एक प्रोफाइल में खुद को पहचानते हैं, तो इसे चुनें और विवरण पृष्ठ पर, विकल्पों में से, इसका दावा करना चुनें। अन्यथा आप नीचे दिए गए बटन का उपयोग करके नए सिरे से एक नई प्रोफ़ाइल बना सकते हैं।", 
+
+  "dso-selector.claim.item.create-from-scratch": "नया बनाएँ", 
+
+  "dso-selector.claim.item.head": "प्रोफाइल टिप्स", 
+
+  "dso-selector.claim.item.not-mine-label": "इनमें से कोई भी मेरा नहीं है", 
+
+  "dso-selector.create.collection.head": "नया संग्रह", 
+
+  "dso-selector.create.collection.sub-level": "में नया संग्रह बनाएं", 
+
+  "dso-selector.create.community.head": "नया समुदाय", 
+
+  "dso-selector.create.community.sub-level": "में नया समुदाय बनाएं", 
+
+  "dso-selector.create.community.top-level": "नया शीर्ष-स्तरीय समुदाय बनाएं", 
+
+  "dso-selector.create.item.head": "नया आइटम", 
+
+  "dso-selector.create.item.sub-level": "में नया आइटम बनाएं", 
+
+  "dso-selector.create.submission.head": "नवीन प्रस्तुतीकरण", 
+
+  "dso-selector.edit.collection.head": "संग्रह संपादित करें", 
+
+  "dso-selector.edit.community.head": "समुदाय संपादित करें", 
+
+  "dso-selector.edit.item.head": "आइटम संपादित करें", 
+
+  "dso-selector.error.title": "{{type }} खोजने में त्रुटि हुई", 
+
+  "dso-selector.export-metadata.dspaceobject.head": "से मेटाडेटा निर्यात करें", 
+
+  "dso-selector.no-results": "{{ type }} नहीं मिला", 
+
+  "dso-selector.placeholder": "{{ type }} खोजें", 
+
+  "dso-selector.select.collection.head": "संग्रह का चयन करें", 
+
+  "dso-selector.set-scope.community.button": "संपूर्ण डीस्पेस में खोजें ", 
+
+  "dso-selector.set-scope.community.head": "खोज का दायरा चुनें", 
+
+  "dso-selector.set-scope.community.input-header": "समुदाय या संग्रह के लिए खोजें", 
+
+  "dso.name.untitled": "शीर्षकहीन", 
+
+  "error-page.description.401": "अनधिकृत", 
+
+  "error-page.description.403": "अनधिकृत", 
+
+  "error-page.description.404": "पृष्ठ नहीं मिला", 
+
+  "error-page.description.500": "सेवा उप्लब्ध् नहीं है", 
+
+  "error-page.orcid.generic-error": "ORCID के माध्यम से लॉगिन के दौरान एक त्रुटि हुई। सुनिश्चित करें कि आपने अपना ORCID खाता ईमेल पता डीस्पेस के साथ साझा किया है। यदि त्रुटि बनी रहती है, तो व्यवस्थापक से संपर्क करें", 
+
+  "error.bitstream": "बिटस्ट्रीम लाने में त्रुटि", 
+
+  "error.browse-by": "आइटम लाने में त्रुटि", 
+
+  "error.collection": "संग्रह लाने में त्रुटि", 
+
+  "error.collections": "संग्रह लाने में त्रुटि", 
+
+  "error.community": "समुदाय लाने में त्रुटि", 
+
+  "error.default": "त्रुटि", 
+
+  "error.identifier": "पहचानकर्ता के लिए कोई आइटम नहीं मिला", 
+
+  "error.invalid-search-query": "खोज क्वेरी मान्य नहीं है. कृपया इस त्रुटि के बारे में अधिक जानकारी के लिए <a href=\"https://solr.apache.org/guide/query-syntax-and-parsing.html\" target=\"_blank\">Solr query syntax</a> सर्वोत्तम अभ्यास देखें .", 
+
+  "error.item": "आइटम लाने में त्रुटि", 
+
+  "error.items": "आइटम लाने में त्रुटि", 
+
+  "error.objects": "मदो को लाने में त्रुटि", 
+
+  "error.recent-submissions": "हाल ही की प्रस्तुतियां लाने में त्रुटि", 
+
+  "error.search-results": "खोज परिणाम लाने में त्रुटि", 
+
+  "error.sub-collections": "उप-संग्रह लाने में त्रुटि", 
+
+  "error.sub-communities": "उप-समुदाय लाने में त्रुटि", 
+
+  "error.submission.sections.init-form-error": "अनुभाग आरंभीकरण के दौरान त्रुटि हुई, कृपया अपने निविष्ट-फॉर्म विन्यास की जाँच करें। विवरण नीचे हैं: <br> <br>  ", 
+
+  "error.top-level-communities": "शीर्ष-स्तरीय समुदायों को लाने में त्रुटि", 
+
+  "error.validation.emailTaken": "यह ई - मेल पहले ही लिया जा चुका हैं", 
+
+  "error.validation.filerequired": "फ़ाइल अपलोड अनिवार्य है", 
+
+  "error.validation.groupExists": "यह समूह पहले से मौजूद है", 
+
+  "error.validation.license.notgranted": "अपना प्रस्तुतीकरण पूरा करने के लिए आपको यह अनुज्ञापत्र देना होगा। यदि आप इस समय यह अनुज्ञापत्र देने में असमर्थ हैं तो आप अपना काम सहेज सकते हैं और बाद में वापस आ सकते हैं या प्रस्तुतीकरण हटा सकते हैं।", 
+
+  "error.validation.NotValidEmail": "यह ई-मेल वैध ईमेल नहीं है", 
+
+  "error.validation.pattern": "यह इनपुट वर्तमान ढांचे द्वारा प्रतिबंधित है: {{ pattern }}.", 
+
+  "error.validation.required": "यह फ़ील्ड आवश्यक है", 
+
+  "feed.description": "सिंडिकेशन फ़ीड", 
+
+  "file-section.error.header": "इस मद के लिए फ़ाइलें प्राप्त करने में त्रुटि", 
+
+  "footer.copyright": "कॉपीराइट © 2002-{{ year }}", 
+
+  "footer.link.cookies": "कुकी सेटिंग", 
+
+  "footer.link.dspace": "डीस्पेस सॉफ्टवेयर", 
+
+  "footer.link.end-user-agreement": "अंतिम उपयोगकर्ता समझौता", 
+
+  "footer.link.feedback": "प्रतिक्रिया भेजें", 
+
+  "footer.link.lyrasis": "लाइरासिस", 
+
+  "footer.link.privacy-policy": "गोपनीयता नीति", 
+
+  "forgot-email.form.email": "ईमेल पता *", 
+
+  "forgot-email.form.email.error.pattern": "कृपया एक मान्य ईमेल पता भरें", 
+
+  "forgot-email.form.email.error.required": "कृपया ईमेल पता भरें", 
+
+  "forgot-email.form.email.hint": "आगे के निर्देशों के साथ इस पते पर एक ईमेल भेजा जाएगा।", 
+
+  "forgot-email.form.error.content": "निम्नलिखित ईमेल पते से जुड़े खाते के लिए पासवर्ड रीसेट करने का प्रयास करते समय एक त्रुटि हुई: {{ email }}", 
+
+  "forgot-email.form.error.head": "पासवर्ड रीसेट करने का प्रयास करते समय त्रुटि", 
+
+  "forgot-email.form.header": "पासवर्ड भूल गए", 
+
+  "forgot-email.form.info": "खाते से संबद्ध ईमेल पता दर्ज करें।", 
+
+  "forgot-email.form.submit": "पासवर्ड रीसेट", 
+
+  "forgot-email.form.success.content": "{{email}} को एक विशेष यूआरएल और अन्य निर्देशों के साथ एक ईमेल भेजा गया है।", 
+
+  "forgot-email.form.success.head": "पासवर्ड रीसेट ईमेल भेजा गया", 
+
+  "forgot-password.form.card.security": "सुरक्षा", 
+
+  "forgot-password.form.error.empty-password": "कृपया नीचे दिए गए बॉक्स में पासवर्ड दर्ज करें।", 
+
+  "forgot-password.form.error.matching-passwords": "पासवर्ड एक - दूसरे से मिलते - जुलते नहीं हैं।", 
+
+  "forgot-password.form.error.password-length": "पासवर्ड कम से कम 6 अक्षर लंबा होना चाहिए।", 
+
+  "forgot-password.form.head": "पासवर्ड भूल गए", 
+
+  "forgot-password.form.identification.email": "ईमेल पता:", 
+
+  "forgot-password.form.identification.header": "पहचान", 
+
+  "forgot-password.form.info": "नीचे दिए गए बॉक्स में एक नया पासवर्ड दर्ज करें, और दूसरे बॉक्स में फिर से टाइप करके इसकी पुष्टि करें। यह कम से कम छह वर्ण लंबा होना चाहिए।", 
+
+  "forgot-password.form.label.password": "पासवर्ड", 
+
+  "forgot-password.form.label.passwordrepeat": "पुष्टि करने के लिए फिर से लिखें", 
+
+  "forgot-password.form.notification.error.title": "नया पासवर्ड सबमिट करने का प्रयास करते समय त्रुटि", 
+
+  "forgot-password.form.notification.success.content": "पासवर्ड रीसेट सफल रहा। आपको बनाए गए उपयोगकर्ता के रूप में लॉग इन किया गया है।", 
+
+  "forgot-password.form.notification.success.title": "पासवर्ड रीसेट पूरा हुआ", 
+
+  "forgot-password.form.submit": "पासवर्ड सबमिट करें", 
+
+  "forgot-password.title": "पासवर्ड भूल गए", 
+
+  "form.add": "और जोड़ें", 
+
+  "form.add-help": "वर्तमान प्रविष्टि जोड़ने और दूसरी प्रविष्टि जोड़ने के लिए यहां क्लिक करें", 
+
+  "form.cancel": "रद्द करें", 
+
+  "form.clear": "साफ़ करें", 
+
+  "form.clear-help": "चयनित मान को हटाने के लिए यहां क्लिक करें", 
+
+  "form.discard": "खारिज करें", 
+
+  "form.drag": "खींचें (Drag)", 
+
+  "form.edit": "संपादित करें", 
+
+  "form.edit-help": "चयनित मान संपादित करने के लिए यहां क्लिक करें", 
+
+  "form.first-name": "प्रथम नाम", 
+
+  "form.group-collapse": "संक्षिप्त करें", 
+
+  "form.group-collapse-help": "संक्षिप्त करने के लिए यहां क्लिक करें", 
+
+  "form.group-expand": "विस्तृत करें", 
+
+  "form.group-expand-help": "विस्तार करने और अधिक तत्व जोड़ने के लिए यहां क्लिक करें", 
+
+  "form.last-name": "उपनाम", 
+
+  "form.loading": "लोड हो रहा है...", 
+
+  "form.lookup": "देखो", 
+
+  "form.lookup-help": "मौजूदा संबंध देखने के लिए यहां क्लिक करें", 
+
+  "form.no-results": "कोई परिणाम नहीं मिला", 
+
+  "form.no-value": "कोई मान दर्ज नहीं किया गया", 
+
+  "form.remove": "हटाएं", 
+
+  "form.repeatable.sort.tip": "आइटम को नई स्थिति में छोड़ें", 
+
+  "form.save": "सहेजें", 
+
+  "form.save-help": "परिवर्तन सहेजें", 
+
+  "form.search": "खोजें", 
+
+  "form.search-help": "मौजूदा पत्राचार देखने के लिए यहां क्लिक करें", 
+
+  "form.submit": "सहेजें", 
+
+  "general.back": "वापस", 
+
+  "general.cancel": "रद्द करें", 
+
+  "general.confirm": "क्या आपको यकीन है?", 
+
+  "general.destroy": "हटाएं", 
+
+  "general.edit": "संपादित करें", 
+
+  "general.new": "नया", 
+
+  "grant-deny-request-copy.deny": "कॉपी न भेजें", 
+
+  "grant-deny-request-copy.email.back": "वापस", 
+
+  "grant-deny-request-copy.email.message": "संदेश", 
+
+  "grant-deny-request-copy.email.message.empty": "कृपया संदेश दर्ज करें", 
+
+  "grant-deny-request-copy.email.permissions.info": "इन अनुरोधों का जवाब देने से बचने के लिए आप इस अवसर का उपयोग दस्तावेज़ पर पहुंच प्रतिबंधों पर पुनर्विचार करने के लिए कर सकते हैं। यदि आप रिपॉजिटरी व्यवस्थापकों से इन प्रतिबंधों को हटाने के लिए कहना चाहते हैं, तो कृपया नीचे दिए गए बॉक्स को चेक करें।", 
+
+  "grant-deny-request-copy.email.permissions.label": "ओपन एक्सेस में बदलें", 
+
+  "grant-deny-request-copy.email.send": "भेजें", 
+
+  "grant-deny-request-copy.email.subject": "विषय", 
+
+  "grant-deny-request-copy.email.subject.empty": "कृपया एक विषय दर्ज करें", 
+
+  "grant-deny-request-copy.grant": "प्रतिलिपि भेजें", 
+
+  "grant-deny-request-copy.header": "दस्तावेज़ की प्रतिलिपि अनुरोध", 
+
+  "grant-deny-request-copy.home-page": "मुझे होम पेज पर ले जाएं", 
+
+  "grant-deny-request-copy.intro1": "यदि आप <a href='{{ url }}'>{{ name }}</a> दस्तावेज़ के लेखकों में से एक हैं, तो कृपया उपयोगकर्ता के अनुरोध का जवाब देने के लिए नीचे दिए गए विकल्पों में से किसी एक का उपयोग करें।", 
+
+  "grant-deny-request-copy.intro2": "एक विकल्प चुनने के बाद, आपको एक सुझाया गया ईमेल उत्तर प्रस्तुत किया जाएगा जिसे आप संपादित कर सकते हैं।", 
+
+  "grant-deny-request-copy.processed": "यह अनुरोध पहले ही संसाधित किया जा चुका है। होम पृष्ठ पर वापस जाने के लिए आप नीचे दिए गए बटन का उपयोग कर सकते हैं।", 
+
+  "grant-request-copy.email.message": "प्रिय {{ recipientName }}, \nआपके अनुरोध के प्रत्युत्तर में मुझे आपको \"{{ itemUrl }}\" ({{itemName }}) दस्तावेज़ से संबंधित फ़ाइल(ो), जिसका मैं एक लेखक हूं, की प्रति संलग्न करते हुए प्रसन्नता हो रही है।\n\nसाभार, \n{{ authorName }} <{{ authorEmail }}>", 
+
+  "grant-request-copy.email.subject": "दस्तावेज़ की प्रति का अनुरोध करें", 
+
+  "grant-request-copy.error": "एक त्रुटि हुई", 
+
+  "grant-request-copy.header": "दस्तावेज़ कॉपी अनुरोध प्रदान करें", 
+
+  "grant-request-copy.intro": "यह संदेश अनुरोध के आवेदक को भेजा जाएगा। अनुरोधित दस्तावेज संलग्न किए जाएंगे।", 
+
+  "grant-request-copy.success": "आइटम अनुरोध सफलतापूर्वक स्वीकृत किया गया", 
+
+  "health-page.error.msg": "स्वास्थ्य जांच सेवा अस्थायी रूप से अनुपलब्ध है", 
+
+  "health-page.heading": "स्वास्थ्य", 
+
+  "health-page.info-tab": "जानकारी", 
+
+  "health-page.property.status": "स्थिति कोड", 
+
+  "health-page.section-info.app.title": "सॉफ्टवेयर बैकएंड", 
+
+  "health-page.section-info.java.title": "जावा", 
+
+  "health-page.section.db.title": "डेटाबेस", 
+
+  "health-page.section.geoIp.title": "जियोआईपी (GeoIp)", 
+
+  "health-page.section.no-issues": "कोई समस्या नहीं मिली", 
+
+  "health-page.section.solrAuthorityCore.title": "Solr: प्राधिकरण कोर", 
+
+  "health-page.section.solrOaiCore.title": "Solr: oai कोर", 
+
+  "health-page.section.solrSearchCore.title": "Solr: मूल खोज", 
+
+  "health-page.section.solrStatisticsCore.title": "Solr: सांख्यिकी कोर", 
+
+  "health-page.status": "स्थिति", 
+
+  "health-page.status-tab": "स्थिति", 
+
+  "health-page.status.error.info": "समस्याएं पाई गईं", 
+
+  "health-page.status.ok.info": "परिचालन", 
+
+  "health-page.status.warning.info": "संभावित समस्याओं का पता चला", 
+
+  "health-page.title": "स्वास्थ्य", 
+
+  "health.breadcrumbs": "स्वास्थ्य", 
+
+  "hello": "नमस्ते", 
+
+  "home.breadcrumbs": "मुख्य पृष्ठ", 
+
+  "home.description": null, 
+
+  "home.search-form.placeholder": "संग्रहालय में खोजें...", 
+
+  "home.title": "मुख्य पृष्ठ", 
+
+  "home.top-level-communities.head": "डीस्पेस में समुदाय", 
+
+  "home.top-level-communities.help": "किसी समुदाय के संग्रह ब्राउज़ करने के लिए उसे चुनें.", 
+
+  "idle-modal.extend-session": "सत्र बढ़ाएँ", 
+
+  "idle-modal.header": "सत्र जल्द ही समाप्त होगा", 
+
+  "idle-modal.info": "सुरक्षा कारणों से, उपयोगकर्ता सत्र {{timeToExpire}} मिनट की निष्क्रियता के बाद समाप्त हो जाते हैं। आपका सत्र जल्द ही समाप्त हो जाएगा। क्या आप इसे बढ़ाना चाहते हैं या लॉग आउट करना चाहते हैं?", 
+
+  "idle-modal.log-out": "लॉग आउट", 
+
+  "iiif.listelement.badge": "छवि मीडिया", 
+
+  "iiif.page.description": "विवरण: ", 
+
+  "iiif.page.doi": "स्थायी लिंक: ", 
+
+  "iiif.page.issue": "अंक: ", 
+
+  "iiif.page.titleprefix": "छवि: ", 
+
+  "iiifsearchable.listelement.badge": "दस्तावेज़ मीडिया", 
+
+  "iiifsearchable.page.description": "विवरण: ", 
+
+  "iiifsearchable.page.doi": "स्थायी लिंक:", 
+
+  "iiifsearchable.page.issue": "अंक:", 
+
+  "iiifsearchable.page.titleprefix": "दस्तावेज़: ", 
+
+  "iiifviewer.fullscreen.notice": "बेहतर देखने के लिए पूर्ण स्क्रीन का उपयोग करें।", 
+
+  "info.end-user-agreement.accept": "मैंने पढ़ लिया है और मैं अंतिम उपयोगकर्ता अनुबंध से सहमत हूं", 
+
+  "info.end-user-agreement.accept.error": "अंतिम उपयोगकर्ता अनुबंध को स्वीकार करते हुए एक त्रुटि उत्पन्न हुई", 
+
+  "info.end-user-agreement.accept.success": "अंतिम उपयोगकर्ता अनुबंध को सफलतापूर्वक अपडेट किया गया", 
+
+  "info.end-user-agreement.breadcrumbs": "अंतिम उपयोगकर्ता समझौता", 
+
+  "info.end-user-agreement.buttons.cancel": "रद्द करें", 
+
+  "info.end-user-agreement.buttons.save": "सहेजें", 
+
+  "info.end-user-agreement.head": "अंतिम उपयोगकर्ता समझौता", 
+
+  "info.end-user-agreement.title": "अंतिम उपयोगकर्ता समझौता", 
+
+  "info.feedback.breadcrumbs": "प्रतिपुष्टि", 
+
+  "info.feedback.comments": "टिप्पणियाँ", 
+
+  "info.feedback.create.success": "फ़ीडबैक सफलतापूर्वक भेजा गया!", 
+
+  "info.feedback.email_help": "इस पते का उपयोग आपकी प्रतिक्रिया पर अनुवर्ती कार्रवाई के लिए किया जाएगा।", 
+
+  "info.feedback.email-label": "तुम्हारा ईमेल", 
+
+  "info.feedback.error.email.required": "मान्य ईमेल पता जरूरी है", 
+
+  "info.feedback.error.message.required": "एक टिप्पणी आवश्यक है", 
+
+  "info.feedback.head": "प्रतिपुष्टि", 
+
+  "info.feedback.info": "डीस्पेस सिस्टम के बारे में अपनी प्रतिक्रिया साझा करने के लिए धन्यवाद। आपकी टिप्पणियों की सराहना की जाती है!", 
+
+  "info.feedback.page_help": "आपकी प्रतिक्रिया से संबंधित पेज", 
+
+  "info.feedback.page-label": "पृष्ठ", 
+
+  "info.feedback.send": "प्रतिक्रिया भेजें", 
+
+  "info.feedback.title": "प्रतिपुष्टि", 
+
+  "info.privacy.breadcrumbs": "गोपनीयता कथन", 
+
+  "info.privacy.head": "गोपनीयता वाले कथन", 
+
+  "info.privacy.title": "गोपनीयता कथन", 
+
+  "item.alerts.private": "यह आइटम खोजने योग्य नहीं है", 
+
+  "item.alerts.withdrawn": "इस मद को वापस ले लिया गया है", 
+
+  "item.badge.private": "गैर-खोज योग्य", 
+
+  "item.badge.withdrawn": "वापस लिया गया", 
+
+  "item.bitstreams.upload.bundle": "बंडल", 
+
+  "item.bitstreams.upload.bundle.new": "बंडल बनाएं", 
+
+  "item.bitstreams.upload.bundle.placeholder": "एक बंडल का चयन करें अथवा नये बंडल नाम डालें", 
+
+  "item.bitstreams.upload.bundles.empty": "इस आइटम में बिटस्ट्रीम अपलोड करने के लिए कोई बंडल नहीं है।", 
+
+  "item.bitstreams.upload.cancel": "रद्द करें", 
+
+  "item.bitstreams.upload.drop-message": "अपलोड करने के लिए एक फ़ाइल छोड़ें", 
+
+  "item.bitstreams.upload.item": "आइटम: ", 
+
+  "item.bitstreams.upload.notifications.bundle.created.content": "नया बंडल सफलतापूर्वक बनाया गया।", 
+
+  "item.bitstreams.upload.notifications.bundle.created.title": "बंडल बन गया", 
+
+  "item.bitstreams.upload.notifications.upload.failed": "अपलोड विफल रहा। कृपया पुनः प्रयास करने से पहले सामग्री को सत्यापित करें।", 
+
+  "item.bitstreams.upload.title": "बिटस्ट्रीम अपलोड करें", 
+
+  "item.edit.authorizations.heading": "इस संपादक के साथ आप किसी आइटम की नीतियों को देख और बदल सकते हैं, साथ ही अलग-अलग आइटम घटकों (बंडल और बिटस्ट्रीम) की नीतियों को बदल सकते हैं। संक्षेप में, आइटम बंडलों का कंटेनर होता है, और बंडल बिटस्ट्रीम के कंटेनर होते हैं। कंटेनर में आमतौर पर जोड़ें/निकालें/पढ़ें/लिखें नीतियां होती हैं, जबकि बिटस्ट्रीम में केवल पढ़ने/लिखने की नीतियां होती हैं।", 
+
+  "item.edit.authorizations.title": "आइटम की नीतियां संपादित करें", 
+
+  "item.edit.bitstreams.bundle.displaying": "वर्तमान में {{ total }} की {{ amount }} बिटस्ट्रीम प्रदर्शित कर रहा है।", 
+
+  "item.edit.bitstreams.bundle.edit.buttons.upload": "अपलोड", 
+
+  "item.edit.bitstreams.bundle.load.all": "({{ total }}) सभी लोड करें", 
+
+  "item.edit.bitstreams.bundle.load.more": "और लोड करें", 
+
+  "item.edit.bitstreams.bundle.name": "बंडल: {{ name }}", 
+
+  "item.edit.bitstreams.discard-button": "रद्द करें", 
+
+  "item.edit.bitstreams.edit.buttons.download": "डाउनलोड", 
+
+  "item.edit.bitstreams.edit.buttons.drag": "खींचें (Drag)", 
+
+  "item.edit.bitstreams.edit.buttons.edit": "संपादित करें", 
+
+  "item.edit.bitstreams.edit.buttons.remove": "हटाएं", 
+
+  "item.edit.bitstreams.edit.buttons.undo": "परिवर्तन पूर्ववत करें", 
+
+  "item.edit.bitstreams.empty": "इस आइटम में कोई बिटस्ट्रीम नहीं है। एक बनाने के लिए अपलोड बटन पर क्लिक करें।", 
+
+  "item.edit.bitstreams.headers.actions": "गतिविधियां", 
+
+  "item.edit.bitstreams.headers.bundle": "बंडल", 
+
+  "item.edit.bitstreams.headers.description": "विवरण", 
+
+  "item.edit.bitstreams.headers.format": "प्रारूप", 
+
+  "item.edit.bitstreams.headers.name": "नाम", 
+
+  "item.edit.bitstreams.notifications.discarded.content": "आपके परिवर्तन खारिज कर दिए गए थे। अपने परिवर्तनों को बहाल करने के लिए 'पूर्ववत करें' बटन पर क्लिक करें", 
+
+  "item.edit.bitstreams.notifications.discarded.title": "परिवर्तन रद्द किये गए", 
+
+  "item.edit.bitstreams.notifications.move.failed.title": "बिटस्ट्रीम ले जाने में त्रुटि", 
+
+  "item.edit.bitstreams.notifications.move.saved.content": "इस आइटम की बिटस्ट्रीम और बंडल में आपके द्वारा किए गए परिवर्तन सहेज लिए गए हैं।", 
+
+  "item.edit.bitstreams.notifications.move.saved.title": "सहेजे गए परिवर्तनों को स्थानांतरित करें", 
+
+  "item.edit.bitstreams.notifications.outdated.content": "जिस आइटम पर आप वर्तमान में काम कर रहे हैं, उसे किसी अन्य उपयोगकर्ता ने बदल दिया है। संघर्षों को रोकने के लिए आपके वर्तमान परिवर्तन खारिज कर दिए गए हैं", 
+
+  "item.edit.bitstreams.notifications.outdated.title": "कालग्रस्त परिवर्तन", 
+
+  "item.edit.bitstreams.notifications.remove.failed.title": "बिटस्ट्रीम हटाने में त्रुटि", 
+
+  "item.edit.bitstreams.notifications.remove.saved.content": "इस आइटम की बिटस्ट्रीम में आपके निष्कासन परिवर्तन सहेज लिए गए हैं।", 
+
+  "item.edit.bitstreams.notifications.remove.saved.title": "हटाए जाने के बदलाव सहेजे गए", 
+
+  "item.edit.bitstreams.reinstate-button": "पूर्ववत करें", 
+
+  "item.edit.bitstreams.save-button": "सहेजें", 
+
+  "item.edit.bitstreams.upload-button": "अपलोड करें", 
+
+  "item.edit.breadcrumbs": "आइटम संपादित करें", 
+
+  "item.edit.delete.cancel": "रद्द करें", 
+
+  "item.edit.delete.confirm": "हटाएं", 
+
+  "item.edit.delete.description": "क्या आप सुनिश्चित हैं कि यह आइटम पूरी तरह से हटा दिया जाना चाहिए? सावधानी: वर्तमान में कोई tombstone नहीं छोड़ा जाएगा।", 
+
+  "item.edit.delete.error": "आइटम को हटाते समय कोई त्रुटि उत्पन्न हुई", 
+
+  "item.edit.delete.header": "आइटम हटाएं: {{id}}", 
+
+  "item.edit.delete.success": "आइटम हटा दिया गया है", 
+
+  "item.edit.head": "आइटम संपादित करें", 
+
+  "item.edit.item-mapper.buttons.add": "आइटम को चयनित संग्रहों में मैप करें", 
+
+  "item.edit.item-mapper.buttons.remove": "चयनित संग्रहों के लिए आइटम की मैपिंग निकालें", 
+
+  "item.edit.item-mapper.cancel": "रद्द करें", 
+
+  "item.edit.item-mapper.description": "यह आइटम मैपर टूल है जो प्रशासकों को इस आइटम को अन्य संग्रहों में मैप करने की अनुमति देता है। आप संग्रहों की खोज कर सकते हैं और उन्हें मैप कर सकते हैं, या उन संग्रहों की सूची ब्राउज़ कर सकते हैं जिनसे आइटम वर्तमान में मैप किया गया है।", 
+
+  "item.edit.item-mapper.head": "आइटम मैपर - संग्रह के लिए आइटम मैप करें", 
+
+  "item.edit.item-mapper.item": "आइटम: \"<b>{{name}}</b>\"", 
+
+  "item.edit.item-mapper.no-search": "खोज करने के लिए कृपया एक प्रश्न दर्ज करें", 
+
+  "item.edit.item-mapper.notifications.add.error.content": "{{amount}} आइटम को संग्रहों में मैप करने में त्रुटियाँ हुईं।", 
+
+  "item.edit.item-mapper.notifications.add.error.head": "मैपिंग त्रुटियाँ", 
+
+  "item.edit.item-mapper.notifications.add.success.content": "{{amount}} आइटम को संग्रह में सफलतापूर्वक मैप किया गया।", 
+
+  "item.edit.item-mapper.notifications.add.success.head": "मैपिंग पूरी हुई", 
+
+  "item.edit.item-mapper.notifications.remove.error.content": "मैपिंग को {{amount}} संग्रह से निकालने में त्रुटियां हुईं.", 
+
+  "item.edit.item-mapper.notifications.remove.error.head": "मैपिंग हटाने में त्रुटियां", 
+
+  "item.edit.item-mapper.notifications.remove.success.content": "{{amount}} संग्रह में आइटम की मैपिंग सफलतापूर्वक निकाली गई।", 
+
+  "item.edit.item-mapper.notifications.remove.success.head": "मैपिंग को हटाना पूरा हुआ", 
+
+  "item.edit.item-mapper.search-form.placeholder": "संग्रह में खोजें...    ", 
+
+  "item.edit.item-mapper.tabs.browse": "मैप किए गए संग्रह ब्राउज़ करें", 
+
+  "item.edit.item-mapper.tabs.map": "नए संग्रहों को मैप करें", 
+
+  "item.edit.metadata.add-button": "जोड़ें", 
+
+  "item.edit.metadata.discard-button": "रद्द करें", 
+
+  "item.edit.metadata.edit.buttons.edit": "संपादित करें", 
+
+  "item.edit.metadata.edit.buttons.remove": "हटाएं", 
+
+  "item.edit.metadata.edit.buttons.undo": "परिवर्तन पूर्ववत करें", 
+
+  "item.edit.metadata.edit.buttons.unedit": "संपादन बंद करें", 
+
+  "item.edit.metadata.empty": "आइटम में वर्तमान में कोई मेटाडेटा नहीं है। मेटाडेटा मान जोड़ना प्रारंभ करने के लिए जोड़ें पर क्लिक करें।", 
+
+  "item.edit.metadata.headers.edit": "संपादित करें", 
+
+  "item.edit.metadata.headers.field": "फील्ड", 
+
+  "item.edit.metadata.headers.language": "भाषा", 
+
+  "item.edit.metadata.headers.value": "मान", 
+
+  "item.edit.metadata.metadatafield.invalid": "कृपया वैध मेटाडेटा फ़ील्ड चुनें", 
+
+  "item.edit.metadata.notifications.discarded.content": "आपके परिवर्तन खारिज कर दिए गए थे। अपने परिवर्तनों को बहाल करने के लिए 'पूर्ववत करें' बटन पर क्लिक करें", 
+
+  "item.edit.metadata.notifications.discarded.title": "परिवर्तन रद्द किये गए", 
+
+  "item.edit.metadata.notifications.error.title": "एक त्रुटि पाई गई", 
+
+  "item.edit.metadata.notifications.invalid.content": "आपके परिवर्तन सहेजे नहीं गए थे। कृपया सुनिश्चित करें कि आपके द्वारा सहेजने से पहले सभी फ़ील्ड मान्य हैं।", 
+
+  "item.edit.metadata.notifications.invalid.title": "मेटाडेटा अमान्य", 
+
+  "item.edit.metadata.notifications.outdated.content": "जिस आइटम पर आप वर्तमान में काम कर रहे हैं, उसे किसी अन्य उपयोगकर्ता ने बदल दिया है। संघर्षों को रोकने के लिए आपके वर्तमान परिवर्तन खारिज कर दिए गए हैं", 
+
+  "item.edit.metadata.notifications.outdated.title": "पुराना बदल गया", 
+
+  "item.edit.metadata.notifications.saved.content": "इस आइटम के मेटाडेटा में आपके परिवर्तन सहेजे गए थे।", 
+
+  "item.edit.metadata.notifications.saved.title": "मेटाडेटा सहेजा गया", 
+
+  "item.edit.metadata.reinstate-button": "पूर्ववत करें", 
+
+  "item.edit.metadata.save-button": "सहेजें", 
+
+  "item.edit.modify.overview.field": "फ़ील्ड", 
+
+  "item.edit.modify.overview.language": "भाषा", 
+
+  "item.edit.modify.overview.value": "मान", 
+
+  "item.edit.move.cancel": "वापस", 
+
+  "item.edit.move.description": "उस संग्रह का चयन करें जिसमें आप इस आइटम को ले जाना चाहते हैं। प्रदर्शित संग्रहों की सूची को छोटा करने के लिए, आप बॉक्स में खोज क्वेरी दर्ज कर सकते हैं।", 
+
+  "item.edit.move.discard-button": "रद्द करें", 
+
+  "item.edit.move.error": "आइटम को स्थानांतरित करने का प्रयास करते समय कोई त्रुटि उत्पन्न हुई", 
+
+  "item.edit.move.head": "आइटम का स्थान परिवर्तन: {{id}}", 
+
+  "item.edit.move.inheritpolicies.checkbox": "नीतियां विरासत में लो", 
+
+  "item.edit.move.inheritpolicies.description": "गंतव्य संग्रह की डिफ़ॉल्ट नीतियों को इनहेरिट करें", 
+
+  "item.edit.move.move": "स्थान परिवर्तन", 
+
+  "item.edit.move.processing": "चल रहा है...", 
+
+  "item.edit.move.save-button": "सहेजें", 
+
+  "item.edit.move.search.placeholder": "संग्रह देखने के लिए एक खोज क्वेरी दर्ज करें", 
+
+  "item.edit.move.success": "आइटम को सफलतापूर्वक स्थानांतरित कर दिया गया है", 
+
+  "item.edit.move.title": "आइटम स्थानांतरण", 
+
+  "item.edit.private.cancel": "रद्द करें", 
+
+  "item.edit.private.confirm": "इसे गैर-खोज योग्य बनाएं", 
+
+  "item.edit.private.description": "क्या आप सुनिश्चित हैं कि इस आइटम को संग्रह में खोजने योग्य नहीं बनाया जाना चाहिए?", 
+
+  "item.edit.private.error": "आइटम को गैर-खोज योग्य बनाते समय एक त्रुटि हुई", 
+
+  "item.edit.private.header": "आइटम को खोजने योग्य न बनाएं: {{ id }}", 
+
+  "item.edit.private.success": "आइटम अब खोजने योग्य नहीं है", 
+
+  "item.edit.public.cancel": "रद्द करें", 
+
+  "item.edit.public.confirm": "इसे खोजने योग्य बनाएं", 
+
+  "item.edit.public.description": "क्या आप इस आइटम को संग्रह में खोजने योग्य बनाने के लिए सुनिश्चित हैं?", 
+
+  "item.edit.public.error": "आइटम को खोजने योग्य बनाते समय एक त्रुटि हुई", 
+
+  "item.edit.public.header": "आइटम को खोजने योग्य बनाएं: {{ id }}", 
+
+  "item.edit.public.success": "आइटम अब खोजने योग्य है", 
+
+  "item.edit.reinstate.cancel": "रद्द करें", 
+
+  "item.edit.reinstate.confirm": "पुनर्स्थापित करें", 
+
+  "item.edit.reinstate.description": "क्या आप इस आइटम को संग्रह में पुनर्स्थापित करने के लिए सुनिश्चित हैं?", 
+
+  "item.edit.reinstate.error": "आइटम को पुनर्स्थापित करते समय एक त्रुटि हुई", 
+
+  "item.edit.reinstate.header": "पुनर्स्थापित आइटम: {{ id }}", 
+
+  "item.edit.reinstate.success": "आइटम को सफलतापूर्वक बहाल कर दिया गया", 
+
+  "item.edit.relationships.discard-button": "रद्द करें", 
+
+  "item.edit.relationships.edit.buttons.add": "जोड़ें", 
+
+  "item.edit.relationships.edit.buttons.remove": "हटाएं", 
+
+  "item.edit.relationships.edit.buttons.undo": "परिवर्तन रद्द किये गए", 
+
+  "item.edit.relationships.no-entity-type": "इस आइटम के लिए संबंध सक्षम करने के लिए 'dspace.entity.type' मेटाडेटा जोड़ें", 
+
+  "item.edit.relationships.no-relationships": "कोई रिश्ता नहीं", 
+
+  "item.edit.relationships.notifications.discarded.content": "आपके परिवर्तन खारिज कर दिए गए थे। अपने परिवर्तनों को बहाल करने के लिए 'पूर्ववत करें' बटन पर क्लिक करें", 
+
+  "item.edit.relationships.notifications.discarded.title": "परिवर्तन रद्द किये गए", 
+
+  "item.edit.relationships.notifications.failed.title": "संबंध संपादित करने में त्रुटि", 
+
+  "item.edit.relationships.notifications.outdated.content": "जिस आइटम पर आप वर्तमान में काम कर रहे हैं, उसे किसी अन्य उपयोगकर्ता ने बदल दिया है। संघर्षों को रोकने के लिए आपके वर्तमान परिवर्तन खारिज कर दिए गए हैं", 
+
+  "item.edit.relationships.notifications.outdated.title": "परिवर्तन पुराना", 
+
+  "item.edit.relationships.notifications.saved.content": "इस आइटम के संबंधों में आपके परिवर्तन सहेज लिए गए थे|", 
+
+  "item.edit.relationships.notifications.saved.title": "रिश्ते सहेजे गए", 
+
+  "item.edit.relationships.reinstate-button": "पूर्ववत करें", 
+
+  "item.edit.relationships.save-button": "सहेजें", 
+
+  "item.edit.return": "वापस", 
+
+  "item.edit.tabs.bitstreams.head": "बिटस्ट्रीम", 
+
+  "item.edit.tabs.bitstreams.title": "आइटम संपादन - बिटस्ट्रीम", 
+
+  "item.edit.tabs.curate.head": "क्यूरेट", 
+
+  "item.edit.tabs.curate.title": "आइटम संपादन - क्यूरेट ", 
+
+  "item.edit.tabs.disabled.tooltip": "आप इस टैब में प्रवेश करने के लिए अधिकृत नहीं हैं", 
+
+  "item.edit.tabs.item-mapper.title": "आइटम संपादन - संग्रह मैपर", 
+
+  "item.edit.tabs.mapper.head": "संग्रह मैपर", 
+
+  "item.edit.tabs.metadata.head": "मेटाडेटा", 
+
+  "item.edit.tabs.metadata.title": "आइटम संपादन - मेटाडेटा", 
+
+  "item.edit.tabs.relationships.head": "संबंध", 
+
+  "item.edit.tabs.relationships.title": "आइटम संपादन - संबंध", 
+
+  "item.edit.tabs.status.buttons.authorizations.button": "प्राधिकरण...", 
+
+  "item.edit.tabs.status.buttons.authorizations.label": "आइटम की प्राधिकरण नीतियां संपादित करें", 
+
+  "item.edit.tabs.status.buttons.delete.button": "स्थायी रूप से हटाना", 
+
+  "item.edit.tabs.status.buttons.delete.label": "आइटम को पूरी तरह से मिटाएं", 
+
+  "item.edit.tabs.status.buttons.mappedCollections.button": "मैप किए गए संग्रह", 
+
+  "item.edit.tabs.status.buttons.mappedCollections.label": "मैप किए गए संग्रह प्रबंधित करें", 
+
+  "item.edit.tabs.status.buttons.move.button": "स्थान परिवर्तन...", 
+
+  "item.edit.tabs.status.buttons.move.label": "आइटम को दूसरे संग्रह में ले जाएं", 
+
+  "item.edit.tabs.status.buttons.private.button": "इसे गैर-खोज योग्य बनाएं...", 
+
+  "item.edit.tabs.status.buttons.private.label": "आइटम को गैर-खोज योग्य बनाएं", 
+
+  "item.edit.tabs.status.buttons.public.button": "इसे खोजने योग्य बनाएं...", 
+
+  "item.edit.tabs.status.buttons.public.label": "आइटम को खोजने योग्य बनाएं", 
+
+  "item.edit.tabs.status.buttons.reinstate.button": "पुनर्स्थापित करें...", 
+
+  "item.edit.tabs.status.buttons.reinstate.label": "आइटम को संग्रह में पुनर्स्थापित करें", 
+
+  "item.edit.tabs.status.buttons.unauthorized": "आप इस क्रिया को करने के लिए अधिकृत नहीं हैं", 
+
+  "item.edit.tabs.status.buttons.withdraw.button": "वापस लें...", 
+
+  "item.edit.tabs.status.buttons.withdraw.label": "संग्रहालय से आइटम वापस लेना", 
+
+  "item.edit.tabs.status.description": "आइटम प्रबंधन पृष्ठ पर आपका स्वागत है। यहां से आप आइटम को वापस ले सकते हैं, बहाल कर सकते हैं, स्थानांतरित कर सकते हैं या हटा सकते हैं। आप अन्य टैब पर नए मेटाडेटा / बिटस्ट्रीम को भी अपडेट या जोड़ सकते हैं।", 
+
+  "item.edit.tabs.status.head": "स्थिति", 
+
+  "item.edit.tabs.status.labels.handle": "हैंडल", 
+
+  "item.edit.tabs.status.labels.id": "आइटम का आंतरिक आईडी", 
+
+  "item.edit.tabs.status.labels.itemPage": "आइटम पृष्ठ", 
+
+  "item.edit.tabs.status.labels.lastModified": "अंतिम संशोधित", 
+
+  "item.edit.tabs.status.title": "आइटम संपादन - स्थिति", 
+
+  "item.edit.tabs.versionhistory.head": "संस्करण इतिहास", 
+
+  "item.edit.tabs.versionhistory.title": "आइटम संपादन - संस्करण इतिहास  ", 
+
+  "item.edit.tabs.versionhistory.under-construction": "इस उपयोगकर्ता इंटरफ़ेस में अभी तक नए संस्करण संपादित करना या जोड़ना संभव नहीं है।", 
+
+  "item.edit.tabs.view.head": "आइटम देखें", 
+
+  "item.edit.tabs.view.title": "आइटम संपादन - देखें", 
+
+  "item.edit.withdraw.cancel": "रद्द करें", 
+
+  "item.edit.withdraw.confirm": "वापस ले", 
+
+  "item.edit.withdraw.description": "क्या आप सुनिश्चित हैं कि इस आइटम को संग्रह से वापस ले लिया जाना चाहिए?", 
+
+  "item.edit.withdraw.error": "आइटम वापस लेते समय एक त्रुटि हुई", 
+
+  "item.edit.withdraw.header": "आइटम वापस ले: {{ id }}", 
+
+  "item.edit.withdraw.success": "आइटम सफलतापूर्वक वापस ले लिया गया", 
+
+  "item.listelement.badge": "आइटम", 
+
+  "item.orcid.return": "वापस", 
+
+  "item.page.abstract": "सारांश", 
+
+  "item.page.author": "लेखक", 
+
+  "item.page.bitstreams.collapse": "संक्षिप्त करें", 
+
+  "item.page.bitstreams.view-more": "और दिखाएं", 
+
+  "item.page.citation": "उद्धरण", 
+
+  "item.page.claim.button": "दावा", 
+
+  "item.page.claim.tooltip": "इस आइटम को प्रोफ़ाइल के रूप में दावा करें", 
+
+  "item.page.collections": "संग्रह", 
+
+  "item.page.collections.load-more": "और लोड करें", 
+
+  "item.page.collections.loading": "लोड हो रहा है...", 
+
+  "item.page.date": "दिनांक", 
+
+  "item.page.description": "विवरण", 
+
+  "item.page.edit": "इस आइटम को संपादित करें", 
+
+  "item.page.files": "फ़ाइलें", 
+
+  "item.page.filesection.description": "विवरण:", 
+
+  "item.page.filesection.download": "डाउनलोड", 
+
+  "item.page.filesection.format": "प्रारूप:", 
+
+  "item.page.filesection.license.bundle": "लाइसेंस बंडल", 
+
+  "item.page.filesection.name": "नाम:", 
+
+  "item.page.filesection.original.bundle": "मूल बंडल", 
+
+  "item.page.filesection.size": "आकार:", 
+
+  "item.page.journal-issn": "जर्नल आईएसएसएन (ISSN)", 
+
+  "item.page.journal-title": "पत्रिका शीर्षक", 
+
+  "item.page.journal.search.title": "इस पत्रिका में लेख", 
+
+  "item.page.link.full": "संपूर्ण आइटम पृष्ठ", 
+
+  "item.page.link.simple": "साधारण आइटम पृष्ठ", 
+
+  "item.page.orcid.title": "ORCID", 
+
+  "item.page.orcid.tooltip": "ORCID सेटिंग पृष्ठ खोलें", 
+
+  "item.page.person.search.title": "इस लेखक के लेख", 
+
+  "item.page.publisher": "प्रकाशक", 
+
+  "item.page.related-items.view-less": "{{ amount }} पिछला छिपाएं ", 
+
+  "item.page.related-items.view-more": "{{ amount }} और दिखाएं", 
+
+  "item.page.relationships.isAuthorOfPublication": "प्रकाशन", 
+
+  "item.page.relationships.isJournalOfPublication": "प्रकाशन", 
+
+  "item.page.relationships.isOrgUnitOfPerson": "लेखक", 
+
+  "item.page.relationships.isOrgUnitOfProject": "अनुसंधान परियोजना", 
+
+  "item.page.return": "वापस", 
+
+  "item.page.subject": "खोजशब्द", 
+
+  "item.page.titleprefix": "आइटम: ", 
+
+  "item.page.uri": "URI", 
+
+  "item.page.version.create": "नया संस्करण बनाएं", 
+
+  "item.page.version.hasDraft": "नया संस्करण नहीं बनाया जा सकता क्योंकि संस्करण इतिहास में एक प्रगतिशील प्रस्तुति है ", 
+
+  "item.page.volume-title": "अंक शीर्षक", 
+
+  "item.preview.dc.contributor.author": "लेखक:", 
+
+  "item.preview.dc.coverage.spatial": "अधिकार - क्षेत्र:", 
+
+  "item.preview.dc.date.issued": "प्रकाशन की तारीख:", 
+
+  "item.preview.dc.description.abstract": "सारांश:", 
+
+  "item.preview.dc.identifier.one": null, 
+
+  "item.preview.dc.identifier.other": "Other identifier:", 
+
+  "item.preview.dc.identifier.zero": "अन्य पहचानकर्ता:", 
+
+  "item.preview.dc.identifier.doi": "डीओआई (DOI)", 
+
+  "item.preview.dc.identifier.isbn": "ISBN", 
+
+  "item.preview.dc.identifier.uri": "पहचानकर्ता:", 
+
+  "item.preview.dc.language.iso": "भाषा:", 
+
+  "item.preview.dc.relation.ispartof": "पत्रिका या श्रृंखला", 
+
+  "item.preview.dc.relation.issn": "ISSN", 
+
+  "item.preview.dc.subject": "विषय:", 
+
+  "item.preview.dc.title": "शीर्षक:", 
+
+  "item.preview.dc.title.alternative": "परिवर्णी शब्द:", 
+
+  "item.preview.dc.type": "प्रकार:", 
+
+  "item.preview.oaire.awardNumber": "निधि पहचान:", 
+
+  "item.preview.oaire.citation.issue": "अंक", 
+
+  "item.preview.oaire.citation.volume": "खंड", 
+
+  "item.preview.oaire.fundingStream": "निधि धारा:", 
+
+  "item.preview.person.familyName": "उपनाम:", 
+
+  "item.preview.person.givenName": "नाम:", 
+
+  "item.preview.person.identifier.orcid": "ORCID:", 
+
+  "item.preview.project.funder.identifier": "निधिदाता की पहचान:", 
+
+  "item.preview.project.funder.name": "निधिदाता:", 
+
+  "item.search.results.head": "आइटम खोज परिणाम", 
+
+  "item.search.title": "आइटम खोज", 
+
+  "item.select.confirm": "चयनित की पुष्टि करें", 
+
+  "item.select.empty": "दिखाने के लिए कोई आइटम नहीं है", 
+
+  "item.select.table.author": "लेखक", 
+
+  "item.select.table.collection": "संग्रह", 
+
+  "item.select.table.title": "शीर्षक", 
+
+  "item.truncatable-part.show-less": "संक्षिप्त करें", 
+
+  "item.truncatable-part.show-more": "और दिखाएं", 
+
+  "item.version.create.modal.button.cancel": "रद्द करें", 
+
+  "item.version.create.modal.button.cancel.tooltip": "नया संस्करण न बनाएं", 
+
+  "item.version.create.modal.button.confirm": "बनाएं", 
+
+  "item.version.create.modal.button.confirm.tooltip": "नया संस्करण बनाएं", 
+
+  "item.version.create.modal.form.summary.label": "Summary", 
+
+  "item.version.create.modal.form.summary.placeholder": "नए संस्करण के लिए सारांश डालें", 
+
+  "item.version.create.modal.header": "नया संस्करण", 
+
+  "item.version.create.modal.submitted.header": "नया संस्करण बनाया जा रहा है...", 
+
+  "item.version.create.modal.submitted.text": "नया संस्करण बनाया जा रहा है। यदि आइटम में बहुत अधिक संबंध हैं तो इसमें कुछ समय लग सकता है।", 
+
+  "item.version.create.modal.text": "इस आइटम के लिए एक नया संस्करण बनाएं", 
+
+  "item.version.create.modal.text.startingFrom": "{{version}} संस्करण से प्रारंभ", 
+
+  "item.version.create.notification.failure": "नया संस्करण नहीं बनाया गया है", 
+
+  "item.version.create.notification.inProgress": "एक नया संस्करण नहीं बनाया जा सकता क्योंकि संस्करण इतिहास में एक प्रगतिशील प्रस्तुति है", 
+
+  "item.version.create.notification.success": "संस्करण संख्या {{version}} के साथ नया संस्करण बनाया गया है", 
+
+  "item.version.delete.modal.button.cancel": "रद्द करें", 
+
+  "item.version.delete.modal.button.cancel.tooltip": "इस संस्करण को न हटाएं", 
+
+  "item.version.delete.modal.button.confirm": "हटाएं", 
+
+  "item.version.delete.modal.button.confirm.tooltip": "इस संस्करण को हटाएं", 
+
+  "item.version.delete.modal.header": "संस्करण हटाएं", 
+
+  "item.version.delete.modal.text": "क्या आप संस्करण {{version}} को हटाना चाहते हैं?", 
+
+  "item.version.delete.notification.failure": "संस्करण संख्या {{version}} को हटाया नहीं गया है", 
+
+  "item.version.delete.notification.success": "संस्करण संख्या {{version}} हटा दिया गया है", 
+
+  "item.version.edit.notification.failure": "संस्करण संख्या {{version}} का सारांश नहीं बदला गया है", 
+
+  "item.version.edit.notification.success": "संस्करण संख्या {{version}} का सारांश बदल दिया गया है", 
+
+  "item.version.history.empty": "इस आइटम के लिए अभी तक कोई अन्य संस्करण नहीं हैं।", 
+
+  "item.version.history.head": "संस्करण इतिहास", 
+
+  "item.version.history.return": "वापस", 
+
+  "item.version.history.selected": "चयनित संस्करण", 
+
+  "item.version.history.selected.alert": "आप वर्तमान में आइटम का {{version}} संस्करण देख रहे हैं।", 
+
+  "item.version.history.table.action.deleteVersion": "संस्करण हटाएं", 
+
+  "item.version.history.table.action.discardSummary": "सारांश सम्पादनों को रद्द करें", 
+
+  "item.version.history.table.action.editSummary": "सारांश संपादित करें", 
+
+  "item.version.history.table.action.editWorkspaceItem": "कार्यक्षेत्र आइटम संपादित करें", 
+
+  "item.version.history.table.action.hasDraft": "एक नया संस्करण नहीं बनाया जा सकता क्योंकि संस्करण इतिहास में एक प्रगतिशील प्रस्तुति है", 
+
+  "item.version.history.table.action.newVersion": "इससे नया संस्करण बनाएं", 
+
+  "item.version.history.table.action.saveSummary": "सारांश संपादन सहेजें", 
+
+  "item.version.history.table.actions": "गतिविधि", 
+
+  "item.version.history.table.date": "तारीख", 
+
+  "item.version.history.table.editor": "संपादक", 
+
+  "item.version.history.table.item": "आइटम", 
+
+  "item.version.history.table.summary": "सारांश", 
+
+  "item.version.history.table.version": "संस्करण", 
+
+  "item.version.history.table.workflowItem": "कार्यप्रवाह आइटम", 
+
+  "item.version.history.table.workspaceItem": "कार्यक्षेत्र आइटम", 
+
+  "item.version.notice": "यह इस आइटम का नवीनतम संस्करण नहीं है। नवीनतम संस्करण <a href='{{destination}}'>यहां</a> पाया जा सकता है।", 
+
+  "journal-relationships.search.results.head": "पत्रिका खोज परिणाम", 
+
+  "journal.listelement.badge": "पत्रिका", 
+
+  "journal.page.description": "विवरण", 
+
+  "journal.page.edit": "इस आइटम को संपादित करें", 
+
+  "journal.page.editor": "मुख्या संपादक", 
+
+  "journal.page.issn": "ISSN", 
+
+  "journal.page.publisher": "प्रकाशक", 
+
+  "journal.page.titleprefix": "पत्रिका: ", 
+
+  "journal.search.results.head": "पत्रिका खोज परिणाम", 
+
+  "journal.search.title": "पत्रिका खोज", 
+
+  "journalissue.listelement.badge": "पत्रिका अंक", 
+
+  "journalissue.page.description": "विवरण", 
+
+  "journalissue.page.edit": "इस आइटम को संपादित करें", 
+
+  "journalissue.page.issuedate": "जारी करने की तिथि", 
+
+  "journalissue.page.journal-issn": "पत्रिका ISSN", 
+
+  "journalissue.page.journal-title": "पत्रिका का शीर्षक", 
+
+  "journalissue.page.keyword": "खोजशब्द", 
+
+  "journalissue.page.number": "संख्या", 
+
+  "journalissue.page.titleprefix": "पत्रिका अंक:", 
+
+  "journalvolume.listelement.badge": "पत्रिका खंड", 
+
+  "journalvolume.page.description": "विवरण", 
+
+  "journalvolume.page.edit": "इस आइटम को संपादित करें", 
+
+  "journalvolume.page.issuedate": "जारी करने की तिथि", 
+
+  "journalvolume.page.titleprefix": "पत्रिका खंड: ", 
+
+  "journalvolume.page.volume": "खंड", 
+
+  "layouts.application.about": "के संबंध में", 
+
+  "layouts.application.account": "खाता", 
+
+  "layouts.application.app_store": "ऐप स्टोर", 
+
+  "layouts.application.imprint": "छाप", 
+
+  "layouts.application.logout": "लॉग आउट", 
+
+  "layouts.application.my_mails": "मेरे मेल", 
+
+  "layouts.application.press": "प्रेस", 
+
+  "layouts.application.preview": "पूर्वावलोकन", 
+
+  "layouts.application.profile": "प्रोफ़ाइल", 
+
+  "layouts.application.sign_in": "लॉग इन करें", 
+
+  "layouts.application.sign_up": "पंजीकृत करें ", 
+
+  "loading.bitstream": "बिटस्ट्रीम लोड हो रहा है...", 
+
+  "loading.bitstreams": "बिटस्ट्रीम लोड हो रहा है...", 
+
+  "loading.browse-by": "लोड हो रहा है आइटम...", 
+
+  "loading.browse-by-page": "पृष्ठ लोड हो रहा है...", 
+
+  "loading.collection": "संग्रह लोड हो रहा है...", 
+
+  "loading.collections": "संग्रह लोड हो रहे हैं...", 
+
+  "loading.community": "समुदाय लोड हो रहा है...", 
+
+  "loading.content-source": "सामग्री स्रोत लोड हो रहा है...", 
+
+  "loading.default": "लोड हो रहा है...", 
+
+  "loading.item": "आइटम लोड हो रहा है...", 
+
+  "loading.items": "आइटम लोड हो रहे हैं...", 
+
+  "loading.mydspace-results": "आइटम लोड हो रहे हैं...", 
+
+  "loading.objects": "लोड हो रहा है...", 
+
+  "loading.recent-submissions": "हाल ही की प्रस्तुतियाँ लोड हो रही हैं...", 
+
+  "loading.search-results": "खोज परिणाम लोड हो रहे हैं...", 
+
+  "loading.sub-collections": "उप-संग्रह लोड हो रहा है...", 
+
+  "loading.sub-communities": "उप-समुदाय लोड हो रहे हैं...", 
+
+  "loading.top-level-communities": "शीर्ष-स्तरीय समुदाय लोड हो रहे हैं...", 
+
+  "login.breadcrumbs": "लॉग इन करें", 
+
+  "login.form.email": "ईमेल पता", 
+
+  "login.form.forgot-password": "क्या आप अपना पासवर्ड भूल गए हैं?", 
+
+  "login.form.header": "कृपया डीस्पेस में लॉग इन करें", 
+
+  "login.form.new-user": "नया उपयोगकर्ता? पंजीकरण करने के लिए यहां क्लिक करें।", 
+
+  "login.form.oidc": "ओआईडीसी (OIDC) के साथ लॉग इन करें", 
+
+  "login.form.or-divider": "अथवा", 
+
+  "login.form.orcid": "ORCID के साथ लॉग इन करें", 
+
+  "login.form.password": "पासवर्ड", 
+
+  "login.form.shibboleth": "शिबोलेथ के साथ लॉग इन करें", 
+
+  "login.form.submit": "लॉग इन करें", 
+
+  "login.title": "लॉग इन करें", 
+
+  "logout.form.header": "डीस्पेस से लॉग आउट करें", 
+
+  "logout.form.submit": "लॉग आउट करें", 
+
+  "logout.title": "लॉग आउट", 
+
+  "media-viewer.next": "अगला", 
+
+  "media-viewer.playlist": "प्लेलिस्ट", 
+
+  "media-viewer.previous": "पिछला", 
+
+  "menu.header.admin": "प्रबंधन", 
+
+  "menu.header.admin.description": "प्रबंधन मेनू", 
+
+  "menu.header.image.logo": "संग्रहालय चिन्ह", 
+
+  "menu.section.access_control": "अभिगम नियंत्रण", 
+
+  "menu.section.access_control_authorizations": "प्राधिकरण", 
+
+  "menu.section.access_control_groups": "समूह", 
+
+  "menu.section.access_control_people": "लोग", 
+
+  "menu.section.admin_search": "व्यवस्थापक खोज", 
+
+  "menu.section.browse_community": "यह समुदाय", 
+
+  "menu.section.browse_community_by_author": "लेखक द्वारा", 
+
+  "menu.section.browse_community_by_issue_date": "जारी करने की तिथि के अनुसार", 
+
+  "menu.section.browse_community_by_title": "शीर्षक के द्वारा", 
+
+  "menu.section.browse_global": "सम्पूर्ण डीस्पेस", 
+
+  "menu.section.browse_global_by_author": "लेखक द्वारा", 
+
+  "menu.section.browse_global_by_dateissued": "जारी करने की तिथि के द्वारा", 
+
+  "menu.section.browse_global_by_subject": "विषय द्वारा", 
+
+  "menu.section.browse_global_by_title": "शीर्षक द्वारा", 
+
+  "menu.section.browse_global_communities_and_collections": "समुदाय और संग्रह", 
+
+  "menu.section.control_panel": "नियंत्रण कक्ष", 
+
+  "menu.section.curation_task": "क्यूरेशन टास्क", 
+
+  "menu.section.edit": "संपादित करें", 
+
+  "menu.section.edit_collection": "संग्रह", 
+
+  "menu.section.edit_community": "समुदाय", 
+
+  "menu.section.edit_item": "आइटम", 
+
+  "menu.section.export": "निर्यात करें", 
+
+  "menu.section.export_collection": "संग्रह", 
+
+  "menu.section.export_community": "समुदाय", 
+
+  "menu.section.export_item": "आइटम", 
+
+  "menu.section.export_metadata": "मेटाडेटा", 
+
+  "menu.section.health": "स्वास्थ्य", 
+
+  "menu.section.icon.access_control": "अभिगम नियंत्रण मेन्यू अनुभाग", 
+
+  "menu.section.icon.admin_search": "व्यवस्थापक खोज मेनू अनुभाग", 
+
+  "menu.section.icon.control_panel": "नियंत्रण कक्ष मेन्यू अनुभाग", 
+
+  "menu.section.icon.curation_tasks": "अवधि कार्य मेनू अनुभाग", 
+
+  "menu.section.icon.edit": "मेन्यू अनुभाग संपादित करें", 
+
+  "menu.section.icon.export": "निर्यात मेनू अनुभाग", 
+
+  "menu.section.icon.find": "मेनू अनुभाग खोजें", 
+
+  "menu.section.icon.health": "स्वास्थ्य जांच मेनू अनुभाग", 
+
+  "menu.section.icon.import": "आयात मेनू अनुभाग", 
+
+  "menu.section.icon.new": "नया मेनू अनुभाग", 
+
+  "menu.section.icon.pin": "साइडबार पिन करें", 
+
+  "menu.section.icon.processes": "प्रक्रिया स्वास्थ्य", 
+
+  "menu.section.icon.registries": "रजिस्ट्रियां मेन्यू अनुभाग", 
+
+  "menu.section.icon.statistics_task": "सांख्यिकी कार्य मेनू अनुभाग", 
+
+  "menu.section.icon.unpin": "साइडबार अनपिन करें", 
+
+  "menu.section.icon.workflow": "कार्यप्रवाह मेनू अनुभाग का व्यवस्थापन करें", 
+
+  "menu.section.import": "आयात", 
+
+  "menu.section.import_batch": "खेप आयात (ZIP)", 
+
+  "menu.section.import_metadata": "मेटाडाटा ", 
+
+  "menu.section.new": "नया", 
+
+  "menu.section.new_collection": "संग्रह", 
+
+  "menu.section.new_community": "समुदाय", 
+
+  "menu.section.new_item": "आइटम", 
+
+  "menu.section.new_item_version": "आइटम संस्करण", 
+
+  "menu.section.new_process": "प्रक्रिया", 
+
+  "menu.section.pin": "साइडबार नत्थी करें", 
+
+  "menu.section.processes": "प्रक्रियाएं", 
+
+  "menu.section.registries": "रजिस्ट्री", 
+
+  "menu.section.registries_format": "प्रारूप", 
+
+  "menu.section.registries_metadata": "मेटाडाटा", 
+
+  "menu.section.statistics": "सांख्यिकी", 
+
+  "menu.section.statistics_task": "सांख्यिकी कार्य", 
+
+  "menu.section.toggle.access_control": "अभिगम नियंत्रण अनुभाग टॉगल करें", 
+
+  "menu.section.toggle.control_panel": "नियंत्रण कक्ष अनुभाग टॉगल करें", 
+
+  "menu.section.toggle.curation_task": "क्यूरेशन कार्य अनुभाग टॉगल करें  ", 
+
+  "menu.section.toggle.edit": "संपादन कार्य अनुभाग टॉगल करें  ", 
+
+  "menu.section.toggle.export": "निर्यात कार्य अनुभाग टॉगल करें  ", 
+
+  "menu.section.toggle.find": "अनुभाग खोजें टॉगल करें", 
+
+  "menu.section.toggle.import": "आयात अनुभाग टॉगल करें", 
+
+  "menu.section.toggle.new": "नया अनुभाग टॉगल करें", 
+
+  "menu.section.toggle.registries": "रजिस्ट्री अनुभाग टॉगल करें", 
+
+  "menu.section.toggle.statistics_task": "सांख्यिकी कार्य अनुभाग टॉगल करें", 
+
+  "menu.section.unpin": "साइडबार अनपिन करें", 
+
+  "menu.section.workflow": "कार्यप्रवाह व्यवस्थापित करें", 
+
+  "metadata-export-search.submit.error": "निर्यात प्रारंभ करना विफल रहा", 
+
+  "metadata-export-search.submit.success": "निर्यात सफलतापूर्वक शुरू किया गया था", 
+
+  "metadata-export-search.tooltip": "खोज परिणामों को CSV के रूप में निर्यात करें", 
+
+  "mydspace.breadcrumbs": "मेरा डीस्पेस", 
+
+  "mydspace.description": null, 
+
+  "mydspace.general.text-here": "यहां", 
+
+  "mydspace.messages.controller-help": "आइटम के प्रस्तुतकर्ता को संदेश भेजने के लिए इस विकल्प का चयन करें।", 
+
+  "mydspace.messages.description-placeholder": "अपना संदेश यहां डालें...", 
+
+  "mydspace.messages.hide-msg": "संदेश छुपाएं", 
+
+  "mydspace.messages.mark-as-read": "पढ़ा गया के रूप में चिह्नित करें", 
+
+  "mydspace.messages.mark-as-unread": "अपठित के रूप में चिह्नित करें", 
+
+  "mydspace.messages.no-content": "कोई सामग्री नहीं है।", 
+
+  "mydspace.messages.no-messages": "अभी तक कोई संदेश नहीं।", 
+
+  "mydspace.messages.send-btn": "भेजें", 
+
+  "mydspace.messages.show-msg": "संदेश दिखाएँ", 
+
+  "mydspace.messages.subject-placeholder": "विषय...", 
+
+  "mydspace.messages.submitter-help": "नियंत्रक को संदेश भेजने के लिए इस विकल्प का चयन करें।", 
+
+  "mydspace.messages.title": "संदेश", 
+
+  "mydspace.messages.to": "तक", 
+
+  "mydspace.new-submission": "नया प्रस्तुतीकरण", 
+
+  "mydspace.new-submission-external": "बाहरी स्रोत से मेटाडेटा आयात करें", 
+
+  "mydspace.new-submission-external-short": "मेटाडेटा आयात करें", 
+
+  "mydspace.results.head": "आपकी प्रस्तुतियाँ", 
+
+  "mydspace.results.no-abstract": "कोई सार नहीं", 
+
+  "mydspace.results.no-authors": "कोई लेखक नहीं", 
+
+  "mydspace.results.no-collections": "कोई संग्रह नहीं", 
+
+  "mydspace.results.no-date": "कोई तारीख नहीं", 
+
+  "mydspace.results.no-files": "कोई फाइल नहीं", 
+
+  "mydspace.results.no-results": "दिखाने के लिए कोई आइटम नहीं थे", 
+
+  "mydspace.results.no-title": "कोई शीर्षक नहीं", 
+
+  "mydspace.results.no-uri": "Uri नहीं है", 
+
+  "mydspace.search-form.placeholder": "मेरे डीस्पेस में खोजें...", 
+
+  "mydspace.show.workflow": "कार्यप्रवाह कार्य", 
+
+  "mydspace.show.workspace": "आपकी प्रस्तुतियां", 
+
+  "mydspace.status.archived": "संग्रहीत", 
+
+  "mydspace.status.validation": "सत्यापन", 
+
+  "mydspace.status.waiting-for-controller": "नियंत्रक की प्रतीक्षा कर रहा है", 
+
+  "mydspace.status.workflow": "कार्यप्रवाह", 
+
+  "mydspace.status.workspace": "कार्यस्थान", 
+
+  "mydspace.title": "मेरा डीस्पेस", 
+
+  "mydspace.upload.upload-failed": "नया कार्यस्थान बनाने में त्रुटि. कृपया पुनः प्रयास करने से पहले अपलोड की गई सामग्री को सत्यापित करें।", 
+
+  "mydspace.upload.upload-failed-manyentries": "असंसाधित फ़ाइल। बहुत अधिक प्रविष्टियों का पता लगाया लेकिन फ़ाइल के लिए केवल एक की अनुमति दी।", 
+
+  "mydspace.upload.upload-failed-moreonefile": "असंसाधित अनुरोध। केवल एक फ़ाइल की अनुमति है।", 
+
+  "mydspace.upload.upload-multiple-successful": "{{qty}} नए कार्यक्षेत्र आइटम बनाए गए।", 
+
+  "mydspace.upload.upload-successful": "नया कार्यस्थान आइटम बनाया गया। इसे संपादित करने के लिए {{here}} क्लिक करें।", 
+
+  "mydspace.view-btn": "देखें", 
+
+  "nav.browse.header": "सम्पूर्ण डीस्पेस", 
+
+  "nav.community-browse.header": "समुदाय द्वारा", 
+
+  "nav.language": "भाषा स्विच", 
+
+  "nav.login": "लॉग इन करें", 
+
+  "nav.logout": "उपयोगकर्ता प्रोफ़ाइल मेनू और लॉग आउट", 
+
+  "nav.main.description": "मुख्य नेविगेशन बार", 
+
+  "nav.mydspace": "मेरा डीस्पेस", 
+
+  "nav.profile": "प्रोफ़ाइल", 
+
+  "nav.search": "खोजें", 
+
+  "nav.statistics.header": "सांख्यिकी", 
+
+  "nav.stop-impersonating": "ई-व्यक्ति का रूप धारण करना बंद करें", 
+
+  "nav.toggle": "नेविगेशन टॉगल करें", 
+
+  "nav.user.description": "उपयोगकर्ता प्रोफ़ाइल बार", 
+
+  "none.listelement.badge": "आइटम", 
+
+  "orgunit.listelement.badge": "संगठित इकाई", 
+
+  "orgunit.page.city": "शहर", 
+
+  "orgunit.page.country": "देश", 
+
+  "orgunit.page.dateestablished": "स्थापना की तिथि", 
+
+  "orgunit.page.description": "विवरण", 
+
+  "orgunit.page.edit": "इस आइटम को संपादित करें", 
+
+  "orgunit.page.id": "पहचान", 
+
+  "orgunit.page.titleprefix": "संगठनात्मक इकाइयाँ: ", 
+
+  "pagination.next.button": "अगला", 
+
+  "pagination.next.button.disabled.tooltip": "परिणामों के और पृष्ठ नहीं", 
+
+  "pagination.options.description": "पृष्ठांकन के विकल्प", 
+
+  "pagination.previous.button": "पिछला", 
+
+  "pagination.results-per-page": "प्रति पृष्ठ परिणाम", 
+
+  "pagination.showing.detail": "{{ range }} में से {{ total }}", 
+
+  "pagination.showing.label": "अब दिखा रहे हैं", 
+
+  "pagination.sort-direction": "क्रमबद्ध विकल्प", 
+
+  "person-relationships.search.results.head": "व्यक्ति खोज परिणाम", 
+
+  "person.listelement.badge": "व्यक्ति", 
+
+  "person.listelement.no-title": "कोई नाम नहीं मिला", 
+
+  "person.orcid.registry.auth": "ORCID प्राधिकरण", 
+
+  "person.orcid.registry.queue": "ORCID रजिस्ट्री कतार", 
+
+  "person.orcid.sync.setting": "ORCID तुल्यकालन सेटिंग्स", 
+
+  "person.page.birthdate": "जन्म तिथि", 
+
+  "person.page.edit": "इस आइटम को संपादित करें", 
+
+  "person.page.email": "ईमेल पता", 
+
+  "person.page.firstname": "पहला नाम", 
+
+  "person.page.jobtitle": "नौकरी का शीर्षक", 
+
+  "person.page.lastname": "उपनाम", 
+
+  "person.page.link.full": "सभी मेटाडेटा दिखाएं", 
+
+  "person.page.name": "नाम", 
+
+  "person.page.orcid": "ORCID", 
+
+  "person.page.orcid.create": "एक ORCID आईडी बनाएं", 
+
+  "person.page.orcid.funding-preferences": "वित्त पोषण प्राथमिकताएं", 
+
+  "person.page.orcid.grant-authorizations": "अनुदान प्राधिकरण", 
+
+  "person.page.orcid.granted-authorizations": "स्वीकृत प्राधिकरण", 
+
+  "person.page.orcid.link": "ORCID आईडी से जोड़े", 
+
+  "person.page.orcid.link.error.message": "प्रोफ़ाइल को ORCID से जोड़ते समय कोई गड़बड़ी हुई। यदि समस्या बनी रहती है, तो व्यवस्थापक से संपर्क करें।", 
+
+  "person.page.orcid.link.processing": "प्रोफ़ाइल को ORCID से लिंक किया जा रहा है...", 
+
+  "person.page.orcid.missing-authorizations": "गुम अनुमति", 
+
+  "person.page.orcid.missing-authorizations-message": "निम्नलिखित प्राधिकरण गायब हैं:", 
+
+  "person.page.orcid.no-missing-authorizations-message": "आपको आपके संस्थान द्वारा सभी फ़ंक्शन का उपयोग करने के लिए एक्सेस अधिकार दिए गए हैं, इसलिए यह बॉक्स खाली है!", 
+
+  "person.page.orcid.no-orcid-message": "अभी तक कोई ORCID iD संबद्ध नहीं है। नीचे दिए गए बटन पर क्लिक करके इस प्रोफाइल को ओआरसीआईडी खाते से लिंक करना संभव है।", 
+
+  "person.page.orcid.orcid-not-linked-message": "इस प्रोफ़ाइल की ORCID iD ({{orcid }}) अभी तक ORCID रजिस्ट्री पर किसी खाते से कनेक्ट नहीं हुई है या कनेक्शन की समय-सीमा समाप्त हो गई है।", 
+
+  "person.page.orcid.profile-preferences": "प्रोफाइल प्राथमिकताएं", 
+
+  "person.page.orcid.publications-preferences": "प्रकाशन प्राथमिकताएं", 
+
+  "person.page.orcid.remove-orcid-message": "यदि आपको अपना ORCID हटाना है, तो कृपया संग्रहालय व्यवस्थापक से संपर्क करें", 
+
+  "person.page.orcid.save.preference.changes": "सेटिंग अद्यतन करें", 
+
+  "person.page.orcid.scope.activities-update": "अपनी शोध गतिविधियों को जोड़ें/अपडेट करें", 
+
+  "person.page.orcid.scope.authenticate": "अपना ORCID आईडी प्राप्त करें", 
+
+  "person.page.orcid.scope.person-update": "अपने बारे में अन्य जानकारी जोड़ें/अपडेट करें", 
+
+  "person.page.orcid.scope.read-limited": "विश्वसनीय पक्षों पर सेट दृश्यता के साथ अपनी जानकारी पढ़ें", 
+
+  "person.page.orcid.sync-fundings.all": "सारे निधि स्त्रोत ", 
+
+  "person.page.orcid.sync-fundings.disabled": "अक्षम", 
+
+  "person.page.orcid.sync-fundings.mine": "मेरे निधि स्त्रोत ", 
+
+  "person.page.orcid.sync-fundings.my_selected": "चयनित निधि स्त्रोत", 
+
+  "person.page.orcid.sync-profile.affiliation": "संबद्धता", 
+
+  "person.page.orcid.sync-profile.biographical": "जीवनी डेटा", 
+
+  "person.page.orcid.sync-profile.education": "शिक्षण", 
+
+  "person.page.orcid.sync-profile.identifiers": "पहचानकर्ता", 
+
+  "person.page.orcid.sync-publications.all": "सभी प्रकाशन", 
+
+  "person.page.orcid.sync-publications.disabled": "निर्योग्य", 
+
+  "person.page.orcid.sync-publications.mine": "मेरे प्रकाशन", 
+
+  "person.page.orcid.sync-publications.my_selected": "चयनित प्रकाशन", 
+
+  "person.page.orcid.sync-queue.description.affiliation": "संबद्धता", 
+
+  "person.page.orcid.sync-queue.description.country": "देश", 
+
+  "person.page.orcid.sync-queue.description.education": "शिक्षण", 
+
+  "person.page.orcid.sync-queue.description.external_ids": "बाहरी आईडी", 
+
+  "person.page.orcid.sync-queue.description.keywords": "खोजशब्द", 
+
+  "person.page.orcid.sync-queue.description.other_names": "अन्य नाम", 
+
+  "person.page.orcid.sync-queue.description.qualification": "योग्यता", 
+
+  "person.page.orcid.sync-queue.description.researcher_urls": "अनुसंधानकर्ता यूआरएल (URLs)", 
+
+  "person.page.orcid.sync-queue.discard": "परिवर्तन छोड़ें और ORCID रजिस्ट्री के साथ सिंक्रनाइज़ न करें", 
+
+  "person.page.orcid.sync-queue.discard.error": "ORCID कतार रिकॉर्ड को हटाना विफल रहा", 
+
+  "person.page.orcid.sync-queue.discard.success": "ORCID कतार रिकॉर्ड को सफलतापूर्वक खारिज कर दिया गया है", 
+
+  "person.page.orcid.sync-queue.empty-message": "ORCID रजिस्ट्री कतार खाली है", 
+
+  "person.page.orcid.sync-queue.send": "ORCID रजिस्ट्री के साथ सिंक्रनाइज़ करें", 
+
+  "person.page.orcid.sync-queue.send.bad-request-error": "ORCID को प्रस्तुतीकरण विफल हुआ क्योंकि ORCID रजिस्ट्री को भेजा गया संसाधन मान्य नहीं है", 
+
+  "person.page.orcid.sync-queue.send.conflict-error": "ORCID को प्रस्तुतीकरण विफल रहा क्योंकि संसाधन ORCID रजिस्ट्री पर पहले से मौजूद है", 
+
+  "person.page.orcid.sync-queue.send.error": "ORCID को प्रस्तुतीकरण विफल रहा", 
+
+  "person.page.orcid.sync-queue.send.not-found-warning": "संसाधन अब ORCID रजिस्ट्री पर मौजूद नहीं है।", 
+
+  "person.page.orcid.sync-queue.send.success": "ORCID को प्रस्तुतीकरण सफलतापूर्वक पूरा किया गया ", 
+
+  "person.page.orcid.sync-queue.send.unauthorized-error.content": "फिर से आवश्यक अनुमतियां देने के लिए <a href='{{orcid}}'>यहां</a> क्लिक करें। यदि समस्या बनी रहती है, तो व्यवस्थापक से संपर्क करें।", 
+
+  "person.page.orcid.sync-queue.send.unauthorized-error.title": "ORCID को प्रस्तुतीकरण अनुपलब्ध प्राधिकरणों के कारण विफल रहा।", 
+
+  "person.page.orcid.sync-queue.send.validation-error": "जिस डेटा को आप ORCID के साथ सिंक्रोनाइज़ करना चाहते हैं वह मान्य नहीं है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.amount-currency.required": "राशि की मुद्रा आवश्यक है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.country.invalid": "अमान्य 2 अंक ISO 3166 देश", 
+
+  "person.page.orcid.sync-queue.send.validation-error.disambiguated-organization.required": "संगठनों को स्पष्ट करने के लिए एक पहचानकर्ता की आवश्यकता है। समर्थित आईडी जीआरआईडी, रिंगगोल्ड, कानूनी इकाई पहचानकर्ता (एलईआई) और क्रॉसरेफ फंडर रजिस्ट्री पहचानकर्ता हैं", 
+
+  "person.page.orcid.sync-queue.send.validation-error.disambiguated-organization.value-required": "संगठन के पहचानकर्ताओं को एक मूल्य की आवश्यकता है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.disambiguation-source.invalid": "संगठन पहचानकर्ताओं में से एक का स्रोत अमान्य है। समर्थित स्रोत हैं RINGGOLD, GRID, LEI और FUNDREF", 
+
+  "person.page.orcid.sync-queue.send.validation-error.disambiguation-source.required": "संगठन के पहचानकर्ताओं को स्रोत की आवश्यकता होती है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.external-id.required": "भेजे जाने वाले संसाधन के लिए कम से कम एक पहचानकर्ता की आवश्यकता होती है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.funder.required": "धन की आवश्यकता है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.organization.address-required": "भेजे जाने वाले संगठन को पते की आवश्यकता है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.organization.city-required": "भेजे जाने वाले संगठन के पते के लिए एक शहर की आवश्यकता है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.organization.country-required": "भेजे जाने वाले संगठन के पते के लिए मान्य 2 अंकों वाला ISO 3166 देश होना चाहिए", 
+
+  "person.page.orcid.sync-queue.send.validation-error.organization.name-required": "संगठन का नाम आवश्यक है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.organization.required": "संगठन की आवश्यकता है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.publication.date-invalid": "प्रकाशन की तारीख 1900 . के एक साल बाद की होनी चाहिए", 
+
+  "person.page.orcid.sync-queue.send.validation-error.start-date.required": "प्रारंभ दिनांक आवश्यक है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.title.required": "शीर्षक आवश्यक है", 
+
+  "person.page.orcid.sync-queue.send.validation-error.type.required": "dc.type आवश्यक है", 
+
+  "person.page.orcid.sync-queue.table.header.action": "कार्रवाई", 
+
+  "person.page.orcid.sync-queue.table.header.description": "विवरण", 
+
+  "person.page.orcid.sync-queue.table.header.type": "प्रकार", 
+
+  "person.page.orcid.sync-queue.tooltip.affiliation": "संबद्धता", 
+
+  "person.page.orcid.sync-queue.tooltip.country": "देश", 
+
+  "person.page.orcid.sync-queue.tooltip.delete": "इस प्रविष्टि को ORCID रजिस्ट्री से निकालें", 
+
+  "person.page.orcid.sync-queue.tooltip.education": "शिक्षा", 
+
+  "person.page.orcid.sync-queue.tooltip.external_ids": "बाहरी पहचानकर्ता", 
+
+  "person.page.orcid.sync-queue.tooltip.insert": "ORCID रजिस्ट्री में नई प्रविष्टि जोड़ें", 
+
+  "person.page.orcid.sync-queue.tooltip.keywords": "खोजशब्द", 
+
+  "person.page.orcid.sync-queue.tooltip.other_names": "अन्य नाम", 
+
+  "person.page.orcid.sync-queue.tooltip.project": "परियोजना", 
+
+  "person.page.orcid.sync-queue.tooltip.publication": "प्रकाशन", 
+
+  "person.page.orcid.sync-queue.tooltip.qualification": "योग्यता", 
+
+  "person.page.orcid.sync-queue.tooltip.researcher_urls": "अनुसंधानकर्ता url", 
+
+  "person.page.orcid.sync-queue.tooltip.update": "ORCID रजिस्ट्री पर इस प्रविष्टि को अद्यतन करें", 
+
+  "person.page.orcid.synchronization-mode": "तुल्यकालन प्रणाली", 
+
+  "person.page.orcid.synchronization-mode-funding-message": "चुनें कि आपकी लिंक की गई परियोजना संस्थाओं को आपके ORCID रिकॉर्ड की फंडिंग जानकारी की सूची में भेजना है या नहीं।", 
+
+  "person.page.orcid.synchronization-mode-message": "कृपया ORCID के साथ तुल्यकालन (सिंक्रोनाइजेशन) विकल्प चुनें। विकल्पों में \"मानव चलित\" (आपको अपना डेटा अपने आप ORCID को भेजना होगा), या \"बैच\" (सिस्टम आपके डेटा को एक निर्धारित स्क्रिप्ट के माध्यम से ORCID को भेजेगा)।", 
+
+  "person.page.orcid.synchronization-mode-profile-message": "क्या आपका जैविक डेटा या व्यक्तिगत पहचानकर्ता आपके ओआरसीआईडी रिकॉर्ड में भेजना है?", 
+
+  "person.page.orcid.synchronization-mode-publication-message": "चुनें कि आपकी लिंक की गई प्रकाशन इकाइयों को आपके ORCID रिकॉर्ड की कार्यों की सूची में भेजना है या नहीं।", 
+
+  "person.page.orcid.synchronization-mode.batch": "बैच", 
+
+  "person.page.orcid.synchronization-mode.label": "तुल्यकालन प्रणाली", 
+
+  "person.page.orcid.synchronization-mode.manual": "मानव चलित", 
+
+  "person.page.orcid.synchronization-settings-update.error": "तुल्यकालन सेटिंग्स का अद्यतन विफल रहा ", 
+
+  "person.page.orcid.synchronization-settings-update.success": "तुल्यकालन सेटिंग्स को सफलतापूर्वक अपडेट कर दिया गया है", 
+
+  "person.page.orcid.unlink": "ORCID से अलग करें", 
+
+  "person.page.orcid.unlink.error": "प्रोफ़ाइल और ORCID रजिस्ट्री को अलग करते समय त्रुटि उत्पन्न हुई। पुनः प्रयास करें", 
+
+  "person.page.orcid.unlink.processing": "संसाधित किया जा रहा है...", 
+
+  "person.page.orcid.unlink.success": "प्रोफ़ाइल और ORCID रजिस्ट्री के बीच वियोग सफल रहा", 
+
+  "person.page.staffid": "कर्मचारी की पहचान", 
+
+  "person.page.titleprefix": "व्यक्ति: ", 
+
+  "person.search.results.head": "व्यक्ति खोज परिणाम", 
+
+  "person.search.title": "व्यक्ति की खोज", 
+
+  "process.detail.arguments": "बहस", 
+
+  "process.detail.arguments.empty": "इस प्रक्रिया में कोई तर्क नहीं है", 
+
+  "process.detail.back": "वापस", 
+
+  "process.detail.create": "समान प्रक्रिया बनाएं", 
+
+  "process.detail.end-time": "समाप्ति समय", 
+
+  "process.detail.logs.button": "प्रक्रिया उत्पाद प्राप्त करें ", 
+
+  "process.detail.logs.loading": "पुन: र्प्राप्ति जारी है", 
+
+  "process.detail.logs.none": "इस प्रक्रिया का कोई उत्पादन नहीं है", 
+
+  "process.detail.output": "प्रक्रिया उत्पाद", 
+
+  "process.detail.output-files": "आउटपुट फ़ाइलें", 
+
+  "process.detail.output-files.empty": "इस प्रक्रिया में कोई फाइल उत्पादित नहीं हुई है", 
+
+  "process.detail.script": "स्क्रिप्ट", 
+
+  "process.detail.start-time": "प्रारंभ समय", 
+
+  "process.detail.status": "स्थिति", 
+
+  "process.detail.title": "प्रक्रिया: {{ id }} - {{ name }}", 
+
+  "process.new.breadcrumbs": "नई प्रक्रिया बनाएं", 
+
+  "process.new.cancel": "रद्द करें", 
+
+  "process.new.header": "नई प्रक्रिया बनाएं", 
+
+  "process.new.notification.error.content": "इस प्रक्रिया को बनाते समय एक त्रुटि हुई", 
+
+  "process.new.notification.error.title": "त्रुटि", 
+
+  "process.new.notification.success.content": "प्रक्रिया सफलतापूर्वक बनाई गई", 
+
+  "process.new.notification.success.title": "सफलता", 
+
+  "process.new.parameter.file.required": "कृपया एक फ़ाइल चुनें", 
+
+  "process.new.parameter.file.upload-button": "फ़ाइल का चयन करें...", 
+
+  "process.new.parameter.required.missing": "निम्नलिखित पैरामीटर आवश्यक हैं लेकिन अभी भी गायब हैं:", 
+
+  "process.new.parameter.string.required": "पैरामीटर मान आवश्यक है", 
+
+  "process.new.parameter.type.file": "फ़ाइल", 
+
+  "process.new.parameter.type.value": "मान", 
+
+  "process.new.select-parameters": "मापदंड", 
+
+  "process.new.select-script": "स्क्रिप्ट", 
+
+  "process.new.select-script.placeholder": "स्क्रिप्ट चुनें...", 
+
+  "process.new.select-script.required": "स्क्रिप्ट की आवश्यकता है", 
+
+  "process.new.submit": "सहेजें", 
+
+  "process.new.title": "एक नई प्रक्रिया बनाएं", 
+
+  "process.overview.breadcrumbs": "प्रक्रियाओं का अवलोकन", 
+
+  "process.overview.new": "नया", 
+
+  "process.overview.table.finish": "समाप्ति समय (UTC)", 
+
+  "process.overview.table.id": "प्रक्रिया पहचान क्रमांक", 
+
+  "process.overview.table.name": "नाम", 
+
+  "process.overview.table.start": "प्रारंभ समय (UTC)", 
+
+  "process.overview.table.status": "स्थिति", 
+
+  "process.overview.table.user": "उपयोगकर्ता", 
+
+  "process.overview.title": "प्रक्रिया अवलोकन", 
+
+  "profile.breadcrumbs": "प्रोफ़ाइल को नवीनतम बनाएं", 
+
+  "profile.card.identify": "पहचान", 
+
+  "profile.card.researcher": "अनुसंधानकर्ता प्रोफाइल", 
+
+  "profile.card.security": "सुरक्षा", 
+
+  "profile.form.submit": "सहेजें", 
+
+  "profile.groups.head": "आप जिस प्राधिकरण समूह से संबंधित हैं", 
+
+  "profile.head": "प्रोफ़ाइल को नवीनतम बनाएं", 
+
+  "profile.metadata.form.error.firstname.required": "पहला नाम आवश्यक है", 
+
+  "profile.metadata.form.error.lastname.required": "उपनाम आवश्यक है", 
+
+  "profile.metadata.form.label.email": "ईमेल पता", 
+
+  "profile.metadata.form.label.firstname": "पहला नाम", 
+
+  "profile.metadata.form.label.language": "भाषा", 
+
+  "profile.metadata.form.label.lastname": "उपनाम", 
+
+  "profile.metadata.form.label.phone": "संपर्क टेलीफोन", 
+
+  "profile.metadata.form.notifications.success.content": "प्रोफ़ाइल में आपके परिवर्तन सहेजे गए थे।", 
+
+  "profile.metadata.form.notifications.success.title": "प्रोफाइल सहेजा गया", 
+
+  "profile.notifications.warning.no-changes.content": "प्रोफाइल में कोई बदलाव नहीं किया गया।", 
+
+  "profile.notifications.warning.no-changes.title": "कोई बदलाव नहीं", 
+
+  "profile.security.form.error.matching-passwords": "पासवर्ड एक - दूसरे से मिलते - जुलते नहीं हैं।", 
+
+  "profile.security.form.error.password-length": "पासवर्ड कम से कम 6 अक्षर लंबा होना चाहिए।", 
+
+  "profile.security.form.info": "वैकल्पिक रूप से, आप नीचे दिए गए बॉक्स में नया पासवर्ड दर्ज कर सकते हैं, और इसे दूसरे बॉक्स में फिर से टाइप करके इसकी पुष्टि करें। यह कम से कम छह वर्ण लंबा होना चाहिए।", 
+
+  "profile.security.form.label.password": "पासवर्ड", 
+
+  "profile.security.form.label.passwordrepeat": "पुष्टि करने के लिए फिर से लिखें", 
+
+  "profile.security.form.notifications.error.not-long-enough": "पासवर्ड कम से कम 6 अक्षर लंबा होना चाहिए।", 
+
+  "profile.security.form.notifications.error.not-same": "प्रदान किए गए पासवर्ड समान नहीं हैं।", 
+
+  "profile.security.form.notifications.error.title": "पासवर्ड बदलने में त्रुटि", 
+
+  "profile.security.form.notifications.success.content": "पासवर्ड में आपके परिवर्तन सहेजे गए थे।", 
+
+  "profile.security.form.notifications.success.title": "पासवर्ड सहेजा गया", 
+
+  "profile.special.groups.head": "विशेष समूह प्राधिकरण जिनसे आप संबंधित हैं", 
+
+  "profile.title": "प्रोफ़ाइल को नवीनतम बनाएं", 
+
+  "project-relationships.search.results.head": "परियोजना खोज परिणाम", 
+
+  "project.listelement.badge": "अनुसंधान परियोजना", 
+
+  "project.page.contributor": "योगदानकर्ता", 
+
+  "project.page.description": "विवरण", 
+
+  "project.page.edit": "इस आइटम को संपादित करें", 
+
+  "project.page.expectedcompletion": "पूरा होने की उम्मीद", 
+
+  "project.page.funder": "निधिदाता", 
+
+  "project.page.id": "पहचान", 
+
+  "project.page.keyword": "खोजशब्द", 
+
+  "project.page.status": "स्थिति", 
+
+  "project.page.titleprefix": "अनुसंधान परियोजना:", 
+
+  "project.search.results.head": "परियोजना खोज परिणाम", 
+
+  "publication-relationships.search.results.head": "प्रकाशन खोज परिणाम", 
+
+  "publication.listelement.badge": "प्रकाशन", 
+
+  "publication.page.description": "विवरण", 
+
+  "publication.page.edit": "इस आइटम को संपादित करें", 
+
+  "publication.page.journal-issn": "पत्रिका ISSN", 
+
+  "publication.page.journal-title": "पत्रिका शीर्षक", 
+
+  "publication.page.publisher": "प्रकाशक", 
+
+  "publication.page.titleprefix": "प्रकाशन:", 
+
+  "publication.page.volume-title": "अंक शीर्षक", 
+
+  "publication.search.results.head": "प्रकाशन खोज परिणाम", 
+
+  "publication.search.title": "प्रकाशन खोज", 
+
+  "register-email.title": "नया उपयोगकर्ता पंजीकरण", 
+
+  "register-page.create-profile.header": "प्रोफ़ाइल बनाएं", 
+
+  "register-page.create-profile.identification.contact": "संपर्क टेलीफोन", 
+
+  "register-page.create-profile.identification.email": "ईमेल पता", 
+
+  "register-page.create-profile.identification.first-name": "पहला नाम *", 
+
+  "register-page.create-profile.identification.first-name.error": "कृपया पहला नाम भरें", 
+
+  "register-page.create-profile.identification.header": "पहचान करें ", 
+
+  "register-page.create-profile.identification.language": "भाषा", 
+
+  "register-page.create-profile.identification.last-name": "उपनाम *", 
+
+  "register-page.create-profile.identification.last-name.error": "कृपया अंतिम नाम भरें", 
+
+  "register-page.create-profile.security.error.empty-password": "कृपया नीचे दिए गए बॉक्स में पासवर्ड दर्ज करें।", 
+
+  "register-page.create-profile.security.error.matching-passwords": "पासवर्ड एक - दूसरे से मिलते - जुलते नहीं हैं।", 
+
+  "register-page.create-profile.security.error.password-length": "पासवर्ड कम से कम 6 अक्षर लंबा होना चाहिए।", 
+
+  "register-page.create-profile.security.header": "सुरक्षा", 
+
+  "register-page.create-profile.security.info": "कृपया नीचे दिए गए बॉक्स में पासवर्ड दर्ज करें, और दूसरे बॉक्स में फिर से टाइप करके इसकी पुष्टि करें। यह कम से कम छह वर्ण लंबा होना चाहिए।", 
+
+  "register-page.create-profile.security.label.password": "पासवर्ड *", 
+
+  "register-page.create-profile.security.label.passwordrepeat": "पुष्टि करने के लिए फिर से लिखें *", 
+
+  "register-page.create-profile.submit": "पंजीकरण पूर्ण करें", 
+
+  "register-page.create-profile.submit.error.content": "नया उपयोगकर्ता पंजीकृत करते समय कुछ गलत हुआ।", 
+
+  "register-page.create-profile.submit.error.head": "पंजीकरण विफल रहा", 
+
+  "register-page.create-profile.submit.success.content": "पंजीकरण सफल रहा। आपको बनाए गए उपयोगकर्ता के रूप में लॉग इन किया गया है।", 
+
+  "register-page.create-profile.submit.success.head": "पंजीकरण पूर्ण", 
+
+  "register-page.registration.email": "ईमेल पता *", 
+
+  "register-page.registration.email.error.pattern": "कृपया ईमेल पता भरें", 
+
+  "register-page.registration.email.error.required": "कृपया ईमेल पता भरें", 
+
+  "register-page.registration.email.hint": "यह पता सत्यापित किया जाएगा और आपके लॉगिन नाम के रूप में उपयोग किया जाएगा।", 
+
+  "register-page.registration.error.content": "निम्न ईमेल पता पंजीकृत करते समय एक त्रुटि हुई: {{ email }}", 
+
+  "register-page.registration.error.head": "ईमेल पंजीकृत करने का प्रयास करते समय त्रुटि", 
+
+  "register-page.registration.header": "नया उपयोगकर्ता पंजीकरण", 
+
+  "register-page.registration.info": "डीस्पेस में नई प्रस्तुति तथा ईमेल द्वारा संग्रह अद्यतन की जानकारी हेतु सदस्यता के लिए नया खता पंजीकृत करें", 
+
+  "register-page.registration.submit": "पंजीकृत करें ", 
+
+  "register-page.registration.success.content": "{{ email }} को एक विशेष यूआरएल और अन्य निर्देशों के साथ एक ईमेल भेजा गया है।", 
+
+  "register-page.registration.success.head": "सत्यापन ईमेल भेज दिया गया है", 
+
+  "relationships.add.error.relationship-type.content": "दो मदों के बीच {{type }} संबंध प्रकार के लिए कोई उपयुक्त मिलान नहीं पाया जा सका", 
+
+  "relationships.add.error.server.content": "सर्वर ने त्रुटि लौटाई", 
+
+  "relationships.add.error.title": "संबंध जोड़ने में असमर्थ", 
+
+  "relationships.isAuthorOf": "लेखक", 
+
+  "relationships.isAuthorOf.OrgUnit": "लेखक (संगठनात्मक इकाइयां)", 
+
+  "relationships.isAuthorOf.Person": "लेखक (व्यक्ति)", 
+
+  "relationships.isContributorOf": "योगदानकर्ता", 
+
+  "relationships.isContributorOf.OrgUnit": "योगदानकर्ता (संगठनात्मक इकाई)", 
+
+  "relationships.isContributorOf.Person": "योगदान देने वाला", 
+
+  "relationships.isFundingAgencyOf.OrgUnit": "निधिदाता", 
+
+  "relationships.isIssueOf": "पत्रिका अंक", 
+
+  "relationships.isJournalIssueOf": "पत्रिका अंक", 
+
+  "relationships.isJournalOf": "पत्रिकाएं", 
+
+  "relationships.isOrgUnitOf": "संगठनात्मक इकाइयाँ", 
+
+  "relationships.isPersonOf": "लेखक", 
+
+  "relationships.isProjectOf": "अनुसंधान परियोजना", 
+
+  "relationships.isPublicationOf": "प्रकाशन", 
+
+  "relationships.isPublicationOfJournalIssue": "लेख", 
+
+  "relationships.isSingleJournalOf": "पत्रिका", 
+
+  "relationships.isSingleVolumeOf": "पत्रिका खंड", 
+
+  "relationships.isVolumeOf": "पत्रिका खंड", 
+
+  "repository.image.logo": "संग्राहलय चिन्ह", 
+
+  "repository.title.prefix": "डीस्पेस एंग्युलर::", 
+
+  "repository.title.prefixDSpace": "डीस्पेस एंग्यूलर ::", 
+
+  "researcher.profile.action.processing": "संसाधित किया जा रहा है...", 
+
+  "researcher.profile.associated": "शोधकर्ता प्रोफ़ाइल संबद्ध", 
+
+  "researcher.profile.change-visibility.fail": "प्रोफ़ाइल दृश्यता बदलते समय एक अनपेक्षित त्रुटि उत्पन्न होती है", 
+
+  "researcher.profile.create.fail": "शोधकर्ता प्रोफ़ाइल निर्माण के दौरान एक त्रुटि उत्पन्न होती है", 
+
+  "researcher.profile.create.new": "नया बनाएं", 
+
+  "researcher.profile.create.success": "अनुसंधानकर्ता प्रोफ़ाइल सफलतापूर्वक बनाई गई", 
+
+  "researcher.profile.delete": "हटाएं", 
+
+  "researcher.profile.expose": "खुलासा", 
+
+  "researcher.profile.hide": "छिपाना", 
+
+  "researcher.profile.not.associated": "अनुसंधानकर्ता प्रोफ़ाइल अभी तक सम्बंधित नहीं है ", 
+
+  "researcher.profile.private.visibility": "निजी", 
+
+  "researcher.profile.public.visibility": "सार्वजनिक", 
+
+  "researcher.profile.status": "दर्जा:", 
+
+  "researcher.profile.view": "देखें", 
+
+  "researcherprofile.claim.not-authorized": "आप इस मद पर दावा करने के लिए अधिकृत नहीं हैं। अधिक जानकारी के लिए व्यवस्थापक से संपर्क करें।", 
+
+  "researcherprofile.error.claim.body": "प्रोफ़ाइल का दावा करते समय एक त्रुटि हुई, कृपया बाद में पुन: प्रयास करें", 
+
+  "researcherprofile.error.claim.title": "त्रुटि", 
+
+  "researcherprofile.success.claim.body": "प्रोफ़ाइल पर सफलतापूर्वक दावा किया गया", 
+
+  "researcherprofile.success.claim.title": "सफलता", 
+
+  "resource-policies.add.button": "जोड़ें", 
+
+  "resource-policies.add.for.": "नई नीति जोड़ें", 
+
+  "resource-policies.add.for.bitstream": "एक नई बिटस्ट्रीम नीति जोड़ें", 
+
+  "resource-policies.add.for.bundle": "नई बंडल नीति जोड़ें", 
+
+  "resource-policies.add.for.collection": "एक नई संग्रह नीति जोड़ें", 
+
+  "resource-policies.add.for.community": "नई सामुदायिक नीति जोड़ें", 
+
+  "resource-policies.add.for.item": "नई आइटम नीति जोड़ें", 
+
+  "resource-policies.create.page.failure.content": "संसाधन नीति बनाते समय कोई त्रुटि उत्पन्न हुई।", 
+
+  "resource-policies.create.page.heading": "के लिए नई संसाधन नीति बनाएं", 
+
+  "resource-policies.create.page.success.content": "संचालन सफल रहा", 
+
+  "resource-policies.create.page.title": "नई संसाधन नीति बनाएं", 
+
+  "resource-policies.delete.btn": "चयनित को हटाएं", 
+
+  "resource-policies.delete.btn.title": "चयनित संसाधन नीतियां हटाएं", 
+
+  "resource-policies.delete.failure.content": "चयनित संसाधन नीतियों को हटाते समय एक त्रुटि उत्पन्न हुई।", 
+
+  "resource-policies.delete.success.content": "संचालन सफल रहा", 
+
+  "resource-policies.edit.page.failure.content": "संसाधन नीति संपादित करते समय कोई त्रुटि उत्पन्न हुई।", 
+
+  "resource-policies.edit.page.heading": "संसाधन नीति संपादित करें", 
+
+  "resource-policies.edit.page.other-failure.content": "संसाधन नीति संपादित करते समय कोई त्रुटि उत्पन्न हुई। लक्ष्य (ई-व्यक्ति या समूह) का सफलतापूर्वक अद्यतन कर दिया गया है।", 
+
+  "resource-policies.edit.page.success.content": "संचालन सफल रहा", 
+
+  "resource-policies.edit.page.target-failure.content": "संसाधन नीति के लक्ष्य (ई-व्यक्ति या समूह) को संपादित करते समय कोई त्रुटि उत्पन्न हुई।", 
+
+  "resource-policies.edit.page.title": "संसाधन नीति संपादित करें", 
+
+  "resource-policies.form.action-type.label": "क्रिया प्रकार चुनें", 
+
+  "resource-policies.form.action-type.required": "आपको संसाधन नीति कार्रवाई का चयन करना होगा।", 
+
+  "resource-policies.form.date.end.label": "अंतिम तिथि", 
+
+  "resource-policies.form.date.start.label": "आरंभ करने की तिथि", 
+
+  "resource-policies.form.description.label": "विवरण", 
+
+  "resource-policies.form.eperson-group-list.label": "वह व्यक्ति या समूह जिसे अनुमति दी जाएगी", 
+
+  "resource-policies.form.eperson-group-list.modal.close": "ठीक है", 
+
+  "resource-policies.form.eperson-group-list.modal.header": "प्रकार नहीं बदल सकता", 
+
+  "resource-policies.form.eperson-group-list.modal.text1.toEPerson": "समूह को ई-व्यक्ति से बदलना संभव नहीं है।", 
+
+  "resource-policies.form.eperson-group-list.modal.text1.toGroup": "ई-व्यक्ति को समूह से बदलना संभव नहीं है।", 
+
+  "resource-policies.form.eperson-group-list.modal.text2": "वर्तमान संसाधन नीति हटाएं और वांछित प्रकार के साथ एक नई बनाएं।", 
+
+  "resource-policies.form.eperson-group-list.select.btn": "चयन करें", 
+
+  "resource-policies.form.eperson-group-list.tab.eperson": "ई-व्यक्ति के लिए खोजें", 
+
+  "resource-policies.form.eperson-group-list.tab.group": "एक समूह खोजें", 
+
+  "resource-policies.form.eperson-group-list.table.headers.action": "गतिविधि", 
+
+  "resource-policies.form.eperson-group-list.table.headers.id": "पहचान", 
+
+  "resource-policies.form.eperson-group-list.table.headers.name": "नाम", 
+
+  "resource-policies.form.name.label": "नाम", 
+
+  "resource-policies.form.policy-type.label": "नीति प्रकार चुनें", 
+
+  "resource-policies.form.policy-type.required": "आपको संसाधन नीति प्रकार का चयन करना होगा।", 
+
+  "resource-policies.table.headers.action": "गतिविधि", 
+
+  "resource-policies.table.headers.date.end": "अंतिम तिथि", 
+
+  "resource-policies.table.headers.date.start": "आरंभ तिथि", 
+
+  "resource-policies.table.headers.edit": "संपादित करें", 
+
+  "resource-policies.table.headers.edit.group": "समूह संपादित करें", 
+
+  "resource-policies.table.headers.edit.policy": "नीति संपादित करें", 
+
+  "resource-policies.table.headers.eperson": "ई-व्यक्ति", 
+
+  "resource-policies.table.headers.group": "समूह", 
+
+  "resource-policies.table.headers.id": "पहचान", 
+
+  "resource-policies.table.headers.name": "नाम", 
+
+  "resource-policies.table.headers.policyType": "प्रकार", 
+
+  "resource-policies.table.headers.title.for.bitstream": "बिटस्ट्रीम के लिए नीतियां", 
+
+  "resource-policies.table.headers.title.for.bundle": "बंडल के लिए नीतियां", 
+
+  "resource-policies.table.headers.title.for.collection": "संग्रह के लिए नीतियां", 
+
+  "resource-policies.table.headers.title.for.community": "समुदाय के लिए नीतियां", 
+
+  "resource-policies.table.headers.title.for.item": "आइटम के लिए नीतियां", 
+
+  "search.breadcrumbs": "खोजें", 
+
+  "search.description": null, 
+
+  "search.filters.applied.f.author": "लेखक", 
+
+  "search.filters.applied.f.birthDate.max": "अंतिम जन्म तिथि", 
+
+  "search.filters.applied.f.birthDate.min": "जन्म तिथि प्रारंभ करें", 
+
+  "search.filters.applied.f.dateIssued.max": "अंतिम तिथि", 
+
+  "search.filters.applied.f.dateIssued.min": "आरंभ करने की तिथि", 
+
+  "search.filters.applied.f.dateSubmitted": "प्रस्तुत करने की तारीख", 
+
+  "search.filters.applied.f.discoverable": "गैर-खोज योग्य", 
+
+  "search.filters.applied.f.entityType": "आइटम का प्रकार", 
+
+  "search.filters.applied.f.has_content_in_original_bundle": "फ़ाइलें हैं", 
+
+  "search.filters.applied.f.itemtype": "प्रकार", 
+
+  "search.filters.applied.f.jobTitle": "नौकरी का शीर्षक", 
+
+  "search.filters.applied.f.namedresourcetype": "स्थिति", 
+
+  "search.filters.applied.f.subject": "विषय", 
+
+  "search.filters.applied.f.submitter": "प्रस्तुतकर्ता", 
+
+  "search.filters.applied.f.withdrawn": "वापस लिया गया", 
+
+  "search.filters.discoverable.false": "हाँ", 
+
+  "search.filters.discoverable.true": "नहीं", 
+
+  "search.filters.entityType.JournalIssue": "पत्रिका अंक", 
+
+  "search.filters.entityType.JournalVolume": "पत्रिका खंड", 
+
+  "search.filters.entityType.OrgUnit": "संगठित इकाई", 
+
+  "search.filters.filter.author.head": "लेखक", 
+
+  "search.filters.filter.author.label": "लेखक का नाम खोजें", 
+
+  "search.filters.filter.author.placeholder": "लेखक का नाम", 
+
+  "search.filters.filter.birthDate.head": "जन्म तिथि", 
+
+  "search.filters.filter.birthDate.label": "जन्म तिथि खोजें", 
+
+  "search.filters.filter.birthDate.placeholder": "जन्म तिथि", 
+
+  "search.filters.filter.collapse": "फ़िल्टर संक्षिप्त करें", 
+
+  "search.filters.filter.creativeDatePublished.head": "प्रकाशित तिथि", 
+
+  "search.filters.filter.creativeDatePublished.label": "प्रकाशित तिथि पर खोजें", 
+
+  "search.filters.filter.creativeDatePublished.placeholder": "प्रकाशित तिथि", 
+
+  "search.filters.filter.creativeWorkEditor.head": "संपादक", 
+
+  "search.filters.filter.creativeWorkEditor.label": "संपादक खोजें", 
+
+  "search.filters.filter.creativeWorkEditor.placeholder": "संपादक", 
+
+  "search.filters.filter.creativeWorkKeywords.head": "विषय", 
+
+  "search.filters.filter.creativeWorkKeywords.label": "विषय खोजें", 
+
+  "search.filters.filter.creativeWorkKeywords.placeholder": "विषय", 
+
+  "search.filters.filter.creativeWorkPublisher.head": "प्रकाशक", 
+
+  "search.filters.filter.creativeWorkPublisher.label": "प्रकाशक खोजें", 
+
+  "search.filters.filter.creativeWorkPublisher.placeholder": "प्रकाशक", 
+
+  "search.filters.filter.dateIssued.head": "तिथि", 
+
+  "search.filters.filter.dateIssued.max.label": "अंत", 
+
+  "search.filters.filter.dateIssued.max.placeholder": "अधिकतम तिथि", 
+
+  "search.filters.filter.dateIssued.min.label": "शुरू करें", 
+
+  "search.filters.filter.dateIssued.min.placeholder": "न्यूनतम तिथि", 
+
+  "search.filters.filter.dateSubmitted.head": "प्रस्तुत करने की तारीख", 
+
+  "search.filters.filter.dateSubmitted.label": "खोज की तारीख जमा की गई", 
+
+  "search.filters.filter.dateSubmitted.placeholder": "प्रस्तुत करने की तारीख", 
+
+  "search.filters.filter.discoverable.head": "गैर-खोज योग्य", 
+
+  "search.filters.filter.entityType.head": "आइटम का प्रकार", 
+
+  "search.filters.filter.entityType.label": "आइटम प्रकार खोजें", 
+
+  "search.filters.filter.entityType.placeholder": "आइटम का प्रकार", 
+
+  "search.filters.filter.expand": "फ़िल्टर का विस्तार करें", 
+
+  "search.filters.filter.has_content_in_original_bundle.head": "फ़ाइलें हैं", 
+
+  "search.filters.filter.itemtype.head": "प्रकार", 
+
+  "search.filters.filter.itemtype.label": "खोज प्रकार", 
+
+  "search.filters.filter.itemtype.placeholder": "प्रकार", 
+
+  "search.filters.filter.jobTitle.head": "नौकरी का शीर्षक", 
+
+  "search.filters.filter.jobTitle.label": "नौकरी का शीर्षक खोजें", 
+
+  "search.filters.filter.jobTitle.placeholder": "नौकरी का शीर्षक", 
+
+  "search.filters.filter.knowsLanguage.head": "ज्ञात भाषा", 
+
+  "search.filters.filter.knowsLanguage.label": "ज्ञात भाषा खोजें", 
+
+  "search.filters.filter.knowsLanguage.placeholder": "ज्ञात भाषा", 
+
+  "search.filters.filter.namedresourcetype.head": "स्थिति", 
+
+  "search.filters.filter.namedresourcetype.label": "खोज स्थिति", 
+
+  "search.filters.filter.namedresourcetype.placeholder": "स्थिति", 
+
+  "search.filters.filter.objectpeople.head": "लोग", 
+
+  "search.filters.filter.objectpeople.label": "लोगों को खोजें", 
+
+  "search.filters.filter.objectpeople.placeholder": "लोग", 
+
+  "search.filters.filter.organizationAddressCountry.head": "देश", 
+
+  "search.filters.filter.organizationAddressCountry.label": "देश खोजें", 
+
+  "search.filters.filter.organizationAddressCountry.placeholder": "देश", 
+
+  "search.filters.filter.organizationAddressLocality.head": "शहर", 
+
+  "search.filters.filter.organizationAddressLocality.label": "शहर खोजें", 
+
+  "search.filters.filter.organizationAddressLocality.placeholder": "शहर", 
+
+  "search.filters.filter.organizationFoundingDate.head": "स्थापना तिथि", 
+
+  "search.filters.filter.organizationFoundingDate.label": "खोज तिथि मिली", 
+
+  "search.filters.filter.organizationFoundingDate.placeholder": "स्थापना तिथि", 
+
+  "search.filters.filter.scope.head": "क्षेत्र", 
+
+  "search.filters.filter.scope.label": "खोज क्षेत्र फ़िल्टर", 
+
+  "search.filters.filter.scope.placeholder": "स्कोप फिल्टर", 
+
+  "search.filters.filter.show-less": "संक्षिप्त करें", 
+
+  "search.filters.filter.show-more": "और दिखाएं", 
+
+  "search.filters.filter.subject.head": "विषय", 
+
+  "search.filters.filter.subject.label": "विषय खोजें", 
+
+  "search.filters.filter.subject.placeholder": "विषय", 
+
+  "search.filters.filter.submitter.head": "प्रस्तुतकर्ता", 
+
+  "search.filters.filter.submitter.label": "प्रस्तुतकर्ता को खोजें", 
+
+  "search.filters.filter.submitter.placeholder": "प्रस्तुतकर्ता", 
+
+  "search.filters.filter.withdrawn.head": "वापस लिया गया", 
+
+  "search.filters.has_content_in_original_bundle.false": "नहीं", 
+
+  "search.filters.has_content_in_original_bundle.true": "हाँ", 
+
+  "search.filters.head": "फिल्टर", 
+
+  "search.filters.reset": "फ़िल्टर रीसेट करें", 
+
+  "search.filters.search.submit": "प्रस्तुत करें", 
+
+  "search.filters.withdrawn.false": "नहीं", 
+
+  "search.filters.withdrawn.true": "हाँ", 
+
+  "search.form.scope.all": "सम्पूर्ण डीस्पेस", 
+
+  "search.form.search": "खोजें", 
+
+  "search.form.search_dspace": "सम्पूर्ण संग्रहालय", 
+
+  "search.results.empty": "आपकी खोज ने कोई परिणाम नहीं दिया।", 
+
+  "search.results.head": "खोज के परिणाम", 
+
+  "search.results.no-results": "आपकी खोज का कोई परिणाम नहीं निकला। आप जो खोज रहे हैं उसे ढूंढने में परेशानी हो रही है? डालने का प्रयास करें", 
+
+  "search.results.no-results-link": "इसके चारों ओर उद्धरण", 
+
+  "search.results.view-result": "देखें", 
+
+  "search.search-form.placeholder": "संग्रहालय में खोजें ...", 
+
+  "search.sidebar.close": "परिणामों पर वापस जाएं", 
+
+  "search.sidebar.filters.title": "फिल्टर", 
+
+  "search.sidebar.open": "खोज उपकरण", 
+
+  "search.sidebar.results": "परिणाम", 
+
+  "search.sidebar.settings.rpp": "प्रति पृष्ठ परिणाम", 
+
+  "search.sidebar.settings.sort-by": "द्वारा क्रमबद्ध करें", 
+
+  "search.sidebar.settings.title": "समायोजन", 
+
+  "search.switch-configuration.title": "दिखाएँ", 
+
+  "search.title": "खोजें", 
+
+  "search.view-switch.show-detail": "विवरण दिखाएँ", 
+
+  "search.view-switch.show-grid": "ग्रिड के रूप में दिखाएं", 
+
+  "search.view-switch.show-list": "सूची के रूप में दिखाएं", 
+
+  "sorting.ASC": "आरोही", 
+
+  "sorting.dc.date.accessioned.ASC": "परिग्रहण तिथि आरोही", 
+
+  "sorting.dc.date.accessioned.DESC": "परिग्रहण तिथि अवरोही", 
+
+  "sorting.dc.date.issued.ASC": "जारी तिथि आरोही", 
+
+  "sorting.dc.date.issued.DESC": "जारी दिनांक अवरोही", 
+
+  "sorting.dc.title.ASC": "शीर्षक आरोही", 
+
+  "sorting.dc.title.DESC": "शीर्षक अवरोही", 
+
+  "sorting.DESC": "अवरोही", 
+
+  "sorting.lastModified.ASC": "अंतिम संशोधित आरोही", 
+
+  "sorting.lastModified.DESC": "अंतिम संशोधित अवरोही", 
+
+  "sorting.score.ASC": "न्यूनतम प्रासंगिक", 
+
+  "sorting.score.DESC": "सबसे अधिक प्रासंगिक", 
+
+  "statistics.breadcrumbs": "सांख्यिकी", 
+
+  "statistics.header": "{{ scope }} के आंकड़े", 
+
+  "statistics.page.no-data": "कोई डेटा उपलब्ध नहीं", 
+
+  "statistics.table.header.views": "दौरे", 
+
+  "statistics.table.no-data": "कोई डेटा उपलब्ध नहीं", 
+
+  "statistics.table.title.TopCities": "शीर्ष शहर के दृश्य", 
+
+  "statistics.table.title.TopCountries": "शीर्ष दर्शक देश", 
+
+  "statistics.table.title.TotalDownloads": "फ़ाइल का दौरा", 
+
+  "statistics.table.title.TotalVisits": "कुल दौरा", 
+
+  "statistics.table.title.TotalVisitsPerMonth": "प्रति माह कुल विज़िट", 
+
+  "statistics.title": "सांख्यिकी", 
+
+  "submission.edit.breadcrumbs": "प्रस्तुति सम्पादित करें", 
+
+  "submission.edit.title": "प्रस्तुति संपादित करें", 
+
+  "submission.general.cancel": "रद्द करें", 
+
+  "submission.general.cannot_submit": "आपको नई प्रस्तुति करने का विशेषाधिकार नहीं है।", 
+
+  "submission.general.deposit": "जमा", 
+
+  "submission.general.discard.confirm.cancel": "रद्द करें", 
+
+  "submission.general.discard.confirm.info": "यह कार्रवाई पूर्ववत नहीं की जा सकती। क्या आपको यकीन है?", 
+
+  "submission.general.discard.confirm.submit": "हां मुझे यकीन है", 
+
+  "submission.general.discard.confirm.title": "प्रस्तुति रद्द करें", 
+
+  "submission.general.discard.submit": "रद्द करें", 
+
+  "submission.general.info.pending-changes": "बदलाव जो सहेजे नहीं गए", 
+
+  "submission.general.info.saved": "सहेजा गया", 
+
+  "submission.general.save": "सहेजें", 
+
+  "submission.general.save-later": "बाद के लिए सहेजें", 
+
+  "submission.import-external.back-to-my-dspace": "मेरे डीस्पेस पर वापस जाएं ", 
+
+  "submission.import-external.page.hint": "डीस्पेस में आयात करने के लिए वेब से आइटम खोजने के लिए ऊपर एक क्वेरी दर्ज करें।", 
+
+  "submission.import-external.page.title": "बाहरी स्रोत से मेटाडेटा आयात करें", 
+
+  "submission.import-external.preview.button.import": "प्रस्तुत करना प्रारंभ करें", 
+
+  "submission.import-external.preview.error.import.body": "बाहरी स्रोत प्रविष्टि आयात प्रक्रिया के दौरान कोई त्रुटि उत्पन्न होती है।", 
+
+  "submission.import-external.preview.error.import.title": "प्रस्तुत करने में त्रुटि", 
+
+  "submission.import-external.preview.subtitle": "नीचे दिया गया मेटाडेटा बाहरी स्रोत से आयात किया गया था। जब आप प्रस्तुति शुरू करेंगे तो यह पहले से भर जाएगा।", 
+
+  "submission.import-external.preview.title": "आइटम पूर्वावलोकन", 
+
+  "submission.import-external.preview.title.Journal": "पत्रिका पूर्वावलोकन", 
+
+  "submission.import-external.preview.title.none": "आइटम पूर्वावलोकन", 
+
+  "submission.import-external.preview.title.OrgUnit": "संगठनात्मक इकाई पूर्वावलोकन", 
+
+  "submission.import-external.preview.title.Person": "व्यक्ति पूर्वावलोकन", 
+
+  "submission.import-external.preview.title.Project": "परियोजना पूर्वावलोकन", 
+
+  "submission.import-external.preview.title.Publication": "प्रकाशन पूर्वावलोकन", 
+
+  "submission.import-external.search.button": "खोजें", 
+
+  "submission.import-external.search.button.hint": "खोजने के लिए कुछ शब्द लिखें", 
+
+  "submission.import-external.search.placeholder": "बाहरी स्रोत खोजें", 
+
+  "submission.import-external.search.source.hint": "बाहरी स्रोत चुनें", 
+
+  "submission.import-external.source.ads": "NASA/ADS", 
+
+  "submission.import-external.source.arxiv": "arXiv", 
+
+  "submission.import-external.source.cinii": "CiNii", 
+
+  "submission.import-external.source.crossref": "CrossRef", 
+
+  "submission.import-external.source.epo": "यूरोपीय पेटेंट कार्यालय", 
+
+  "submission.import-external.source.lcname": "लाइब्रेरी ऑफ़ कांग्रेस के नाम", 
+
+  "submission.import-external.source.loading": "लोड हो रहा है...", 
+
+  "submission.import-external.source.openAIREFunding": "OpenAIRE API का वित्तपोषण", 
+
+  "submission.import-external.source.orcid": "ORCID", 
+
+  "submission.import-external.source.orcidWorks": "ORCID", 
+
+  "submission.import-external.source.pubmed": "पबमेड (Pubmed)", 
+
+  "submission.import-external.source.pubmedeu": "पबमेड (Pubmed) यूरोप", 
+
+  "submission.import-external.source.scielo": "SciELO", 
+
+  "submission.import-external.source.scopus": "स्कोपस", 
+
+  "submission.import-external.source.sherpaJournal": "शेरपा पत्रिकाएं", 
+
+  "submission.import-external.source.sherpaJournalIssn": "ISSN द्वारा शेरपा पत्रिकाएं  ", 
+
+  "submission.import-external.source.sherpaPublisher": "शेरपा प्रकाशक", 
+
+  "submission.import-external.source.vufind": "VuFind", 
+
+  "submission.import-external.source.wos": "वेब ऑफ़ साइंस", 
+
+  "submission.import-external.title": "बाहरी स्रोत से मेटाडेटा आयात करें", 
+
+  "submission.import-external.title.Journal": "किसी बाहरी स्रोत से पत्रिका आयात करें", 
+
+  "submission.import-external.title.JournalIssue": "किसी बाहरी स्रोत से पत्रिका अंक आयात करें   ", 
+
+  "submission.import-external.title.JournalVolume": "किसी बाहरी स्रोत से पत्रिका अंक आयात करें", 
+
+  "submission.import-external.title.none": "बाहरी स्रोत से मेटाडेटा आयात करें", 
+
+  "submission.import-external.title.OrgUnit": "किसी बाहरी स्रोत से प्रकाशक आयात करें", 
+
+  "submission.import-external.title.Person": "किसी व्यक्ति को बाहरी स्रोत से आयात करें", 
+
+  "submission.import-external.title.Project": "किसी बाहरी स्रोत से प्रोजेक्ट आयात करें", 
+
+  "submission.import-external.title.Publication": "किसी बाहरी स्रोत से प्रकाशन आयात करें", 
+
+  "submission.sections.accesses.form.access-condition-hint": "आइटम जमा करने के बाद उस पर लागू करने के लिए प्रयोग शर्त का चयन करें", 
+
+  "submission.sections.accesses.form.access-condition-label": "पहुँच स्थिति प्रकार", 
+
+  "submission.sections.accesses.form.date-required": "तिथि आवश्यक है।", 
+
+  "submission.sections.accesses.form.date-required-from": "तिथि से अनुदान पहुंच आवश्यक है।", 
+
+  "submission.sections.accesses.form.date-required-until": "तिथि तक पहुंच प्रदान करना आवश्यक है।", 
+
+  "submission.sections.accesses.form.discoverable-description": "चयनित होने पर, यह आइटम खोज/ब्राउज़ में खोजने योग्य होगा। अचयनित होने पर, आइटम केवल सीधे लिंक के माध्यम से उपलब्ध होगा और कभी भी खोज/ब्राउज़ में दिखाई नहीं देगा। ", 
+
+  "submission.sections.accesses.form.discoverable-label": "खोज योग्य", 
+
+  "submission.sections.accesses.form.from-hint": "उस तिथि का चयन करें जिससे संबंधित एक्सेस शर्त लागू की गई है", 
+
+  "submission.sections.accesses.form.from-label": "अभिगमन आरम्भ तिथि", 
+
+  "submission.sections.accesses.form.from-placeholder": "से", 
+
+  "submission.sections.accesses.form.group-label": "समूह", 
+
+  "submission.sections.accesses.form.group-required": "समूह की आवश्यकता है।", 
+
+  "submission.sections.accesses.form.until-hint": "उस तिथि का चयन करें जब तक संबंधित पहुंच की शर्त लागू नहीं होती है", 
+
+  "submission.sections.accesses.form.until-label": "तक पहुंच प्रदान करें", 
+
+  "submission.sections.accesses.form.until-placeholder": "तक", 
+
+  "submission.sections.ccLicense.change": "अपना लाइसेंस प्रकार बदलें…", 
+
+  "submission.sections.ccLicense.confirmation": "मैं ऊपर लाइसेंस प्रदान करता हूं", 
+
+  "submission.sections.ccLicense.link": "आपने निम्न लाइसेंस का चयन किया है:", 
+
+  "submission.sections.ccLicense.none": "कोई लाइसेंस उपलब्ध नहीं", 
+
+  "submission.sections.ccLicense.option.select": "कोई विकल्प चुनें…", 
+
+  "submission.sections.ccLicense.select": "एक लाइसेंस प्रकार चुनें…", 
+
+  "submission.sections.ccLicense.type": "अनुज्ञाप‍त्र के प्रकार ", 
+
+  "submission.sections.describe.relationship-lookup.close": "बंद करना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.added": "चयन में स्थानीय प्रविष्टि को सफलतापूर्वक जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Equipment": "रिमोट उपकरण आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Event": "दूरस्थ घटना आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Funding": "सुदूर निधि आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.isAuthorOfPublication": "दूरस्थ लेखक आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.isProjectOfPublication": "परियोजना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Journal": "दूरस्थ पत्रिका आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Journal Issue": "दूरस्थ पत्रिका प्रकाशन आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Journal Volume": "दूरस्थ जर्नल वॉल्यूम आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.none": "दूरस्थ आइटम आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.OrgUnit": "दूरस्थ संगठनात्मक इकाई आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Patent": "रिमोट पेटेंट आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Person": "दूरस्थ व्यक्ति आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Product": "दूरस्थ उत्पाद आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Project": "दूरस्थ परियोजना आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-button-title.Publication": "दूरस्थ प्रकाशन आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.authority": "प्राधिकरण", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.authority.new": "नई स्थानीय प्राधिकरण प्रविष्टि के रूप में आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.cancel": "रद्द करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.collection": "नई प्रविष्टियों को आयात करने के लिए संग्रह का चयन करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.entities": "इकाइयां", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.entities.new": "नई स्थानीय इकाई के रूप में आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.arxiv": "arXiv से आयात किया जा रहा है", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.lcname": "एलसी नाम से आयात करना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.openAIREFunding": "OpenAIRE API का वित्तपोषण", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.orcid": "ORCID से आयात करना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.pubmed": "पबमेड से आयात करना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.sherpaJournal": "शेरपा पत्रिका से आयात", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.head.sherpaPublisher": "शेरपा प्रकाशक से आयात करना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.import": "आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.isAuthorOfPublication.added.local-entity": "स्थानीय लेखक को चयन में सफलतापूर्वक जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.isAuthorOfPublication.added.new-entity": "चयन में बाहरी लेखक को सफलतापूर्वक आयात और जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.isAuthorOfPublication.title": "दूरस्थ लेखक आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.isProjectOfPublication.added.new-entity": "नई इकाई जोड़ी गई!", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.isProjectOfPublication.title": "परियोजना", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal Issue.added.local-entity": "चयन में स्थानीय पत्रिका अंक को सफलतापूर्वक जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal Issue.added.new-entity": "चयन में बाहरी जर्नल अंक को सफलतापूर्वक आयात और जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal Issue.title": "रिमोट जर्नल इश्यू आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal Volume.added.local-entity": "स्थानीय पत्रिका अंक को चयन में सफलतापूर्वक जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal Volume.added.new-entity": "चयन में बाहरी पत्रिका अंक को सफलतापूर्वक आयात कर जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal Volume.title": "रिमोट जर्नल वॉल्यूम आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal.added.local-entity": "स्थानीय पत्रिका को चयन में सफलतापूर्वक जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal.added.new-entity": "चयन में बाहरी जर्नल को सफलतापूर्वक आयात और जोड़ा गया", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.Journal.title": "दूरस्थ पत्रिका आयात करें", 
+
+  "submission.sections.describe.relationship-lookup.external-source.import-modal.select": "एक स्थानीय मैच चुनें:", 
+
+  "submission.sections.describe.relationship-lookup.name-variant.notification.confirm": "एक नया नाम प्रकार सहेजें", 
+
+  "submission.sections.describe.relationship-lookup.name-variant.notification.content": "क्या आप \"{{ value }}\" को इस व्यक्ति के लिए एक नाम प्रकार के रूप में सहेजना चाहते हैं ताकि आप और अन्य इसे भविष्य में प्रस्तुतीकरण के लिए पुन: उपयोग कर सकें? यदि आप नहीं करते हैं तो भी आप इस प्रस्तुतीकरण के लिए इसका उपयोग कर सकते हैं।", 
+
+  "submission.sections.describe.relationship-lookup.name-variant.notification.decline": "इस प्रस्तुति के लिए ही प्रयोग करें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.deselect-all": "सभी को अचिन्हिंत करें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.deselect-page": "पृष्ठ का चयन रद्द करें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.loading": "लोड हो रहा है...", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.placeholder": "खोज क्वेरी", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.search": "जाओ", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.search-form.placeholder": "खोज...", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.select-all": "सबका चयन करें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.select-page": "पृष्ठ का चयन करें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.arxiv": "arXiv ({{ count }})", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.DataFile": "({{ count }}) स्थानीय डेटा फ़ाइलें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.DataPackage": "({{ count }}) स्थानीय डेटा पैकेज", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isAuthorOfPublication": "({{ count }}) स्थानीय लेखक", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isChildOrgUnitOf": "संगठनात्मक इकाइयों के लिए खोजें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isFundingAgencyOfProject": "परियोजना के निधिदाता", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isFundingAgencyOfPublication": "निधिदाता संस्थाओ के लिए खोजें", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isFundingOfPublication": "अनुदान की खोज करें ", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isJournalIssueOfPublication": "({{ count }}) स्थानीय पत्रिका प्रकाशन", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isJournalOfPublication": "({{ count }}) स्थानीय पत्रिकाएं", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isJournalVolumeOfPublication": "({{ count }}) स्थानीय पत्रिका खंड", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.isProjectOfPublication": "परियोजनाएं", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.Journal": "({{ count }}) स्थानीय पत्रिकाएं", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.JournalIssue": "({{ count }}) स्थानीय पत्रिका मुद्दे", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.JournalVolume": "({{ count }}) स्थानीय पत्रिका खंड", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.lcname": "({{ count }}) एलसी नाम", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.openAIREFunding": "OpenAIRE API का वित्तपोषण", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.orcid": "ORCID ({{ count }})", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.OrgUnit": "({{ count }}) स्थानीय संगठनात्मक इकाइयाँ ", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.Person": "({{ count }}) स्थानीय लेखक", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.Project": "({{ count }}) स्थानीय परियोजनाएं", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.Publication": "({{ count }}) स्थानीय प्रकाशन", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.pubmed": "({{ count }}) पबमेड (Pubmed)", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.sherpaJournal": "({{ count }}) शेरपा पत्रिका", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.tab-title.sherpaPublisher": "({{ count }}) शेरपा प्रकाशक", 
+
+  "submission.sections.describe.relationship-lookup.search-tab.toggle-dropdown": "ड्रॉपडाउन टॉगल करें", 
+
+  "submission.sections.describe.relationship-lookup.selected": "चयनित {{ size }} आइटम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.no-selection": "आपका चयन वर्तमान में खाली है।", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.search-form.placeholder": "खोज...", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.settings": "समायोजन", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.tab-title": "वर्तमान चयन ({{ count }})", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.arxiv": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.crossref": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.DataFile": "चयनित डेटा फ़ाइलें", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.DataPackage": "चयनित डेटा पैकेज", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.epo": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isAuthorOfPublication": "चयनित लेखक", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isChildOrgUnitOf": "चयनित संगठनात्मक इकाई", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isFundingAgencyOfPublication": "चयनित फंडिंग एजेंसी", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isFundingOfPublication": "चयनित अनुदान", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isJournalIssueOfPublication": "चयनित अंक", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isJournalOfPublication": "चयनित पत्रिकाएं", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isJournalVolumeOfPublication": "चयनित पत्रिका खंड", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.isProjectOfPublication": "परियोजना", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.Journal": "चयनित पत्रिकाएं", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.JournalIssue": "चयनित अंक", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.JournalVolume": "चयनित पत्रिका खंड", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.lcname": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.openAIREFunding": "OpenAIRE API का वित्तपोषण", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.orcid": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.orcidv2": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.OrgUnit": "चयनित संगठनात्मक इकाइयाँ", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.Person": "चयनित लेखक", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.Project": "चयनित परियोजनाएं", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.Publication": "चयनित प्रकाशन", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.pubmed": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.scielo": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.scopus": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.sherpaJournal": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.sherpaPublisher": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.selection-tab.title.wos": "खोज के परिणाम", 
+
+  "submission.sections.describe.relationship-lookup.title.DataFile": "डेटा फ़ाइलें", 
+
+  "submission.sections.describe.relationship-lookup.title.DataPackage": "डेटा पैकेज", 
+
+  "submission.sections.describe.relationship-lookup.title.Funding Agency": "निधिकरण संस्था", 
+
+  "submission.sections.describe.relationship-lookup.title.isAuthorOfPublication": "लेखक", 
+
+  "submission.sections.describe.relationship-lookup.title.isChildOrgUnitOf": "जनक संगठनात्मक इकाई", 
+
+  "submission.sections.describe.relationship-lookup.title.isFundingAgencyOfProject": "परियोजना के निधिदाता", 
+
+  "submission.sections.describe.relationship-lookup.title.isFundingAgencyOfPublication": "निधिकरण संस्था", 
+
+  "submission.sections.describe.relationship-lookup.title.isFundingOfPublication": "निधिकरण", 
+
+  "submission.sections.describe.relationship-lookup.title.isJournalIssueOfPublication": "पत्रिका के मुद्दे", 
+
+  "submission.sections.describe.relationship-lookup.title.isJournalOfPublication": "पत्रिकाएं", 
+
+  "submission.sections.describe.relationship-lookup.title.isJournalVolumeOfPublication": "पत्रिका खंड", 
+
+  "submission.sections.describe.relationship-lookup.title.isProjectOfPublication": "परियोजनाएं", 
+
+  "submission.sections.describe.relationship-lookup.title.JournalIssue": "पत्रिका प्रकाशन", 
+
+  "submission.sections.describe.relationship-lookup.title.JournalVolume": "पत्रिका खंड", 
+
+  "submission.sections.describe.relationship-lookup.title.OrgUnit": "संगठनात्मक इकाइयाँ", 
+
+  "submission.sections.describe.relationship-lookup.title.Person": "लेखक", 
+
+  "submission.sections.describe.relationship-lookup.title.Project": "परियोजनाएं", 
+
+  "submission.sections.describe.relationship-lookup.title.Publication": "प्रकाशन", 
+
+  "submission.sections.general.add-more": "और जोड़ें", 
+
+  "submission.sections.general.cannot_deposit": "फ़ॉर्म में त्रुटियों के कारण जमा पूरा नहीं किया जा सकता है।<br>कृपया जमा को पूरा करने के लिए सभी आवश्यक फ़ील्ड भरें।", 
+
+  "submission.sections.general.collection": "संग्रह", 
+
+  "submission.sections.general.deposit_error_notice": "आइटम प्रस्तुत करते समय एक समस्या हुई थी, कृपया बाद में फिर से प्रयास करें।", 
+
+  "submission.sections.general.deposit_success_notice": "प्रस्तुति को सफलतापूर्वक जमा किया गया।", 
+
+  "submission.sections.general.discard_error_notice": "आइटम को हटाते समय एक समस्या हुई थी, कृपया बाद में फिर से प्रयास करें।", 
+
+  "submission.sections.general.discard_success_notice": "प्रस्तुति सफलतापूर्वक रद्द करी गयी। ", 
+
+  "submission.sections.general.metadata-extracted": "नया मेटाडेटा निकाला गया है और <strong>{{sectionId}}</strong> अनुभाग में जोड़ा गया है।", 
+
+  "submission.sections.general.metadata-extracted-new-section": "सबमिशन में नया <strong>{{sectionId}}</strong> अनुभाग जोड़ा गया है।", 
+
+  "submission.sections.general.no-collection": "कोई संग्रह नहीं मिला", 
+
+  "submission.sections.general.no-sections": "कोई विकल्प उपलब्ध नहीं", 
+
+  "submission.sections.general.save_error_notice": "आइटम सहेजते समय एक समस्या हुई थी, कृपया बाद में पुन: प्रयास करें।", 
+
+  "submission.sections.general.save_success_notice": "प्रस्तुतीकरण सफलतापूर्वक सहेजा गया।", 
+
+  "submission.sections.general.search-collection": "संग्रह के लिए खोजें", 
+
+  "submission.sections.general.sections_not_valid": "अपूर्ण खंड हैं।", 
+
+  "submission.sections.license.granted-label": "मैं उपरोक्त लाइसेंस की पुष्टि करता हूं", 
+
+  "submission.sections.license.notgranted": "आपको अनुज्ञापत्र स्वीकार करना होगा", 
+
+  "submission.sections.license.required": "आपको लाइसेंस स्वीकार करना होगा", 
+
+  "submission.sections.sherpa-policy.title-empty": "प्रकाशक नीति की कोई जानकारी उपलब्ध नहीं है। अगर आपके काम में संबधित आईएसएसएन है, तो कृपया संबंधित प्रकाशक की खुली पहुंच (ओपन एक्सेस) नीतियों को देखने के लिए इसे ऊपर दर्ज करें।", 
+
+  "submission.sections.sherpa.error.message": "शेरपा जानकारी प्राप्त करने में त्रुटि हुई थी", 
+
+  "submission.sections.sherpa.publication.information": "प्रकाशन की जानकारी", 
+
+  "submission.sections.sherpa.publication.information.issns": "ISSNs", 
+
+  "submission.sections.sherpa.publication.information.publishers": "प्रकाशक", 
+
+  "submission.sections.sherpa.publication.information.romeoPub": "रोमियो पब", 
+
+  "submission.sections.sherpa.publication.information.title": "शीर्षक", 
+
+  "submission.sections.sherpa.publication.information.url": "यूआरएल (URL)", 
+
+  "submission.sections.sherpa.publication.information.zetoPub": "ज़ेटो पब (Zeto Pub)", 
+
+  "submission.sections.sherpa.publisher.policy": "प्रकाशक नीति", 
+
+  "submission.sections.sherpa.publisher.policy.conditions": "स्थितियाँ", 
+
+  "submission.sections.sherpa.publisher.policy.description": "नीचे दी गई जानकारी शेरपा रोमियो के माध्यम से मिली। आपके प्रकाशक की नीतियों के आधार पर, यह इस बारे में सलाह देता है कि क्या प्रतिबंध आवश्यक हो सकता है और/या आपको कौन सी फाइलें अपलोड करने की अनुमति है। यदि आपके कोई प्रश्न हैं, तो कृपया पाद लेख में फ़ीडबैक फ़ॉर्म के माध्यम से अपने साइट व्यवस्थापक से संपर्क करें।", 
+
+  "submission.sections.sherpa.publisher.policy.embargo": "प्रतिबंध", 
+
+  "submission.sections.sherpa.publisher.policy.license": "अनुज्ञाप‍त्र", 
+
+  "submission.sections.sherpa.publisher.policy.location": "स्थान", 
+
+  "submission.sections.sherpa.publisher.policy.more.information": "अधिक जानकारी के लिए, कृपया निम्नलिखित लिंक देखें:", 
+
+  "submission.sections.sherpa.publisher.policy.noembargo": "कोई प्रतिबंध नहीं", 
+
+  "submission.sections.sherpa.publisher.policy.nolocation": "कोई भी नहीं", 
+
+  "submission.sections.sherpa.publisher.policy.openaccess": "इस पत्रिका की नीति द्वारा अनुमत ओपन एक्सेस पाथवे लेख संस्करण द्वारा नीचे सूचीबद्ध हैं। अधिक जानकारी के लिए पथ पर क्लिक करें", 
+
+  "submission.sections.sherpa.publisher.policy.prerequisites": "पूर्वापेक्षाएँ", 
+
+  "submission.sections.sherpa.publisher.policy.refresh": "ताज़ा करें", 
+
+  "submission.sections.sherpa.publisher.policy.version": "संस्करण", 
+
+  "submission.sections.sherpa.record.information": "दस्तावेज की जानकारी", 
+
+  "submission.sections.sherpa.record.information.date.created": "बनाने की तिथि", 
+
+  "submission.sections.sherpa.record.information.date.modified": "अंतिम बार संशोधित", 
+
+  "submission.sections.sherpa.record.information.id": "पहचान", 
+
+  "submission.sections.sherpa.record.information.uri": "यूआरआई (URI)", 
+
+  "submission.sections.status.errors.aria": "इसमें त्रुटियां हैं", 
+
+  "submission.sections.status.errors.title": "त्रुटियाँ", 
+
+  "submission.sections.status.info.aria": "अतिरिक्त जानकारी", 
+
+  "submission.sections.status.info.title": "अतिरिक्त जानकारी", 
+
+  "submission.sections.status.valid.aria": "यह सही है", 
+
+  "submission.sections.status.valid.title": "वैध", 
+
+  "submission.sections.status.warnings.aria": "चेतावनियाँ हैं", 
+
+  "submission.sections.status.warnings.title": "चेतावनी", 
+
+  "submission.sections.submit.progressbar.accessCondition": "आइटम पहुंच की शर्तें", 
+
+  "submission.sections.submit.progressbar.CClicense": "क्रिएटिव कामन्स लाइसेंस", 
+
+  "submission.sections.submit.progressbar.describe.recycle": "पुनर्चक्रण", 
+
+  "submission.sections.submit.progressbar.describe.stepcustom": "वर्णन करें", 
+
+  "submission.sections.submit.progressbar.describe.stepone": "वर्णन करना", 
+
+  "submission.sections.submit.progressbar.describe.steptwo": "वर्णन करें", 
+
+  "submission.sections.submit.progressbar.detect-duplicate": "संभावित दोहराव", 
+
+  "submission.sections.submit.progressbar.license": "जमा करने के लिए अनुज्ञापत्र ", 
+
+  "submission.sections.submit.progressbar.sherpaPolicies": "प्रकाशक खुली पहुँच नीति की जानकारी", 
+
+  "submission.sections.submit.progressbar.sherpapolicy": "शेरपा नीतियां", 
+
+  "submission.sections.submit.progressbar.upload": "फाइलें अपलोड करें", 
+
+  "submission.sections.toggle.aria.close": "{{sectionHeader}} सेक्शन को छोटा करें", 
+
+  "submission.sections.toggle.aria.open": "{{sectionHeader}} सेक्शन को विस्तृत करें", 
+
+  "submission.sections.toggle.close": "खंड बंद करें", 
+
+  "submission.sections.toggle.open": "खुला खंड", 
+
+  "submission.sections.upload.delete.confirm.cancel": "रद्द करें", 
+
+  "submission.sections.upload.delete.confirm.info": "यह कार्रवाई पूर्ववत नहीं की जा सकती। क्या आपको यकीन है?", 
+
+  "submission.sections.upload.delete.confirm.submit": "हां मुझे यकीन है", 
+
+  "submission.sections.upload.delete.confirm.title": "बिटस्ट्रीम हटाएं", 
+
+  "submission.sections.upload.delete.submit": "हटाएं", 
+
+  "submission.sections.upload.download.title": "बिटस्ट्रीम डाउनलोड करें", 
+
+  "submission.sections.upload.drop-message": "आइटम के साथ संलग्न करने के लिए फ़ाइलें छोड़ें", 
+
+  "submission.sections.upload.edit.title": "बिटस्ट्रीम संपादित करें", 
+
+  "submission.sections.upload.form.access-condition-hint": "आइटम जमा होने के बाद बिटस्ट्रीम पर लागू करने के लिए एक एक्सेस शर्त का चयन करें", 
+
+  "submission.sections.upload.form.access-condition-label": "पहुँच स्थिति प्रकार", 
+
+  "submission.sections.upload.form.date-required": "तिथि आवश्यक है।", 
+
+  "submission.sections.upload.form.date-required-from": "अभिगमन आरम्भ तिथि आवश्यक है।", 
+
+  "submission.sections.upload.form.date-required-until": "तिथि तक प्रवेश प्रदान करना आवश्यक है।", 
+
+  "submission.sections.upload.form.from-hint": "उस तिथि का चयन करें जिससे संबंधित पहुंच शर्त लागू करि जाएगी", 
+
+  "submission.sections.upload.form.from-label": "से पहुंच प्रदान करें", 
+
+  "submission.sections.upload.form.from-placeholder": "से", 
+
+  "submission.sections.upload.form.group-label": "समूह", 
+
+  "submission.sections.upload.form.group-required": "समूह की आवश्यकता है।", 
+
+  "submission.sections.upload.form.until-hint": "उस तिथि का चयन करें जब तक संबंधित पहुंच शर्त लागू नहीं हो जाती", 
+
+  "submission.sections.upload.form.until-label": "अभिगमन अंत तिथि ", 
+
+  "submission.sections.upload.form.until-placeholder": "तक", 
+
+  "submission.sections.upload.header.policy.default.nolist": "{{CollectionName}} संग्रह में अपलोड की गई फ़ाइलें निम्न समूह (समूहों) के अनुसार पहुंच योग्य होंगी:", 
+
+  "submission.sections.upload.header.policy.default.withlist": "कृपया ध्यान दें कि {{collectionName}} संग्रह में अपलोड की गई फ़ाइलें निम्न समूह (समूहों) के साथ एकल फ़ाइल के लिए स्पष्ट रूप से तय की गई फ़ाइलों के अतिरिक्त पहुंच योग्य होंगी:", 
+
+  "submission.sections.upload.info": "यहां आपको आइटम में वर्तमान में सभी फाइलें मिलेंगी। आप फ़ाइल मेटाडेटा और एक्सेस शर्तों को अपडेट कर सकते हैं या <strong>अतिरिक्त फ़ाइलें अपलोड कर सकते हैं बस उन्हें पृष्ठ में हर जगह खींच कर छोड़ सकते हैं</strong>", 
+
+  "submission.sections.upload.no-entry": "नहीं", 
+
+  "submission.sections.upload.no-file-uploaded": "अभी तक कोई फ़ाइल अपलोड नहीं हुई है|", 
+
+  "submission.sections.upload.save-metadata": "मेटाडेटा सहेजें", 
+
+  "submission.sections.upload.undo": "रद्द करें", 
+
+  "submission.sections.upload.upload-failed": "अपलोड विफल", 
+
+  "submission.sections.upload.upload-successful": "अपलोड सफल", 
+
+  "submission.submit.breadcrumbs": "नया प्रस्तुतीकरण", 
+
+  "submission.submit.title": "नया प्रस्तुतीकरण", 
+
+  "submission.workflow.generic.delete": "हटाएं", 
+
+  "submission.workflow.generic.delete-help": "यदि आप इस आइटम को त्यागना चाहते हैं, तो \"हटाएं\" चुनें। फिर आपको इसकी पुष्टि करने के लिए कहा जाएगा।", 
+
+  "submission.workflow.generic.edit": "संपादित करें", 
+
+  "submission.workflow.generic.edit-help": "आइटम का मेटाडेटा बदलने के लिए इस विकल्प का चयन करें।", 
+
+  "submission.workflow.generic.view": "देखें", 
+
+  "submission.workflow.generic.view-help": "आइटम का मेटाडेटा देखने के लिए इस विकल्प का चयन करें।", 
+
+  "submission.workflow.tasks.claimed.approve": "स्वीकृत करें", 
+
+  "submission.workflow.tasks.claimed.approve_help": "यदि आपने आइटम की समीक्षा की है और यह संग्रह में शामिल करने के लिए उपयुक्त है, तो \"स्वीकृत करें\" चुनें।", 
+
+  "submission.workflow.tasks.claimed.edit": "संपादित करें", 
+
+  "submission.workflow.tasks.claimed.edit_help": "आइटम का मेटाडेटा बदलने के लिए इस विकल्प का चयन करें।", 
+
+  "submission.workflow.tasks.claimed.reject_help": "यदि आपने आइटम की समीक्षा की है और पाया है कि यह संग्रह में शामिल करने के लिए उपयुक्त <strong>नहीं</strong> है,  तो \"अस्वीकार करें\" चुनें। फिर आपको एक संदेश दर्ज करने के लिए कहा जाएगा जो यह दर्शाता है कि आइटम अनुपयुक्त क्यों है, और क्या जमाकर्ता को कुछ बदलना चाहिए और फिर से सबमिट करना चाहिए।", 
+
+  "submission.workflow.tasks.claimed.reject.reason.info": "कृपया नीचे दिए गए बॉक्स में प्रस्तुति को अस्वीकार करने का अपना कारण दर्ज करें, यह इंगित करते हुए कि क्या प्रस्तुतकर्ता किसी समस्या को ठीक कर सकता है और फिर से प्रस्तुत कर सकता है।  ", 
+
+  "submission.workflow.tasks.claimed.reject.reason.placeholder": "अस्वीकार करने का कारण बताएं", 
+
+  "submission.workflow.tasks.claimed.reject.reason.submit": "आइटम अस्वीकार करें", 
+
+  "submission.workflow.tasks.claimed.reject.reason.title": "कारण", 
+
+  "submission.workflow.tasks.claimed.reject.submit": "अस्वीकार करें", 
+
+  "submission.workflow.tasks.claimed.return": "पूल में वापस करें ", 
+
+  "submission.workflow.tasks.claimed.return_help": "कार्य को पूल में लौटाएं ताकि कोई अन्य उपयोगकर्ता कार्य कर सके।", 
+
+  "submission.workflow.tasks.generic.error": "ऑपरेशन के दौरान हुई गड़बड़ी...", 
+
+  "submission.workflow.tasks.generic.processing": "संसाधित किया जा रहा है...", 
+
+  "submission.workflow.tasks.generic.submitter": "प्रस्तुतकर्ता", 
+
+  "submission.workflow.tasks.generic.success": "संचालन सफल रहा", 
+
+  "submission.workflow.tasks.pool.claim": "दावा करें", 
+
+  "submission.workflow.tasks.pool.claim_help": "यह कार्य स्वयं को सौंपें।", 
+
+  "submission.workflow.tasks.pool.hide-detail": "विवरण छुपाएं", 
+
+  "submission.workflow.tasks.pool.show-detail": "विवरण दिखाएँ", 
+
+  "submission.workspace.generic.view": "देखें", 
+
+  "submission.workspace.generic.view-help": "आइटम का मेटाडेटा देखने के लिए इस विकल्प का चयन करें।", 
+
+  "thumbnail.default.alt": "थंबनेल चित्र", 
+
+  "thumbnail.default.placeholder": "कोई थंबनेल उपलब्ध नहीं", 
+
+  "thumbnail.orgunit.alt": "संगठन इकाई चिन्ह", 
+
+  "thumbnail.orgunit.placeholder": "संगठन इकाई स्थानधारक छवि", 
+
+  "thumbnail.person.alt": "प्रोफ़ाइल चित्र", 
+
+  "thumbnail.person.placeholder": "कोई प्रोफ़ाइल चित्र उपलब्ध नहीं है", 
+
+  "thumbnail.project.alt": "परियोजना चिन्ह ", 
+
+  "thumbnail.project.placeholder": "परियोजना स्थानधारक छवि", 
+
+  "title": "डीस्पेस", 
+
+  "uploader.browse": "ब्राउज़ करें", 
+
+  "uploader.delete.btn-title": "हटाएं", 
+
+  "uploader.drag-message": "अपनी फ़ाइलों को यहाँ खींचें और छोड़ें", 
+
+  "uploader.or": ", अथवा", 
+
+  "uploader.processing": "प्रसंस्करण", 
+
+  "uploader.queue-length": "कतार की लंबाई", 
+
+  "virtual-metadata.delete-item.info": "उन प्रकारों का चयन करें जिनके लिए आप वर्चुअल मेटाडेटा को वास्तविक मेटाडेटा के रूप में सहेजना चाहते हैं", 
+
+  "virtual-metadata.delete-item.modal-head": "इस संबंध का आभासी मेटाडेटा", 
+
+  "virtual-metadata.delete-relationship.modal-head": "वे आइटम चुनें जिनके लिए आप आभासी मेटाडेटा को वास्तविक मेटाडेटा के रूप में सहेजना चाहते हैं", 
+
+  "vocabulary-treeview.header": "श्रेणीबद्ध वृक्ष दृश्य", 
+
+  "vocabulary-treeview.load-more": "और लोड करें", 
+
+  "vocabulary-treeview.search.form.reset": "रीसेट", 
+
+  "vocabulary-treeview.search.form.search": "खोज", 
+
+  "vocabulary-treeview.search.no-result": "दिखाने के लिए कोई आइटम नहीं थे", 
+
+  "vocabulary-treeview.tree.description.nsi": "नॉर्वेजियन साइंस इंडेक्स", 
+
+  "vocabulary-treeview.tree.description.srsc": "अनुसंधान विषय श्रेणियाँ", 
+
+  "workflow-item.delete.button.cancel": "रद्द करें", 
+
+  "workflow-item.delete.button.confirm": "हटाएं", 
+
+  "workflow-item.delete.header": "कार्यप्रवाह आइटम हटाएं", 
+
+  "workflow-item.delete.notification.error.content": "कार्यप्रवाह आइटम हटाया नहीं जा सका", 
+
+  "workflow-item.delete.notification.error.title": "कुछ गलत हो गया", 
+
+  "workflow-item.delete.notification.success.content": "यह कार्यप्रवाह आइटम सफलतापूर्वक हटा दिया गया था", 
+
+  "workflow-item.delete.notification.success.title": "हटाए गए", 
+
+  "workflow-item.delete.title": "कार्यप्रवाह आइटम हटाएं", 
+
+  "workflow-item.edit.breadcrumbs": "कार्यप्रवाह वस्तु संपादित करें", 
+
+  "workflow-item.edit.title": "कार्यप्रवाह आइटम संपादित करें", 
+
+  "workflow-item.send-back.button.cancel": "रद्द करें", 
+
+  "workflow-item.send-back.button.confirm": "वापस भेजे", 
+
+  "workflow-item.send-back.header": "कार्यप्रवाह आइटम को वापस प्रस्तुतकर्ता को भेजें", 
+
+  "workflow-item.send-back.notification.error.content": "कार्यप्रवाह आइटम को सबमिटर को वापस नहीं भेजा जा सका", 
+
+  "workflow-item.send-back.notification.error.title": "कुछ गलत हो गया", 
+
+  "workflow-item.send-back.notification.success.content": "यह कार्यप्रवाह आइटम सफलतापूर्वक सबमिट करने वाले को वापस भेज दिया गया था", 
+
+  "workflow-item.send-back.notification.success.title": "प्रस्तुतकर्ता को वापस भेजा गया", 
+
+  "workflow-item.send-back.title": "कार्यप्रवाह आइटम को वापस प्रस्तुतिकर्ता को भेजें", 
+
+  "workflow-item.view.breadcrumbs": "कार्यप्रवाह दृश्य", 
+
+  "workflow.search.results.head": "कार्यप्रवाह कार्य", 
+
+  "workflowAdmin.search.results.head": "कार्यप्रवाह व्यवस्थापित करें", 
+
+  "workspace-item.view.breadcrumbs": "कार्यक्षेत्र दृश्य", 
+
+  "workspace-item.view.title": "कार्यक्षेत्र दृश्य", 
+
+  "workspace.search.results.head": "आपकी प्रस्तुतियाँ"
+  
+}

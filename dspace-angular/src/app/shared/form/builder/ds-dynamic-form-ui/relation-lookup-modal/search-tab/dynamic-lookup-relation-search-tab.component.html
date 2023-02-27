@@ -1,0 +1,64 @@
+<ds-themed-search *ngIf="this.relationship.searchConfiguration && context"
+           [configuration]="this.relationship.searchConfiguration"
+           [context]="context"
+           [fixedFilterQuery]="this.relationship.filter"
+           [inPlaceSearch]="true"
+           [linkType]="linkTypes.ExternalLink"
+           [searchFormPlaceholder]="'submission.sections.describe.relationship-lookup.search-tab.search-form.placeholder'"
+           [selectable]="true"
+           [selectionConfig]="{ repeatable: repeatable, listId: listId }"
+           [showScopeSelector]="false"
+           [showViewModes]="false"
+           (resultFound)="onResultFound($event)"
+           (deselectObject)="deselectObject.emit($event)"
+           (selectObject)="selectObject.emit($event)">
+  <div additionalSearchOptions *ngIf="repeatable" class="position-absolute">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <div class="input-group-text">
+          <!-- In theory we don't need separate checkboxes for this,
+               but I wasn't able to get this to work correctly without them.
+               Checkboxes that are in the indeterminate state always switch to checked when clicked
+               This seemed like the cleanest and clearest solution to solve this issue for now. -->
+
+          <input *ngIf="!allSelected && !(someSelected$ | async)"
+                 type="checkbox"
+                 [indeterminate]="false"
+                 (change)="selectAll()">
+          <input *ngIf="!allSelected && (someSelected$ | async)"
+                 type="checkbox"
+                 [indeterminate]="true"
+                 (change)="deselectAll()">
+          <input *ngIf="allSelected" type="checkbox"
+                 [checked]="true"
+                 (change)="deselectAll()">
+        </div>
+      </div>
+      <div ngbDropdown class="input-group-append">
+        <button *ngIf="selectAllLoading" type="button"
+                class="btn btn-outline-secondary rounded-right">
+                            <span class="spinner-border spinner-border-sm" role="status"
+                                  aria-hidden="true"></span>
+          <span class="sr-only">{{ ('submission.sections.describe.relationship-lookup.search-tab.loading' | translate) }}</span>
+        </button>
+        <button id="resultdropdown" type="button"
+                ngbDropdownToggle
+                class="btn btn-outline-secondary dropdown-toggle-split"
+                data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false"
+                [hidden]="selectAllLoading">
+          <span class="sr-only">{{ ('submission.sections.describe.relationship-lookup.toggle-dropdown' | translate) }}</span>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="resultdropdown" *ngVar="(resultsRD$ | async) as resultsRD">
+          <button class="dropdown-item"
+                  (click)="selectPage(resultsRD?.page)">{{ ('submission.sections.describe.relationship-lookup.search-tab.select-page' | translate) }}</button>
+          <button class="dropdown-item"
+                  (click)="deselectPage(resultsRD?.page)">{{ ('submission.sections.describe.relationship-lookup.search-tab.deselect-page' | translate) }}</button>
+          <button class="dropdown-item" (click)="selectAll()">{{ ('submission.sections.describe.relationship-lookup.search-tab.select-all' | translate) }}</button>
+          <button class="dropdown-item" (click)="deselectAll()">{{ ('submission.sections.describe.relationship-lookup.search-tab.deselect-all' | translate) }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ds-themed-search>

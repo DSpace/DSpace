@@ -1,0 +1,23 @@
+<div class="container">
+    <div class="row">
+        <ng-container *ngVar="(dsoRD$ | async)?.payload as dso">
+            <div class="col-12 pb-4">
+                <h2 id="header" class="border-bottom pb-2">{{ 'collection.delete.head' | translate}}</h2>
+                <p class="pb-2">{{ 'collection.delete.text' | translate:{ dso: dso.name } }}</p>
+                <div class="form-group row">
+                  <div class="col text-right space-children-mr">
+                    <button class="btn btn-outline-secondary" (click)="onCancel(dso)" [disabled]="(processing$ | async)">
+                      <i class="fas fa-times"></i> {{'collection.delete.cancel' | translate}}
+                    </button>
+                    <button class="btn btn-danger" (click)="onConfirm(dso)" [disabled]="(processing$ | async)">
+                      <span *ngIf="processing$ | async"><i class='fas fa-circle-notch fa-spin'></i> {{'collection.delete.processing' | translate}}</span>
+                      <span *ngIf="!(processing$ | async)"><i class="fas fa-trash"></i> {{'collection.delete.confirm' | translate}}</span>
+                    </button>
+                  </div>
+                </div>
+            </div>
+        </ng-container>
+
+    </div>
+
+</div>

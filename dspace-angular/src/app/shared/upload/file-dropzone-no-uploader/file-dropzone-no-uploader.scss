@@ -1,0 +1,29 @@
+.ds-base-drop-zone {
+  border: 2px dashed var(--bs-gray-600);
+}
+
+.ds-document-drop-zone {
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.ds-document-drop-zone-active {
+  z-index: var(--ds-drop-zone-area-z-index) !important;
+}
+
+.ds-document-drop-zone-inner {
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: var(--ds-drop-zone-area-inner-z-index);
+  top: 0;
+  left: 0;
+}
+
+.ds-document-drop-zone-inner-content {
+  border: 4px dashed var(--bs-primary);
+  z-index: var(--ds-drop-zone-area-inner-z-index);
+}
+
+.ds-document-drop-zone-inner-content p {
+  font-size: calc(var(--bs-font-size-lg) * 2.5);
+}

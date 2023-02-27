@@ -1,0 +1,65 @@
+@import './../../../../../../../styles/variables';
+
+:host {
+  display: block;
+}
+.drag-disable {
+  visibility: hidden !important;
+  &:hover, &:focus {
+    cursor: default;
+    .drag-icon {
+      visibility: hidden !important;
+    }
+  }
+}
+.cdk-drag {
+  margin-left: calc(-2.3 * var(--bs-spacer));
+  margin-right: calc(-0.5 * var(--bs-spacer));
+  padding-right: calc(0.5 * var(--bs-spacer));
+  .drag-icon {
+    visibility: hidden;
+    width: calc(2 * var(--bs-spacer));
+    color: var(--bs-gray-600);
+    margin: var(--bs-btn-padding-y) 0;
+    line-height: var(--bs-btn-line-height);
+    text-indent: calc(0.5 * var(--bs-spacer))
+  }
+
+  &:hover, &:focus {
+    cursor: grab;
+    .drag-icon {
+      visibility: visible;
+    }
+  }
+
+}
+
+.drag-handle {
+  &:hover {
+    cursor: move;
+  }
+
+  &:focus {
+    .drag-icon {
+      visibility: visible;
+    }
+  }
+}
+
+.cdk-drop-list-dragging {
+  .drag-handle {
+    cursor: grabbing;
+    .drag-icon {
+      visibility: hidden;
+    }
+  }
+}
+
+.cdk-drag-preview {
+  margin: 0;
+  padding: 0;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}

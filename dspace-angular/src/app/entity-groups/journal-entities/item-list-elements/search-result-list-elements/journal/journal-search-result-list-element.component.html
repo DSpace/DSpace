@@ -1,0 +1,34 @@
+<div class="row">
+  <div *ngIf="showThumbnails" class="col-3 col-md-2">
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer"
+       [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out">
+      <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+      </ds-thumbnail>
+    </a>
+      <span *ngIf="linkType == linkTypes.None" class="lead item-list-title dont-break-out">
+      <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+      </ds-thumbnail>
+    </span>
+  </div>
+  <div [ngClass]="showThumbnails ? 'col-9' : 'col-md-12'">
+    <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+    <ds-truncatable [id]="dso.id">
+      <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer"
+         [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out"
+         [innerHTML]="dsoTitle"></a>
+      <span *ngIf="linkType == linkTypes.None"
+            class="lead item-list-title dont-break-out"
+            [innerHTML]="dsoTitle"></span>
+      <span class="text-muted">
+    <ds-truncatable-part [id]="dso.id" [minLines]="1">
+            <span *ngIf="dso.allMetadata(['creativeworkseries.issn']).length > 0"
+                  class="item-list-journals">
+                    <span *ngFor="let value of allMetadataValues(['creativeworkseries.issn']); let last=last;">
+                        <span [innerHTML]="value"><span [innerHTML]="value"></span></span>
+                    </span>
+            </span>
+        </ds-truncatable-part>
+  </span>
+    </ds-truncatable>
+  </div>
+</div>

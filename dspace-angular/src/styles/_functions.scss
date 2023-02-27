@@ -1,0 +1,20 @@
+@use 'sass:math';
+
+@function calculateRem($size) {
+    $remSize: math.div($size, 16px);
+    @return $remSize;
+}
+
+
+@function strip-unit($number) {
+    @if type-of($number) == 'number' and not unitless($number) {
+        @return math.div($number , ($number * 0 + 1));
+    }
+    @return $number;
+}
+
+
+@function calculatePx($size) {
+    $pxSize: strip-unit($size) * 16px;
+    @return $pxSize;
+}

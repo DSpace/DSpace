@@ -1,0 +1,59 @@
+<div class="container">
+    <div class="metadata-registry row">
+        <div class="col-12">
+
+            <h2 id="header" class="border-bottom pb-2">{{'admin.registries.metadata.head' | translate}}</h2>
+
+            <p id="description" class="pb-2">{{'admin.registries.metadata.description' | translate}}</p>
+
+            <ds-metadata-schema-form (submitForm)="forceUpdateSchemas()"></ds-metadata-schema-form>
+
+            <ds-pagination
+                    *ngIf="(metadataSchemas | async)?.payload?.totalElements > 0"
+                    [paginationOptions]="config"
+                    [collectionSize]="(metadataSchemas | async)?.payload?.totalElements"
+                    [hideGear]="true"
+                    [hidePagerWhenSinglePage]="true">
+
+                <div class="table-responsive">
+                    <table id="metadata-schemas" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">{{'admin.registries.metadata.schemas.table.id' | translate}}</th>
+                            <th scope="col">{{'admin.registries.metadata.schemas.table.namespace' | translate}}</th>
+                            <th scope="col">{{'admin.registries.metadata.schemas.table.name' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let schema of (metadataSchemas | async)?.payload?.page"
+                            [ngClass]="{'table-primary' : isActive(schema) | async}">
+                            <td>
+                                <label>
+                                    <input type="checkbox"
+                                           [checked]="isSelected(schema) | async"
+                                           (change)="selectMetadataSchema(schema, $event)"
+                                    >
+                                </label>
+                            </td>
+                            <td class="selectable-row" (click)="editSchema(schema)"><a [routerLink]="[schema.prefix]">{{schema.id}}</a></td>
+                            <td class="selectable-row" (click)="editSchema(schema)"><a [routerLink]="[schema.prefix]">{{schema.namespace}}</a></td>
+                            <td class="selectable-row" (click)="editSchema(schema)"><a [routerLink]="[schema.prefix]">{{schema.prefix}}</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </ds-pagination>
+
+            <div *ngIf="(metadataSchemas | async)?.payload?.totalElements == 0" class="alert alert-info w-100 mb-2" role="alert">
+              {{'admin.registries.metadata.schemas.no-items' | translate}}
+            </div>
+
+            <div>
+              <button *ngIf="(metadataSchemas | async)?.payload?.page?.length > 0" type="submit" class="btn btn-danger float-right" (click)="deleteSchemas()">{{'admin.registries.metadata.schemas.table.delete' | translate}}</button>
+            </div>
+
+        </div>
+    </div>
+</div>

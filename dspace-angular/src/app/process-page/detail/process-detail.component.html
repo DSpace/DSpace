@@ -1,0 +1,99 @@
+<div class="container" *ngVar="(processRD$ | async)?.payload as process">
+    <div class="d-flex">
+        <h2 class="flex-grow-1">{{'process.detail.title' | translate:{
+            id: process?.processId,
+            name: process?.scriptName
+        } }}</h2>
+    </div>
+    <ds-process-detail-field id="process-name" [title]="'process.detail.script'">
+        <div>{{ process?.scriptName }}</div>
+    </ds-process-detail-field>
+
+    <ds-process-detail-field *ngIf="process?.parameters && process?.parameters?.length > 0" id="process-arguments"
+                             [title]="'process.detail.arguments'">
+        <div *ngFor="let argument of process?.parameters">{{ argument?.name }} {{ argument?.value }}</div>
+    </ds-process-detail-field>
+
+    <div *ngVar="(filesRD$ | async)?.payload?.page as files">
+        <ds-process-detail-field *ngIf="files && files?.length > 0" id="process-files"
+                                 [title]="'process.detail.output-files'">
+            <ds-themed-file-download-link *ngFor="let file of files; let last=last;" [bitstream]="file">
+                <span>{{getFileName(file)}}</span>
+                <span>({{(file?.sizeBytes) | dsFileSize }})</span>
+            </ds-themed-file-download-link>
+        </ds-process-detail-field>
+    </div>
+
+    <ds-process-detail-field *ngIf="process && process.startTime" id="process-start-time"
+                             [title]="'process.detail.start-time' | translate">
+        <div>{{ process.startTime | date:dateFormat:'UTC' }}</div>
+    </ds-process-detail-field>
+
+    <ds-process-detail-field *ngIf="process && process.endTime" id="process-end-time"
+                             [title]="'process.detail.end-time' | translate">
+        <div>{{ process.endTime | date:dateFormat:'UTC' }}</div>
+    </ds-process-detail-field>
+
+    <ds-process-detail-field *ngIf="process && process.processStatus" id="process-status"
+                             [title]="'process.detail.status' | translate">
+        <div>{{ process.processStatus }}</div>
+    </ds-process-detail-field>
+
+    <ds-process-detail-field *ngIf="isProcessFinished(process)" id="process-output" [title]="'process.detail.output'">
+        <button *ngIf="!showOutputLogs && process?._links?.output?.href != undefined" id="showOutputButton"
+                class="btn btn-primary" (click)="showProcessOutputLogs()">
+            {{ 'process.detail.logs.button' | translate }}
+        </button>
+        <ds-themed-loading *ngIf="retrievingOutputLogs$ | async" class="ds-themed-loading"
+                           message="{{ 'process.detail.logs.loading' | translate }}"></ds-themed-loading>
+        <pre class="font-weight-bold text-secondary bg-light p-3"
+             *ngIf="showOutputLogs && (outputLogs$ | async)?.length > 0">{{ (outputLogs$ | async) }}</pre>
+        <p id="no-output-logs-message" *ngIf="(!(retrievingOutputLogs$ | async) && showOutputLogs)
+      && !(outputLogs$ | async) || (outputLogs$ | async)?.length == 0 || !process._links.output">
+            {{ 'process.detail.logs.none' | translate }}
+        </p>
+    </ds-process-detail-field>
+
+    <ds-process-detail-field id="process-actions" [title]="'process.detail.actions'">
+        <button class="btn btn-success mr-2" routerLink="/processes/new" [queryParams]="{id: process?.processId}"><i
+                class="fas fa-plus pr-2"></i>{{'process.detail.create' | translate}}</button>
+        <button *ngIf="isProcessFinished(process)" id="delete" class="btn btn-danger"
+                (click)="openDeleteModal(deleteModal)">
+            <i class="fas fa-trash pr-2"></i>{{ 'process.detail.delete.button' | translate }}
+        </button>
+    </ds-process-detail-field>
+
+    <div style="text-align: right;">
+        <a class="btn btn-outline-secondary mt-3" [routerLink]="'/processes'">{{'process.detail.back' | translate}}</a>
+    </div>
+</div>
+
+<ng-template #deleteModal >
+
+    <div *ngVar="(processRD$ | async)?.payload as process">
+
+        <div class="modal-header">
+            <div>
+                <h4>{{'process.detail.delete.header' | translate }}</h4>
+            </div>
+            <button type="button" class="close"
+                    (click)="closeModal()" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div>{{'process.detail.delete.body' | translate }}</div>
+            <div class="mt-4">
+                <button class="btn btn-primary mr-2" (click)="closeModal()">{{'process.detail.delete.cancel' | translate}}</button>
+                <button id="delete-confirm" class="btn btn-danger"
+                        (click)="deleteProcess(process)">{{ 'process.detail.delete.confirm' | translate }}
+                </button>
+            </div>
+        </div>
+
+
+    </div>
+
+</ng-template>
+

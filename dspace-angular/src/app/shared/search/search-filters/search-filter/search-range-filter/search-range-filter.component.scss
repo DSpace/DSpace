@@ -1,0 +1,40 @@
+.filters {
+    .toggle-more-filters a {
+        color: var(--bs-link-color);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
+
+::ng-deep
+{
+    html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
+        right: calc(var(--ds-slider-handle-width) / -2);
+    }
+    .noUi-horizontal .noUi-handle {
+        width: var(--ds-slider-handle-width);
+        &:before {
+            left: calc(((var(--ds-slider-handle-width) - 2px) / 2) - 2px);
+        }
+        &:after {
+            left: calc(((var(--ds-slider-handle-width) - 2px) / 2) + 2px);
+        }
+        &:focus {
+            outline: none;
+            box-shadow: var(--bs-input-btn-focus-box-shadow);
+        }
+    }
+
+  .noUi-connect {
+      background: var(--ds-slider-color);
+  }
+
+  .noUi-target {
+    padding: 0 calc((var(--ds-slider-handle-width) / 2) - 1.5px);
+    margin: 0 1px;
+  }
+  .noUi-connect {
+    margin: 0 calc(-1 * (var(--ds-slider-handle-width) / 2));
+    width: calc(100% + var(--ds-slider-handle-width));
+  }
+}

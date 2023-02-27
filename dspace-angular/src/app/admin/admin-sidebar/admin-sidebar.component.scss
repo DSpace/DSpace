@@ -1,0 +1,123 @@
+:host {
+  --ds-icon-z-index: 10;
+
+    left: 0;
+    top: 0;
+    height: 100vh;
+    flex: 1 1 auto;
+    nav {
+        background-color: var(--ds-admin-sidebar-bg);
+        height: 100%;
+        flex-direction: column;
+        > div {
+            width: 100%;
+            &.sidebar-top-level-items {
+                flex: 1;
+                overflow: auto;
+                @include dark-scrollbar;
+            }
+        }
+
+        &.inactive ::ng-deep .sidebar-collapsible {
+            margin-left: calc(-1 * var(--ds-sidebar-items-width));
+        }
+
+        .navbar-nav {
+            .admin-menu-header {
+                background-color: var(--ds-admin-sidebar-header-bg);
+
+                .sidebar-section {
+                  background-color: inherit;
+                }
+
+                .logo-wrapper {
+                    img {
+                        height: 20px;
+                    }
+                }
+                .section-header-text {
+                    line-height: 1.5;
+                }
+
+                .navbar-brand {
+                  margin-right: 0;
+                }
+
+            }
+        }
+
+
+        ::ng-deep {
+            .navbar-nav {
+                .sidebar-section {
+                    display: flex;
+                    align-content: stretch;
+                    background-color: var(--ds-admin-sidebar-bg);
+                    overflow-x: visible;
+
+                    .nav-item {
+                        padding-top: var(--bs-spacer);
+                        padding-bottom: var(--bs-spacer);
+                        background-color: inherit;
+
+                      &:focus-visible {
+                        // since links fill the whole sidebar, we _inset_ the outline
+                        outline-offset: -4px;
+
+                        // replace padding with margins so it doesn't extend over the :focus-visible outline
+                        //  → can't remove the padding altogether; the icon needs to fill out
+                        //    the collapsed width of the sidebar for the slide animation to look decent.
+                        .shortcut-icon {
+                          padding-left: 0;
+                          padding-right: 0;
+                          margin-left: var(--ds-icon-padding);
+                          margin-right: var(--ds-icon-padding);
+                        }
+                        .logo-wrapper {
+                          margin-right: var(--bs-navbar-padding-x) !important;
+                        }
+                        .navbar-brand {
+                          padding-top: 0;
+                          padding-bottom: 0;
+                          margin-top: var(--bs-navbar-brand-padding-y);
+                          margin-bottom: var(--bs-navbar-brand-padding-y);
+                        }
+                      }
+                    }
+
+                    .shortcut-icon {
+                        background-color: inherit;
+                        padding-left: var(--ds-icon-padding);
+                        padding-right: var(--ds-icon-padding);
+                        z-index: var(--ds-icon-z-index);
+                        align-self: baseline;
+                    }
+
+                    .sidebar-collapsible {
+                        padding-left: 0;
+                        padding-right: var(--bs-spacer);
+                        width: var(--ds-sidebar-items-width);
+                        position: relative;
+                        .toggle {
+                          width: 100%;
+                        }
+
+                        ul {
+                          padding-top: var(--bs-spacer);
+
+                          li a {
+                            padding-left: var(--bs-spacer);
+                          }
+                        }
+                    }
+
+                    &.active > .sidebar-collapsible > .nav-link {
+                        color: var(--bs-navbar-dark-active-color);
+                    }
+                }
+            }
+        }
+
+    }
+
+}

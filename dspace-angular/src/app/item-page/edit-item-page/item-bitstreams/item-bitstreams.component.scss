@@ -1,0 +1,56 @@
+.header-row {
+  color: var(--bs-table-dark-color);
+  background-color: var(--bs-table-dark-bg);
+  border-color: var(--bs-table-dark-border-color);
+}
+
+.bundle-row {
+  color: var(--bs-table-head-color);
+  background-color: var(--bs-table-head-bg);
+  border-color: var(--bs-table-border-color);
+}
+
+.row-element {
+  padding: 12px;
+  padding: 0.75em;
+  border-bottom: var(--bs-table-border-width) solid var(--bs-table-border-color);
+}
+
+.drag-handle {
+  visibility: hidden;
+  &:hover {
+    cursor: move;
+  }
+}
+
+.bitstream-row-drag-handle:hover {
+  cursor: move;
+}
+
+:host ::ng-deep .bitstream-row:hover .drag-handle, :host ::ng-deep .bitstream-row-drag-handle:focus .drag-handle {
+  visibility: visible !important;
+}
+
+.cdk-drag-preview {
+  margin-left: 0;
+  box-sizing: border-box;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging {
+  .bitstream-row-drag-handle, .drag-handle {
+    cursor: grabbing;
+  }
+}
+
+:host ::ng-deep .larger-tooltip .tooltip-inner {
+  max-width: 500px;
+}

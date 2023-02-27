@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <h4 class="modal-title">New name variant</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    {{'submission.sections.describe.relationship-lookup.name-variant.notification.content' | translate: { value: value } }}
+</div>
+<div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-light confirm-button" (click)="modal.close()">{{'submission.sections.describe.relationship-lookup.name-variant.notification.confirm' | translate }}</button>
+    <button type="button" class="btn btn-light decline-button" (click)="modal.dismiss()">{{'submission.sections.describe.relationship-lookup.name-variant.notification.decline' | translate }}</button>
+</div>

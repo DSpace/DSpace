@@ -1,0 +1,21 @@
+.loginDropdownMenu, .logoutDropdownMenu {
+  min-width: 330px;
+  z-index: 1002;
+}
+
+.loginDropdownMenu {
+  min-height: 260px;
+}
+
+.dropdown-item.active, .dropdown-item:active,
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: transparent !important;
+}
+
+.dropdown-toggle {
+  color: var(--ds-header-icon-color);
+
+  &:hover, &:focus {
+    color: var(--ds-header-icon-color-hover);
+  }
+}

@@ -1,0 +1,11 @@
+<div class="form-group" *ngIf="script">
+    <label>{{'process.new.select-parameters' | translate}}</label>
+    <ds-parameter-select
+            *ngFor="let value of parameterValues; let i = index; let last = last"
+            [parameters]="script.parameters"
+            [parameterValue]="value"
+            [removable]="!last"
+            [index]="i"
+            (removeParameter)="removeParameter(i)"
+            (changeParameter)="updateParameter($event, i)"></ds-parameter-select>
+</div>

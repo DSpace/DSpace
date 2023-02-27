@@ -1,0 +1,16 @@
+<div class="form-row mb-2 mx-0">
+    <select id="process-parameters"
+            class="form-control col"
+            name="parameter-{{index}}"
+            [(ngModel)]="selectedParameter"
+            #param="ngModel">
+        <option [ngValue]="undefined">Add a parameter...</option>
+        <option *ngFor="let param of parameters" [ngValue]="param.name">
+            {{param.nameLong || param.name}}
+        </option>
+    </select>
+    <ds-parameter-value-input [initialValue]="parameterValue.value" [parameter]="selectedScriptParameter" (updateValue)="selectedParameterValue = $event" class="d-block col" [index]="index"></ds-parameter-value-input>
+    <button *ngIf="removable" class="btn btn-light col-1 remove-button" (click)="removeParameter.emit(parameterValue);"><span class="fas fa-trash"></span></button>
+    <span *ngIf="!removable" class="col-1"></span>
+</div>
+

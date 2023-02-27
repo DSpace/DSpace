@@ -1,0 +1,10 @@
+<ds-metadata-field-wrapper [label]="label | translate">
+  <ng-container *ngIf="item.hasMetadata(metadata)">
+    <span *ngFor="let mdValue of allMetadataValues(metadata); let last=last;">
+      {{mdValue}}<span *ngIf="!last" [innerHTML]="separator"></span>
+    </span>
+  </ng-container>
+  <ng-container *ngIf="!item.hasMetadata(metadata)">
+    <span class="text-muted">{{(placeholder | translate)}}</span>
+  </ng-container>
+</ds-metadata-field-wrapper>

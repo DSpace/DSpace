@@ -1,0 +1,11 @@
+<ds-themed-loading *ngIf="isLoading" message="Loading..."></ds-themed-loading>
+<ds-form *ngIf="!isLoading && formModel" #formRef="formComponent"
+         [formId]="formId"
+         [formModel]="formModel"
+         [displaySubmit]="false"
+         [displayCancel]="false"
+         (dfChange)="onChange($event)"
+         (dfFocus)="onFocus($event)"
+         (remove)="onRemove($event)"
+         (ngbEvent)="onCustomEvent($event)"
+         (removeArrayItem)="onRemove($event)"></ds-form>

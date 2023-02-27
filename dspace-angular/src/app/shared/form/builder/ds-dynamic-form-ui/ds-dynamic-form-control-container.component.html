@@ -1,0 +1,82 @@
+<div [class.form-group]="(model.type !== 'GROUP' && asBootstrapFormGroup) || getClass('element', 'container').includes('form-group')"
+     [class.d-none]="model.hidden"
+     [formGroup]="group"
+     [ngClass]="[getClass('element', 'container'), getClass('grid', 'container')]">
+  <label *ngIf="!isCheckbox && hasLabel"
+         [id]="'label_' + model.id"
+         [for]="id"
+         [innerHTML]="(model.required && model.label) ? (model.label | translate) + ' *' : (model.label | translate)"
+         [ngClass]="[getClass('element', 'label'), getClass('grid', 'label')]"></label>
+  <ng-container *ngTemplateOutlet="startTemplate?.templateRef; context: { $implicit: model };"></ng-container>
+  <!--    Should be *ngIf instead of class d-none, but that breaks the #componentViewContainer reference-->
+  <div [ngClass]="{'form-row': model.hasLanguages || isRelationship,
+                      'd-none': value?.isVirtual && (model.hasSelectableMetadata || context?.index > 0)}">
+    <div [ngClass]="getClass('grid', 'control')">
+      <div>
+        <ng-container #componentViewContainer></ng-container>
+      </div>
+
+      <small *ngIf="hasHint && ((!model.repeatable && (isRelationship === false || value?.value === null)) || (model.repeatable === true && context?.index === context?.context?.groups?.length - 1)) && (!showErrorMessages || errorMessages.length === 0)"
+             class="text-muted ds-hint" [innerHTML]="model.hint | translate" [ngClass]="getClass('element', 'hint')"></small>
+      <!-- In case of repeatable fields show empty space for all elements except the first -->
+      <div *ngIf="context?.index !== null
+              && (!showErrorMessages || errorMessages.length === 0)" class="clearfix w-100 mb-2"></div>
+
+      <div *ngIf="!model.hideErrorMessages && showErrorMessages" [id]="id + '_errors'"
+           [ngClass]="[getClass('element', 'errors'), getClass('grid', 'errors')]">
+        <small *ngFor="let message of errorMessages" class="invalid-feedback d-block">{{ message | translate: model.validators }}</small>
+      </div>
+
+    </div>
+    <div *ngIf="model.languageCodes && model.languageCodes.length > 0" class="col-xs-2" >
+      <select
+        #language="ngModel"
+        [disabled]="model.readOnly"
+        [(ngModel)]="model.language"
+        class="form-control"
+        (blur)="onBlur($event)"
+        (change)="onChangeLanguage($event)"
+        [ngModelOptions]="{standalone: true}"
+        required>
+        <option *ngFor="let lang of model.languageCodes" [value]="lang.code">{{lang.display}}</option>
+      </select>
+    </div>
+    <div *ngIf="isRelationship" class="col-auto text-center">
+      <button class="btn btn-secondary"
+              type="button"
+              ngbTooltip="{{'form.lookup-help' | translate}}"
+              placement="top"
+              (click)="openLookup(); $event.stopPropagation();"><i class="fa fa-search"></i>
+      </button>
+    </div>
+  </div>
+  <ng-container *ngTemplateOutlet="endTemplate?.templateRef; context: model"></ng-container>
+  <ng-container *ngIf="value?.isVirtual">
+    <ds-existing-metadata-list-element
+      *ngIf="model.hasSelectableMetadata"
+      [reoRel]="relationshipValue$ | async"
+      [submissionItem]="item$ | async"
+      [listId]="listId"
+      [metadataFields]="model.metadataFields"
+      [submissionId]="model.submissionId"
+      [relationshipOptions]="model.relationship"
+      (remove)="onRemove()"
+    >
+    </ds-existing-metadata-list-element>
+    <ds-existing-relation-list-element
+      *ngIf="!model.hasSelectableMetadata"
+      [ngClass]="{'d-block pb-2 pt-2': !context?.index}"
+      [reoRel]="relationshipValue$ | async"
+      [submissionItem]="item$ | async"
+      [listId]="listId"
+      [metadataFields]="model.metadataFields"
+      [submissionId]="model.submissionId"
+      [relationshipOptions]="model.relationship"
+    >
+    </ds-existing-relation-list-element>
+    <small *ngIf="hasHint && (model.repeatable === false || context?.index === context?.context?.groups?.length - 1) && (!showErrorMessages || errorMessages.length === 0)"
+           class="text-muted ds-hint" [innerHTML]="model.hint | translate" [ngClass]="getClass('element', 'hint')"></small>
+    <div class="clearfix w-100 mb-2"></div>
+  </ng-container>
+  <ng-content></ng-content>
+</div>

@@ -1,0 +1,94 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">{{ ('submission.sections.describe.relationship-lookup.title.' + relationshipOptions.relationshipType) | translate }}</h4>
+    <button type="button" [disabled]="isPending" class="close" aria-label="Close button" aria-describedby="modal-title"
+            (click)="close()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <ds-themed-loading *ngIf="!item || !collection"></ds-themed-loading>
+    <ng-container *ngIf="item && collection">
+        <ul ngbNav #nav="ngbNav" class="nav-tabs">
+            <li ngbNavItem>
+                <a ngbNavLink>{{'submission.sections.describe.relationship-lookup.search-tab.tab-title.' + relationshipOptions.relationshipType | translate  : { count: (totalInternal$ | async)} }}</a>
+                <ng-template ngbNavContent>
+                    <ds-dynamic-lookup-relation-search-tab
+                            [selection$]="selection$"
+                            [listId]="listId"
+                            [relationship]="relationshipOptions"
+                            [repeatable]="repeatable"
+                            [context]="context"
+                            [query]="query"
+                            [relationshipType]="relationshipType"
+                            [isLeft]="isLeft"
+                            [item]="item"
+                            [isEditRelationship]="isEditRelationship"
+                            [toRemove]="toRemove"
+                            (selectObject)="select($event)"
+                            (deselectObject)="deselect($event)"
+                            (resultFound)="setTotalInternals($event.pageInfo.totalElements)"
+                            class="d-block pt-3">
+                    </ds-dynamic-lookup-relation-search-tab>
+                </ng-template>
+            </li>
+            <li ngbNavItem *ngFor="let source of (externalSourcesRD$ | async); let idx = index">
+                <a ngbNavLink>{{'submission.sections.describe.relationship-lookup.search-tab.tab-title.' + source.id | translate  : { count: (totalExternal$ | async)[idx] } }}</a>
+                <ng-template ngbNavContent>
+                    <ds-dynamic-lookup-relation-external-source-tab
+                            [label]="label"
+                            [listId]="listId"
+                            [repeatable]="repeatable"
+                            [item]="item"
+                            [collection]="collection"
+                            [relationship]="relationshipOptions"
+                            [context]="context"
+                            [externalSource]="source"
+                            (importedObject)="imported($event)"
+                            class="d-block pt-3">
+                    </ds-dynamic-lookup-relation-external-source-tab>
+                </ng-template>
+            </li>
+            <li ngbNavItem *ngIf="!isEditRelationship">
+                <a ngbNavLink>{{'submission.sections.describe.relationship-lookup.selection-tab.tab-title' | translate : { count: (selection$ | async)?.length } }}</a>
+                <ng-template ngbNavContent>
+                    <ds-dynamic-lookup-relation-selection-tab
+                            [selection$]="selection$"
+                            [listId]="listId"
+                            [relationshipType]="relationshipOptions.relationshipType"
+                            [repeatable]="repeatable"
+                            [context]="context"
+                            (selectObject)="select($event)"
+                            (deselectObject)="deselect($event)"
+                            class="d-block pt-3">
+                    </ds-dynamic-lookup-relation-selection-tab>
+                </ng-template>
+            </li>
+        </ul>
+        <div [ngbNavOutlet]="nav"></div>
+    </ng-container>
+</div>
+<div class="modal-footer">
+  <small>{{ ('submission.sections.describe.relationship-lookup.selected' | translate: {size: (selection$ | async)?.length || 0}) }}</small>
+  <div class="d-flex float-right space-children-mr">
+    <div class="close-button">
+        <button type="button" [disabled]="isPending" class="btn btn-outline-secondary" (click)="close()">
+            {{ ('submission.sections.describe.relationship-lookup.close' | translate) }}</button>
+    </div>
+    <ng-container *ngIf="isEditRelationship">
+      <button class="btn btn-danger discard"
+              [disabled]="(toAdd.length == 0 && toRemove.length == 0) || isPending"
+              (click)="discardEv()">
+              <i class="fas fa-times"></i>
+        <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.discard-button" | translate}}</span>
+      </button>
+      <button class="btn btn-primary submit"
+            [disabled]="(toAdd.length == 0 && toRemove.length == 0) || isPending"
+              (click)="submitEv()">
+              <span *ngIf="isPending" class="spinner-border spinner-border-sm" role="status"
+                              aria-hidden="true"></span>
+              <i class="fas fa-save"></i>
+        <span class="d-none d-sm-inline">&nbsp;{{"item.edit.metadata.save-button" | translate}}</span>
+      </button>
+    </ng-container>
+  </div>
+</div>

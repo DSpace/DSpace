@@ -1,0 +1,20 @@
+.button-row {
+  .btn {
+    margin-right: var(--ds-gap);
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    @media screen and (min-width: map-get($grid-breakpoints, sm)) {
+      min-width: var(--ds-edit-item-button-min-width);
+    }
+  }
+
+  &.top .btn {
+    margin-top: calc(var(--bs-spacer) / 2);
+    margin-bottom: calc(var(--bs-spacer) / 2);
+  }
+
+
+}

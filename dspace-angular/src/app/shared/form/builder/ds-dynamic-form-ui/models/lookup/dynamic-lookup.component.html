@@ -1,0 +1,129 @@
+<div ngbDropdown #sdRef="ngbDropdown"
+     (click)="$event.stopPropagation();"
+     (openChange)="openChange($event);">
+
+  <div class="form-row align-items-center">
+    <!--Simple lookup, first field -->
+    <div class="col right-addon">
+      <i dsAuthorityConfidenceState
+         class="far fa-circle fa-2x fa-fw position-absolute mt-1 p-0 pr-2"
+         aria-hidden="true"
+         [authorityValue]="model.value"
+         (whenClickOnConfidenceNotAccepted)="whenClickOnConfidenceNotAccepted(sdRef, $event)"></i>
+      <input class="form-control"
+             [attr.aria-labelledby]="'label_' + model.id"
+             [attr.autoComplete]="model.autoComplete"
+             [class.is-invalid]="showErrorMessages"
+             [id]="model.id"
+             [name]="model.name"
+             [type]="model.inputType"
+             [(ngModel)]="firstInputValue"
+             [disabled]="isInputDisabled()"
+             [placeholder]="model.placeholder | translate"
+             [readonly]="model.readOnly"
+             (change)="onChange($event)"
+             (blur)="onBlur($event); $event.stopPropagation(); sdRef.close();"
+             (focus)="onFocus($event); $event.stopPropagation(); sdRef.close();"
+             (click)="$event.stopPropagation(); $event.stopPropagation(); sdRef.close();">
+    </div>
+
+    <!--Lookup-name, second field-->
+    <div *ngIf="isLookupName()" class="col" >
+      <input  class="form-control"
+              [ngClass]="{}"
+              [attr.aria-labelledby]="'label_' + model.id"
+              [attr.autoComplete]="model.autoComplete"
+              [class.is-invalid]="showErrorMessages"
+              [id]="id"
+              [name]="model.name + '_2'"
+              [type]="model.inputType"
+              [(ngModel)]="secondInputValue"
+              [disabled]="firstInputValue.length === 0 || isInputDisabled()"
+              [placeholder]="model.secondPlaceholder | translate"
+              [readonly]="model.readOnly"
+              (change)="onChange($event)"
+              (blur)="onBlur($event); $event.stopPropagation(); sdRef.close();"
+              (focus)="onFocus($event); $event.stopPropagation(); sdRef.close();"
+              (click)="$event.stopPropagation(); sdRef.close();">
+    </div>
+    <div class="col-auto text-center">
+      <button ngbDropdownAnchor
+              class="btn btn-secondary"
+              type="button"
+              ngbTooltip="{{'form.search-help' | translate}}"
+              placement="top"
+              [disabled]="model.readOnly || isSearchDisabled()"
+              [hidden]="isInputDisabled()"
+              (click)="sdRef.open(); search(); $event.stopPropagation();">{{'form.search' | translate}}
+      </button>
+      <button *ngIf="isInputDisabled()" class="btn btn-secondary"
+              type="button"
+              ngbTooltip="{{'form.clear-help' | translate}}"
+              placement="top"
+              [disabled]="model.readOnly"
+              (click)="remove()">{{'form.clear' | translate}}
+      </button>
+    </div>
+    <div class="col-auto text-center">
+      <button *ngIf="!editMode" class="btn btn-secondary"
+              type="button"
+              ngbTooltip="{{'form.edit-help' | translate}}"
+              placement="top"
+              [disabled]="isEditDisabled()"
+              (click)="switchEditMode()">{{'form.edit' | translate}}
+      </button>
+      <button *ngIf="editMode" class="btn btn-secondary"
+              type="button"
+              ngbTooltip="{{'form.save-help' | translate}}"
+              placement="top"
+              [disabled]="!hasEmptyValue()"
+              (click)="saveChanges()">{{'form.save' | translate}}
+      </button>
+    </div>
+  </div>
+
+  <div ngbDropdownMenu
+       class="dropdown-menu scrollable-dropdown-menu w-100"
+       aria-haspopup="true"
+       aria-expanded="false"
+       [attr.aria-labelledby]="'label_' + model.id">
+    <div class="scrollable-menu"
+         aria-labelledby="scrollableDropdownMenuButton"
+         infiniteScroll
+         [infiniteScrollDistance]="2"
+         [infiniteScrollThrottle]="50"
+         (scrolled)="onScroll()"
+         [scrollWindow]="false">
+
+      <button class="dropdown-item disabled"
+              *ngIf="optionsList && optionsList.length == 0"
+              (click)="$event.stopPropagation(); clearFields(); sdRef.close();">{{'form.no-results' | translate}}
+      </button>
+      <button class="dropdown-item lookup-item"
+              *ngFor="let listEntry of optionsList"
+              (click)="$event.stopPropagation(); onSelect(listEntry); sdRef.close();"
+              title="{{ listEntry.display }}">
+        <ng-container
+          [ngTemplateOutlet]="(listEntry.hasOtherInformation()) ? hasInfo : noInfo"
+          [ngTemplateOutletContext]="{entry: listEntry}">
+        </ng-container>
+      </button>
+      <div class="scrollable-dropdown-loading text-center" *ngIf="loading"><p>{{'form.loading' | translate}}</p></div>
+    </div>
+  </div>
+</div>
+
+<ng-template #hasInfo let-entry="entry">
+  <ul class="list-unstyled mb-0" [attr.aria-labelledby]="'label_' + model.id">
+    <li class="list-item text-truncate text-primary font-weight-bold">{{entry.value}}</li>
+    <li class="list-item text-truncate text-secondary" *ngFor="let item of entry.otherInformation | dsObjNgFor" >
+      {{ 'form.other-information.' + item.key | translate }} : {{item.value}}
+    </li>
+  </ul>
+</ng-template>
+
+<ng-template #noInfo let-entry="entry">
+  <ul class="list-unstyled mb-0" [attr.aria-labelledby]="'label_' + model.id">
+    <li class="list-item text-truncate text-primary font-weight-bold">{{entry.value}}</li>
+  </ul>
+</ng-template>

@@ -1,0 +1,17 @@
+a {
+    color: var(--bs-body-color);
+    &:hover, &:focus {
+        text-decoration: none;
+    }
+    span.badge {
+        vertical-align: text-top;
+    }
+}
+
+.break-facet {
+    word-break: break-word;
+}
+
+.filter-checkbox {
+    height: fit-content;
+}

@@ -1,0 +1,4 @@
+<div class="mt-2" *ngVar="(itemRD$ | async)?.payload as item">
+  <ds-item-versions *ngIf="item" [item]="item" [displayWhenEmpty]="true" [displayTitle]="false"
+                    [displayActions]="true"></ds-item-versions>
+</div>

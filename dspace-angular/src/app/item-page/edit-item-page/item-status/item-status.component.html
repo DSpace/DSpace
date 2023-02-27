@@ -1,0 +1,33 @@
+<p class="mt-2">{{'item.edit.tabs.status.description' | translate}}</p>
+<div class="row">
+  <div *ngFor="let statusKey of statusDataKeys" class="w-100">
+    <div class="col-3 float-left status-label">
+      {{'item.edit.tabs.status.labels.' + statusKey | translate}}:
+    </div>
+    <div class="col-9 float-left status-data" id="status-{{statusKey}}">
+      {{statusData[statusKey]}}
+    </div>
+  </div>
+
+  <div *ngFor="let identifier of (identifiers$ | async)" class="w-100">
+    <div *ngIf="(identifier.identifierType=='doi')">
+      <div class="col-3 float-left status-label">
+        {{identifier.identifierType.toLocaleUpperCase()}}
+      </div>
+      <div class="col-9 float-left status-label">{{identifier.value}}
+        ({{"item.edit.identifiers.doi.status."+identifier.identifierStatus|translate}})</div>
+    </div>
+  </div>
+
+  <div class="col-3 float-left status-label">
+    {{'item.edit.tabs.status.labels.itemPage' | translate}}:
+  </div>
+  <div class="col-9 float-left status-data" id="status-itemPage">
+    <a [routerLink]="itemPageRoute$ | async">{{itemPageRoute$ | async}}</a>
+  </div>
+
+  <div *ngFor="let operation of (operations$ | async)" class="w-100" [ngClass]="{'pt-3': operation}">
+    <ds-item-operation *ngIf="operation" [operation]="operation"></ds-item-operation>
+  </div>
+
+</div>

@@ -1,0 +1,96 @@
+<div class="container" *ngIf="(isXsOrSm$ | async)">
+    <div class="row">
+        <div class="col-12">
+            <ng-template *ngTemplateOutlet="searchForm"></ng-template>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!showSidebar && (initialized$ | async)">
+  <ng-template *ngTemplateOutlet="searchContent"></ng-template>
+</div>
+
+<ds-page-with-sidebar *ngIf="showSidebar && (initialized$ | async)" [id]="'search-page'" [sidebarContent]="sidebarContent">
+  <ng-template *ngTemplateOutlet="searchContent"></ng-template>
+</ds-page-with-sidebar>
+
+<ng-template #searchContent>
+    <div class="row">
+        <div class="col-12" *ngIf="!(isXsOrSm$ | async)">
+            <ng-template *ngTemplateOutlet="searchForm"></ng-template>
+            <ng-content select="[additionalSearchOptions]"></ng-content>
+        </div>
+        <div id="search-content" class="col-12">
+            <div class="d-block d-md-none search-controls clearfix">
+                <ds-view-mode-switch [viewModeList]="viewModeList" [inPlaceSearch]="inPlaceSearch"></ds-view-mode-switch>
+                <button (click)="openSidebar()" aria-controls="#search-body"
+                        class="btn btn-outline-primary float-right open-sidebar"><i
+                        class="fas fa-sliders"></i> {{"search.sidebar.open"
+                        | translate}}
+                </button>
+            </div>
+            <ds-themed-search-results [searchResults]="resultsRD$ | async"
+                                      [searchConfig]="searchOptions$ | async"
+                                      [configuration]="(currentConfiguration$ | async)"
+                                      [disableHeader]="!searchEnabled"
+                                      [linkType]="linkType"
+                                      [context]="(currentContext$ | async)"
+                                      [selectable]="selectable"
+                                      [selectionConfig]="selectionConfig"
+                                      [showCsvExport]="showCsvExport"
+                                      (contentChange)="onContentChange($event)"
+                                      (deselectObject)="deselectObject.emit($event)"
+                                      (selectObject)="selectObject.emit($event)"></ds-themed-search-results>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #sidebarContent>
+    <ds-search-sidebar id="search-sidebar" *ngIf="!(isXsOrSm$ | async)"
+                       [configurationList]="configurationList"
+                       [configuration]="(currentConfiguration$ | async)"
+                       [currentScope]="(currentScope$ | async)"
+                       [filters]="filtersRD$.asObservable()"
+                       [refreshFilters]="refreshFilters"
+                       [resultCount]="(resultsRD$ | async)?.payload?.totalElements"
+                       [searchOptions]="(searchOptions$ | async)"
+                       [sortOptionsList]="(sortOptionsList$ | async)"
+                       [currentSortOption]="(currentSortOptions$ | async)"
+                       [inPlaceSearch]="inPlaceSearch"
+                       [viewModeList]="viewModeList"
+                       [showViewModes]="showViewModes"
+                       (changeConfiguration)="changeContext($event.context)"
+                       (changeViewMode)="changeViewMode()"></ds-search-sidebar>
+    <ds-search-sidebar id="search-sidebar-sm" *ngIf="(isXsOrSm$ | async)"
+                       [configurationList]="configurationList"
+                       [configuration]="(currentConfiguration$ | async)"
+                       [currentScope]="(currentScope$ | async)"
+                       [filters]="filtersRD$.asObservable()"
+                       [refreshFilters]="refreshFilters"
+                       [resultCount]="(resultsRD$ | async)?.payload.totalElements"
+                       [searchOptions]="(searchOptions$ | async)"
+                       [sortOptionsList]="(sortOptionsList$ | async)"
+                       [currentSortOption]="(currentSortOptions$ | async)"
+                       [viewModeList]="viewModeList"
+                       [showViewModes]="showViewModes"
+                       (toggleSidebar)="closeSidebar()"
+                       (changeConfiguration)="changeContext($event.context)"
+                       (changeViewMode)="changeViewMode()">
+    </ds-search-sidebar>
+</ng-template>
+
+<ng-template #searchForm>
+    <ds-search-form *ngIf="searchEnabled" id="search-form"
+                    [query]="(searchOptions$ | async)?.query"
+                    [scope]="(searchOptions$ | async)?.scope"
+                    [currentUrl]="searchLink"
+                    [showScopeSelector]="showScopeSelector"
+                    [inPlaceSearch]="inPlaceSearch"
+                    [searchPlaceholder]="searchFormPlaceholder | translate">
+    </ds-search-form>
+    <div class="row mb-3 mb-md-1">
+        <div class="labels col-sm-9">
+            <ds-search-labels *ngIf="searchEnabled" [inPlaceSearch]="inPlaceSearch"></ds-search-labels>
+        </div>
+    </div>
+</ng-template>

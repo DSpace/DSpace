@@ -1,0 +1,13 @@
+<ds-themed-loading *ngIf="(loading | async) || (isAuthenticated | async)" class="m-5"></ds-themed-loading>
+<div *ngIf="!(loading | async) && !(isAuthenticated | async)" class="px-4 py-3 login-container">
+  <ng-container *ngFor="let authMethod of (authMethods); let i = index">
+    <div *ngIf="i === 1" class="text-center mt-2">
+      <span class="align-middle">{{"login.form.or-divider" | translate}}</span>
+    </div>
+    <ds-log-in-container [authMethod]="authMethod" [isStandalonePage]="isStandalonePage"></ds-log-in-container>
+  </ng-container>
+
+  <div class="dropdown-divider"></div>
+  <a class="dropdown-item" *ngIf="canRegister$ | async" [routerLink]="[getRegisterRoute()]" [attr.data-test]="'register' | dsBrowserOnly">{{"login.form.new-user" | translate}}</a>
+  <a class="dropdown-item" [routerLink]="[getForgotRoute()]" [attr.data-test]="'forgot' | dsBrowserOnly">{{"login.form.forgot-password" | translate}}</a>
+</div>

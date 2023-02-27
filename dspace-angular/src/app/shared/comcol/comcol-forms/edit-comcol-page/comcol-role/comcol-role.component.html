@@ -1,0 +1,52 @@
+<div class="card p-2 m-3 {{(comcolRole$ | async)?.name}}">
+
+  <div class="card-body d-flex flex-column"
+       *ngVar="group$ | async as group">
+
+    <h5 class="w-100">
+      {{ roleName$ | async }}
+    </h5>
+
+    <div class="mt-2 mb-2">
+      <ds-alert [type]="'alert-info'" >{{'comcol-role.edit.' + (comcolRole$ | async)?.name + '.description' | translate}}</ds-alert>
+    </div>
+
+    <div class="d-flex flex-md-row justify-content-between flex-column">
+      <div class="w-100 d-flex align-items-center">
+        <ds-themed-loading *ngIf="!(groupRD$ | async)"></ds-themed-loading>
+        <div *ngIf="hasNoGroup$ | async">
+          {{'comcol-role.edit.no-group' | translate}}
+        </div>
+        <div *ngIf="hasAnonymousGroup$ | async">
+          {{'comcol-role.edit.' + (comcolRole$ | async)?.name + '.anonymous-group' | translate}}
+        </div>
+        <a *ngIf="hasCustomGroup$ | async"
+           routerLink="{{editGroupLink$ | async}}">
+          {{group.name}}
+        </a>
+      </div>
+
+      <div class="flex-shrink-0">
+        <button *ngIf="hasNoGroup$ | async"
+             class="btn btn-primary create"
+             (click)="create()">
+          <i class="fas fa-plus" aria-hidden="true"></i> {{'comcol-role.edit.create' | translate}}
+        </button>
+        <button *ngIf="hasAnonymousGroup$ | async"
+             class="btn btn-primary restrict"
+             (click)="create()">
+          {{'comcol-role.edit.restrict' | translate}}
+        </button>
+        <button *ngIf="hasCustomGroup$ | async"
+             class="btn btn-danger delete"
+             (click)="delete()">
+          <i class="fas fa-trash" aria-hidden="true"></i> {{'comcol-role.edit.delete' | translate}}
+        </button>
+      </div>
+
+    </div>
+
+
+  </div>
+
+</div>

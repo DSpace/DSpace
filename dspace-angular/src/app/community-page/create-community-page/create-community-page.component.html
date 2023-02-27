@@ -1,0 +1,13 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 pb-4">
+      <ng-container *ngVar="(parentRD$ | async)?.payload as parent">
+        <h2 *ngIf="!parent" id="header" class="border-bottom pb-2">{{ 'community.create.head' | translate }}</h2>
+        <h2 *ngIf="parent" id="sub-header" class="border-bottom pb-2">{{ 'community.create.sub-head' | translate:{ parent: parent.name } }}</h2>
+      </ng-container>
+    </div>
+  </div>
+  <ds-community-form (submitForm)="onSubmit($event)"
+                     (back)="navigateToHome()"
+                     (finish)="navigateToNewPage()"></ds-community-form>
+</div>

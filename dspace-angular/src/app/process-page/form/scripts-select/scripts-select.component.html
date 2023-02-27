@@ -1,0 +1,20 @@
+<div class="form-group" *ngIf="scripts$ | async">
+    <label for="process-script">{{'process.new.select-script' | translate}}</label>
+    <select required id="process-script"
+            class="form-control"
+            name="script"
+            [(ngModel)]="selectedScript"
+            #script="ngModel">
+        <option [ngValue]="undefined">{{'process.new.select-script.placeholder' | translate}}</option>
+        <option *ngFor="let script of scripts$ | async" [ngValue]="script.id">
+            {{script.name}}
+        </option>
+    </select>
+
+    <div *ngIf="script.invalid && (script.dirty || script.touched)"
+         class="alert alert-danger validation-error">
+        <div *ngIf="script.errors.required">
+            {{'process.new.select-script.required' | translate}}
+        </div>
+    </div>
+</div>

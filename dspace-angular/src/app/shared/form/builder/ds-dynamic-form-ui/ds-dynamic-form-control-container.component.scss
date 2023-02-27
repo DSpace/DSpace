@@ -1,0 +1,16 @@
+:host ::ng-deep {
+  // For proper scoping, do not include the .css file suffix here
+  @import "../../form.component";
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:host ::ng-deep .custom-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}

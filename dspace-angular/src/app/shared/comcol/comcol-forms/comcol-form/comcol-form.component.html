@@ -1,0 +1,48 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 d-inline-block">
+      <label>{{type.value + '.edit.logo.label' | translate}}</label>
+    </div>
+    <ng-container *ngVar="(dso?.logo | async)?.payload as logo">
+      <div class="col-12 d-inline-block alert" [ngClass]="{'alert-danger': markLogoForDeletion}" id="logo-section" *ngIf="logo">
+        <div class="row">
+          <div class="col-8 d-inline-block">
+            <ds-comcol-page-logo [logo]="logo"></ds-comcol-page-logo>
+          </div>
+          <div class="col-4 d-inline-block">
+            <div *ngIf="logo" class="btn-group btn-group-sm float-right" role="group">
+              <button *ngIf="!markLogoForDeletion" type="button" class="btn btn-danger"
+                      title="{{type.value + '.edit.logo.delete.title' | translate}}"
+                      (click)="deleteLogo()">
+                <i class="fas fa-trash" aria-hidden="true"></i>
+              </button>
+              <button *ngIf="markLogoForDeletion" type="button" class="btn btn-warning"
+                      title="{{type.value + '.edit.logo.delete-undo.title' | translate}}"
+                      (click)="undoDeleteLogo()">
+                <i class="fas fa-undo" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!logo" class="col-12 d-inline-block">
+        <ds-uploader  *ngIf="initializedUploaderOptions | async"
+                      [dropMsg]="type.value + '.edit.logo.upload'"
+                      [dropOverDocumentMsg]="type.value + '.edit.logo.upload'"
+                      [enableDragOverDocument]="true"
+                      [uploadFilesOptions]="uploadFilesOptions"
+                      (onCompleteItem)="onCompleteItem()"
+                      (onUploadError)="onUploadError()"></ds-uploader>
+      </div>
+    </ng-container>
+  </div>
+</div>
+<ds-form *ngIf="formModel"
+         [formId]="'comcol-form-id'"
+         [formModel]="formModel"
+         [displayCancel]="false"
+         (submitForm)="onSubmit()">
+  <button before (click)="back.emit()" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i> {{ type.value + '.edit.return' | translate }}
+  </button>
+</ds-form>

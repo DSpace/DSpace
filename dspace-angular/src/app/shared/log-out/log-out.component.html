@@ -1,0 +1,6 @@
+<div class="form-login px-4">
+
+  <div *ngIf="(error | async)" class="alert alert-danger" role="alert" @fadeOut>{{ error | async }}</div>
+
+  <button class="btn btn-lg btn-primary btn-block mt-3" (click)="logOut()" [attr.data-test]="'logout-button' | dsBrowserOnly"><i class="fas fa-sign-out-alt"></i> {{"logout.form.submit" | translate}}</button>
+</div>

@@ -1,0 +1,30 @@
+<ng-container *ngIf="healthComponent?.components">
+  <div *ngFor="let entry of healthComponent?.components | dsObjNgFor" class="mb-3 border-bottom" data-test="collapse">
+    <div class="w-100 d-flex justify-content-between collapse-toggle" (click)="collapse.toggle()">
+      <button type="button" class="btn btn-link p-0" (click)="$event.preventDefault()" [attr.aria-expanded]="!collapse.collapsed"
+              aria-controls="collapseExample">
+        {{ entry.key | titlecase }}
+      </button>
+      <div class="d-inline-block">
+        <span *ngIf="collapse.collapsed" class="fas fa-chevron-down"></span>
+        <span *ngIf="!collapse.collapsed" class="fas fa-chevron-up"></span>
+      </div>
+    </div>
+    <div #collapse="ngbCollapse" [ngbCollapse]="isCollapsed">
+      <div class="card border-0">
+        <div class="card-body">
+          <ds-health-component [healthComponent]="entry.value"
+                               [healthComponentName]="entry.key"></ds-health-component>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-container *ngIf="healthComponent?.details">
+  <div *ngFor="let item of healthComponent?.details | dsObjNgFor" data-test="details">
+    <p data-test="property"><span class="font-weight-bold">{{ getPropertyLabel(item.key) | titlecase }}</span> : {{item.value}}</p>
+  </div>
+</ng-container>
+<ng-container *ngIf="!healthComponent?.details && !healthComponent?.components">
+  <ds-alert [content]="'health-page.section.no-issues'" [type]="AlertTypeEnum.Info"></ds-alert>
+</ng-container>
