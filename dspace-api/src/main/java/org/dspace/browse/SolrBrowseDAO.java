@@ -8,7 +8,6 @@
 package org.dspace.browse;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -179,7 +178,6 @@ public class SolrBrowseDAO implements BrowseDAO {
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
             addDefaultFilterQueries(query);
-            addStatusFilter(query);
             if (distinct) {
                 DiscoverFacetField dff;
                 if (StringUtils.isNotBlank(startsWith)) {
@@ -228,18 +226,6 @@ public class SolrBrowseDAO implements BrowseDAO {
             }
         }
         return sResponse;
-    }
-
-    private void addStatusFilter(DiscoverQuery query) {
-        try {
-            if (!authorizeService.isAdmin(context)
-                && (authorizeService.isCommunityAdmin(context)
-                || authorizeService.isCollectionAdmin(context))) {
-                query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
-            }
-        } catch (SQLException ex) {
-            log.error("Error looking up authorization rights of current user", ex);
-        }
     }
 
     private void addLocationScopeFilter(DiscoverQuery query) {
@@ -346,7 +332,6 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverQuery query = new DiscoverQuery();
         addLocationScopeFilter(query);
         addDefaultFilterQueries(query);
-        addStatusFilter(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 

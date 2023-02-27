@@ -21,6 +21,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.LogicalStatementException;
+import org.dspace.content.logic.TrueFilter;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -28,6 +29,7 @@ import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.doi.DOIIdentifierNotApplicableException;
 import org.dspace.identifier.service.DOIService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * <p>Any identifier a method of this class returns is a string in the following format: doi:10.123/456.</p>
  *
  * @author Pascal-Nicolas Becker
+ * @author Kim Shepherd
  */
 public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     private static final Logger log = LoggerFactory.getLogger(DOIIdentifierProvider.class);
@@ -71,16 +74,44 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
     public static final String DOI_QUALIFIER = "uri";
-
+    // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
+    // The DOI is queued for reservation with the service provider
     public static final Integer TO_BE_RESERVED = 2;
+    // The DOI has been registered online
     public static final Integer IS_REGISTERED = 3;
+    // The DOI has been reserved online
     public static final Integer IS_RESERVED = 4;
+    // The DOI is reserved and requires an updated metadata record to be sent to the service provider
     public static final Integer UPDATE_RESERVED = 5;
+    // The DOI is registered and requires an updated metadata record to be sent to the service provider
     public static final Integer UPDATE_REGISTERED = 6;
+    // The DOI metadata record should be updated before performing online registration
     public static final Integer UPDATE_BEFORE_REGISTRATION = 7;
+    // The DOI will be deleted locally and marked as deleted in the DOI service provider
     public static final Integer TO_BE_DELETED = 8;
+    // The DOI has been deleted and is no longer associated with an item
     public static final Integer DELETED = 9;
+    // The DOI is created in the database and is waiting for either successful filter check on item install or
+    // manual intervention by an administrator to proceed to reservation or registration
+    public static final Integer PENDING = 10;
+    // The DOI is created in the database, but no more context is known
+    public static final Integer MINTED = 11;
+
+    public static final String[] statusText = {
+        "UNKNOWN",                      // 0
+        "TO_BE_REGISTERED",             // 1
+        "TO_BE_RESERVED",               // 2
+        "IS_REGISTERED",                // 3
+        "IS_RESERVED",                  // 4
+        "UPDATE_RESERVED",              // 5
+        "UPDATE_REGISTERED",            // 6
+        "UPDATE_BEFORE_REGISTRATION",   // 7
+        "TO_BE_DELETED",                // 8
+        "DELETED",                      // 9
+        "PENDING",                      // 10
+        "MINTED",                       // 11
+    };
 
     @Autowired(required = true)
     protected DOIService doiService;
@@ -88,8 +119,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     protected ContentServiceFactory contentServiceFactory;
     @Autowired(required = true)
     protected ItemService itemService;
-
-    protected Filter filterService;
 
     /**
      * Empty / default constructor for Spring
@@ -154,16 +183,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     }
 
     /**
-     * Set the Filter to use when testing items to see if a DOI should be registered
-     * Spring will use this setter to set the filter from the configured property in identifier-services.xml
-     * @param filterService - an object implementing the org.dspace.content.logic.Filter interface
-     */
-    @Override
-    public void setFilterService(Filter filterService) {
-        this.filterService = filterService;
-    }
-
-    /**
      * This identifier provider supports identifiers of type
      * {@link org.dspace.identifier.DOI}.
      *
@@ -206,7 +225,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     @Override
     public String register(Context context, DSpaceObject dso)
             throws IdentifierException {
-        return register(context, dso, false);
+        return register(context, dso, this.filter);
     }
 
     /**
@@ -219,29 +238,29 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     @Override
     public void register(Context context, DSpaceObject dso, String identifier)
             throws IdentifierException {
-        register(context, dso, identifier, false);
+        register(context, dso, identifier, this.filter);
     }
 
     /**
      * Register a new DOI for a given DSpaceObject
      * @param context    - DSpace context
      * @param dso        - DSpaceObject identified by the new DOI
-     * @param skipFilter - boolean indicating whether to skip any filtering of items before performing registration
+     * @param filter     - Logical item filter to determine whether this identifier should be registered
      * @throws IdentifierException
      */
     @Override
-    public String register(Context context, DSpaceObject dso, boolean skipFilter)
+    public String register(Context context, DSpaceObject dso, Filter filter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             // DOI are currently assigned only to Item
             return null;
         }
 
-        String doi = mint(context, dso, skipFilter);
+        String doi = mint(context, dso, filter);
 
         // register tries to reserve doi if it's not already.
         // So we don't have to reserve it here.
-        register(context, dso, doi, skipFilter);
+        register(context, dso, doi, filter);
         return doi;
     }
 
@@ -250,11 +269,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context    - DSpace context
      * @param dso        - DSpaceObject identified by the new DOI
      * @param identifier - String containing the DOI to register
-     * @param skipFilter - boolean indicating whether to skip any filtering of items before performing registration
+     * @param filter     - Logical item filter to determine whether this identifier should be registered
      * @throws IdentifierException
      */
     @Override
-    public void register(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void register(Context context, DSpaceObject dso, String identifier, Filter filter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             // DOI are currently assigned only to Item
@@ -265,7 +284,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
         // search DOI in our db
         try {
-            doiRow = loadOrCreateDOI(context, dso, doi, skipFilter);
+            doiRow = loadOrCreateDOI(context, dso, doi, filter);
         } catch (SQLException ex) {
             log.error("Error in databse connection: " + ex.getMessage());
             throw new RuntimeException("Error in database conncetion.", ex);
@@ -277,7 +296,6 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
 
-        // Check status of DOI
         if (IS_REGISTERED.equals(doiRow.getStatus())) {
             return;
         }
@@ -290,6 +308,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             log.warn("SQLException while changing status of DOI {} to be registered.", doi);
             throw new RuntimeException(sqle);
         }
+
     }
 
     /**
@@ -309,7 +328,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException, IllegalArgumentException {
-        reserve(context, dso, identifier, false);
+        reserve(context, dso, identifier, this.filter);
     }
 
     /**
@@ -317,20 +336,18 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context    - DSpace context
      * @param dso        - DSpaceObject identified by this DOI
      * @param identifier - String containing the DOI to reserve
-     * @param skipFilter - boolean indicating whether to skip any filtering of items before performing reservation
+     * @param filter     - Logical item filter to determine whether this identifier should be reserved
      * @throws IdentifierException
      * @throws IllegalArgumentException
      */
     @Override
-    public void reserve(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void reserve(Context context, DSpaceObject dso, String identifier, Filter filter)
         throws IdentifierException, IllegalArgumentException {
         String doi = doiService.formatIdentifier(identifier);
         DOI doiRow = null;
 
         try {
-            // if the doi is in our db already loadOrCreateDOI just returns.
-            // if it is not loadOrCreateDOI safes the doi.
-            doiRow = loadOrCreateDOI(context, dso, doi, skipFilter);
+            doiRow = loadOrCreateDOI(context, dso, doi, filter);
         } catch (SQLException sqle) {
             throw new RuntimeException(sqle);
         }
@@ -359,7 +376,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      */
     public void reserveOnline(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException, IllegalArgumentException, SQLException {
-        reserveOnline(context, dso, identifier, false);
+        reserveOnline(context, dso, identifier, this.filter);
     }
 
     /**
@@ -367,16 +384,16 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
      * @param identifier    - String containing the DOI to reserve
-     * @param skipFilter    - skip the filters for {@link checkMintable(Context, DSpaceObject)}
+     * @param filter        - Logical item filter to determine whether this identifier should be reserved online
      * @throws IdentifierException
      * @throws IllegalArgumentException
      * @throws SQLException
      */
-    public void reserveOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void reserveOnline(Context context, DSpaceObject dso, String identifier, Filter filter)
             throws IdentifierException, IllegalArgumentException, SQLException {
         String doi = doiService.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
-        DOI doiRow = loadOrCreateDOI(context, dso, doi, skipFilter);
+        DOI doiRow = loadOrCreateDOI(context, dso, doi, filter);
 
         if (DELETED.equals(doiRow.getStatus()) || TO_BE_DELETED.equals(doiRow.getStatus())) {
             throw new DOIIdentifierException("You tried to reserve a DOI that "
@@ -402,7 +419,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     public void registerOnline(Context context, DSpaceObject dso, String identifier)
         throws IdentifierException, IllegalArgumentException, SQLException {
 
-        registerOnline(context, dso, identifier, false);
+        registerOnline(context, dso, identifier, this.filter);
 
     }
 
@@ -411,18 +428,17 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject identified by this DOI
      * @param identifier    - String containing the DOI to register
-     * @param skipFilter    - skip filters for {@link checkMintable(Context, DSpaceObject)}
+     * @param filter     - Logical item filter to determine whether this identifier should be registered online
      * @throws IdentifierException
      * @throws IllegalArgumentException
      * @throws SQLException
      */
-    public void registerOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void registerOnline(Context context, DSpaceObject dso, String identifier, Filter filter)
             throws IdentifierException, IllegalArgumentException, SQLException {
-        log.debug("registerOnline: skipFilter is " + skipFilter);
 
         String doi = doiService.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
-        DOI doiRow = loadOrCreateDOI(context, dso, doi, skipFilter);
+        DOI doiRow = loadOrCreateDOI(context, dso, doi, filter);
 
         if (DELETED.equals(doiRow.getStatus()) || TO_BE_DELETED.equals(doiRow.getStatus())) {
             throw new DOIIdentifierException("You tried to register a DOI that "
@@ -435,7 +451,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         } catch (DOIIdentifierException die) {
             // do we have to reserve DOI before we can register it?
             if (die.getCode() == DOIIdentifierException.RESERVE_FIRST) {
-                this.reserveOnline(context, dso, identifier, skipFilter);
+                this.reserveOnline(context, dso, identifier, filter);
                 connector.registerDOI(context, dso, doi);
             } else {
                 throw die;
@@ -471,17 +487,23 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             throws IdentifierException, IllegalArgumentException, SQLException {
 
         String doi = doiService.formatIdentifier(identifier);
-
-        boolean skipFilter = false;
+        // Use the default filter unless we find the object
+        Filter updateFilter = this.filter;
 
         if (doiService.findDOIByDSpaceObject(context, dso) != null) {
             // We can skip the filter here since we know the DOI already exists for the item
             log.debug("updateMetadata: found DOIByDSpaceObject: " +
                 doiService.findDOIByDSpaceObject(context, dso).getDoi());
-            skipFilter = true;
+            updateFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                    "always_true_filter", TrueFilter.class);
         }
 
-        DOI doiRow = loadOrCreateDOI(context, dso, doi, skipFilter);
+        DOI doiRow = loadOrCreateDOI(context, dso, doi, updateFilter);
+
+        if (PENDING.equals(doiRow.getStatus()) || MINTED.equals(doiRow.getStatus())) {
+            log.info("Not updating metadata for PENDING or MINTED doi: " + doi);
+            return;
+        }
 
         if (DELETED.equals(doiRow.getStatus()) || TO_BE_DELETED.equals(doiRow.getStatus())) {
             throw new DOIIdentifierException("You tried to register a DOI that "
@@ -571,19 +593,19 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     @Override
     public String mint(Context context, DSpaceObject dso)
             throws IdentifierException {
-        return mint(context, dso, false);
+        return mint(context, dso, this.filter);
     }
 
     /**
      * Mint a new DOI in DSpace - this is usually the first step of registration
      * @param context    - DSpace context
      * @param dso        - DSpaceObject identified by the new identifier
-     * @param skipFilter - boolean indicating whether to skip any filtering of items before minting.
+     * @param filter     - Logical item filter to determine whether this identifier should be registered
      * @return a String containing the new identifier
      * @throws IdentifierException
      */
     @Override
-    public String mint(Context context, DSpaceObject dso, boolean skipFilter) throws IdentifierException {
+    public String mint(Context context, DSpaceObject dso, Filter filter) throws IdentifierException {
 
         String doi = null;
         try {
@@ -597,7 +619,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         }
         if (null == doi) {
             try {
-                DOI doiRow = loadOrCreateDOI(context, dso, null, skipFilter);
+                DOI doiRow = loadOrCreateDOI(context, dso, null, filter);
                 doi = DOI.SCHEME + doiRow.getDoi();
 
             } catch (SQLException e) {
@@ -895,7 +917,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      */
     protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier)
             throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
-        return loadOrCreateDOI(context, dso, doiIdentifier, false);
+        return loadOrCreateDOI(context, dso, doiIdentifier, this.filter);
     }
 
     /**
@@ -910,13 +932,13 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @param context       - DSpace context
      * @param dso           - DSpaceObject to identify
      * @param doiIdentifier - DOI to load or create (null to mint a new one)
-     * @param skipFilter    - Whether or not to skip the filters for the checkMintable() check
+     * @param filter     - Logical item filter to determine whether this identifier should be registered
      * @return
      * @throws SQLException
      * @throws DOIIdentifierException
      * @throws org.dspace.identifier.IdentifierNotApplicableException passed through.
      */
-    protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier, boolean skipFilter)
+    protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier, Filter filter)
         throws SQLException, DOIIdentifierException, IdentifierNotApplicableException {
 
         DOI doi = null;
@@ -954,6 +976,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                     // doi is assigned to a DSO; is it assigned to our specific dso?
                     // check if DOI already belongs to dso
                     if (dso.getID().equals(doi.getDSpaceObject().getID())) {
+                        // Before we return this, check the filter
+                        checkMintable(context, filter, dso);
                         return doi;
                     } else {
                         throw new DOIIdentifierException("Trying to create a DOI " +
@@ -963,15 +987,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 }
             }
 
-            // we did not find the doi in the database or shall reassign it. Before doing so, we should check if a
-            // filter is in place to prevent the creation of new DOIs for certain items.
-            if (skipFilter) {
-                log.warn("loadOrCreateDOI: Skipping default item filter");
-            } else {
-                // Find out if we're allowed to create a DOI
-                // throws an exception if creation of a new DOI is prohibited by a filter
-                checkMintable(context, dso);
-            }
+            // Check if this item is eligible for minting. An IdentifierNotApplicableException will be thrown if not.
+            checkMintable(context, filter, dso);
 
             // check prefix
             if (!doiIdentifier.startsWith(this.getPrefix() + "/")) {
@@ -984,15 +1001,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 doi = doiService.create(context);
             }
         } else {
-            // We need to generate a new DOI. Before doing so, we should check if a
-            // filter is in place to prevent the creation of new DOIs for certain items.
-            if (skipFilter) {
-                log.warn("loadOrCreateDOI: Skipping default item filter");
-            } else {
-                // Find out if we're allowed to create a DOI
-                // throws an exception if creation of a new DOI is prohibited by a filter
-                checkMintable(context, dso);
-            }
+            // Check if this item is eligible for minting. An IdentifierNotApplicableException will be thrown if not.
+            checkMintable(context, filter, dso);
 
             doi = doiService.create(context);
             doiIdentifier = this.getPrefix() + "/" + this.getNamespaceSeparator() +
@@ -1002,7 +1012,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         // prepare new doiRow
         doi.setDoi(doiIdentifier);
         doi.setDSpaceObject(dso);
-        doi.setStatus(null);
+        doi.setStatus(MINTED);
         try {
             doiService.update(context, doi);
         } catch (SQLException e) {
@@ -1102,20 +1112,32 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     /**
      * Checks to see if an item can have a DOI minted, using the configured logical filter
      * @param context
+     * @param filter Logical item filter to apply
      * @param dso The item to be evaluated
      * @throws DOIIdentifierNotApplicableException
      */
     @Override
-    public void checkMintable(Context context, DSpaceObject dso) throws DOIIdentifierNotApplicableException {
+    public void checkMintable(Context context, Filter filter, DSpaceObject dso)
+            throws DOIIdentifierNotApplicableException {
+        if (filter == null) {
+            Filter trueFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
+                    "always_true_filter", TrueFilter.class);
+            // If a null filter was passed, and we have a good default filter to apply, apply it.
+            // Otherwise, set to TrueFilter which means "no filtering"
+            if (this.filter != null) {
+                filter = this.filter;
+            } else {
+                filter = trueFilter;
+            }
+        }
         // If the check fails, an exception will be thrown to be caught by the calling method
-        if (this.filterService != null && contentServiceFactory
-            .getDSpaceObjectService(dso).getTypeText(dso).equals("ITEM")) {
+        if (contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso).equals("ITEM")) {
             try {
-                boolean result = filterService.getResult(context, (Item) dso);
+                boolean result = filter.getResult(context, (Item) dso);
                 log.debug("Result of filter for " + dso.getHandle() + " is " + result);
                 if (!result) {
                     throw new DOIIdentifierNotApplicableException("Item " + dso.getHandle() +
-                        " was evaluated as 'false' by the item filter, not minting");
+                            " was evaluated as 'false' by the item filter, not minting");
                 }
             } catch (LogicalStatementException e) {
                 log.error("Error evaluating item with logical filter: " + e.getLocalizedMessage());
@@ -1125,4 +1147,16 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             log.debug("DOI Identifier Provider: filterService is null (ie. don't prevent DOI minting)");
         }
     }
+
+    /**
+     * Checks to see if an item can have a DOI minted, using the configured logical filter
+     * @param context
+     * @param dso The item to be evaluated
+     * @throws DOIIdentifierNotApplicableException
+     */
+    @Override
+    public void checkMintable(Context context, DSpaceObject dso) throws DOIIdentifierNotApplicableException {
+        checkMintable(context, this.filter, dso);
+    }
+
 }
