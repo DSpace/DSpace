@@ -1,9 +1,16 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.identifier;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -14,19 +21,16 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.identifier.service.IdentifierService;
 import org.dspace.kernel.ServiceManager;
-import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTestWithDatabase {
     private ServiceManager serviceManager;
+    private IdentifierServiceImpl identifierService;
 
-    private String handlePrefix;
+    private String firstHandle;
 
     private Collection collection;
     private Item itemV1;
@@ -39,10 +43,10 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        ConfigurationService configurationService = new DSpace().getConfigurationService();
-        handlePrefix = configurationService.getProperty("handle.prefix");
-
         serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+        identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
+        // Clean out providers to avoid any being used for creation of community and collection
+        identifierService.setProviders(new ArrayList<>());
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -59,7 +63,6 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
                 (IdentifierProvider) serviceManager.getServiceByName(type.getName(), type);
 
         // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
-        IdentifierServiceImpl identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
         identifierService.setProviders(List.of(identifierProvider));
     }
 
@@ -67,6 +70,7 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         itemV1 = ItemBuilder.createItem(context, collection)
                 .withTitle("First version")
                 .build();
+        firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
     }
@@ -76,9 +80,9 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         registerProvider(VersionedHandleIdentifierProvider.class);
         createVersions();
 
-        assertEquals(handlePrefix + "/1", itemV1.getHandle());
-        assertEquals(handlePrefix + "/1.2", itemV2.getHandle());
-        assertEquals(handlePrefix + "/1.3", itemV3.getHandle());
+        assertEquals(firstHandle, itemV1.getHandle());
+        assertEquals(firstHandle + ".2", itemV2.getHandle());
+        assertEquals(firstHandle + ".3", itemV3.getHandle());
     }
 
     @Test
@@ -86,15 +90,8 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
         createVersions();
 
-        assertEquals(handlePrefix + "/1.3", itemV1.getHandle());
-        assertEquals(handlePrefix + "/1.2", itemV2.getHandle());
-        assertEquals(handlePrefix + "/1", itemV3.getHandle());
-    }
-
-    @After
-    @Override
-    public void destroy() throws Exception {
-        super.destroy();
-        // serviceManager.getApplicationContext().refresh();
+        assertEquals(firstHandle + ".3", itemV1.getHandle());
+        assertEquals(firstHandle + ".2", itemV2.getHandle());
+        assertEquals(firstHandle, itemV3.getHandle());
     }
 }
