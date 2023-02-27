@@ -190,10 +190,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             statisticsCoreBase = null;
         }
 
-        log.info("solr-statistics.server:  {}", statisticsCoreURL);
-        log.info("usage-statistics.dbfile:  {}",
-                 configurationService.getProperty("usage-statistics.dbfile"));
-
         solr = solrStatisticsCore.getSolr();
 
         // Read in the file so we don't have to do it all the time
