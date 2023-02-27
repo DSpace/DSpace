@@ -796,6 +796,28 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             collection.setSubmitters(null);
             groupService.delete(context, g);
         }
+        
+        // Remove all workflow groups
+        g = collection.getWorkflowStep1(context);
+		if (g != null) {
+            collection.setWorkflowGroup(context, 1, null);
+            this.groupService.delete(context, g);
+        }
+        g = collection.getWorkflowStep2(context);
+        if (g != null) {
+            collection.setWorkflowGroup(context, 2, null);
+            this.groupService.delete(context, g);
+        }
+        g = collection.getWorkflowStep3(context);
+        if (g != null) {
+            collection.setWorkflowGroup(context, 3, null);
+            this.groupService.delete(context, g);
+        }
+        
+        for (final Community owningCommunity : collection.getCommunities()) {
+            collection.removeCommunity(owningCommunity);
+            owningCommunity.removeCollection(collection);
+        }
 
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
         while (owningCommunities.hasNext()) {
