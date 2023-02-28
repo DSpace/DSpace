@@ -426,6 +426,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             }
         }
 
+        DSpaceObject itemWithCanonicalHandle = handleService.resolveToObject(context, canonical);
+        if (itemWithCanonicalHandle != null) {
+            if (itemWithCanonicalHandle.getID() != previous.getItem().getID()) {
+                log.warn("The previous version's item (" + previous.getItem().getID() +
+                        ") does not match with the item containing handle " + canonical +
+                        " (" + itemWithCanonicalHandle.getID() + ")");
+            }
+            // Move the original handle from whatever item it's on to the newest version
+            handleService.modifyHandleDSpaceObject(context, canonical, dso);
+        } else {
+            handleService.createHandle(context, dso, canonical);
+        }
+
         // add a new Identifier for this item: 12345/100.x
         String idNew = canonical + DOT + version.getVersionNumber();
         //Make sure we don't have an old handle hanging around (if our previous version was deleted in the workspace)

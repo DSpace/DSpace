@@ -8,6 +8,7 @@
 package org.dspace.identifier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -80,9 +81,15 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         registerProvider(VersionedHandleIdentifierProvider.class);
         createVersions();
 
+        // Confirm the original item only has its original handle
         assertEquals(firstHandle, itemV1.getHandle());
+        assertEquals(1, itemV1.getHandles().size());
+        // Confirm the second item has the correct version handle
         assertEquals(firstHandle + ".2", itemV2.getHandle());
+        assertEquals(1, itemV2.getHandles().size());
+        // Confirm the last item has the correct version handle
         assertEquals(firstHandle + ".3", itemV3.getHandle());
+        assertEquals(1, itemV3.getHandles().size());
     }
 
     @Test
@@ -90,8 +97,19 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
         createVersions();
 
-        assertEquals(firstHandle + ".3", itemV1.getHandle());
+        // Confirm the original item only has a version handle
+        assertEquals(firstHandle + ".1", itemV1.getHandle());
+        assertEquals(1, itemV1.getHandles().size());
+        // Confirm the second item has the correct version handle
         assertEquals(firstHandle + ".2", itemV2.getHandle());
+        assertEquals(1, itemV2.getHandles().size());
+        // Confirm the last item has both the correct version handle and the original handle
         assertEquals(firstHandle, itemV3.getHandle());
+        assertEquals(2, itemV3.getHandles().size());
+        containsHandle(itemV3, firstHandle + ".3");
+    }
+
+    private void containsHandle(Item item, String handle) {
+        assertTrue(item.getHandles().stream().anyMatch(h -> handle.equals(h.getHandle())));
     }
 }
