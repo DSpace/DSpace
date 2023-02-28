@@ -51,8 +51,11 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh run
-      
+
     deploy:      
+      mode: replicated
+      restart_policy:
+        condition: on-failure
       labels:
           - traefik.enable=true
           - traefik.http.services.repositorio_web.loadbalancer.server.port=80
@@ -88,7 +91,10 @@ services:
     volumes:
     - app:/app
 
-    deploy:      
+    deploy:
+      mode: replicated
+      restart_policy:
+        condition: on-failure      
       labels:
           - traefik.enable=true
           - traefik.http.services.repositorio_web.loadbalancer.server.port=80
@@ -116,7 +122,10 @@ services:
     volumes:
     - pgdata:/pgdata
 
-    deploy:      
+    deploy: 
+      mode: replicated
+      restart_policy:
+        condition: on-failure     
       labels:
           - traefik.enable=true
           - traefik.http.services.repositorio_web.loadbalancer.server.port=80
@@ -167,7 +176,10 @@ services:
       cp -r -u /opt/solr/server/solr/configsets/statistics/* statistics
       exec solr -f
 
-    deploy:      
+    deploy:  
+      mode: replicated
+      restart_policy:
+        condition: on-failure    
       labels:
           - traefik.enable=true
           - traefik.http.services.repositorio_web.loadbalancer.server.port=80
