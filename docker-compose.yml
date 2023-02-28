@@ -51,6 +51,17 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh run
+      
+    deploy:      
+      labels:
+          - traefik.enable=true
+          - traefik.http.services.repositorio_web.loadbalancer.server.port=80
+          - traefik.http.routers.repositorio_web.entrypoints=web
+          - traefik.http.routers.repositorio_web.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.entrypoints=webs
+          - traefik.http.routers.repositorio_web-s.tls=true
+          - traefik.http.routers.repositorio_web-s.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.tls.certresolver=resolve  
 
   # DSpace frontend container
   riunne-angular:
@@ -77,6 +88,17 @@ services:
     volumes:
     - app:/app
 
+    deploy:      
+      labels:
+          - traefik.enable=true
+          - traefik.http.services.repositorio_web.loadbalancer.server.port=80
+          - traefik.http.routers.repositorio_web.entrypoints=web
+          - traefik.http.routers.repositorio_web.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.entrypoints=webs
+          - traefik.http.routers.repositorio_web-s.tls=true
+          - traefik.http.routers.repositorio_web-s.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.tls.certresolver=resolve   
+
   # DSpace database container
   riunne-db:
     container_name: riunnedb
@@ -93,6 +115,17 @@ services:
     tty: true
     volumes:
     - pgdata:/pgdata
+
+    deploy:      
+      labels:
+          - traefik.enable=true
+          - traefik.http.services.repositorio_web.loadbalancer.server.port=80
+          - traefik.http.routers.repositorio_web.entrypoints=web
+          - traefik.http.routers.repositorio_web.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.entrypoints=webs
+          - traefik.http.routers.repositorio_web-s.tls=true
+          - traefik.http.routers.repositorio_web-s.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.tls.certresolver=resolve  
 
   # DSpace Solr container
   riunne-solr:
@@ -133,6 +166,17 @@ services:
       precreate-core statistics /opt/solr/server/solr/configsets/statistics
       cp -r -u /opt/solr/server/solr/configsets/statistics/* statistics
       exec solr -f
+
+    deploy:      
+      labels:
+          - traefik.enable=true
+          - traefik.http.services.repositorio_web.loadbalancer.server.port=80
+          - traefik.http.routers.repositorio_web.entrypoints=web
+          - traefik.http.routers.repositorio_web.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.entrypoints=webs
+          - traefik.http.routers.repositorio_web-s.tls=true
+          - traefik.http.routers.repositorio_web-s.rule=Host(`10.20.1.237`)
+          - traefik.http.routers.repositorio_web-s.tls.certresolver=resolve  
 
 volumes:
   assetstore:
