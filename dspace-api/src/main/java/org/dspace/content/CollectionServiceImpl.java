@@ -757,6 +757,22 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
 
+        // Remove all workflow groups
+        Group workflowGroup = collection.getWorkflowStep1(context);
+		if (workflowGroup != null) {
+            collection.setWorkflowGroup(context, 1, null);
+            this.groupService.delete(context, workflowGroup);
+        }
+		workflowGroup = collection.getWorkflowStep2(context);
+        if (workflowGroup != null) {
+            collection.setWorkflowGroup(context, 2, null);
+            this.groupService.delete(context, workflowGroup);
+        }
+        workflowGroup = collection.getWorkflowStep3(context);
+        if (workflowGroup != null) {
+            collection.setWorkflowGroup(context, 3, null);
+            this.groupService.delete(context, workflowGroup);
+        }
 
         // Delete bitstream logo
         setLogo(context, collection, null);
