@@ -27,13 +27,13 @@
  * Authorization is based on evaluating the tuple of (object, action, actor),
  * such as (ITEM, READ, EPerson John Smith) to check if the {@code EPerson}
  * "John Smith" can read an item.  {@code ResourcePolicy} objects are pretty
- * simple, describing a single instance of (object, action, actor).  If multiple
- * actors are desired, such as groups 10, 11, and 12 are allowed to READ Item
- * 13, you simply create a {@code ResourcePolicy} for each group.
+ * simple, describing a single instance of (object, action, actor).  If
+ * multiple actors are desired, such as groups 10, 11, and 12 are allowed to
+ * READ Item 13, you simply create a {@code ResourcePolicy} for each group.
  *
  * <h2>Built-in groups</h2>
- * The install process should create two built-in groups - {@code Anonymous} for
- * anonymous/public access, and {@code Administrators} for administrators.
+ * The install process should create two built-in groups - {@code Anonymous}
+ * for anonymous/public access, and {@code Administrators} for administrators.
  * Group {@code Anonymous} allows anyone access, even if not authenticated.
  * Group {@code Administrators}' members have super-user rights,
  * and are allowed to do any action to any object.
@@ -50,23 +50,16 @@
  * <dd>These are applied during submission to give the submitter access while
  * composing a submission.</dd>
  * <dt>WORKFLOW</dt>
- * <dd>These are automatically applied during workflow, to give curators access
- * to submissions in their curation queues.  They usually have an
+ * <dd>These are automatically applied during workflow, to give curators
+ * access to submissions in their curation queues.  They usually have an
  * automatically-created workflow group as the actor.</dd>
  *
  * <h2>Start and End dates</h2>
- * A policy may have a start date and/or an end date.  The policy is considered
- * not valid before the start date or after the end date.  No date means do not
- * apply the related test.  For example, embargo until a given date can be
- * expressed by a READ policy with a given start date, and a limited-time offer
- * by a READ policy with a given end date.
- *
- * <h2>Unused ResourcePolicy attributes</h2>
- * {@code ResourcePolicy} has a few attributes that are currently unused,
- * but are included with the intent that they will be used someday.
- * One is the {@code EPerson} - policies could apply to only a single EPerson,
- * but for ease of administration currently a Group is the recommended unit to
- * use to describe the actor.
+ * A policy may have a start date and/or an end date.  The policy is
+ * considered not valid before the start date or after the end date.  No date
+ * means do not apply the related test.  For example, embargo until a given
+ * date can be expressed by a READ policy with a given start date, and a
+ * limited-time offer by a READ policy with a given end date.
  *
  * @author dstuve
  * @author mwood
