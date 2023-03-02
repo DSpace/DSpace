@@ -1136,7 +1136,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         Item item = (Item) dso;
 
         // UMD Customization
-        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, null, null, doiService.formatIdentifier(doi));
+        itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, null, null, doiService.DOIToExternalForm(doi));
         // End UMD Customization
         try {
             itemService.update(context, item);
