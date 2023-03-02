@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,6 +113,13 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         }
         // If no token is present, we simply do the admin execution
         EPerson eperson = createEPersonFromRestObject(context, epersonRest);
+        
+        try {
+			accountService.sendForgotPasswordInfo(context, epersonRest.getEmail());
+		} catch (SQLException | IOException | MessagingException | AuthorizeException e) {
+			log.error("Something went wrong with sending forgot password info email: "
+                    + epersonRest.getEmail(), e);
+		}
 
         return converter.toRest(eperson, utils.obtainProjection());
     }
