@@ -463,18 +463,14 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                     + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
 
-        // register DOI Online
-        try {
-            connector.registerDOI(context, dso, doi);
-        } catch (DOIIdentifierException die) {
-            // do we have to reserve DOI before we can register it?
-            if (die.getCode() == DOIIdentifierException.RESERVE_FIRST) {
-                this.reserveOnline(context, dso, identifier, skipFilter);
-                connector.registerDOI(context, dso, doi);
-            } else {
-                throw die;
-            }
+        // UMD Customization
+        // We have to reserve DOI before we can register it
+        if (!connector.isDOIReserved(context, doi)) {
+            this.reserveOnline(context, dso, identifier);
         }
+        // register DOI Online
+        connector.registerDOI(context, dso, doi);
+        // End UMD Customization
 
         // safe DOI as metadata of the item
         try {

@@ -468,13 +468,15 @@ public class DataCiteConnector
     @Override
     public void registerDOI(Context context, DSpaceObject dso, String doi)
         throws DOIIdentifierException {
-        // DataCite wants us to reserve a DOI before we can register it
-        if (!this.isDOIReserved(context, doi)) {
-            // the DOIIdentifierProvider should catch and handle this
-            throw new DOIIdentifierException("You need to reserve a DOI "
-                                                 + "before you can register it.",
-                                             DOIIdentifierException.RESERVE_FIRST);
-        }
+        // UMD Customization
+        // // DataCite wants us to reserve a DOI before we can register it
+        // if (!this.isDOIReserved(context, doi)) {
+        //     // the DOIIdentifierProvider should catch and handle this
+        //     throw new DOIIdentifierException("You need to reserve a DOI "
+        //                                          + "before you can register it.",
+        //                                      DOIIdentifierException.RESERVE_FIRST);
+        // }
+        // End UMD Customization
 
         // send doi=<doi>\nurl=<url> to mds/doi
         DataCiteResponse resp = null;
