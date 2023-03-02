@@ -14,6 +14,23 @@
 BINDIR=`dirname $0`
 DSPACEDIR=`cd "$BINDIR/.." ; pwd`
 
+# UMD Customization
+# Ensure "additions" jar is place before other DSpace jars in the classpath
+# (but after any specified by the CLASSPATH environment variable, so that it
+# can override any stock DSpace classes. This issue may be corrected
+# in future DSpace versions, see:
+#  * https://github.com/DSpace/DSpace/issues/3248 and
+#  * https://github.com/DSpace/DSpace/issues/8506
+ADDITIONS_JAR=`ls $DSPACEDIR/lib/additions-*.jar 2>/dev/null`
+if [ "$ADDITIONS_JAR" != "" ]; then
+  if [ "$CLASSPATH" = "" ]; then
+    CLASSPATH=$ADDITIONS_JAR
+  else
+    CLASSPATH=$CLASSPATH:$ADDITIONS_JAR
+  fi
+fi
+# End UMD Customiztion
+
 # Get the JARs in $DSPACEDIR/lib
 JARS="$DSPACEDIR/lib/*"
 
