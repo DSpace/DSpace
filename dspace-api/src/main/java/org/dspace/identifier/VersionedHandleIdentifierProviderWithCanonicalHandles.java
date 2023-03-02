@@ -306,6 +306,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
         } catch (IllegalStateException | SQLException e) {
             log.error(LogHelper.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
