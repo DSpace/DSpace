@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.submit.factory.impl;
+
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -23,11 +24,12 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
+import org.dspace.util.TimeHelpers;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "add" operation to add custom resource policies.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessConditionDTO> {
@@ -52,6 +54,12 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
         String[] absolutePath = getAbsolutePath(path).split("/");
         List<AccessConditionDTO> accessConditions = parseAccessConditions(path, value, absolutePath);
 
+        // Clamp access condition dates to midnight UTC
+        for (AccessConditionDTO condition : accessConditions) {
+            condition.setStartDate(TimeHelpers.toMidnightUTC(condition.getStartDate()));
+            condition.setEndDate(TimeHelpers.toMidnightUTC(condition.getEndDate()));
+        }
+
         verifyAccessConditions(context, configuration, accessConditions);
 
         if (absolutePath.length == 1) {
@@ -65,7 +73,7 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
     }
 
     private List<AccessConditionDTO> parseAccessConditions(String path, Object value, String[] split) {
-        List<AccessConditionDTO> accessConditions = new ArrayList<AccessConditionDTO>();
+        List<AccessConditionDTO> accessConditions = new ArrayList<>();
         if (split.length == 1) {
             accessConditions = evaluateArrayObject((LateObjectEvaluator) value);
         } else if (split.length == 2) {
