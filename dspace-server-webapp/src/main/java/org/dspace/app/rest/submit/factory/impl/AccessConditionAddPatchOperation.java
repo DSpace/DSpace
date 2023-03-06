@@ -10,6 +10,7 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,8 +57,14 @@ public class AccessConditionAddPatchOperation extends AddPatchOperation<AccessCo
 
         // Clamp access condition dates to midnight UTC
         for (AccessConditionDTO condition : accessConditions) {
-            condition.setStartDate(TimeHelpers.toMidnightUTC(condition.getStartDate()));
-            condition.setEndDate(TimeHelpers.toMidnightUTC(condition.getEndDate()));
+            Date date = condition.getStartDate();
+            if (null != date) {
+                condition.setStartDate(TimeHelpers.toMidnightUTC(date));
+            }
+            date = condition.getEndDate();
+            if (null != date) {
+                condition.setEndDate(TimeHelpers.toMidnightUTC(date));
+            }
         }
 
         verifyAccessConditions(context, configuration, accessConditions);
