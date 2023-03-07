@@ -405,8 +405,3 @@ data.community.handle = 1903/27669
 # Equitable Access Policy
 # The handle for the "Equitable Access Policy" community
 equitable_access_policy.community.handle = 1903/29474
-
-# Expose "dspace.name" and "dspace.baseUrl" properties so it is available for
-# JSON-LD Website. See dspace/config/modules/rest.cfg
-rest.properties.exposed = dspace.name
-rest.properties.exposed = dspace.baseUrl
