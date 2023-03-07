@@ -69,6 +69,7 @@
         <mapping class="org.dspace.eperson.Subscription"/>
         <mapping class="org.dspace.eperson.SubscriptionParameter"/>
         <mapping class="org.dspace.handle.Handle"/>
+        <mapping class="org.dspace.handleredirect.HandleRedirect"/>
 
         <mapping class="org.dspace.harvest.HarvestedCollection"/>
         <mapping class="org.dspace.harvest.HarvestedItem"/>

@@ -106,6 +106,7 @@
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
+    <bean class="org.dspace.handleredirect.HandleRedirectServiceImpl"/>
 
     <bean class="org.dspace.harvest.HarvestedCollectionServiceImpl"/>
     <bean class="org.dspace.harvest.HarvestedItemServiceImpl"/>

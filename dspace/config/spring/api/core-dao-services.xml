@@ -44,6 +44,7 @@
     <bean class="org.dspace.eperson.dao.impl.SubscriptionParameterDAOImpl"/>
 
     <bean class="org.dspace.handle.dao.impl.HandleDAOImpl"/>
+    <bean class="org.dspace.handleredirect.dao.impl.HandleRedirectDAOImpl"/>
 
     <bean class="org.dspace.harvest.dao.impl.HarvestedItemDAOImpl"/>
     <bean class="org.dspace.harvest.dao.impl.HarvestedCollectionDAOImpl"/>
