@@ -29,6 +29,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -47,10 +48,6 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 public class AnnotationListService extends AbstractResourceService {
 
-    /**
-     * Bundle used for canvas annotations.
-     */
-    public static final String ANNOTATION_BUNDLE = "ANNOTATIONS";
 
     @Autowired
     IIIFUtils utils;
@@ -162,7 +159,7 @@ public class AnnotationListService extends AbstractResourceService {
         try {
             for (Bundle bundle : bitstream.getBundles()) {
                 for (Item item : bundle.getItems()) {
-                    for (Bundle annotationsBundle : itemService.getBundles(item, ANNOTATION_BUNDLE)) {
+                    for (Bundle annotationsBundle : itemService.getBundles(item, IIIFSharedUtils.ANNOTATIONS_BUNDLE)) {
                         for (Bitstream annotationFile : annotationsBundle.getBitstreams()) {
                             if (pattern.matcher(annotationFile.getName()).matches()) {
                                 InputStream iiifAnnotation = bitstreamService.retrieve(context, annotationFile);

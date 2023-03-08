@@ -7,7 +7,6 @@
  */
 package org.dspace.app.iiif.service;
 
-import static org.dspace.app.iiif.service.AnnotationListService.ANNOTATION_BUNDLE;
 import static org.dspace.app.iiif.service.utils.IIIFUtils.METADATA_IMAGE_WIDTH;
 
 import java.sql.SQLException;
@@ -31,6 +30,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.iiif.util.IIIFSharedUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -293,7 +293,7 @@ public class CanvasService extends AbstractResourceService {
         try {
             for (Bundle bundle : bitstream.getBundles()) {
                 for (Item item : bundle.getItems()) {
-                    for (Bundle annotationsBundle : itemService.getBundles(item, ANNOTATION_BUNDLE)) {
+                    for (Bundle annotationsBundle : itemService.getBundles(item, IIIFSharedUtils.ANNOTATIONS_BUNDLE)) {
                         for (Bitstream annotationFile : annotationsBundle.getBitstreams()) {
                             if (pattern.matcher(annotationFile.getName()).matches()) {
                                 ImageAnnotationService is = new ImageAnnotationService(configurationService);
