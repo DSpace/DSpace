@@ -15,8 +15,8 @@ import org.dspace.handleredirect.HandleRedirect;
 
 /**
  * Database Access Object interface class for the RedirectHandle object.
- * The implementation of this class is responsible for all database calls for the HandleRedirect object and is autowired by
- * spring
+ * The implementation of this class is responsible for all database calls for the
+ * HandleRedirect object and is autowired by spring
  * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author Ying Jin at rice.edu Updated from HandleDAO.java

@@ -11,7 +11,8 @@ import org.dspace.handleredirect.service.HandleRedirectService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the handleredirect package, use HandleRedirectServiceFactory.getInstance() to retrieve an
+ * Abstract factory to get services for the handleredirect package,
+ * use HandleRedirectServiceFactory.getInstance() to retrieve an
  * implementation
  *
  * @author Ying Jin at rice.edu
@@ -22,6 +23,7 @@ public abstract class HandleRedirectServiceFactory {
 
     public static HandleRedirectServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
-                                    .getServiceByName("handleRedirectServiceFactory", HandleRedirectServiceFactory.class);
+                                    .getServiceByName("handleRedirectServiceFactory",
+                                                       HandleRedirectServiceFactory.class);
     }
 }

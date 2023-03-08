@@ -11,7 +11,8 @@ import org.dspace.handleredirect.service.HandleRedirectService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the handleredirect package, use HandleRedirectServiceFactory.getInstance() to retrieve
+ * Factory implementation to get services for the handleredirect package,
+ * use HandleRedirectServiceFactory.getInstance() to retrieve
  * an implementation
  *
  * @author Ying Jin at rice.edu
