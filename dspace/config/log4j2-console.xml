@@ -25,7 +25,7 @@
          For command line / Ant scripts, we are only concerned about significant warnings/errors.
          For the full detail, change this to INFO and re-run Ant. -->
     <Loggers>
-        <Root level='WARN'>
+        <Root level='INFO'>
             <AppenderRef ref='A1'/>
         </Root>
     </Loggers>

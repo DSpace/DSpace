@@ -794,6 +794,21 @@
         </profile>
 
         <!--
+           Builds central WebApp boot for DSpace
+        -->
+        <profile>
+            <id>dspace-webapp-boot</id>
+            <activation>
+                <file>
+                    <exists>dspace-webapp-boot/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-webapp-boot</module>
+            </modules>
+        </profile>
+
+        <!--
            Builds Services for DSpace
         -->
         <profile>
@@ -1068,6 +1083,7 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
+<<<<<<< HEAD
                 <type>test-jar</type>
                 <version>7.6-SNAPSHOT</version>
                 <scope>test</scope>
@@ -1094,6 +1110,26 @@
                 <artifactId>dspace-server-webapp</artifactId>
                 <version>7.6-SNAPSHOT</version>
                 <type>war</type>
+=======
+                <version>cris-2022.03.01-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-server-webapp</artifactId>
+                <type>test-jar</type>
+                <version>cris-2022.03.01-SNAPSHOT</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-rdf</artifactId>
+                <version>cris-2022.03.01-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-iiif</artifactId>
+                <version>cris-2022.03.01-SNAPSHOT</version>
+>>>>>>> 0dad4dd713... [DSC-963] Create new project to run dspace with embedded tomcat
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>

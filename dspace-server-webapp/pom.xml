@@ -2,7 +2,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-server-webapp</artifactId>
-    <packaging>war</packaging>
     <name>DSpace Server Webapp</name>
     <description>
         DSpace Server Webapp (Spring Boot)
@@ -25,55 +24,10 @@
 
         <!-- Default resource delimiter for Spring Boot, so it doesn't clash with Spring ${} placeholders-->
         <resource.delimiter>@</resource.delimiter>
-        <!-- Define our starting class for our Spring Boot Application -->
-        <start-class>org.dspace.app.rest.Application</start-class>
     </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <!-- Builds a *-tests.jar of all test classes -->
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Verify OS license headers for all source code files -->
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/src/test/resources/**</exclude>
-                        <exclude>**/src/test/data/**</exclude>
-                        <!--Skip license check of third party files included/customized from HAL Browser -->
-                        <exclude>src/main/webapp/index.html</exclude>
-                        <exclude>src/main/webapp/login.html</exclude>
-                        <exclude>src/main/webapp/styles.css</exclude>
-                        <exclude>src/main/webapp/js/hal/**</exclude>
-                        <exclude>src/main/webapp/js/vendor/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
             <!-- This plugin allows us to run a Groovy script in our Maven POM
                  (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
                  We are generating a OS-agnostic version (agnostic.build.dir) of
@@ -252,12 +206,6 @@
                     <artifactId>hibernate-validator</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>
@@ -488,12 +436,10 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

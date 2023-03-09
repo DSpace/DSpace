@@ -17,8 +17,6 @@ import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceAPIRequestLoggingFilter;
-import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
-import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli;
 import org.dspace.app.util.DSpaceContextListener;
@@ -27,11 +25,9 @@ import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.lang.NonNull;
@@ -58,12 +54,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Tim Donohue
  */
-@SpringBootApplication
 @EnableScheduling
 @EnableCaching
-public class Application extends SpringBootServletInitializer {
+@Configuration
+public class WebApplication {
 
-    private static final Logger log = LoggerFactory.getLogger(Application.class);
+    private static final Logger log = LoggerFactory.getLogger(WebApplication.class);
 
     @Autowired
     private ApplicationConfig configuration;
@@ -84,26 +80,6 @@ public class Application extends SpringBootServletInitializer {
     @Scheduled(cron = "${google.analytics.cron:-}")
     public void sendGoogleAnalyticsEvents() {
         googleAsyncEventListener.sendCollectedEvents();
-    }
-
-    /**
-     * Override the default SpringBootServletInitializer.configure() method,
-     * passing it this Application class.
-     * <p>
-     * This is necessary to allow us to build a deployable WAR, rather than
-     * always relying on embedded Tomcat.
-     * <p>
-     * See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
-     *
-     * @param application
-     * @return
-     */
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        // Pass this Application class, and our initializers for DSpace Kernel and Configuration
-        // NOTE: Kernel must be initialized before Configuration
-        return application.sources(Application.class)
-                          .initializers(new DSpaceKernelInitializer(), new DSpaceConfigurationInitializer());
     }
 
     /**
