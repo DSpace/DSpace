@@ -389,6 +389,7 @@ drum.environment.bannerText = Local Environment
 # LIBDRUM-563
 # Wufoo Feedback Form Embed
 # Required
+wufoo.feedback.formUrl = https://libumd.wufoo.com/forms/
 wufoo.feedback.formHash = r12gwaic1xvrtzs
 # Optional
 wufoo.feedback.field.email = Field1
