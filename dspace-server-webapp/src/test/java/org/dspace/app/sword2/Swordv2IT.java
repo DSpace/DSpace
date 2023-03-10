@@ -34,7 +34,7 @@ import org.springframework.test.context.TestPropertySource;
  */
 // Ensure the SWORDv2 SERVER IS ENABLED before any tests run.
 // This annotation overrides default DSpace config settings loaded into Spring Context
-@TestPropertySource(properties = {"swordv2-server.enabled = true"})
+@TestPropertySource(properties = {"swordv2-server.enabled = true", "server.servlet.context-path = /"})
 public class Swordv2IT extends AbstractWebClientIntegrationTest {
 
     @Autowired

@@ -47,7 +47,7 @@ import org.springframework.test.context.TestPropertySource;
  */
 // Ensure the RDF endpoint IS ENABLED before any tests run.
 // This annotation overrides default DSpace config settings loaded into Spring Context
-@TestPropertySource(properties = {"rdf.enabled = true"})
+@TestPropertySource(properties = {"rdf.enabled = true", "server.servlet.context-path = /"})
 public class RdfIT extends AbstractWebClientIntegrationTest {
 
     @Autowired
