@@ -217,7 +217,11 @@
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-server-webapp</artifactId>
-                    <type>war</type>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-webapp-boot</artifactId>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>

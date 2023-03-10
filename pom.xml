@@ -1122,6 +1122,11 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
+                <artifactId>dspace-webapp-boot</artifactId>
+                <version>cris-2022.03.01-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
                 <version>cris-2022.03.01-SNAPSHOT</version>
             </dependency>
