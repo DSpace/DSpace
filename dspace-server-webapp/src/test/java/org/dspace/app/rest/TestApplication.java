@@ -5,12 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app;
+package org.dspace.app.rest;
 
-import org.dspace.app.rest.WebApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackageClasses = WebApplication.class)
+@SpringBootApplication
 public class TestApplication {
 
 }

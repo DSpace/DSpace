@@ -9,7 +9,7 @@ package org.dspace.app.rest.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.app.TestApplication;
+import org.dspace.app.rest.TestApplication;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.junit.runner.RunWith;
