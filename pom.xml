@@ -1083,7 +1083,6 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-<<<<<<< HEAD
                 <type>test-jar</type>
                 <version>7.6-SNAPSHOT</version>
                 <scope>test</scope>
@@ -1102,39 +1101,11 @@
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <version>7.6-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-server-webapp</artifactId>
-                <version>7.6-SNAPSHOT</version>
-                <type>war</type>
-=======
-                <version>cris-2022.03.01-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-server-webapp</artifactId>
-                <type>test-jar</type>
-                <version>cris-2022.03.01-SNAPSHOT</version>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-webapp-boot</artifactId>
-                <version>cris-2022.03.01-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-rdf</artifactId>
-                <version>cris-2022.03.01-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-iiif</artifactId>
-                <version>cris-2022.03.01-SNAPSHOT</version>
->>>>>>> 0dad4dd713... [DSC-963] Create new project to run dspace with embedded tomcat
+                <version>7.6-SNAPSHOT</version>
+                <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>
