@@ -757,7 +757,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify the general admin has this feature on item 1
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+                + "http://localhost/api/core/items/" + item1.getID())
+            .param("size", "1000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -765,7 +766,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify community A admin has this feature on item 1
         getClient(communityAAdminToken).perform(
             get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+                + "http://localhost/api/core/items/" + item1.getID())
+            .param("size", "1000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -773,7 +775,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify collection X admin has this feature on item 1
         getClient(collectionXAdminToken).perform(
             get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+                + "http://localhost/api/core/items/" + item1.getID())
+            .param("size", "1000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -781,7 +784,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify item 1 admin doesn’t have this feature on item 1
         getClient(item1AdminToken).perform(
             get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+                + "http://localhost/api/core/items/" + item1.getID())
+            .param("size", "1000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -789,7 +793,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify community A admin doesn’t have this feature on item 2
         getClient(communityAAdminToken).perform(
             get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item2.getID()))
+                + "http://localhost/api/core/items/" + item2.getID())
+            .param("size", "1000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -808,7 +813,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // verify item 1 write has this feature on item 1
         getClient(item1WriterToken).perform(
             get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+                + "http://localhost/api/core/items/" + item1.getID())
+            .param("size", "1000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canMove')]")
                 .exists());
