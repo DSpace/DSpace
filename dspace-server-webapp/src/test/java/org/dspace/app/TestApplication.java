@@ -5,11 +5,18 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest;
+package org.dspace.app;
 
+import org.dspace.app.rest.WebApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+/**
+ * Spring boot application for integration tests.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
+@SpringBootApplication(scanBasePackageClasses = WebApplication.class)
 public class TestApplication {
 
 }
