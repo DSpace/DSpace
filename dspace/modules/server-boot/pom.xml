@@ -1,26 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
-    <artifactId>dspace-webapp-boot</artifactId>
-    <packaging>war</packaging>
-    <name>DSpace WebApplication Boot</name>
+    <artifactId>server-boot</artifactId>
+    <name>DSpace Server Webapp:: Boot</name>
 
     <!--
       A Parent POM that Maven inherits DSpace Default
       POM attributes from.
     -->
     <parent>
+        <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <artifactId>dspace-parent</artifactId>
         <version>7.6-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
-        <root.basedir>${basedir}/..</root.basedir>
-        <!-- Default resource delimiter for Spring Boot, so it doesn't clash with Spring ${} placeholders-->
-        <resource.delimiter>@</resource.delimiter>
+        <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
 
     <dependencies>
@@ -105,26 +102,9 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <plugins>
-            <!-- Verify OS license headers for all source code files -->
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/src/test/resources/**</exclude>
-                        <exclude>**/src/test/data/**</exclude>
-                        <!--Skip license check of third party files included/customized from HAL Browser -->
-                        <exclude>src/main/resources/static/index.html</exclude>
-                        <exclude>src/main/resources/static/login.html</exclude>
-                        <exclude>src/main/resources/static/styles.css</exclude>
-                        <exclude>src/main/resources/static/js/hal/**</exclude>
-                        <exclude>src/main/resources/static/js/vendor/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

@@ -40,6 +40,23 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Verify OS license headers for all source code files -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <!--Skip license check of third party files included/customized from HAL Browser -->
+                        <exclude>src/main/resources/static/index.html</exclude>
+                        <exclude>src/main/resources/static/login.html</exclude>
+                        <exclude>src/main/resources/static/styles.css</exclude>
+                        <exclude>src/main/resources/static/js/hal/**</exclude>
+                        <exclude>src/main/resources/static/js/vendor/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <!-- This plugin allows us to run a Groovy script in our Maven POM
                  (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
                  We are generating a OS-agnostic version (agnostic.build.dir) of

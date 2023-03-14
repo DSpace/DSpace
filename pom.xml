@@ -794,21 +794,6 @@
         </profile>
 
         <!--
-           Builds central WebApp boot for DSpace
-        -->
-        <profile>
-            <id>dspace-webapp-boot</id>
-            <activation>
-                <file>
-                    <exists>dspace-webapp-boot/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>dspace-webapp-boot</module>
-            </modules>
-        </profile>
-
-        <!--
            Builds Services for DSpace
         -->
         <profile>
@@ -1101,11 +1086,6 @@
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <version>7.6-SNAPSHOT</version>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-webapp-boot</artifactId>
-                <version>7.6-SNAPSHOT</version>
-                <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>

@@ -64,5 +64,16 @@
                 <module>server</module>
             </modules>
         </profile>
+        <profile>
+            <id>dspace-server-webapp-boot</id>
+            <activation>
+                <file>
+                    <exists>server-boot/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>server-boot</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

@@ -28,13 +28,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  *
  */
 @SpringBootApplication(scanBasePackageClasses = WebApplication.class)
-public class Application extends SpringBootServletInitializer {
-
-    public static void main(String[] args) {
-        new SpringApplicationBuilder(Application.class)
-            .initializers(new DSpaceKernelInitializer(), new DSpaceConfigurationInitializer())
-            .run(args);
-    }
+public class ServerApplication extends SpringBootServletInitializer {
 
     /**
      * Override the default SpringBootServletInitializer.configure() method,
@@ -52,7 +46,7 @@ public class Application extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         // Pass this Application class, and our initializers for DSpace Kernel and Configuration
         // NOTE: Kernel must be initialized before Configuration
-        return application.sources(Application.class)
+        return application.sources(ServerApplication.class)
                           .initializers(new DSpaceKernelInitializer(), new DSpaceConfigurationInitializer());
     }
 }
