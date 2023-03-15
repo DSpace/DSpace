@@ -20,12 +20,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@SuppressWarnings({ "checkstyle:hideutilityclassconstructor" })
 @SpringBootApplication(scanBasePackageClasses = WebApplication.class)
 public class ServerBootApplication {
-
-    private ServerBootApplication() {
-
-    }
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(ServerBootApplication.class)
