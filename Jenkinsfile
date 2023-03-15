@@ -60,7 +60,7 @@ pipeline {
            |
            |Check console output at $BUILD_URL to view the results.
            |
-           |Static analysis checks were not performed for this build.
+           |There are ${ANALYSIS_ISSUES_COUNT} static analysis issues in this build.
            |
            |There were ${TEST_COUNTS,var="skip"} skipped tests.'''.stripMargin()
   }
@@ -99,7 +99,7 @@ pipeline {
     stage('test') {
       steps {
         sh '''
-          mvn clean install -DskipUnitTests=false -DskipIntegrationTests=false -Dsurefire.rerunFailingTestsCount=3 -Dfailsafe.rerunFailingTestsCount=3 -Dcheckstyle.skip=true -Dlicense.skip=true
+          mvn clean install -DskipUnitTests=false -DskipIntegrationTests=false -Dsurefire.rerunFailingTestsCount=3 -Dfailsafe.rerunFailingTestsCount=3 -Dlicense.skip=true
         '''
       }
       post {
@@ -109,6 +109,13 @@ pipeline {
 
           // Collect integration test reports
           junit '**/target/failsafe-reports/*.xml'
+
+          recordIssues(
+            tools: [checkStyle(reportEncoding: 'UTF-8')],
+            // Filter out the hundreds of TODOs warnings at the "INFO" level
+            // from the stock DSpace code
+            filters: [excludeType('TodoCommentCheck')],
+            unstableTotalNormal: 1, enabledForFailure: true)
         }
       }
     }
