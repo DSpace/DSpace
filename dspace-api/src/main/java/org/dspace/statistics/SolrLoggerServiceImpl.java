@@ -17,9 +17,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -174,6 +177,19 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
+
+        if (null != statisticsCoreURL) {
+            Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
+            statisticsCoreBase = statisticsPath
+                .getName(statisticsPath.getNameCount() - 1)
+                .toString();
+        } else {
+            log.warn("Unable to find solr-statistics.server parameter in DSpace configuration. This is required for " +
+                     "sharding statistics.");
+            statisticsCoreBase = null;
+        }
+
         solr = solrStatisticsCore.getSolr();
 
         // Read in the file so we don't have to do it all the time

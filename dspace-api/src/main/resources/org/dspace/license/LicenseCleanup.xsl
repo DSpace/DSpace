@@ -8,7 +8,7 @@
     http://www.dspace.org/license/
 
 -->
-<xsl:stylesheet version="1.1"
+<xsl:stylesheet version="1.0"
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:old-cc="http://web.resource.org/cc/"
