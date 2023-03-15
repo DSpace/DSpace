@@ -3,9 +3,8 @@ package edu.umd.lib.dspace.content.service;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.core.Context;
-
 import edu.umd.lib.dspace.content.EmbargoDTO;
+import org.dspace.core.Context;
 
 /**
  * Service interface class for the EmbargoDTO object.

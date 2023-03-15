@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
@@ -130,6 +129,10 @@ import org.xml.sax.InputSource;
 public class EtdLoader {
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(EtdLoader.class);
+
+    // Suppress default constructor
+    private EtdLoader() {
+    }
 
     static long lRead = 0;
 
@@ -293,17 +296,14 @@ public class EtdLoader {
             }
 
             context.complete();
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Uncaught exception: " + e.getMessage(), e);
-        }
-
-        finally {
+        } finally {
             if (marcwriter != null) {
                 try {
                     marcwriter.close();
                 } catch (Exception e) {
+                    log.error("Error closing marcwriter", e);
                 }
             }
 
@@ -311,6 +311,7 @@ public class EtdLoader {
                 try {
                     csvwriter.close();
                 } catch (Exception e) {
+                    log.error("Error closing csvwriter", e);
                 }
             }
 
@@ -879,21 +880,18 @@ public class EtdLoader {
 
             // Create csv entry for this item
             createCsv(item, strHandle);
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error loading item " + strItem + ": "
                     + e.getMessage());
             if (context != null) {
                 context.abort();
             }
-        }
-
-        finally {
+        } finally {
             if (context != null) {
                 try {
                     context.complete();
                 } catch (Exception e) {
+                    log.error("Exception closine context", e);
                 }
             }
         }
@@ -950,15 +948,11 @@ public class EtdLoader {
                 if (strFileName.endsWith("_DATA.xml")) {
                     lmap.set(0, strFileName);
                     lmap.set(1, ze);
-                }
-
-                else if (strFileName.endsWith(".pdf")) {
+                } else if (strFileName.endsWith(".pdf")) {
                     lmap.set(2, strFileName);
                     lmap.set(3, ze);
                 }
-            }
-
-            else {
+            } else {
                 lmap.add(strFileName);
                 lmap.add(ze);
             }

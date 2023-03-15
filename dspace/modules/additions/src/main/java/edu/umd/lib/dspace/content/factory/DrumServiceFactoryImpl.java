@@ -1,8 +1,7 @@
 package edu.umd.lib.dspace.content.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import edu.umd.lib.dspace.content.service.EmbargoDTOService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Factory implementation to get drum specific services, use

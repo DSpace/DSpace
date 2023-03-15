@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +35,7 @@ public class WufooFeedbackRestController implements InitializingBean {
     /**
      * The REST endpoint to use to retrieve Wufoo Feedback form information
      */
-    public static final String WUFOO_ENDPOINT ="/api/wufoo-feedback";
+    public static final String WUFOO_ENDPOINT = "/api/wufoo-feedback";
 
     // Configuration property names for retrieving Wufoo API settings
     // Each of these properties should be defined in the "local.cfg" file.

@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.Logger;
@@ -41,12 +40,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * UMD Custom Class for LIBDRUM-701
- * 
+ *
  * This RestController takes care of the creation and deletion of Communities'
  * nested objects
  * This class will typically receive the UUID of a Community and it'll perform
  * logic on its nested objects
- * 
+ *
  * @author Mohamed Abdul Rasheed (mohideen at umd.edu)
  */
 @RestController
@@ -57,7 +56,8 @@ public class CommunityCommunityGroupController {
     /**
      * Regular expression in the request mapping to accept UUID as identifier
      */
-    protected static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
+    protected static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
+        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
 
     @Autowired
     protected Utils utils;

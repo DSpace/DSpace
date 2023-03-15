@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.umd.lib.dspace.authenticate.LdapService;
-import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
 import edu.umd.lib.dspace.authenticate.impl.Ldap;
+import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
 import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 import org.apache.commons.lang3.StringUtils;
@@ -368,13 +368,14 @@ public class CASAuthentication implements AuthenticationMethod {
 
     @Override
     public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
-      return false;
+        return false;
     }
 
     /**
      * Registers an EPerson, using the information in the given Ldap object.
      */
-    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request) throws Exception {
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request)
+        throws Exception {
         // Turn off authorizations to create a new user
         context.turnOffAuthorisationSystem();
 
@@ -410,7 +411,7 @@ public class CASAuthentication implements AuthenticationMethod {
             context.dispatchEvents();
 
             log.info("CASAuthentication::registerEPerson: create_um_eperson eperson_id="
-                     + eperson.getID() +", uid=" + uid);
+                     + eperson.getID() + ", uid=" + uid);
 
             return eperson;
         } finally {

@@ -1,9 +1,8 @@
 
 package edu.umd.lib.dspace.content.factory;
 
-import org.dspace.services.factory.DSpaceServicesFactory;
-
 import edu.umd.lib.dspace.content.service.EmbargoDTOService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Abstract factory to get services for the drum package, use

@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
 
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.UnitService;
-import org.dspace.core.Context;
 
 /**
  * Class representing an LDAP result for a particular user

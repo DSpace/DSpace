@@ -7,21 +7,16 @@
  */
 package org.dspace.discovery;
 
-import java.sql.SQLException;
-
-import org.apache.solr.common.SolrInputDocument;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
+import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 
 /**
  * Indexes the id of the CommunityGroup for any Community
- * 
+ *
  * @author Mohamed Mohideen Abdul Rasheed (mohideen at umd.edu)
  */
 public class SolrServiceCommunityGroupIndexingPlugin implements SolrServiceIndexPlugin {
