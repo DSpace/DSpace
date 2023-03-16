@@ -103,7 +103,7 @@ public class EmbargoDTO {
     }
 
     public String getEndDateString() {
-        if(endDate == null) {
+        if (endDate == null) {
             return null;
         }
         return this.endDate.toString();

@@ -15,12 +15,10 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Community;
 import org.dspace.content.CommunityGroup;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test for UnitRestRepository

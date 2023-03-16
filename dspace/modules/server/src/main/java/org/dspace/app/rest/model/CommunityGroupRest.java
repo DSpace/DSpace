@@ -9,7 +9,6 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -60,7 +59,7 @@ public class CommunityGroupRest extends BaseObjectRest<Integer> {
     public String getType() {
         return NAME;
     }
-    
+
     @Override
     @JsonIgnore
     public Class getController() {

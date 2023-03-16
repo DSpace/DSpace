@@ -11,8 +11,7 @@ import java.util.Map;
 /**
  * Class representing a community group.
  */
-public class CommunityGroup
-{
+public class CommunityGroup {
     public static final int FACULTY   = 0;
     public static final int LIBRARIES = 1;
     public static final int UM        = 2;
@@ -29,7 +28,7 @@ public class CommunityGroup
     private static final Map<Integer, String> shortNames;
     static {
         Map<Integer, String> staticShortNames = new HashMap<>();
-        staticShortNames.put(FACULTY, "UM Faculty");  
+        staticShortNames.put(FACULTY, "UM Faculty");
         staticShortNames.put(LIBRARIES, "UM Libraries");
         staticShortNames.put(UM, "UM Community");
         shortNames = Collections.unmodifiableMap(staticShortNames);
@@ -57,8 +56,7 @@ public class CommunityGroup
      * Get the name of this community group.
      * @return the name of the group
      */
-    public String getName()
-    {
+    public String getName() {
         return CommunityGroup.names.get(id);
     }
 
@@ -69,9 +67,8 @@ public class CommunityGroup
      *
      * @return the name of the group
      */
-    public String getShortName()
-    {
-      return CommunityGroup.shortNames.get(id);
+    public String getShortName() {
+        return CommunityGroup.shortNames.get(id);
     }
 
     /**
@@ -79,8 +76,7 @@ public class CommunityGroup
      *
      * @return the internal identifier
      */
-    public int getID()
-    {
+    public int getID() {
         return this.id;
     }
 }

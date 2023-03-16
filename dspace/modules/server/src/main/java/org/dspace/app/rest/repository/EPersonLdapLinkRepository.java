@@ -4,14 +4,17 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.umd.lib.dspace.authenticate.LdapService;
+import edu.umd.lib.dspace.authenticate.impl.Ldap;
+import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.LdapRest;
+import org.dspace.app.rest.model.UnitRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -23,11 +26,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
-import edu.umd.lib.dspace.authenticate.LdapService;
-import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
-import edu.umd.lib.dspace.authenticate.impl.Ldap;
-import org.dspace.app.rest.model.UnitRest;
 
 /**
  * Link repository for the direct Ldap subresource of an individual eperson.

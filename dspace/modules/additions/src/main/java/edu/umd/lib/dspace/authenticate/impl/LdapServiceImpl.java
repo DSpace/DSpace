@@ -134,7 +134,7 @@ public class LdapServiceImpl implements LdapService {
                                           "ldap entry:\n" + entry,
                                           ""));
             return ldap;
-        } catch(NamingException ne) {
+        } catch (NamingException ne) {
             log.error("LDAP NamingException for '" + strUid + "'", ne);
         }
         return null;

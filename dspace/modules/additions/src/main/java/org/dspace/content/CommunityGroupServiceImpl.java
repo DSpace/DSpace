@@ -16,16 +16,16 @@ public class CommunityGroupServiceImpl implements CommunityGroupService {
 
     @Override
     public CommunityGroup find(int id) {
-      return CommunityGroup.communityGroups.get(id);
+        return CommunityGroup.communityGroups.get(id);
     }
 
     @Override
     public List<CommunityGroup> findAll() {
-      return new ArrayList<CommunityGroup>(CommunityGroup.communityGroups.values());
+        return new ArrayList<CommunityGroup>(CommunityGroup.communityGroups.values());
     }
 
     @Override
     public List<Community> getCommunities(Context context, CommunityGroup group) throws SQLException {
-      return communityService.findByCommunityGroupTop(context, group);
+        return communityService.findByCommunityGroupTop(context, group);
     }
 }

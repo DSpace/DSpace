@@ -11,7 +11,7 @@ public interface CommunityGroupService {
 
     /**
      * Find the CommunityGroup for the ID
-     * 
+     *
      * @param id id of the community group
      * @return communityGroup communityGroup
      */
@@ -19,7 +19,7 @@ public interface CommunityGroupService {
 
     /**
      * Find the CommunityGroup for the ID
-     * 
+     *
      * @param id id of the community group
      * @return communityGroup communityGroup
      */
@@ -27,12 +27,12 @@ public interface CommunityGroupService {
 
     /**
      * Return the communities that are part of the given community group.
-     * 
+     *
      * @param context context
      * @param group communityGroup
-     * 
-     * @return communities list of communities 
+     *
+     * @return communities list of communities
      */
     List<Community> getCommunities(Context context, CommunityGroup group) throws SQLException;
-    
+
 }

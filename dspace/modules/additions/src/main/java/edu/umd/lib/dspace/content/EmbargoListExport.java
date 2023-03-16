@@ -5,6 +5,9 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import com.opencsv.CSVWriter;
+import edu.umd.lib.dspace.content.factory.DrumServiceFactory;
+import edu.umd.lib.dspace.content.service.EmbargoDTOService;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.dspace.core.Context;
@@ -12,11 +15,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
-
-import com.opencsv.CSVWriter;
-
-import edu.umd.lib.dspace.content.factory.DrumServiceFactory;
-import edu.umd.lib.dspace.content.service.EmbargoDTOService;
 
 /**
  * Exporter for the batch export of embargoed items
@@ -63,8 +61,8 @@ public class EmbargoListExport extends DSpaceRunnable<EmbargoListExportScriptCon
         StringWriter stringWriter = new StringWriter();
         try (CSVWriter writer = new CSVWriter(stringWriter)) {
             writer.writeNext(new String[] {
-                    "Handle", "Item ID", "Bitstream ID", "Title", "Advisor",
-                    "Author", "Department", "Type", "End Date"
+                "Handle", "Item ID", "Bitstream ID", "Title", "Advisor",
+                "Author", "Department", "Type", "End Date"
             });
 
             for (EmbargoDTO embargo : embargoes) {

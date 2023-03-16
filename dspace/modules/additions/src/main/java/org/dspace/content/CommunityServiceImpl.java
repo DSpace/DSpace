@@ -707,14 +707,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     // Begin UMD Customization
     @Override
-    public List<Community> findByCommunityGroupTop(Context context, CommunityGroup group) throws SQLException
-    {
+    public List<Community> findByCommunityGroupTop(Context context, CommunityGroup group) throws SQLException {
         List<Community> topCommunities = findAllTop(context);
 
         List<Community> topGroupCommunities = new ArrayList<Community>();
-      
+
         for (Community community : topCommunities) {
-            if(group.getID() == community.getGroupID()) {
+            if (group.getID() == community.getGroupID()) {
                 topGroupCommunities.add(community);
             }
         }

@@ -53,7 +53,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     private Integer legacyId;
 
     // Begin UMD Customization
-    @Column(name="group_id")
+    @Column(name = "group_id")
     private Integer groupId;
     // End UMD Customization
 
@@ -279,12 +279,12 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     // Customization to support finding top level community by CommunityGroup
     // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
     public int getGroupID() {
-      return this.groupId != null ? this.groupId.intValue() : -1;
+        return this.groupId != null ? this.groupId.intValue() : -1;
     }
 
     public void setGroupID(int groupId) {
-      this.groupId = groupId;
-      setModified();
+        this.groupId = groupId;
+        setModified();
     }
 
     // UMD Customization for LIBDRUM-701
