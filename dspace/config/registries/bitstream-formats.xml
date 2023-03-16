@@ -201,7 +201,7 @@
 
   <bitstream-type>
     <mimetype>image/png</mimetype>
-    <short_description>image/png</short_description>
+    <short_description>PNG</short_description>
     <description>Portable Network Graphics</description>
     <support_level>1</support_level>
     <internal>false</internal>
