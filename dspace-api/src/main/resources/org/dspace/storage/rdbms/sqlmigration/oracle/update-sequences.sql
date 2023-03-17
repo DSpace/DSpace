@@ -63,6 +63,10 @@ BEGIN
   updateseq('webapp_seq', 'webapp', 'webapp_id');
   updateseq('requestitem_seq', 'requestitem', 'requestitem_id');
   updateseq('handle_id_seq', 'handle', 'handle_id');
+  updateseq('checksum_history_check_id_seq', 'checksum_history', 'check_id');
+  updateseq('doi_seq', 'doi', 'doi_id');
+  updateseq('versionhistory_seq', 'versionhistory', 'versionhistory_id');
+  updateseq('versionitem_seq', 'versionitem', 'versionitem_id');
 
   -- Handle Sequence is a special case.  Since Handles minted by DSpace
   -- use the 'handle_seq', we need to ensure the next assigned handle

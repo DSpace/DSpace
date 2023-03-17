@@ -21,21 +21,25 @@
 
 
 SELECT setval('bitstreamformatregistry_seq', max(bitstream_format_id)) FROM bitstreamformatregistry;
+SELECT setval('checksum_history_check_id_seq', max(check_id)) FROM checksum_history;
+SELECT setval('doi_seq', max(doi_id)) FROM doi;
 SELECT setval('fileextension_seq', max(file_extension_id)) FROM fileextension;
-SELECT setval('resourcepolicy_seq', max(policy_id)) FROM resourcepolicy;
-SELECT setval('workspaceitem_seq', max(workspace_item_id)) FROM workspaceitem;
-SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
-SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
-SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registrationdata;
-SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
-SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
-SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
-SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
+SELECT setval('handle_id_seq', max(handle_id)) FROM handle;
 SELECT setval('harvested_collection_seq', max(id)) FROM harvested_collection;
 SELECT setval('harvested_item_seq', max(id)) FROM harvested_item;
-SELECT setval('webapp_seq', max(webapp_id)) FROM webapp;
+SELECT setval('metadatafieldregistry_seq', max(metadata_field_id)) FROM metadatafieldregistry;
+SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
+SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
+SELECT setval('registrationdata_seq', max(registrationdata_id)) FROM registrationdata;
 SELECT setval('requestitem_seq', max(requestitem_id)) FROM requestitem;
-SELECT setval('handle_id_seq', max(handle_id)) FROM handle;
+SELECT setval('resourcepolicy_seq', max(policy_id)) FROM resourcepolicy;
+SELECT setval('subscription_seq', max(subscription_id)) FROM subscription;
+SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
+SELECT setval('versionhistory_seq', max(versionhistory_id)) FROM versionhistory;
+SELECT setval('versionitem_seq', max(versionitem_id)) FROM versionitem;
+SELECT setval('webapp_seq', max(webapp_id)) FROM webapp;
+SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
+SELECT setval('workspaceitem_seq', max(workspace_item_id)) FROM workspaceitem;
 
 -- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
 -- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'
