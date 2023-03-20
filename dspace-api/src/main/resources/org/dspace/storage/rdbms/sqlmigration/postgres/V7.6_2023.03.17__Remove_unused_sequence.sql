@@ -10,4 +10,4 @@
 -- Drop the 'history_seq' sequence (related table deleted at Dspace-1.5)
 -----------------------------------------------------------------------------------
 
-DROP SEQUENCE history_seq;
+DROP SEQUENCE IF EXISTS history_seq;
