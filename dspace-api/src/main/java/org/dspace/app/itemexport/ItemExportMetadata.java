@@ -15,6 +15,7 @@ public class ItemExportMetadata {
     private String bachelorsPaperChair;
     private String bachelorsPaperSpeciality;
     private String presentationDate;
+    private String publisher;
 
     private ItemExportMetadata(Builder builder) {
         title = builder.title;
@@ -31,6 +32,7 @@ public class ItemExportMetadata {
         bachelorsPaperChair = builder.bachelorsPaperChair;
         bachelorsPaperSpeciality = builder.bachelorsPaperSpeciality;
         presentationDate = builder.presentationDate;
+        publisher = builder.publisher;
     }
 
     public String getTitle() {
@@ -88,6 +90,9 @@ public class ItemExportMetadata {
     public String getPresentationDate() {
         return presentationDate;
     }
+    public String getPublisher() {
+        return publisher;
+    }
 
     public static final class Builder {
         private String title;
@@ -104,6 +109,7 @@ public class ItemExportMetadata {
         private String bachelorsPaperChair;
         private String bachelorsPaperSpeciality;
         private String presentationDate;
+        private String publisher;
 
         public Builder() {
         }
@@ -123,6 +129,7 @@ public class ItemExportMetadata {
             this.bachelorsPaperChair = copy.getBachelorsPaperChair();
             this.bachelorsPaperSpeciality = copy.getBachelorsPaperSpeciality();
             this.presentationDate = copy.getPresentationDate();
+            this.publisher = copy.getPublisher();
         }
 
         public Builder withTitle(String title) {
@@ -192,6 +199,11 @@ public class ItemExportMetadata {
 
         public Builder withPresentationDate(String presentationDate) {
             this.presentationDate = presentationDate;
+            return this;
+        }
+
+        public Builder withPublisher(String publisher) {
+            this.publisher = publisher;
             return this;
         }
 

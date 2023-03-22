@@ -70,6 +70,7 @@ public class EssuirMetadataExporter {
         String type = fetchMetadataFieldValue(item, "type", "*", "Unknown type");
         String speciality = fetchMetadataFieldValue(item, "speciality", "id", "[]");
         String presentationDate = fetchMetadataFieldValue(item, "date", "presentation", "");
+        String publisher = fetchMetadataFieldValue(item, "publisher", null, "");
         List<SpecialityDetailedInfo> specialityDetailedInfoList = new ObjectMapper().readValue(speciality, new TypeReference<List<SpecialityDetailedInfo>>() {
         });
 
@@ -82,7 +83,8 @@ public class EssuirMetadataExporter {
                 .withSubmitterEmail(submitter.getEmail())
                 .withSubmitterFirstName(submitter.getFirstName())
                 .withSubmitterLastName(submitter.getLastName())
-                .withPresentationDate(presentationDate);
+                .withPresentationDate(presentationDate)
+                .withPublisher(publisher);
 
         if (specialityDetailedInfoList.size() == 3) {
             String facultyName = specialityDetailedInfoList.get(0).getName();
@@ -120,6 +122,7 @@ public class EssuirMetadataExporter {
                 .addColumn("bachelorsPaperChair")
                 .addColumn("bachelorsPaperSpeciality")
                 .addColumn("presentationDate")
+                .addColumn("publisher")
                 .build();
         CsvMapper csvMapper = new CsvMapper();
 
@@ -128,7 +131,7 @@ public class EssuirMetadataExporter {
         ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
         ItemService itemService = contentServiceFactory.getItemService();
         Iterator<Item> items = itemService.findAll(context);
-        writer.write("Paper Title;Handle;Collection;Submitter Email;Submitter First Name;Submitter Last Name;Chair Name;Faculty Name;Date Available;Type; Bachelors Paper Faculty; Bachelors Paper Chair; Bachelors Paper Speciality; Presentation Date");
+        writer.write("Paper Title;Handle;Collection;Submitter Email;Submitter First Name;Submitter Last Name;Chair Name;Faculty Name;Date Available;Type; Bachelors Paper Faculty; Bachelors Paper Chair; Bachelors Paper Speciality; Presentation Date; Publisher");
         writer.newLine();
         writer.flush();
         while (items.hasNext()) {
