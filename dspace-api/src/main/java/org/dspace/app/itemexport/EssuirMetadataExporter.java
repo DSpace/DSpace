@@ -72,7 +72,7 @@ public class EssuirMetadataExporter {
         String presentationDate = fetchMetadataFieldValue(item, "date", "presentation", "");
         String publisher = fetchMetadataFieldValue(item, "publisher", null, "");
         String license = fetchMetadataFieldValue(item, "rights", "uri", "");
-        String language = fetchMetadataFieldValue(item, "type", "*", "");
+        String language = fetchMetadataFieldValue(item, "language", null, "");
         List<SpecialityDetailedInfo> specialityDetailedInfoList = new ObjectMapper().readValue(speciality, new TypeReference<List<SpecialityDetailedInfo>>() {
         });
 
