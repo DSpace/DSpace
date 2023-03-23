@@ -166,6 +166,30 @@ public class Utils {
     }
 
     /**
+     * Returns list of objects for the current page.
+     * @param fullList the complete list of objects
+     * @param optionalPageable
+     * @return list of page objects
+     * @param <T>
+     */
+    public <T> List<T> getPageObjectList(List<T> fullList, @Nullable Pageable optionalPageable) {
+        Pageable pageable = getPageable(optionalPageable);
+        int total = fullList.size();
+        List<T> pageContent = null;
+        if (pageable.getOffset() > total) {
+            throw new PaginationException(total);
+        } else {
+            if (pageable.getOffset() + pageable.getPageSize() > total) {
+                pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()), total);
+            } else {
+                pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
+            }
+            return pageContent;
+        }
+    }
+
+    /**
      * Convenience method to get a default pageable instance if needed.
      *
      * @param optionalPageable the existing pageable instance, may be null.
