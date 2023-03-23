@@ -16,6 +16,8 @@ public class ItemExportMetadata {
     private String bachelorsPaperSpeciality;
     private String presentationDate;
     private String publisher;
+    private String license;
+    private String language;
 
     private ItemExportMetadata(Builder builder) {
         title = builder.title;
@@ -33,6 +35,8 @@ public class ItemExportMetadata {
         bachelorsPaperSpeciality = builder.bachelorsPaperSpeciality;
         presentationDate = builder.presentationDate;
         publisher = builder.publisher;
+        license = builder.license;
+        language = builder.language;
     }
 
     public String getTitle() {
@@ -93,6 +97,12 @@ public class ItemExportMetadata {
     public String getPublisher() {
         return publisher;
     }
+    public String getLicense() {
+        return license;
+    }
+    public String getLanguage() {
+        return language;
+    }
 
     public static final class Builder {
         private String title;
@@ -110,6 +120,8 @@ public class ItemExportMetadata {
         private String bachelorsPaperSpeciality;
         private String presentationDate;
         private String publisher;
+        private String license;
+        private String language;
 
         public Builder() {
         }
@@ -130,6 +142,8 @@ public class ItemExportMetadata {
             this.bachelorsPaperSpeciality = copy.getBachelorsPaperSpeciality();
             this.presentationDate = copy.getPresentationDate();
             this.publisher = copy.getPublisher();
+            this.license = copy.getLicense();
+            this.language = copy.getLanguage();
         }
 
         public Builder withTitle(String title) {
@@ -206,6 +220,17 @@ public class ItemExportMetadata {
             this.publisher = publisher;
             return this;
         }
+
+        public Builder withLicense(String license) {
+            this.license = license;
+            return this;
+        }
+
+        public Builder withLanguage(String language) {
+            this.language = language;
+            return this;
+        }
+
 
         public ItemExportMetadata build() {
             return new ItemExportMetadata(this);
