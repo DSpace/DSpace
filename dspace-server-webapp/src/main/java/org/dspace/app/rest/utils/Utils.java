@@ -98,6 +98,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -151,16 +152,10 @@ public class Utils {
     public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
         Pageable pageable = getPageable(optionalPageable);
         int total = fullContents.size();
-        List<T> pageContent = null;
         if (pageable.getOffset() > total) {
             throw new PaginationException(total);
         } else {
-            if (pageable.getOffset() + pageable.getPageSize() > total) {
-                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()), total);
-            } else {
-                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
-            }
+            List<T> pageContent = getListSlice(fullContents, pageable);
             return new PageImpl<>(pageContent, pageable, total);
         }
     }
@@ -175,18 +170,30 @@ public class Utils {
     public <T> List<T> getPageObjectList(List<T> fullList, @Nullable Pageable optionalPageable) {
         Pageable pageable = getPageable(optionalPageable);
         int total = fullList.size();
-        List<T> pageContent = null;
         if (pageable.getOffset() > total) {
             throw new PaginationException(total);
         } else {
-            if (pageable.getOffset() + pageable.getPageSize() > total) {
-                pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()), total);
-            } else {
-                pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
-            }
-            return pageContent;
+            return getListSlice(fullList, pageable);
         }
+    }
+
+    /**
+     * Returns the list elements required for the page
+     * @param fullList the complete list of objects
+     * @param pageable
+     * @return list of page objects
+     * @param <T>
+     */
+    private <T> List<T> getListSlice(List<T> fullList, Pageable pageable) {
+        int total = fullList.size();
+        List<T> pageContent = null;
+        if (pageable.getOffset() + pageable.getPageSize() > total) {
+            pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()), total);
+        } else {
+            pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
+        }
+        return pageContent;
     }
 
     /**
