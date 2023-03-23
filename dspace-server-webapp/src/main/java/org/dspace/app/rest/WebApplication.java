@@ -208,7 +208,7 @@ public class WebApplication {
                 // Make all other Webjars available off the /webjars path
                 registry
                     .addResourceHandler("/webjars/**")
-                    .addResourceLocations("/webjars/");
+                    .addResourceLocations("/webjars/", "classpath:/META-INF/resources/webjars/");
             }
 
             @Override
