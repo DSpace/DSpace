@@ -24,6 +24,10 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import java.util.Date;
+
 /**
  * Class for PATCH REMOVE operations on Dspace Objects' metadata
  * Usage: (can be done on other dso than Item also):
@@ -82,6 +86,21 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
                     // remove that metadata
                     dsoService.removeMetadataValues(context, dso,
                             Arrays.asList(metadataValues.get(indexInt)));
+
+                    if (dso.getType() == Constants.ITEM) {
+                       // Add provenance reason when metadata is changed.
+                       EPerson e = context.getCurrentUser();
+                       String userName = e.getFullName();
+                       Date date = new Date();  
+                       String timestamp = date.toString();
+
+                       String msg="";
+ //                      msg += " For dc=" + metadataField.getElement() + "." + metadataField.getQualifier() + " this value=> \""  + metadataValues.getValue() + "\" was removed.";
+ //                      String prov_value = "A request to update metadata was received on " + timestamp + " (GMT) by " + userName  +  msg;
+
+ //                      dsoService.addMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+ //                         "description", "provenance", metadataValue.getLanguage(), prov_value, metadataValue.getAuthority(), metadataValue.getConfidence());
+                    }
                 } else {
                     throw new UnprocessableEntityException("UnprocessableEntityException - There is no metadata of " +
                             "this type at that index");

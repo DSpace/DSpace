@@ -405,7 +405,7 @@ public interface ItemService
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public void withdraw(Context context, Item item) throws SQLException, AuthorizeException;
+    public void withdraw(Context context, Item item, String reason) throws SQLException, AuthorizeException;
 
 
     /**

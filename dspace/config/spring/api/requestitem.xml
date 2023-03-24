@@ -33,13 +33,13 @@
             If you don't configure that or if the requested item doesn't have
             these metadata, the submitter data are used as fail over.
         -->
-        <!--
+        
 
             <property name="emailMetadata"
-                      value="schema.element.qualifier" />
+                      value="dc.requestcopy.email" />
             <property name="fullNameMetadata"
-                      value="schema.element.qualifier" />
-        -->
+                      value="dc.requestcopy.name" />
+        
     </bean>
 
     <!-- HelpDesk to instead get RequestItem emails-->

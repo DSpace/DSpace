@@ -36,6 +36,9 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
+
+import org.dspace.content.service.UmrestrictedService;
+
 /**
  * Abstract factory to get services for the content package, use ContentServiceFactory.getInstance() to retrieve an
  * implementation
@@ -72,6 +75,8 @@ public abstract class ContentServiceFactory {
     public abstract InstallItemService getInstallItemService();
 
     public abstract SupervisedItemService getSupervisedItemService();
+
+    public abstract UmrestrictedService getUmrestrictedService();
 
     public abstract SiteService getSiteService();
 

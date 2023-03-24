@@ -61,6 +61,8 @@
         <mapping class="org.dspace.content.Site"/>
         <mapping class="org.dspace.content.WorkspaceItem"/>
 
+        <mapping class="org.dspace.content.Umrestricted"/>
+
         <mapping class="org.dspace.eperson.EPerson"/>
         <mapping class="org.dspace.eperson.Group"/>
         <mapping class="org.dspace.eperson.Group2GroupCache"/>

@@ -20,6 +20,10 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import java.util.Date;
+
 /**
  Class for PATCH ADD operations on Dspace Objects' metadata
  * Usage: (can be done on other dso than Item also):
@@ -69,6 +73,22 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
             dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
                     metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
                     metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt);
+
+            if (dso.getType() == Constants.ITEM) {
+              // Add provenance reason when metadata is changed.
+              EPerson e = context.getCurrentUser();
+              String userName = e.getFullName();
+              Date date = new Date();  
+              String timestamp = date.toString();
+
+              String msg="";
+              msg += " For dc=" + metadataField.getElement() + "." + metadataField.getQualifier() + " this value was added=> \"" +  metadataValue.getValue() + "\"";
+              String prov_value = "A request to add a metadata was received on " + timestamp + " (GMT) by " + userName  +  msg;
+
+              dsoService.addMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+                "description", "provenance", metadataValue.getLanguage(), prov_value, metadataValue.getAuthority(), metadataValue.getConfidence());
+             }
+
         } catch (SQLException e) {
             throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataAddOperation.add trying to add " +
                     "metadata to dso.", e);

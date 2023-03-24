@@ -24,6 +24,10 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import java.util.Date;
+
 /**
  Class for PATCH REPLACE operations on Dspace Objects' metadata
  * Usage: (can be done on other dso than Item also):
@@ -91,7 +95,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
         }
         // replace single existing metadata value
         if (propertyOfMd == null) {
-            this.replaceSingleMetadataValue(dso, dsoService, metadataField, metadataValue, index);
+            this.replaceSingleMetadataValue(context, dso, dsoService, metadataField, metadataValue, index);
             return;
         }
         // replace single property of exiting metadata value
@@ -145,7 +149,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param index             index of md being replaced
      */
     // replace single existing metadata value
-    private void replaceSingleMetadataValue(DSpaceObject dso, DSpaceObjectService dsoService,
+    private void replaceSingleMetadataValue(Context context, DSpaceObject dso, DSpaceObjectService dsoService,
                                             MetadataField metadataField, MetadataValueRest metadataValue,
                                             String index) {
         try {
@@ -157,16 +161,36 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                     && metadataValues.get(indexInt) != null) {
                 // Alter this existing md
                 MetadataValue existingMdv = metadataValues.get(indexInt);
+                String old_value = existingMdv.getValue();
+
                 existingMdv.setAuthority(metadataValue.getAuthority());
                 existingMdv.setConfidence(metadataValue.getConfidence());
                 existingMdv.setLanguage(metadataValue.getLanguage());
                 existingMdv.setValue(metadataValue.getValue());
                 dsoService.setMetadataModified(dso);
+	
+		if (dso.getType() == Constants.ITEM) {
+                  // Add provenance reason when metadata is changed.
+                  EPerson e = context.getCurrentUser();
+                  String userName = e.getFullName();
+                  Date date = new Date();  
+                  String timestamp = date.toString();
+
+                  String msg="";
+                  msg += " For dc=" + metadataField.getElement() + "." + metadataField.getQualifier() + " this value=> \"" + old_value + "\" became => \"" + metadataValue.getValue() + "\"";
+                  String prov_value = "A request to update metadata was received on " + timestamp + " (GMT) by " + userName  +  msg;
+
+                  dsoService.addMetadata(context, dso, metadataField.getMetadataSchema().getName(),
+                    "description", "provenance", metadataValue.getLanguage(), prov_value, metadataValue.getAuthority(), metadataValue.getConfidence());
+                }
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("This index (" + index + ") is not valid number.", e);
+        } catch (SQLException e) {
+            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataOperation.replace trying to " +
+                    "remove and replace metadata from dso.", e);
         }
     }
 

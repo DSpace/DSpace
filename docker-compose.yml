@@ -67,6 +67,7 @@ services:
       PGDATA: /pgdata
     # Uses a custom Postgres image with pgcrypto installed
     image: dspace/dspace-postgres-pgcrypto
+    platform: linux/amd64
     networks:
       dspacenet:
     ports:

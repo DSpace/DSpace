@@ -438,7 +438,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                         // Withdraw the item
                         if (!item.isWithdrawn()) {
                             if (change) {
-                                itemService.withdraw(c, item);
+                                itemService.withdraw(c, item, "");
                             }
                             whatHasChanged.setWithdrawn();
                         }

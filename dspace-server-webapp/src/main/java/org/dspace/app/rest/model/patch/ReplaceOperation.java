@@ -18,4 +18,8 @@ public class ReplaceOperation extends Operation {
         super("replace", path, value);
     }
 
+    public ReplaceOperation(String path, Object value, String reason) {
+        super("replace", path, value, reason);
+    }
+
 }

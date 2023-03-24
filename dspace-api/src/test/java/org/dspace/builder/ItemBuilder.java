@@ -380,7 +380,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
             }
 
             if (withdrawn) {
-                itemService.withdraw(context, item);
+                itemService.withdraw(context, item, "");
             }
 
             context.dispatchEvents();

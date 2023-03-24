@@ -57,6 +57,8 @@
     <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
     <bean class="org.dspace.content.FeedbackServiceImpl"/>
 
+    <bean class="org.dspace.content.UmrestrictedServiceImpl"/>
+
     <bean class="org.dspace.scripts.ProcessServiceImpl"/>
     <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 

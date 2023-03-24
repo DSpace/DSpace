@@ -167,7 +167,7 @@ public class InstallItemServiceImpl implements InstallItemService {
             }
         }
 
-        String provDescription = "Made available in DSpace on " + now
+        String provDescription = "Made available in Deep Blue Documents on " + now
             + " (GMT). " + getBitstreamProvenanceMessage(c, item);
 
         // If an issue date was passed in and it wasn't set to "today" (literal string)

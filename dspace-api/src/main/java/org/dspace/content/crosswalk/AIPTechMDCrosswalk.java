@@ -417,7 +417,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                         } else if (dcField.equals("rights.accessRights")) {
                             //check if item is withdrawn
                             if (value.equalsIgnoreCase("WITHDRAWN")) {
-                                itemService.withdraw(context, item);
+                                itemService.withdraw(context, item, "");
                             }
                         } else if (dcField.equals("identifier.uri") ||
                             dcField.equals("relation.isPartOf")) {

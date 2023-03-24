@@ -26,6 +26,13 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import org.dspace.app.util.Restrict;
+import java.util.Calendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 /**
  * Public interface to the embargo subsystem.
  * <p>
@@ -127,6 +134,60 @@ public class EmbargoServiceImpl implements EmbargoService {
         if (result == null) {
             return null;
         }
+
+
+        String withheldTemplate = "WITHHELD_.*_MONTHS";
+        Pattern withheldRegex = null;
+        withheldRegex = Pattern.compile(withheldTemplate);
+        Matcher matchRegex = null;
+
+        String restriction = terms.get(0).getValue();
+        log.info("Embargo request value = " + restriction);
+
+        matchRegex = withheldRegex.matcher(restriction);
+
+        int restrictionValue = -1;
+        if (restriction.equals("WITHHELD_THREE_MONTHS"))
+        {
+            restrictionValue = 3;
+        }
+        else if (restriction.equals("WITHHELD_HALF_YEAR"))
+        {
+            restrictionValue = 6;
+        }
+        else if (restriction.equals("WITHHELD_ONE_YEAR"))
+        {
+            restrictionValue = 12;
+        }
+        else if (matchRegex.matches())
+        {
+            //Now get the months out.
+
+            int pos1 = restriction.indexOf("WITHHELD_");
+            int pos2 = restriction.indexOf("_MONTHS");
+
+            String months = restriction.substring (pos1 + 9, pos2 );
+
+            restrictionValue = Integer.parseInt ( months );
+
+        }
+
+
+        if (restrictionValue != -1)
+        {
+              //Restrict.applyByMonth(context, item, restrictionValue);
+
+              // You want to return the calc value              
+              Calendar release = Calendar.getInstance();
+              release.setTime(new Date());
+              release.add(release.MONTH, restrictionValue);
+              Date releaseDate = release.getTime();
+              return new DCDate(releaseDate);
+        }
+
+        //If you get here.  Go on to the regular embargo
+
+
 
         // new DCDate(non-date String) means toDate() will return null
         Date liftDate = result.toDate();

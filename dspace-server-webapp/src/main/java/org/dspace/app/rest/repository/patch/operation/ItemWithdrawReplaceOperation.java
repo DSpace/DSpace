@@ -62,7 +62,10 @@ public class ItemWithdrawReplaceOperation<R> extends PatchOperation<R> {
                     if (item.isWithdrawn()) {
                         return object;
                     }
-                    itemService.withdraw(context, item);
+
+                    String reason = operation.getReason();
+                    itemService.withdraw(context, item, reason);
+
                     return object;
 
                 } else {

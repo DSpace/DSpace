@@ -8,6 +8,13 @@
         </step>
     </command>
     <command>
+        <name>newpassword</name>
+        <description>Run the checksum checker</description>
+        <step>
+            <class>org.dspace.app.checker.PasswordCreator</class>
+        </step>
+    </command>
+    <command>
         <name>healthcheck</name>
         <description>Create health check report</description>
         <step>
@@ -350,6 +357,13 @@
         <description>Automatically add the IIIF canvas width/height metadata to Bitstreams of IIIF enabled Items.</description>
         <step>
             <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
+        </step>
+    </command>
+    <command>
+        <name>release</name>
+        <description>Release items that have been embargoed.</description>
+        <step>
+            <class>org.dspace.administer.ReleaseRestricted</class>
         </step>
     </command>
 </commands>

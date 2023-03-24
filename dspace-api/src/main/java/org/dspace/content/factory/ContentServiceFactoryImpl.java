@@ -32,6 +32,9 @@ import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.dspace.content.service.UmrestrictedService;
+
+
 /**
  * Factory implementation to get services for the content package, use ContentServiceFactory.getInstance() to
  * retrieve an implementation
@@ -82,6 +85,9 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private EntityTypeService entityTypeService;
     @Autowired(required = true)
     private EntityService entityService;
+    @Autowired(required = true)
+    private UmrestrictedService umrestrictedService;
+
 
     @Override
     public List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices() {
@@ -111,6 +117,12 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public CollectionService getCollectionService() {
         return collectionService;
+    }
+
+    @Override
+    public UmrestrictedService getUmrestrictedService()
+    {
+        return umrestrictedService;
     }
 
     @Override

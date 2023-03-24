@@ -616,7 +616,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public void withdraw(Context context, Item item) throws SQLException, AuthorizeException {
+    public void withdraw(Context context, Item item, String reason) throws SQLException, AuthorizeException {
         // Check permission. User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
         AuthorizeUtil.authorizeWithdrawItem(context, item);
@@ -649,6 +649,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         prov.append(installItemService.getBitstreamProvenanceMessage(context, item));
 
         addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "provenance", "en", prov.toString());
+
+        addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "description", "withdrawalreason", "en", reason);
 
         // Update item in DB
         update(context, item);
