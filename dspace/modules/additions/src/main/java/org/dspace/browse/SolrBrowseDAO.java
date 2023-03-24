@@ -218,7 +218,8 @@ public class SolrBrowseDAO implements BrowseDAO {
                 }
                 if (StringUtils.isNotBlank(startsWith) && orderField != null) {
                     // UMD Customization - DSpace 7.5 Fix - https://github.com/DSpace/DSpace/commit/b0afb15efa6ad962ff2447fdbaf78c23813758ec
-                    query.addFilterQueries("bi_" + orderField + "_sort:" + ClientUtils.escapeQueryChars(startsWith) + "*");
+                    query.addFilterQueries("bi_" + orderField + "_sort:" +
+                                           ClientUtils.escapeQueryChars(startsWith) + "*");
                     // End UMD Customization
                 }
                 // filter on item to be sure to don't include any other object
