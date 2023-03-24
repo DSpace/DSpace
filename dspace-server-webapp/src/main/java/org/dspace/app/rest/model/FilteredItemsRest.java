@@ -28,7 +28,7 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
     public static final String CATEGORY = RestModel.CONTENT_REPORT;
 
     /** Items included in the report */
-    private List<FilteredItemRest> items = new ArrayList<>();
+    private List<ItemRest> items = new ArrayList<>();
     /** Total item count (for pagination) */
     private long itemCount;
 
@@ -71,7 +71,7 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
      *
      * @param item {@link ItemRest} to add to this report
      */
-    public void addItem(FilteredItemRest item) {
+    public void addItem(ItemRest item) {
         items.add(item);
     }
 
@@ -82,7 +82,7 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
      *
      * @param items Values that replace the current ones
      */
-    public void setItems(List<FilteredItemRest> items) {
+    public void setItems(List<ItemRest> items) {
         this.items.clear();
         this.items.addAll(items);
     }

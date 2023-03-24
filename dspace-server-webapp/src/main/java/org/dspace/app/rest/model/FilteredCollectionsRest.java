@@ -8,7 +8,9 @@
 package org.dspace.app.rest.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.dspace.app.rest.ContentReportRestController;
 
@@ -35,6 +37,18 @@ public class FilteredCollectionsRest extends BaseObjectRest<String> {
      * the {@link #collections} collection attribute.
      */
     private FilteredCollectionRest summary;
+
+    /**
+     * Shortcut method that builds a FilteredCollectionsRest instance
+     * from its building blocks.
+     * @param collections a list of FilteredCollectionRest instances
+     * @return a FilteredCollectionsRest instance built from the provided parameters
+     */
+    public static FilteredCollectionsRest of(Collection<FilteredCollectionRest> collections) {
+        var colls = new FilteredCollectionsRest();
+        Optional.ofNullable(collections).ifPresent(cs -> cs.stream().forEach(colls::addCollection));
+        return colls;
+    }
 
     @Override
     public String getCategory() {

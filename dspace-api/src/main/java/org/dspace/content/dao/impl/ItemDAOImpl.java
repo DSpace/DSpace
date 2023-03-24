@@ -8,16 +8,21 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
@@ -26,12 +31,14 @@ import org.dspace.content.Item;
 import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.MetadataValue_;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.contentreport.QueryOperator;
 import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.util.JpaCriteriaBuilderKit;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
@@ -301,34 +308,38 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, String regexClause, long offset, int limit) throws SQLException {
-        // TODO: Refactor the query to use JPA instead of the old Hibernate Criteria API
-        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
-        criteria.setFirstResult((int) offset);
-        criteria.setMaxResults(limit);
-
-        fillCriteriaForMetadataQuery(criteria, queryPredicates, collectionUuids, regexClause);
-        criteria.addOrder(Order.asc("item.id"));
-
-        return criteria.list();
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot);
+        List<Predicate> predicates = toPredicates(criteriaBuilder, criteriaQuery, itemRoot, queryPredicates, collectionUuids, regexClause);
+        criteriaQuery.where(criteriaBuilder.and(predicates.stream().toArray(Predicate[]::new)));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
+        criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
+        try {
+            return list(context, criteriaQuery, false, Item.class, limit, (int) offset);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
     public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, String regexClause) throws SQLException {
-        // TODO: Refactor the query to use JPA instead of the old Hibernate Criteria API
-        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
-        criteria.setProjection(Projections.rowCount());
-
-        fillCriteriaForMetadataQuery(criteria, queryPredicates, collectionUuids, regexClause);
-
-        List<Number> count = criteria.list();
-        if (count == null || count.isEmpty()) {
-            return 0;
-        }
-        return count.get(0).longValue();
+        // Build the query infrastructure
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        // Select
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        // Apply the selected predicates
+        List<Predicate> predicates = toPredicates(criteriaBuilder, criteriaQuery, itemRoot, queryPredicates, collectionUuids, regexClause);
+        criteriaQuery.where(criteriaBuilder.and(predicates.stream().toArray(Predicate[]::new)));
+        // Execute the query
+        return countLong(context, criteriaQuery, criteriaBuilder, itemRoot);
     }
 
     /**
@@ -342,6 +353,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
      * @param regexClause Syntactic expression used to query the database using a regular expression
      *        (e.g.: "text_value ~ ?")
      */
+    @Deprecated(forRemoval = true)
     private void fillCriteriaForMetadataQuery(Criteria criteria, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, String regexClause) {
         if (!collectionUuids.isEmpty()) {
@@ -371,7 +383,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             subcriteria.add(Property.forName("mv.dSpaceObject").eqProperty("item.id"));
             subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
 
-            if (predicate.getFields().isEmpty()) {
+            if (!predicate.getFields().isEmpty()) {
                 subcriteria.add(Restrictions.in("metadataField", predicate.getFields()));
             }
 
@@ -385,6 +397,67 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         }
 
         log.debug(String.format("Running custom query with %d filters", queryPredicates.size()));
+    }
+
+    private <T> List<Predicate> toPredicates(CriteriaBuilder criteriaBuilder, CriteriaQuery<T> query,
+            Root<Item> root, List<QueryPredicate> queryPredicates,
+            List<UUID> collectionUuids, String regexClause) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (!collectionUuids.isEmpty()) {
+            Subquery<Collection> scollQuery = query.subquery(Collection.class);
+            Root<Collection> collRoot = scollQuery.from(Collection.class);
+            In<UUID> inColls = criteriaBuilder.in(collRoot.get(DSpaceObject_.ID));
+            collectionUuids.forEach(inColls::value);
+            scollQuery.select(collRoot.get(DSpaceObject_.ID))
+                    .where(criteriaBuilder.and(
+                            criteriaBuilder.equal(collRoot.get(DSpaceObject_.ID),
+                                    root.get(Item_.OWNING_COLLECTION).get(DSpaceObject_.ID)),
+                            collRoot.get(DSpaceObject_.ID).in(collectionUuids)
+                    ));
+            predicates.add(criteriaBuilder.exists(scollQuery));
+        }
+
+        for (int i = 0; i < queryPredicates.size(); i++) {
+            QueryPredicate predicate = queryPredicates.get(i);
+            QueryOperator op = predicate.getOperator();
+            if (op == null) {
+                log.warn("Skipping Invalid Operator: null");
+                continue;
+            }
+
+            if (op.getUsesRegex()) {
+                if (regexClause.isEmpty()) {
+                    log.warn("Skipping Unsupported Regex Operator: " + op);
+                    continue;
+                }
+            }
+
+            List<Predicate> mvPredicates = new ArrayList<>();
+            Subquery<MetadataValue> mvQuery = query.subquery(MetadataValue.class);
+            Root<MetadataValue> mvRoot = mvQuery.from(MetadataValue.class);
+            mvPredicates.add(criteriaBuilder.equal(mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root.get(DSpaceObject_.ID)));
+
+            if (!predicate.getFields().isEmpty()) {
+                In<MetadataField> inFields = criteriaBuilder.in(mvRoot.get(MetadataValue_.METADATA_FIELD));
+                predicate.getFields().forEach(inFields::value);
+            }
+
+            JpaCriteriaBuilderKit<MetadataValue> jpaKit = new JpaCriteriaBuilderKit<>(criteriaBuilder, mvQuery, mvRoot);
+            mvPredicates.add(op.buildJpaPredicate(predicate.getValue(), regexClause, jpaKit));
+
+            mvQuery.select(mvRoot.get(MetadataValue_.D_SPACE_OBJECT))
+                    .where(mvPredicates.stream().toArray(Predicate[]::new));
+
+            if (op.getNegate()) {
+                predicates.add(criteriaBuilder.not(criteriaBuilder.exists(mvQuery)));
+            } else {
+                predicates.add(criteriaBuilder.exists(mvQuery));
+            }
+        }
+
+        log.debug(String.format("Running custom query with %d filters", queryPredicates.size()));
+        return predicates;
     }
 
     @Override

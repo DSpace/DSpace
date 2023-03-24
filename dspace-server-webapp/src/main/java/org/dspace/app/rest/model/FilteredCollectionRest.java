@@ -9,6 +9,7 @@ package org.dspace.app.rest.model;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -50,6 +51,36 @@ public class FilteredCollectionRest implements Cloneable {
      */
     @JsonIgnore
     private boolean sealed;
+
+    /**
+     * Shortcut method that builds a FilteredCollectionRest instance
+     * from its building blocks.
+     * @param label Name of the collection
+     * @param handle Handle of the collection
+     * @param communityLabel Name of the owning community
+     * @param communityHandle Handle of the owning community
+     * @param totalItems Total number of items in the collection
+     * @param allFiltersValue Number of items in the collection that match all requested filters
+     * @param values Number of filtered items per requested filter in the collection
+     * @param doSeal true if the collection must be sealed immediately
+     * @return a FilteredCollectionRest instance built from the provided parameters
+     */
+    public static FilteredCollectionRest of(String label, String handle,
+            String communityLabel, String communityHandle,
+            int totalItems, int allFiltersValue, Map<Filter, Integer> values, boolean doSeal) {
+        var coll = new FilteredCollectionRest();
+        coll.label = label;
+        coll.handle = handle;
+        coll.communityLabel = communityLabel;
+        coll.communityHandle = communityHandle;
+        coll.totalItems = totalItems;
+        coll.allFiltersValue = allFiltersValue;
+        Optional.ofNullable(values).ifPresent(vs -> vs.forEach(coll::addValue));
+        if (doSeal) {
+            coll.seal();
+        }
+        return coll;
+    }
 
     /**
      * Returns the item counts per filter.

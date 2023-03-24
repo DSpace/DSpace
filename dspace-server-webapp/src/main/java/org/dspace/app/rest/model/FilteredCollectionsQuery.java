@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,20 @@ import org.dspace.app.rest.contentreport.Filter;
 public class FilteredCollectionsQuery {
 
     private Map<Filter, Boolean> filters = new EnumMap<>(Filter.class);
+
+    /**
+     * Shortcut method that builds a FilteredCollectionsQuery instance
+     * from its building blocks.
+     * @param filters filters to apply to existing items.
+     * The filters mapping to true will be applied, others (either missing or
+     * mapping to false) will not.
+     * @return a FilteredCollectionsQuery instance built from the provided parameters
+     */
+    public static FilteredCollectionsQuery of(Map<Filter, Boolean> filters) {
+        var query = new FilteredCollectionsQuery();
+        Optional.ofNullable(filters).ifPresent(query.filters::putAll);
+        return query;
+    }
 
     public Map<Filter, Boolean> getFilters() {
         return filters;

@@ -9,7 +9,10 @@ package org.dspace;
 
 import static org.junit.Assert.fail;
 
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import javax.sql.DataSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,6 +92,14 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();
+
+            // Register custom functions in the H2 database
+            DataSource dataSource = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("dataSource", DataSource.class);
+            try (Connection c = dataSource.getConnection(); Statement stmt = c.createStatement()) {
+                stmt.execute("CREATE ALIAS IF NOT EXIST matches FOR 'org.dspace.util.DSpaceH2Dialect.matches'");
+            }
         } catch (SQLException se) {
             log.error("Error initializing database", se);
             fail("Error initializing database: " + se.getMessage()
@@ -247,9 +258,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             int status =  ScriptLauncher.handleScript(args, commandConfigs, testDSpaceRunnableHandler, kernelImpl);
             if (testDSpaceRunnableHandler.getException() != null) {
                 throw testDSpaceRunnableHandler.getException();
-            } else {
-                return status;
             }
+            return status;
         } finally {
             if (!context.isValid()) {
                 setUp();

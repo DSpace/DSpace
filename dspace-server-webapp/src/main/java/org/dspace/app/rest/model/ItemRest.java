@@ -55,6 +55,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         )
 })
 public class ItemRest extends DSpaceObjectRest {
+
+    private static final long serialVersionUID = 7014445851745431873L;
     public static final String NAME = "item";
     public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
@@ -75,6 +77,7 @@ public class ItemRest extends DSpaceObjectRest {
     private Date lastModified = new Date();
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
+    private CollectionRest owningCollection;
 
     @Override
     public String getCategory() {
@@ -126,4 +129,13 @@ public class ItemRest extends DSpaceObjectRest {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
+
+    public CollectionRest getOwningCollection() {
+        return owningCollection;
+    }
+
+    public void setOwningCollection(CollectionRest owningCollection) {
+        this.owningCollection = owningCollection;
+    }
+
 }

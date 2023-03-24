@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +42,8 @@ public class ItemConverter
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private CollectionConverter collectionConverter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
@@ -51,6 +54,10 @@ public class ItemConverter
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
+
+        Optional.ofNullable(obj.getOwningCollection())
+                .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
+                .ifPresent(item::setOwningCollection);
 
         List<MetadataValue> entityTypes =
             itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
