@@ -45,7 +45,7 @@ public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpace
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     public Page<VocabularyEntryDetailsRest> getChildren(@Nullable HttpServletRequest request, String name,
                                                         @Nullable Pageable optionalPageable, Projection projection) {
 

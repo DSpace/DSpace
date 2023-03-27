@@ -13,11 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCDate;
-import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
@@ -34,37 +38,57 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class SingleUserReviewAction extends ProcessingAction {
-
-    public static final int MAIN_PAGE = 0;
-    public static final int REJECT_PAGE = 1;
-    public static final int SUBMITTER_IS_DELETED_PAGE = 2;
+    private static final Logger log = LogManager.getLogger(SingleUserReviewAction.class);
 
     public static final int OUTCOME_REJECT = 1;
 
-    protected static final String SUBMIT_APPROVE = "submit_approve";
-    protected static final String SUBMIT_REJECT = "submit_reject";
     protected static final String SUBMIT_DECLINE_TASK = "submit_decline_task";
 
     @Override
     public void activate(Context c, XmlWorkflowItem wfItem) {
-
+        // empty
     }
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
-        int page = Util.getIntParameter(request, "page");
-
-        switch (page) {
-            case MAIN_PAGE:
-                return processMainPage(c, wfi, step, request);
-            case REJECT_PAGE:
-                return processRejectPage(c, wfi, step, request);
-            case SUBMITTER_IS_DELETED_PAGE:
-                return processSubmitterIsDeletedPage(c, wfi, request);
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
+        if (!super.isOptionInParam(request)) {
+            return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
+        }
+        switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
+            case SUBMIT_APPROVE:
+                return processAccept(c, wfi);
+            case SUBMIT_REJECT:
+                return processReject(c, wfi, request);
+            case SUBMIT_DECLINE_TASK:
+                return processDecline(c, wfi);
             default:
                 return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
         }
+    }
+
+    /**
+     * Process {@link super#SUBMIT_REJECT} on this action, will either:
+     * - If submitter of item no longer exists => Permanently delete corresponding item (no wfi/wsi remaining)
+     * - Otherwise: reject item back to submission => becomes wsi of submitter again
+     */
+    private ActionResult processReject(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
+        throws SQLException, IOException, AuthorizeException {
+        if (wfi.getSubmitter() == null) {
+            // If the original submitter is no longer there, delete the task
+            return processDelete(c, wfi);
+        } else {
+            return super.processRejectPage(c, wfi, request);
+        }
+    }
+
+    /**
+     * Accept the workflow item => last step in workflow so will be archived
+     * Info on step & reviewer will be added on metadata dc.description.provenance of resulting item
+     */
+    public ActionResult processAccept(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
+        super.addApprovedProvenance(c, wfi);
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
     @Override
@@ -76,87 +100,29 @@ public class SingleUserReviewAction extends ProcessingAction {
         return options;
     }
 
-    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException {
-        if (request.getParameter(SUBMIT_APPROVE) != null) {
-            //Delete the tasks
-            addApprovedProvenance(c, wfi);
-
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        } else if (request.getParameter(SUBMIT_REJECT) != null) {
-            // Make sure we indicate which page we want to process
-            if (wfi.getSubmitter() == null) {
-                request.setAttribute("page", SUBMITTER_IS_DELETED_PAGE);
-            } else {
-                request.setAttribute("page", REJECT_PAGE);
-            }
-            // We have pressed reject item, so take the user to a page where they can reject
-            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
-        } else if (request.getParameter(SUBMIT_DECLINE_TASK) != null) {
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, OUTCOME_REJECT);
-
-        } else {
-            //We pressed the leave button so return to our submissions page
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
-        }
-    }
-
-    private void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {
-        //Add the provenance for the accept
-        String now = DCDate.getCurrent().toString();
-
-        // Get user's name + email address
-        String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
-                                                    .getEPersonName(c.getCurrentUser());
-
-        String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
-            + usersName + " on " + now + " (GMT) ";
-
-        // Add to item as a DC field
-        itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",
-                                provDescription);
-        itemService.update(c, wfi.getItem());
-    }
-
-    public ActionResult processRejectPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+    /**
+     * Since original submitter no longer exists, workflow item is permanently deleted
+     */
+    private ActionResult processDelete(Context c, XmlWorkflowItem wfi)
         throws SQLException, AuthorizeException, IOException {
-        if (request.getParameter("submit_reject") != null) {
-            String reason = request.getParameter("reason");
-            if (reason == null || 0 == reason.trim().length()) {
-                request.setAttribute("page", REJECT_PAGE);
-                addErrorField(request, "reason");
-                return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
-            }
-
-            //We have pressed reject, so remove the task the user has & put it back to a workspace item
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
-                                     .sendWorkflowItemBackSubmission(c, wfi, c.getCurrentUser(),
-                                                                     this.getProvenanceStartId(), reason);
-
-
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
-        } else {
-            //Cancel, go back to the main task page
-            request.setAttribute("page", MAIN_PAGE);
-
-            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
-        }
+        EPerson user = c.getCurrentUser();
+        c.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+            .abort(c, wfi, user);
+        ContentServiceFactory.getInstance().getWorkspaceItemService().deleteAll(c, workspaceItem);
+        c.restoreAuthSystemState();
+        return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
     }
 
-    public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
-        if (request.getParameter("submit_delete") != null) {
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
-                    .deleteWorkflowByWorkflowItem(c, wfi, c.getCurrentUser());
-            // Delete and send user back to myDspace page
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
-        } else if (request.getParameter("submit_keep_it") != null) {
-            // Do nothing, just send it back to myDspace page
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
-        } else {
-            //Cancel, go back to the main task page
-            request.setAttribute("page", MAIN_PAGE);
-            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
-        }
+    /**
+     * Selected reviewer declines to review task, then the workflow is aborted and restarted
+     */
+    private ActionResult processDecline(Context c, XmlWorkflowItem wfi)
+        throws SQLException, IOException, AuthorizeException, WorkflowException {
+        c.turnOffAuthorisationSystem();
+        xmlWorkflowService.restartWorkflow(c, wfi, c.getCurrentUser(), this.getProvenanceStartId());
+        c.restoreAuthSystemState();
+        return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
     }
+
 }

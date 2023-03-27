@@ -1076,6 +1076,53 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         return wsi;
     }
 
+    @Override
+    public void restartWorkflow(Context context, XmlWorkflowItem wi, EPerson decliner, String provenance)
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to restart a workflow");
+        }
+        context.turnOffAuthorisationSystem();
+
+        // rejection provenance
+        Item myitem = wi.getItem();
+
+        // Here's what happened
+        String provDescription =
+            provenance + " Declined by " + getEPersonName(decliner) + " on " + DCDate.getCurrent().toString() +
+                " (GMT) ";
+
+        // Add to item as a DC field
+        itemService
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                "description", "provenance", "en", provDescription);
+
+        //Clear any workflow schema related metadata
+        itemService
+            .clearMetadata(context, myitem, WorkflowRequirementsService.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
+
+        itemService.update(context, myitem);
+
+        // remove policy for controller
+        removeUserItemPolicies(context, myitem, decliner);
+        revokeReviewerPolicies(context, myitem);
+
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(context, wi);
+
+        // Because of issue of xmlWorkflowItemService not realising wfi wrapper has been deleted
+        context.commit();
+        wsi = context.reloadEntity(wsi);
+
+        log.info(LogHelper.getHeader(context, "decline_workflow", "workflow_item_id="
+            + wi.getID() + "item_id=" + wi.getItem().getID() + "collection_id=" + wi.getCollection().getID() +
+            "eperson_id=" + decliner.getID()));
+
+        // Restart workflow
+        this.startWithoutNotify(context, wsi);
+        context.restoreAuthSystemState();
+    }
+
     /**
      * Return the workflow item to the workspace of the submitter. The workflow
      * item is removed, and a workspace item created.

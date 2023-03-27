@@ -8,6 +8,7 @@
 package org.dspace.app.requestitem.service;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.requestitem.RequestItem;
@@ -61,6 +62,14 @@ public interface RequestItemService {
      * @return the matching request, or null if not found.
      */
     public RequestItem findByToken(Context context, String token);
+
+    /**
+     * Retrieve a request based on the item.
+     * @param context current DSpace session.
+     * @param item the item to find requests for.
+     * @return the matching requests, or null if not found.
+     */
+    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
 
     /**
      * Save updates to the record. Only accept_request, and decision_date are set-able.

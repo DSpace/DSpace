@@ -163,6 +163,8 @@ public class HttpHeadersInitializer {
 
         }
 
+        httpHeaders.put(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS,
+                        Collections.singletonList(HttpHeaders.ACCEPT_RANGES));
         httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(String.format(CONTENT_DISPOSITION_FORMAT,
                                                                                      disposition,
                                                                                      encodeText(fileName))));

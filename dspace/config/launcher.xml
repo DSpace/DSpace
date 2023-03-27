@@ -290,13 +290,6 @@
         </step>
     </command>
     <command>
-        <name>sub-daily</name>
-        <description>Send daily subscription notices</description>
-        <step>
-            <class>org.dspace.eperson.SubscribeCLITool</class>
-        </step>
-    </command>
-    <command>
         <name>test-email</name>
         <description>Test the DSpace email server settings are OK</description>
         <step>
