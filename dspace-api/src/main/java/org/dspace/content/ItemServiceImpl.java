@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -51,8 +53,15 @@ import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
@@ -93,6 +102,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected CommunityService communityService;
     @Autowired(required = true)
+    protected GroupService groupService;
+    @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
     protected BundleService bundleService;
@@ -104,6 +115,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected InstallItemService installItemService;
+    @Autowired(required = true)
+    protected SearchService searchService;
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
     @Autowired(required = true)
@@ -148,6 +161,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private ResearcherProfileService researcherProfileService;
+    @Autowired(required = true)
+    private RequestItemService requestItemService;
+
+    @Autowired(required = true)
+    protected SubscribeService subscribeService;
 
     protected ItemServiceImpl() {
         super();
@@ -755,7 +773,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         log.info(LogHelper.getHeader(context, "delete_item", "item_id="
             + item.getID()));
-
+        //remove subscription related with it
+        subscribeService.deleteByDspaceObject(context, item);
         // Remove relationships
         for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
@@ -769,6 +788,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // remove version attached to the item
         removeVersion(context, item);
+
+        removeRequest(context, item);
 
         removeOrcidSynchronizationStuff(context, item);
 
@@ -790,6 +811,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Finally remove item row
         itemDAO.delete(context, item);
+    }
+
+    protected void removeRequest(Context context, Item item) throws SQLException {
+        Iterator<RequestItem> requestItems = requestItemService.findByItem(context, item);
+        while (requestItems.hasNext()) {
+            RequestItem requestItem = requestItems.next();
+            requestItemService.delete(context, requestItem);
+        }
     }
 
     @Override
@@ -1063,6 +1092,53 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
+    }
+
+    /**
+     * Finds all Indexed Items where the current user has edit rights. If the user is an Admin,
+     * this is all Indexed Items. Otherwise, it includes those Items where
+     * an indexed "edit" policy lists either the eperson or one of the eperson's groups
+     *
+     * @param context                    DSpace context
+     * @param discoverQuery
+     * @return                           discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    private DiscoverResult retrieveItemsWithEdit(Context context, DiscoverQuery discoverQuery)
+        throws SQLException, SearchServiceException {
+        EPerson currentUser = context.getCurrentUser();
+        if (!authorizeService.isAdmin(context)) {
+            String userId = currentUser != null ? "e" + currentUser.getID().toString() : "e";
+            Stream<String> groupIds = groupService.allMemberGroupsSet(context, currentUser).stream()
+                .map(group -> "g" + group.getID());
+            String query = Stream.concat(Stream.of(userId), groupIds)
+                .collect(Collectors.joining(" OR ", "edit:(", ")"));
+            discoverQuery.addFilterQueries(query);
+        }
+        return searchService.search(context, discoverQuery);
+    }
+
+    @Override
+    public List<Item> findItemsWithEdit(Context context, int offset, int limit)
+        throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        return resp.getIndexableObjects().stream()
+            .map(solrItems -> ((IndexableItem) solrItems).getIndexedObject())
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException {
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableItem.TYPE);
+        DiscoverResult resp = retrieveItemsWithEdit(context, discoverQuery);
+        return (int) resp.getTotalSearchResults();
     }
 
     /**

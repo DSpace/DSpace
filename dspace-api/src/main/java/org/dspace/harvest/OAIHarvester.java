@@ -455,6 +455,7 @@ public class OAIHarvester {
         harvestRow.setHarvestStartTime(startTime);
         harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
         harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
+        harvestRow.setLastHarvested(startTime);
         log.info(
             "Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested "
                 + currentRecord + " items.");
@@ -567,11 +568,7 @@ public class OAIHarvester {
             // Import the actual bitstreams
             if (harvestRow.getHarvestType() == 3) {
                 log.info("Running ORE ingest on: " + item.getHandle());
-
-                List<Bundle> allBundles = item.getBundles();
-                for (Bundle bundle : allBundles) {
-                    itemService.removeBundle(ourContext, item, bundle);
-                }
+                itemService.removeAllBundles(ourContext, item);
                 ORExwalk.ingest(ourContext, item, oreREM, true);
             }
         } else {
