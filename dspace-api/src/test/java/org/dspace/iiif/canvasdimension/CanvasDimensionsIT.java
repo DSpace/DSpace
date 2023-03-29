@@ -353,6 +353,40 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
     }
 
+
+    @Test
+    public void processItemWithJp2File() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create a new Item
+        iiifItem = ItemBuilder.createItem(context, col1)
+                              .withTitle("Test Item")
+                              .withIssueDate("2017-10-17")
+                              .enableIIIF()
+                              .build();
+
+        // Add jp2 image to verify image server call for dimensions
+        InputStream input = this.getClass().getResourceAsStream("cat.jp2");
+        bitstream = BitstreamBuilder
+            .createBitstream(context, iiifItem, input)
+            .withName("Bitstream2.jp2")
+            .withMimeType("image/jp2")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String id = iiifItem.getID().toString();
+
+        execCanvasScript(id);
+
+        assertTrue(bitstream.getMetadata().stream()
+                            .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
+                            .anyMatch(m -> m.getValue().contentEquals("64")));
+        assertTrue(bitstream.getMetadata().stream()
+                            .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_WIDTH))
+                            .anyMatch(m -> m.getValue().contentEquals("64")));
+
+    }
+
     @Test
     public void processParentCommunityWithMaximum() throws Exception {
         context.turnOffAuthorisationSystem();
