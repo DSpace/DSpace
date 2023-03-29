@@ -126,7 +126,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                         "A problem with the database connection occurd while processing DOI " + versionedDOI + ".", ex);
                     throw new RuntimeException("A problem with the database connection occured.", ex);
                 }
-                return DOI.SCHEME + versionedDOI;
+                return versionedDOI;
             }
         }
 
