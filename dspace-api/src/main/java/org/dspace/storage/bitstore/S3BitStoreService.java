@@ -62,6 +62,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class S3BitStoreService extends BaseBitStoreService {
     protected static final String DEFAULT_BUCKET_PREFIX = "dspace-asset-";
+    // Prefix indicating a registered bitstream
+    protected final String REGISTERED_FLAG = "-R";
     /**
      * log4j log
      */
@@ -246,6 +248,10 @@ public class S3BitStoreService extends BaseBitStoreService {
     @Override
     public InputStream get(Bitstream bitstream) throws IOException {
         String key = getFullKey(bitstream.getInternalId());
+        // Strip -R from bitstream key if it's registered
+        if (isRegisteredBitstream(key)) {
+            key = key.substring(REGISTERED_FLAG.length());
+        }
         try {
             S3Object object = s3Service.getObject(new GetObjectRequest(bucketName, key));
             return (object != null) ? object.getObjectContent() : null;
@@ -312,6 +318,10 @@ public class S3BitStoreService extends BaseBitStoreService {
     @Override
     public Map about(Bitstream bitstream, Map attrs) throws IOException {
         String key = getFullKey(bitstream.getInternalId());
+        // If this is a registered bitstream, strip the -R prefix before retrieving
+        if (isRegisteredBitstream(key)) {
+            key = key.substring(REGISTERED_FLAG.length());
+        }
         try {
             ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
             if (objectMetadata != null) {
@@ -410,13 +420,13 @@ public class S3BitStoreService extends BaseBitStoreService {
      * @param sInternalId
      * @return Computed Relative path
      */
-    private String getRelativePath(String sInternalId) {
+    public String getRelativePath(String sInternalId) {
         BitstreamStorageService bitstreamStorageService = StorageServiceFactory.getInstance()
                 .getBitstreamStorageService();
 
         String sIntermediatePath = StringUtils.EMPTY;
         if (bitstreamStorageService.isRegisteredBitstream(sInternalId)) {
-            sInternalId = sInternalId.substring(2);
+            sInternalId = sInternalId.substring(REGISTERED_FLAG.length());
         } else {
             sInternalId = sanitizeIdentifier(sInternalId);
             sIntermediatePath = getIntermediatePath(sInternalId);
@@ -587,4 +597,14 @@ public class S3BitStoreService extends BaseBitStoreService {
         store.get(id);
 */
     }
+
+    /**
+     * Is this a registered bitstream? (not stored via this service originally)
+     * @param internalId
+     * @return
+     */
+    public boolean isRegisteredBitstream(String internalId) {
+        return internalId.startsWith(REGISTERED_FLAG);
+    }
+
 }

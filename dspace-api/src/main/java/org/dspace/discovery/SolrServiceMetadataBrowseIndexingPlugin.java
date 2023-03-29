@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFIXES;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -261,9 +263,9 @@ public class SolrServiceMetadataBrowseIndexingPlugin implements SolrServiceIndex
                         }
                     }
                 }
-
                 for (String facet : distFValues) {
                     document.addField(bi.getDistinctTableName() + "_filter", facet);
+                    document.addField(bi.getDistinctTableName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES, facet);
                 }
                 for (String facet : distFAuths) {
                     document.addField(bi.getDistinctTableName()

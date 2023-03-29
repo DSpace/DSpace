@@ -40,7 +40,7 @@ public class VocabularyEntryDetailsParentLinkRepository extends AbstractDSpaceRe
     @Autowired
     private AuthorityUtils authorityUtils;
 
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("permitAll()")
     public VocabularyEntryDetailsRest getParent(@Nullable HttpServletRequest request, String name,
             @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();

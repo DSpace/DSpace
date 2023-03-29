@@ -11,9 +11,12 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.app.rest.matcher.SupervisionOrderMatcher.matchSuperVisionOrder;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -70,6 +73,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.builder.SupervisionOrderBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -89,6 +93,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.supervision.SupervisionOrder;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -8289,6 +8294,276 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
         assertTrue(date.equals(date2));
+    }
+
+    @Test
+    public void supervisionOrdersLinksTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Collection 1")
+                             .build();
+
+        WorkspaceItem witem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                .withTitle("Workspace Item 1")
+                                .withIssueDate("2022-12-12")
+                                .withAuthor("Eskander, Mohamed")
+                                .withSubject("ExtraEntry")
+                                .grantLicense()
+                                .build();
+
+        Group group =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(admin)
+                        .build();
+
+        SupervisionOrder supervisionOrderOne = SupervisionOrderBuilder
+            .createSupervisionOrder(context, witem.getItem(), group)
+            .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+            .andExpect(jsonPath("$",
+                Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                    "Workspace Item 1", "2022-12-12", "ExtraEntry"))))
+            .andExpect(jsonPath("$._links.supervisionOrders.href", containsString(
+                "/api/submission/workspaceitems/" + witem.getID() + "/supervisionOrders")
+            ));
+    }
+
+    @Test
+    public void supervisionOrdersEndpointTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Collection col1 =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Collection 1")
+                             .build();
+
+        WorkspaceItem witemOne =
+            WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                .withTitle("Test item -- supervision orders")
+                                .withIssueDate("2022-12-12")
+                                .withAuthor("Eskander, Mohamed")
+                                .grantLicense()
+                                .build();
+
+        WorkspaceItem witemTwo =
+            WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                .withTitle("Test item -- no supervision orders")
+                                .withIssueDate("2022-12-12")
+                                .withAuthor("Eskander")
+                                .grantLicense()
+                                .build();
+
+        Group groupA =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(admin)
+                        .build();
+
+        Group groupB =
+            GroupBuilder.createGroup(context)
+                        .withName("group B")
+                        .addMember(eperson)
+                        .build();
+
+        SupervisionOrder supervisionOrderOne = SupervisionOrderBuilder
+            .createSupervisionOrder(context, witemOne.getItem(), groupA)
+            .build();
+
+        SupervisionOrder supervisionOrderTwo = SupervisionOrderBuilder
+            .createSupervisionOrder(context, witemOne.getItem(), groupB)
+            .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // Item's supervision orders endpoint of itemOne by not admin
+        getClient(authToken)
+            .perform(get("/api/submission/workspaceitems/" + witemOne.getID() + "/supervisionOrders"))
+            .andExpect(status().isForbidden());
+
+        // Item's supervision orders endpoint of itemOne by admin
+        getClient(adminToken)
+            .perform(get("/api/submission/workspaceitems/" + witemOne.getID() + "/supervisionOrders"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(2)))
+            .andExpect(jsonPath("$._embedded.supervisionOrders", containsInAnyOrder(
+                matchSuperVisionOrder(supervisionOrderOne),
+                matchSuperVisionOrder(supervisionOrderTwo)
+            )))
+            .andExpect(jsonPath("$._links.self.href", containsString(
+                "/api/submission/workspaceitems/" + witemOne.getID() + "/supervisionOrders")
+            ));
+
+        // Item's supervision orders endpoint of itemTwo by admin
+        getClient(adminToken)
+            .perform(get("/api/submission/workspaceitems/" + witemTwo.getID() + "/supervisionOrders"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(0)))
+            .andExpect(jsonPath("$._embedded.supervisionOrders", empty()))
+            .andExpect(jsonPath("$._links.self.href", containsString(
+                "/api/submission/workspaceitems/" + witemTwo.getID() + "/supervisionOrders")
+            ));
+    }
+
+    @Test
+    public void patchBySupervisorTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("userA@test.com")
+                          .withPassword(password)
+                          .build();
+
+        EPerson userB =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("userB@test.com")
+                          .withPassword(password)
+                          .build();
+
+        EPerson userC =
+            EPersonBuilder.createEPerson(context)
+                          .withCanLogin(true)
+                          .withEmail("userC@test.com")
+                          .withPassword(password)
+                          .build();
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                            .withName("Parent Community")
+                            .build();
+
+        Collection publications =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                             .withName("Publications")
+                             .withEntityType("Publication")
+                             .build();
+
+        Group groupA =
+            GroupBuilder.createGroup(context)
+                        .withName("group A")
+                        .addMember(userA)
+                        .build();
+
+        Group groupB =
+            GroupBuilder.createGroup(context)
+                        .withName("group B")
+                        .addMember(userB)
+                        .build();
+
+        WorkspaceItem witem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, publications)
+                                .withTitle("Workspace Item 1")
+                                .withIssueDate("2017-10-17")
+                                .withSubject("ExtraEntry")
+                                .grantLicense()
+                                .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.restoreAuthSystemState();
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(post("/api/core/supervisionorders/")
+                .param("uuid", witem.getItem().getID().toString())
+                .param("group", groupA.getID().toString())
+                .param("type", "EDITOR")
+                .contentType(contentType))
+            .andExpect(status().isCreated());
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(post("/api/core/supervisionorders/")
+                .param("uuid", witem.getItem().getID().toString())
+                .param("group", groupB.getID().toString())
+                .param("type", "OBSERVER")
+                .contentType(contentType))
+            .andExpect(status().isCreated());
+
+        String authTokenA = getAuthToken(userA.getEmail(), password);
+        String authTokenB = getAuthToken(userB.getEmail(), password);
+        String authTokenC = getAuthToken(userC.getEmail(), password);
+
+        getClient(authTokenC).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isForbidden());
+
+        // a simple patch to update an existent metadata
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
+        String patchBody = getPatchContent(updateTitle);
+
+        getClient(authTokenB).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isForbidden());
+
+        getClient(authTokenA).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.errors").doesNotExist())
+                            .andExpect(jsonPath("$",
+                                // check the new title and untouched values
+                                Matchers.is(WorkspaceItemMatcher
+                                    .matchItemWithTitleAndDateIssuedAndSubject(
+                                        witem,
+                                        "New Title", "2017-10-17",
+                                        "ExtraEntry"))));
+
+        getClient(authTokenA).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.errors").doesNotExist())
+                             .andExpect(jsonPath("$",
+                                 Matchers.is(
+                                     WorkspaceItemMatcher
+                                         .matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem,
+                                             "New Title", "2017-10-17",
+                                             "ExtraEntry")
+                                 )));
+
+        getClient(authTokenB).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.errors").doesNotExist())
+                             .andExpect(jsonPath("$",
+                                 Matchers.is(
+                                     WorkspaceItemMatcher
+                                         .matchItemWithTitleAndDateIssuedAndSubject(
+                                             witem,
+                                             "New Title", "2017-10-17",
+                                             "ExtraEntry")
+                                 )));
     }
 
 }

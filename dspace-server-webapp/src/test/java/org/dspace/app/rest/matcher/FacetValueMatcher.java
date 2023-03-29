@@ -31,6 +31,13 @@ public class FacetValueMatcher {
         );
     }
 
+    public static Matcher<? super Object> entryFacetWithoutSelfLink(String label) {
+        return allOf(
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover"))
+        );
+    }
+
     public static Matcher<? super Object> entryAuthorWithAuthority(String label, String authority, int count) {
         return allOf(
             hasJsonPath("$.authorityKey", is(authority)),
@@ -48,15 +55,20 @@ public class FacetValueMatcher {
             hasJsonPath("$.type", is("discover")),
             hasJsonPath("$.count", is(count)),
             hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
-            hasJsonPath("$._links.search.href", containsString("f.subject=" + label + ",equals"))
+            hasJsonPath("$._links.search.href", containsString(
+                "f.subject=" + urlPathSegmentEscaper().escape(label) + ",equals"))
         );
     }
 
 
-    public static Matcher<? super Object> entrySubject(String label, String authority, int count) {
+    public static Matcher<? super Object> entrySubjectWithAuthority(String label, String authority, int count) {
         return allOf(
             hasJsonPath("$.authorityKey", is(authority)),
-            entrySubject(label, count)
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.subject=" + authority + ",authority"))
         );
     }
 
@@ -90,4 +102,16 @@ public class FacetValueMatcher {
             hasJsonPath("$._links.search.href", containsString(",equals"))
         );
     }
+
+    public static Matcher<? super Object> entrySupervisedBy(String label, String authority, int count) {
+        return allOf(
+            hasJsonPath("$.authorityKey", is(authority)),
+            hasJsonPath("$.count", is(count)),
+            hasJsonPath("$.label", is(label)),
+            hasJsonPath("$.type", is("discover")),
+            hasJsonPath("$._links.search.href", containsString("api/discover/search/objects")),
+            hasJsonPath("$._links.search.href", containsString("f.supervisedBy=" + authority + ",authority"))
+        );
+    }
+
 }

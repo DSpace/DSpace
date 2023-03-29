@@ -397,8 +397,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
                 authorizeService.addPolicy(context, b, Constants.READ, anonymous);
             } else {
-                //- Inherit policies from the source bitstream
-                authorizeService.inheritPolicies(context, source, b);
+                //- replace the policies using the same in the source bitstream
+                authorizeService.replaceAllPolicies(context, source, b);
             }
 
             //do post-processing of the generated bitstream

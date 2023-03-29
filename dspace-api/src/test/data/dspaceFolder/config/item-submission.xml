@@ -143,6 +143,12 @@
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
             <type>sherpaPolicy</type>
         </step-definition>
+
+        <step-definition id="identifiers">
+            <heading>submit.progressbar.identifiers</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
+            <type>identifiers</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -168,6 +174,8 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
+
+            <step id="identifiers"/>
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>

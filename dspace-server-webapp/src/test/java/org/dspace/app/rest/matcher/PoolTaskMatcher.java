@@ -28,7 +28,7 @@ public class PoolTaskMatcher {
     /**
      * Check if the returned json expose all the required links and properties
      * 
-     * @param ptask
+     * @param pTask
      *            the pool task
      * @param step
      *            the step name

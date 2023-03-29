@@ -19,7 +19,6 @@ import org.dspace.core.Context;
  * Not can have one sub-statement only, while and, or, nor, ... can have multiple sub-statements.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class Not implements LogicalStatement {
 

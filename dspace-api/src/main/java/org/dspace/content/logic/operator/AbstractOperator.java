@@ -22,7 +22,6 @@ import org.dspace.core.Context;
  * as a logical result
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public abstract class AbstractOperator implements LogicalStatement {
 

@@ -187,6 +187,7 @@
     <internal>false</internal>
     <extension>jpeg</extension>
     <extension>jpg</extension>
+    <extension>jfif</extension>
   </bitstream-type>
   
   <bitstream-type>
@@ -215,6 +216,15 @@
     <internal>false</internal>
     <extension>tiff</extension>
     <extension>tif</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+      <mimetype>image/jp2</mimetype>
+      <short_description>JPEG2000</short_description>
+      <description>JPEG 2000 Image File Format</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>jp2</extension>
   </bitstream-type>
 
   <bitstream-type>
