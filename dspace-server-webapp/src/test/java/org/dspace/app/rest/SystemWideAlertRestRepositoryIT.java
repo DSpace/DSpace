@@ -9,22 +9,22 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.matcher.DateMatcher.dateMatcher;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.alerts.AllowSessionsEnum;
 import org.dspace.alerts.SystemWideAlert;
 import org.dspace.app.rest.model.SystemWideAlertRest;
@@ -42,11 +42,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findAll method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
 
@@ -58,8 +58,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                  .build();
         context.restoreAuthSystemState();
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
         String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(get("/api/system/systemwidealerts/"))
@@ -69,8 +67,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                    hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                    hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                    hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions().getValue())),
-                                   hasJsonPath("$.countdownTo",
-                                               startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                   hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                    hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                            ),
                            allOf(
@@ -141,11 +138,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findOne method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
         SystemWideAlert systemWideAlert2 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 2")
@@ -156,7 +153,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                  .build();
         context.restoreAuthSystemState();
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -170,7 +166,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlert1.getAllowSessions().getValue())),
                                              hasJsonPath("$.countdownTo",
-                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                                         dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                              )
                                     ));
@@ -183,11 +179,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findOne method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
 
@@ -199,8 +195,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                  .build();
         context.restoreAuthSystemState();
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
         // When the alert is active and the user is not an admin, the user will be able to see the alert
         getClient().perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
                             .andExpect(status().isOk())
@@ -211,7 +205,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlert1.getAllowSessions().getValue())),
                                              hasJsonPath("$.countdownTo",
-                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                                         dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                              )
                                     ));
@@ -228,11 +222,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findOne method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
 
@@ -244,7 +238,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                  .build();
         context.restoreAuthSystemState();
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String authToken = getAuthToken(eperson.getEmail(), password);
 
 
@@ -257,7 +250,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlert1.getAllowSessions().getValue())),
                                              hasJsonPath("$.countdownTo",
-                                                         startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                                         dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                              )
                                     ));
@@ -274,11 +267,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create three alert entries in the db to fully test the findActive search method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
 
@@ -297,8 +290,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                  .build();
         context.restoreAuthSystemState();
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
         getClient().perform(get("/api/system/systemwidealerts/search/active"))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$._embedded.systemwidealerts", containsInAnyOrder(
@@ -307,7 +298,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                     hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                     hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions().getValue())),
                                     hasJsonPath("$.countdownTo",
-                                                startsWith(sdf.format(systemWideAlert1.getCountdownTo()))),
+                                                dateMatcher(dateToNearestSecond)),
                                     hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                     ),
                                     allOf(
@@ -323,9 +314,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createTest() throws Exception {
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
+
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
-        systemWideAlertRest.setCountdownTo(new Date());
+        systemWideAlertRest.setCountdownTo(dateToNearestSecond);
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
@@ -336,7 +329,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         AtomicReference<Integer> idRef = new AtomicReference<>();
 
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         getClient(authToken).perform(post("/api/system/systemwidealerts/")
                                              .content(mapper.writeValueAsBytes(systemWideAlertRest))
                                              .contentType(contentType))
@@ -348,7 +340,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                          hasJsonPath("$.allowSessions",
                                                      is(systemWideAlertRest.getAllowSessions())),
                                          hasJsonPath("$.countdownTo",
-                                                     startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
+                                                     dateMatcher(dateToNearestSecond)),
                                          hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                              )
                                     ))
@@ -363,7 +355,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                             hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
                                             hasJsonPath("$.allowSessions", is(systemWideAlertRest.getAllowSessions())),
                                             hasJsonPath("$.countdownTo",
-                                                        startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
+                                                        dateMatcher(dateToNearestSecond)),
                                             hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                     )
                            ));
@@ -450,10 +442,12 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                 .build();
         context.restoreAuthSystemState();
 
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
+
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setAlertId(systemWideAlert.getID());
         systemWideAlertRest.setMessage("Updated alert test message");
-        systemWideAlertRest.setCountdownTo(new Date());
+        systemWideAlertRest.setCountdownTo(dateToNearestSecond);
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
@@ -462,7 +456,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         String authToken = getAuthToken(admin.getEmail(), password);
 
 
-        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         getClient(authToken).perform(put("/api/system/systemwidealerts/" + systemWideAlert.getID())
                                              .content(mapper.writeValueAsBytes(systemWideAlertRest))
                                              .contentType(contentType))
@@ -474,7 +467,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlertRest.getAllowSessions())),
                                              hasJsonPath("$.countdownTo",
-                                                         startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
+                                                         dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                              )
                                     ));
@@ -487,7 +480,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                             hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
                                             hasJsonPath("$.allowSessions", is(systemWideAlertRest.getAllowSessions())),
                                             hasJsonPath("$.countdownTo",
-                                                        startsWith(sdf.format(systemWideAlertRest.getCountdownTo()))),
+                                                        dateMatcher(dateToNearestSecond)),
                                             hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                     )
                            ));
