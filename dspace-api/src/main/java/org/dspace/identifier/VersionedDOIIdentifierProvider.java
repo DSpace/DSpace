@@ -145,7 +145,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
             log.error("AuthorizationException while creating a new DOI: ", ex);
             throw new IdentifierException(ex);
         }
-        return DOI.SCHEME + doi;
+        return doi.startsWith(DOI.SCHEME) ? doi : DOI.SCHEME + doi;
     }
 
     @Override
