@@ -96,6 +96,8 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
+        } else if (metadataSchemaRest.getNamespace().contains(".")) {
+            throw new UnprocessableEntityException("metadata schema namespace cannot contain dots");
         }
 
         // create

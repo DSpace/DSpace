@@ -253,10 +253,14 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         if (isBlank(metadataFieldRest.getElement())) {
             throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        } else if (metadataFieldRest.getElement().contains(".")) {
+            throw new DSpaceBadRequestException("metadata element (in request body) cannot contain dots");
         }
 
         if (isBlank(metadataFieldRest.getQualifier())) {
             metadataFieldRest.setQualifier(null);
+        } else if (metadataFieldRest.getQualifier().contains(".")) {
+            throw new DSpaceBadRequestException("metadata qualifier (in request body) cannot contain dots");
         }
 
         // create
