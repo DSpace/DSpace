@@ -210,6 +210,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
+        discoverQuery.setSortField("fieldName_sort", DiscoverQuery.SORT_ORDER.asc);
         return discoverQuery;
     }
 
