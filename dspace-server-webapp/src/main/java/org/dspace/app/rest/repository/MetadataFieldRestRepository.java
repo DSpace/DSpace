@@ -135,13 +135,14 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         @Parameter(value = "exactName", required = false) String exactName,
         Pageable pageable) throws SQLException {
         Context context = obtainContext();
+        long totalElements = 0;
 
         List<MetadataField> matchingMetadataFields = new ArrayList<>();
 
         if (StringUtils.isBlank(exactName)) {
             // Find matches in Solr Search core
             DiscoverQuery discoverQuery =
-                this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query);
+                this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query, pageable);
             try {
                 DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
                 for (IndexableObject object : searchResult.getIndexableObjects()) {
@@ -149,6 +150,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                         matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
                     }
                 }
+                totalElements = searchResult.getTotalSearchResults();
             } catch (SearchServiceException e) {
                 log.error("Error while searching with Discovery", e);
                 throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
@@ -163,10 +165,11 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             MetadataField exactMatchingMdField = metadataFieldService.findByString(context, exactName, '.');
             if (exactMatchingMdField != null) {
                 matchingMetadataFields.add(exactMatchingMdField);
+                totalElements = 1;
             }
         }
 
-        return converter.toRestPage(matchingMetadataFields, pageable, utils.obtainProjection());
+        return converter.toRestPage(matchingMetadataFields, pageable, totalElements, utils.obtainProjection());
     }
 
     /**
@@ -182,7 +185,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
      * @throws SQLException If DB error
      */
     private DiscoverQuery createDiscoverQuery(Context context, String schemaName, String elementName,
-        String qualifierName, String query) throws SQLException {
+        String qualifierName, String query, Pageable pageable) throws SQLException {
         List<String> filterQueries = new ArrayList<>();
         if (StringUtils.isNotBlank(query)) {
             if (query.split("\\.").length > 3) {
@@ -211,6 +214,8 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
         discoverQuery.setSortField("fieldName_sort", DiscoverQuery.SORT_ORDER.asc);
+        discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+        discoverQuery.setMaxResults(pageable.getPageSize());
         return discoverQuery;
     }
 
