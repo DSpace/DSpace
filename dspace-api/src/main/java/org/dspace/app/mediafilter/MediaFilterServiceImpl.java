@@ -315,25 +315,25 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
         // check if destination bitstream exists
         Bundle existingBundle = null;
-        Bitstream existingBitstream = null;
+        List<Bitstream> existingBitstreams = new ArrayList<Bitstream>();
         List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
 
         if (bundles.size() > 0) {
-            // only finds the last match (FIXME?)
+            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
             for (Bundle bundle : bundles) {
                 List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 for (Bitstream bitstream : bitstreams) {
                     if (bitstream.getName().trim().equals(newName.trim())) {
                         existingBundle = bundle;
-                        existingBitstream = bitstream;
+                        existingBitstreams.add(bitstream);
                     }
                 }
             }
         }
 
         // if exists and overwrite = false, exit
-        if (!overWrite && (existingBitstream != null)) {
+        if (!overWrite && (existingBitstreams.size() > 0)) {
             if (!isQuiet) {
                 logInfo("SKIPPED: bitstream " + source.getID()
                                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
@@ -408,9 +408,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             logError("!!! OutOfMemoryError !!!");
         }
 
-        // fixme - set date?
         // we are overwriting, so remove old bitstream
-        if (existingBitstream != null) {
+        for (Bitstream existingBitstream : existingBitstreams) {
             bundleService.removeBitstream(context, existingBundle, existingBitstream);
         }
 
