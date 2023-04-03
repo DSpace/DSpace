@@ -147,8 +147,13 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
             throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
         }
 
-        if (metadataSchemaRest == null || isBlank(metadataSchemaRest.getPrefix())) {
-            throw new UnprocessableEntityException("metadata schema name cannot be blank");
+        MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
+        if (metadataSchema == null) {
+            throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
+        }
+
+        if (!Objects.equals(metadataSchemaRest.getPrefix(), metadataSchema.getName())) {
+            throw new UnprocessableEntityException("Metadata schema name cannot be updated.");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
@@ -158,12 +163,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
             throw new UnprocessableEntityException("ID in request doesn't match path ID");
         }
 
-        MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
-        if (metadataSchema == null) {
-            throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
-        }
-
-        metadataSchema.setName(metadataSchemaRest.getPrefix());
         metadataSchema.setNamespace(metadataSchemaRest.getNamespace());
 
         try {

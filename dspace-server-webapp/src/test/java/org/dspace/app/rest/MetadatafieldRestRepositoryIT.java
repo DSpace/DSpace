@@ -832,31 +832,81 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
-                                                          .build();
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setId(metadataField.getID());
+        metadataFieldRest.setElement(ELEMENT);
+        metadataFieldRest.setQualifier(QUALIFIER);
+        metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(put("/api/core/metadatafields/" + metadataField.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void update_elementShouldThrowError() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
+            .build();
 
         context.restoreAuthSystemState();
 
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setId(metadataField.getID());
         metadataFieldRest.setElement(ELEMENT_UPDATED);
+        metadataFieldRest.setQualifier(QUALIFIER);
+        metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(put("/api/core/metadatafields/" + metadataField.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
+                metadataSchema.getName(), ELEMENT, QUALIFIER)
+            ));
+    }
+
+    @Test
+    public void update_qualifierShouldThrowError() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setId(metadataField.getID());
+        metadataFieldRest.setElement(ELEMENT);
         metadataFieldRest.setQualifier(QUALIFIER_UPDATED);
         metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
-                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
-                .contentType(contentType))
-            .andExpect(status().isOk());
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
 
         getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
-                       metadataSchema.getName(), ELEMENT_UPDATED, QUALIFIER_UPDATED)
-                                      ));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
+                metadataSchema.getName(), ELEMENT, QUALIFIER)
+            ));
     }
 
     @Test
-    public void update_checkUpdatedInIndex() throws Exception {
+    public void update_checkNotUpdatedInIndex() throws Exception {
         context.turnOffAuthorisationSystem();
 
         MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
@@ -885,27 +935,27 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(put("/api/core/metadatafields/" + metadataField.getID())
                 .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
-            .andExpect(status().isOk());
+            .andExpect(status().isUnprocessableEntity());
 
-        // new metadata field found in index
+        // new metadata field not found in index
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("schema", metadataSchema.getName())
             .param("element", ELEMENT_UPDATED)
             .param("qualifier", QUALIFIER_UPDATED))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
-                       MetadataFieldMatcher.matchMetadataFieldByKeys(metadataSchema.getName(),
-                           ELEMENT_UPDATED, QUALIFIER_UPDATED))
-                                      ))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        // original metadata field not found in index
+        // original metadata field found in index
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("schema", metadataSchema.getName())
             .param("element", metadataField.getElement())
             .param("qualifier", metadataField.getQualifier()))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataFieldByKeys(metadataSchema.getName(),
+                                                                     ELEMENT, QUALIFIER))
+                   ))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test

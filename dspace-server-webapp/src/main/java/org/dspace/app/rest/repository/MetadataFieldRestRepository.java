@@ -313,21 +313,23 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
         }
 
-        if (metadataFieldRest == null || isBlank(metadataFieldRest.getElement())) {
-            throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        MetadataField metadataField = metadataFieldService.find(context, id);
+        if (metadataField == null) {
+            throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
+        }
+
+        if (!Objects.equals(metadataFieldRest.getElement(), metadataField.getElement())) {
+            throw new UnprocessableEntityException("Metadata element cannot be updated.");
+        }
+
+        if (!Objects.equals(metadataFieldRest.getQualifier(), metadataField.getQualifier())) {
+            throw new UnprocessableEntityException("Metadata qualifier cannot be updated.");
         }
 
         if (!Objects.equals(id, metadataFieldRest.getId())) {
             throw new UnprocessableEntityException("ID in request body doesn't match path ID");
         }
 
-        MetadataField metadataField = metadataFieldService.find(context, id);
-        if (metadataField == null) {
-            throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
-        }
-
-        metadataField.setElement(metadataFieldRest.getElement());
-        metadataField.setQualifier(metadataFieldRest.getQualifier());
         metadataField.setScopeNote(metadataFieldRest.getScopeNote());
 
         try {

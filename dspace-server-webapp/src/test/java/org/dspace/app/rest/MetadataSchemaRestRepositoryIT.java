@@ -202,7 +202,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         MetadataSchemaRest metadataSchemaRest = new MetadataSchemaRest();
         metadataSchemaRest.setId(metadataSchema.getID());
-        metadataSchemaRest.setPrefix(TEST_NAME_UPDATED);
+        metadataSchemaRest.setPrefix(TEST_NAME);
         metadataSchemaRest.setNamespace(TEST_NAMESPACE_UPDATED);
 
         getClient(getAuthToken(admin.getEmail(), password))
@@ -214,7 +214,33 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", MetadataschemaMatcher
-                       .matchEntry(TEST_NAME_UPDATED, TEST_NAMESPACE_UPDATED)));
+                       .matchEntry(TEST_NAME, TEST_NAMESPACE_UPDATED)));
+    }
+
+    @Test
+    public void update_schemaNameShouldThrowError() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, TEST_NAME, TEST_NAMESPACE)
+            .build();
+
+        context.restoreAuthSystemState();
+
+        MetadataSchemaRest metadataSchemaRest = new MetadataSchemaRest();
+        metadataSchemaRest.setId(metadataSchema.getID());
+        metadataSchemaRest.setPrefix(TEST_NAME_UPDATED);
+        metadataSchemaRest.setNamespace(TEST_NAMESPACE_UPDATED);
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(put("/api/core/metadataschemas/" + metadataSchema.getID())
+                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", MetadataschemaMatcher
+                .matchEntry(TEST_NAME, TEST_NAMESPACE)));
     }
 
     @Test
