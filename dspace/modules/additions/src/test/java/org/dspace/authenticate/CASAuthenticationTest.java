@@ -65,17 +65,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
     @Test
     public void authenticate_fails_LdapUserNotFound() throws Exception {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userNotFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return "no_such_user";
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userNotFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -89,6 +93,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         int initialEPersonCount = ePersonService.countTotal(context);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
@@ -101,11 +106,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                     throws SQLException {
                 return false;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -125,17 +133,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         ePersonService.update(context, eperson);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.CERT_REQUIRED",
                 AuthenticationMethod.CERT_REQUIRED, response);
@@ -150,17 +162,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         ePersonService.update(context, eperson);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.BAD_ARGS",
                 AuthenticationMethod.BAD_ARGS, response);
@@ -175,17 +191,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         ePersonService.update(context, eperson);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
@@ -196,6 +216,15 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         String netid = "eperson_that_does_not_exist_yet";
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+
+        // Set up MockLdapService so we can verify that the "registerEPerson"
+        // method was called.
+        MockLdapService mockLdapService = new MockLdapService() {
+            @Override
+            public Ldap queryLdap(String strUid) {
+                return new Ldap(strUid, null);
+            }
+        };
 
         MockCASAuthentication stubCas = new MockCASAuthentication() {
             @Override
@@ -208,18 +237,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                     throws SQLException {
                 return true;
             }
-        };
 
-        // Set up MockLdapService so we can verify that the "registerEPerson"
-        // method was called.
-        MockLdapService mockLdapService = new MockLdapService() {
             @Override
-            public Ldap queryLdap(String strUid) {
-                return new Ldap(strUid, null);
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
             }
         };
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);

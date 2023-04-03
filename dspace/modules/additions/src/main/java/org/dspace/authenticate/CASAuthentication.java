@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -162,6 +163,39 @@ public class CASAuthentication implements AuthenticationMethod {
         return netid;
     }
 
+    /*
+     * This method is provided for testing, so that tests can override the
+     * LdapService implementation.
+     *
+     * @return the LdapService for use in querying LDAP.
+     */
+    protected LdapService createLdapService(Context context) throws NamingException {
+        return new LdapServiceImpl(context);
+    }
+
+    /**
+     * Queries the LDAP service for the given user id, returning null if the
+     * user id is not found.
+     *
+     * @param strUid the uid of the user to look up in LDAP
+     * @return an Ldap object encapsulating the LDAP search results, or null
+     * if the user id is not found.
+     */
+    protected Ldap queryLdap(Context context, String strUid) {
+        try {
+            LdapService ldapService = createLdapService(context);
+
+            try (ldapService) {
+                return ldapService.queryLdap(strUid);
+            }
+        } catch (Exception e) {
+            log.error("Exception querying LDAP service", e);
+        }
+
+        return null;
+    }
+
+
     /**
      * CAS authentication.
      *
@@ -170,17 +204,6 @@ public class CASAuthentication implements AuthenticationMethod {
     @Override
     public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
             throws SQLException {
-        try (LdapService ldap = new LdapServiceImpl(context)) {
-            return authenticate(context, username, password, realm, request, ldap);
-        } catch (Exception e) {
-            log.error("Unexpected exception caught", e);
-        }
-
-        return BAD_ARGS;
-    }
-
-    protected int authenticate(Context context, String username, String password, String realm,
-            HttpServletRequest request, LdapService ldapService) {
         final String ticket = request.getParameter("ticket");
         log.info(getHeader(context, "login", " ticket: " + ticket));
 
@@ -202,7 +225,7 @@ public class CASAuthentication implements AuthenticationMethod {
             }
 
             // Check directory
-            Ldap ldap = ldapService.queryLdap(netid);
+            Ldap ldap = queryLdap(context, netid);
             if (ldap == null) {
                 log.error("Unknown directory id " + netid);
                 return NO_SUCH_USER;
