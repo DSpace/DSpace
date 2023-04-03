@@ -1,8 +1,0 @@
-#!/bin/sh
-
-BINDIR=`dirname $0`
-
-JAVA_OPTS="-Dlog4j.configuration=log4j-app.properties -Ddspace.log.init.disable=true"
-export JAVA_OPTS
-
-$BINDIR/dspace dsrun edu.umd.lib.dspace.app.UpdateStats

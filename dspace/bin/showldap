@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Get the DSPACE/bin directory
-BINDIR=`dirname $0`
-
-$BINDIR/groovy showldap $*
-
