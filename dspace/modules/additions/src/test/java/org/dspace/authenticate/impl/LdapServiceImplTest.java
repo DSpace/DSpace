@@ -59,33 +59,33 @@ public class LdapServiceImplTest extends AbstractUnitTest {
         // otherwise will be persistent (as a Mockito spy) across tests
         ldapService.resetLdapQueryCache();
     }
+}
 
-    /**
-     * Testable implementation of the LdapServiceImpl class that replaces
-     * the LdapServerDelegate with a mock implementation, and allows the
-     * ldapQueryCache to be accessed.
-     */
-    class TestableLdapServiceImpl extends LdapServiceImpl {
-        public TestableLdapServiceImpl(org.dspace.core.Context context) throws NamingException {
-            super(context);
-        }
+/**
+ * Testable implementation of the LdapServiceImpl class that replaces
+ * the LdapServerDelegate with a mock implementation, and allows the
+ * ldapQueryCache to be accessed.
+ */
+class TestableLdapServiceImpl extends LdapServiceImpl {
+    public TestableLdapServiceImpl(org.dspace.core.Context context) throws NamingException {
+        super(context);
+    }
 
-        @Override
-        protected LdapClient createLdapClient(org.dspace.core.Context context) throws NamingException {
-            return mock(LdapServiceImpl.LdapClient.class);
-        }
+    @Override
+    protected LdapClient createLdapClient(org.dspace.core.Context context) throws NamingException {
+        return mock(LdapServiceImpl.LdapClient.class);
+    }
 
-        public LdapClient getClient() {
-            return this.client;
-        }
+    public LdapClient getClient() {
+        return this.client;
+    }
 
-        public Map<String, Ldap> replaceCacheWithSpy() {
-            ldapQueryCache = spy(LdapServiceImpl.ldapQueryCache);
-            return ldapQueryCache;
-        }
+    public Map<String, Ldap> replaceCacheWithSpy() {
+        ldapQueryCache = spy(LdapServiceImpl.ldapQueryCache);
+        return ldapQueryCache;
+    }
 
-        public void resetLdapQueryCache() {
-            ldapQueryCache = null;
-        }
+    public void resetLdapQueryCache() {
+        ldapQueryCache = null;
     }
 }
