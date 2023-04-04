@@ -111,3 +111,51 @@ login filter classes are configured.
 
 All other classes used for CAS/LDAP authentication are in the "additions"
 module.
+
+## CAS Authentication, Impersonated Users and Special Groups
+
+DSpace 7 enables administrators to impersonate users by adding an
+"X-On-Behalf-Of" header to the HTTP request. This header is handled by the
+"org.dspace.app.rest.security.StatelessAuthenticationFilter" class in the
+authetication filter chain (see the
+"org.dspace.app.rest.security.WebSecurityConfiguration" class). The
+"StatelessAuthenticationFilter" class calls the "switchContextUser" method on
+the "org.dspace.core.Context" class, which sets the current user and clears the
+special groups.
+
+The special groups for the impersonated user are populated by the
+"org.dspace.app.rest.security.AnonymousAdditionalAuthorizationFilter" class,
+which despite its configuration as one of the first filters in
+"WebSecurityConfiguration", is actually near the end of the filter chain.
+This is because the "StatelessAuthenticationFilter" which the filter is supposed
+to be "before" hasn't been added yet.
+
+The "AnonymousAdditionalAuthorizationFilter" calls the "getSpecialGroups"
+method of the "AuthenticationServiceImpl" class, which in turn calls the
+"getSpecialGroups" method on each "AuthenticationMethod" implementation,
+including in the "org.dspace.authenticate.CASAuthentication".
+
+Note that the "getSpecialGroups" on the "CASAuthentication" is called for
+*every* HTTP request.
+
+In the normal authentication process, the special groups for a user are
+populated when the request contains a "CAS_LDAP" ("cas.ldap") attribute in
+the request's session. This occurs once as part of the CAS authentication
+process, and the resulting special groups are added to the JWT token for the
+user (and presented on subsequent requests). The LDAP server is queried
+only once during this process.
+
+For impersonated users, the special groups must be retrieved from LDAP, based on
+the "currentUser" of the DSpace context. A single page retrieval by the
+browser may require multiple HTTP requests, so it is impractical to query the
+LDAP server for each request. In order to handle this, the
+"edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl" uses a simple in-memory
+expiring cache to store the result of an LDAP server query for a limited
+period of time, with a default expiration timeout of 5 minutes. This
+limits the number of requests made to the LDAP server for any particular
+impersonated user to one every 5 minutes.
+
+The cache expiration timeout is controlled by the "drum.ldap.cacheTimeout"
+configuration parameter. Note that it is possible to turn off caching by setting
+this value to "0", but that is not recommended as it would result in excessive
+numbers of queries to the campus LDAP server when impersonating users.
