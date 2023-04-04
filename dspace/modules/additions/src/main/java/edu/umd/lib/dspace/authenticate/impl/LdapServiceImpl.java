@@ -15,6 +15,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import edu.umd.lib.dspace.authenticate.LdapService;
+import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.LogHelper;
@@ -23,6 +24,17 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Implementation of the LdapService interface.
+ *
+ * This implementation uses a simple in-memory cache to limit the number of
+ * actual calls made to the LDAP server.
+ *
+ * Caching is needed because when impersonating users, the "queryLdap" method
+ * will be called by CASAuthentication for each HTTP request.
+ *
+ * Ldap entries in the cache expire based on the
+ * <code>drum.ldap.cacheTimeout</code> configuration parameter, which is
+ * the timemout in milliseconds, or 0 for no caching. The default timeout is
+ * 5 minutes.
  */
 public class LdapServiceImpl implements LdapService {
 
@@ -41,6 +53,11 @@ public class LdapServiceImpl implements LdapService {
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
+     * The expiring, in-memory cache. Made protected for use in tests.
+     */
+    protected static volatile PassiveExpiringMap<String, Ldap> ldapQueryCache;
+
+    /**
      * The client for calls to the LDAP server. Made protected for use in
      * tests
      */
@@ -52,6 +69,7 @@ public class LdapServiceImpl implements LdapService {
      */
     public LdapServiceImpl(org.dspace.core.Context context) throws NamingException {
         this.client = createLdapClient(context);
+        initCache();
     }
 
     /**
@@ -68,6 +86,17 @@ public class LdapServiceImpl implements LdapService {
     }
 
     /**
+     * Initializes the in-memory persistent cache for LDAP retrievals.
+     */
+    private static synchronized void initCache() {
+        if (ldapQueryCache == null) {
+            int cacheTimeoutInMillis =
+                configurationService.getIntProperty("drum.ldap.cacheTimeout", 5 * 60 * 1000); // Default is five minutes
+            ldapQueryCache = new PassiveExpiringMap<>(cacheTimeoutInMillis);
+        }
+    }
+
+    /**
      * Queries LDAP for the given username, returning an Ldap object if found,
      * otherwise null is returned.
      *
@@ -77,7 +106,19 @@ public class LdapServiceImpl implements LdapService {
     public Ldap queryLdap(String strUid) {
         try {
             Ldap ldap = null;
-            ldap = client.queryLdapService(strUid);
+
+            synchronized (ldapQueryCache) {
+                if (ldapQueryCache.containsKey(strUid)) {
+                    log.debug("Returning cached LDAP entry for {}", strUid);
+                    return ldapQueryCache.get(strUid);
+                }
+
+                ldap = client.queryLdapService(strUid);
+
+                ldapQueryCache.put(strUid, ldap);
+
+            }
+
             return ldap;
         } catch (NamingException ne) {
             log.error("LDAP NamingException for '" + strUid + "'", ne);
@@ -112,8 +153,15 @@ public class LdapServiceImpl implements LdapService {
         private org.dspace.core.Context context;
         private DirContext ctx;
 
+        /**
+         * Constructs an LdapClient from the given DSpace context.
+         *
+         * @param context the DSpace Context
+         */
         public LdapClient(org.dspace.core.Context context)
                 throws NamingException {
+            this.context = context;
+
             String strUrl = configurationService.getProperty("drum.ldap.url");
             String strBindAuth = configurationService.getProperty("drum.ldap.bind.auth");
             String strBindPassword =  configurationService.getProperty("drum.ldap.bind.password");
@@ -136,8 +184,6 @@ public class LdapServiceImpl implements LdapService {
 
             log.debug("Initializing new LDAP context");
             this.ctx = new InitialDirContext(env);
-
-            this.context = context;
         }
 
         /**
