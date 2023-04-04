@@ -90,12 +90,54 @@ public class CASAuthentication implements AuthenticationMethod {
     }
 
     /**
+     * Returns an Ldap object from the given HttpServletRequest and Context,
+     * or null if no Ldap object is found.
+     *
+     * This method returns an Ldap object when either:
+     *
+     * a) the HttpServlet request contains a CAS_LDAP attribute in the
+     *     request's session (which occurs once as part of the CAS login
+     *     process)
+     *
+     * or
+     *
+     * b) the "isContextSwitched()" method on the DSpace Contet object returns
+     *    true, indicated that a user is being impersonated. Note that this
+     *    method will be called for each request.
+     *
+     * @param context the DSpace context object
+     * @param request the HttpServletRequest being processed
+     * @return an Ldap object derived from the request, or null.
+     */
+    protected Ldap getLdap(Context context, HttpServletRequest request) {
+        if (request.getSession().getAttribute(CAS_LDAP) != null) {
+            return (Ldap) request.getSession().getAttribute(CAS_LDAP);
+        }
+
+        if (context.isContextUserSwitched() && (context.getCurrentUser() != null)) {
+            String impersonatedNetId = context.getCurrentUser().getNetid();
+
+            if (impersonatedNetId != null) {
+                return queryLdap(context, impersonatedNetId);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Groups mapped from Ldap Units
+     *
+     * @param context the DSpace context
+     * @param request the HTTP reqquest
+     * @return a List of Groups representing the "special groups" the user has
+     * access to.
      */
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
         try {
-            Ldap ldap = (Ldap) request.getSession().getAttribute(CAS_LDAP);
+            Ldap ldap = getLdap(context, request);
+
             if (ldap != null) {
                 List<Group> groups = ldap.getGroups(context);
 
@@ -163,7 +205,7 @@ public class CASAuthentication implements AuthenticationMethod {
         return netid;
     }
 
-    /*
+    /**
      * This method is provided for testing, so that tests can override the
      * LdapService implementation.
      *
@@ -194,7 +236,6 @@ public class CASAuthentication implements AuthenticationMethod {
 
         return null;
     }
-
 
     /**
      * CAS authentication.
