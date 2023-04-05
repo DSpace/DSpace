@@ -62,12 +62,24 @@ public class SearchUtils {
         return searchService;
     }
 
+    /**
+     * Retrieves the Discovery Configuration for a null context, prefix and DSpace object.
+     * This will result in returning the default configuration
+     * @return the default configuration
+     */
     public static DiscoveryConfiguration getDiscoveryConfiguration() {
         return getDiscoveryConfiguration(null, null, null);
     }
 
-    public static DiscoveryConfiguration getDiscoveryConfiguration(final Context context,
-                                                                   DSpaceObject dso) {
+    /**
+     * Retrieves the Discovery Configuration with a null prefix for a DSpace object.
+     * @param context
+     *              the dabase context
+     * @param dso
+     *              the DSpace object
+     * @return the Discovery Configuration for the specified DSpace object
+     */
+    public static DiscoveryConfiguration getDiscoveryConfiguration(Context context, DSpaceObject dso) {
         return getDiscoveryConfiguration(context, null, dso);
     }
 
@@ -84,7 +96,7 @@ public class SearchUtils {
      *            the DSpaceObject
      * @return the discovery configuration for the specified scope
      */
-    public static DiscoveryConfiguration getDiscoveryConfiguration(final Context context, String prefix,
+    public static DiscoveryConfiguration getDiscoveryConfiguration(Context context, String prefix,
                                                                    DSpaceObject dso) {
         if (prefix != null) {
             return getDiscoveryConfigurationByName(dso != null ? prefix + "." + dso.getHandle() : prefix);
@@ -161,12 +173,12 @@ public class SearchUtils {
      * Method that retrieves a list of all the configuration objects from the given item
      * A configuration object can be returned for each parent community/collection
      *
-     * @param item the DSpace item
      * @param context   the database context
+     * @param item the DSpace item
      * @return a list of configuration objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item, Context context)
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Context context, Item item)
             throws SQLException {
         List<Collection> collections = item.getCollections();
         return getAllDiscoveryConfigurations(context, null, collections, item);

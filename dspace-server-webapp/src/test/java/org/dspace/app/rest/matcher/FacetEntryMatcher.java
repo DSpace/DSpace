@@ -99,7 +99,7 @@ public class FacetEntryMatcher {
         );
     }
 
-    public static Matcher<? super Object> matchFacet(String name, String facetType, boolean hasNext) {
+    public static Matcher<? super Object> matchFacet(boolean hasNext, String name, String facetType) {
         return allOf(
                 hasJsonPath("$.name", is(name)),
                 hasJsonPath("$.facetType", is(facetType)),
