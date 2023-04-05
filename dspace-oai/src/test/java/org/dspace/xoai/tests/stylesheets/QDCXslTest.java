@@ -7,13 +7,13 @@
  */
 package org.dspace.xoai.tests.stylesheets;
 
-import org.dspace.xoai.tests.support.XmlMatcherBuilder;
-import org.junit.Test;
-
 import static org.dspace.xoai.tests.support.XmlMatcherBuilder.xml;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+
+import org.dspace.xoai.tests.support.XmlMatcherBuilder;
+import org.junit.Test;
 
 public class QDCXslTest extends AbstractXSLTest {
 
@@ -24,11 +24,11 @@ public class QDCXslTest extends AbstractXSLTest {
         assertThat(result, is(qdc().withXPath("//dc:title", equalTo("Test Webpage"))));
     }
 
-    private XmlMatcherBuilder qdc () {
+    private XmlMatcherBuilder qdc() {
         return xml()
-                .withNamespace("dqc", "http://dspace.org/qualifieddc/")
-                .withNamespace("dcterms", "http://purl.org/dc/terms/")
-                .withNamespace("dc", "http://purl.org/dc/elements/1.1/")
-                ;
+            .withNamespace("dqc", "http://dspace.org/qualifieddc/")
+            .withNamespace("dcterms", "http://purl.org/dc/terms/")
+            .withNamespace("dc", "http://purl.org/dc/elements/1.1/")
+            ;
     }
 }

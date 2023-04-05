@@ -8,7 +8,12 @@
 package org.dspace.statistics;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -33,8 +38,7 @@ import org.dspace.statistics.service.SolrLoggerService;
  * @author kevinvandevelde at atmire.com
  * @author ben at atmrie.com
  */
-public class StatisticsLoggingConsumer implements Consumer
-{
+public class StatisticsLoggingConsumer implements Consumer {
 
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -42,8 +46,7 @@ public class StatisticsLoggingConsumer implements Consumer
     private Set<String> toRemoveQueries = null;
 
     @Override
-    public void initialize() throws Exception
-    {
+    public void initialize() throws Exception {
 
     }
 
@@ -51,10 +54,8 @@ public class StatisticsLoggingConsumer implements Consumer
     // TODO: use async threaded consumer as this might require some processing time
     // TODO: we might be able to improve the performance: changing the collection will trigger 4 update commands
     @Override
-    public void consume(Context ctx, Event event) throws Exception
-    {
-        if (toRemoveQueries == null)
-        {
+    public void consume(Context ctx, Event event) throws Exception {
+        if (toRemoveQueries == null) {
             toRemoveQueries = new HashSet<String>();
         }
 
@@ -63,43 +64,37 @@ public class StatisticsLoggingConsumer implements Consumer
         int eventType = event.getEventType();
 
         // Check if we are deleting something
-        if (eventType == Event.DELETE)
-        {
+        if (eventType == Event.DELETE) {
             // First make sure we delete everything for this dso
             String query = "id:" + dsoId + " AND type:" + dsoType;
             toRemoveQueries.add(query);
-        }
-        else if (eventType == Event.MODIFY && dsoType == Constants.ITEM)
-        {
+        } else if (eventType == Event.MODIFY && dsoType == Constants.ITEM) {
             // We have a modified item check for a withdraw/reinstate
-        }
-        else if (eventType == Event.MODIFY_METADATA
-                && event.getSubjectType() == Constants.ITEM)
-        {
+        } else if (eventType == Event.MODIFY_METADATA
+            && event.getSubjectType() == Constants.ITEM) {
             Item item = itemService.find(ctx, event.getSubjectID());
 
             String updateQuery = "id:" + item.getID() + " AND type:"
-                    + item.getType();
+                + item.getType();
             Map<String, List<String>> indexedValues = solrLoggerService.queryField(
-                    updateQuery, null, null);
+                updateQuery, null, null);
 
             // Get all the metadata
             List<String> storageFieldList = new ArrayList<String>();
             List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
 
             solrLoggerService.update(updateQuery, "replace", storageFieldList,
-                    storageValuesList);
+                                     storageValuesList);
 
         }
 
         if (eventType == Event.ADD && dsoType == Constants.COLLECTION
-                && event.getObject(ctx) instanceof Item)
-        {
+            && event.getObject(ctx) instanceof Item) {
             // We are mapping a new item make sure that the owning collection is
             // updated
             Item newItem = (Item) event.getObject(ctx);
             String updateQuery = "id: " + newItem.getID() + " AND type:"
-                    + newItem.getType();
+                + newItem.getType();
 
             List<String> fieldNames = new ArrayList<String>();
             List<List<Object>> valuesList = new ArrayList<List<Object>>();
@@ -117,14 +112,12 @@ public class StatisticsLoggingConsumer implements Consumer
             // Now make sure we also update the communities
             solrLoggerService.update(updateQuery, "addOne", fieldNames, valuesList);
 
-        }
-        else if (eventType == Event.REMOVE && dsoType == Constants.COLLECTION
-                && event.getObject(ctx) instanceof Item)
-        {
+        } else if (eventType == Event.REMOVE && dsoType == Constants.COLLECTION
+            && event.getObject(ctx) instanceof Item) {
             // Unmapping items
             Item newItem = (Item) event.getObject(ctx);
             String updateQuery = "id: " + newItem.getID() + " AND type:"
-                    + newItem.getType();
+                + newItem.getType();
 
             List<String> fieldNames = new ArrayList<String>();
             List<List<Object>> valuesList = new ArrayList<List<Object>>();
@@ -144,13 +137,11 @@ public class StatisticsLoggingConsumer implements Consumer
     }
 
     private List<Object> findOwningCommunities(Context context, UUID collId)
-            throws SQLException
-    {
+        throws SQLException {
         Collection coll = collectionService.find(context, collId);
 
         List<Object> owningComms = new ArrayList<Object>();
-        for (int i = 0; i < coll.getCommunities().size(); i++)
-        {
+        for (int i = 0; i < coll.getCommunities().size(); i++) {
             Community community = coll.getCommunities().get(i);
             findComms(community, owningComms);
         }
@@ -159,14 +150,11 @@ public class StatisticsLoggingConsumer implements Consumer
     }
 
     private void findComms(Community comm, List<Object> parentComms)
-            throws SQLException
-    {
-        if (comm == null)
-        {
+        throws SQLException {
+        if (comm == null) {
             return;
         }
-        if (!parentComms.contains(comm.getID()))
-        {
+        if (!parentComms.contains(comm.getID())) {
             parentComms.add(comm.getID());
         }
         List<Community> parentCommunities = comm.getParentCommunities();
@@ -175,12 +163,9 @@ public class StatisticsLoggingConsumer implements Consumer
     }
 
     @Override
-    public void end(Context ctx) throws Exception
-    {
-        if (toRemoveQueries != null)
-        {
-            for (String query : toRemoveQueries)
-            {
+    public void end(Context ctx) throws Exception {
+        if (toRemoveQueries != null) {
+            for (String query : toRemoveQueries) {
                 solrLoggerService.removeIndex(query);
             }
         }
@@ -189,8 +174,7 @@ public class StatisticsLoggingConsumer implements Consumer
     }
 
     @Override
-    public void finish(Context ctx) throws Exception
-    {
+    public void finish(Context ctx) throws Exception {
     }
 
 }

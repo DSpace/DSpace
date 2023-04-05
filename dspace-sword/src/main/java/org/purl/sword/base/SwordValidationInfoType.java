@@ -8,13 +8,12 @@
 package org.purl.sword.base;
 
 /**
- *
  * @author Neil Taylor
  */
 public enum SwordValidationInfoType {
-   VALID,
-   INFO,
-   WARNING,
-   ERROR;
+    VALID,
+    INFO,
+    WARNING,
+    ERROR;
 
 }

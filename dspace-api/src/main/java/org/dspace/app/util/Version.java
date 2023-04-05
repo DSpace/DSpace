@@ -9,7 +9,6 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,11 +21,15 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *
  * @author mwood
  */
-public class Version
-{
+public class Version {
+
+    /**
+     * Default constructor
+     */
+    private Version() { }
+
     public static void main(String[] argv)
-        throws IOException
-    {
+        throws IOException {
         InputStream propStream;
 
         Properties sys = System.getProperties();
@@ -38,8 +41,7 @@ public class Version
         // SCM revision
         Properties scm = new Properties();
         propStream = Version.class.getResourceAsStream("/scm.properties");
-        if (null != propStream)
-        {
+        if (null != propStream) {
             scm.load(propStream);
         }
         System.out.printf("  SCM revision:  %s\n", scm.get("revision"));
@@ -54,10 +56,9 @@ public class Version
         // UIs used
         List<WebApp> apps = UtilServiceFactory.getInstance().getWebAppService().getApps();
         System.out.println("  Applications:");
-        for (WebApp app : apps)
-        {
+        for (WebApp app : apps) {
             System.out.printf("                %s at %s\n",
-                    app.getAppName(), app.getUrl());
+                              app.getAppName(), app.getUrl());
         }
 
         // Is Discovery available?
@@ -65,8 +66,7 @@ public class Version
         String[] consumers = config.getArrayProperty("event.dispatcher.default.consumers");
         String discoveryStatus = "not enabled.";
         for (String consumer : consumers) {
-            if (consumer.equals("discovery"))
-            {
+            if (consumer.equals("discovery")) {
                 discoveryStatus = "enabled.";
                 break;
             }
@@ -81,8 +81,7 @@ public class Version
         // ant version
         Properties ant = new Properties();
         propStream = Version.class.getResourceAsStream("/ant.properties");
-        if (null != propStream)
-        {
+        if (null != propStream) {
             ant.load(propStream);
         }
         System.out.printf("   Ant version:  %s\n",
@@ -91,8 +90,7 @@ public class Version
         // maven version
         Properties maven = new Properties();
         propStream = Version.class.getResourceAsStream("/maven.properties");
-        if (null != propStream)
-        {
+        if (null != propStream) {
             maven.load(propStream);
         }
         System.out.printf(" Maven version:  %s\n",

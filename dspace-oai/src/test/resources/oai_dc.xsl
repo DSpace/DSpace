@@ -7,7 +7,7 @@
     tree and available online at
 
     http://www.dspace.org/license/
-	Developed by DSpace @ Lyncode <dspace@lyncode.com>
+	Developed by DSpace @ Lyncode (dspace at lyncode dot com)
 	
 	> http://www.openarchives.org/OAI/2.0/oai_dc.xsd
 

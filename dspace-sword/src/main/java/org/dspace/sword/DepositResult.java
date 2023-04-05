@@ -7,8 +7,8 @@
  */
 package org.dspace.sword;
 
-import org.dspace.content.Item;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
 
 /**
  * The DSpace class for representing the results of a deposit
@@ -16,84 +16,82 @@ import org.dspace.content.Bitstream;
  * components required to later build the SWORD response
  *
  * @author Richard Jones
- *
  */
-public class DepositResult
-{
-    /** the handle assigned to the item, if available */
+public class DepositResult {
+    /**
+     * the handle assigned to the item, if available
+     */
     private String handle;
 
-    /** the item created during deposit */
+    /**
+     * the item created during deposit
+     */
     private Item item;
 
-    /** Bitstream created as a result of the deposit */
+    /**
+     * Bitstream created as a result of the deposit
+     */
     private Bitstream bitstream;
 
-    /** The treatment of the item during deposit */
+    /**
+     * The treatment of the item during deposit
+     */
     private String treatment;
 
-    /** The media linkto the created object */
+    /**
+     * The media linkto the created object
+     */
     private String mediaLink;
 
-    public Bitstream getBitstream()
-    {
+    public Bitstream getBitstream() {
         return bitstream;
     }
 
-    public void setBitstream(Bitstream bitstream)
-    {
+    public void setBitstream(Bitstream bitstream) {
         this.bitstream = bitstream;
     }
 
-    public String getTreatment()
-    {
+    public String getTreatment() {
         return treatment;
     }
 
-    public void setTreatment(String treatment)
-    {
+    public void setTreatment(String treatment) {
         this.treatment = treatment;
     }
 
     /**
      * @return the item
      */
-    public Item getItem()
-    {
+    public Item getItem() {
         return item;
     }
 
     /**
      * @param item the item to set
      */
-    public void setItem(Item item)
-    {
+    public void setItem(Item item) {
         this.item = item;
     }
 
     /**
      * @return the handle
      */
-    public String getHandle()
-    {
+    public String getHandle() {
         return handle;
     }
 
     /**
-     * @param handle    the item handle
+     * @param handle the item handle
      */
-    public void setHandle(String handle)
-    {
+    public void setHandle(String handle) {
         this.handle = handle;
     }
 
-    public String getMediaLink()
-    {
+    public String getMediaLink() {
         return mediaLink;
     }
 
-    public void setMediaLink(String mediaLink)
-    {
+    public void setMediaLink(String mediaLink) {
         this.mediaLink = mediaLink;
     }
 }

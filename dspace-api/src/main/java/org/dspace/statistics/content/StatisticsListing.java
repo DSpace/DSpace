@@ -10,20 +10,19 @@ package org.dspace.statistics.content;
 
 /**
  * Encapsulates all data to render the statistics as a list
- * 
+ *
  * @author kevinvandevelde at atmire.com
  * Date: 23-dec-2008
  * Time: 12:38:58
- * 
  */
 public class StatisticsListing extends StatisticsDisplay {
 
-    public StatisticsListing(StatisticsData statisticsData){
+    public StatisticsListing(StatisticsData statisticsData) {
         super(statisticsData);
     }
 
     @Override
-	public String getType() {
-		return "listing";
-	}
+    public String getType() {
+        return "listing";
+    }
 }

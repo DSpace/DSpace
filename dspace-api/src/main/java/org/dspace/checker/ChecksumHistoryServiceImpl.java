@@ -7,6 +7,11 @@
  */
 package org.dspace.checker;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.dspace.checker.dao.ChecksumHistoryDAO;
 import org.dspace.checker.service.ChecksumHistoryService;
 import org.dspace.checker.service.ChecksumResultService;
@@ -14,11 +19,6 @@ import org.dspace.checker.service.MostRecentChecksumService;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Service implementation for the ChecksumHistory object.
@@ -37,8 +37,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     @Autowired(required = true)
     protected ChecksumResultService checksumResultService;
 
-    protected ChecksumHistoryServiceImpl()
-    {
+    protected ChecksumHistoryServiceImpl() {
 
     }
 
@@ -72,8 +71,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         checksumHistory.setChecksumExpected(mostRecentChecksum.getExpectedChecksum());
         checksumHistory.setChecksumCalculated(mostRecentChecksum.getCurrentChecksum());
         ChecksumResult checksumResult;
-        if(mostRecentChecksum.getBitstream().isDeleted())
-        {
+        if (mostRecentChecksum.getBitstream().isDeleted()) {
             checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
         } else {
             checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
@@ -88,17 +86,15 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     /**
      * Delete the history records from the database.
      *
-     * @param context Context
-     * @param retentionDate
-     *            any records older than this data are deleted.
-     * @param checksumResultCode
-     *            result code records must have for them to be deleted.
+     * @param context            Context
+     * @param retentionDate      any records older than this data are deleted.
+     * @param checksumResultCode result code records must have for them to be deleted.
      * @return number of records deleted.
      * @throws SQLException if database error occurs.
      */
     @Override
-    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode) throws SQLException
-    {
+    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode)
+        throws SQLException {
         return checksumHistoryDAO.deleteByDateAndCode(context, retentionDate, checksumResultCode);
     }
 
@@ -114,10 +110,9 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     public int prune(Context context, Map<ChecksumResultCode, Long> interests) throws SQLException {
         long now = System.currentTimeMillis();
         int count = 0;
-        for (Map.Entry<ChecksumResultCode, Long> interest : interests.entrySet())
-        {
+        for (Map.Entry<ChecksumResultCode, Long> interest : interests.entrySet()) {
             count += deleteByDateAndCode(context, new Date(now - interest.getValue().longValue()),
-                    interest.getKey());
+                                         interest.getKey());
         }
         return count;
 

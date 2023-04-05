@@ -55,13 +55,6 @@
         </step>
     </command>
     <command>
-        <name>curate</name>
-        <description>Perform curation tasks on DSpace objects</description>
-        <step>
-            <class>org.dspace.curate.CurationCli</class>
-        </step>
-    </command>
-    <command>
         <name>database</name>
         <description>Perform database tasks like test database connection, migrate/repair database, remove database</description>
         <step>
@@ -97,20 +90,6 @@
         </step>
     </command>
     <command>
-        <name>export</name>
-        <description>Export items or collections</description>
-        <step>
-            <class>org.dspace.app.itemexport.ItemExportCLITool</class>
-        </step>
-    </command>
-    <command>
-        <name>filter-media</name>
-        <description>Perform the media filtering to extract full text from documents and to create thumbnails</description>
-        <step>
-            <class>org.dspace.app.mediafilter.MediaFilterCLITool</class>
-        </step>
-    </command>
-    <command>
         <name>generate-sitemaps</name>
         <description>Generate search engine and html sitemaps</description>
         <step>
@@ -125,24 +104,10 @@
         </step>
     </command>
     <command>
-        <name>import</name>
-        <description>Import items into DSpace</description>
-        <step>
-            <class>org.dspace.app.itemimport.ItemImportCLITool</class>
-        </step>
-    </command>
-    <command>
         <name>index-authority</name>
         <description>Indexes all metadata fields that use solr authority</description>
         <step>
             <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
-        </step>
-    </command>
-    <command>
-        <name>index-discovery</name>
-        <description>Update Discovery Solr Search Index</description>
-        <step>
-            <class>org.dspace.discovery.IndexClient</class>
         </step>
     </command>
     <command>
@@ -157,20 +122,6 @@
         <description>Run the handle server simple setup command</description>
         <step>
             <class>net.handle.server.SimpleSetup</class>
-        </step>
-    </command>
-    <command>
-        <name>metadata-export</name>
-        <description>Export metadata for batch editing</description>
-        <step>
-            <class>org.dspace.app.bulkedit.MetadataExport</class>
-        </step>
-    </command>
-    <command>
-        <name>metadata-import</name>
-        <description>Import metadata after batch editing</description>
-        <step>
-            <class>org.dspace.app.bulkedit.MetadataImport</class>
         </step>
     </command>
     <command>
@@ -216,6 +167,13 @@
         </step>
     </command>
     <command>
+        <name>retry-tracker</name>
+        <description>Retry all failed commits to the OpenURLTracker</description>
+        <step>
+            <class>org.dspace.statistics.export.RetryFailedOpenUrlTracker</class>
+        </step>
+    </command>
+    <command>
         <name>solr-export-statistics</name>
         <description>Export usage statistics data from Solr for back-up purposes</description>
         <step passuserargs="true">
@@ -240,6 +198,13 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>reindex</argument>
+        </step>
+    </command>
+    <command>
+        <name>solr-upgrade-statistics-6x</name>
+        <description>Upgrade statistics (integer to UUID) to DSpace 6.x (or above) compatibility</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrUpgradePre6xStatistics</class>
         </step>
     </command>
     <command>
@@ -311,13 +276,6 @@
         </step>
     </command>
     <command>
-        <name>stats-log-importer-elasticsearch</name>
-        <description>Import solr-format converted log files into Elastic Search statistics</description>
-        <step>
-            <class>org.dspace.statistics.util.StatisticsImporterElasticSearch</class>
-        </step>
-    </command>
-    <command>
         <name>stats-util</name>
         <description>Statistics Client for Maintenance of Solr Statistics Indexes</description>
         <step>
@@ -374,10 +332,24 @@
         </step>
     </command>
     <command>
-        <name>retry-tracker</name>
-        <description>Retry all failed commits to the OpenURLTracker</description>
+        <name>initialize-entities</name>
+        <description>Initialize the entities with a provided xml</description>
         <step>
-            <class>com.atmire.statistics.export.RetryOpenUrlTracker</class>
+            <class>org.dspace.app.util.InitializeEntities</class>
         </step>
-     </command>
+    </command>
+    <command>
+        <name>anonymize-statistics</name>
+        <description>Anonymize the ip values of the solr statistics</description>
+        <step>
+            <class>org.dspace.statistics.AnonymizeStatistics</class>
+        </step>
+    </command>
+    <command>
+        <name>iiif-canvas-dimensions</name>
+        <description>Automatically add the IIIF canvas width/height metadata to Bitstreams of IIIF enabled Items.</description>
+        <step>
+            <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
+        </step>
+    </command>
 </commands>

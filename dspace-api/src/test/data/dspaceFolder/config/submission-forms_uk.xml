@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!DOCTYPE input-forms SYSTEM "submission-forms.dtd">
+
+
+<input-forms>
+
+    <!-- The form-definitions map lays out the detailed definition of all the -->
+    <!-- submission forms. Each separate form set has a unique name as an     -->
+    <!-- attribute. This name matches one of the names in the form-map. One   -->
+    <!-- named form set has the name "traditional"; as this name suggests,    -->
+    <!-- it is the old style and is also the default, which gets used when    -->
+    <!-- the specified collection has no correspondingly-named form set.      -->
+    <!--                                                                      -->
+    <!-- Each form set contains an ordered set of pages; each page defines    -->
+    <!-- one submission metadata entry screen. Each page has an ordered list  -->
+    <!-- of field definitions, Each field definition corresponds to one       -->
+    <!-- metadata entry (a so-called row), which has a DC element name, a     -->
+    <!-- displayed label, a text string prompt which is called a hint, and    -->
+    <!-- an input-type. Each field also may hold optional elements: DC        -->
+    <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
+    <!-- serves as a 'this field is required' flag.                           -->
+
+    <form-definitions>
+        <form name="bitstream-metadata">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Заголовок</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ввести основний заголовок файла.</hint>
+                    <required>Заговолок файла обов'язковий !</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Опис</label>
+                    <input-type>textarea</input-type>
+                    <hint>Ввести опис для цього файла</hint>
+                    <required></required>
+                </field>
+            </row>
+        </form>
+
+        <form name="languagetest">
+            <row>
+                <relation-field>
+                    <relationship-type>isAuthorOfPublication</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Автор</label>
+                    <hint>Додати автора</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>author</dc-qualifier>
+                        <input-type>name</input-type>
+                    </linked-metadata-field>
+                    <required>Потрібно ввести хочаб одного автора!</required>
+                </relation-field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Заголовок</label>
+                    <input-type>onebox</input-type>
+                    <hint>Ввести основний заголовок файла</hint>
+                    <required>Заговолок файла обов'язковий !</required>
+                    <!--    <language value-pairs-name="common_iso_languages">true</language> -->
+                </field>
+            </row>
+     
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Мова</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша). Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A) </hint>
+                    <required></required>
+                </field>
+            </row>
+        </form>
+    </form-definitions>
+
+
+    <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
+    <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+    <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
+    <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+    <!-- Term this set of value-pairs applies.                                 -->
+    <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
+    <!--     language_iso-pairs. The name attribute matches a name             -->
+    <!--     in the form-map, above.                                           -->
+    <!-- A value-pair contains one 'pair' for each value displayed in the list -->
+    <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
+    <!-- element. A UI list displays the displayed-values, but the program     -->
+    <!-- stores the associated stored-values in the database.                  -->
+
+    <form-value-pairs>
+        <!-- default language order: (from dspace 1.2.1)
+             "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
+        -->
+        <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+            <pair>
+                <displayed-value>N/A</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Американська (USA)</displayed-value>
+                <stored-value>en_US</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Англiйська</displayed-value>
+                <stored-value>en</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Iспанська</displayed-value>
+                <stored-value>es</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Нiмецька</displayed-value>
+                <stored-value>de</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Французька</displayed-value>
+                <stored-value>fr</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Iталiйська</displayed-value>
+                <stored-value>it</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Японська</displayed-value>
+                <stored-value>ja</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Китайська</displayed-value>
+                <stored-value>zh</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Португальська</displayed-value>
+                <stored-value>pt</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Турецька</displayed-value>
+                <stored-value>tr</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>(Iнша)</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+        </value-pairs>
+    </form-value-pairs>
+
+</input-forms>

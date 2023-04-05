@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+
+    <!-- ******************** -->
+    <!-- Service declarations -->
+    <!-- ******************** -->
+    <bean class="org.dspace.app.requestitem.RequestItemServiceImpl"/>
+
+    <bean class="org.dspace.app.itemexport.ItemExportServiceImpl"/>
+
+    <!--Ensure that bean remains prototype ! Uses setters to set certain properties such as should is pass through workflow-->
+    <bean class="org.dspace.app.itemimport.ItemImportServiceImpl" scope="prototype"/>
+
+    <!--Ensure that bean remains prototype ! -->
+    <bean class="org.dspace.app.mediafilter.MediaFilterServiceImpl" scope="prototype"/>
+
+    <bean class="org.dspace.app.sfx.SFXFileReaderServiceImpl" scope="prototype"/>
+
+    <bean class="org.dspace.app.util.MetadataExposureServiceImpl"/>
+    <bean class="org.dspace.app.util.OpenSearchServiceImpl"/>
+    <bean class="org.dspace.app.util.WebAppServiceImpl"/>
+    <bean class="org.dspace.app.util.DSpaceObjectUtilsImpl"/>
+
+    <bean class="org.dspace.authenticate.AuthenticationServiceImpl"/>
+
+    <bean class="org.dspace.authorize.AuthorizeServiceImpl"/>
+    <bean class="org.dspace.authorize.ResourcePolicyServiceImpl"/>
+
+    <bean class="org.dspace.authority.AuthorityValueServiceImpl"/>
+    <bean class="org.dspace.authority.AuthorityServiceImpl"/>
+
+    <bean class="org.dspace.checker.ChecksumHistoryServiceImpl"/>
+    <bean class="org.dspace.checker.ChecksumResultServiceImpl"/>
+    <bean class="org.dspace.checker.MostRecentChecksumServiceImpl"/>
+    <bean class="org.dspace.checker.SimpleReporterServiceImpl"/>
+
+    <bean class="org.dspace.content.CollectionServiceImpl"/>
+    <bean class="org.dspace.content.BitstreamFormatServiceImpl"/>
+    <bean class="org.dspace.content.BitstreamServiceImpl"/>
+    <bean class="org.dspace.content.BundleServiceImpl"/>
+    <bean class="org.dspace.content.CommunityServiceImpl"/>
+    <bean class="org.dspace.content.InstallItemServiceImpl"/>
+    <bean class="org.dspace.content.ItemServiceImpl"/>
+    <bean class="org.dspace.content.MetadataDSpaceCsvExportServiceImpl"/>
+    <bean class="org.dspace.content.MetadataFieldServiceImpl"/>
+    <bean class="org.dspace.content.MetadataSchemaServiceImpl"/>
+    <bean class="org.dspace.content.MetadataValueServiceImpl"/>
+    <bean class="org.dspace.content.SiteServiceImpl"/>
+    <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
+    <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipServiceImpl"/>
+    <bean class="org.dspace.content.EntityTypeServiceImpl"/>
+    <bean class="org.dspace.content.EntityServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
+    <bean class="org.dspace.content.FeedbackServiceImpl"/>
+
+    <bean class="org.dspace.scripts.ProcessServiceImpl"/>
+    <bean class="org.dspace.scripts.ScriptServiceImpl"/>
+
+    <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
+    <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
+
+    <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
+
+    <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
+
+    <bean class="org.dspace.handle.hdlresolver.HdlResolverServiceImpl"/>
+
+    <bean class='org.dspace.service.impl.HttpConnectionPoolService'
+          id='solrHttpConnectionPoolService'
+          scope='singleton'
+          autowire-candidate='true'>
+        <constructor-arg name='configPrefix' value='solr'/>
+    </bean>
+
+    <!-- Ensure PluginService is initialized properly via init() method -->
+    <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
+    <bean class="org.dspace.core.LicenseServiceImpl"/>
+    <bean class="org.dspace.core.NewsServiceImpl">
+        <property name="acceptableFilenames">
+            <list>
+                <value>news-top.html</value>
+                <value>news-side.html</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class='org.dspace.curate.XmlWorkflowCuratorServiceImpl'/>
+
+    <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
+
+    <!-- Ensure EmbargoService and AccessStatusService are initialized properly via init() method -->
+    <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
+    <bean class="org.dspace.access.status.AccessStatusServiceImpl" init-method="init"/>
+
+    <bean class="org.dspace.eperson.AccountServiceImpl"/>
+    <bean class="org.dspace.eperson.EPersonServiceImpl"/>
+    <bean class="org.dspace.eperson.GroupServiceImpl"/>
+    <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
+    <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
+    <bean class="org.dspace.eperson.SupervisorServiceImpl"/>
+    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
+    <bean class="org.dspace.event.EventServiceImpl"/>
+
+    <bean class="org.dspace.handle.HandleServiceImpl"/>
+
+    <bean class="org.dspace.harvest.HarvestedCollectionServiceImpl"/>
+    <bean class="org.dspace.harvest.HarvestedItemServiceImpl"/>
+    <bean class="org.dspace.harvest.HarvestSchedulingServiceImpl"/>
+
+    <bean class="org.dspace.identifier.DOIServiceImpl"/>
+
+    <bean class="org.dspace.license.CreativeCommonsServiceImpl"/>
+    <bean class="org.dspace.license.CCLicenseConnectorServiceImpl"/>
+
+    <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
+    <bean id="clientInfoService" class="org.dspace.service.impl.ClientInfoServiceImpl"/>
+
+    <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
+
+    <!-- Configurable workflow services -->
+    <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRoleServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
+
+    <!-- Discovery indexable object services -->
+    <bean class="org.dspace.discovery.indexobject.ClaimedTaskIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.CollectionIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.CommunityIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.ItemIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.PoolTaskIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.WorkflowItemIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
+
+    <!-- OIDC Authentication -->
+    <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
+    <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
+
+    <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
+    <bean class="org.dspace.authorize.RegexPasswordValidator" />
+
+</beans>
+

@@ -1,17 +1,27 @@
 package org.dspace.authenticate;
 
+import static org.dspace.core.LogHelper.getHeader;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import edu.umd.lib.dspace.authenticate.LdapService;
+import edu.umd.lib.dspace.authenticate.impl.Ldap;
+import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
+import edu.yale.its.tp.cas.client.ProxyTicketValidator;
+import edu.yale.its.tp.cas.client.ServiceTicketValidator;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -20,11 +30,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
-import edu.umd.lib.dspace.authenticate.Ldap;
-import edu.umd.lims.util.ErrorHandling;
-import edu.yale.its.tp.cas.client.ProxyTicketValidator;
 // we use the Java CAS client
-import edu.yale.its.tp.cas.client.ServiceTicketValidator;
 
 /**
  * Authenticator for Central Authentication Service (CAS).
@@ -35,32 +41,20 @@ import edu.yale.its.tp.cas.client.ServiceTicketValidator;
  * @version $Revision: 1.0 $
  */
 
-public class CASAuthentication implements AuthenticationMethod
-{
-
+public class CASAuthentication implements AuthenticationMethod {
     /** log4j category */
-    private static Logger log = Logger.getLogger(CASAuthentication.class);
-
-    private static String casServicevalidate; // URL to validate ST tickets
-
-    private static String casProxyvalidate; // URL to validate PT tickets
-
-    // (optional) store user's details for self registration, can get this info
-    // from LDAP, RDBMS etc
-    private String email;
-
-    private String firstName;
-
-    private String lastName;
+    private static final Logger log = LogManager.getLogger(CASAuthentication.class);
 
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-    public final static String CASUSER = "dspace.current.user.ldap";
+    public final static String CAS_AUTHENTICATED = "cas.authenticated";
+    public final static String CAS_LDAP = "cas.ldap";
 
-    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    
+    private final static ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
+
     /**
      * Predicate, can new user automatically create EPerson. Checks
      * configuration value. You'll probably want this to be true to take
@@ -68,29 +62,22 @@ public class CASAuthentication implements AuthenticationMethod
      * are already known by DSpace.
      */
     @Override
-    public boolean canSelfRegister(Context context, HttpServletRequest request,
-            String username) throws SQLException
-    {
-        return configurationService
-                .getBooleanProperty("drum.webui.cas.autoregister");
+    public boolean canSelfRegister(Context context, HttpServletRequest request, String username) throws SQLException {
+        return configurationService.getBooleanProperty("drum.webui.cas.autoregister");
     }
 
     /**
      * Nothing extra to initialize.
      */
     @Override
-    public void initEPerson(Context context, HttpServletRequest request,
-            EPerson eperson) throws SQLException
-    {
+    public void initEPerson(Context context, HttpServletRequest request, EPerson eperson) throws SQLException {
     }
 
     /**
      * We don't use EPerson password so there is no reason to change it.
      */
     @Override
-    public boolean allowSetPassword(Context context,
-            HttpServletRequest request, String username) throws SQLException
-    {
+    public boolean allowSetPassword(Context context, HttpServletRequest request, String username) throws SQLException {
         return false;
     }
 
@@ -98,28 +85,64 @@ public class CASAuthentication implements AuthenticationMethod
      * Returns true, CAS is an implicit method
      */
     @Override
-    public boolean isImplicit()
-    {
+    public boolean isImplicit() {
         return true;
     }
 
     /**
+     * Returns an Ldap object from the given HttpServletRequest and Context,
+     * or null if no Ldap object is found.
+     *
+     * This method returns an Ldap object when either:
+     *
+     * a) the HttpServlet request contains a CAS_LDAP attribute in the
+     *     request's session (which occurs once as part of the CAS login
+     *     process)
+     *
+     * or
+     *
+     * b) the "isContextSwitched()" method on the DSpace Contet object returns
+     *    true, indicated that a user is being impersonated. Note that this
+     *    method will be called for each request.
+     *
+     * @param context the DSpace context object
+     * @param request the HttpServletRequest being processed
+     * @return an Ldap object derived from the request, or null.
+     */
+    protected Ldap getLdap(Context context, HttpServletRequest request) {
+        if (request.getSession().getAttribute(CAS_LDAP) != null) {
+            return (Ldap) request.getSession().getAttribute(CAS_LDAP);
+        }
+
+        if (context.isContextUserSwitched() && (context.getCurrentUser() != null)) {
+            String impersonatedNetId = context.getCurrentUser().getNetid();
+
+            if (impersonatedNetId != null) {
+                return queryLdap(context, impersonatedNetId);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Groups mapped from Ldap Units
+     *
+     * @param context the DSpace context
+     * @param request the HTTP reqquest
+     * @return a List of Groups representing the "special groups" the user has
+     * access to.
      */
     @Override
-    public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
-    {
-        try
-        {
-            Ldap ldap = (Ldap) request.getSession().getAttribute(CASUSER);
-            if (ldap != null)
-            {
-                ldap.setContext(context);
-                List<Group> groups = ldap.getGroups();
+    public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
+        try {
+            Ldap ldap = getLdap(context, request);
+
+            if (ldap != null) {
+                List<Group> groups = ldap.getGroups(context);
 
                 Group CASGroup = groupService.findByName(context, "CAS Authenticated");
-                if (CASGroup == null)
-                {
+                if (CASGroup == null) {
                     throw new Exception(
                             "Unable to find 'CAS Authenticated' group");
                 }
@@ -128,13 +151,90 @@ public class CASAuthentication implements AuthenticationMethod
 
                 return groups;
             }
-        }
-        catch (Exception e)
-        {
-            log.error("Ldap exception: " + ErrorHandling.getStackTrace(e));
+        } catch (Exception e) {
+            log.error("Ldap exception", e);
         }
 
         return new ArrayList<Group>();
+    }
+
+    /**
+     * Returns the "service" URL to send as part of the CAS ticket validation.
+     * This URL must exactly match the "service" URL sent to CAS when
+     * initiating authentication, including any query parametes.
+     *
+     * @param context the current Context
+     * @param request the HttpServletRequest
+     * @return a String representing the service URL to be sent as part of the
+     *         CAS ticket validation.
+     */
+    protected String getServiceUrlFromRequest(Context context, HttpServletRequest request) {
+        String serviceUrl = request.getRequestURL().toString();
+
+        // Append "redirectUrl" query parameter (if present) onto "service"
+        if (request.getParameter("redirectUrl") != null) {
+            serviceUrl = serviceUrl + "?redirectUrl=" + request.getParameter("redirectUrl");
+        }
+
+        return serviceUrl;
+    }
+
+    /**
+     * Returns the username of the authenticated user from the CAS ticket,
+     * or null if the ticket is invalid, or authentication was not
+     * successful.
+     *
+     * @param context the current Context
+     * @param ticket the CAS ticket
+     * @param serviceUrl the service URL to use in validating the ticket
+     * @return the username of the authenticated user, or null.
+     */
+    protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl)
+            throws IOException, ServletException {
+        // Determine CAS validation URL
+        final String validateURL = configurationService.getProperty("drum.cas.validate.url");
+        log.info(getHeader(context, "login", "CAS validate:  " + validateURL));
+        if (validateURL == null) {
+            log.error("No CAS validation URL specified. You need to set property 'drum.cas.validate.url'");
+            return null;
+        }
+
+        // Validate ticket (it is assumed that CAS validator returns the
+        // user network ID)
+        final String netid = validate(serviceUrl, ticket, validateURL);
+        return netid;
+    }
+
+    /**
+     * This method is provided for testing, so that tests can override the
+     * LdapService implementation.
+     *
+     * @return the LdapService for use in querying LDAP.
+     */
+    protected LdapService createLdapService(Context context) throws NamingException {
+        return new LdapServiceImpl(context);
+    }
+
+    /**
+     * Queries the LDAP service for the given user id, returning null if the
+     * user id is not found.
+     *
+     * @param strUid the uid of the user to look up in LDAP
+     * @return an Ldap object encapsulating the LDAP search results, or null
+     * if the user id is not found.
+     */
+    protected Ldap queryLdap(Context context, String strUid) {
+        try {
+            LdapService ldapService = createLdapService(context);
+
+            try (ldapService) {
+                return ldapService.queryLdap(strUid);
+            }
+        } catch (Exception e) {
+            log.error("Exception querying LDAP service", e);
+        }
+
+        return null;
     }
 
     /**
@@ -143,164 +243,82 @@ public class CASAuthentication implements AuthenticationMethod
      * @return One of: SUCCESS, BAD_CREDENTIALS, NO_SUCH_USER, BAD_ARGS
      */
     @Override
-    public int authenticate(Context context, String netid, String password,
-            String realm, HttpServletRequest request) throws SQLException
-    {
+    public int authenticate(Context context, String username, String password, String realm, HttpServletRequest request)
+            throws SQLException {
         final String ticket = request.getParameter("ticket");
-        final String service = request.getRequestURL().toString();
-        log.info(LogManager.getHeader(context, "login", " ticket: " + ticket));
-        log.info(LogManager.getHeader(context, "login", "service: " + service));
+        log.info(getHeader(context, "login", " ticket: " + ticket));
 
-        // administrator override, force login as a CAS user
-        if (netid != null && password != null)
-        {
-            Ldap ldap = null;
-
-            try
-            {
-                ldap = new Ldap(context);
-
-                if (ldap.checkAdmin(password) && ldap.checkUid(netid))
-                {
-
-                    EPerson eperson = ePersonService.findByNetid(context,
-                            netid.toLowerCase());
-
-                    if (eperson != null)
-                    {
-
-                        // Save the ldap object in the session
-                        request.getSession().setAttribute(CASUSER, ldap);
-
-                        log.debug(LogManager.getHeader(
-                                context,
-                                "authenticate",
-                                CASUSER
-                                        + "="
-                                        + request.getSession().getAttribute(
-                                                CASUSER)));
-
-                        // Logged in OK.
-                        context.setCurrentUser(eperson);
-                        log.info(LogManager.getHeader(context, "authenticate",
-                                "type=CAS (admin override)"));
-                        return SUCCESS;
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                log.error("Error checking admin override: "
-                        + ErrorHandling.getStackTrace(ex));
-            }
-            finally
-            {
-                if (ldap != null)
-                    ldap.close();
-            }
-
+        if (ticket == null) {
+            // No CAS ticket
+            log.error("'ticket' from request is null.");
+            return BAD_ARGS;
         }
 
+        final String serviceUrl = getServiceUrlFromRequest(context, request);
+        log.info(getHeader(context, "login", "service: " + serviceUrl));
+
         // CAS ticket
-        if (ticket != null)
-        {
-            try
-            {
-                // Determine CAS validation URL
-                String validate = configurationService
-                        .getProperty("drum.cas.validate.url");
-                log.info(LogManager.getHeader(context, "login",
-                        "CAS validate:  " + validate));
-                if (validate == null)
-                {
-                    throw new ServletException(
-                            "No CAS validation URL specified. You need to set property 'cas.validate.url'");
-                }
+        try {
+            String netid = getNetIdFromCasTicket(context, ticket, serviceUrl);
+            if (netid == null) {
+                log.error("Ticket '" + ticket + "' is not valid. netid is null.");
+                return BAD_ARGS;
+            }
 
-                // Validate ticket (it is assumed that CAS validator returns the
-                // user network ID)
-                netid = validate(service, ticket, validate);
-                if (netid == null)
-                {
-                    throw new ServletException("Ticket '" + ticket
-                            + "' is not valid");
-                }
+            // Check directory
+            Ldap ldap = queryLdap(context, netid);
+            if (ldap == null) {
+                log.error("Unknown directory id " + netid);
+                return NO_SUCH_USER;
+            }
 
-                // Check directory
-                Ldap ldap = new Ldap(context);
-                if (ldap.checkUid(netid))
-                {
-                    ldap.close();
-                }
-                else
-                {
-                    throw new ServletException("Unknown directory id " + netid);
-                }
+            // Save the ldap object in the session
+            request.getSession().setAttribute(CAS_LDAP, ldap);
 
-                // Save the ldap object in the session
-                request.getSession().setAttribute(CASUSER, ldap);
+            log.info("netid = " + netid);
 
-                log.debug(LogManager.getHeader(context, "authenticate", CASUSER
-                        + "=" + request.getSession().getAttribute(CASUSER)));
+            // Locate the eperson in DSpace
+            EPerson eperson = null;
+            try {
+                eperson = ePersonService.findByNetid(context, netid.toLowerCase());
+            } catch (SQLException ignored) {
+                log.warn("ignored SQL exception");
+            }
 
-                // Locate the eperson in DSpace
-                EPerson eperson = null;
-                try
-                {
-                    eperson = ePersonService.findByNetid(context, netid.toLowerCase());
-                }
-                catch (SQLException e)
-                {
-                }
-                // if they entered a netd that matches an eperson and they are
-                // allowed to login
-                if (eperson != null)
-                {
-                    // e-mail address corresponds to active account
-                    if (eperson.getRequireCertificate())
-                    {
-                        // they must use a certificate
-                        return CERT_REQUIRED;
-                    }
-                    else if (!eperson.canLogIn())
-                        return BAD_ARGS;
-
-                    // Logged in OK.
+            // Register New User, if necessary
+            if (eperson == null) {
+                if (canSelfRegister(context, request, netid)) {
+                    eperson = registerEPerson(netid, context, ldap, request);
 
                     context.setCurrentUser(eperson);
-                    log.info(LogManager.getHeader(context, "authenticate",
-                            "type=CAS"));
-                    return SUCCESS;
+                } else {
+                    // No auto-registration for valid netid
+                    log.warn(getHeader(context, "authenticate", "type=netid_but_no_record, cannot auto-register"));
+                    return NO_SUCH_USER;
                 }
-
-                // the user does not exist in DSpace so create an eperson
-                else
-                {
-                    if (canSelfRegister(context, request, netid))
-                    {
-                        eperson = ldap.registerEPerson(netid);
-
-                        context.restoreAuthSystemState();
-                        context.setCurrentUser(eperson);
-                        return SUCCESS;
-                    }
-                    else
-                    {
-                        // No auto-registration for valid netid
-                        log.warn(LogManager
-                                .getHeader(context, "authenticate",
-                                        "type=netid_but_no_record, cannot auto-register"));
-                        return NO_SUCH_USER;
-                    }
-                }
-
             }
-            catch (Exception e)
-            {
-                log.error("Unexpected exception caught", e);
-                // throw new ServletException(e);
+
+            if (eperson == null) {
+                return AuthenticationMethod.NO_SUCH_USER;
             }
+
+            if (eperson.getRequireCertificate()) {
+                // they must use a certificate
+                return CERT_REQUIRED;
+            }
+
+            if (!eperson.canLogIn()) {
+                return BAD_ARGS;
+            }
+
+            // Logged in OK.
+            request.setAttribute(CAS_AUTHENTICATED, true);
+
+            context.setCurrentUser(eperson);
+            log.info(getHeader(context, "authenticate", "type=CAS"));
+            return SUCCESS;
+        } catch (Exception e) {
+            log.error("Unexpected exception caught", e);
         }
         return BAD_ARGS;
     }
@@ -309,110 +327,160 @@ public class CASAuthentication implements AuthenticationMethod
      * Returns the NetID of the owner of the given ticket, or null if the ticket
      * isn't valid.
      *
-     * @param service
-     *            the service ID for the application validating the ticket
-     * @param ticket
-     *            the opaque service ticket (ST) to validate
+     * @param service the service ID for the application validating the ticket
+     * @param ticket  the opaque service ticket (ST) to validate
      */
-    public static String validate(String service, String ticket,
-            String validateURL) throws IOException, ServletException
-    {
+    public static String validate(String service, String ticket, String validateURL)
+            throws IOException, ServletException {
+        ServiceTicketValidator stv;
 
-        ServiceTicketValidator stv = null;
-        String validateUrl = null;
-
-        if (ticket.startsWith("ST"))
-        {
+        if (ticket.startsWith("ST")) {
             stv = new ServiceTicketValidator();
-            validateUrl = casServicevalidate;
-        }
-        else
-        {
+        } else {
             // uPortal uses this
             stv = new ProxyTicketValidator();
-            validateUrl = casProxyvalidate;
         }
 
         stv.setCasValidateUrl(validateURL);
-        stv.setService(java.net.URLEncoder.encode(service));
+        stv.setService(java.net.URLEncoder.encode(service, StandardCharsets.UTF_8));
         stv.setServiceTicket(ticket);
 
-        try
-        {
+        try {
             stv.validate();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Unexpected exception caught", e);
             throw new ServletException(e);
         }
 
-        if (!stv.isAuthenticationSuccesful())
+        if (!stv.isAuthenticationSuccesful()) {
             return null;
-        String netid = stv.getUser();
-
-        return netid;
-
-    }
-
-    /**
-     * Add code here to extract user details email, firstname, lastname from
-     * LDAP or database etc
-     */
-
-    public void registerUser(String netid) throws ClassNotFoundException,
-            SQLException
-    {
-        // add your code here
+        }
+        return stv.getUser();
     }
 
     /*
      * Returns URL to which to redirect to obtain credentials (either password
      * prompt or e.g. HTTPS port for client cert.); null means no redirect.
-     * 
+     *
      * @param context DSpace context, will be modified (ePerson set) upon
      * success.
-     * 
+     *
      * @param request The HTTP request that started this operation, or null if
      * not applicable.
-     * 
+     *
      * @param response The HTTP response from the servlet method.
-     * 
+     *
      * @return fully-qualified URL
      */
     @Override
-    public String loginPageURL(Context context, HttpServletRequest request,
-            HttpServletResponse response)
-    {
+    public String loginPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
+        // Determine the client redirect URL, where to redirect after authenticating.
+        String redirectUrl = null;
+        if (request.getHeader("Referer") != null && StringUtils.isNotBlank(request.getHeader("Referer"))) {
+            redirectUrl = request.getHeader("Referer");
+        } else if (request.getHeader("X-Requested-With") != null
+                && StringUtils.isNotBlank(request.getHeader("X-Requested-With"))) {
+            redirectUrl = request.getHeader("X-Requested-With");
+        }
+
+        // Determine the "service" URL, i.e., the DSpace authentication endpoint
+        // where CAS will send the user after successfully authenticating.
+        // The serviceUrl triggers the CASLoginFilter in order to extract
+        // the user's information, locally authenticate them & then
+        // redirect back to the UI.
+        //
+        // The path for the URL is configured in org.dspace.app.rest.security.WebSecurityConfiguration
+        String serviceUrl = configurationService.getProperty("dspace.server.url") + "/api/authn/cas"
+                + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
+
+        if (serviceUrl.startsWith("https")) {
+            // Ensure that the serviceUrl uses "http", instead of "https".
+            // This is needed for Kubernetes, where HTTPS is handled
+            // by Nginx, and the serviceUrl called after successful CAS
+            // authentication is made to the DSpace endpoint as HTTP.
+            // When validating the CAS ticket, the serviceUrl must exactly
+            // match the serviceUrl returned by the "getServiceUrlFromRequest"
+            // method (which calculates the serviceUrl from the parameters
+            // of the incoming request), including protocol.
+            serviceUrl = serviceUrl.replaceFirst("https", "http");
+        }
+
         // Determine CAS server URL
-        final String authServer = configurationService
-                .getProperty("drum.cas.server.url");
-        final String origUrl = (String) request.getSession().getAttribute(
-                "interrupted.request.url");
-        // final String service = (origUrl != null ? origUrl : request
-        // .getRequestURL().toString());
-        final String service = (origUrl != null ? origUrl : request
-                .getRequestURL().toString()).replace("login", "cas-login");
-        log.info("CAS server:  " + authServer);
+        final String authServer = configurationService.getProperty("drum.cas.server.url");
+
+        log.debug("CAS server:  " + authServer);
+        log.debug("Service URL: " + serviceUrl);
+        log.debug("redirectUrl: " + redirectUrl);
 
         // Redirect to CAS server
-        return response.encodeRedirectURL(authServer + "?service=" + service);
+        String result = response.encodeRedirectURL(authServer + "?service=" + serviceUrl);
+        return result;
     }
 
-    /*
-     * Returns message key for title of the "login" page, to use in a menu
-     * showing the choice of multiple login methods.
-     * 
-     * @param context DSpace context, will be modified (ePerson set) upon
-     * success.
-     * 
-     * @return Message key to look up in i18n message catalog.
-     */
     @Override
-    public String loginPageTitle(Context context)
-    {
-        // return null;
-        return "org.dspace.eperson.CASAuthentication.title";
+    public String getName() {
+        return "cas";
     }
 
+    @Override
+    public boolean isUsed(Context context, HttpServletRequest request) {
+        if (request != null && context.getCurrentUser() != null && request.getAttribute(CAS_AUTHENTICATED) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
+        return false;
+    }
+
+    /**
+     * Registers an EPerson, using the information in the given Ldap object.
+     */
+    protected EPerson registerEPerson(String uid, Context context, Ldap ldap, HttpServletRequest request)
+        throws Exception {
+        // Turn off authorizations to create a new user
+        context.turnOffAuthorisationSystem();
+
+        try {
+            // Create a new eperson
+            EPerson eperson = ePersonService.create(context);
+
+            String strFirstName = ldap.getFirstName();
+            if (strFirstName == null) {
+                strFirstName = "??";
+            }
+
+            String strLastName = ldap.getLastName();
+            if (strLastName == null) {
+                strLastName = "??";
+            }
+
+            String strPhone = ldap.getPhone();
+            if (strPhone == null) {
+                strPhone = "??";
+            }
+
+            eperson.setNetid(uid);
+            eperson.setEmail(uid + "@umd.edu");
+            eperson.setFirstName(context, strFirstName);
+            eperson.setLastName(context, strLastName);
+            ePersonService.setMetadataSingleValue(context, eperson, EPersonService.MD_PHONE, null, strPhone);
+            eperson.setCanLogIn(true);
+            eperson.setRequireCertificate(false);
+
+            AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
+            ePersonService.update(context, eperson);
+            context.dispatchEvents();
+
+            log.info("CASAuthentication::registerEPerson: create_um_eperson eperson_id="
+                     + eperson.getID() + ", uid=" + uid);
+
+            return eperson;
+        } finally {
+            // Turn authorizations back on.
+            context.restoreAuthSystemState();
+        }
+    }
 }

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
 
     <!-- Hibernate 4 Configuration -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" lazy-init="true">
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" lazy-init="true">
         <!-- Load most Hibernate settings from hibernate.cfg.xml -->
         <property name="configLocation" value="file:${dspace.dir}/config/hibernate.cfg.xml"/>
         <!-- Use the dataSource defined in the bean below. This is necessary so that Flyway can initialize
@@ -17,7 +18,7 @@
             <props>
                 <prop key="hibernate.dialect">${db.dialect}</prop>
                 <prop key="hibernate.default_schema">${db.schema}</prop>
-                <prop key='net.sf.ehcache.configurationResourceName'>
+                <prop key='hibernate.javax.cache.uri'>
                     file:${dspace.dir}/config/hibernate-ehcache-config.xml
                 </prop>
             </props>
@@ -43,9 +44,14 @@
         <property name="url" value="${db.url}"/>
         <property name="username" value="${db.username}"/>
         <property name="password" value="${db.password}"/>
+        <property name="initialSize" value="${db.initialsize}"/>
         <property name="maxWaitMillis" value="${db.maxwait}"/>
         <property name="maxIdle" value="${db.maxidle}"/>
+        <property name="minIdle" value="${db.minidle}"/>
         <property name="maxTotal" value="${db.maxconnections}"/>
+        <property name="maxConnLifetimeMillis" value="${db.maxconnlifetime}"/>
+        <property name="removeAbandonedOnBorrow" value="${db.removeabandoned}"/>
+        <property name="removeAbandonedTimeout" value="${db.removeabandonedtimeout}"/>
     </bean>
 
 </beans>

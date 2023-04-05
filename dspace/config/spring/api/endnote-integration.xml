@@ -1,0 +1,52 @@
+ <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="endnoteMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dcTitle" value-ref="endnoteTitleContrib" />
+        <entry key-ref="dcAuthors" value-ref="endnoteAuthorsContrib" />
+        <entry key-ref="dcAbstract" value-ref="endnoteAbstractContrib" />
+		<entry key-ref="dcIssued" value-ref="endnoteIssuedContrib" />
+		<entry key-ref="dcJournal" value-ref="endnoteJournalContrib" />    
+    </util:map>
+
+    <bean id="endnoteJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJournal"/>
+        <property name="key" value="SO" />
+    </bean>
+
+    <bean id="endnoteIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcIssued"/>
+        <property name="key" value="PY" />
+    </bean>
+
+    <bean id="endnoteAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAbstract"/>
+        <property name="key" value="AB" />
+    </bean>
+    
+    <bean id="endnoteAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAuthors"/>
+        <property name="key" value="AU" />
+    </bean>
+    
+    <bean id="endnoteTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcTitle"/>
+        <property name="key" value="TI" />
+    </bean>
+    
+</beans>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="dspaceRunnableThreadExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
+
+
+    <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
+        <property name="description" value="Update Discovery Solr Search Index"/>
+        <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
+    </bean>
+
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportCliScriptConfiguration">
+        <property name="description" value="Import metadata after batch editing" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImportCLI"/>
+    </bean>
+
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportCliScriptConfiguration">
+        <property name="description" value="Export metadata for batch editing"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportCli"/>
+    </bean>
+
+    <bean id="metadata-export-search" class="org.dspace.app.bulkedit.MetadataExportSearchCliScriptConfiguration">
+        <property name="description" value="export metadata from a discovery search" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
+    </bean>
+
+    <bean id="curate"
+          class="org.dspace.curate.CurationCliScriptConfiguration">
+        <property name="description"
+                  value="Curation tasks"/>
+        <property name="dspaceRunnableClass"
+                  value="org.dspace.curate.CurationCli"/>
+    </bean>
+
+    <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
+        <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
+        <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
+    </bean>
+    
+    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionCliScriptConfiguration">
+        <property name="description" value="Delete all the values of the specified metadata field"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
+    </bean>
+
+    <bean id="filter-media" class="org.dspace.app.mediafilter.MediaFilterScriptConfiguration">
+        <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
+    </bean>
+
+    <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
+        <property name="description" value="Update the database status of Items in solr"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
+    </bean>
+
+    <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
+        <property name="description" value="Mocking a script for testing purposes" />
+        <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
+    </bean>
+    
+    <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
+        <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
+        <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
+    </bean>
+
+    <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
+        <property name="description" value="Cleanup all the old processes in the specified state"/>
+        <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
+    </bean>
+
+    <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
+    <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
+        <property name="description" value="Mocking a script for testing purposes" />
+        <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
+    </bean>
+
+    <bean id="import" class="org.dspace.app.itemimport.ItemImportCLIScriptConfiguration" primary="true">
+        <property name="description" value="Batch Import from Simple Archive Format (SAF)" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemimport.ItemImportCLI"/>
+    </bean>
+
+    <bean id="export" class="org.dspace.app.itemexport.ItemExportCLIScriptConfiguration" primary="true">
+        <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExportCLI"/>
+    </bean>
+
+</beans>

@@ -7,21 +7,19 @@
  */
 package org.dspace.rest.common;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.dspace.eperson.EPerson;
-import org.dspace.app.util.Util;
-
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.util.Util;
+import org.dspace.eperson.EPerson;
 
 /**
  * Determine status of REST API - is it running, accessible and without errors?.
  * Find out API version (DSpace major version) and DSpace source version.
  * Find out your authentication status.
- *
  */
 @XmlRootElement(name = "status")
-public class Status
-{
+public class Status {
     private boolean okay;
     private boolean authenticated;
     private String email;
@@ -48,7 +46,7 @@ public class Status
 
     public Status(EPerson eperson) {
         setOkay(true);
-        if(eperson != null) {
+        if (eperson != null) {
             setAuthenticated(true);
             setEmail(eperson.getEmail());
             setFullname(eperson.getFullName());
@@ -58,13 +56,11 @@ public class Status
     }
 
     @JsonProperty("okay")
-    public boolean isOkay()
-    {
+    public boolean isOkay() {
         return this.okay;
     }
 
-    public void setOkay(boolean okay)
-    {
+    public void setOkay(boolean okay) {
         this.okay = okay;
     }
 

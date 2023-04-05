@@ -5,10 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
+
 /**
  * Spring extensions and adaptors for DSpace.
- * 
- * @see org.dspace.utils.DSpace for starting the kernel.
+ *
+ * See {@link org.dspace.utils.DSpace} for starting the kernel.
  */
 
 package org.dspace.servicemanager.spring;

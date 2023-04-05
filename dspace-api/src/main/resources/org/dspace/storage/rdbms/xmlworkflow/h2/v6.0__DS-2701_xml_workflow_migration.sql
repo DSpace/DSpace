@@ -1,0 +1,24 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
+----------------------------------------------------
+-- Database Schema Update for XML/Configurable Workflow (for DSpace 6.0)
+--
+-- This file will automatically create/update your
+-- DSpace Database tables to support XML/Configurable workflows.
+-- However, it does NOT migrate your existing classic
+-- workflows. That step is performed by the corresponding
+-- "data_workflow_migration.sql" script.
+--
+-- This script is called automatically by the following
+-- Flyway Java migration class:
+-- org.dspace.storage.rdbms.xmlworkflow.V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration
+----------------------------------------------------
+--
+-- Nothing here as the H2 in memory database is always a fresh installation
+-- so the xml workflow is already activated in version 5

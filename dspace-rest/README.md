@@ -1,6 +1,8 @@
-#DSpace REST API (Jersey)
+#DSpace REST API (Jersey) - DEPRECATED
 
 A RESTful web services API for DSpace, built using JAX-RS1 JERSEY.
+
+_This REST API has been deprecated and will be removed in v8. Please use the Server API (/server) webapp instead._
 
 ##Getting Started
 This REST API is integrated directly into the DSpace codebase.

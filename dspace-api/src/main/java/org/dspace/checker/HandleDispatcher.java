@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -25,27 +25,33 @@ import org.dspace.handle.service.HandleService;
 /**
  * A BitstreamDispatcher that checks all the bitstreams contained within an
  * item, collection or community referred to by Handle.
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- * 
  */
-public class HandleDispatcher implements BitstreamDispatcher
-{
+public class HandleDispatcher implements BitstreamDispatcher {
 
-    /** Log 4j logger. */
-    private static final Logger LOG = Logger.getLogger(HandleDispatcher.class);
+    /**
+     * Log 4j logger.
+     */
+    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(HandleDispatcher.class);
 
     protected Context context;
 
-    /** Handle to retrieve bitstreams from. */
+    /**
+     * Handle to retrieve bitstreams from.
+     */
     protected String handle = null;
 
-    /** Has the type of object the handle refers to been determined. */
+    /**
+     * Has the type of object the handle refers to been determined.
+     */
     protected boolean init = false;
 
-    /** the delegate to dispatch to. */
+    /**
+     * the delegate to dispatch to.
+     */
     protected IteratorDispatcher delegate = null;
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
@@ -54,38 +60,33 @@ public class HandleDispatcher implements BitstreamDispatcher
     /**
      * Blanked off, no-op constructor.
      */
-    private HandleDispatcher()
-    {
+    private HandleDispatcher() {
     }
 
     /**
      * Main constructor.
-     * 
+     *
      * @param context Context
-     * @param hdl
-     *            the handle to get bitstreams from.
+     * @param hdl     the handle to get bitstreams from.
      */
-    public HandleDispatcher(Context context, String hdl)
-    {
+    public HandleDispatcher(Context context, String hdl) {
         this.context = context;
         handle = hdl;
     }
 
     /**
      * Private initialization routine.
-     * 
+     *
      * @throws SQLException if database error
-     *             if database access fails.
+     *                      if database access fails.
      */
     protected synchronized void init() throws SQLException {
-        if (!init)
-        {
+        if (!init) {
             DSpaceObject dso = handleService.resolveToObject(context, handle);
 
             Iterator<Bitstream> ids = new ArrayList<Bitstream>().iterator();
 
-            switch (dso.getType())
-            {
+            switch (dso.getType()) {
                 case Constants.BITSTREAM:
                     ids = Arrays.asList(((Bitstream) dso)).iterator();
                     break;
@@ -101,6 +102,8 @@ public class HandleDispatcher implements BitstreamDispatcher
                 case Constants.COMMUNITY:
                     ids = bitstreamService.getCommunityBitstreams(context, (org.dspace.content.Community) dso);
                     break;
+                default:
+                    break;
             }
 
             delegate = new IteratorDispatcher(ids);
@@ -110,14 +113,13 @@ public class HandleDispatcher implements BitstreamDispatcher
 
     /**
      * Initializes this dispatcher on first execution.
-     * 
+     *
      * @throws SQLException if database error
      * @see org.dspace.checker.BitstreamDispatcher#next()
      */
     @Override
     public Bitstream next() throws SQLException {
-        if (!init)
-        {
+        if (!init) {
             init();
         }
 

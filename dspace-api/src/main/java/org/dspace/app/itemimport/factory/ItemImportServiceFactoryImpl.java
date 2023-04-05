@@ -11,7 +11,8 @@ import org.dspace.app.itemimport.service.ItemImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the itemimport package, use ItemImportService.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the itemimport package, use ItemImportService.getInstance() to retrieve
+ * an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

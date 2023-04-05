@@ -1,0 +1,152 @@
+{
+  "tests": [
+    {
+      "name": "clear metadata",
+      "patch": [
+        { "op": "replace",
+          "path": "/metadata",
+          "value": {}
+        }
+      ],
+      "expect": {}
+    },
+    {
+      "name": "add first title",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title",
+          "value": [
+            { "value": "title 1" }
+          ]
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1, "place": 0}
+        ]
+      }
+    },
+    {
+      "name": "add second title",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title/-",
+          "value": { "value": "最後のタイトル", "language": "ja_JP" }
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1,"place": 0 },
+          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 ,"place": 1}
+        ]
+      }
+    },
+    {
+      "name": "insert zeroth title",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/metadata/dc.title/0",
+          "value": {
+            "value": "title 0"
+          }
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 ,"place": 2 }
+        ]
+      }
+    },
+    {
+      "name": "move last title up one",
+      "patch": [
+        {
+          "op": "move",
+          "from": "/metadata/dc.title/2",
+          "path": "/metadata/dc.title/1"
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "最後のタイトル", "language": "ja_JP", "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 2 }
+        ]
+      }
+    },
+    {
+      "name": "replace title 2 value and language in two operations",
+      "patch": [
+        {
+          "op": "replace",
+          "path": "/metadata/dc.title/1/value",
+          "value": "title A"
+        },
+        {
+          "op": "replace",
+          "path": "/metadata/dc.title/1/language",
+          "value": "en_US"
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 2 }
+        ]
+      }
+    },
+    {
+      "name": "copy title A to end of list",
+      "patch": [
+        {
+          "op": "copy",
+          "from": "/metadata/dc.title/1",
+          "path": "/metadata/dc.title/-"
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 ,"place": 1 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 2 },
+          { "value": "title A", "language": "en_US", "authority": null, "confidence": -1 ,"place": 3 }
+        ]
+      }
+    },
+    {
+      "name": "remove both title A copies",
+      "patch": [
+        {
+          "op": "remove",
+          "path": "/metadata/dc.title/1"
+        },
+        {
+          "op": "remove",
+          "path": "/metadata/dc.title/2"
+        }
+      ],
+      "expect": {
+        "dc.title": [
+          { "value": "title 0", "language": null, "authority": null, "confidence": -1 ,"place": 0 },
+          { "value": "title 1", "language": null, "authority": null, "confidence": -1 ,"place": 1 }
+        ]
+      }
+    },
+    {
+      "name": "remove all titles",
+      "patch": [
+        {
+          "op": "remove",
+          "path": "/metadata/dc.title"
+        }
+      ],
+      "expect": {}
+    }
+  ]
+}

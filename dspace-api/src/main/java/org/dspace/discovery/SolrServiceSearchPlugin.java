@@ -19,5 +19,14 @@ import org.dspace.core.Context;
  */
 public interface SolrServiceSearchPlugin {
 
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery);
+    /**
+     * Edits the solr query before it is sent to solr by adding additional parameters to it.
+     *
+     * @param context The DSpace Context object.
+     * @param discoveryQuery The discovery query object on which the solr query is based.
+     * @param solrQuery The query that will be sent to solr and which may be edited by this plugin.
+     * @throws SearchServiceException Any checked exception that might happen in this plugin
+     */
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery)
+            throws SearchServiceException;
 }

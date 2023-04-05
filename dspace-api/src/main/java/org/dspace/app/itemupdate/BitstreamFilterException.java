@@ -8,30 +8,27 @@
 package org.dspace.app.itemupdate;
 
 /**
- *    Exception class for BitstreamFilters
- *
+ * Exception class for BitstreamFilters
  */
-public class BitstreamFilterException extends Exception 
-{
-	
-	private static final long serialVersionUID = 1L;
-	
-	public BitstreamFilterException() {}
-        /**
-         * 
-         * @param msg exception message
-         */
-	public BitstreamFilterException(String msg)
-	{
-		super(msg);
-	}
-        /**
-         * 
-         * @param e exception
-         */
-	public BitstreamFilterException(Exception e)
-	{
-		super(e);
-	}
-	
+public class BitstreamFilterException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
+    public BitstreamFilterException() {
+    }
+
+    /**
+     * @param msg exception message
+     */
+    public BitstreamFilterException(String msg) {
+        super(msg);
+    }
+
+    /**
+     * @param e exception
+     */
+    public BitstreamFilterException(Exception e) {
+        super(e);
+    }
+
 }

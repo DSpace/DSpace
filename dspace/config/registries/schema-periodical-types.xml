@@ -1,0 +1,50 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Periodical Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>periodical</name>
+        <namespace>https://schema.org/Periodical</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>creativework</name>
+        <namespace>https://schema.org/CreativeWork</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>creativeworkseries</name>
+        <namespace>https://schema.org/CreativeWorkSeries</namespace>
+    </dc-schema>
+
+    <!--NO EQUIVALENT FOUND
+        - journal.title
+            > NOT FOUND (not great options in direct parent creative work: creativework.about or reativework.mainEntity;
+                option non-direct parent thing.name)
+    -->
+
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>editor</element>
+        <scope_note>Specifies the Person who edited the CreativeWork.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>publisher</element>
+        <scope_note>The publisher of the creative work.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativeworkseries</schema>
+        <element>issn</element>
+        <scope_note>The International Standard Serial Number (ISSN) that identifies this serial publication. You can
+            repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial
+            publication.
+        </scope_note>
+    </dc-type>
+
+</dspace-dc-types>

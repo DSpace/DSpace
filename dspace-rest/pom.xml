@@ -3,22 +3,22 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>6.3-drum-7.1</version>
-    <name>DSpace REST :: API and Implementation</name>
-    <description>DSpace RESTful Web Services API</description>
+    <version>7.4-drum-0-SNAPSHOT</version>
+    <name>DSpace (Deprecated) REST Webapp</name>
+    <description>DSpace RESTful Web Services API. NOTE: this REST API is DEPRECATED.
+        Please consider using the REST API in the dspace-server-webapp instead!</description>
     <url>http://demo.dspace.org</url>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.3-drum-7.1</version>
+        <version>7.4-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring-security.version>3.2.9.RELEASE</spring-security.version>
     </properties>
     <build>
         <plugins>
@@ -35,7 +35,7 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
-                    <!--Exclude license check for XMLUI files which don't need it-->
+                    <!--Exclude license check for third-party files which don't need it-->
                     <excludes>
                         <exclude>**/static/reports/spin.js</exclude>
                         <exclude>**/static/reports/README.md</exclude>
@@ -62,82 +62,36 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>${jersey.version}</version>
-            <exclusions>
-                <!-- Pinned to 2.5.4 below, this is because the current version number includes both 2.5.4 AND 2.5.0 jackson-annotations-->
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-jaxrs-base</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-jaxrs-json-provider</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-module-jaxb-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                    <artifactId>jackson-jaxrs-base</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                    <artifactId>jackson-jaxrs-json-provider</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>jackson-module-jaxb-annotations</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-jaxb</artifactId>
+            <version>${jersey.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-base</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-
-        <!-- Spring 3 dependencies -->
+        <!-- Spring dependencies -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>
- 
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
- 
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
-		
+
         <!-- Jersey + Spring -->
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-spring3</artifactId>
-            <version>2.22.1</version>
+            <artifactId>jersey-spring5</artifactId>
+            <version>${jersey.version}</version>
             <exclusions>
+                <!-- We provide our own version of Spring framework dependencies -->
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring</artifactId>
@@ -161,6 +115,11 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <!-- Newer version provided by jersey-server above -->
+                <exclusion>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -195,29 +154,8 @@
         </dependency>
 
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-
-        <!-- Use DSpace, for now, an older version to minimize spring generated dependency on Discovery -->
-        <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Connecting to DSpace datasource sets a dependency on Postgres DB-->
@@ -232,7 +170,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -241,12 +178,25 @@
             <version>1.2.1</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+	<dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+	</dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
+        </dependency>
+        <dependency>
+           <groupId>junit</groupId>
+           <artifactId>junit</artifactId>
+           <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

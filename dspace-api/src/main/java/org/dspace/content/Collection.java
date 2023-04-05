@@ -7,18 +7,36 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.*;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
-import java.sql.SQLException;
-import java.util.*;
-import org.dspace.authorize.AuthorizeException;
 
 /**
  * Class representing a collection.
@@ -32,44 +50,29 @@ import org.dspace.authorize.AuthorizeException;
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
-@Table(name="collection")
+@Table(name = "collection")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
-{
+public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
 
-    @Column(name="collection_id", insertable = false, updatable = false)
+    @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    /** The logo bitstream */
+    /**
+     * The logo bitstream
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logo_bitstream_id")
     private Bitstream logo;
 
-    /** The item template */
+    /**
+     * The item template
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_item_id")
     private Item template;
-
-    /**
-     * Groups corresponding to workflow steps - NOTE these start from one, so
-     * workflowGroups[0] corresponds to workflow_step_1.
-     */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_1")
-    private Group workflowStep1;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_2")
-    private Group workflowStep2;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workflow_step_3")
-    private Group workflowStep3;
-
 
     @OneToOne
     @JoinColumn(name = "submitter")
@@ -83,43 +86,39 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
-            name = "community2collection",
-            joinColumns = {@JoinColumn(name = "collection_id") },
-            inverseJoinColumns = {@JoinColumn(name = "community_id") }
+        name = "community2collection",
+        joinColumns = {@JoinColumn(name = "collection_id")},
+        inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
-    private Set<Community> communities = new HashSet<>();
+    private final Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
-
-    // Keys for accessing Collection metadata
-    @Transient
-    public static final String COPYRIGHT_TEXT = "copyright_text";
-    @Transient
-    public static final String INTRODUCTORY_TEXT = "introductory_text";
-    @Transient
-    public static final String SHORT_DESCRIPTION = "short_description";
-    @Transient
-    public static final String SIDEBAR_TEXT = "side_bar_text";
-    @Transient
-    public static final String PROVENANCE_TEXT = "provenance_description";
 
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.CollectionService#create(Context, Community)}
      * or
      * {@link org.dspace.content.service.CollectionService#create(Context, Community, String)}
-     *
      */
-    protected Collection()
-    {
+    protected Collection() {
 
     }
 
+    /**
+     * Takes a pre-determined UUID to be passed to the object to allow for the
+     * restoration of previously defined UUID's.
+     *
+     * @param uuid Takes a uuid to be passed to the Pre-Defined UUID Generator
+     */
+    protected Collection(UUID uuid) {
+        this.predefinedUUID = uuid;
+    }
+
     @Override
-    public String getName()
-    {
-        String value = getCollectionService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+    public String getName() {
+        String value = getCollectionService()
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -129,8 +128,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      *
      * @return the logo of the collection, or <code>null</code>
      */
-    public Bitstream getLogo()
-    {
+    public Bitstream getLogo() {
         return logo;
     }
 
@@ -149,10 +147,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * <code>collection_100_submit</code>.
      *
      * @return the default group of submitters, or <code>null</code> if there
-     *         is no default group.
+     * is no default group.
      */
-    public Group getSubmitters()
-    {
+    public Group getSubmitters() {
         return submitters;
     }
 
@@ -178,10 +175,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * <code>collection_100_admin</code>.
      *
      * @return group of administrators, or <code>null</code> if there is no
-     *         default group.
+     * default group.
      */
-    public Group getAdministrators()
-    {
+    public Group getAdministrators() {
         return admins;
     }
 
@@ -190,42 +186,39 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    public Group getWorkflowStep1() {
-        return workflowStep1;
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep1(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 1);
     }
 
-    public Group getWorkflowStep2() {
-        return workflowStep2;
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep2(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 2);
     }
 
-    public Group getWorkflowStep3() {
-        return workflowStep3;
-    }
-
-    void setWorkflowStep1(Group workflowStep1) {
-        this.workflowStep1 = workflowStep1;
-        setModified();
-    }
-
-    void setWorkflowStep2(Group workflowStep2) {
-        this.workflowStep2 = workflowStep2;
-        setModified();
-    }
-
-    void setWorkflowStep3(Group workflowStep3) {
-        this.workflowStep3 = workflowStep3;
-        setModified();
+    // FIXME this should be moved to the collectionService or completely removed, see also
+    // https://jira.duraspace.org/browse/DS-3041
+    public Group getWorkflowStep3(Context context) {
+        return getCollectionService().getWorkflowGroup(context, this, 3);
     }
 
     /**
      * Get the license that users must grant before submitting to this
      * collection.
      *
-     * @return the license for this collection
+     * @return the license for this collection. Never null.
      */
-    public String getLicenseCollection()
-    {
-        return getCollectionService().getMetadata(this, "license");
+    @Nonnull
+    public String getLicenseCollection() {
+        String license = getCollectionService()
+                .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
+        if (null == license) {
+            return "";
+        } else {
+            return license;
+        }
     }
 
     /**
@@ -237,7 +230,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadata(context, this, "license", license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
     }
 
     /**
@@ -249,8 +242,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return the item template, or <code>null</code>
      * @throws SQLException if database error
      */
-    public Item getTemplateItem() throws SQLException
-    {
+    public Item getTemplateItem() throws SQLException {
         return template;
     }
 
@@ -265,11 +257,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return array of <code>Community</code> objects
      * @throws SQLException if database error
      */
-    public List<Community> getCommunities() throws SQLException
-    {
+    public List<Community> getCommunities() throws SQLException {
         // We return a copy because we do not want people to add elements to this collection directly.
         // We return a list to maintain backwards compatibility
-        Community[] output = communities.toArray(new Community[]{});
+        Community[] output = communities.toArray(new Community[] {});
         Arrays.sort(output, new NameAscendingComparator());
         return Arrays.asList(output);
     }
@@ -289,41 +280,34 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Return <code>true</code> if <code>other</code> is the same Collection
      * as this object, <code>false</code> otherwise
      *
-     * @param other
-     *            object to compare to
-     *
+     * @param other object to compare to
      * @return <code>true</code> if object passed in represents the same
-     *         collection as this object
+     * collection as this object
      */
-     @Override
-     public boolean equals(Object other)
-     {
-         if (other == null)
-         {
-             return false;
-         }
-         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
-         if (this.getClass() != objClass)
-         {
-             return false;
-         }
-         final Collection otherCollection = (Collection) other;
-         if (!this.getID().equals(otherCollection.getID() ))
-         {
-             return false;
-         }
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
+        if (this.getClass() != objClass) {
+            return false;
+        }
+        final Collection otherCollection = (Collection) other;
+        if (!this.getID().equals(otherCollection.getID())) {
+            return false;
+        }
 
-         return true;
-     }
+        return true;
+    }
 
-     @Override
-     public int hashCode()
-     {
-         int hash = 5;
-         hash += 71 * hash + getType();
-         hash += 71 * hash + getID().hashCode();
-         return hash;
-     }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash += 71 * hash + getType();
+        hash += 71 * hash + getID().hashCode();
+        return hash;
+    }
 
     /**
      * return type found in Constants
@@ -331,14 +315,12 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @return int Constants.COLLECTION
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.COLLECTION;
     }
 
     public void setWorkflowGroup(Context context, int step, Group g)
-            throws SQLException, AuthorizeException 
-    {
+        throws SQLException, AuthorizeException {
         getCollectionService().setWorkflowGroup(context, this, step, g);
     }
 
@@ -348,10 +330,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     }
 
     private CollectionService getCollectionService() {
-        if(collectionService == null)
-        {
+        if (collectionService == null) {
             collectionService = ContentServiceFactory.getInstance().getCollectionService();
         }
         return collectionService;
     }
+
 }

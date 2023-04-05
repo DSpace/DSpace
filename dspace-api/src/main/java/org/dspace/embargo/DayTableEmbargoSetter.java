@@ -30,39 +30,39 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * All the {@code <terms>} fields should be defined in a 'value-pairs' element,
  * and the field configured as the embargo terms should employ a drop-down using
  * that element in input_forms.xml, if user submission is desired.
- * 
+ *
  * @author Richard Rodgers
  */
-public class DayTableEmbargoSetter extends DefaultEmbargoSetter
-{
+public class DayTableEmbargoSetter extends DefaultEmbargoSetter {
     public DayTableEmbargoSetter() {
         super();
     }
-    
+
     /**
      * Parse the terms into a definite date. Only terms expressions processed
      * are those defined in 'embargo.terms.days' configuration property.
-     * 
+     *
      * @param context the DSpace context
-     * @param item the item to embargo
-     * @param terms the embargo terms
+     * @param item    the item to embargo
+     * @param terms   the embargo terms
      * @return parsed date in DCDate format
      */
     @Override
     public DCDate parseTerms(Context context, Item item, String terms)
         throws SQLException, AuthorizeException {
 
-        String termsOpen = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("embargo.terms.open");
+        String termsOpen = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                .getProperty("embargo.terms.open");
         Properties termProps = getTermProperties();
 
-    	if (terms != null) {
+        if (terms != null) {
             if (termsOpen.equals(terms)) {
                 return EmbargoServiceImpl.FOREVER;
             }
             String days = termProps.getProperty(terms);
             if (days != null && days.length() > 0) {
-                long lift = System.currentTimeMillis() + 
-                           (Long.parseLong(days) * 24 * 60 * 60 * 1000);
+                long lift = System.currentTimeMillis() +
+                    (Long.parseLong(days) * 24 * 60 * 60 * 1000);
                 return new DCDate(new Date(lift));
             }
         }
@@ -71,13 +71,14 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter
 
     /**
      * Get term properties from configuration
+     *
      * @return Properties
      */
-    private Properties getTermProperties()
-    {
+    private Properties getTermProperties() {
         Properties termProps = new Properties();
 
-        String terms[] = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("embargo.terms.days");
+        String terms[] = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                              .getArrayProperty("embargo.terms.days");
 
         if (terms != null) {
             for (String term : terms) {

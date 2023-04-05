@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 
 <!--
-  - dublin-core-types.xml
-  -
-  - Version:  $Revision$
-  -
-  - Date:     $Date$
-  -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
   - registry must be read from the database.
@@ -20,8 +14,6 @@
   -   <scope_note></scope_note>
   - </dc-type>
   -->
-
-<!-- start of XML -->
 
 <dspace-dc-types>
 
@@ -267,6 +259,19 @@
     <element>identifier</element>
     <qualifier>other</qualifier>
     <scope_note>A known identifier type common to a local collection.</scope_note>
+  </dc-type>
+  
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>doi</qualifier>
+  </dc-type>
+  
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>scopus</qualifier>
+    <scope_note>The scopus identifier</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->

@@ -8,23 +8,24 @@
 
 package org.dspace.services.email;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.test.DSpaceAbstractKernelTest;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
 /**
- *
  * @author mwood
  */
 public class EmailServiceImplTest
-        extends DSpaceAbstractKernelTest
-{
+    extends DSpaceAbstractKernelTest {
     private static final String USERNAME = "auser";
     private static final String PASSWORD = "apassword";
 
@@ -57,8 +58,7 @@ public class EmailServiceImplTest
      */
     @Test
     public void testGetSession()
-            throws MessagingException
-    {
+        throws MessagingException {
         System.out.println("getSession");
         Session session;
         EmailService instance = getService(EmailServiceImpl.class);
@@ -66,17 +66,47 @@ public class EmailServiceImplTest
         // Try to get a Session
         session = instance.getSession();
         assertNotNull(" getSession returned null", session);
+        assertNull(" getSession returned authenticated session",
+                session.getProperties().getProperty("mail.smtp.auth"));
     }
 
     private static final String CFG_USERNAME = "mail.server.username";
     private static final String CFG_PASSWORD = "mail.server.password";
 
     /**
+     * Test of testGetSession method, of class EmailServiceImpl when an smtp
+     * username is provided.
+     */
+    @Test
+    public void testGetAuthenticatedInstance() {
+        System.out.println("getSession");
+        ConfigurationService cfg = getKernel().getConfigurationService();
+
+        // Save existing values.
+        String oldUsername = cfg.getProperty(CFG_USERNAME);
+        String oldPassword = cfg.getProperty(CFG_PASSWORD);
+
+        // Set known values.
+        cfg.setProperty(CFG_USERNAME, USERNAME);
+        cfg.setProperty(CFG_PASSWORD, PASSWORD);
+
+        EmailServiceImpl instance = (EmailServiceImpl) getService(EmailServiceImpl.class);
+        instance.reset();
+        assertNotNull(" getSession returned null", instance);
+        assertEquals(" authenticated session ", "true",
+                instance.getSession().getProperties().getProperty("mail.smtp.auth"));
+
+        // Restore old values, if any.
+        cfg.setProperty(CFG_USERNAME, oldUsername);
+        cfg.setProperty(CFG_PASSWORD, oldPassword);
+        instance.reset();
+    }
+
+    /**
      * Test of getPasswordAuthentication method, of class EmailServiceImpl.
      */
     @Test
-    public void testGetPasswordAuthentication()
-    {
+    public void testGetPasswordAuthentication() {
         System.out.println("getPasswordAuthentication");
         ConfigurationService cfg = getKernel().getConfigurationService();
 

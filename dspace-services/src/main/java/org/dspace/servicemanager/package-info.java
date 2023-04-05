@@ -5,8 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
+
 /**
- * Register, configure, manipulate services.
+ * Register, configure, manipulate, locate services.
+ * See {@link DSpaceServiceManager} for a starting point.
  */
 
 package org.dspace.servicemanager;

@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2019//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_190101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" Owner="NLM">
+        <PMID Version="1">15117179</PMID>
+        <DateCompleted>
+            <Year>2005</Year>
+            <Month>02</Month>
+            <Day>15</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2006</Year>
+            <Month>11</Month>
+            <Day>15</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0003-2700</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>76</Volume>
+                    <Issue>9</Issue>
+                    <PubDate>
+                        <Year>2004</Year>
+                        <Month>May</Month>
+                        <Day>01</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Analytical chemistry</Title>
+                <ISOAbbreviation>Anal. Chem.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Multistep microreactions with proteins using electrocapture technology.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>2425-9</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>A method to perform multistep reactions by means of electroimmobilization of a target molecule in a microflow stream is presented. A target protein is captured by the opposing effects between the hydrodynamic and electric forces, after which another medium is injected into the system. The second medium carries enzymes or other reagents, which are brought into contact with the target protein and react. The immobilization is reversed by disconnecting the electric field, upon which products are collected at the outlet of the device for analysis. On-line reduction, alkylation, and trypsin digestion of proteins is demonstrated and was monitored by MALDI mass spectrometry.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Astorga-Wells</LastName>
+                    <ForeName>Juan</ForeName>
+                    <Initials>J</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Medical Biochemistry and Biophysics, Karolinska Institutet, SE-171 77 Stockholm, Sweden.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Bergman</LastName>
+                    <ForeName>Tomas</ForeName>
+                    <Initials>T</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Jörnvall</LastName>
+                    <ForeName>Hans</ForeName>
+                    <Initials>H</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+                <PublicationType UI="D013485">Research Support, Non-U.S. Gov't</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>Anal Chem</MedlineTA>
+            <NlmUniqueID>0370536</NlmUniqueID>
+            <ISSNLinking>0003-2700</ISSNLinking>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance UI="D011506">Proteins</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>EC 3.4.21.4</RegistryNumber>
+                <NameOfSubstance UI="D014357">Trypsin</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D000818" MajorTopicYN="N">Animals</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D002417" MajorTopicYN="N">Cattle</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D004563" MajorTopicYN="N">Electrochemistry</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006736" MajorTopicYN="N">Horses</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D044085" MajorTopicYN="N">Microfluidics</DescriptorName>
+                <QualifierName UI="Q000295" MajorTopicYN="N">instrumentation</QualifierName>
+                <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D010449" MajorTopicYN="N">Peptide Mapping</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D011506" MajorTopicYN="N">Proteins</DescriptorName>
+                <QualifierName UI="Q000032" MajorTopicYN="Y">analysis</QualifierName>
+                <QualifierName UI="Q000737" MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D019032" MajorTopicYN="N">Spectrometry, Mass, Matrix-Assisted Laser Desorption-Ionization</DescriptorName>
+                <QualifierName UI="Q000379" MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D014357" MajorTopicYN="N">Trypsin</DescriptorName>
+                <QualifierName UI="Q000737" MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2004</Year>
+                <Month>5</Month>
+                <Day>1</Day>
+                <Hour>5</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2005</Year>
+                <Month>2</Month>
+                <Day>16</Day>
+                <Hour>9</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2004</Year>
+                <Month>5</Month>
+                <Day>1</Day>
+                <Hour>5</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">15117179</ArticleId>
+            <ArticleId IdType="doi">10.1021/ac0354342</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+</PubmedArticleSet>

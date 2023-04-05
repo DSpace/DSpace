@@ -7,39 +7,41 @@
  */
 package org.dspace.content;
 
-import mockit.NonStrictExpectations;
-import org.apache.log4j.Logger;
-import org.dspace.AbstractUnitTest;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.*;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import org.apache.logging.log4j.Logger;
+import org.dspace.AbstractUnitTest;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.InstallItemService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Unit Tests for class InstallItem
+ *
  * @author pvillega
  */
-public class InstallItemTest extends AbstractUnitTest
-{
+public class InstallItemTest extends AbstractUnitTest {
 
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
@@ -51,28 +53,28 @@ public class InstallItemTest extends AbstractUnitTest
     private Collection collection;
     private Community owningCommunity;
 
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(InstallItemTest.class);
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(InstallItemTest.class);
 
-    /** Used to check/verify thrown exceptions in below tests **/
+    /**
+     * Used to check/verify thrown exceptions in below tests
+     **/
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
 
-
     @Before
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
         try {
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
             context.restoreAuthSystemState();
-        }
-        catch (SQLException | AuthorizeException ex)
-        {
+        } catch (SQLException | AuthorizeException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
@@ -87,8 +89,7 @@ public class InstallItemTest extends AbstractUnitTest
      */
     @After
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         try {
             context.turnOffAuthorisationSystem();
             communityService.delete(context, owningCommunity);
@@ -106,8 +107,7 @@ public class InstallItemTest extends AbstractUnitTest
      * Test of installItem method, of class InstallItem.
      */
     @Test
-    public void testInstallItem_Context_InProgressSubmission() throws Exception 
-    {
+    public void testInstallItem_Context_InProgressSubmission() throws Exception {
         context.turnOffAuthorisationSystem();
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
@@ -120,12 +120,11 @@ public class InstallItemTest extends AbstractUnitTest
      * Test of installItem method (with a valid handle), of class InstallItem.
      */
     @Test
-    public void testInstallItem_validHandle() throws Exception
-    {
+    public void testInstallItem_validHandle() throws Exception {
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
-      
+
         //Test assigning a specified handle to an item
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
         Item result = installItemService.installItem(context, is, handle);
@@ -137,30 +136,23 @@ public class InstallItemTest extends AbstractUnitTest
     /**
      * Test of installItem method (with an invalid handle), of class InstallItem.
      */
-    @Test
-    public void testInstallItem_invalidHandle() throws Exception
-    {
-        //Default to Full-Admin rights
-        new NonStrictExpectations(authorizeService.getClass())
-        {{
-            // Deny Community ADD perms
-                authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                    Constants.ADD); result = false;
-            // Allow full Admin perms
-                authorizeService.isAdmin((Context) any); result = true;
-                authorizeService.isAdmin((Context) any, (EPerson) any); result = true;
-        }};
+    @Test(expected = IllegalStateException.class)
+    public void testInstallItem_invalidHandle() throws Exception {
+        // create two items for tests
+        context.turnOffAuthorisationSystem();
+        try {
+            WorkspaceItem is = workspaceItemService.create(context, collection, false);
+            WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
 
-        String handle = "123456789/56789";
-        WorkspaceItem is = workspaceItemService.create(context, collection, false);
-        WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
-        
-        //Test assigning the same Handle to two different items
-        installItemService.installItem(context, is, handle);
+            //Test assigning the same Handle to two different items
+            String handle = "123456789/56789";
+            installItemService.installItem(context, is, handle);
 
-        // Assigning the same handle again should throw a RuntimeException
-        thrown.expect(RuntimeException.class);
-        installItemService.installItem(context, is2, handle);
+            // Assigning the same handle again should throw a RuntimeException
+            installItemService.installItem(context, is2, handle);
+        } finally {
+            context.restoreAuthSystemState();
+        }
         fail("Exception expected");
     }
 
@@ -169,8 +161,7 @@ public class InstallItemTest extends AbstractUnitTest
      * Test of restoreItem method, of class InstallItem.
      */
     @Test
-    public void testRestoreItem() throws Exception
-    {
+    public void testRestoreItem() throws Exception {
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
@@ -184,7 +175,7 @@ public class InstallItemTest extends AbstractUnitTest
         //Build the beginning of a dummy provenance message
         //(restoreItem should NEVER insert a provenance message with today's date)
         String provDescriptionBegins = "Made available in DSpace on " + date;
-        
+
         Item result = installItemService.restoreItem(context, is, handle);
         context.restoreAuthSystemState();
 
@@ -192,10 +183,10 @@ public class InstallItemTest extends AbstractUnitTest
         assertThat("testRestoreItem 0", result, equalTo(is.getItem()));
 
         //Make sure that restore did NOT insert a new provenance message with today's date
-        List<MetadataValue> provMsgValues = itemService.getMetadata(result, "dc", "description", "provenance", Item.ANY);
+        List<MetadataValue> provMsgValues = itemService
+            .getMetadata(result, "dc", "description", "provenance", Item.ANY);
         int i = 1;
-        for(MetadataValue val : provMsgValues)
-        {
+        for (MetadataValue val : provMsgValues) {
             assertFalse("testRestoreItem " + i, val.getValue().startsWith(provDescriptionBegins));
             i++;
         }
@@ -205,8 +196,7 @@ public class InstallItemTest extends AbstractUnitTest
      * Test of getBitstreamProvenanceMessage method, of class InstallItem.
      */
     @Test
-    public void testGetBitstreamProvenanceMessage() throws Exception
-    {
+    public void testGetBitstreamProvenanceMessage() throws Exception {
         File f = new File(testProps.get("test.bitstream").toString());
         context.turnOffAuthorisationSystem();
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
@@ -223,23 +213,23 @@ public class InstallItemTest extends AbstractUnitTest
         // Create provenance description
         String testMessage = "No. of bitstreams: 2\n";
         testMessage += "one: "
-                    + one.getSize() + " bytes, checksum: "
-                    + one.getChecksum() + " ("
-                    + one.getChecksumAlgorithm() + ")\n";
+            + one.getSizeBytes() + " bytes, checksum: "
+            + one.getChecksum() + " ("
+            + one.getChecksumAlgorithm() + ")\n";
         testMessage += "two: "
-                    + two.getSize() + " bytes, checksum: "
-                    + two.getChecksum() + " ("
-                    + two.getChecksumAlgorithm() + ")\n";
+            + two.getSizeBytes() + " bytes, checksum: "
+            + two.getChecksum() + " ("
+            + two.getChecksumAlgorithm() + ")\n";
 
-        assertThat("testGetBitstreamProvenanceMessage 0", installItemService.getBitstreamProvenanceMessage(context, item), equalTo(testMessage));
+        assertThat("testGetBitstreamProvenanceMessage 0",
+                   installItemService.getBitstreamProvenanceMessage(context, item), equalTo(testMessage));
     }
 
     /**
      * Test passing in "today" as an issued date to InstallItem.
      */
     @Test
-    public void testInstallItem_todayAsIssuedDate() throws Exception
-    {
+    public void testInstallItem_todayAsIssuedDate() throws Exception {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
@@ -253,7 +243,7 @@ public class InstallItemTest extends AbstractUnitTest
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-       
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         String date = sdf.format(calendar.getTime());
@@ -272,8 +262,7 @@ public class InstallItemTest extends AbstractUnitTest
      * Test null issue date (when none set) in InstallItem
      */
     @Test
-    public void testInstallItem_nullIssuedDate() throws Exception
-    {
+    public void testInstallItem_nullIssuedDate() throws Exception {
         //create a dummy WorkspaceItem with no dc.date.issued
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";
@@ -291,8 +280,7 @@ public class InstallItemTest extends AbstractUnitTest
      * Test passing in "today" as an issued date to restoreItem.
      */
     @Test
-    public void testRestoreItem_todayAsIssuedDate() throws Exception
-    {
+    public void testRestoreItem_todayAsIssuedDate() throws Exception {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
         String handle = "123456789/56789";

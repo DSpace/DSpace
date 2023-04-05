@@ -29,84 +29,69 @@ import java.util.jar.JarFile;
  * @author Mark H. Wood
  */
 public class PathsClassLoader
-        extends ClassLoader
-{
-    /** Filesystem paths to be searched. */
+    extends ClassLoader {
+    /**
+     * Filesystem paths to be searched.
+     */
     private final String[] classpath;
 
     /**
      * Instantiate to use a custom class path.
      *
-     * @param parent delegate to this ClassLoader first.
+     * @param parent    delegate to this ClassLoader first.
      * @param classpath filesystem paths to be searched for classes and JARs.
      */
-    PathsClassLoader(ClassLoader parent, String[] classpath)
-    {
+    PathsClassLoader(ClassLoader parent, String[] classpath) {
         super(parent);
         this.classpath = classpath;
     }
 
     @Override
-    protected Class findClass(String name) throws ClassNotFoundException
-    {
+    protected Class findClass(String name) throws ClassNotFoundException {
         Class found = null;
-        for (String aPath : classpath)
-        {
+        for (String aPath : classpath) {
             String bodyPath = name.replace('.', '/');
             File pathFile = new File(aPath);
-            if (pathFile.isDirectory())
-            {
+            if (pathFile.isDirectory()) {
                 byte[] body;
                 int bodySize;
                 File bodyFile = new File(pathFile, bodyPath + ".class");
-                if (!bodyFile.exists())
-                {
+                if (!bodyFile.exists()) {
                     continue;
                 }
                 bodySize = (int) bodyFile.length();
                 body = new byte[bodySize];
                 FileInputStream bodyStream = null;
-                try
-                {
+                try {
                     bodyStream = new FileInputStream(bodyFile);
                     int pos = 0;
                     int len;
-                    do
-                    {
+                    do {
                         len = bodyStream.read(body, pos, bodySize);
                         pos += len;
                     } while (pos < bodySize);
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     throw new ClassNotFoundException("Class body not read", e);
-                } finally
-                {
-                    if (null != bodyStream)
-                    {
-                        try
-                        {
+                } finally {
+                    if (null != bodyStream) {
+                        try {
                             bodyStream.close();
-                        } catch (IOException ex)
-                        {
+                        } catch (IOException ex) {
                             /* don't care */
                         }
                     }
                 }
                 found = defineClass(name, body, 0, bodySize);
                 break;
-            }
-            else if (pathFile.isFile())
-            {
+            } else if (pathFile.isFile()) {
                 byte[] body;
                 int bodySize;
                 InputStream bodyStream = null;
                 JarFile jar = null;
-                try
-                {
+                try {
                     jar = new JarFile(pathFile);
                     JarEntry entry = jar.getJarEntry(bodyPath + ".class");
-                    if (null == entry)
-                    {
+                    if (null == entry) {
                         continue;
                     }
                     bodyStream = jar.getInputStream(entry);
@@ -114,51 +99,37 @@ public class PathsClassLoader
                     body = new byte[bodySize];
                     int pos = 0;
                     int len;
-                    do
-                    {
+                    do {
                         len = bodyStream.read(body, pos, bodySize);
                         pos += len;
                     } while (pos < bodySize);
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     throw new ClassNotFoundException("Class body not read", e);
-                } finally
-                {
-                    if (null != bodyStream)
-                    {
-                        try
-                        {
+                } finally {
+                    if (null != bodyStream) {
+                        try {
                             bodyStream.close();
-                        } catch (IOException e)
-                        {
+                        } catch (IOException e) {
                             /* don't care */
                         }
                     }
-                    if (null != jar)
-                    {
-                        try
-                        {
+                    if (null != jar) {
+                        try {
                             jar.close();
-                        } catch (IOException e)
-                        {
+                        } catch (IOException e) {
                             /* don't care */
                         }
                     }
                 }
                 found = defineClass(name, body, 0, bodySize);
                 break;
-            }
-            else
-            {
+            } else {
                 // Just skip this path element -- probably just file not found here.
             }
         }
-        if (null == found)
-        {
+        if (null == found) {
             throw new ClassNotFoundException(name);
-        }
-        else
-        {
+        } else {
             resolveClass(found);
             return found;
         }

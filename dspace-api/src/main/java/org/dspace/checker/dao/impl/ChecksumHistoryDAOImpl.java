@@ -9,14 +9,15 @@ package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Date;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.dao.ChecksumHistoryDAO;
 import org.dspace.content.Bitstream;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
-import org.hibernate.Query;
+import org.dspace.core.Context;
 
 /**
  * <p>
@@ -24,27 +25,27 @@ import org.hibernate.Query;
  * update,insert and delete database operations should go through this class for
  * checksum history operations.
  * </p>
- * 
+ *
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
  * @author kevinvandevelde at atmire.com
- * 
- * 
+ *
+ *
  */
-public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory> implements ChecksumHistoryDAO
-{
+public class ChecksumHistoryDAOImpl extends AbstractHibernateDAO<ChecksumHistory> implements ChecksumHistoryDAO {
 
-    protected ChecksumHistoryDAOImpl()
-    {
+    protected ChecksumHistoryDAOImpl() {
         super();
     }
 
     @Override
-    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode resultCode) throws SQLException {
-        String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult.resultCode=:resultCode";
+    public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode resultCode)
+        throws SQLException {
+        String hql = "delete from ChecksumHistory where processEndDate < :processEndDate AND checksumResult" +
+            ".resultCode=:resultCode";
         Query query = createQuery(context, hql);
-        query.setTimestamp("processEndDate", retentionDate);
+        query.setParameter("processEndDate", retentionDate, TemporalType.TIMESTAMP);
         query.setParameter("resultCode", resultCode);
         return query.executeUpdate();
     }

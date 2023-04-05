@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>6.3-drum-7.1</version>
+      <version>7.4-drum-0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -25,6 +25,63 @@
        <!-- This is the path to the root [dspace-src] directory. -->
        <root.basedir>${basedir}/../../..</root.basedir>
    </properties>
+
+   <build>
+      <plugins>
+         <!-- This plugin allows us to run a Groovy script in our Maven POM
+                 (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
+                 We are generating a OS-agnostic version (agnostic.build.dir) of
+                 the ${project.build.directory} property (full path of target dir).
+                 This is needed by the Surefire & Failsafe plugins (see below)
+                 to initialize the Unit Test environment's dspace.cfg file.
+                 Otherwise, the Unit Test Framework will not work on Windows OS.
+                 This Groovy code was mostly borrowed from:
+                 http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+            -->
+         <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>groovy-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>setproperty</id>
+                  <phase>initialize</phase>
+                  <goals>
+                     <goal>execute</goal>
+                  </goals>
+                  <configuration>
+                     <source>
+                        project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
+                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                     </source>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <debug>true</debug>
+               <showDeprecation>true</showDeprecation>
+               <annotationProcessorPaths>
+                  <!-- Enable Hibernate's Metamodel Generator to generate metadata model classes
+                       (ending in _ suffix) for more type-safe Criteria queries -->
+                  <path>
+                     <groupId>org.hibernate</groupId>
+                     <artifactId>hibernate-jpamodelgen</artifactId>
+                     <version>${hibernate.version}</version>
+                  </path>
+                  <!-- Enable http://errorprone.info -->
+                  <path>
+                     <groupId>com.google.errorprone</groupId>
+                     <artifactId>error_prone_core</artifactId>
+                     <version>${errorprone.version}</version>
+                  </path>
+               </annotationProcessorPaths>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
 
    <profiles>
       <profile>
@@ -42,6 +99,144 @@
             </dependency>
          </dependencies>
       </profile>
+
+      <!-- Setup the Unit Test Environment (when -DskipUnitTests=false) -->
+      <profile>
+         <id>unit-test-environment</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+            <property>
+               <name>skipUnitTests</name>
+               <value>false</value>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <!-- Unit Testing setup: This plugin unzips the
+                   'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                   the 'target/testing/' folder, to create a test
+                   install of DSpace, against which Tests can be run. -->
+               <plugin>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                     <artifactItems>
+                        <artifactItem>
+                           <groupId>org.dspace</groupId>
+                           <artifactId>dspace-parent</artifactId>
+                           <version>${project.version}</version>
+                           <type>zip</type>
+                           <classifier>testEnvironment-additions</classifier>
+                        </artifactItem>
+                     </artifactItems>
+                  </configuration>
+                  <executions>
+                     <execution>
+                        <id>setupUnitTestEnvironment</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+
+               <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
+               <plugin>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <configuration>
+                     <systemPropertyVariables>
+                        <!-- Specify the dspace.dir to use for test environment -->
+                        <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                        <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                        <!-- Turn off any DSpace logging -->
+                        <dspace.log.init.disable>true</dspace.log.init.disable>
+                        <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
+                     </systemPropertyVariables>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+         <dependencies>
+            <!-- When running tests, also include test classes from dspace-api
+                     (this test-jar is only built when tests are enabled). -->
+            <dependency>
+               <groupId>org.dspace</groupId>
+               <artifactId>dspace-api</artifactId>
+               <type>test-jar</type>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+      </profile>
+
+      <!-- Setup the Integration Test Environment (when -DskipIntegrationTests=false) -->
+      <profile>
+         <id>integration-test-environment</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+            <property>
+               <name>skipIntegrationTests</name>
+               <value>false</value>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <!-- Integration Testing setup: This plugin unzips the
+                    'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                    the 'target/testing/' folder, to essentially create a test
+                    install of DSpace, against which Tests can be run. -->
+               <plugin>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                     <artifactItems>
+                        <artifactItem>
+                           <groupId>org.dspace</groupId>
+                           <artifactId>dspace-parent</artifactId>
+                           <version>${project.version}</version>
+                           <type>zip</type>
+                           <classifier>testEnvironment-additions</classifier>
+                        </artifactItem>
+                     </artifactItems>
+                  </configuration>
+                  <executions>
+                     <execution>
+                        <id>setupIntegrationTestEnvironment</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                           <goal>unpack</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+
+               <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
+               <plugin>
+                  <artifactId>maven-failsafe-plugin</artifactId>
+                  <configuration>
+                     <systemPropertyVariables>
+                        <!-- Specify the dspace.dir to use for test environment -->
+                        <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                        <!-- Turn off any DSpace logging -->
+                        <dspace.log.init.disable>true</dspace.log.init.disable>
+                        <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
+                     </systemPropertyVariables>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+         <dependencies>
+            <!-- When running tests, also include test classes from dspace-api
+                     (this test-jar is only built when tests are enabled). -->
+            <dependency>
+               <groupId>org.dspace</groupId>
+               <artifactId>dspace-api</artifactId>
+               <type>test-jar</type>
+               <scope>test</scope>
+            </dependency>
+         </dependencies>
+      </profile>
+
    </profiles>
 
    <!--
@@ -49,23 +244,26 @@
    -->
    <dependencies>
       <dependency>
-         <groupId>com.atmire</groupId>
-         <artifactId>atmire-statistics-exporter-api</artifactId>
-         <version>1.0.0</version>
-         <type>jar</type>
-      </dependency>
-
-      <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-api</artifactId>
+          <type>test-jar</type>
+          <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-services</artifactId>
+      </dependency>
+      <dependency>
          <groupId>javax.servlet</groupId>
-         <artifactId>servlet-api</artifactId>
+         <artifactId>javax.servlet-api</artifactId>
          <scope>provided</scope>
       </dependency>
       <dependency>
@@ -80,27 +278,86 @@
          </exclusions>
       </dependency>
       <dependency>
-         <groupId>edu.umd.lib</groupId>
-         <artifactId>lib-util</artifactId>
-         <version>1.0</version>
-         <exclusions>
-            <exclusion>
-               <groupId>org.apache.poi</groupId>
-               <artifactId>poi-ooxml-schemas</artifactId>
-            </exclusion>
-         </exclusions>
+         <groupId>dom4j</groupId>
+         <artifactId>dom4j</artifactId>
+         <version>1.6.1</version>
       </dependency>
       <dependency>
          <groupId>cas</groupId>
          <artifactId>casclient</artifactId>
          <version>2.1.1</version>
+         <exclusions>
+            <exclusion>
+               <groupId>javax.servlet</groupId>
+               <artifactId>servlet-api</artifactId>
+            </exclusion>
+          </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-solrj</artifactId>
+         <version>${solr.client.version}</version>
+      </dependency>
+      <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
+      <!-- The following Solr / Lucene dependencies also support integration tests -->
+      <dependency>
+         <groupId>org.apache.solr</groupId>
+         <artifactId>solr-core</artifactId>
+         <version>${solr.client.version}</version>
+         <scope>test</scope>
+         <exclusions>
+            <!-- Newer version brought in by opencsv -->
+            <exclusion>
+               <groupId>org.apache.commons</groupId>
+               <artifactId>commons-text</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
       <dependency>
          <groupId>org.marc4j</groupId>
          <artifactId>marc4j</artifactId>
-         <version>2.0</version>
+         <version>2.9.2</version>
       </dependency>
-
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-icu</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-smartcn</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.lucene</groupId>
+         <artifactId>lucene-analyzers-stempel</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.hamcrest</groupId>
+         <artifactId>hamcrest-all</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>com.h2database</groupId>
+         <artifactId>h2</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.mockito</groupId>
+         <artifactId>mockito-inline</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-test</artifactId>
+         <scope>test</scope>
+      </dependency>
    </dependencies>
 
 </project>

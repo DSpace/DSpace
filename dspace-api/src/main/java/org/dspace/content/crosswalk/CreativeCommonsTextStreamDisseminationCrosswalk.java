@@ -7,16 +7,16 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
@@ -28,45 +28,42 @@ import org.dspace.license.service.CreativeCommonsService;
 /**
  * Export the object's Creative Commons license, text form.
  *
- * @author  Larry Stone
- * @version $Revision: 1.0 $
- * 
- * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored (see https://jira.duraspace.org/browse/DS-2604) 
+ * @author Larry Stone
+ * @deprecated the bitstream with the
+ * license in the textual format it is no
+ * longer stored (see https://jira.duraspace.org/browse/DS-2604)
  */
+@Deprecated
 public class CreativeCommonsTextStreamDisseminationCrosswalk
-    implements StreamDisseminationCrosswalk
-{
+    implements StreamDisseminationCrosswalk {
 
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+    protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
+                                                                                         .getCreativeCommonsService();
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
+    /**
+     * log4j logger
+     */
+    private static final Logger log =
+            LogManager.getLogger(CreativeCommonsTextStreamDisseminationCrosswalk.class);
 
     @Override
-    public boolean canDisseminate(Context context, DSpaceObject dso)
-    {
-        try
-        {
+    public boolean canDisseminate(Context context, DSpaceObject dso) {
+        try {
             return dso.getType() == Constants.ITEM &&
-                    creativeCommonsService.getLicenseTextBitstream((Item) dso) != null;
-        }
-        catch (Exception e)
-        {
+                creativeCommonsService.getLicenseTextBitstream((Item) dso) != null;
+        } catch (Exception e) {
             log.error("Failed getting CC license", e);
-            return  false;
+            return false;
         }
     }
 
     @Override
     public void disseminate(Context context, DSpaceObject dso, OutputStream out)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
-        if (dso.getType() == Constants.ITEM)
-        {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        if (dso.getType() == Constants.ITEM) {
             Bitstream cc = creativeCommonsService.getLicenseTextBitstream((Item) dso);
-            if (cc != null)
-            {
+            if (cc != null) {
                 Utils.copy(bitstreamService.retrieve(context, cc), out);
                 out.close();
             }
@@ -74,8 +71,7 @@ public class CreativeCommonsTextStreamDisseminationCrosswalk
     }
 
     @Override
-    public String getMIMEType()
-    {
+    public String getMIMEType() {
         return "text/plain";
     }
 }

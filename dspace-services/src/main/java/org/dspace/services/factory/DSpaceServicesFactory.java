@@ -8,16 +8,17 @@
 package org.dspace.services.factory;
 
 import org.dspace.kernel.ServiceManager;
-import org.dspace.services.*;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.EmailService;
+import org.dspace.services.EventService;
+import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 
 /**
- * Abstract factory to get services for the services package, use DSpaceServicesFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the services package, use DSpaceServicesFactory.getInstance() to retrieve an
+ * implementation
  */
-public abstract class DSpaceServicesFactory
-{
-    public abstract CachingService getCachingService();
-
+public abstract class DSpaceServicesFactory {
     public abstract ConfigurationService getConfigurationService();
 
     public abstract EmailService getEmailService();
@@ -26,12 +27,9 @@ public abstract class DSpaceServicesFactory
 
     public abstract RequestService getRequestService();
 
-    public abstract SessionService getSessionService();
-
     public abstract ServiceManager getServiceManager();
 
-    public static DSpaceServicesFactory getInstance()
-    {
+    public static DSpaceServicesFactory getInstance() {
         return new DSpace().getServiceManager().getServiceByName("dSpaceServicesFactory", DSpaceServicesFactory.class);
     }
 

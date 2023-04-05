@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dspace-dc-types SYSTEM "dspace-dc-types.dtd">
+
+<!--
+  This document was based on the OpenAIRE4 Guidelines for Literature Repositories
+  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/index.html
+  -->
+  
+<dspace-dc-types>
+    <dspace-header>
+        <title>OpenAIRE4 fields definition</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>oaire</name>
+        <namespace>http://namespace.openaire.eu/schema/oaire/</namespace>
+    </dc-schema>
+    
+    <dc-schema>
+        <name>datacite</name>
+        <namespace>http://datacite.org/schema/kernel-4</namespace>
+    </dc-schema>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>fundingStream</element>
+        <scope_note>Name of the funding stream</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>awardNumber</element>
+        <scope_note>Project grantId or awardNumber</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>awardURI</element>
+        <scope_note>URI of the project landing page provided by the funder for more information about the award (grant).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oaire</schema>
+        <element>awardTitle</element>
+        <scope_note>Title of the project, award or grant.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>version</element>
+        <scope_note>Use either a version number or the label of the vocabulary term as value.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>title</qualifier>
+        <scope_note>The title name of the container (e.g. journal, book, conference) this work is published in. This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>volume</qualifier>
+        <scope_note>The volume, typically a number, of the container (e.g. journal). This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>issue</qualifier>
+        <scope_note>The issue of the container (e.g. journal). This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>startPage</qualifier>
+        <scope_note>The start page is part of the pagination information of the work published in a container (e.g. journal issue). This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>endPage</qualifier>
+        <scope_note>The end page is part of the pagination information of the work published in a container (e.g. journal issue). This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>edition</qualifier>
+        <scope_note>The edition the work was published in (e.g. book edition). This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>conferencePlace</qualifier>
+        <scope_note>The place where the conference took place. This property is considered to be part of the bibliographic citation.</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>citation</element>
+        <qualifier>conferenceDate</qualifier>
+        <scope_note>The date when the conference took place. This property is considered to be part of the bibliographic citation. Recommended best practice for encoding the date value is defined in a profile of ISO 8601 [W3CDTF] and follows the YYYY-MM-DD format.</scope_note>
+    </dc-type>
+
+    <!--
+      OpenAIRE4 Guidelines
+      21 - Geolocation -->	
+    <dc-type>
+        <schema>datacite</schema>
+        <element>geoLocation</element>
+        <scope_note>Spatial region or named place where the data was gathered or about which the data is focused.</scope_note>
+    </dc-type>
+        
+    <!-- specific type required by OpenAIRE4 Guidelines -->
+    <dc-type>
+        <schema>datacite</schema>
+        <element>subject</element>
+        <qualifier>fos</qualifier>
+        <scope_note>Fields of Science and Technology - OECD</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

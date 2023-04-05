@@ -1,0 +1,3 @@
+-- Contents moved into V1.7.2_2__drum_database_schema_unit_add_faculty_only.sql
+-- to ensure that the "Unit" table is created, before it is modified in the next
+-- migration.

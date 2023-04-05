@@ -1,0 +1,26 @@
+<!-- DSpace Schema Fields definition language -->
+<!--                                                           -->
+<!-- This DTD defines the format for the DSpace                -->
+<!-- 'config/registries/*-types.xml' configuration files           -->
+
+ <!-- Root element is 'dspace-dc-types' -->
+ <!ELEMENT dspace-dc-types (dspace-header|dc-schema|dc-type)* >
+ 
+ <!ELEMENT dspace-header (title|contributor.author|contributor.editor|date.created|description|description.version)* >
+
+ <!ELEMENT dc-schema (name|namespace)* >
+ 
+ <!ELEMENT dc-type (schema|element|qualifier|scope_note)* >
+ 
+ <!ELEMENT title (#PCDATA) >
+ <!ELEMENT contributor.author (#PCDATA)>
+ <!ELEMENT contributor.editor (#PCDATA)>
+ <!ELEMENT date.created (#PCDATA)>
+ <!ELEMENT description (#PCDATA)>
+ <!ELEMENT description.version (#PCDATA)>
+ <!ELEMENT name (#PCDATA)>
+ <!ELEMENT namespace (#PCDATA)> 
+ <!ELEMENT schema (#PCDATA)>
+ <!ELEMENT element (#PCDATA)>
+ <!ELEMENT qualifier (#PCDATA)>
+ <!ELEMENT scope_note (#PCDATA)>

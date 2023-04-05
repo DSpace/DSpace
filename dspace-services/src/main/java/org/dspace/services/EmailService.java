@@ -11,13 +11,12 @@ package org.dspace.services;
 import javax.mail.Session;
 
 /**
- *
  * @author mwood
  */
-public interface EmailService
-{
+public interface EmailService {
     /**
      * Provide a reference to the JavaMail session.
+     *
      * @return JavaMail session
      */
     Session getSession();

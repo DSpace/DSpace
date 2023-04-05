@@ -7,21 +7,27 @@
  */
 package org.dspace.identifier;
 
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.handle.service.HandleService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+
+import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Context;
+import org.dspace.core.LogHelper;
+import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * The old DSpace handle identifier service, used to create handles or retrieve objects based on their handle
@@ -32,16 +38,20 @@ import java.util.List;
  */
 @Component
 public class HandleIdentifierProvider extends IdentifierProvider {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(HandleIdentifierProvider.class);
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleIdentifierProvider.class);
 
-    /** Prefix registered to no one */
+    /**
+     * Prefix registered to no one
+     */
     protected static final String EXAMPLE_PREFIX = "123456789";
 
     @Autowired(required = true)
     protected HandleService handleService;
     @Autowired(required = true)
-    protected ItemService itemService;
+    protected ContentServiceFactory contentServiceFactory;
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
@@ -49,66 +59,42 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     }
 
     @Override
-    public boolean supports(String identifier)
-    {
-        String prefix = handleService.getPrefix();
-        String canonicalPrefix = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("handle.canonical.prefix");
-        if (identifier == null)
-        {
-            return false;
-        }
-        // return true if handle has valid starting pattern
-        if (identifier.startsWith(prefix + "/")
-                || identifier.startsWith(canonicalPrefix)
-                || identifier.startsWith("hdl:")
-                || identifier.startsWith("info:hdl")
-                || identifier.matches("^https?://hdl\\.handle\\.net/.*")
-                || identifier.matches("^https?://.+/handle/.*"))
-        {
-            return true;
-        }
-        
-        //Check additional prefixes supported in the config file
-        String[] additionalPrefixes = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("handle.additional.prefixes");
-        for(String additionalPrefix: additionalPrefixes) {
-            if (identifier.startsWith(additionalPrefix + "/")) {
-                return true;
-            }
-        }
-
-        return false;
+    public boolean supports(String identifier) {
+        return handleService.parseHandle(identifier) != null;
     }
 
     @Override
     public String register(Context context, DSpaceObject dso) {
-        try{
+        try {
             String id = mint(context, dso);
 
             // move canonical to point the latest version
-            if(dso instanceof Item)
-            {
-                Item item = (Item)dso;
+            if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
+                Item item = (Item) dso;
                 populateHandleMetadata(context, item, id);
             }
 
             return id;
-        }catch (Exception e){
-            log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+        } catch (IOException | SQLException | AuthorizeException e) {
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
     }
 
     @Override
     public void register(Context context, DSpaceObject dso, String identifier) {
-        try{
+        try {
             handleService.createHandle(context, dso, identifier);
-            if(dso instanceof Item)
-            {
-                Item item = (Item)dso;
+            if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
+                Item item = (Item) dso;
                 populateHandleMetadata(context, item, identifier);
             }
-        }catch (Exception e){
-            log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+        } catch (IOException | IllegalStateException | SQLException | AuthorizeException e) {
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
     }
@@ -116,10 +102,12 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier) {
-        try{
+        try {
             handleService.createHandle(context, dso, identifier);
-        }catch(Exception e){
-            log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+        } catch (IllegalStateException | SQLException e) {
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -129,21 +117,21 @@ public class HandleIdentifierProvider extends IdentifierProvider {
      * Creates a new handle in the database.
      *
      * @param context DSpace context
-     * @param dso The DSpaceObject to create a handle for
+     * @param dso     The DSpaceObject to create a handle for
      * @return The newly created handle
-     * @exception java.sql.SQLException If a database error occurs
      */
     @Override
     public String mint(Context context, DSpaceObject dso) {
-        if(dso.getHandle() != null)
-        {
+        if (dso.getHandle() != null) {
             return dso.getHandle();
         }
 
-        try{
+        try {
             return handleService.createHandle(context, dso);
-        }catch (Exception e){
-            log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
+        } catch (SQLException e) {
+            log.error(LogHelper.getHeader(context,
+                    "Error while attempting to create handle",
+                    "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
     }
@@ -151,11 +139,12 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     @Override
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
-        try
-        {
+        try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
-        }catch (Exception e){
-            log.error(LogManager.getHeader(context, "Error while resolving handle to item", "handle: " + identifier), e);
+        } catch (IllegalStateException | SQLException e) {
+            log.error(LogHelper.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
+                      e);
         }
 //        throw new IllegalStateException("Unsupported Handle Type "
 //                + Constants.typeText[handletypeid]);
@@ -163,13 +152,13 @@ public class HandleIdentifierProvider extends IdentifierProvider {
     }
 
     @Override
-    public String lookup(Context context, DSpaceObject dso) throws IdentifierNotFoundException, IdentifierNotResolvableException {
+    public String lookup(Context context, DSpaceObject dso)
+        throws IdentifierNotFoundException, IdentifierNotResolvableException {
 
-        try
-        {
+        try {
             return handleService.findHandle(context, dso);
-        }catch(SQLException sqe){
-            throw new IdentifierNotResolvableException(sqe.getMessage(),sqe);
+        } catch (SQLException sqe) {
+            throw new IdentifierNotResolvableException(sqe.getMessage(), sqe);
         }
     }
 
@@ -180,20 +169,18 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public void delete(Context context, DSpaceObject dso) throws IdentifierException {
-        try{
+        try {
             handleService.unbindHandle(context, dso);
-        }catch(SQLException sqe)
-        {
-            throw new IdentifierException(sqe.getMessage(),sqe);
+        } catch (SQLException sqe) {
+            throw new IdentifierException(sqe.getMessage(), sqe);
         }
 
     }
 
     public static String retrieveHandleOutOfUrl(String url)
-            throws SQLException {
+        throws SQLException {
         // We can do nothing with this, return null
-        if (!url.contains("/"))
-        {
+        if (!url.contains("/")) {
             return null;
         }
 
@@ -204,38 +191,39 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     /**
      * Get the configured Handle prefix string, or a default
+     *
      * @return configured prefix or "123456789"
      */
-    public static String getPrefix()
-    {
-        String prefix = ConfigurationManager.getProperty("handle.prefix");
-        if (null == prefix)
-        {
+    public static String getPrefix() {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String prefix = configurationService.getProperty("handle.prefix");
+        if (null == prefix) {
             prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
             log.error("handle.prefix is not configured; using " + prefix);
         }
         return prefix;
     }
 
-    protected void populateHandleMetadata(Context context, Item item, String handle)
-            throws SQLException, IOException, AuthorizeException
-    {
+    protected void populateHandleMetadata(Context context, DSpaceObject dso, String handle)
+            throws SQLException, IOException, AuthorizeException {
         String handleref = handleService.getCanonicalForm(handle);
+
+        DSpaceObjectService<DSpaceObject> dsoService = contentServiceFactory.getDSpaceObjectService(dso);
 
         // Add handle as identifier.uri DC value.
         // First check that identifier doesn't already exist.
         boolean identifierExists = false;
-        List<MetadataValue> identifiers = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
-        for (MetadataValue identifier : identifiers)
-        {
-            if (handleref.equals(identifier.getValue()))
-            {
+        List<MetadataValue> identifiers = dsoService
+                .getMetadata(dso, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
+        for (MetadataValue identifier : identifiers) {
+            if (handleref.equals(identifier.getValue())) {
                 identifierExists = true;
             }
         }
-        if (!identifierExists)
-        {
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+        if (!identifierExists) {
+            dsoService.addMetadata(context, dso, MetadataSchemaEnum.DC.getName(),
+                    "identifier", "uri", null, handleref);
         }
     }
 }

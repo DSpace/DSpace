@@ -18,14 +18,13 @@ import org.dspace.xoai.filter.results.SolrFilterResult;
  * http://www.openarchives.org/OAI/openarchivesprotocol.html#deletion
  * <P>
  * (Don't worry, a tombstone doesn't display the withdrawn item's metadata or files.)
- * 
+ *
  * @author Tim Donohue
  */
 public class DSpaceWithdrawnFilter extends DSpaceFilter {
 
     @Override
-    public boolean isShown(DSpaceItem item)
-    {
+    public boolean isShown(DSpaceItem item) {
         // For DSpace, if an Item is withdrawn, "isDeleted()" will be true.
         // In this scenario, we want a withdrawn item to be *shown* so that
         // we can properly respond with a "deleted" status via OAI-PMH.
@@ -35,8 +34,7 @@ public class DSpaceWithdrawnFilter extends DSpaceFilter {
     }
 
     @Override
-    public SolrFilterResult buildSolrQuery()
-    {
+    public SolrFilterResult buildSolrQuery() {
         // In Solr, we store withdrawn items as "deleted".
         // See org.dspace.xoai.app.XOAI, index(Item) method.
         return new SolrFilterResult("item.deleted:true");

@@ -10,32 +10,45 @@
 # This is a Unix shell script for running a command-line DSpace tool.
 # It sets the CLASSPATH appropriately before invoking Java.
 
+# Assume that this script is in the bin subdirectory of the DSpace installation directory.
 BINDIR=`dirname $0`
 DSPACEDIR=`cd "$BINDIR/.." ; pwd`
-# Add the directory with all oai classes (original and overlay) needed by the 'dspace oai' launcher.xml
-OAICLASSES=$DSPACEDIR/webapps/oai/WEB-INF/classes/
 
-# Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
-JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
+# UMD Customization
+# Ensure "additions" jar is place before other DSpace jars in the classpath
+# (but after any specified by the CLASSPATH environment variable, so that it
+# can override any stock DSpace classes. This issue may be corrected
+# in future DSpace versions, see:
+#  * https://github.com/DSpace/DSpace/issues/3248 and
+#  * https://github.com/DSpace/DSpace/issues/8506
+ADDITIONS_JAR=`ls $DSPACEDIR/lib/additions-*.jar 2>/dev/null`
+if [ "$ADDITIONS_JAR" != "" ]; then
+  if [ "$CLASSPATH" = "" ]; then
+    CLASSPATH=$ADDITIONS_JAR
+  else
+    CLASSPATH=$CLASSPATH:$ADDITIONS_JAR
+  fi
+fi
+# End UMD Customiztion
+
+# Get the JARs in $DSPACEDIR/lib
+JARS="$DSPACEDIR/lib/*"
 
 # Class path for DSpace will be:
 #   Any existing classpath
-#   The JARs (WEB-INF/lib/*.jar)
-#   The WEB-INF/classes directory
+#   The JARs (lib/*.jar)
+#   The configuration directory
 if [ "$CLASSPATH" = "" ]; then
-    FULLPATH=$OAICLASSES:$JARS:$DSPACEDIR/config
+  FULLPATH=$JARS:$DSPACEDIR/config
 else
-    FULLPATH=$CLASSPATH:$OAICLASSES:$JARS:$DSPACEDIR/config
+  FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 fi
-
 
 # If the user only wants the CLASSPATH, just give it now.
 if [ "$1" = "classpath" ]; then
   echo $FULLPATH
   exit 0
 fi
-
-
 
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
@@ -44,4 +57,6 @@ if [ "$JAVA_OPTS" = "" ]; then
 fi
 
 # Now invoke Java
-java $JAVA_OPTS -classpath $FULLPATH org.dspace.app.launcher.ScriptLauncher "$@"
+java $JAVA_OPTS \
+     -classpath $FULLPATH \
+     org.dspace.app.launcher.ScriptLauncher "$@"

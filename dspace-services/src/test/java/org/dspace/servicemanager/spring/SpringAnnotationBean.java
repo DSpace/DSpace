@@ -10,27 +10,26 @@ package org.dspace.servicemanager.spring;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.example.ServiceExample;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
 
 /**
  * This bean is a bean which is annotated as a spring bean and should be found when the AC starts up
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @Service
 public class SpringAnnotationBean {
 
     private ServiceExample serviceExample;
-    @Autowired
-    @Required
+
+    @Autowired(required = true)
     public void setServiceExample(ServiceExample serviceExample) {
         this.serviceExample = serviceExample;
     }
 
     private ConcreteExample concreteExample;
-    @Autowired
-    @Required
+
+    @Autowired(required = true)
     public void setConcreteExample(ConcreteExample concreteExample) {
         this.concreteExample = concreteExample;
     }
@@ -48,6 +47,7 @@ public class SpringAnnotationBean {
     }
 
     private String value = null;
+
     public void setTestName(String testName) {
         value = testName;
     }

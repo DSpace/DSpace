@@ -1,0 +1,31 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Publication Issue Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>publicationissue</name>
+        <namespace>https://schema.org/PublicationIssue</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>creativework</name>
+        <namespace>https://schema.org/CreativeWork</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>publicationissue</schema>
+        <element>issueNumber</element>
+        <scope_note>Identifies the issue of publication; for example, "iii" or "2".</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>creativework</schema>
+        <element>keywords</element>
+        <scope_note>Keywords or tags used to describe this content. Multiple entries in a keywords list are typically
+            delimited by commas.
+        </scope_note>
+    </dc-type>
+
+</dspace-dc-types>

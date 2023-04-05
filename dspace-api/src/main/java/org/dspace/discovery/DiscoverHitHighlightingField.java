@@ -23,15 +23,13 @@ public class DiscoverHitHighlightingField {
     private int maxChars;
     private int maxSnippets;
 
-    public DiscoverHitHighlightingField(String field, int maxChars, int maxSnippets)
-    {
+    public DiscoverHitHighlightingField(String field, int maxChars, int maxSnippets) {
         this.field = field;
         this.maxChars = maxChars;
         this.maxSnippets = maxSnippets;
     }
 
-    public String getField()
-    {
+    public String getField() {
         return field;
     }
 
@@ -40,14 +38,17 @@ public class DiscoverHitHighlightingField {
      * field containing a matching hit. e.g. If maxChars = 200
      * and a hit is found in the full-text the 200 chars
      * surrounding the hit will be shown
+     *
+     * @return max number of characters shown for a hit
      */
-    public int getMaxChars()
-    {
+    public int getMaxChars() {
         return maxChars;
     }
 
-    public int getMaxSnippets()
-    {
+    /**
+     * @return max number of result snippets
+     */
+    public int getMaxSnippets() {
         return maxSnippets;
     }
 }

@@ -10,15 +10,13 @@ package org.dspace.app.itemupdate;
 import java.util.Properties;
 
 /**
- *   Bitstream filter to delete from TEXT bundle
- *
+ * Bitstream filter to delete from TEXT bundle
  */
 public class DerivativeTextBitstreamFilter extends BitstreamFilterByBundleName {
-	
-	public DerivativeTextBitstreamFilter()
-	{
-		props = new Properties();
-		props.setProperty("bundle", "TEXT");
-	}
+
+    public DerivativeTextBitstreamFilter() {
+        props = new Properties();
+        props.setProperty("bundle", "TEXT");
+    }
 
 }

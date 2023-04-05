@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="org.dspace.submit.listener.MetadataListener" class="org.dspace.submit.listener.SimpleMetadataListener">
+        <property name="externalDataProvidersMap">
+	        <map>
+                <entry key="dc.identifier.other">
+                    <list>
+                        <ref bean="pubmedLiveImportDataProvider"/>
+                    </list>
+                </entry>
+	        </map>            
+        </property>
+    </bean>
+	
+ </beans>

@@ -39,7 +39,7 @@
             <include>README</include>
          </includes>
          <excludes>
-            <exclude>LICENSE_HEADER</exclude>
+            <exclude>LICENSE.header</exclude>
          </excludes>
       </fileSet>
       <!-- If local.cfg is in the root folder, copy it to config folder -->
@@ -81,9 +81,6 @@
          <includes>
             <include>*:jar:*</include>
          </includes>
-        <excludes>
-            <exclude>org.glassfish.hk2.external:bean-validator:jar:*</exclude>
-        </excludes>
          <outputDirectory>lib</outputDirectory>
          <useProjectArtifact>false</useProjectArtifact>
       </dependencySet>
@@ -108,9 +105,6 @@
                   <includes>
                      <include>*:jar:*</include>
                   </includes>
-                  <excludes>
-                      <exclude>org.glassfish.hk2.external:bean-validator:jar:*</exclude>
-                  </excludes>
                </dependencySet>
             </dependencySets>
          </binaries>
@@ -124,10 +118,6 @@
          <includes>
             <include>org.dspace.modules:*:war:*</include>
          </includes>
-         <!-- Exclude Mirage2, as it is copied into the XMLUI WAR when enabled -->
-         <excludes>
-            <exclude>org.dspace.modules:xmlui-mirage2:war:*</exclude>
-         </excludes>
          <binaries>
             <includeDependencies>false</includeDependencies>
             <outputDirectory>webapps/${module.artifactId}</outputDirectory>

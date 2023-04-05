@@ -1,16 +1,16 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "java",
-            "name": "Debug (Attach to Tomcat)",
-            "request": "attach",
-            "hostName": "127.0.0.1",
-            "port": 8000,
-            "projectName": "xmlui"
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug (Attach to Tomcat)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 8000,
+      "projectName": "server"
+    }
+  ]
 }

@@ -11,23 +11,20 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.sfx.service.SFXFileReaderService;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.service.ItemService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
-
-import org.dspace.content.DCPersonName;
-import org.dspace.content.Item;
-import org.dspace.core.Constants;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.sfx.service.SFXFileReaderService;
+import org.dspace.content.DCPersonName;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -61,7 +58,7 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
     /**
      * log4j logger
      */
-    private final Logger log = Logger.getLogger(SFXFileReaderServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(SFXFileReaderServiceImpl.class);
 
     protected SFXFileReaderServiceImpl() {
     }
@@ -78,8 +75,7 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
     }
 
     @Override
-    public Document parseFile(String fileName)
-    {
+    public Document parseFile(String fileName) {
         log.info("Parsing XML file... " + fileName);
         DocumentBuilder docBuilder;
         Document doc = null;
@@ -178,7 +174,8 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
                         }
                     }
                     if (finish == 4) {
-                        List<MetadataValue> dcvalue = itemService.getMetadata(item, schema, element, qualifier, Item.ANY);
+                        List<MetadataValue> dcvalue = itemService
+                            .getMetadata(item, schema, element, qualifier, Item.ANY);
                         if (dcvalue.size() > 0) {
                             // Issued Date
                             if (element.equals("date") && qualifier.equals("issued")) {
@@ -190,7 +187,8 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
                                 if (myquery.equals("")) {
                                     myquery = querystring + URLEncoder.encode(fullDate, Constants.DEFAULT_ENCODING);
                                 } else {
-                                    myquery = myquery + "&" + querystring + URLEncoder.encode(fullDate, Constants.DEFAULT_ENCODING);
+                                    myquery = myquery + "&" + querystring + URLEncoder
+                                        .encode(fullDate, Constants.DEFAULT_ENCODING);
                                 }
                             } else {
                                 // Contributor Author
@@ -209,13 +207,16 @@ public class SFXFileReaderServiceImpl implements SFXFileReaderService {
                                     if (myquery.equals("")) {
                                         myquery = querystring + URLEncoder.encode(dpnName, Constants.DEFAULT_ENCODING);
                                     } else {
-                                        myquery = myquery + "&" + querystring + URLEncoder.encode(dpnName, Constants.DEFAULT_ENCODING);
+                                        myquery = myquery + "&" + querystring + URLEncoder
+                                            .encode(dpnName, Constants.DEFAULT_ENCODING);
                                     }
                                 } else {
                                     if (myquery.equals("")) {
-                                        myquery = querystring + URLEncoder.encode(dcvalue.get(0).getValue(), Constants.DEFAULT_ENCODING);
+                                        myquery = querystring + URLEncoder
+                                            .encode(dcvalue.get(0).getValue(), Constants.DEFAULT_ENCODING);
                                     } else {
-                                        myquery = myquery + "&" + querystring + URLEncoder.encode(dcvalue.get(0).getValue(), Constants.DEFAULT_ENCODING);
+                                        myquery = myquery + "&" + querystring + URLEncoder
+                                            .encode(dcvalue.get(0).getValue(), Constants.DEFAULT_ENCODING);
                                     }
                                 }
                             }

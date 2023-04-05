@@ -24,16 +24,16 @@ import org.dspace.statistics.content.filter.StatisticsFilter;
  * @author kevinvandevelde at atmire.com
  * Date: 23-dec-2008
  * Time: 9:27:09
- * 
  */
 public abstract class StatisticsDisplay {
     private String id;
     private StatisticsData statisticsData;
     private String title;
 
-    /** css information used to position the display object in a html page**/
+    /**
+     * css information used to position the display object in a html page
+     **/
     private List<String> css;
-
 
 
     public void setTitle(String title) {
@@ -44,25 +44,24 @@ public abstract class StatisticsDisplay {
         return title;
     }
 
-    protected StatisticsDisplay(StatisticsData statisticsData){
+    protected StatisticsDisplay(StatisticsData statisticsData) {
         this.statisticsData = statisticsData;
     }
-
 
 
     public List<DatasetGenerator> getDatasetGenerators() {
         return statisticsData.getDatasetGenerators();
     }
 
-    public void addDatasetGenerator(DatasetGenerator set){
+    public void addDatasetGenerator(DatasetGenerator set) {
         statisticsData.addDatasetGenerator(set);
     }
 
-    public void addFilter(StatisticsFilter filter){
+    public void addFilter(StatisticsFilter filter) {
         statisticsData.addFilters(filter);
     }
 
-    public List<StatisticsFilter> getFilters(){
+    public List<StatisticsFilter> getFilters() {
         return statisticsData.getFilters();
     }
 
@@ -79,19 +78,19 @@ public abstract class StatisticsDisplay {
     }
 
     public abstract String getType();
-    
+
     public Dataset getDataset() {
         return statisticsData.getDataset();
     }
 
-    public Dataset getDataset(Context context) throws SQLException, SolrServerException, IOException, ParseException {
-        return statisticsData.createDataset(context);
+    public Dataset getDataset(Context context, int facetMinCount) throws SQLException, SolrServerException, IOException,
+        ParseException {
+        return statisticsData.createDataset(context, facetMinCount);
     }
 
-    public void addCss(String style){
+    public void addCss(String style) {
         if (style != null) {
-            if (css == null)
-            {
+            if (css == null) {
                 css = new ArrayList<String>();
             }
             css.add(style.trim());
@@ -103,8 +102,7 @@ public abstract class StatisticsDisplay {
             StringBuilder result = new StringBuilder();
             for (String s : css) {
                 result.append(s);
-                if (!s.endsWith(";"))
-                {
+                if (!s.endsWith(";")) {
                     result.append(";");
                 }
             }

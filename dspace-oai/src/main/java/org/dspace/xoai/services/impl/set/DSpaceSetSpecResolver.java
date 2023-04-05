@@ -8,19 +8,19 @@
 
 package org.dspace.xoai.services.impl.set;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.xoai.exceptions.InvalidSetSpecException;
-import org.dspace.xoai.services.api.config.ConfigurationService;
-import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.HandleResolver;
 import org.dspace.xoai.services.api.HandleResolverException;
+import org.dspace.xoai.services.api.config.ConfigurationService;
+import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.set.SetSpecResolver;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DSpaceSetSpecResolver implements SetSpecResolver {
     private static final String HANDLE_PREFIX = "{handle-prefix}";
@@ -40,7 +40,9 @@ public class DSpaceSetSpecResolver implements SetSpecResolver {
     public String toSetSpec(Community community) throws InvalidSetSpecException {
         String handle = community.getHandle();
         String[] split = handle.split("/");
-        if (split.length != 2) throw new InvalidSetSpecException("Invalid handle "+handle);
+        if (split.length != 2) {
+            throw new InvalidSetSpecException("Invalid handle " + handle);
+        }
 
         return format(getSetSpecFormat(Community.class), split[0], split[1]);
     }
@@ -49,7 +51,9 @@ public class DSpaceSetSpecResolver implements SetSpecResolver {
     public String toSetSpec(Collection collection) throws InvalidSetSpecException {
         String handle = collection.getHandle();
         String[] split = handle.split("/");
-        if (split.length != 2) throw new InvalidSetSpecException("Invalid handle "+handle);
+        if (split.length != 2) {
+            throw new InvalidSetSpecException("Invalid handle " + handle);
+        }
 
         return String.format(getSetSpecFormat(Community.class), split[0], split[1]);
     }
@@ -59,12 +63,13 @@ public class DSpaceSetSpecResolver implements SetSpecResolver {
         String communityPattern = getPattern(Community.class);
         String collectionPattern = getPattern(Collection.class);
         String pattern;
-        if (setSpec.matches(communityPattern))
+        if (setSpec.matches(communityPattern)) {
             pattern = communityPattern;
-        else if (setSpec.matches(collectionPattern))
+        } else if (setSpec.matches(collectionPattern)) {
             pattern = collectionPattern;
-        else
+        } else {
             throw new InvalidSetSpecException("Unknown set spec");
+        }
 
 
         Matcher matcher = Pattern.compile(pattern).matcher(setSpec);
@@ -83,11 +88,12 @@ public class DSpaceSetSpecResolver implements SetSpecResolver {
     }
 
     private String getPattern(Class<?> clazz) {
-        return "^"+getSetSpecFormat(clazz).replace(HANDLE_PREFIX, "([0-9]+)").replace(LOCAL_ID, "([0-9]+)")+"$";
+        return "^" + getSetSpecFormat(clazz).replace(HANDLE_PREFIX, "([0-9]+)").replace(LOCAL_ID, "([0-9]+)") + "$";
     }
 
     private String getSetSpecFormat(Class<?> clazz) {
-        String property = configurationService.getProperty("oai", clazz.getSimpleName().toLowerCase() + ".setSpecFormat");
+        String property = configurationService
+            .getProperty("oai", clazz.getSimpleName().toLowerCase() + ".setSpecFormat");
         return property == null ? DEFAULT_FORMAT : property;
     }
 }

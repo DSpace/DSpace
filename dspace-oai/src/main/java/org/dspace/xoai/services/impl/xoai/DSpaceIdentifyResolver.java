@@ -8,10 +8,10 @@
 package org.dspace.xoai.services.impl.xoai;
 
 import com.lyncode.xoai.dataprovider.services.api.RepositoryConfiguration;
+import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
-import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.xoai.IdentifyResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +25,7 @@ public class DSpaceIdentifyResolver implements IdentifyResolver {
 
     @Override
     public RepositoryConfiguration getIdentify() throws ContextServiceException {
-        return new DSpaceRepositoryConfiguration(earliestDateResolver, configurationService, contextService.getContext());
+        return new DSpaceRepositoryConfiguration(earliestDateResolver, configurationService,
+                                                 contextService.getContext());
     }
 }

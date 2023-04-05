@@ -7,20 +7,22 @@
  */
 package org.dspace.authority;
 
-import org.apache.log4j.Logger;
-
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * This class contains a list of active authority types.
  * It can be used to created a new instance of a specific type.
- * However if you need to make a new instance to store it in solr, you need to use AuthorityValueGenerator.
- * To create an instance from a solr record, use AuthorityValue#fromSolr(SolrDocument).
+ * However if you need to make a new instance to store it in Solr, you need to use {@link AuthorityValueGenerator}.
+ * To create an instance from a Solr record, use {@link AuthorityValue#fromSolr(SolrDocument)}.
  *
- * This class is instantiated in spring and accessed by a static method in AuthorityValue.
+ * This class is instantiated in Spring and accessed by a static method in AuthorityValue.
  *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -32,12 +34,11 @@ public class AuthorityTypes {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(AuthorityTypes.class);
+    private static final Logger log = LogManager.getLogger(AuthorityTypes.class);
 
-    protected List<AuthorityValue> types = new ArrayList<AuthorityValue>();
+    protected List<AuthorityValue> types = new ArrayList<>();
 
-    protected Map<String, AuthorityValue> fieldDefaults = new HashMap<String, AuthorityValue>();
-
+    protected Map<String, AuthorityValue> fieldDefaults = new HashMap<>();
 
 
     public List<AuthorityValue> getTypes() {
@@ -61,10 +62,10 @@ public class AuthorityTypes {
         for (AuthorityValue authorityValue : types) {
             if (authorityValue.getAuthorityType().equals(type)) {
                 try {
-                    result = authorityValue.getClass().newInstance();
-                } catch (InstantiationException e) {
-                    log.error("Error", e);
-                } catch (IllegalAccessException e) {
+                    result = authorityValue.getClass().getDeclaredConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException
+                        | NoSuchMethodException | SecurityException
+                        | IllegalArgumentException | InvocationTargetException e) {
                     log.error("Error", e);
                 }
             }

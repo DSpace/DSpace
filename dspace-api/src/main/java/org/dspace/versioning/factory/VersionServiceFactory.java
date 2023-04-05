@@ -10,9 +10,11 @@ package org.dspace.versioning.factory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.versioning.utils.RelationshipVersioningUtils;
 
 /**
- * Abstract factory to get services for the versioning package, use VersionServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the versioning package, use VersionServiceFactory.getInstance() to retrieve
+ * an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -22,8 +24,10 @@ public abstract class VersionServiceFactory {
 
     public abstract VersioningService getVersionService();
 
-    public static VersionServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("versionServiceFactory", VersionServiceFactory.class);
+    public abstract RelationshipVersioningUtils getRelationshipVersioningUtils();
+
+    public static VersionServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("versionServiceFactory", VersionServiceFactory.class);
     }
 }

@@ -8,8 +8,9 @@
 
 package org.dspace.rdf.conversion;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import java.sql.SQLException;
+
+import com.hp.hpl.jena.rdf.model.Model;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -17,5 +18,5 @@ import org.dspace.core.Context;
 public interface RDFConverter {
 
     public Model convert(Context context, DSpaceObject dso)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 }

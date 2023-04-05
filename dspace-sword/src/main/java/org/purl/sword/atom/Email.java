@@ -7,30 +7,27 @@
  */
 package org.purl.sword.atom;
 
-import org.purl.sword.base.*;
+import org.purl.sword.base.BasicStringContentElement;
+import org.purl.sword.base.Namespaces;
+import org.purl.sword.base.XmlName;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class Email extends BasicStringContentElement
-{
+public class Email extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_ATOM, "email", Namespaces.NS_ATOM);
+        new XmlName(Namespaces.PREFIX_ATOM, "email", Namespaces.NS_ATOM);
 
-    public Email()
-    {
+    public Email() {
         super(XML_NAME);
     }
 
-    public Email(String email)
-    {
+    public Email(String email) {
         this();
         setContent(email);
     }
 
-    public static XmlName elementName()
-    {
-        return XML_NAME; 
+    public static XmlName elementName() {
+        return XML_NAME;
     }
 }

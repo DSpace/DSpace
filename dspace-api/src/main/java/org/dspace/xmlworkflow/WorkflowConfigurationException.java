@@ -8,22 +8,23 @@
 package org.dspace.xmlworkflow;
 
 /**
- * Exception for problems with the configuration xml
+ * Exception for problems with the configuration XML.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class WorkflowConfigurationException extends Exception{
+public class WorkflowConfigurationException extends Exception {
 
-    private String error;
+    private final String error;
 
-    public WorkflowConfigurationException(String error){
+    public WorkflowConfigurationException(String error) {
         this.error = error;
     }
 
-    public String toString(){
+    @Override
+    public String getMessage() {
         return this.error;
     }
 

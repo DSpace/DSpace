@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
@@ -15,8 +16,8 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.3-drum-7.1</version>
-        <relativePath>..</relativePath>
+        <version>7.4-drum-0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -26,7 +27,7 @@
 
     <profiles>
 
-        <!-- Build Profile. This builds all Overlay modules for DSpace -->   
+        <!-- Build Profile. This builds all Overlay modules for DSpace -->
         <profile>
             <id>build</id>
             <activation>
@@ -38,9 +39,9 @@
             <!-- Build all Overlay submodules -->
             <modules>
                 <module>modules</module>
-            </modules> 
+            </modules>
         </profile>
-   
+
         <!--
             DSpace Assembly profile. By default this is enabled.
             This profile actually builds all submodules and then assembles
@@ -85,8 +86,8 @@
             </build>
         </profile>
 
-        <!-- This profile simply determines whether we are creating 
-             zip / tarball distributions to upload to SourceFore or similar. 
+        <!-- This profile simply determines whether we are creating
+             zip / tarball distributions to upload to SourceFore or similar.
              By running "mvn package -Ddistributions=true" you'll
              SKIP normal build & assembly (see above profiles) and
              INSTEAD just run the "distributions" profile below. -->
@@ -102,7 +103,7 @@
             <properties>
                 <distributions>false</distributions>
             </properties>
-        </profile> 
+        </profile>
 
 
         <!--
@@ -144,193 +145,113 @@
                     </executions>
                  </plugin>
               </plugins>
-               <resources>
-                   <!-- Enumerate filtered files explicitly to avoid issues with other config tech. -->
-                   <resource>
-                       <directory>${basedir}</directory>
-                       <filtering>true</filtering>
-                       <includes>
-                           <include>config/default.context.xml</include>
-                           <include>config/dspace.cfg</include>
-                           <include>config/log4j-handle-plugin.properties</include>
-                           <include>config/log4j.properties</include>
-                           <include>config/modules/curate.cfg</include>
-                           <include>config/modules/com.atmire.statistics.oai.cfg</include>
-                           <include>config/modules/solr-statistics.cfg</include>
-                       </includes>
-                   </resource>
-                   <!-- Declare a mutually exclusive resource set for non-filtered files. -->
-                   <resource>
-                       <directory>${basedir}</directory>
-                       <filtering>false</filtering>
-                       <excludes>
-                           <exclude>config/default.context.xml</exclude>
-                           <exclude>config/dspace.cfg</exclude>
-                           <exclude>config/log4j-handle-plugin.properties</exclude>
-                           <exclude>config/log4j.properties</exclude>
-                           <exclude>config/modules/curate.cfg</exclude>
-                           <exclude>config/modules/com.atmire.statistics.oai.cfg</exclude>
-                           <exclude>config/modules/solr-statistics.cfg</exclude>
-                       </excludes>
-                   </resource>
-               </resources>
            </build>
         </profile>
 
-        <!-- An added <profile>
-            Run 'mvn -P installer-dist' to create a tarball of target/dspace-installer-${version}.tar.gz.
-            Transfer the tarcall to server and un-tar it at /apps/drum.
-            The server is based on the value of -Denv= while building drum.
-            Ex. Build by 'mvn clean install -Denv=prod -Dlicense.skip=true' and the 
-            dspace-installer-${version}.tar.gz is the distribution for production.
-
-            https://issues.umd.edu/browse/LIBITD-767
-        -->
+        <!-- Profile to aggregate (local) code coverage reports created by JaCoCo (jacoco.org)
+             during the Unit and Integration testing processes.
+             This plugin is disabled by default, as it is triggered by name in [src]/.travis.yml
+             See also jacoco-maven-plugin settings in Parent POM, as those
+             settings generate the module-specific reports that are aggregated here. -->
         <profile>
-          <id>installer-dist</id>
-      	  <build>
-            <defaultGoal>validate</defaultGoal>
-            <plugins>
-              <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <tarLongFileMode>posix</tarLongFileMode>
-                    <descriptors>
-                        <descriptor>src/main/assembly/dspace-installer-distribution.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                  <execution>
-                    <id>distro-assembly</id>
-                    <phase>validate</phase>
-                    <goals>
-                      <goal>single</goal>
-                    </goals>
-                  </execution>
-                </executions>
-              </plugin>
-            </plugins>
-          </build>
-        </profile>
-        <!-- 
-            Profile to deploy a snapshot version to UMD Nexus
-
-            https://issues.umd.edu/browse/LIBDRUM-514
-        -->
-        <profile>
-          <id>deploy-snapshot</id>
-          <build>
-            <defaultGoal>install</defaultGoal>
-            <plugins>
-              <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-                <executions>
-                  <execution>
-                    <id>deploy-snapshot</id>
-                    <phase>install</phase>
-                    <goals>
-                      <goal>deploy-file</goal>
-                    </goals>
-                    <configuration>
-                      <file>target/dspace-installer-${project.version}.tar.gz</file>
-                      <url>https://maven.lib.umd.edu/nexus/content/repositories/snapshots</url>
-                      <repositoryId>nexus</repositoryId>
-                      <groupId>edu.umd.lib.drum</groupId>
-                      <artifactId>drum-installer</artifactId>
-                      <version>${project.version}</version>
-                      <packaging>tar.gz</packaging>
-                    </configuration>
-                  </execution>
-                </executions>
-              </plugin>
-            </plugins>
-          </build>
-        </profile>
-        <!-- 
-            Profile to deploy a release version to UMD Nexus
-
-            https://issues.umd.edu/browse/LIBDRUM-514
-        -->
-        <profile>
-          <id>deploy-release</id>
-          <build>
-            <defaultGoal>install</defaultGoal>
-            <plugins>
-              <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-                <executions>
-                  <execution>
-                    <id>deploy-release</id>
-                    <phase>install</phase>
-                    <goals>
-                      <goal>deploy-file</goal>
-                    </goals>
-                    <configuration>
-                      <file>target/dspace-installer-${project.version}.tar.gz</file>
-                      <url>https://maven.lib.umd.edu/nexus/content/repositories/releases</url>
-                      <repositoryId>nexus</repositoryId>
-                      <groupId>edu.umd.lib.drum</groupId>
-                      <artifactId>drum-installer</artifactId>
-                      <version>${project.version}</version>
-                      <packaging>tar.gz</packaging>
-                    </configuration>
-                  </execution>
-                </executions>
-              </plugin>
-            </plugins>
-          </build>
+            <id>coverage-report</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Aggregate all test code coverage reports from the individual module coverage reports
+                         that are generated during unit & integration testing.
+                         Results (HTML and XML) are written to ./target/site/jacoco-aggregate/ -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>aggregate-test-report</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>report-aggregate</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- By default, JaCoCo will lookup all *.exec in the target folders of the Reactor Build Order -->
+                                    <!-- Sets the path to the files which contain the execution data. -->
+                                    <dataFileIncludes>
+                                        <dataFileInclude>**/jacoco-ut.exec</dataFileInclude>
+                                        <dataFileInclude>**/jacoco-it.exec</dataFileInclude>
+                                    </dataFileIncludes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <!-- Add all modules that should be taken into account for the coverage reports -->
+                <!-- (Excludes dspace-rest which is deprecated and doesn't build by default) -->
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-api</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-oai</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-rdf</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-iiif</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-services</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-server-webapp</artifactId>
+                    <type>war</type>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-sword</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.dspace</groupId>
+                    <artifactId>dspace-swordv2</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+            <scope>provided</scope>
+        </dependency>
     	<!-- This dependency ensures DSpace OAI JAR is added to [dspace]/lib/,
              so that the 'dspace oai' launcher.xml command works.  -->
     	<dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <type>jar</type>
-            <classifier>classes</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.lyncode</groupId>
-                    <artifactId>builder-commons</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
     	</dependency>
-        <!-- Ensure that the additional service API classes are available during spring instantiation-->
-        <dependency>
-            <groupId>com.atmire</groupId>
-            <artifactId>atmire-statistics-exporter-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>builder-commons</artifactId>
-            <version>1.0.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
 
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
     	</dependency>
     </dependencies>
 </project>

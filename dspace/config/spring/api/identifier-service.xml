@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2002-2010, DuraSpace.  All rights reserved
-    Licensed under the DuraSpace License.
-
-    A copy of the DuraSpace License has been included in this
-    distribution and is available at: http://www.dspace.org/license
-
--->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -74,6 +65,21 @@
             ref="org.dspace.identifier.doi.DOIConnector" />
     </bean>
     -->
+
+    <!-- An optional logical item filter can be included in provider configuration based
+    on the filters defined in item-filters.xml, eg. -->
+    <!--
+    <bean id="org.dspace.identifier.DOIIdentifierProvider"
+        class="org.dspace.identifier.DOIIdentifierProvider"
+        scope="singleton">
+        <property name="configurationService"
+            ref="org.dspace.services.ConfigurationService" />
+        <property name="DOIConnector"
+            ref="org.dspace.identifier.doi.DOIConnector" />
+        <property name="filterService" ref="openaire_filter" />
+    </bean>
+    -->
+
     
     <!-- The DOIConnector will handle the API calls to your DOI registration
          agency for the DOIIdentifierProvider. If your registration agency

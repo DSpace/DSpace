@@ -14,14 +14,14 @@ import org.dspace.services.model.RequestInterceptor;
 
 
 /**
- * This will execute a request and ensure that it closes even if the 
- * thing that is being executed (run) dies.  It will appropriately end 
- * the request based on the result of the execution and can start a new 
+ * This will execute a request and ensure that it closes even if the
+ * thing that is being executed (run) dies.  It will appropriately end
+ * the request based on the result of the execution and can start a new
  * request or tie into an existing request if there is one.
  * <p>
- * This is also a Runnable so it can be used as a wrapper which allows 
+ * This is also a Runnable so it can be used as a wrapper which allows
  * something to be executed inside a request.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public final class RequestExecutor implements Runnable {
@@ -31,14 +31,14 @@ public final class RequestExecutor implements Runnable {
     private final boolean useExistingRequestIfPossible;
 
     /**
-     * Create an executor which can be used to execute the runnable 
+     * Create an executor which can be used to execute the runnable
      * within a request by calling the execute method.
-     * This will create a new request to execute the code in when the 
+     * This will create a new request to execute the code in when the
      * execute method is called.
      * All parameters are required.
-     * 
+     *
      * @param requestService the request service
-     * @param toExecute the code to execute
+     * @param toExecute      the code to execute
      * @throws IllegalArgumentException if the params are null
      */
     public RequestExecutor(RequestService requestService, Runnable toExecute) {
@@ -46,14 +46,15 @@ public final class RequestExecutor implements Runnable {
     }
 
     /**
-     * Create an executor which can be used to execute the runnable 
+     * Create an executor which can be used to execute the runnable
      * within a request by calling the execute method.
      * All parameters are required.
-     * 
-     * @param requestService the request service
-     * @param toExecute the code to execute
+     *
+     * @param requestService               the request service
+     * @param toExecute                    the code to execute
      * @param useExistingRequestIfPossible if true then this will try to attach to an existing request and
-     * will create a new request if none is found, if false it will create a new request to execute in
+     *                                     will create a new request if none is found, if false it will create a new
+     *                                     request to execute in
      * @throws IllegalArgumentException if the params are null
      */
     public RequestExecutor(RequestService requestService, Runnable toExecute, boolean useExistingRequestIfPossible) {
@@ -68,12 +69,14 @@ public final class RequestExecutor implements Runnable {
     /**
      * Execute the {@link Runnable} which is contained in this object,
      * the same as calling {@link #run()}.
+     *
      * @throws RequestInterceptor.RequestInterruptionException if the method fails
      */
     public void execute() {
         RequestService requestService = this.requestServiceRef.get();
         if (requestService == null) {
-            throw new IllegalStateException("it is no longer possible to execute this because the RequestService is no longer valid");
+            throw new IllegalStateException(
+                "it is no longer possible to execute this because the RequestService is no longer valid");
         }
         String requestId = null;
         if (useExistingRequestIfPossible) {
@@ -93,7 +96,9 @@ public final class RequestExecutor implements Runnable {
             }
         } catch (Exception e) {
             requestService.endRequest(e);
-            throw new RequestInterceptor.RequestInterruptionException("Failure during execution of Runnable (" + toExecute + ") in request ("+requestId+"):" + e.getMessage(), e);
+            throw new RequestInterceptor.RequestInterruptionException(
+                "Failure during execution of Runnable (" + toExecute + ") in request (" + requestId + "):" + e
+                    .getMessage(), e);
         }
     }
 

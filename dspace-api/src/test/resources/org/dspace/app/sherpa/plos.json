@@ -1,0 +1,619 @@
+{
+  "items" : [
+    {
+      "country" : "us",
+      "name" : [
+        {
+          "preferred" : "name",
+          "name" : "Public Library of Science",
+          "preferred_phrases" : [
+            {
+              "language" : "en",
+              "phrase" : "Name",
+              "value" : "name"
+            }
+          ],
+          "language" : "en",
+          "language_phrases" : [
+            {
+              "value" : "en",
+              "phrase" : "English",
+              "language" : "en"
+            }
+          ]
+        }
+      ],
+      "country_phrases" : [
+        {
+          "language" : "en",
+          "phrase" : "United States of America",
+          "value" : "us"
+        }
+      ],
+      "id" : 112,
+      "url" : "http://www.plos.org/",
+      "publication_count" : 7,
+      "system_metadata" : {
+        "id" : 112,
+        "publicly_visible" : "yes",
+        "uri" : "http://v2.sherpa.ac.uk/id/publisher/112",
+        "date_created" : "2005-02-07 00:00:00",
+        "publicly_visible_phrases" : [
+          {
+            "value" : "yes",
+            "phrase" : "Yes",
+            "language" : "en"
+          }
+        ],
+        "date_modified" : "2019-05-20 11:49:24"
+      },
+      "publications" : [
+        {
+          "title" : [
+            {
+              "title" : "PLoS Biology",
+              "language" : "en",
+              "language_phrases" : [
+                {
+                  "value" : "en",
+                  "language" : "en",
+                  "phrase" : "English"
+                }
+              ]
+            }
+          ],
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17601",
+          "id" : 17601,
+          "type" : "journal",
+          "issns" : [
+            {
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Print",
+                  "value" : "print"
+                }
+              ],
+              "issn" : "1544-9173",
+              "type" : "print"
+            },
+            {
+              "type" : "electronic",
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Electronic",
+                  "value" : "electronic"
+                }
+              ],
+              "issn" : "1545-7885"
+            }
+          ],
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "language" : "en",
+              "phrase" : "Journal"
+            }
+          ]
+        },
+        {
+          "title" : [
+            {
+              "title" : "PLoS Computational Biology",
+              "language" : "en",
+              "language_phrases" : [
+                {
+                  "value" : "en",
+                  "language" : "en",
+                  "phrase" : "English"
+                }
+              ]
+            }
+          ],
+          "id" : 17595,
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17595",
+          "type" : "journal",
+          "issns" : [
+            {
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Print",
+                  "value" : "print"
+                }
+              ],
+              "issn" : "1553-734X",
+              "type" : "print"
+            },
+            {
+              "type" : "electronic",
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Electronic",
+                  "value" : "electronic"
+                }
+              ],
+              "issn" : "1553-7358"
+            }
+          ],
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "phrase" : "Journal",
+              "language" : "en"
+            }
+          ]
+        },
+        {
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "language" : "en",
+              "phrase" : "Journal"
+            }
+          ],
+          "issns" : [
+            {
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Print",
+                  "value" : "print"
+                }
+              ],
+              "issn" : "1553-7390",
+              "type" : "print"
+            },
+            {
+              "issn" : "1553-7404",
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Electronic",
+                  "value" : "electronic"
+                }
+              ],
+              "type" : "electronic"
+            }
+          ],
+          "title" : [
+            {
+              "title" : "PLoS Genetics",
+              "language_phrases" : [
+                {
+                  "value" : "en",
+                  "language" : "en",
+                  "phrase" : "English"
+                }
+              ],
+              "language" : "en"
+            }
+          ],
+          "id" : 17596,
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17596",
+          "type" : "journal"
+        },
+        {
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17597",
+          "id" : 17597,
+          "title" : [
+            {
+              "language_phrases" : [
+                {
+                  "phrase" : "English",
+                  "language" : "en",
+                  "value" : "en"
+                }
+              ],
+              "language" : "en",
+              "title" : "PLoS Medicine"
+            }
+          ],
+          "type" : "journal",
+          "issns" : [
+            {
+              "type_phrases" : [
+                {
+                  "value" : "print",
+                  "phrase" : "Print",
+                  "language" : "en"
+                }
+              ],
+              "issn" : "1549-1277",
+              "type" : "print"
+            },
+            {
+              "type" : "electronic",
+              "issn" : "1549-1676",
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Electronic",
+                  "value" : "electronic"
+                }
+              ]
+            }
+          ],
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "language" : "en",
+              "phrase" : "Journal"
+            }
+          ]
+        },
+        {
+          "title" : [
+            {
+              "language_phrases" : [
+                {
+                  "value" : "en",
+                  "language" : "en",
+                  "phrase" : "English"
+                }
+              ],
+              "language" : "en",
+              "acronym" : "PLoS NTDs",
+              "title" : "PLoS Neglected Tropical Diseases"
+            }
+          ],
+          "id" : 17598,
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17598",
+          "type" : "journal",
+          "issns" : [
+            {
+              "type" : "electronic",
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Electronic",
+                  "value" : "electronic"
+                }
+              ],
+              "issn" : "1935-2735"
+            }
+          ],
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "language" : "en",
+              "phrase" : "Journal"
+            }
+          ]
+        },
+        {
+          "issns" : [
+            {
+              "type" : "electronic",
+              "type_phrases" : [
+                {
+                  "value" : "electronic",
+                  "language" : "en",
+                  "phrase" : "Electronic"
+                }
+              ],
+              "issn" : "1932-6203"
+            }
+          ],
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "language" : "en",
+              "phrase" : "Journal"
+            }
+          ],
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17599",
+          "id" : 17599,
+          "title" : [
+            {
+              "language" : "en",
+              "language_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "English",
+                  "value" : "en"
+                }
+              ],
+              "title" : "PLoS ONE"
+            }
+          ],
+          "type" : "journal"
+        },
+        {
+          "issns" : [
+            {
+              "type" : "print",
+              "issn" : "1553-7366",
+              "type_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Print",
+                  "value" : "print"
+                }
+              ]
+            },
+            {
+              "type" : "electronic",
+              "issn" : "1553-7374",
+              "type_phrases" : [
+                {
+                  "phrase" : "Electronic",
+                  "language" : "en",
+                  "value" : "electronic"
+                }
+              ]
+            }
+          ],
+          "type_phrases" : [
+            {
+              "value" : "journal",
+              "phrase" : "Journal",
+              "language" : "en"
+            }
+          ],
+          "id" : 17600,
+          "title" : [
+            {
+              "title" : "PLoS Pathogens",
+              "language_phrases" : [
+                {
+                  "value" : "en",
+                  "phrase" : "English",
+                  "language" : "en"
+                }
+              ],
+              "language" : "en"
+            }
+          ],
+          "uri" : "http://v2.sherpa.ac.uk/id/publication/17600",
+          "type" : "journal"
+        }
+      ],
+      "policies" : [
+        {
+          "open_access_prohibited_phrases" : [
+            {
+              "phrase" : "No",
+              "language" : "en",
+              "value" : "no"
+            }
+          ],
+          "internal_moniker" : "Default policy",
+          "id" : 112,
+          "uri" : "http://v2.sherpa.ac.uk/id/publisher_policy/112",
+          "open_access_prohibited" : "no",
+          "permitted_oa" : [
+            {
+              "license" : [
+                {
+                  "license" : "cc_by",
+                  "license_phrases" : [
+                    {
+                      "value" : "cc_by",
+                      "phrase" : "CC BY",
+                      "language" : "en"
+                    }
+                  ],
+                  "version" : "4"
+                }
+              ],
+              "copyright_owner_phrases" : [
+                {
+                  "phrase" : "Authors",
+                  "language" : "en",
+                  "value" : "authors"
+                }
+              ],
+              "location" : {
+                "location" : [
+                  "preprint_repository"
+                ],
+                "location_phrases" : [
+                  {
+                    "value" : "preprint_repository",
+                    "language" : "en",
+                    "phrase" : "Preprint Repository"
+                  }
+                ]
+              },
+              "copyright_owner" : "authors",
+              "article_version" : [
+                "submitted"
+              ],
+              "additional_oa_fee_phrases" : [
+                {
+                  "phrase" : "No",
+                  "language" : "en",
+                  "value" : "no"
+                }
+              ],
+              "conditions" : [
+                "Published source must be acknowledged with citation"
+              ],
+              "article_version_phrases" : [
+                {
+                  "phrase" : "Submitted",
+                  "language" : "en",
+                  "value" : "submitted"
+                }
+              ],
+              "additional_oa_fee" : "no"
+            },
+            {
+              "additional_oa_fee" : "no",
+              "article_version_phrases" : [
+                {
+                  "value" : "accepted",
+                  "phrase" : "Accepted",
+                  "language" : "en"
+                }
+              ],
+              "location" : {
+                "location_phrases" : [
+                  {
+                    "phrase" : "Any Website",
+                    "language" : "en",
+                    "value" : "any_website"
+                  }
+                ],
+                "location" : [
+                  "any_website"
+                ]
+              },
+              "license" : [
+                {
+                  "license" : "cc_by",
+                  "license_phrases" : [
+                    {
+                      "language" : "en",
+                      "phrase" : "CC BY",
+                      "value" : "cc_by"
+                    }
+                  ],
+                  "version" : "4"
+                }
+              ],
+              "copyright_owner_phrases" : [
+                {
+                  "phrase" : "Authors",
+                  "language" : "en",
+                  "value" : "authors"
+                }
+              ],
+              "additional_oa_fee_phrases" : [
+                {
+                  "phrase" : "No",
+                  "language" : "en",
+                  "value" : "no"
+                }
+              ],
+              "copyright_owner" : "authors",
+              "article_version" : [
+                "accepted"
+              ]
+            },
+            {
+              "additional_oa_fee" : "no",
+              "article_version_phrases" : [
+                {
+                  "language" : "en",
+                  "phrase" : "Published",
+                  "value" : "published"
+                }
+              ],
+              "publisher_deposit" : [
+                {
+                  "repository_metadata" : {
+                    "type_phrases" : [
+                      {
+                        "value" : "disciplinary",
+                        "phrase" : "Disciplinary",
+                        "language" : "en"
+                      }
+                    ],
+                    "description" : "A subject-based repository of biomedical and life sciences journal literature developed and managed by the National Center for Biotechnology Information (NCBI) at the US National Library of Medicine (NLM). \r\n\r\nContent includes articles deposited by participating journals that have applied to and been selected for the archive by NLM, as well as individual author manuscripts that have been submitted in compliance with the NIH Public Access Policy and similar policies of other research funding agencies. More than 2000 journals currently use PMC as a repository. Digitization projects have also added content from the 18th, 19th, and 20th centuries to the archive.",
+                    "url" : "http://www.ncbi.nlm.nih.gov/pmc/",
+                    "name" : [
+                      {
+                        "preferred" : "name",
+                        "name" : "PubMed Central",
+                        "preferred_phrases" : [
+                          {
+                            "language" : "en",
+                            "phrase" : "Name",
+                            "value" : "name"
+                          }
+                        ],
+                        "language" : "en",
+                        "language_phrases" : [
+                          {
+                            "phrase" : "English",
+                            "language" : "en",
+                            "value" : "en"
+                          }
+                        ]
+                      }
+                    ],
+                    "type" : "disciplinary"
+                  },
+                  "system_metadata" : {
+                    "id" : 267,
+                    "uri" : "http://v2.sherpa.ac.uk/id/repository/267"
+                  }
+                }
+              ],
+              "conditions" : [
+                "Published source must be acknowledged with citation"
+              ],
+              "copyright_owner" : "authors",
+              "article_version" : [
+                "published"
+              ],
+              "additional_oa_fee_phrases" : [
+                {
+                  "value" : "no",
+                  "phrase" : "No",
+                  "language" : "en"
+                }
+              ],
+              "license" : [
+                {
+                  "license" : "cc_by",
+                  "license_phrases" : [
+                    {
+                      "language" : "en",
+                      "phrase" : "CC BY",
+                      "value" : "cc_by"
+                    }
+                  ],
+                  "version" : "4.0"
+                }
+              ],
+              "copyright_owner_phrases" : [
+                {
+                  "value" : "authors",
+                  "phrase" : "Authors",
+                  "language" : "en"
+                }
+              ],
+              "location" : {
+                "named_repository" : [
+                  "PubMed Central"
+                ],
+                "location_phrases" : [
+                  {
+                    "language" : "en",
+                    "phrase" : "Named Repository",
+                    "value" : "named_repository"
+                  },
+                  {
+                    "value" : "this_journal",
+                    "language" : "en",
+                    "phrase" : "This Journal"
+                  }
+                ],
+                "location" : [
+                  "named_repository",
+                  "this_journal"
+                ]
+              }
+            }
+          ],
+          "urls" : [
+            {
+              "description" : "Pre-print Server policy",
+              "url" : "http://journals.plos.org/plosone/s/ethical-publishing-practice#loc-preprint-servers"
+            },
+            {
+              "description" : "Open Access",
+              "url" : "https://www.plos.org/open-access/"
+            }
+          ],
+          "publication_count" : 7
+        }
+      ]
+    }
+  ]
+}

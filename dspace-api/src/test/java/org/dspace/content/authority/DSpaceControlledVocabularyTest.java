@@ -7,46 +7,44 @@
  */
 package org.dspace.content.authority;
 
-import java.io.IOException;
-
-import org.dspace.content.Collection;
-import org.dspace.AbstractDSpaceTest;
-import org.dspace.core.factory.CoreServiceFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.junit.*;
+
+import java.io.IOException;
+
+import org.dspace.AbstractDSpaceTest;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Unit tests for DSpaceControlledVocabulary.
  *
  * @author mwood
  */
-public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest
-{
-    public DSpaceControlledVocabularyTest()
-    {
+public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
+    public DSpaceControlledVocabularyTest() {
     }
 
     @BeforeClass
     public static void setUpClass()
-            throws Exception
-    {
+        throws Exception {
     }
 
     @AfterClass
     public static void tearDownClass()
-            throws Exception
-    {
+        throws Exception {
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
     }
 
     /**
@@ -67,29 +65,27 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest
 
     /**
      * Test of getMatches method, of class DSpaceControlledVocabulary.
+     * @throws java.io.IOException passed through.
+     * @throws java.lang.ClassNotFoundException passed through.
      */
     @Test
-    public void testGetMatches() throws IOException, ClassNotFoundException
-    {
+    public void testGetMatches() throws IOException, ClassNotFoundException {
         System.out.println("getMatches");
 
         final String PLUGIN_INTERFACE = "org.dspace.content.authority.ChoiceAuthority";
 
         // Ensure that 'id' attribute is optional
-        String field = null; // not used
         String text = "north 40";
-        Collection collection = null;
         int start = 0;
-        int limit = 0;
+        int limit = 10;
         String locale = null;
-        // This "farm" Controlled Vocab is included in TestEnvironment data 
+        // This "farm" Controlled Vocab is included in TestEnvironment data
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
         // by test configs in /src/test/data/dspaceFolder/config/local.cfg
         DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
-                CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
+            CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
-        Choices result = instance.getMatches(field, text, collection, start,
-                limit, locale);
+        Choices result = instance.getMatches(text, start, limit, locale);
         assertEquals("the farm::north 40", result.values[0].value);
     }
 

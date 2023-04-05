@@ -3,16 +3,17 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>rest</artifactId>
     <packaging>war</packaging>
-    <name>DSpace REST :: Local Customizations</name>
+    <name>DSpace (Deprecated) REST Webapp :: Local Customizations</name>
     <description>
         This project allows you to overlay your own local REST customizations
-        on top of the default REST API provided with DSpace.
+        on top of the deprecated REST API provided with DSpace. NOTE: This REST API is DEPRECATED. Please consider
+        using the REST API in dspace-server-webapp instead.
     </description>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
-        <version>6.3-drum-7.1</version>
+        <version>7.4-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -112,38 +113,26 @@
         <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- DSpace REST Webapp -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
+            <version>${project.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
+            <version>${project.version}</version>
             <type>jar</type>
             <classifier>classes</classifier>
         </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 

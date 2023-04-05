@@ -7,7 +7,9 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -20,7 +22,7 @@ import org.junit.Test;
 
 /**
  * Test the kernel can fire up correctly
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelImplTest {
@@ -56,7 +58,7 @@ public class DSpaceKernelImplTest {
         assertEquals(kernel.getConfigurationService(), kernelImpl.getConfigurationService());
         assertEquals(kernel.getServiceManager(), kernelImpl.getServiceManager());
         kernelImpl.stop();
-        
+
         kernel = null;
     }
 
@@ -72,8 +74,9 @@ public class DSpaceKernelImplTest {
         assertNotNull(kernel.getServiceManager());
         assertEquals(kernel.getConfigurationService(), kernelImpl.getConfigurationService());
         assertEquals(kernel.getServiceManager(), kernelImpl.getServiceManager());
-        
-        DSpaceKernelImpl kernelImpl2 = DSpaceKernelInit.getKernel("AZ-kernel"); // checks for the existing kernel but does not init
+
+        DSpaceKernelImpl kernelImpl2 = DSpaceKernelInit
+            .getKernel("AZ-kernel"); // checks for the existing kernel but does not init
         kernelImpl2.start();
         DSpaceKernel kernel2 = kernelImpl2.getManagedBean();
         assertNotNull(kernel2);
@@ -92,7 +95,7 @@ public class DSpaceKernelImplTest {
         kernelImpl2.destroy();
         kernelImpl2 = null;
         kernel = kernel2 = null;
-        
+
         kernelImpl.stop();
     }
 
@@ -102,7 +105,7 @@ public class DSpaceKernelImplTest {
         ClassLoader cl1 = new URLClassLoader(new URL[0], current);
         cl1.getParent();
         // TODO
-        
+
         cl1 = null;
         current = null;
     }

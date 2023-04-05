@@ -12,26 +12,23 @@ package org.dspace.app.bulkedit;
  *
  * @author Stuart Lewis
  */
-public class MetadataImportException extends Exception
-{
+public class MetadataImportException extends Exception {
     /**
      * Instantiate a new MetadataImportException
      *
      * @param message the error message
      */
-    public MetadataImportException(String message)
-    {
-       super(message);
+    public MetadataImportException(String message) {
+        super(message);
     }
 
     /**
      * Instantiate a new MetadataImportException
      *
-     * @param message the error message
+     * @param message   the error message
      * @param exception the root cause
      */
-    public MetadataImportException(String message, Exception exception)
-    {
-       super(message, exception);
+    public MetadataImportException(String message, Exception exception) {
+        super(message, exception);
     }
 }

@@ -7,15 +7,17 @@
  */
 package org.dspace.xmlworkflow.state.actions.userassignment;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.RoleMembers;
-import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
-
-import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * @author Bram De Schouwer (bram.deschouwer at dot com)
@@ -34,6 +36,11 @@ public class AssignAction extends UserSelectionAction {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
+    }
+
     public void generateTasks() {
     }
 
@@ -43,11 +50,12 @@ public class AssignAction extends UserSelectionAction {
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi,  RoleMembers roleMembers) throws SQLException {
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException {
+    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
+        throws WorkflowConfigurationException, SQLException {
         return false;
     }
 

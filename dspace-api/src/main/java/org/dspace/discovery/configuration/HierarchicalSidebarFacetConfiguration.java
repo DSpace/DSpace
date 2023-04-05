@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Special sidebar facet configuration used for hierarchical facets
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilterFacet{
+public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilterFacet {
 
     private String splitter;
     private boolean skipFirstNodeLevel = true;
@@ -31,7 +31,7 @@ public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilter
         return splitter;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setSplitter(String splitter) {
         this.splitter = splitter;
     }
@@ -46,10 +46,12 @@ public class HierarchicalSidebarFacetConfiguration extends DiscoverySearchFilter
 
     @Override
     public void setType(String type) throws DiscoveryConfigurationException {
-        if(type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)){
+        if (type.equalsIgnoreCase(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
             this.type = type;
-        }else{
-            throw new DiscoveryConfigurationException("The " + type + " can't be used with a hierarchical facet side bar facet use the \"DiscoverySearchFilterFacet\" class instead.");
+        } else {
+            throw new DiscoveryConfigurationException(
+                "The " + type + " can't be used with a hierarchical facet side bar facet use the " +
+                    "\"DiscoverySearchFilterFacet\" class instead.");
         }
 
     }

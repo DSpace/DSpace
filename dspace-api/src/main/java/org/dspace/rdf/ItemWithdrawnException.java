@@ -9,12 +9,10 @@
 package org.dspace.rdf;
 
 /**
- *
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
 public class ItemWithdrawnException extends Exception {
-    public ItemWithdrawnException()
-    {
+    public ItemWithdrawnException() {
         super("The processed item is withdrawn.");
     }
 }

@@ -8,8 +8,10 @@
 
 package org.dspace.core;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Locale;
-import mockit.Expectations;
+
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -19,38 +21,26 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
- *
  * @author mwood
  */
-public class I18nUtilTest extends AbstractDSpaceTest
-{
-
-    public I18nUtilTest()
-    {
-    }
+public class I18nUtilTest extends AbstractDSpaceTest {
 
     @BeforeClass
-    public static void setUpClass()
-    {
+    public static void setUpClass() {
     }
 
     @AfterClass
-    public static void tearDownClass()
-    {
+    public static void tearDownClass() {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
     }
 
     /**
@@ -140,27 +130,22 @@ public class I18nUtilTest extends AbstractDSpaceTest
      * Test of getMessage method, of class I18nUtil.
      */
     @Test
-    public void testGetMessage_String()
-    {
+    public void testGetMessage_String() {
         System.out.println("getMessage");
         final ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        
+
         // Override "default.locale" and ensure it is set to US English
-        new Expectations(configService.getClass()) {{
-            configService.getProperty("default.locale"); result = "en_US.UTF-8";
-        }};
+        configService.setProperty("default.locale", "en_US.UTF-8");
 
         // Assert our overridden default.locale is set in I18nUtil
         assertEquals("Default locale", new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale());
-        
-        String key, expResult, result;
 
-        // Test for a stock key
-        key = "jsp.general.home";
-        expResult = "DSpace Home";
-        result = I18nUtil.getMessage(key);
+        // Test for a stock key (in Messages.properties)
+        String key = "metadata.dc.title";
+        String expResult = "Title";
+        String result = I18nUtil.getMessage(key);
         assertEquals("Returns the translation of the key if it is defined",
-                expResult, result);
+                     expResult, result);
 
         // Test for a missing key
         key = expResult = "bogus key";
@@ -172,18 +157,16 @@ public class I18nUtilTest extends AbstractDSpaceTest
      * Test of getMessage method, of class I18nUtil.
      */
     @Test
-    public void testGetMessage_String_Locale()
-    {
+    public void testGetMessage_String_Locale() {
         System.out.println("getMessage");
-        String key, expResult, result;
         Locale locale = Locale.US;
 
-        // Test for a stock key
-        key = "jsp.general.home";
-        expResult = "DSpace Home";
-        result = I18nUtil.getMessage(key, locale);
+        // Test for a stock key (in Messages.properties)
+        String key = "metadata.dc.title";
+        String expResult = "Title";
+        String result = I18nUtil.getMessage(key, locale);
         assertEquals("Returns the translation of the key if it is defined",
-                expResult, result);
+                     expResult, result);
 
         // Test for a missing key
         key = expResult = "bogus key";

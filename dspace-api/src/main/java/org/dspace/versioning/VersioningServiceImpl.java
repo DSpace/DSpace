@@ -10,6 +10,7 @@ package org.dspace.versioning;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -24,16 +25,13 @@ import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- *
- *
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
-*/
+ */
 public class VersioningServiceImpl implements VersioningService {
 
     @Autowired(required = true)
@@ -46,38 +44,38 @@ public class VersioningServiceImpl implements VersioningService {
     private WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
     protected WorkflowItemService workflowItemService;
-    
+
     private DefaultItemVersionProvider provider;
 
-    @Required
+    @Autowired(required = true)
     public void setProvider(DefaultItemVersionProvider provider) {
         this.provider = provider;
     }
 
-    protected VersioningServiceImpl()
-    {
+    protected VersioningServiceImpl() {
 
     }
 
-    /** Service Methods */
+    /*
+     * Service Methods
+     */
     @Override
-    public Version createNewVersion(Context c, Item item){
+    public Version createNewVersion(Context c, Item item) {
         return createNewVersion(c, item, null);
     }
 
     @Override
     public Version createNewVersion(Context c, Item item, String summary) {
-        try{
+        try {
             VersionHistory vh = versionHistoryService.findByItem(c, item);
-            if(vh==null)
-            {
+            if (vh == null) {
                 // first time: create 2 versions: old and new one
-                vh= versionHistoryService.create(c);
+                vh = versionHistoryService.create(c);
 
                 // get dc:date.accessioned to be set as first version date...
                 List<MetadataValue> values = itemService.getMetadata(item, "dc", "date", "accessioned", Item.ANY);
                 Date versionDate = new Date();
-                if(values!=null && values.size() > 0){
+                if (values != null && values.size() > 0) {
                     String date = values.get(0).getValue();
                     versionDate = new DCDate(date).toDate();
                 }
@@ -93,26 +91,25 @@ public class VersioningServiceImpl implements VersioningService {
             provider.updateItemState(c, itemNew, item);
 
             return version;
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void removeVersion(Context c, Version version) throws SQLException {
-        try{
+    public void delete(Context c, Version version) throws SQLException {
+        try {
             // we will first delete the version and then the item
             // after deletion of the version we cannot find the item anymore
             // so we need to get the item now
             Item item = version.getItem();
 
             VersionHistory history = version.getVersionHistory();
-            if (item != null)
-            {
+            if (item != null) {
                 // take care of the item identifiers
                 provider.deleteVersionedItem(c, version, history);
             }
-            
+
             // to keep version number stables, we do not delete versions,
             // we set all fields null except versionnumber and versionhistory
             version.setItem(null);
@@ -124,39 +121,35 @@ public class VersioningServiceImpl implements VersioningService {
             // if all versions of a version history were deleted,
             // we delete the version history.
             if (this.getVersionsByHistory(c, history) == null
-                    || this.getVersionsByHistory(c, history).isEmpty())
-            {
+                || this.getVersionsByHistory(c, history).isEmpty()) {
                 // hard delete the previously soft deleted versions
-                for (Version v : history.getVersions())
-                {
+                for (Version v : history.getVersions()) {
                     versionDAO.delete(c, v);
                 }
                 // delete the version history
                 versionHistoryService.delete(c, history);
             }
-            
+
             // Completely delete the item
             if (item != null) {
                 // DS-1814 introduce the possibility that submitter can create
                 // new versions. To avoid authorithation problems we need to
                 // check whether a corresponding workspaceItem exists.
-                if (!item.isArchived())
-                {
-                	WorkspaceItem wsi = workspaceItemService.findByItem(c, item);
-        			if(wsi != null) {
+                if (!item.isArchived()) {
+                    WorkspaceItem wsi = workspaceItemService.findByItem(c, item);
+                    if (wsi != null) {
                         workspaceItemService.deleteAll(c, wsi);
-                	} else {
-        				WorkflowItem wfi = workflowItemService.findByItem(c, item);
-        				if (wfi != null) {
-        					workflowItemService.delete(c, wfi);
-        				}
-        			}
-                }
-            	else {
+                    } else {
+                        WorkflowItem wfi = workflowItemService.findByItem(c, item);
+                        if (wfi != null) {
+                            workflowItemService.delete(c, wfi);
+                        }
+                    }
+                } else {
                     itemService.delete(c, item);
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             c.abort();
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -165,8 +158,8 @@ public class VersioningServiceImpl implements VersioningService {
     @Override
     public void removeVersion(Context c, Item item) throws SQLException {
         Version version = versionDAO.findByItem(c, item);
-        if(version!=null){
-            removeVersion(c, version);
+        if (version != null) {
+            delete(c, version);
         }
     }
 
@@ -177,12 +170,12 @@ public class VersioningServiceImpl implements VersioningService {
 
 
     @Override
-    public Version restoreVersion(Context c, Version version){
+    public Version restoreVersion(Context c, Version version) {
         return restoreVersion(c, version, null);
     }
 
     @Override
-    public Version restoreVersion(Context c, Version version, String summary)  {
+    public Version restoreVersion(Context c, Version version, String summary) {
         return null;
     }
 
@@ -200,11 +193,15 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     @Override
-    public Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date, int versionNumber) {
+    public Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date,
+                                    int versionNumber) {
         try {
             Version version = versionDAO.create(context, new Version());
-
-            version.setVersionNumber(getNextVersionNumer(context, history));
+            if (versionNumber > 0 && !isVersionExist(context, item, versionNumber)) {
+                version.setVersionNumber(versionNumber);
+            } else {
+                version.setVersionNumber(getNextVersionNumer(context, history));
+            }
             version.setVersionDate(date);
             version.setePerson(item.getSubmitter());
             version.setItem(item);
@@ -217,30 +214,56 @@ public class VersioningServiceImpl implements VersioningService {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
+    private boolean isVersionExist(Context context, Item item, int versionNumber) throws SQLException {
+        VersionHistory history = versionHistoryService.findByItem(context, item);
+        if (Objects.isNull(history)) {
+            return false;
+        }
+        return history.getVersions().stream().filter(v -> v.getVersionNumber() == versionNumber)
+                                    .findFirst()
+                                    .isPresent();
+    }
+
     @Override
     public List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException {
-        List<Version> versions = versionDAO.findVersionsWithItems(c, vh);
+        List<Version> versions = versionDAO.findVersionsWithItems(c, vh, -1, -1);
         return versions;
     }
 
+    @Override
+    public List<Version> getVersionsByHistoryWithItems(Context c, VersionHistory vh, int offset, int limit)
+           throws SQLException {
+        return versionDAO.findVersionsWithItems(c, vh, offset, limit);
+    }
 
 // **** PROTECTED METHODS!!
 
-    protected Version createVersion(Context c, VersionHistory vh, Item item, String summary, Date date) throws SQLException {
+    protected Version createVersion(Context c, VersionHistory vh, Item item, String summary, Date date)
+        throws SQLException {
         return createNewVersion(c, vh, item, summary, date, getNextVersionNumer(c, vh));
     }
 
-    protected int getNextVersionNumer(Context c, VersionHistory vh) throws SQLException{
+    protected int getNextVersionNumer(Context c, VersionHistory vh) throws SQLException {
         int next = versionDAO.getNextVersionNumber(c, vh);
-        
+
         // check if we have uncommited versions in DSpace's cache
-        if (versionHistoryService.getLatestVersion(c, vh) != null 
-                && versionHistoryService.getLatestVersion(c, vh).getVersionNumber() >= next)
-        {
+        if (versionHistoryService.getLatestVersion(c, vh) != null
+            && versionHistoryService.getLatestVersion(c, vh).getVersionNumber() >= next) {
             next = versionHistoryService.getLatestVersion(c, vh).getVersionNumber() + 1;
         }
-        
+
         return next;
     }
+
+    @Override
+    public void update(Context context, Version version) throws SQLException {
+        versionDAO.save(context, version);
+    }
+
+    @Override
+    public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException {
+        return versionDAO.countVersionsByHistoryWithItem(context, versionHistory);
+    }
+
 }

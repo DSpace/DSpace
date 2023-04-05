@@ -16,9 +16,16 @@ BINDIR=`dirname $0`
 
 echo "Writing simple Handle server configuration"
 
-# Read parameters from DSpace config
-dshostname=`$BINDIR/dspace dsprop --property dspace.hostname`
+# Read server URL from DSpace config
+dsurl=`$BINDIR/dspace dsprop --property dspace.server.url`
+# Parse hostname from URL
+dshostname=`echo $dsurl | awk -F/ '{ print $3; exit }'`
+# Determine IP address from hostname
 dshostip=`host $dshostname | awk '/has address/ { print $4; exit }'`
+if [ "$dshostip" = "127.0.0.1" ]; then
+  # Just use default. SimpleSetup will fail when trying to bind to localhost addresses.
+  dshostip=""
+fi
 dsname=`$BINDIR/dspace dsprop --property dspace.name`
 handle=`$BINDIR/dspace dsprop --property handle.prefix`
 handledir=`$BINDIR/dspace dsprop --property handle.dir`
@@ -26,13 +33,13 @@ tempfile=/tmp/handleconfig$$
 contactemail=`$BINDIR/dspace dsprop --property mail.admin`
 
 # Write the options to a file we can pipe into the setup tool
-echo "1" >$tempfile   # 1 = non-caching server, 2 = caching server
-echo "" >>$tempfile   # Primary server?  Default = y (n = mirror server)
+echo "" >$tempfile   # Primary server?  Default = y (n = mirror server)
+echo "" >>$tempfile   # Dual-stack (IPv4 and IPv6)? (default=n)
 echo $dshostip >>$tempfile   # IP address
+echo "" >>$tempfile   # DBind address (default=same as IP)
 echo "" >>$tempfile   # Port to listen to (default=2641)
 echo "" >>$tempfile   # Port for HTTP i/f to listen to (default=8000)
-echo "" >>$tempfile   # Log all accesses?  ("y" or "n", default=n)
-echo "" >>$tempfile   # Rotate logs? (default=No)
+echo "n" >>$tempfile   # Log all accesses?  ("y" or "n", default=y)
 echo "" >>$tempfile   # Version/serial no. of site (default=1)
 echo $dsname Handle Server >>$tempfile  # Server description
 echo $dsname >>$tempfile # Server descriptive name
@@ -46,23 +53,24 @@ echo "n" >>$tempfile  # Do not encrypt admin private key
                       # OR do not overwrite old admin private key
 
 # Now run Handle server config tool, and pipe our config in
-$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null
+$BINDIR/dspace dsrun net.handle.server.SimpleSetup $handledir < $tempfile >/dev/null 2>&1
 
 # Remove temp file
 rm -f $tempfile
 
 # Now update server configuration (config.dct) with our handle prefix and the
 # DSpace Handle plugin
-sed 's/YOUR_NAMING_AUTHORITY/'$handle'/' <$handledir/config.dct >$tempfile
+sed 's/YOUR_PREFIX/'$handle'/' <$handledir/config.dct >$tempfile
 
 # Remove original config file - will replace
 rm -f $handledir/config.dct
 
-# Insert our HandlePlugin - this awk script inserts these lines in the
-# server_config section:
+# Insert our HandlePlugin and turn off transaction queue.
+# This awk script inserts these lines in the server_config section:
 #   "storage_type" = "CUSTOM"
 #   "storage_class" = "org.dspace.handle.HandlePlugin"
-awk '/.*/ {print $0} /"server_config" = {/ {printf "\"storage_type\" = \"CUSTOM\"\n\"storage_class\" = \"org.dspace.handle.HandlePlugin\"\n\n",$0}' <$tempfile >$handledir/config.dct
+#   "enable_txn_queue" = "n"
+awk '/.*/ {print $0} /"server_config" = {/ {printf "\"storage_type\" = \"CUSTOM\"\n\"storage_class\" = \"org.dspace.handle.HandlePlugin\"\n\"enable_txn_queue\" = \"no\"\n\n",$0}' <$tempfile >$handledir/config.dct
 
 
 #sed 's/"server_config" = {/"server_config" = {\n"storage_type" = "CUSTOM"\n"storage_class" = "org.dspace.handle.HandlePlugin"/'  <$tempfile >$handledir/config.dct

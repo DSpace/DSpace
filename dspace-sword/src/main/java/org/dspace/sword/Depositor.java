@@ -16,42 +16,41 @@ import org.purl.sword.base.SWORDErrorException;
  *
  * Abstract class for depositing content into the archive.
  */
-public abstract class Depositor
-{
+public abstract class Depositor {
     /**
-     * The sword service implementation
+     * The SWORD service implementation
      */
     protected SWORDService swordService;
 
     /**
-     * Construct a new Depositor with the given sword service on the given
+     * Construct a new Depositor with the given SWORD service on the given
      * dspace object.  It is anticipated that extensions of this class will
      * specialise in certain kinds of dspace object
      *
-     * @param swordService
-     * @param dso
+     * @param swordService SWORD service
+     * @param dso          DSpace object
      */
-    public Depositor(SWORDService swordService, DSpaceObject dso)
-    {
+    public Depositor(SWORDService swordService, DSpaceObject dso) {
         this.swordService = swordService;
     }
 
     /**
-     * Execute the deposit process with the given sword deposit.
+     * Execute the deposit process with the given SWORD deposit.
      *
-     * @param deposit
-     * @throws SWORDErrorException
-     * @throws DSpaceSWORDException
+     * @param deposit deposit request
+     * @return deposit result
+     * @throws SWORDErrorException  on generic SWORD exception
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public abstract DepositResult doDeposit(Deposit deposit)
-            throws SWORDErrorException, DSpaceSWORDException;
+        throws SWORDErrorException, DSpaceSWORDException;
 
     /**
      * Undo any changes to the archive effected by the deposit
      *
-     * @param result
-     * @throws DSpaceSWORDException
+     * @param result deposit result
+     * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public abstract void undoDeposit(DepositResult result)
-            throws DSpaceSWORDException;
+        throws DSpaceSWORDException;
 }

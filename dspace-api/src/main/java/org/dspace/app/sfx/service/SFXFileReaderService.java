@@ -7,11 +7,11 @@
  */
 package org.dspace.app.sfx.service;
 
+import java.io.IOException;
+
 import org.dspace.content.Item;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import java.io.IOException;
 
 /**
  * XML configuration file reader for DSpace metadata fields (DC) mapping
@@ -33,14 +33,15 @@ public interface SFXFileReaderService {
      * Loads the SFX configuration file
      *
      * @param fileName The name of the SFX configuration file
-     * @param item The item to process, from which metadata values will be taken
-     *
+     * @param item     The item to process, from which metadata values will be taken
      * @return the SFX string
      * @throws IOException if IO error
      */
     public String loadSFXFile(String fileName, Item item) throws IOException;
 
-    /** Parses XML file and returns XML document.
+    /**
+     * Parses XML file and returns XML document.
+     *
      * @param fileName XML file to parse
      * @return XML document or <B>null</B> if error occurred. The error is caught and logged.
      */
@@ -67,6 +68,7 @@ public interface SFXFileReaderService {
 
     /**
      * Is Empty text Node *
+     *
      * @param nd node
      * @return true or false
      */
@@ -74,7 +76,8 @@ public interface SFXFileReaderService {
 
     /**
      * Returns the value of the node's attribute named {@code <name>}
-     * @param e node
+     *
+     * @param e    node
      * @param name name
      * @return value
      */
@@ -83,6 +86,7 @@ public interface SFXFileReaderService {
     /**
      * Returns the value found in the Text node (if any) in the
      * node list that's passed in.
+     *
      * @param node node
      * @return value
      */

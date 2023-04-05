@@ -12,7 +12,8 @@ import org.dspace.identifier.service.IdentifierService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the identifier package, use IdentifierServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the identifier package, use IdentifierServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

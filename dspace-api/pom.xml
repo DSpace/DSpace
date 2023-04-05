@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.3-drum-7.1</version>
+        <version>7.4-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -50,6 +50,33 @@
                 <configuration>
                     <debug>true</debug>
                     <showDeprecation>true</showDeprecation>
+                    <annotationProcessorPaths>
+                        <!-- Enable Hibernate's Metamodel Generator to generate metadata model classes
+                             (ending in _ suffix) for more type-safe Criteria queries -->
+                        <path>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>${hibernate.version}</version>
+                        </path>
+                        <!-- Enable JAXB -->
+                        <path>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                            <version>${jaxb-api.version}</version>
+                        </path>
+                        <!-- Enable Commons Annotations -->
+                        <path>
+                            <groupId>javax.annotation</groupId>
+                            <artifactId>javax.annotation-api</artifactId>
+                            <version>${javax-annotation.version}</version>
+                        </path>
+                        <!-- Enable http://errorprone.info -->
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -71,25 +98,11 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Verify OS license headers for all source code files -->
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/src/test/resources/**</exclude>
-                        <exclude>**/src/test/data/**</exclude>
-                        <exclude>**/.gitignore</exclude>
-                        <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
-                        <exclude>src/main/java/org/apache/solr/handler/extraction/ExtractingParams.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9.1</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -114,50 +127,110 @@
                 </executions>
             </plugin>
 
+            <!-- This plugin allows us to run a Groovy script in our Maven POM
+                 (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
+                 We are generating a OS-agnostic version (agnostic.build.dir) of
+                 the ${project.build.directory} property (full path of target dir).
+                 This is needed by the Surefire & Failsafe plugins (see below)
+                 to initialize the Unit Test environment's dspace.cfg file.
+                 Otherwise, the Unit Test Framework will not work on Windows OS.
+                 This Groovy code was mostly borrowed from:
+                 http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
+            -->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>setproperty</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
+                                log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>src/test/data/**</exclude>
+                        <!-- Ignore license header requirements on Flyway upgrade scripts -->
+                        <exclude>src/main/resources/org/dspace/storage/rdbms/flywayupgrade/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Used to create/generate 'org.dspace.workflow' classes from our workflow-curation.xsd via JAXB -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.5.0</version>
+                <executions>
+                    <execution>
+                        <id>workflow-curation</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/org/dspace/workflow</source>
+                            </sources>
+                            <packageName>org.dspace.workflow</packageName>
+                            <addGeneratedAnnotation>true</addGeneratedAnnotation>
+                            <noPackageLevelAnnotations>true</noPackageLevelAnnotations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
 
     <profiles>
         <profile>
-            <id>findbugs</id>
+            <id>spotbugs</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <!-- property>
-                    <name>maven.test.skip</name>
-                    <value>false</value>
-                </property -->
             </activation>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
         </profile>
 
-        <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
-             See also the 'skiptests' profile in Parent POM. -->
+        <!-- Setup the Unit Test Environment (when -DskipUnitTests=false) -->
         <profile>
-            <id>test-environment</id>
+            <id>unit-test-environment</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipUnitTests</name>
                     <value>false</value>
                 </property>
             </activation>
             <build>
                 <plugins>
-                    <!-- Unit/Integration Testing setup: This plugin unzips the
+                    <!-- Unit Testing setup: This plugin unzips the
                          'testEnvironment.zip' file (created by dspace-parent POM), into
                          the 'target/testing/' folder, to essentially create a test
                          install of DSpace, against which Tests can be run. -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.8</version>
                         <configuration>
                             <outputDirectory>${project.build.directory}/testing</outputDirectory>
                             <artifactItems>
@@ -172,12 +245,65 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>setupTestEnvironment</id>
+                                <id>setupUnitTestEnvironment</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
                             </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Run Unit Testing! This plugin just kicks off the tests. -->
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
+                                <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <!-- Turn off any DSpace logging -->
+                                <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Setup the Integration Test Environment (when -DskipIntegrationTests=false) -->
+        <profile>
+            <id>integration-test-environment</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>skipIntegrationTests</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Integration Testing setup: This plugin unzips the
+                         'testEnvironment.zip' file (created by dspace-parent POM), into
+                         the 'target/testing/' folder, to essentially create a test
+                         install of DSpace, against which Tests can be run. -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/testing</outputDirectory>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-parent</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>testEnvironment</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                        <executions>
                             <execution>
                                 <id>setupIntegrationTestEnvironment</id>
                                 <phase>pre-integration-test</phase>
@@ -188,152 +314,130 @@
                         </executions>
                     </plugin>
 
-                    <!-- This plugin allows us to run a Groovy script in our Maven POM
-                         (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
-                         We are generating a OS-agnostic version (agnostic.build.dir) of
-                         the ${project.build.directory} property (full path of target dir).
-                         This is needed by the FileWeaver & Surefire plugins (see below)
-                         to initialize the Unit Test environment's dspace.cfg file.
-                         Otherwise, the Unit Test Framework will not work on Windows OS.
-                         This Groovy code was mostly borrowed from:
-                         http://stackoverflow.com/questions/3872355/how-to-convert-file-separator-in-maven
-                    -->
-                    <plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>groovy-maven-plugin</artifactId>
-                        <version>2.0</version>
-                        <executions>
-                            <execution>
-                                <id>setproperty</id>
-                                <phase>generate-test-resources</phase> <!-- XXX I think this should be 'initialize' - MHW -->
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <source>
-                                    project.properties['agnostic.build.dir']=project.build.directory.replace(File.separator,'/');
-                                    println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
-                                    </source>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <!-- Specify the dspace.dir to use for test environment -->
-                                <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
-                                <!-- Turn off any DSpace logging -->
-                                <dspace.log.init.disable>true</dspace.log.init.disable>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
-                          <execution>
-                            <id>validate-ALL-xml-and-xsl</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                              <goal>validate</goal>
-                            </goals>
-                          </execution>
-                        </executions>
-                        <configuration>
-                          <validationSets>
-                            <!-- validate ALL XML and XSL config files in the testing folder -->
-                             <validationSet>
-                                 <dir>${agnostic.build.dir}/testing</dir>
-                                 <includes>
-                                     <include>**/*.xml</include>
-                                     <include>**/*.xsl</include>
-                                     <include>**/*.xconf</include>
-                                 </includes>
-                             </validationSet>
-                             <!-- validate ALL XML and XSL files throughout the project -->
-                             <validationSet>
-                                <dir>${root.basedir}</dir>
-                                 <includes>
-                                     <include>**/*.xml</include>
-                                     <include>**/*.xsl</include>
-                                     <include>**/*.xmap</include>
-                                 </includes>
-                                 <excludes>
-                                     <exclude>**/node/node_modules/**</exclude>
-                                 </excludes>
-                              </validationSet>
-                          </validationSets>
-                        </configuration>
-                    </plugin>
-
-
-
-                    <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
+                    <!-- Run Integration Testing! This plugin just kicks off the tests. -->
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
+                                <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
-
         </profile>
     </profiles>
 
-
     <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+                <exclusions>
+                    <!-- Newer version pulled in via Jersey below -->
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+             Caching dependencies for sherpa service. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>${spring-boot.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-        	<groupId>org.hibernate</groupId>
-        	<artifactId>hibernate-ehcache</artifactId>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-cdi</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>1.0.2.Final</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.dspace</groupId>
+            <groupId>net.handle</groupId>
             <artifactId>handle</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>jargon</artifactId>
+            <groupId>net.cnri</groupId>
+            <artifactId>cnri-servlet-container</artifactId>
+            <exclusions>
+                <!-- Newer versions provided in our parent POM -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+                <!-- Newer version of Bouncycastle brought in via Tika -->
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Jetty is needed to run Handle Server -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>mets</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.dspace.dependencies</groupId>
-            <artifactId>dspace-tm-extractors</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -344,8 +448,8 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -361,8 +465,8 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -373,13 +477,17 @@
             <artifactId>commons-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -393,78 +501,21 @@
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>oro</groupId>
-            <artifactId>oro</artifactId>
+            <artifactId>jdom2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>fontbox</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>rome</groupId>
-            <artifactId>rome</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>rome</groupId>
-            <artifactId>opensearch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>fontbox</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
         </dependency>
+        <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>oclc-harvester2</artifactId>
@@ -473,11 +524,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
-        <dependency> <!-- Keep jmockit before junit -->
-            <groupId>org.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -485,7 +531,7 @@
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
+            <artifactId>hamcrest-all</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -494,48 +540,32 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.databene</groupId>
-            <artifactId>contiperf</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.rometools</groupId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Used for RSS / ATOM syndication feeds -->
+        <dependency>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.rometools</groupId>
             <artifactId>rome-modules</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>gr.ekt.bte</groupId>
-            <artifactId>bte-core</artifactId>
-            <version>0.9.3.5</version>
-            <exclusions>
-                <!-- A more recent version is retrieved from another dependency -->
-                <exclusion>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-core</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.jbibtex</groupId>
+            <artifactId>jbibtex</artifactId>
+            <version>1.0.20</version>
         </dependency>
         <dependency>
-            <groupId>gr.ekt.bte</groupId>
-            <artifactId>bte-io</artifactId>
-            <version>0.9.3.5</version>
-            <exclusions>
-                <!-- A more recent version is retrieved from another dependency -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-                <!-- A more recent version is retrieved from another dependency -->
-                <exclusion>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-core</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -543,28 +573,60 @@
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
+            <artifactId>httpmime</artifactId>
         </dependency>
+
+        <!-- SolrJ is used to communicate with Solr throughout the dspace-api -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.client.version}</version>
+        </dependency>
+        <!-- Solr Core is only needed for Integration Tests (to run a MockSolrServer) -->
+        <!-- The following Solr / Lucene dependencies also support integration tests -->
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-core</artifactId>
+            <scope>test</scope>
+            <version>${solr.client.version}</version>
             <exclusions>
+                <!-- Newer version brought in by opencsv -->
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-icu</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-stempel</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Tika is used to extract full text from documents in order to index in Solr -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers-standard-package</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.maxmind.geoip2</groupId>
             <artifactId>geoip2</artifactId>
@@ -581,39 +643,19 @@
         </dependency>
 
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.coverity.security</groupId>
             <artifactId>coverity-escapers</artifactId>
             <version>1.1.1</version>
         </dependency>
 
-        <!--  Gson: Java to Json conversion -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <dependency>
@@ -633,7 +675,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>4.0.3</version>
+            <version>8.4.4</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -657,6 +699,7 @@
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
         </dependency>
+
         <!-- FindBugs -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
@@ -666,10 +709,10 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -678,48 +721,193 @@
             <type>jar</type>
         </dependency>
 
+        <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
         <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-impl</artifactId>
-            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
-            <version>1.2.14</version>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>axiom-api</artifactId>
-            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
-            <version>1.2.14</version>
-        </dependency>
+        <!-- Jersey / JAX-RS client (javax.ws.rs.*) dependencies needed to integrate with external sources/services -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <!-- Required because Jersey no longer includes a dependency injection provider by default.
+             Needed to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
         <!-- S3 -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.10.50</version>
+            <version>1.12.261</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.orcid</groupId>
+            <artifactId>orcid-model</artifactId>
+            <version>3.0.2</version>
             <exclusions>
                 <exclusion>
-                    <groupId>joda-time</groupId>
-                    <artifactId>joda-time</artifactId>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                    <artifactId>jackson-jaxrs-json-provider</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>io.swagger</groupId>
+                	<artifactId>swagger-jersey-jaxrs</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
-        <!-- For ORCID v2 integration -->
-        <dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>orcid-jaxb-api</artifactId>
-           <version>2.1.0</version>
-        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
+
+        <!-- Useful for testing command-line tools -->
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.19.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Used for Solr core export/import -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.6</version>
+        </dependency>
+
+        <!-- Email templating -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+       <dependency>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+            <version>6.4.0</version>
+        </dependency>
+
+        <!-- required for openaire api integration -->
+        <dependency>
+            <groupId>eu.openaire</groupId>
+            <artifactId>funders-model</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-junit-rule</artifactId>
+            <version>5.11.2</version>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Exclude snakeyaml to avoid conflicts with: spring-boot-starter-cache -->
+            	<exclusion>
+            		<groupId>org.yaml</groupId>
+            		<artifactId>snakeyaml</artifactId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+          <!-- for mockserver -->
+          <!-- Solve dependency convergence issues related to
+               'mockserver-junit-rule' by selecting the versions we want to use. -->
+          <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.9</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>4.1.68.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.3</version>
+          </dependency>
+          <dependency>
+              <groupId>org.xmlunit</groupId>
+              <artifactId>xmlunit-core</artifactId>
+              <version>2.8.0</version>
+              <scope>test</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.github.java-json-tools</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>2.2.14</version>
+          </dependency>
+          <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
+          </dependency>
+          <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+          </dependency>
+          <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>1.6.2</version>
+          </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

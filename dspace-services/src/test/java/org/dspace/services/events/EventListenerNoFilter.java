@@ -16,15 +16,17 @@ import org.dspace.services.model.EventListener;
 /**
  * This is a sample event listener for testing,
  * it does no filtering
- * 
+ *
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 1:17:31 PM Nov 20, 2008
  */
 public class EventListenerNoFilter implements EventListener {
 
     public List<Event> received = new Vector<Event>();
+
     public List<Event> getReceivedEvents() {
         return received;
     }
+
     public void clearReceivedEvents() {
         received.clear();
     }

@@ -12,7 +12,7 @@ import org.dspace.services.model.EventListener;
 /**
  * This is a sample event listener for testing,
  * it does filtering on the resource and the name
- * 
+ *
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 1:17:31 PM Nov 20, 2008
  */
 public class EventListenerBothFilters extends EventListenerNoFilter implements EventListener {

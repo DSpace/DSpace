@@ -20,15 +20,15 @@ import java.lang.annotation.RetentionPolicy;
  * Thus, it effectively means that if a task is iterating over a collection,
  * the first error, or failure will halt the process.
  * This ensures that the status code and result of the failure are preserved.
- * 
+ *
  * @author richardrodgers
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Suspendable
-{    
+public @interface Suspendable {
     // by default, suspension occurs however task is invoked
     Curator.Invoked invoked() default Curator.Invoked.ANY;
+
     // by default, either ERROR or FAILURE status codes trigger suspension
     int[] statusCodes() default {-1, 1};
 }

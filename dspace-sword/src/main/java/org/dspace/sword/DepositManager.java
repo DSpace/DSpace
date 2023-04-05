@@ -7,21 +7,29 @@
  */
 package org.dspace.sword;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
-
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
 import org.purl.sword.base.SWORDAuthenticationException;
@@ -29,35 +37,35 @@ import org.purl.sword.base.SWORDEntry;
 import org.purl.sword.base.SWORDErrorException;
 
 /**
- * This class is responsible for initiating the process of 
+ * This class is responsible for initiating the process of
  * deposit of SWORD Deposit objects into the DSpace repository
  *
  * @author Richard Jones
- *
  */
-public class DepositManager
-{
-    /** Log4j logger */
-    public static final Logger log = Logger.getLogger(DepositManager.class);
+public class DepositManager {
+    /**
+     * Log4j logger
+     */
+    public static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DepositManager.class);
 
-    /** The SWORD service implementation */
+    /**
+     * The SWORD service implementation
+     */
     private SWORDService swordService;
 
     /**
      * Construct a new DepositManager using the given instantiation of
      * the SWORD service implementation
      *
-     * @param service
+     * @param service SWORD service
      */
-    public DepositManager(SWORDService service)
-    {
+    public DepositManager(SWORDService service) {
         this.swordService = service;
         log.debug("Created instance of DepositManager");
     }
 
     public DSpaceObject getDepositTarget(Deposit deposit)
-            throws DSpaceSWORDException, SWORDErrorException
-    {
+        throws DSpaceSWORDException, SWORDErrorException {
         SWORDUrlManager urlManager = swordService.getUrlManager();
         Context context = swordService.getContext();
 
@@ -67,20 +75,17 @@ public class DepositManager
 
         swordService.message("Performing deposit using location: " + loc);
 
-        if (dso instanceof Collection)
-        {
+        if (dso instanceof Collection) {
             CollectionService collectionService = ContentServiceFactory
-                    .getInstance().getCollectionService();
+                .getInstance().getCollectionService();
             swordService.message(
-                    "Location resolves to collection with handle: " +
-                            dso.getHandle() +
-                            " and name: " +
-                            collectionService.getName((Collection) dso));
-        }
-        else if (dso instanceof Item)
-        {
+                "Location resolves to collection with handle: " +
+                    dso.getHandle() +
+                    " and name: " +
+                    collectionService.getName((Collection) dso));
+        } else if (dso instanceof Item) {
             swordService.message("Location resolves to item with handle: " +
-                    dso.getHandle());
+                                     dso.getHandle());
         }
 
         return dso;
@@ -91,13 +96,15 @@ public class DepositManager
      * the deposit process.  The returned DepositRequest can be
      * used then to assemble the SWORD response.
      *
+     * @param deposit deposit request
      * @return the response to the deposit request
-     * @throws DSpaceSWORDException
+     * @throws DSpaceSWORDException         can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException          on generic SWORD exception
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
     public DepositResponse deposit(Deposit deposit)
-            throws DSpaceSWORDException, SWORDErrorException,
-            SWORDAuthenticationException
-    {
+        throws DSpaceSWORDException, SWORDErrorException,
+        SWORDAuthenticationException {
         // start the timer, and initialise the verboseness of the request
         Date start = new Date();
         swordService.message("Initialising verbose deposit");
@@ -112,71 +119,56 @@ public class DepositManager
         // find out if the supplied SWORDContext can submit to the given
         // dspace object
         SWORDAuthenticator auth = new SWORDAuthenticator();
-        if (!auth.canSubmit(swordService, deposit, dso))
-        {
+        if (!auth.canSubmit(swordService, deposit, dso)) {
             // throw an exception if the deposit can't be made
             String oboEmail = "none";
-            if (swordContext.getOnBehalfOf() != null)
-            {
+            if (swordContext.getOnBehalfOf() != null) {
                 oboEmail = swordContext.getOnBehalfOf().getEmail();
             }
-            log.info(LogManager
-                    .getHeader(context, "deposit_failed_authorisation",
-                            "user=" +
-                                    swordContext.getAuthenticated().getEmail() +
-                                    ",on_behalf_of=" + oboEmail));
+            log.info(LogHelper.getHeader(context,
+                                          "deposit_failed_authorisation",
+                                          "user=" + swordContext.getAuthenticated().getEmail() +
+                                              ",on_behalf_of=" + oboEmail));
             throw new SWORDAuthenticationException(
-                    "Cannot submit to the given collection with this context");
+                "Cannot submit to the given collection with this context");
         }
 
         // make a note of the authentication in the verbose string
         swordService.message("Authenticated user: " +
-                swordContext.getAuthenticated().getEmail());
-        if (swordContext.getOnBehalfOf() != null)
-        {
+                                 swordContext.getAuthenticated().getEmail());
+        if (swordContext.getOnBehalfOf() != null) {
             swordService.message("Depositing on behalf of: " +
-                    swordContext.getOnBehalfOf().getEmail());
+                                     swordContext.getOnBehalfOf().getEmail());
         }
 
         // determine which deposit engine we initialise
         Depositor dep = null;
-        if (dso instanceof Collection)
-        {
+        if (dso instanceof Collection) {
             swordService.message(
-                    "Initialising depositor for an Item in a Collection");
+                "Initialising depositor for an Item in a Collection");
             dep = new CollectionDepositor(swordService, dso);
-        }
-        else if (dso instanceof Item)
-        {
+        } else if (dso instanceof Item) {
             swordService.message(
-                    "Initialising depositor for a Bitstream in an Item");
+                "Initialising depositor for a Bitstream in an Item");
             dep = new ItemDepositor(swordService, dso);
         }
 
-        if (dep == null)
-        {
+        if (dep == null) {
             log.error(
-                    "The specified deposit target does not exist, or is not a collection or an item");
+                "The specified deposit target does not exist, or is not a collection or an item");
             throw new DSpaceSWORDException(
-                    "Deposit target is not a collection or an item");
+                "Deposit target is not a collection or an item");
         }
 
         DepositResult result = null;
 
-        try
-        {
+        try {
             result = dep.doDeposit(deposit);
-        }
-        catch (DSpaceSWORDException | SWORDErrorException | RuntimeException e)
-        {
-            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
-            {
-                try
-                {
+        } catch (DSpaceSWORDException | SWORDErrorException | RuntimeException e) {
+            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest()) {
+                try {
                     storePackageAsFile(deposit);
-                }
-                catch (IOException e2)
-                {
+                } catch (IOException e2) {
                     log.warn("Unable to store SWORD package as file: " + e);
                 }
             }
@@ -190,8 +182,7 @@ public class DepositManager
         // a record of the handle straight away.
         String handle = result.getHandle();
         int state = Deposit.CREATED;
-        if (StringUtils.isBlank(handle))
-        {
+        if (StringUtils.isBlank(handle)) {
             state = Deposit.ACCEPTED;
         }
 
@@ -199,43 +190,37 @@ public class DepositManager
         response.setLocation(result.getMediaLink());
 
         DSpaceATOMEntry dsatom = null;
-        if (result.getItem() != null)
-        {
-            swordService
-                    .message("Initialising ATOM entry generator for an Item");
+        if (result.getItem() != null) {
+            swordService.message("Initialising ATOM entry generator for an Item");
             dsatom = new ItemEntryGenerator(swordService);
-        }
-        else if (result.getBitstream() != null)
-        {
+        } else if (result.getBitstream() != null) {
             swordService.message(
-                    "Initialising ATOM entry generator for a Bitstream");
+                "Initialising ATOM entry generator for a Bitstream");
             dsatom = new BitstreamEntryGenerator(swordService);
         }
-        if (dsatom == null)
-        {
+        if (dsatom == null) {
             log.error("The deposit failed, see exceptions for explanation");
             throw new DSpaceSWORDException(
-                    "Result of deposit did not yield an Item or a Bitstream");
+                "Result of deposit did not yield an Item or a Bitstream");
         }
         SWORDEntry entry = dsatom.getSWORDEntry(result, deposit);
 
         // if this was a no-op, we need to remove the files we just
         // deposited, and abort the transaction
-        if (deposit.isNoOp())
-        {
+        if (deposit.isNoOp()) {
             dep.undoDeposit(result);
             swordService.message(
-                    "NoOp Requested: Removed all traces of submission");
+                "NoOp Requested: Removed all traces of submission");
         }
 
         entry.setNoOp(deposit.isNoOp());
 
         Date finish = new Date();
         long delta = finish.getTime() - start.getTime();
-        swordService
-                .message("Total time for deposit processing: " + delta + " ms");
+        swordService.message(
+            "Total time for deposit processing: " + delta + " ms");
         entry.setVerboseDescription(
-                swordService.getVerboseDescription().toString());
+            swordService.getVerboseDescription().toString());
 
         response.setEntry(entry);
 
@@ -243,39 +228,40 @@ public class DepositManager
     }
 
     /**
-     *   Store original package on disk and companion file containing SWORD headers as found in the deposit object
-     *   Also write companion file with header info from the deposit object.
+     * Store original package on disk and companion file containing SWORD
+     * headers as found in the deposit object
+     * Also write companion file with header info from the deposit object.
      *
-     * @param deposit
+     * @param deposit the original deposit request
      */
-    private void storePackageAsFile(Deposit deposit) throws IOException
-    {
+    private void storePackageAsFile(Deposit deposit) throws IOException {
         String path = swordService.getSwordConfig().getFailedPackageDir();
 
         File dir = new File(path);
-        if (!dir.exists() || !dir.isDirectory())
-        {
+        if (!dir.exists() || !dir.isDirectory()) {
             throw new IOException(
-                    "Directory does not exist for writing packages on ingest error.");
+                "Directory does not exist for writing packages on ingest error.");
         }
 
         String filenameBase =
-                "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+            "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+        // No dots or slashes allowed in filename
+        filenameBase = filenameBase.replaceAll("\\.", "").replaceAll("/", ""). replaceAll("\\\\", "");
 
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");
 
         InputStream is = new BufferedInputStream(
-                new FileInputStream(deposit.getFile()));
+            new FileInputStream(deposit.getFile()));
         OutputStream fos = new BufferedOutputStream(
-                new FileOutputStream(packageFile));
+            new FileOutputStream(packageFile));
         Utils.copy(is, fos);
         fos.close();
         is.close();
 
         //write companion file with headers
         PrintWriter pw = new PrintWriter(
-                new BufferedWriter(new FileWriter(headersFile)));
+            new BufferedWriter(new FileWriter(headersFile)));
 
         pw.println("Content-Disposition=" + deposit.getContentDisposition());
         pw.println("Content-Type=" + deposit.getContentType());

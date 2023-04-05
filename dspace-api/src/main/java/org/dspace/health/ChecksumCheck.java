@@ -7,14 +7,18 @@
  */
 package org.dspace.health;
 
-import org.dspace.checker.*;
-import org.dspace.core.Context;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import org.dspace.checker.CheckerCommand;
+import org.dspace.checker.ChecksumResultCode;
+import org.dspace.checker.ChecksumResultsCollector;
+import org.dspace.checker.MostRecentChecksum;
+import org.dspace.checker.SimpleDispatcher;
+import org.dspace.core.Context;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -22,9 +26,9 @@ import java.util.List;
 public class ChecksumCheck extends Check {
 
     @Override
-    public String run( ReportInfo ri ) {
+    public String run(ReportInfo ri) {
         String ret = "No md5 checks made!";
-        Context context =  new Context();
+        Context context = new Context();
         CheckerCommand checker = new CheckerCommand(context);
         Date process_start = Calendar.getInstance().getTime();
         checker.setProcessStartDate(process_start);
@@ -48,17 +52,17 @@ public class ChecksumCheck extends Check {
 
         if (collector.arr.size() > 0) {
             ret = String.format("Checksum performed on [%d] items:\n",
-                collector.arr.size());
+                                collector.arr.size());
             int ok_items = 0;
             for (MostRecentChecksum bi : collector.arr) {
                 if (!ChecksumResultCode.CHECKSUM_MATCH.equals(bi
-                    .getChecksumResult().getResultCode())) {
+                                                                  .getChecksumResult().getResultCode())) {
                     ret += String
                         .format("md5 checksum FAILED (%s): %s id: %s bitstream-id: %s\n was: %s\n  is: %s\n",
-                            bi.getChecksumResult(), bi.getBitstream().getName(),
-                            bi.getBitstream().getInternalId(), bi.getBitstream().getID(),
-                            bi.getExpectedChecksum(),
-                            bi.getCurrentChecksum());
+                                bi.getChecksumResult(), bi.getBitstream().getName(),
+                                bi.getBitstream().getInternalId(), bi.getBitstream().getID(),
+                                bi.getExpectedChecksum(),
+                                bi.getCurrentChecksum());
                 } else {
                     ok_items++;
                 }

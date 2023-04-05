@@ -10,27 +10,30 @@ package org.dspace.app.statistics;
 import java.text.NumberFormat;
 
 /**
- * This class provides a number of tools that may be useful to the methods 
+ * This class provides a number of tools that may be useful to the methods
  * which generate the different types of report
  *
- * @author  Richard Jones
+ * @author Richard Jones
  */
-public class ReportTools
-{
+public class ReportTools {
+
+    /**
+     * Default constructor
+     */
+    private ReportTools() { }
+
     /**
      * method to take the given integer and produce a string to be used in
      * the display of the report.  Basically provides an interface for a
      * standard NumberFormat class, but without the hassle of instantiating
      * and localising it.
      *
-     * @param   number  the integer to be formatted
-     *
-     * @return      a string containing the formatted number
+     * @param number the integer to be formatted
+     * @return a string containing the formatted number
      */
-    public static String numberFormat(int number)
-    {
+    public static String numberFormat(int number) {
         NumberFormat nf = NumberFormat.getIntegerInstance();
         return nf.format((double) number);
     }
-    
+
 }

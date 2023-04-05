@@ -19,24 +19,33 @@ import org.dspace.core.Context;
 
 /**
  * Service interface class for the EtdUnit object.
- * The implementation of this class is responsible for all business logic calls for the EtdUnit object and is autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the EtdUnit object and is autowired by spring
  *
  * @author mohideen at umd.edu
  */
-public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObjectLegacySupportService<EtdUnit>
-{
+public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObjectLegacySupportService<EtdUnit> {
     /**
      * Create a new etdunit, with a new ID.
      *
-     * @param parent parent etdunit
+     * @param parent  parent etdunit
      * @param context
-     *            DSpace context object
+     *                DSpace context object
      *
      * @return the newly created etdunit
-     * @throws SQLException if database error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public EtdUnit create(Context context) throws SQLException, AuthorizeException;
+
+    /**
+     * set name of unit
+     *
+     * @param etdunit DSpace unit
+     * @param name    new unit name
+     * @throws SQLException if database error
+     */
+    public void setName(EtdUnit etdunit, String name) throws SQLException;
 
     /**
      * find the etdunit by its ID
@@ -63,31 +72,31 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
      * Finds all etdunits in the site
      *
      * @param context
-     *            DSpace context
+     *                DSpace context
      *
      * @return list of all etdunits in the site
      */
-    public List<EtdUnit> findAll(Context context) throws SQLException;
+    public List<EtdUnit> findAll(Context context, int pageSize, int offset) throws SQLException;
 
     /**
      * Finds all etdunits that are mapped to the collection
      *
      * @param context
-     *            DSpace context
+     *                  DSpace context
      * @param collction
-     *            collection
+     *                  collection
      *
      * @return list of all etdunits mapped to the given collection
      */
     public List<EtdUnit> findAllByCollection(Context context, Collection collection) throws SQLException;
 
-     /**
+    /**
      * Find the etdunits that match the search query across etdunit_id or name
      *
      * @param context
-     *            DSpace context
+     *                DSpace context
      * @param query
-     *            The search string
+     *                The search string
      *
      * @return array of EtdUnit objects
      */
@@ -97,13 +106,13 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
      * Find the etdunits that match the search query across etdunit_id or name
      *
      * @param context
-     *            DSpace context
+     *                DSpace context
      * @param query
-     *            The search string
+     *                The search string
      * @param offset
-     *            Inclusive offset
+     *                Inclusive offset
      * @param limit
-     *            Maximum number of matches returned
+     *                Maximum number of matches returned
      *
      * @return list of EtdUnit objects
      */
@@ -115,15 +124,14 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
      * results.
      *
      * @param context
-     *            DSpace context
+     *                DSpace context
      * @param query
-     *            The search string
+     *                The search string
      *
      * @return the number of etdunits mathching the query
      */
     public int searchResultCount(Context context, String query) throws SQLException;
 
-   
     /**
      * Return an list of collections of this etdunit and its subcommunities
      *
@@ -133,22 +141,20 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
      * @throws SQLException if database error
      */
 
-    public List<Collection> getAllCollections(Context context, EtdUnit etdunit)
-            throws SQLException;
-
+    public List<Collection> getAllCollections(Context context, EtdUnit etdunit) throws SQLException;
 
     /**
      * Add an exisiting collection to the etdunit
      *
-     * @param context context
-     * @param etdunit etdunit
+     * @param context    context
+     * @param etdunit    etdunit
      * @param collection
-     *            collection to add
-     * @throws SQLException if database error
+     *                   collection to add
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     public void addCollection(Context context, EtdUnit etdunit, Collection collection)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Remove a collection. If it only belongs to one parent etdunit,
@@ -156,22 +162,22 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
      * it is simply unmapped from the current etdunit.
      *
      * @param context context
-     * @param c collection to remove
+     * @param c       collection to remove
      * @param etdunit etdunit
-     * @throws SQLException if database error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException if IO error
+     * @throws IOException        if IO error
      */
     public void removeCollection(Context context, EtdUnit etdunit, Collection c)
-            throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Returns true or false based on whether a given collection is a member
      * to the etdunit.
-     * 
-     * @param etdunit etdunit
+     *
+     * @param etdunit    etdunit
      * @param collection collection
-     * 
+     *
      * @return true if collection is a member of the etdunit, false otherwise
      */
     public boolean isMember(EtdUnit etdunit, Collection collection);
@@ -188,5 +194,5 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
     public void canEdit(Context context) throws AuthorizeException, SQLException;
 
     int countTotal(Context context) throws SQLException;
-    
+
 }

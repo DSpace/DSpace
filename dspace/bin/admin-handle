@@ -1,4 +1,0 @@
-#!/bin/sh
-
-BINDIR=`dirname $0`
-$BINDIR/dsrun net.handle.apps.gui.hadmin.HandleTool

@@ -32,6 +32,16 @@ $ENV{JAVA_OPTS} .= " -Detdloader.marcfile=$marcfile" if (defined $marcfile);
 $ENV{JAVA_OPTS} .= " -Detdloader.singleitem=$item" if (defined $item);
 $ENV{JAVA_OPTS} .= " -Detdloader.csvfile=$csvfile" if (defined $csvfile);
 
+# Add additions jar to front of classpath to ensure the overlay files
+# has precedence over stock implementation
+chomp($bindir_realpath = `realpath $bindir`);
+chomp($dspacedir = `dirname $bindir_realpath`);
+chomp($additions_jar = `find $dspacedir/lib/ -type f -name "additions*.jar"`);
+$prev_classpath = $ENV{CLASSPATH};
+$classpath_separator = ":";
+$ENV{CLASSPATH} = $additions_jar;
+$ENV{CLASSPATH} .= $classpath_separator.$prev_classpath if ($prev_classpath ne "");
+
 @cmd = ("$bindir/dspace", "dsrun", "edu.umd.lib.dspace.app.EtdLoader");
 
 #print $ENV{JAVA_OPTS};
@@ -99,6 +109,4 @@ EOS
 
     exit 1;
 }
-
-
 

@@ -8,17 +8,17 @@
 package org.dspace.services.factory;
 
 import org.dspace.kernel.ServiceManager;
-import org.dspace.services.*;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.EmailService;
+import org.dspace.services.EventService;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the services package, use DSpaceServicesFactory.getInstance() to retrieve an implementation
- *
+ * Factory implementation to get services for the services package, use DSpaceServicesFactory.getInstance() to
+ * retrieve an implementation
  */
 public class DSpaceServicesFactoryImpl extends DSpaceServicesFactory {
-
-    @Autowired(required = true)
-    private CachingService cachingService;
 
     @Autowired(required = true)
     private ConfigurationService configurationService;
@@ -33,15 +33,7 @@ public class DSpaceServicesFactoryImpl extends DSpaceServicesFactory {
     private RequestService requestService;
 
     @Autowired(required = true)
-    private SessionService sessionService;
-
-    @Autowired(required = true)
     private ServiceManager serviceManager;
-
-    @Override
-    public CachingService getCachingService() {
-        return cachingService;
-    }
 
     @Override
     public ConfigurationService getConfigurationService() {
@@ -61,11 +53,6 @@ public class DSpaceServicesFactoryImpl extends DSpaceServicesFactory {
     @Override
     public RequestService getRequestService() {
         return requestService;
-    }
-
-    @Override
-    public SessionService getSessionService() {
-        return sessionService;
     }
 
     @Override

@@ -8,20 +8,20 @@
 
 package org.dspace.importer.external.pubmed.metadatamapping.contributor;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.DCDate;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
-import org.springframework.beans.factory.annotation.Required;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.DCDate;
+import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
+import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Pubmed specific implementation of {@link MetadataContributor}
@@ -30,18 +30,20 @@ import java.util.List;
  * @author Philip Vissenaekens (philip at atmire dot com)
  */
 public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T> {
-    Logger log = Logger.getLogger(PubmedDateMetadatumContributor.class);
+    Logger log = org.apache.logging.log4j.LogManager.getLogger(PubmedDateMetadatumContributor.class);
 
     private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 
-    /* A list of all the dateFormats to attempt, these should be configured to have the most specific first and the more lenient at the back */
+    /* A list of all the dateFormats to attempt.  These should be configured to
+       have the most specific first and the more lenient at the back. */
     private List<String> dateFormatsToAttempt;
 
 
     public List<String> getDateFormatsToAttempt() {
         return dateFormatsToAttempt;
     }
-    @Required
+
+    @Autowired(required = true)
     public void setDateFormatsToAttempt(List<String> dateFormatsToAttempt) {
         this.dateFormatsToAttempt = dateFormatsToAttempt;
     }
@@ -52,8 +54,9 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
     private MetadataContributor year;
 
     /**
-     * Set the metadatafieldMapping used in the transforming of a record to actual metadata
-     * @param metadataFieldMapping
+     * Set the metadatafieldMapping used in the transforming of a record to actual metadata.
+     *
+     * @param metadataFieldMapping the new mapping.
      */
     @Override
     public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {
@@ -62,6 +65,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
         month.setMetadataFieldMapping(metadataFieldMapping);
         year.setMetadataFieldMapping(metadataFieldMapping);
     }
+
     /**
      * Initialize an empty PubmedDateMetadatumContributor object
      */
@@ -69,13 +73,13 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
     }
 
     /**
-     *
      * @param field {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
-     * @param day a MetadataContributor, representing a day
+     * @param day   a MetadataContributor, representing a day
      * @param month a {@link MetadataContributor}, representing a month
-     * @param year a {@link MetadataContributor}, representing a year
+     * @param year  a {@link MetadataContributor}, representing a year
      */
-    public PubmedDateMetadatumContributor(MetadataFieldConfig field, MetadataContributor day, MetadataContributor month, MetadataContributor year) {
+    public PubmedDateMetadatumContributor(MetadataFieldConfig field, MetadataContributor day, MetadataContributor month,
+                                          MetadataContributor year) {
         this.field = field;
         this.day = day;
         this.month = month;
@@ -84,8 +88,11 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Retrieve the metadata associated with the given object.
-     * The code will loop over the different dates and attempt to format them using the configured dateFormats to attempt.
-     * For each date, once a format is successful, this result is used. Make sure that dateFormatsToAttempt is configured from most restrictive to most lenient to try and get the most precise result
+     * The code will loop over the different dates and attempt to format them using the configured dateFormats to
+     * attempt.
+     * For each date, once a format is successful, this result is used. Make sure that dateFormatsToAttempt is
+     * configured from most restrictive to most lenient to try and get the most precise result
+     *
      * @param t A class to retrieve metadata from.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
@@ -104,30 +111,37 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                 String dateString = "";
 
                 if (monthList.size() > i && dayList.size() > i) {
-                    dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue() + "-" + dayList.get(i).getValue();
+                    dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue() +
+                        "-" + dayList.get(i).getValue();
                 } else if (monthList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue();
                 } else {
                     dateString = yearList.get(i).getValue();
                 }
 
-                int j = 0 ;
+                int j = 0;
                 // Use the first dcDate that has been formatted (Config should go from most specific to most lenient)
-                while (j<dateFormatsToAttempt.size() && dcDate==null){
+                while (j < dateFormatsToAttempt.size() && dcDate == null) {
                     String dateFormat = dateFormatsToAttempt.get(j);
                     try {
                         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
                         Date date = formatter.parse(dateString);
                         dcDate = new DCDate(date);
                     } catch (ParseException e) {
-                        // Multiple dateformats can be configured, we don't want to print the entire stacktrace every time one of those formats fails.
-                        log.info("Failed parsing "+dateString+" using the following format: "+dateFormat+ ", check the configured dataformats in config/spring/api/pubmed-integration.xml");
+                        // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
+                        // time one of those formats fails.
+                        log.debug(
+                            "Failed parsing " + dateString + " using the following format: " + dateFormat + ", check " +
+                                "the configured dataformats in config/spring/api/pubmed-integration.xml");
                     }
                     j++;
                 }
-
                 if (dcDate != null) {
                     values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));
+                } else {
+                    log.info(
+                            "Failed parsing " + dateString + ", check " +
+                                "the configured dataformats in config/spring/api/pubmed-integration.xml");
                 }
             }
         } catch (Exception e) {
@@ -138,6 +152,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Return the MetadataFieldConfig used while retrieving MetadatumDTO
+     *
      * @return MetadataFieldConfig
      */
     public MetadataFieldConfig getField() {
@@ -146,6 +161,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Setting the MetadataFieldConfig
+     *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
     public void setField(MetadataFieldConfig field) {
@@ -154,6 +170,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Retrieve the day from the object
+     *
      * @return {@link MetadataContributor}, representing a day
      */
     public MetadataContributor getDay() {
@@ -162,6 +179,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Set a day ({@link MetadataContributor}) to this object
+     *
      * @param day a {@link MetadataContributor}, representing a day
      */
     public void setDay(MetadataContributor day) {
@@ -170,6 +188,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Retrieve the month from the object
+     *
      * @return {@link MetadataContributor}, representing a month
      */
     public MetadataContributor getMonth() {
@@ -178,6 +197,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Set a month ({@link MetadataContributor}) to this object
+     *
      * @param month a {@link MetadataContributor}, representing a month
      */
     public void setMonth(MetadataContributor month) {
@@ -186,6 +206,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Retrieve the year from the object
+     *
      * @return {@link MetadataContributor}, representing a year
      */
     public MetadataContributor getYear() {
@@ -194,6 +215,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     /**
      * Set a year ({@link MetadataContributor}) to this object
+     *
      * @param year a {@link MetadataContributor}, representing a year
      */
     public void setYear(MetadataContributor year) {

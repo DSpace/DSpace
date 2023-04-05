@@ -17,23 +17,18 @@ public interface LicenseService {
     /**
      * Writes license to a text file.
      *
-     * @param licenseFile
-     *            name for the file into which license will be written,
-     *            relative to the current directory.
-     * @param newLicense new license
+     * @param licenseFile name for the file into which license will be written,
+     *                    relative to the current directory.
+     * @param newLicense  new license
      */
     public void writeLicenseFile(String licenseFile,
-            String newLicense);
+                                 String newLicense);
 
     /**
      * Get the License
      *
-     * @param
-     *         licenseFile   file name
-     *
-     *  @return
-     *         license text
-     *
+     * @param licenseFile file name
+     * @return license text
      */
     public String getLicenseText(String licenseFile);
 

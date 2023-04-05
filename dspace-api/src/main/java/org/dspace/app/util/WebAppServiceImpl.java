@@ -7,22 +7,22 @@
  */
 package org.dspace.app.util;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.dao.WebAppDAO;
-import org.dspace.app.util.service.WebAppService;
-import org.dspace.core.Context;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.dao.WebAppDAO;
+import org.dspace.app.util.service.WebAppService;
+import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the WebApp object.
@@ -33,14 +33,13 @@ import java.util.List;
  */
 public class WebAppServiceImpl implements WebAppService {
 
-    private final Logger log = Logger.getLogger(WebAppServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(WebAppServiceImpl.class);
 
     @Autowired(required = true)
     protected WebAppDAO webAppDAO;
 
 
-    protected WebAppServiceImpl()
-    {
+    protected WebAppServiceImpl() {
 
     }
 
@@ -66,8 +65,7 @@ public class WebAppServiceImpl implements WebAppService {
     }
 
     @Override
-    public List<WebApp> getApps()
-    {
+    public List<WebApp> getApps() {
         ArrayList<WebApp> apps = new ArrayList<>();
 
         Context context = null;
@@ -76,17 +74,15 @@ public class WebAppServiceImpl implements WebAppService {
             context = new Context();
             List<WebApp> webApps = findAll(context);
 
-            for (WebApp app : webApps)
-            {
+            for (WebApp app : webApps) {
                 method = new HttpHead(app.getUrl());
-                HttpClient client = new DefaultHttpClient();
-                HttpResponse response = client.execute(method);
-                int status = response.getStatusLine().getStatusCode();
-                if (status != HttpStatus.SC_OK)
-                {
-                    delete(context, app
-
-                    );
+                int status;
+                try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+                    HttpResponse response = client.execute(method);
+                    status = response.getStatusLine().getStatusCode();
+                }
+                if (status != HttpStatus.SC_OK) {
+                    delete(context, app);
                     continue;
                 }
 
@@ -97,12 +93,10 @@ public class WebAppServiceImpl implements WebAppService {
         } catch (IOException e) {
             log.error("Failure checking for a running webapp", e);
         } finally {
-            if (null != method)
-            {
+            if (null != method) {
                 method.releaseConnection();
             }
-            if (null != context)
-            {
+            if (null != context) {
                 context.abort();
             }
         }

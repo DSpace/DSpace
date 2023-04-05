@@ -17,7 +17,7 @@ public class EmbargoDTO {
     private String author;
     private String department;
     private String type;
-    private Date endDate; 
+    private Date endDate;
 
     public EmbargoDTO() {
     }
@@ -103,7 +103,7 @@ public class EmbargoDTO {
     }
 
     public String getEndDateString() {
-        if(endDate == null) {
+        if (endDate == null) {
             return null;
         }
         return this.endDate.toString();

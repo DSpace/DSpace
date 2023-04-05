@@ -29,104 +29,108 @@ import org.slf4j.LoggerFactory;
  * will be interpreted as relative to the directory named in {@code log.dir}.
  * If no name is configured, it defaults to "usage-events.tsv".  If the file is
  * new or empty, a column heading record will be written when the file is opened.
- * 
+ *
  * @author Mark H. Wood
  * @author Mark Diggory
  */
 public class TabFileUsageEventListener
-        extends AbstractUsageEventListener
-{
-    /** log category. */
+    extends AbstractUsageEventListener {
+    /**
+     * log category.
+     */
     private static final Logger errorLog = LoggerFactory
-            .getLogger(TabFileUsageEventListener.class);
+        .getLogger(TabFileUsageEventListener.class);
 
-    /** ISO 8601 Basic string format for record timestamps. */
+    /**
+     * ISO 8601 Basic string format for record timestamps.
+     */
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "yyyyMMdd'T'HHmmssSSS");
+        "yyyyMMdd'T'HHmmssSSS");
 
-    /** File on which to write event records. */
+    /**
+     * File on which to write event records.
+     */
     private PrintWriter eventLog;
 
-    /** Is this instance initialized? */
+    /**
+     * Is this instance initialized?
+     */
     private boolean initialized = false;
 
     /**
      * Set up a usage event listener for writing TSV records to a file.
      */
-    private void init()
-    {
+    private void init() {
         ConfigurationService configurationService
-                = new DSpace().getConfigurationService();
+            = new DSpace().getConfigurationService();
 
         String logPath = configurationService.getPropertyAsType(
-                "usageEvent.tabFileLogger.file",
-                "usage-events.tsv");
+            "usageEvent.tabFileLogger.file",
+            "usage-events.tsv");
 
         String logDir = null;
-        if (!new File(logPath).isAbsolute())
-        {
+        if (!new File(logPath).isAbsolute()) {
             logDir = configurationService.getProperty("log.report.dir");
         }
 
         File logFile = new File(logDir, logPath);
-        try
-        {
+        try {
             eventLog = new PrintWriter(new OutputStreamWriter(
-                    new FileOutputStream(logFile, true)));
+                new FileOutputStream(logFile, true)));
             errorLog.debug("Writing to {}", logFile.getAbsolutePath());
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             errorLog.error("{} cannot open file, will not log events:  {}",
-                            TabFileUsageEventListener.class.getName(),
-                            e.getMessage());
+                           TabFileUsageEventListener.class.getName(),
+                           e.getMessage());
             throw new IllegalArgumentException("Cannot open event log file", e);
         }
 
-        if (logFile.length() <= 0)
-        {
+        if (logFile.length() <= 0) {
             eventLog.println("date"
-                    + '\t' + "event"
-                    + '\t' + "objectType"
-                    + '\t' + "objectId"
-                    + '\t' + "sessionId"
-                    + '\t' + "sourceAddress"
-                    + '\t' + "eperson");
+                                 + '\t' + "event"
+                                 + '\t' + "objectType"
+                                 + '\t' + "objectId"
+                                 + '\t' + "sessionId"
+                                 + '\t' + "sourceAddress"
+                                 + '\t' + "eperson");
         }
 
         initialized = true;
     }
-    
+
     @Override
-    public synchronized void receiveEvent(Event event)
-    {
-        if (!initialized)
+    public synchronized void receiveEvent(Event event) {
+        if (!initialized) {
             init();
+        }
 
-        if (errorLog.isDebugEnabled())
+        if (errorLog.isDebugEnabled()) {
             errorLog.debug("got: {}", event.toString());
+        }
 
-        if(!(event instanceof UsageEvent))
+        if (!(event instanceof UsageEvent)) {
             return;
+        }
 
-        if (null == eventLog)
+        if (null == eventLog) {
             return;
+        }
 
-        UsageEvent ue = (UsageEvent)event;
+        UsageEvent ue = (UsageEvent) event;
 
         eventLog.append(dateFormat.format(new Date()))
-            .append('\t').append(ue.getName()) // event type
-            .append('\t').append(Constants.typeText[ue.getObject().getType()])
-            .append('\t').append(ue.getObject().getID().toString())
-            .append('\t').append(ue.getRequest().getSession().getId())
-            .append('\t').append(ue.getRequest().getRemoteAddr());
+                .append('\t').append(ue.getName()) // event type
+                .append('\t').append(Constants.typeText[ue.getObject().getType()])
+                .append('\t').append(ue.getObject().getID().toString())
+                .append('\t').append(ue.getRequest().getSession().getId())
+                .append('\t').append(ue.getRequest().getRemoteAddr());
 
         String epersonName = (null == ue.getContext().getCurrentUser()
-                ? "anonymous"
-                : ue.getContext().getCurrentUser().getEmail());
+            ? "anonymous"
+            : ue.getContext().getCurrentUser().getEmail());
         eventLog.append('\t').append(epersonName);
 
         eventLog.println();
         eventLog.flush();
-	}
+    }
 }

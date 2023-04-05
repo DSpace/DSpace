@@ -7,29 +7,27 @@
  */
 package org.purl.sword.atom;
 
-import org.purl.sword.base.*;
+import org.purl.sword.base.BasicStringContentElement;
+import org.purl.sword.base.Namespaces;
+import org.purl.sword.base.XmlName;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class Accept extends BasicStringContentElement
-{
+public class Accept extends BasicStringContentElement {
     /**
-     * The XmlName representation for this element. 
+     * The XmlName representation for this element.
      */
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_APP, "accept", Namespaces.NS_APP);
+        new XmlName(Namespaces.PREFIX_APP, "accept", Namespaces.NS_APP);
 
-    public Accept()
-    {
+    public Accept() {
         super(XML_NAME.getPrefix(), XML_NAME.getLocalName(), XML_NAME.getNamespace());
     }
 
-    public Accept(String version)
-    {
+    public Accept(String version) {
         this();
-        setContent(version); 
+        setContent(version);
     }
 
     /**
@@ -37,8 +35,7 @@ public class Accept extends BasicStringContentElement
      *
      * @return The prefix, localname and namespace for this element.
      */
-    public static XmlName elementName()
-    {
+    public static XmlName elementName() {
         return XML_NAME;
     }
 }

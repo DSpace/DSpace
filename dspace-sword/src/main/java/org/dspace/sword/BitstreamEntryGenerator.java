@@ -7,38 +7,43 @@
  */
 package org.dspace.sword;
 
-import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.atom.Content;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.InvalidMediaTypeException;
 import org.purl.sword.atom.Link;
 import org.purl.sword.atom.Rights;
 import org.purl.sword.atom.Title;
-import org.apache.log4j.Logger;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * @author Richard Jones
  *
  * Class to generate ATOM Entry documents for DSpace Bitstreams
  */
-public class BitstreamEntryGenerator extends DSpaceATOMEntry
-{
-    /** logger */
-    private static Logger log = Logger.getLogger(BitstreamEntryGenerator.class);
+public class BitstreamEntryGenerator extends DSpaceATOMEntry {
+    /**
+     * logger
+     */
+    private static final Logger log = LogManager.getLogger(BitstreamEntryGenerator.class);
 
     /**
      * Create a new ATOM Entry generator which can provide a SWORD Entry for
      * a bitstream
      *
-     * @param service
+     * @param service SWORD service
      */
-    protected BitstreamEntryGenerator(SWORDService service)
-    {
+    protected BitstreamEntryGenerator(SWORDService service) {
         super(service);
         log.debug("Create new instance of BitstreamEntryGenerator");
     }
@@ -46,45 +51,37 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
     /**
      * Add all the subject classifications from the bibliographic
      * metadata.
-     *
      */
-    protected void addCategories()
-    {
+    @Override
+    protected void addCategories() {
         // do nothing
     }
 
     /**
      * Set the content type that DSpace received.
-     *
      */
+    @Override
     protected void addContentElement()
-            throws DSpaceSWORDException
-    {
-        try
-        {
+        throws DSpaceSWORDException {
+        try {
             // get the things we need out of the service
             SWORDUrlManager urlManager = swordService.getUrlManager();
 
             // if this is a deposit which is no op we can't do anything here
-            if (this.deposit != null && this.deposit.isNoOp())
-            {
+            if (this.deposit != null && this.deposit.isNoOp()) {
                 return;
             }
 
             String bsurl = urlManager.getBitstreamUrl(this.bitstream);
             BitstreamFormat bf = null;
-            try
-            {
+            try {
                 bf = this.bitstream.getFormat(swordService.getContext());
-            }
-            catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 log.error("Exception caught: ", e);
                 throw new DSpaceSWORDException(e);
             }
             String format = "application/octet-stream";
-            if (bf != null)
-            {
+            if (bf != null) {
                 format = bf.getMIMEType();
             }
 
@@ -94,9 +91,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
             entry.setContent(con);
 
             log.debug("Adding content element with url=" + bsurl);
-        }
-        catch (InvalidMediaTypeException e)
-        {
+        } catch (InvalidMediaTypeException e) {
             log.error("caught and swallowed exception: ", e);
             // do nothing; we'll live without the content type declaration!
         }
@@ -109,15 +104,16 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
      * they can be used to access the resource over http (i.e.
      * a real URL).
      */
+    @Override
     protected void addIdentifier()
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         // if this is a deposit which is no op we can't do anything here
-        if (this.deposit != null && this.deposit.isNoOp())
-        {
+        if (this.deposit != null && this.deposit.isNoOp()) {
             // just use the dspace url as the
             // property
-            String cfg = ConfigurationManager.getProperty("dspace.url");
+            ConfigurationService configurationService
+                    = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String cfg = configurationService.getProperty("dspace.ui.url");
             entry.setId(cfg);
 
             return;
@@ -130,7 +126,6 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
         String bsurl = urlManager.getBitstreamUrl(this.bitstream);
         entry.setId(bsurl);
         log.debug("Added identifier for bitstream with url=" + bsurl);
-        return;
 
         // FIXME: later on we will maybe have a workflow page supplied
         // by the sword interface?
@@ -138,14 +133,12 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 
     /**
      * Add links associated with this item.
-     *
      */
+    @Override
     protected void addLinks()
-            throws DSpaceSWORDException
-    {
+        throws DSpaceSWORDException {
         // if this is a deposit which is no op we can't do anything here
-        if (this.deposit != null && this.deposit.isNoOp())
-        {
+        if (this.deposit != null && this.deposit.isNoOp()) {
             return;
         }
 
@@ -154,18 +147,14 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 
         String bsurl = urlManager.getBitstreamUrl(this.bitstream);
         BitstreamFormat bf;
-        try
-        {
+        try {
             bf = this.bitstream.getFormat(swordService.getContext());
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error("Exception caught: ", e);
             throw new DSpaceSWORDException(e);
         }
         String format = "application/octet-stream";
-        if (bf != null)
-        {
+        if (bf != null) {
             format = bf.getMIMEType();
         }
 
@@ -180,35 +169,30 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 
     /**
      * Add the date of publication from the bibliographic metadata
-     *
      */
-    protected void addPublishDate()
-    {
+    @Override
+    protected void addPublishDate() {
         // do nothing
     }
 
     /**
      * Add rights information.  This attaches an href to the URL
-     * of the item's licence file
-     *
+     * of the item's license file
      */
+    @Override
     protected void addRights()
-            throws DSpaceSWORDException
-    {
-        try
-        {
+        throws DSpaceSWORDException {
+        try {
             // work our way up to the item
             List<Bundle> bundle2bitstreams = this.bitstream
-                    .getBundles();
-            if (bundle2bitstreams.isEmpty())
-            {
+                .getBundles();
+            if (bundle2bitstreams.isEmpty()) {
                 log.error("Found orphaned bitstream: " + bitstream.getID());
                 throw new DSpaceSWORDException("Orphaned bitstream discovered");
             }
             Bundle bundle = bundle2bitstreams.get(0);
             List<Item> items = bundle.getItems();
-            if (items.isEmpty())
-            {
+            if (items.isEmpty()) {
                 log.error("Found orphaned bundle: " + bundle.getID());
                 throw new DSpaceSWORDException("Orphaned bundle discovered");
             }
@@ -218,16 +202,13 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
             SWORDUrlManager urlManager = swordService.getUrlManager();
             StringBuilder rightsString = new StringBuilder();
             List<Bundle> lbundles = item.getBundles();
-            for (Bundle lbundle : lbundles)
-            {
-                if (!Constants.LICENSE_BUNDLE_NAME.equals(lbundle.getName()))
-                {
+            for (Bundle lbundle : lbundles) {
+                if (!Constants.LICENSE_BUNDLE_NAME.equals(lbundle.getName())) {
                     // skip non-license bundles
                     continue;
                 }
                 List<Bitstream> bss = lbundle.getBitstreams();
-                for (Bitstream bs : bss)
-                {
+                for (Bitstream bs : bss) {
                     String url = urlManager.getBitstreamUrl(bs);
                     rightsString.append(url).append(" ");
                 }
@@ -238,9 +219,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
             rights.setType(ContentType.TEXT);
             entry.setRights(rights);
             log.debug("Added rights entry to entity");
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             log.error("caught exception: ", e);
             throw new DSpaceSWORDException(e);
         }
@@ -248,19 +227,17 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 
     /**
      * Add the summary/abstract from the bibliographic metadata
-     *
      */
-    protected void addSummary()
-    {
+    @Override
+    protected void addSummary() {
         // do nothing
     }
 
     /**
      * Add the title from the bibliographic metadata
-     *
      */
-    protected void addTitle()
-    {
+    @Override
+    protected void addTitle() {
         Title title = new Title();
         title.setContent(this.bitstream.getName());
         title.setType(ContentType.TEXT);
@@ -270,10 +247,9 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
 
     /**
      * Add the date that this item was last updated
-     *
      */
-    protected void addLastUpdatedDate()
-    {
+    @Override
+    protected void addLastUpdatedDate() {
         // do nothing
     }
 }

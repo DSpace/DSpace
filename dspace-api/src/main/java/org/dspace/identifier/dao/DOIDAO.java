@@ -7,13 +7,13 @@
  */
 package org.dspace.identifier.dao;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.identifier.DOI;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Database Access Object interface class for the DOI object.
@@ -22,14 +22,14 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface DOIDAO extends GenericDAO<DOI>
-{
+public interface DOIDAO extends GenericDAO<DOI> {
     public DOI findByDoi(Context context, String doi) throws SQLException;
 
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude) throws SQLException;
-    
+    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+        throws SQLException;
+
     public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> statuses, boolean dsoNotNull)
-            throws SQLException;
+        throws SQLException;
 
     public List<DOI> findByStatus(Context context, List<Integer> statuses) throws SQLException;
 

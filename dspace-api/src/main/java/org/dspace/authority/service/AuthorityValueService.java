@@ -7,11 +7,11 @@
  */
 package org.dspace.authority.service;
 
+import java.util.List;
+
 import org.apache.solr.common.SolrDocument;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.core.Context;
-
-import java.util.List;
 
 /**
  * This service contains all methods for using authority values
@@ -21,8 +21,7 @@ import java.util.List;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public interface AuthorityValueService
-{
+public interface AuthorityValueService {
     public static final String SPLIT = "::";
     public static final String GENERATE = "will be generated" + SPLIT;
 
@@ -36,13 +35,16 @@ public interface AuthorityValueService
 
     public AuthorityValue findByOrcidID(Context context, String orcid_id);
 
-    public List<AuthorityValue> findByName(Context context, String schema, String element, String qualifier, String name);
+    public List<AuthorityValue> findByName(Context context, String schema, String element, String qualifier,
+                                           String name);
 
-    public List<AuthorityValue> findByAuthorityMetadata(Context context, String schema, String element, String qualifier, String value);
+    public List<AuthorityValue> findByAuthorityMetadata(Context context, String schema, String element,
+                                                        String qualifier, String value);
 
     public List<AuthorityValue> findByExactValue(Context context, String field, String value);
 
-    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier, String value);
+    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier,
+                                            String value);
 
     public List<AuthorityValue> findOrcidHolders(Context context);
 

@@ -72,6 +72,15 @@
                         <includes>
                             <include>config/**</include>
                         </includes>
+                        <!-- UMD Customization -->
+                        <!-- Exclude any "drum-*" configuration files, as these
+                             files contain UMD DRUM-specific configuration
+                             that will cause the stock DSpace
+                             unit/integration tests to fail -->
+                        <excludes>
+                            <exclude>config/**/drum-*</exclude>
+                        </excludes>
+                        <!-- End UMD Customization -->
                     </fileSet>
                     <!-- Then add in other necessary directories -->
                     <fileSet>

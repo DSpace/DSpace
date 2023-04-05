@@ -8,8 +8,10 @@
 # - note:
 # - default tag for branch: dspace/dspace: dspace/dspace:dspace-6_x-jdk8
 
+ARG JDK_VERSION=11
+
 # Step 1 - Run Maven Build
-FROM docker.lib.umd.edu/drum-dependencies-6_x:latest as build
+FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 
@@ -24,8 +26,7 @@ ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
 # Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package -Denv=local -Dgrunt.environment=dev -P \!dspace-jspui,\!dspace-lni,\!dspace-rdf,\!dspace-solr,\!dspace-sword,\!dspace-swordv2 -Dmirage2.deps.included=true && \
-# RUN mvn package -Dmirage2.on=true  -Dmirage2.deps.included=true && \
+RUN mvn package -Pdspace-rest && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 
@@ -35,19 +36,30 @@ ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 
-RUN ant init_installation update_configs update_code update_webapps update_solr_indexes
+RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM docker.lib.umd.edu/drum-tomcat:latest
-
-ENV DSPACE_INSTALL=/dspace \
-    JAVA_OPTS=-Xmx2000m
-
+FROM tomcat:9-jdk${JDK_VERSION}
+ENV DSPACE_INSTALL=/dspace
+ENV TOMCAT_INSTALL=/usr/local/tomcat
+# Copy the /dspace directory from 'ant_build' containger to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
+# Enable the AJP connector in Tomcat's server.xml
+# NOTE: secretRequired="false" should only be used when AJP is NOT accessible from an external network. But, secretRequired="true" isn't supported by mod_proxy_ajp until Apache 2.5
+RUN sed -i '/Service name="Catalina".*/a \\n    <Connector protocol="AJP/1.3" port="8009" address="0.0.0.0" redirectPort="8443" URIEncoding="UTF-8" secretRequired="false" />' $TOMCAT_INSTALL/conf/server.xml
+# Expose Tomcat port and debug port
+EXPOSE 8080 8000
+# Give java extra memory (2GB)
+ENV JAVA_OPTS=-Xmx2000m
 
-RUN rm -rf /usr/local/tomcat/webapps/* && \
-    ln -s $DSPACE_INSTALL/webapps/xmlui /usr/local/tomcat/webapps/ROOT && \
-    ln -s $DSPACE_INSTALL/webapps/rest /usr/local/tomcat/webapps/rest && \
-    ln -s $DSPACE_INSTALL/webapps/oai /usr/local/tomcat/webapps/oai && \
-    ln -s $DSPACE_INSTALL/webapps/rdf /usr/local/tomcat/webapps/rdf
+# Link the DSpace 'server' webapp into Tomcat's webapps directory.
+# This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
+# Also link the v6.x (deprecated) REST API off the "/rest" path
+RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
+# If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
+# You also MUST update the 'dspace.server.url' configuration to match.
+# Please note that server webapp should only run on one path at a time.
+#RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
+#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+

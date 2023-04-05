@@ -7,10 +7,14 @@
  */
 package org.dspace.storage.bitstore;
 
-import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
@@ -20,51 +24,55 @@ import org.dspace.storage.bitstore.service.BitstreamStorageService;
  */
 public class BitStoreMigrate {
 
-    /** log4j log */
-    private static Logger log = Logger.getLogger(BitStoreMigrate.class);
+    /**
+     * log4j log
+     */
+    private static final Logger log = LogManager.getLogger(BitStoreMigrate.class);
 
-    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private static final BitstreamStorageService bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
+    private static final BitstreamStorageService bitstreamStorageService
+            = StorageServiceFactory.getInstance().getBitstreamStorageService();
+
+    /**
+     * Default constructor
+     */
+    private BitStoreMigrate() { }
 
     /**
      * Migrates asset store.
      *
-     * @param argv -
-     *            Command-line arguments
+     * @param argv the command line arguments given
      */
-    public static void main(String[] argv)
-    {
-        try
-        {
+    public static void main(String[] argv) {
+        try {
             log.info("Migrate Assetstore");
 
             // set up command line parser
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine line = null;
 
             // create an options object and populate it
             Options options = new Options();
 
-            options.addOption("a", "source", true, "Source assetstore store_number (to lose content). This is a number such as 0 or 1");
-            options.addOption("b", "destination", true, "Destination assetstore store_number (to gain content). This is a number such as 0 or 1.");
-            options.addOption("d", "delete", false, "Delete file from losing assetstore. (Default: Keep bitstream in old assetstore)");
+            options.addOption("a", "source", true,
+                              "Source assetstore store_number (to lose content). This is a number such as 0 or 1");
+            options.addOption("b", "destination", true,
+                              "Destination assetstore store_number (to gain content). This is a number such as 0 or " +
+                                  "1.");
+            options.addOption("d", "delete", false,
+                              "Delete file from losing assetstore. (Default: Keep bitstream in old assetstore)");
             options.addOption("p", "print", false, "Print out current assetstore information");
             options.addOption("s", "size", true, "Batch commit size. (Default: 1, commit after each file transfer)");
             options.addOption("h", "help", false, "Help");
 
-            try
-            {
+            try {
                 line = parser.parse(options, argv);
-            }
-            catch (ParseException e)
-            {
+            } catch (ParseException e) {
                 log.fatal(e);
                 System.exit(1);
             }
 
             // user asks for help
-            if (line.hasOption('h'))
-            {
+            if (line.hasOption('h')) {
                 printHelp(options);
                 System.exit(0);
             }
@@ -72,31 +80,31 @@ public class BitStoreMigrate {
             Context context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
 
-            if(line.hasOption('p')) {
+            if (line.hasOption('p')) {
                 bitstreamStorageService.printStores(context);
                 System.exit(0);
             }
 
             boolean deleteOld = false;
-            if (line.hasOption('d'))
-            {
+            if (line.hasOption('d')) {
                 log.debug("DELETE flag set to remove bitstream from old assetstore");
                 deleteOld = true;
             }
             log.debug("deleteOldAssets = " + deleteOld);
 
 
-            if(line.hasOption('a') && line.hasOption('b')) {
+            if (line.hasOption('a') && line.hasOption('b')) {
                 Integer sourceAssetstore = Integer.valueOf(line.getOptionValue('a'));
                 Integer destinationAssetstore = Integer.valueOf(line.getOptionValue('b'));
 
                 //Safe default, commit every time. TODO Performance Profile
                 Integer batchCommitSize = 1;
-                if(line.hasOption('s')) {
+                if (line.hasOption('s')) {
                     batchCommitSize = Integer.parseInt(line.getOptionValue('s'));
                 }
 
-                bitstreamStorageService.migrate(context, sourceAssetstore, destinationAssetstore, deleteOld, batchCommitSize);
+                bitstreamStorageService
+                    .migrate(context, sourceAssetstore, destinationAssetstore, deleteOld, batchCommitSize);
             } else {
                 printHelp(options);
                 System.exit(0);
@@ -105,17 +113,14 @@ public class BitStoreMigrate {
             context.complete();
 
             System.exit(0);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.fatal("Caught exception:", e);
             System.out.println("Exception during BitStoreMigrate: " + e.getMessage());
             System.exit(1);
         }
     }
 
-    private static void printHelp(Options options)
-    {
+    private static void printHelp(Options options) {
         HelpFormatter myhelp = new HelpFormatter();
         myhelp.printHelp("BitstoreMigrate\n", options);
     }

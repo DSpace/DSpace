@@ -11,7 +11,8 @@ import org.dspace.embargo.service.EmbargoService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the embargo package, use EmbargoServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the embargo package, use EmbargoServiceFactory.getInstance() to retrieve an
+ * implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -19,8 +20,8 @@ public abstract class EmbargoServiceFactory {
 
     public abstract EmbargoService getEmbargoService();
 
-    public static EmbargoServiceFactory getInstance()
-    {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("embargoServiceFactory", EmbargoServiceFactory.class);
+    public static EmbargoServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("embargoServiceFactory", EmbargoServiceFactory.class);
     }
 }

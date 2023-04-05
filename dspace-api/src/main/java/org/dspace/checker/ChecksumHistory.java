@@ -7,12 +7,23 @@
  */
 package org.dspace.checker;
 
-import org.dspace.core.Context;
-import org.dspace.content.Bitstream;
-import org.dspace.core.ReloadableEntity;
-
-import javax.persistence.*;
 import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.dspace.content.Bitstream;
+import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 
 /**
  * <p>
@@ -22,18 +33,17 @@ import java.util.Date;
  * @author Jim Downing
  * @author Grace Carpenter
  * @author Nathan Sarr
- *
  */
 @Entity
-@Table(name="checksum_history")
-public class ChecksumHistory implements ReloadableEntity<Long>
-{
+@Table(name = "checksum_history")
+public class ChecksumHistory implements ReloadableEntity<Long> {
 
 
     @Id
-    @Column(name="check_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="checksum_history_check_id_seq")
-    @SequenceGenerator(name="checksum_history_check_id_seq", sequenceName="checksum_history_check_id_seq", allocationSize = 1)
+    @Column(name = "check_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "checksum_history_check_id_seq")
+    @SequenceGenerator(name = "checksum_history_check_id_seq", sequenceName = "checksum_history_check_id_seq",
+        allocationSize = 1)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,10 +58,10 @@ public class ChecksumHistory implements ReloadableEntity<Long>
     @Column(name = "process_end_date", nullable = false)
     private Date processEndDate;
 
-    @Column(name= "checksum_expected", nullable = false)
+    @Column(name = "checksum_expected", nullable = false)
     private String checksumExpected;
 
-    @Column(name= "checksum_calculated", nullable = false)
+    @Column(name = "checksum_calculated", nullable = false)
     private String checksumCalculated;
 
     @ManyToOne
@@ -63,8 +73,7 @@ public class ChecksumHistory implements ReloadableEntity<Long>
      * Protected constructor, create object using:
      * {@link org.dspace.checker.service.ChecksumHistoryService#addHistory(Context, MostRecentChecksum)}
      */
-    protected ChecksumHistory()
-    {
+    protected ChecksumHistory() {
     }
 
     public Long getID() {
@@ -74,8 +83,7 @@ public class ChecksumHistory implements ReloadableEntity<Long>
     /**
      * @return Returns the bitstreamId.
      */
-    public Bitstream getBitstream()
-    {
+    public Bitstream getBitstream() {
         return bitstream;
     }
 
@@ -86,19 +94,16 @@ public class ChecksumHistory implements ReloadableEntity<Long>
     /**
      * @return Returns the checksumCalculated.
      */
-    public String getChecksumCalculated()
-    {
+    public String getChecksumCalculated() {
         return checksumCalculated;
     }
 
     /**
      * Set the checksum calculated.
      *
-     * @param checksumCalculated
-     *            The checksumCalculated to set.
+     * @param checksumCalculated The checksumCalculated to set.
      */
-    public void setChecksumCalculated(String checksumCalculated)
-    {
+    public void setChecksumCalculated(String checksumCalculated) {
         this.checksumCalculated = checksumCalculated;
     }
 
@@ -107,19 +112,16 @@ public class ChecksumHistory implements ReloadableEntity<Long>
      *
      * @return Returns the checksumExpected.
      */
-    public String getChecksumExpected()
-    {
+    public String getChecksumExpected() {
         return checksumExpected;
     }
 
     /**
      * Set the expected checksum.
      *
-     * @param checksumExpected
-     *            The checksumExpected to set.
+     * @param checksumExpected The checksumExpected to set.
      */
-    public void setChecksumExpected(String checksumExpected)
-    {
+    public void setChecksumExpected(String checksumExpected) {
         this.checksumExpected = checksumExpected;
     }
 
@@ -128,19 +130,16 @@ public class ChecksumHistory implements ReloadableEntity<Long>
      *
      * @return Returns the processEndDate.
      */
-    public Date getProcessEndDate()
-    {
+    public Date getProcessEndDate() {
         return processEndDate == null ? null : new Date(processEndDate.getTime());
     }
 
     /**
      * Set the process end date. This is the date and time the processing ended.
      *
-     * @param processEndDate
-     *            The processEndDate to set.
+     * @param processEndDate The processEndDate to set.
      */
-    public void setProcessEndDate(Date processEndDate)
-    {
+    public void setProcessEndDate(Date processEndDate) {
         this.processEndDate = (processEndDate == null ? null : new Date(processEndDate.getTime()));
     }
 
@@ -150,8 +149,7 @@ public class ChecksumHistory implements ReloadableEntity<Long>
      *
      * @return Returns the processStartDate.
      */
-    public Date getProcessStartDate()
-    {
+    public Date getProcessStartDate() {
         return processStartDate == null ? null : new Date(processStartDate.getTime());
     }
 
@@ -159,31 +157,27 @@ public class ChecksumHistory implements ReloadableEntity<Long>
      * Set the process start date. This is the date and time the processing
      * started.
      *
-     * @param processStartDate
-     *            The processStartDate to set.
+     * @param processStartDate The processStartDate to set.
      */
-    public void setProcessStartDate(Date processStartDate)
-    {
+    public void setProcessStartDate(Date processStartDate) {
         this.processStartDate = (processStartDate == null ? null : new Date(processStartDate.getTime()));
     }
 
     /**
      * Return the processing result.
+     *
      * @return result
      */
-    public ChecksumResult getResult()
-    {
+    public ChecksumResult getResult() {
         return checksumResult;
     }
 
     /**
      * Set the checksum processing result.
      *
-     * @param result
-     *            The result to set.
+     * @param result The result to set.
      */
-    public void setResult(ChecksumResult result)
-    {
+    public void setResult(ChecksumResult result) {
         this.checksumResult = result;
     }
 }
