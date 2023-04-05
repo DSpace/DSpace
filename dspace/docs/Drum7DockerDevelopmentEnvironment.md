@@ -5,10 +5,13 @@ using docker.
 
 ## Development Setup
 
+This repository uses the "GitHub Flow" branching model, with "drum-main" as the
+main branch for DRUM development.
+
 1. Clone the Git repository and switch to the directory:
 
     ```bash
-    git clone -b drum-develop git@github.com:umd-lib/DSpace.git drum
+    git clone -b drum-main git@github.com:umd-lib/DSpace.git drum
     cd drum
     ```
 
