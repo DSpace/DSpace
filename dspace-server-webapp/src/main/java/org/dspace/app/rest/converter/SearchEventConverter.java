@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.PageRest;
 import org.dspace.app.rest.model.SearchEventRest;
 import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.utils.DSpaceObjectResolver;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -29,11 +30,20 @@ public class SearchEventConverter {
     @Autowired
     private ScopeResolver scopeResolver;
 
+    @Autowired
+    private DSpaceObjectResolver dSpaceObjectResolver;
+
     public UsageSearchEvent convert(Context context, HttpServletRequest request, SearchEventRest searchEventRest) {
         UsageSearchEvent usageSearchEvent = new UsageSearchEvent(UsageEvent.Action.SEARCH, request, context,
                                                                              null);
         usageSearchEvent.setQuery(searchEventRest.getQuery());
         usageSearchEvent.setDsoType(searchEventRest.getDsoType());
+        if (searchEventRest.getObject() != null) {
+            IndexableObject object = dSpaceObjectResolver.resolveObject(context, searchEventRest.getObject());
+            if (object != null && object.getIndexedObject() instanceof DSpaceObject) {
+                usageSearchEvent.setObject((DSpaceObject) object.getIndexedObject());
+            }
+        }
         if (searchEventRest.getScope() != null) {
             IndexableObject scopeObject =
                     scopeResolver.resolveScope(context, String.valueOf(searchEventRest.getScope()));
