@@ -1,10 +1,15 @@
 package org.dspace.authenticate;
 
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -14,8 +19,10 @@ import edu.umd.lib.dspace.authenticate.impl.Ldap;
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.statistics.util.DummyHttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,17 +72,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
     @Test
     public void authenticate_fails_LdapUserNotFound() throws Exception {
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userNotFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return "no_such_user";
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userNotFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -89,6 +100,7 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         int initialEPersonCount = ePersonService.countTotal(context);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
@@ -101,11 +113,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                     throws SQLException {
                 return false;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.NO_SUCH_USER",
                 AuthenticationMethod.NO_SUCH_USER, response);
@@ -125,17 +140,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         ePersonService.update(context, eperson);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.CERT_REQUIRED",
                 AuthenticationMethod.CERT_REQUIRED, response);
@@ -150,17 +169,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         ePersonService.update(context, eperson);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.BAD_ARGS",
                 AuthenticationMethod.BAD_ARGS, response);
@@ -175,17 +198,21 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         ePersonService.update(context, eperson);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+        LdapService mockLdapService = MockLdapService.userFound();
 
         CASAuthentication stubCas = new CASAuthentication() {
             @Override
             protected String getNetIdFromCasTicket(Context context, String ticket, String serviceUrl) {
                 return netid;
             }
+
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
         };
 
-        LdapService mockLdapService = MockLdapService.userFound();
-
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
@@ -196,6 +223,15 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         String netid = "eperson_that_does_not_exist_yet";
 
         HttpServletRequest mockRequest = new MockHttpServletRequest("", Map.of("ticket", "ST-CAS-TICKET"));
+
+        // Set up MockLdapService so we can verify that the "registerEPerson"
+        // method was called.
+        MockLdapService mockLdapService = new MockLdapService() {
+            @Override
+            public Ldap queryLdap(String strUid) {
+                return new Ldap(strUid, null);
+            }
+        };
 
         MockCASAuthentication stubCas = new MockCASAuthentication() {
             @Override
@@ -208,18 +244,14 @@ public class CASAuthenticationTest extends AbstractUnitTest {
                     throws SQLException {
                 return true;
             }
-        };
 
-        // Set up MockLdapService so we can verify that the "registerEPerson"
-        // method was called.
-        MockLdapService mockLdapService = new MockLdapService() {
             @Override
-            public Ldap queryLdap(String strUid) {
-                return new Ldap(strUid, null);
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
             }
         };
 
-        int response = stubCas.authenticate(context, null, null, null, mockRequest, mockLdapService);
+        int response = stubCas.authenticate(context, null, null, null, mockRequest);
 
         assertEquals("Expected AuthenticationMethod.SUCCESS",
                 AuthenticationMethod.SUCCESS, response);
@@ -227,13 +259,127 @@ public class CASAuthenticationTest extends AbstractUnitTest {
         // Verify that Ldap.registerPerson was called
         assertTrue("Ldap.registerEPerson was not called", stubCas.registerEPersonCalled);
     }
+
+    @Test
+    public void getSpecialGroups_requestDoesNotHaveLdapAttribute() {
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+
+        CASAuthentication cas = new CASAuthentication();
+        List<Group> specialGroups = cas.getSpecialGroups(context, mockRequest);
+        assertTrue(specialGroups.isEmpty());
+    }
+
+    @Test
+    public void getSpecialGroups_requestHasLdapAttribute_CASAuthenticatedGroupDoesNotExist() throws Exception {
+        Ldap mockLdap = new MockLdap(new ArrayList<Group>());
+        MockHttpSession mockSession = new MockHttpSession();
+        mockSession.setAttribute(CASAuthentication.CAS_LDAP, mockLdap);
+        HttpServletRequest mockRequest = new MockHttpServletRequest(mockSession);
+
+        List<Group> specialGroups = cas.getSpecialGroups(context, mockRequest);
+        assertEquals(0, specialGroups.size());
+    }
+
+    @Test
+    public void getSpecialGroups_requestHasLdapAttribute_CASAuthenticatedGroupExists() throws Exception {
+        Ldap mockLdap = new MockLdap(new ArrayList<Group>(List.of(
+            createGroupWithName("Group1"),
+            createGroupWithName("Group2")))
+        );
+        MockHttpSession mockSession = new MockHttpSession();
+        mockSession.setAttribute(CASAuthentication.CAS_LDAP, mockLdap);
+        HttpServletRequest mockRequest = new MockHttpServletRequest(mockSession);
+        createGroupWithName("CAS Authenticated");
+
+        List<Group> specialGroups = cas.getSpecialGroups(context, mockRequest);
+        assertEquals(3, specialGroups.size());
+        List<String> groupNames = specialGroups.stream().map(group -> group.getName()).collect(toList());
+        assertThat(groupNames, hasItems("Group1", "Group2", "CAS Authenticated"));
+    }
+
+    @Test
+    public void getSpecialGroups_requestHasLdapAttributeWithMultipleGroups_CASAuthenticatedGroupExists()
+            throws Exception {
+        Ldap mockLdap = new MockLdap(new ArrayList<Group>());
+        MockHttpSession mockSession = new MockHttpSession();
+        mockSession.setAttribute(CASAuthentication.CAS_LDAP, mockLdap);
+        HttpServletRequest mockRequest = new MockHttpServletRequest(mockSession);
+        createGroupWithName("CAS Authenticated");
+
+        List<Group> specialGroups = cas.getSpecialGroups(context, mockRequest);
+        assertEquals(1, specialGroups.size());
+        assertEquals("CAS Authenticated", specialGroups.get(0).getName());
+    }
+
+    @Test
+    public void getSpecialGroups_impersonatingUser_impersonatedUserNotInLdap() throws Exception {
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        context.switchContextUser(eperson);
+
+        LdapService mockLdapService = MockLdapService.userNotFound();
+
+        CASAuthentication stubCas = new CASAuthentication() {
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
+        };
+
+        List<Group> specialGroups = stubCas.getSpecialGroups(context, mockRequest);
+        assertEquals(0, specialGroups.size());
+    }
+
+    @Test
+    public void getSpecialGroups_impersonatingUser_impersonatedUserInLdap() throws Exception {
+        MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        eperson.setNetid("impersonatedUser");
+        context.switchContextUser(eperson);
+
+        LdapService mockLdapService = MockLdapService.userFound();
+
+        CASAuthentication stubCas = new CASAuthentication() {
+            @Override
+            protected LdapService createLdapService(Context context) {
+                return mockLdapService;
+            }
+        };
+
+        createGroupWithName("CAS Authenticated");
+
+        List<Group> specialGroups = stubCas.getSpecialGroups(context, mockRequest);
+        assertEquals(1, specialGroups.size());
+        assertEquals("CAS Authenticated", specialGroups.get(0).getName());
+    }
+
+    /**
+     * Helper method to create a Group with the given name.
+     *
+     * @param name the name of the Group to create
+     */
+    private Group createGroupWithName(String name) throws Exception {
+        context.turnOffAuthorisationSystem();
+        try {
+            GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+            Group group = groupService.create(context);
+            groupService.setName(group, name);
+            return group;
+        } finally {
+            context.restoreAuthSystemState();
+        }
+    }
+
 }
 
 class MockHttpServletRequest extends DummyHttpServletRequest {
     private String serviceUrl = null;
     private Map<String, String> parameterMap = Collections.emptyMap();
+    private HttpSession session = new MockHttpSession();
 
     public MockHttpServletRequest() {
+    }
+
+    public MockHttpServletRequest(HttpSession session) {
+        this.session = session;
     }
 
     public MockHttpServletRequest(String serviceUrl) {
@@ -257,7 +403,7 @@ class MockHttpServletRequest extends DummyHttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        return new MockHttpSession();
+        return session;
     }
 
     @Override
@@ -303,4 +449,23 @@ class MockCASAuthentication extends CASAuthentication {
         registerEPersonCalled = true;
         return super.registerEPerson(uid, context, ldap, request);
     }
+
+    public void setGroupService(GroupService groupService) {
+        this.groupService = groupService;
+    }
 }
+
+class MockLdap extends Ldap {
+    private List<Group> groups;
+
+    public MockLdap(List<Group> groups) {
+        super("testUser", null);
+        this.groups = groups;
+    }
+
+    @Override
+    public List<Group> getGroups(Context context) {
+        return groups;
+    }
+}
+

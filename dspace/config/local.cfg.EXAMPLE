@@ -266,6 +266,8 @@ drum.ldap.bind.auth =
 drum.ldap.bind.password =
 drum.ldap.connect.timeout = 1000
 drum.ldap.read.timeout = 5000
+# Expiration time, in milliseconds, for the in-memory LDAP cache.
+drum.ldap.cacheTimeout = 300000
 
 #####################
 # REST API SETTINGS #
