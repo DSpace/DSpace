@@ -87,17 +87,22 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     public Page<RegistrationRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
-
+    
     @Override
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest;
-
+        String accountType = request.getParameter(TYPE_QUERY_PARAM);
+        if (StringUtils.isBlank(accountType) ||
+            (!accountType.equalsIgnoreCase(TYPE_FORGOT) && !accountType.equalsIgnoreCase(TYPE_REGISTER))) {
+            throw new IllegalArgumentException(String.format("Needs query param '%s' with value %s or %s indicating " +
+                "what kind of registration request it is", TYPE_QUERY_PARAM, TYPE_FORGOT, TYPE_REGISTER));
+        }
         String captchaToken = request.getHeader("X-Recaptcha-Token");
         boolean verificationEnabled = configurationService.getBooleanProperty("registration.verification.enabled");
 
-        if (verificationEnabled) {
+        if (verificationEnabled && !accountType.equalsIgnoreCase(TYPE_FORGOT)) {
             try {
                 captchaService.processResponse(captchaToken, REGISTER_ACTION);
             } catch (InvalidReCaptchaException e) {
@@ -114,12 +119,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         if (StringUtils.isBlank(registrationRest.getEmail())) {
             throw new UnprocessableEntityException("The email cannot be omitted from the Registration endpoint");
         }
-        String accountType = request.getParameter(TYPE_QUERY_PARAM);
-        if (StringUtils.isBlank(accountType) ||
-            (!accountType.equalsIgnoreCase(TYPE_FORGOT) && !accountType.equalsIgnoreCase(TYPE_REGISTER))) {
-            throw new IllegalArgumentException(String.format("Needs query param '%s' with value %s or %s indicating " +
-                "what kind of registration request it is", TYPE_QUERY_PARAM, TYPE_FORGOT, TYPE_REGISTER));
-        }
         EPerson eperson = null;
         try {
             eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
@@ -130,14 +129,14 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             try {
                 if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                     throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
-                        + eperson.getEmail());
+                                                            + eperson.getEmail());
                 }
                 accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                 log.error("Something went wrong with sending forgot password info email: "
-                    + registrationRest.getEmail(), e);
+                              + registrationRest.getEmail(), e);
             }
-        } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
+           } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
             try {
                 String email = registrationRest.getEmail();
                 if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
@@ -152,12 +151,13 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 accountService.sendRegistrationInfo(context, email);
             } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
                 log.error("Something went wrong with sending registration info email: "
-                    + registrationRest.getEmail(), e);
+                              + registrationRest.getEmail(), e);
             }
         }
         return null;
     }
 
+    
     @Override
     public Class<RegistrationRest> getDomainClass() {
         return RegistrationRest.class;
