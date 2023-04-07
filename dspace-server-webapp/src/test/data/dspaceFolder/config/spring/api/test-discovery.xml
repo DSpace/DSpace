@@ -39,10 +39,13 @@
                 <!-- Do not change the id of special entries or else they won't work -->
                 <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
+                <entry key="supervisedWorkspace" value-ref="supervisedWorkspaceConfiguration" />
                 <!-- "workflow" is a special entry to search for your own workflow tasks -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <!-- "workflowAdmin" is a special entry to search for all workflow items if you are an administrator -->
                 <entry key="workflowAdmin" value-ref="workflowAdminConfiguration" />
+                <!-- "supervision" is a special entry to search for all workspace and workflow items if you are an administrator -->
+                <entry key="supervision" value-ref="supervisionConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
 
