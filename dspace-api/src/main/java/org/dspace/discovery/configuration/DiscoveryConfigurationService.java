@@ -17,6 +17,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
@@ -36,10 +38,11 @@ public class DiscoveryConfigurationService {
     private Map<Integer, List<String>> toIgnoreMetadataFields = new HashMap<>();
 
     /**
-     * Discovery configurations, cached by DSO UUID. When a DSO doesn't have its own configuration, we take the one of
-     * the first parent that does. This cache ensures we don't have to go up the hierarchy every time.
+     * Discovery configurations, cached by Community/Collection UUID. When a  Community or Collection does not have its
+     * own configuration, we take the one of the first parent that does.
+     * This cache ensures we do not have to go up the hierarchy every time.
      */
-    private final Map<UUID, DiscoveryConfiguration> uuidMap = new HashMap<>();
+    private final Map<UUID, DiscoveryConfiguration> comColToDiscoveryConfigurationMap = new HashMap<>();
 
     public Map<String, DiscoveryConfiguration> getMap() {
         return map;
@@ -57,15 +60,26 @@ public class DiscoveryConfigurationService {
         this.toIgnoreMetadataFields = toIgnoreMetadataFields;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(final Context context,
-                                                            IndexableObject dso) {
+    /**
+     * Retrieve the discovery configuration for the provided IndexableObject. When a DSpace Object can be retrieved from
+     * the IndexableObject, the discovery configuration will be returned for the DSpace Object. Otherwise, a check will
+     * be done to look for the unique index ID of the IndexableObject. When the IndexableObject is null, the default
+     * configuration will be retrieved
+     *
+     * When no direct match is found, the parent object will
+     * be checked until there is no parent left, in which case the "default" configuration will be returned.
+     * @param context   - The database context
+     * @param indexableObject       - The IndexableObject to retrieve the configuration for
+     * @return the discovery configuration for the provided IndexableObject.
+     */
+    public DiscoveryConfiguration getDiscoveryConfiguration(Context context, IndexableObject indexableObject) {
         String name;
-        if (dso == null) {
-            name = "default";
-        } else if (dso instanceof IndexableDSpaceObject) {
-            return getDiscoveryDSOConfiguration(context, ((IndexableDSpaceObject) dso).getIndexedObject());
+        if (indexableObject == null) {
+            return getDiscoveryConfiguration(null);
+        } else if (indexableObject instanceof IndexableDSpaceObject) {
+            return getDiscoveryDSOConfiguration(context, ((IndexableDSpaceObject) indexableObject).getIndexedObject());
         } else {
-            name = dso.getUniqueIndexID();
+            name = indexableObject.getUniqueIndexID();
         }
         return getDiscoveryConfiguration(name);
     }
@@ -77,16 +91,15 @@ public class DiscoveryConfigurationService {
      * @param dso       - The DSpace object to retrieve the configuration for
      * @return the discovery configuration for the provided DSO.
      */
-    public DiscoveryConfiguration getDiscoveryDSOConfiguration(final Context context,
-                                                               DSpaceObject dso) {
+    public DiscoveryConfiguration getDiscoveryDSOConfiguration(final Context context, DSpaceObject dso) {
         // Fall back to default configuration
         if (dso == null) {
-            return getDiscoveryConfiguration("default", false);
+            return getDiscoveryConfiguration(null, true);
         }
 
         // Attempt to retrieve cached configuration by UUID
-        if (uuidMap.containsKey(dso.getID())) {
-            return uuidMap.get(dso.getID());
+        if (comColToDiscoveryConfigurationMap.containsKey(dso.getID())) {
+            return comColToDiscoveryConfigurationMap.get(dso.getID());
         }
 
         DiscoveryConfiguration configuration;
@@ -107,13 +120,21 @@ public class DiscoveryConfigurationService {
             configuration = getDiscoveryDSOConfiguration(context, parentObject);
         }
 
-        // Cache the resulting configuration
-        uuidMap.put(dso.getID(), configuration);
+        // Cache the resulting configuration when the DSO is a Community or Collection
+        if (dso instanceof Community || dso instanceof Collection) {
+            comColToDiscoveryConfigurationMap.put(dso.getID(), configuration);
+        }
 
         return configuration;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfiguration(final String name) {
+    /**
+     * Retrieve the Discovery Configuration for the provided name. When no configuration can be found for the name, the
+     * default configuration will be returned.
+     * @param name  - The name of the configuration to be retrieved
+     * @return the Discovery Configuration for the provided name, or default when none was found.
+     */
+    public DiscoveryConfiguration getDiscoveryConfiguration(String name) {
         return getDiscoveryConfiguration(name, true);
     }
 
@@ -138,13 +159,23 @@ public class DiscoveryConfigurationService {
         return result;
     }
 
-    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final Context context,
-                                                                       final String configurationName,
-                                                                       final IndexableObject dso) {
+    /**
+     * Retrieve the Discovery configuration for the provided name or IndexableObject. The configuration will first be
+     * checked for the provided name. When no match is found for the name, the configuration will be retrieved for the
+     * IndexableObject
+     *
+     * @param context           - The database context
+     * @param configurationName - The name of the configuration to be retrieved
+     * @param indexableObject   - The indexable object to retrieve the configuration for
+     * @return the Discovery configuration for the provided name, or when not found for the provided IndexableObject
+     */
+    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrIndexableObject(Context context,
+                                                                                   String configurationName,
+                                                                                   IndexableObject indexableObject) {
         if (StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
             return getMap().get(configurationName);
         } else {
-            return getDiscoveryConfiguration(context, dso);
+            return getDiscoveryConfiguration(context, indexableObject);
         }
     }
 

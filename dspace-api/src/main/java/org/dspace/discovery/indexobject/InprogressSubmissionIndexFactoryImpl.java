@@ -86,7 +86,7 @@ public abstract class InprogressSubmissionIndexFactoryImpl
             discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(context,
                                                                                 (WorkspaceItem) inProgressSubmission);
         } else {
-            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(item, context);
+            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(context, item);
         }
         indexableItemService.addDiscoveryFields(doc, context, item, discoveryConfigurations);
         indexableCollectionService.storeCommunityCollectionLocations(doc, locations);
