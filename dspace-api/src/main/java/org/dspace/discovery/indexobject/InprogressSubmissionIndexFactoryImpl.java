@@ -22,6 +22,8 @@ import org.dspace.discovery.indexobject.factory.CollectionIndexFactory;
 import org.dspace.discovery.indexobject.factory.InprogressSubmissionIndexFactory;
 import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.EPerson;
+import org.dspace.supervision.SupervisionOrder;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.util.SolrUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ public abstract class InprogressSubmissionIndexFactoryImpl
     protected CollectionIndexFactory indexableCollectionService;
     @Autowired
     protected ItemIndexFactory indexableItemService;
+
+    @Autowired
+    protected SupervisionOrderService supervisionOrderService;
 
 
     @Override
@@ -59,6 +64,8 @@ public abstract class InprogressSubmissionIndexFactoryImpl
             addFacetIndex(doc, "submitter", submitter.getID().toString(),
                     submitter.getFullName());
         }
+
+        addSupervisedByFacetIndex(context, item, doc);
 
         doc.addField("inprogress.item", new IndexableItem(inProgressSubmission.getItem()).getUniqueIndexID());
 
@@ -83,5 +90,14 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         }
         indexableItemService.addDiscoveryFields(doc, context, item, discoveryConfigurations);
         indexableCollectionService.storeCommunityCollectionLocations(doc, locations);
+    }
+
+    private void addSupervisedByFacetIndex(Context context, Item item, SolrInputDocument doc) throws SQLException {
+        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(context, item);
+        for (SupervisionOrder supervisionOrder : supervisionOrders) {
+            addFacetIndex(doc, "supervisedBy", supervisionOrder.getGroup().getID().toString(),
+                supervisionOrder.getGroup().getName());
+        }
+
     }
 }

@@ -141,12 +141,12 @@ public class BrowseEngine {
                 Collection col = (Collection) scope.getBrowseContainer();
                 dao.setContainerTable("collection2item");
                 dao.setContainerIDField("collection_id");
-                dao.setContainerID(col.getID());
+                dao.setContainer(col);
             } else if (scope.inCommunity()) {
                 Community com = (Community) scope.getBrowseContainer();
                 dao.setContainerTable("communities2item");
                 dao.setContainerIDField("community_id");
-                dao.setContainerID(com.getID());
+                dao.setContainer(com);
             }
         }
 
@@ -247,12 +247,12 @@ public class BrowseEngine {
                     Collection col = (Collection) scope.getBrowseContainer();
                     dao.setContainerTable("collection2item");
                     dao.setContainerIDField("collection_id");
-                    dao.setContainerID(col.getID());
+                    dao.setContainer(col);
                 } else if (scope.inCommunity()) {
                     Community com = (Community) scope.getBrowseContainer();
                     dao.setContainerTable("communities2item");
                     dao.setContainerIDField("community_id");
-                    dao.setContainerID(com.getID());
+                    dao.setContainer(com);
                 }
             }
 
@@ -413,12 +413,12 @@ public class BrowseEngine {
                     Collection col = (Collection) scope.getBrowseContainer();
                     dao.setContainerTable("collection2item");
                     dao.setContainerIDField("collection_id");
-                    dao.setContainerID(col.getID());
+                    dao.setContainer(col);
                 } else if (scope.inCommunity()) {
                     Community com = (Community) scope.getBrowseContainer();
                     dao.setContainerTable("communities2item");
                     dao.setContainerIDField("community_id");
-                    dao.setContainerID(com.getID());
+                    dao.setContainer(com);
                 }
             }
 

@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery.indexobject;
 
+import static org.dspace.discovery.SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFIXES;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -519,88 +523,10 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                                         + var);
                             }
                         }
-
+                        // if searchFilter is of type "facet", delegate to indexIfFilterTypeFacet method
                         if (searchFilter.getFilterType().equals(DiscoverySearchFilterFacet.FILTER_TYPE_FACET)) {
-                            if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT)) {
-                                //Add a special filter
-                                //We use a separator to split up the lowercase and regular case, this is needed to
-                                // get our filters in regular case
-                                //Solr has issues with facet prefix and cases
-                                if (authority != null) {
-                                    String facetValue = preferedLabel != null ? preferedLabel : value;
-                                    doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue
-                                            .toLowerCase() + separator + facetValue + SearchUtils.AUTHORITY_SEPARATOR
-                                            + authority);
-                                } else {
-                                    doc.addField(searchFilter.getIndexFieldName() + "_filter",
-                                            value.toLowerCase() + separator + value);
-                                }
-                            } else if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
-                                if (date != null) {
-                                    String indexField = searchFilter.getIndexFieldName() + ".year";
-                                    String yearUTC = DateFormatUtils.formatUTC(date, "yyyy");
-                                    doc.addField(searchFilter.getIndexFieldName() + "_keyword", yearUTC);
-                                    // add the year to the autocomplete index
-                                    doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);
-                                    doc.addField(indexField, yearUTC);
-
-                                    if (yearUTC.startsWith("0")) {
-                                        doc.addField(
-                                                searchFilter.getIndexFieldName()
-                                                        + "_keyword",
-                                                yearUTC.replaceFirst("0*", ""));
-                                        // add date without starting zeros for autocomplete e filtering
-                                        doc.addField(
-                                                searchFilter.getIndexFieldName()
-                                                        + "_ac",
-                                                yearUTC.replaceFirst("0*", ""));
-                                        doc.addField(
-                                                searchFilter.getIndexFieldName()
-                                                        + "_ac",
-                                                value.replaceFirst("0*", ""));
-                                        doc.addField(
-                                                searchFilter.getIndexFieldName()
-                                                        + "_keyword",
-                                                value.replaceFirst("0*", ""));
-                                    }
-
-                                    //Also save a sort value of this year, this is required for determining the upper
-                                    // & lower bound year of our facet
-                                    if (doc.getField(indexField + "_sort") == null) {
-                                        //We can only add one year so take the first one
-                                        doc.addField(indexField + "_sort", yearUTC);
-                                    }
-                                }
-                            } else if (searchFilter.getType()
-                                    .equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
-                                HierarchicalSidebarFacetConfiguration hierarchicalSidebarFacetConfiguration =
-                                        (HierarchicalSidebarFacetConfiguration) searchFilter;
-                                String[] subValues = value.split(hierarchicalSidebarFacetConfiguration.getSplitter());
-                                if (hierarchicalSidebarFacetConfiguration
-                                        .isSkipFirstNodeLevel() && 1 < subValues.length) {
-                                    //Remove the first element of our array
-                                    subValues = (String[]) ArrayUtils.subarray(subValues, 1, subValues.length);
-                                }
-                                for (int i = 0; i < subValues.length; i++) {
-                                    StringBuilder valueBuilder = new StringBuilder();
-                                    for (int j = 0; j <= i; j++) {
-                                        valueBuilder.append(subValues[j]);
-                                        if (j < i) {
-                                            valueBuilder.append(hierarchicalSidebarFacetConfiguration.getSplitter());
-                                        }
-                                    }
-
-                                    String indexValue = valueBuilder.toString().trim();
-                                    doc.addField(searchFilter.getIndexFieldName() + "_tax_" + i + "_filter",
-                                            indexValue.toLowerCase() + separator + indexValue);
-                                    //We add the field x times that it has occurred
-                                    for (int j = i; j < subValues.length; j++) {
-                                        doc.addField(searchFilter.getIndexFieldName() + "_filter",
-                                                indexValue.toLowerCase() + separator + indexValue);
-                                        doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
-                                    }
-                                }
-                            }
+                            indexIfFilterTypeFacet(doc, searchFilter, value, date,
+                                                   authority, preferedLabel, separator);
                         }
                     }
                 }
@@ -795,5 +721,141 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     public Optional<IndexableItem> findIndexableObject(Context context, String id) throws SQLException {
         final Item item = itemService.find(context, UUID.fromString(id));
         return item == null ? Optional.empty() : Optional.of(new IndexableItem(item));
+    }
+
+    /**
+     * Handles indexing when discoverySearchFilter is of type facet.
+     *
+     * @param doc the solr document
+     * @param searchFilter the discoverySearchFilter
+     * @param value the metadata value
+     * @param date Date object
+     * @param authority the authority key
+     * @param preferedLabel the preferred label for metadata field
+     * @param separator the separator being used to separate lowercase and regular case
+     */
+    private void indexIfFilterTypeFacet(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
+                                   Date date, String authority, String preferedLabel, String separator) {
+        if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT)) {
+            //Add a special filter
+            //We use a separator to split up the lowercase and regular case, this is needed to
+            // get our filters in regular case
+            //Solr has issues with facet prefix and cases
+            if (authority != null) {
+                String facetValue = preferedLabel != null ? preferedLabel : value;
+                doc.addField(searchFilter.getIndexFieldName() + "_filter", facetValue
+                    .toLowerCase() + separator + facetValue + SearchUtils.AUTHORITY_SEPARATOR
+                    + authority);
+            } else {
+                doc.addField(searchFilter.getIndexFieldName() + "_filter",
+                             value.toLowerCase() + separator + value);
+            }
+            //Also add prefix field with all parts of value
+            saveFacetPrefixParts(doc, searchFilter, value, separator, authority, preferedLabel);
+        } else if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
+            if (date != null) {
+                String indexField = searchFilter.getIndexFieldName() + ".year";
+                String yearUTC = DateFormatUtils.formatUTC(date, "yyyy");
+                doc.addField(searchFilter.getIndexFieldName() + "_keyword", yearUTC);
+                // add the year to the autocomplete index
+                doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);
+                doc.addField(indexField, yearUTC);
+
+                if (yearUTC.startsWith("0")) {
+                    doc.addField(
+                        searchFilter.getIndexFieldName()
+                            + "_keyword",
+                        yearUTC.replaceFirst("0*", ""));
+                    // add date without starting zeros for autocomplete e filtering
+                    doc.addField(
+                        searchFilter.getIndexFieldName()
+                            + "_ac",
+                        yearUTC.replaceFirst("0*", ""));
+                    doc.addField(
+                        searchFilter.getIndexFieldName()
+                            + "_ac",
+                        value.replaceFirst("0*", ""));
+                    doc.addField(
+                        searchFilter.getIndexFieldName()
+                            + "_keyword",
+                        value.replaceFirst("0*", ""));
+                }
+
+                //Also save a sort value of this year, this is required for determining the upper
+                // & lower bound year of our facet
+                if (doc.getField(indexField + "_sort") == null) {
+                    //We can only add one year so take the first one
+                    doc.addField(indexField + "_sort", yearUTC);
+                }
+            }
+        } else if (searchFilter.getType()
+                               .equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)) {
+            HierarchicalSidebarFacetConfiguration hierarchicalSidebarFacetConfiguration =
+                (HierarchicalSidebarFacetConfiguration) searchFilter;
+            String[] subValues = value.split(hierarchicalSidebarFacetConfiguration.getSplitter());
+            if (hierarchicalSidebarFacetConfiguration
+                .isSkipFirstNodeLevel() && 1 < subValues.length) {
+                //Remove the first element of our array
+                subValues = (String[]) ArrayUtils.subarray(subValues, 1, subValues.length);
+            }
+            for (int i = 0; i < subValues.length; i++) {
+                StringBuilder valueBuilder = new StringBuilder();
+                for (int j = 0; j <= i; j++) {
+                    valueBuilder.append(subValues[j]);
+                    if (j < i) {
+                        valueBuilder.append(hierarchicalSidebarFacetConfiguration.getSplitter());
+                    }
+                }
+
+                String indexValue = valueBuilder.toString().trim();
+                doc.addField(searchFilter.getIndexFieldName() + "_tax_" + i + "_filter",
+                             indexValue.toLowerCase() + separator + indexValue);
+                //We add the field x times that it has occurred
+                for (int j = i; j < subValues.length; j++) {
+                    doc.addField(searchFilter.getIndexFieldName() + "_filter",
+                                 indexValue.toLowerCase() + separator + indexValue);
+                    doc.addField(searchFilter.getIndexFieldName() + "_keyword", indexValue);
+                }
+            }
+            //Also add prefix field with all parts of value
+            saveFacetPrefixParts(doc, searchFilter, value, separator, authority, preferedLabel);
+        }
+    }
+
+    /**
+     * Stores every "value part" in lowercase, together with the original value in regular case,
+     * separated by the separator, in the {fieldName}{@link SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFIXES} field.
+     * <br>
+     * E.g. Author "With Multiple Words" gets stored as:
+     * <br>
+     * <code>
+     *     with multiple words ||| With Multiple Words, <br>
+     *     multiple words ||| With Multiple Words, <br>
+     *     words ||| With Multiple Words, <br>
+     * </code>
+     * in the author_prefix field.
+     * @param doc the solr document
+     * @param searchFilter the current discoverySearchFilter
+     * @param value the metadata value
+     * @param separator the separator being used to separate value part and original value
+     */
+    private void saveFacetPrefixParts(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
+                                      String separator, String authority, String preferedLabel) {
+        value = StringUtils.normalizeSpace(value);
+        Pattern pattern = Pattern.compile("\\b\\w+\\b", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(value);
+        while (matcher.find()) {
+            int index = matcher.start();
+            String currentPart = StringUtils.substring(value, index);
+            if (authority != null) {
+                String facetValue = preferedLabel != null ? preferedLabel : currentPart;
+                doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
+                             facetValue.toLowerCase() + separator + value
+                                 + SearchUtils.AUTHORITY_SEPARATOR + authority);
+            } else {
+                doc.addField(searchFilter.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES,
+                             currentPart.toLowerCase() + separator + value);
+            }
+        }
     }
 }

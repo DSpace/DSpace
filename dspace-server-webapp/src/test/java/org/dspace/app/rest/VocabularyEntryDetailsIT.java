@@ -57,12 +57,12 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$",
                                 VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB110", "Religion/Theology",
-                                        "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology")))
+                                        "HUMANITIES and RELIGION::Religion/Theology")))
                         .andExpect(jsonPath("$.selectable", is(true)))
                         .andExpect(jsonPath("$.otherInformation.id", is("SCB110")))
                         .andExpect(jsonPath("$.otherInformation.note", is("Religionsvetenskap/Teologi")))
                         .andExpect(jsonPath("$.otherInformation.parent",
-                                is("Research Subject Categories::HUMANITIES and RELIGION")))
+                                is("HUMANITIES and RELIGION")))
                         .andExpect(jsonPath("$._links.parent.href",
                                 endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/parent")))
                         .andExpect(jsonPath("$._links.children.href",
@@ -70,10 +70,10 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void findOneUnauthorizedTest() throws Exception {
+    public void findOneAnonymousTest() throws Exception {
         String idAuthority = "srsc:SCB110";
         getClient().perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isOk());
     }
 
     @Test
@@ -102,30 +102,30 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
           .andExpect(status().isOk())
           .andExpect(jsonPath("$._embedded.vocabularyEntryDetails", Matchers.containsInAnyOrder(
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB11", "HUMANITIES and RELIGION",
-                  "Research Subject Categories::HUMANITIES and RELIGION"),
+                  "HUMANITIES and RELIGION"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB12", "LAW/JURISPRUDENCE",
-                  "Research Subject Categories::LAW/JURISPRUDENCE"),
+                  "LAW/JURISPRUDENCE"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB13", "SOCIAL SCIENCES",
-                  "Research Subject Categories::SOCIAL SCIENCES"),
+                  "SOCIAL SCIENCES"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB14", "MATHEMATICS",
-                  "Research Subject Categories::MATHEMATICS"),
+                  "MATHEMATICS"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB15", "NATURAL SCIENCES",
-                  "Research Subject Categories::NATURAL SCIENCES"),
+                  "NATURAL SCIENCES"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB16", "TECHNOLOGY",
-                  "Research Subject Categories::TECHNOLOGY"),
+                  "TECHNOLOGY"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB17",
                    "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING",
-                  "Research Subject Categories::FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+                  "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB18", "MEDICINE",
-                  "Research Subject Categories::MEDICINE"),
+                  "MEDICINE"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB19", "ODONTOLOGY",
-                  "Research Subject Categories::ODONTOLOGY"),
+                  "ODONTOLOGY"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB21", "PHARMACY",
-                  "Research Subject Categories::PHARMACY"),
+                  "PHARMACY"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB22", "VETERINARY MEDICINE",
-                  "Research Subject Categories::VETERINARY MEDICINE"),
+                  "VETERINARY MEDICINE"),
           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB23", "INTERDISCIPLINARY RESEARCH AREAS",
-                  "Research Subject Categories::INTERDISCIPLINARY RESEARCH AREAS")
+                  "INTERDISCIPLINARY RESEARCH AREAS")
           )))
           .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
 
@@ -134,30 +134,30 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
          .andExpect(status().isOk())
          .andExpect(jsonPath("$._embedded.vocabularyEntryDetails", Matchers.containsInAnyOrder(
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB11", "HUMANITIES and RELIGION",
-                         "Research Subject Categories::HUMANITIES and RELIGION"),
+                         "HUMANITIES and RELIGION"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB12", "LAW/JURISPRUDENCE",
-                         "Research Subject Categories::LAW/JURISPRUDENCE"),
+                         "LAW/JURISPRUDENCE"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB13", "SOCIAL SCIENCES",
-                         "Research Subject Categories::SOCIAL SCIENCES"),
+                         "SOCIAL SCIENCES"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB14", "MATHEMATICS",
-                         "Research Subject Categories::MATHEMATICS"),
+                         "MATHEMATICS"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB15", "NATURAL SCIENCES",
-                         "Research Subject Categories::NATURAL SCIENCES"),
+                         "NATURAL SCIENCES"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB16", "TECHNOLOGY",
-                         "Research Subject Categories::TECHNOLOGY"),
+                         "TECHNOLOGY"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB17",
                           "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING",
-                         "Research Subject Categories::FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+                         "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB18", "MEDICINE",
-                         "Research Subject Categories::MEDICINE"),
+                         "MEDICINE"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB19", "ODONTOLOGY",
-                         "Research Subject Categories::ODONTOLOGY"),
+                         "ODONTOLOGY"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB21", "PHARMACY",
-                         "Research Subject Categories::PHARMACY"),
+                         "PHARMACY"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB22", "VETERINARY MEDICINE",
-                         "Research Subject Categories::VETERINARY MEDICINE"),
+                         "VETERINARY MEDICINE"),
                  VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB23", "INTERDISCIPLINARY RESEARCH AREAS",
-                         "Research Subject Categories::INTERDISCIPLINARY RESEARCH AREAS")
+                         "INTERDISCIPLINARY RESEARCH AREAS")
           )))
          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
     }
@@ -170,14 +170,14 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                  .andExpect(jsonPath("$._embedded.children", Matchers.containsInAnyOrder(
                    VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB1401",
                            "Algebra, geometry and mathematical analysis",
-                           "Research Subject Categories::MATHEMATICS::Algebra, geometry and mathematical analysis"),
+                           "MATHEMATICS::Algebra, geometry and mathematical analysis"),
                    VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB1402", "Applied mathematics",
-                           "Research Subject Categories::MATHEMATICS::Applied mathematics"),
+                           "MATHEMATICS::Applied mathematics"),
                    VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB1409", "Other mathematics",
-                           "Research Subject Categories::MATHEMATICS::Other mathematics")
+                           "MATHEMATICS::Other mathematics")
                   )))
                  .andExpect(jsonPath("$._embedded.children[*].otherInformation.parent",
-                         Matchers.everyItem(is("Research Subject Categories::MATHEMATICS"))))
+                         Matchers.everyItem(is("MATHEMATICS"))))
                  .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
@@ -191,15 +191,15 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
           .andExpect(status().isOk())
           .andExpect(jsonPath("$._embedded.vocabularyEntryDetails", Matchers.containsInAnyOrder(
                   VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB11", "HUMANITIES and RELIGION",
-                          "Research Subject Categories::HUMANITIES and RELIGION"),
+                          "HUMANITIES and RELIGION"),
                   VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB12", "LAW/JURISPRUDENCE",
-                          "Research Subject Categories::LAW/JURISPRUDENCE"),
+                          "LAW/JURISPRUDENCE"),
                   VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB13", "SOCIAL SCIENCES",
-                          "Research Subject Categories::SOCIAL SCIENCES"),
+                          "SOCIAL SCIENCES"),
                   VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB14", "MATHEMATICS",
-                          "Research Subject Categories::MATHEMATICS"),
+                          "MATHEMATICS"),
                   VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB15", "NATURAL SCIENCES",
-                          "Research Subject Categories::NATURAL SCIENCES")
+                          "NATURAL SCIENCES")
               )))
           .andExpect(jsonPath("$.page.totalElements", is(12)))
           .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -213,16 +213,16 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
            .andExpect(status().isOk())
            .andExpect(jsonPath("$._embedded.vocabularyEntryDetails", Matchers.containsInAnyOrder(
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB16", "TECHNOLOGY",
-                   "Research Subject Categories::TECHNOLOGY"),
+                   "TECHNOLOGY"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB17",
                         "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING",
-                   "Research Subject Categories::FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+                   "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB18", "MEDICINE",
-                   "Research Subject Categories::MEDICINE"),
+                   "MEDICINE"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB19", "ODONTOLOGY",
-                   "Research Subject Categories::ODONTOLOGY"),
+                   "ODONTOLOGY"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB21", "PHARMACY",
-                   "Research Subject Categories::PHARMACY")
+                   "PHARMACY")
                )))
            .andExpect(jsonPath("$.page.totalElements", is(12)))
            .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -236,9 +236,9 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
            .andExpect(status().isOk())
            .andExpect(jsonPath("$._embedded.vocabularyEntryDetails", Matchers.containsInAnyOrder(
                    VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB22", "VETERINARY MEDICINE",
-                           "Research Subject Categories::VETERINARY MEDICINE"),
+                           "VETERINARY MEDICINE"),
                    VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB23", "INTERDISCIPLINARY RESEARCH AREAS",
-                           "Research Subject Categories::INTERDISCIPLINARY RESEARCH AREAS")
+                           "INTERDISCIPLINARY RESEARCH AREAS")
                )))
            .andExpect(jsonPath("$.page.totalElements", is(12)))
            .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -254,10 +254,10 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void searchTopUnauthorizedTest() throws Exception {
+    public void searchTopAnonymousTest() throws Exception {
         getClient().perform(get("/api/submission/vocabularyEntryDetails/search/top")
-                   .param("vocabulary", "srsc:SCB16"))
-                   .andExpect(status().isUnauthorized());
+                   .param("vocabulary", "srsc"))
+                   .andExpect(status().isOk());
     }
 
     @Test
@@ -271,9 +271,9 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                  .andExpect(jsonPath("$._embedded.children", Matchers.containsInAnyOrder(
                      VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB1401",
                              "Algebra, geometry and mathematical analysis",
-                             "Research Subject Categories::MATHEMATICS::Algebra, geometry and mathematical analysis"),
+                             "MATHEMATICS::Algebra, geometry and mathematical analysis"),
                      VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB1402", "Applied mathematics",
-                             "Research Subject Categories::MATHEMATICS::Applied mathematics")
+                             "MATHEMATICS::Applied mathematics")
                      )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)))
                  .andExpect(jsonPath("$.page.totalPages", is(2)))
@@ -286,7 +286,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.children", Matchers.contains(
                     VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB1409", "Other mathematics",
-                            "Research Subject Categories::MATHEMATICS::Other mathematics")
+                            "MATHEMATICS::Other mathematics")
                     )))
                 .andExpect(jsonPath("$.page.totalElements", is(3)))
                 .andExpect(jsonPath("$.page.totalPages", is(2)))
@@ -300,13 +300,13 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.children", Matchers.containsInAnyOrder(
               VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR140202", "Numerical analysis",
-                      "Research Subject Categories::MATHEMATICS::Applied mathematics::Numerical analysis"),
+                      "MATHEMATICS::Applied mathematics::Numerical analysis"),
               VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR140203", "Mathematical statistics",
-                      "Research Subject Categories::MATHEMATICS::Applied mathematics::Mathematical statistics"),
+                      "MATHEMATICS::Applied mathematics::Mathematical statistics"),
               VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR140204", "Optimization, systems theory",
-                      "Research Subject Categories::MATHEMATICS::Applied mathematics::Optimization, systems theory"),
+                      "MATHEMATICS::Applied mathematics::Optimization, systems theory"),
               VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR140205", "Theoretical computer science",
-                      "Research Subject Categories::MATHEMATICS::Applied mathematics::Theoretical computer science")
+                      "MATHEMATICS::Applied mathematics::Theoretical computer science")
              )))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
     }
@@ -328,10 +328,10 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void srscSearchTopUnauthorizedTest() throws Exception {
+    public void srscSearchTopAnonymousTest() throws Exception {
         getClient().perform(get("/api/submission/vocabularyEntryDetails/search/top")
                    .param("vocabulary", "srsc"))
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isOk());
     }
 
     @Test
@@ -341,7 +341,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$", is(
                          VocabularyEntryDetailsMatcher.matchAuthorityEntry(
-                                 "srsc:SCB18", "MEDICINE","Research Subject Categories::MEDICINE")
+                                 "srsc:SCB18", "MEDICINE","MEDICINE")
                   )));
     }
 
@@ -353,9 +353,9 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void findParentByChildUnauthorizedTest() throws Exception {
+    public void findParentByChildAnonymousTest() throws Exception {
         getClient().perform(get("/api/submission/vocabularyEntryDetails/srsc:SCB180/parent"))
-                   .andExpect(status().isUnauthorized());
+                   .andExpect(status().isOk());
     }
 
     @Test
@@ -375,11 +375,11 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                  .andExpect(jsonPath("$._embedded.parent",
                          VocabularyEntryDetailsMatcher.matchAuthorityEntry(
                                  "srsc:SCB11", "HUMANITIES and RELIGION",
-                                 "Research Subject Categories::HUMANITIES and RELIGION")))
+                                 "HUMANITIES and RELIGION")))
                  .andExpect(jsonPath("$._embedded.children._embedded.children", matchAllSrscSC110Children()))
                  .andExpect(jsonPath("$._embedded.children._embedded.children[*].otherInformation.parent",
                          Matchers.everyItem(
-                                 is("Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology"))));
+                                 is("HUMANITIES and RELIGION::Religion/Theology"))));
 
         getClient(tokenAdmin).perform(
                 get("/api/submission/vocabularyEntryDetails/srsc:SCB110").param("embed", "children"))
@@ -387,7 +387,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                  .andExpect(jsonPath("$._embedded.children._embedded.children", matchAllSrscSC110Children()))
                  .andExpect(jsonPath("$._embedded.children._embedded.children[*].otherInformation.parent",
                          Matchers.everyItem(
-                                 is("Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology"))));
+                                 is("HUMANITIES and RELIGION::Religion/Theology"))));
 
         getClient(tokenAdmin).perform(
                 get("/api/submission/vocabularyEntryDetails/srsc:SCB110").param("embed", "parent"))
@@ -395,47 +395,47 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                 .andExpect(jsonPath("$._embedded.parent",
                         VocabularyEntryDetailsMatcher.matchAuthorityEntry(
                                 "srsc:SCB11", "HUMANITIES and RELIGION",
-                                "Research Subject Categories::HUMANITIES and RELIGION")));
+                                "HUMANITIES and RELIGION")));
     }
 
     private Matcher<Iterable<? extends Object>> matchAllSrscSC110Children() {
         return Matchers.containsInAnyOrder(
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110102",
                    "History of religion",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::History of religion"),
+                   "HUMANITIES and RELIGION::Religion/Theology::History of religion"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110103",
                    "Church studies",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Church studies"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Church studies"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110104",
                    "Missionary studies",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Missionary studies"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Missionary studies"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110105",
                    "Systematic theology",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Systematic theology"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Systematic theology"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110106",
                    "Islamology",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Islamology"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Islamology"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110107",
                    "Faith and reason",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Faith and reason"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Faith and reason"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110108",
                    "Sociology of religion",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Sociology of religion"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Sociology of religion"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110109",
                    "Psychology of religion",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Psychology of religion"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Psychology of religion"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110110",
                    "Philosophy of religion",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Philosophy of religion"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Philosophy of religion"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110111",
                    "New Testament exegesis",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::New Testament exegesis"),
+                   "HUMANITIES and RELIGION::Religion/Theology::New Testament exegesis"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110112",
                    "Old Testament exegesis",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Old Testament exegesis"),
+                   "HUMANITIES and RELIGION::Religion/Theology::Old Testament exegesis"),
            VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110113",
                    "Dogmatics with symbolics",
-                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Dogmatics with symbolics")
+                   "HUMANITIES and RELIGION::Religion/Theology::Dogmatics with symbolics")
           );
     }
 

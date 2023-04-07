@@ -119,7 +119,7 @@ public class EPersonAuthorityIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
             .param("filter", "Luca"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isOk());
 
     }
 

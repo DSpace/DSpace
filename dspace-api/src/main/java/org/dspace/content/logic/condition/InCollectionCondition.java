@@ -23,7 +23,6 @@ import org.dspace.core.Context;
  * if the item belongs to any of them.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class InCollectionCondition extends AbstractCondition {
     private static Logger log = LogManager.getLogger(InCollectionCondition.class);

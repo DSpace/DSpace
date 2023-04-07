@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFIXES;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -108,6 +110,9 @@ public class DiscoverResult {
         // Check if we are dealing with a date, sometimes the facet values arrive as dates !
         if (facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             facetValues = getFacetResult(field.getIndexFieldName() + ".year");
+        }
+        if (facetValues.isEmpty()) {
+            facetValues = getFacetResult(field.getIndexFieldName() + SOLR_FIELD_SUFFIX_FACET_PREFIXES);
         }
         return ListUtils.emptyIfNull(facetValues);
     }
