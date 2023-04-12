@@ -359,7 +359,7 @@ public class S3BitStoreService extends BaseBitStoreService {
             if (attrs.contains("checksum")) {
                 try (InputStream in = get(bitstream)) {
                     byte[] md5Digest = MessageDigest.getInstance(CSA).digest(IOUtils.toByteArray(in));
-                    metadata.put("checksum", Base64.encodeBase64String(md5Digest));
+                    metadata.put("checksum", Utils.toHex(md5Digest));
                 } catch (NoSuchAlgorithmException nsae) {
                     // Should never happen
                     log.warn("Caught NoSuchAlgorithmException", nsae);
