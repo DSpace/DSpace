@@ -242,7 +242,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(about, hasEntry(is("modified"), notNullValue()));
         assertThat(about.size(), is(2));
 
-        String expectedChecksum = Base64.encodeBase64String(generateChecksum(content));
+        String expectedChecksum = Utils.toHex(generateChecksum(content));
 
         about = s3BitStoreService.about(bitstream, List.of("size_bytes", "modified", "checksum"));
         assertThat(about, hasEntry("size_bytes", 22L));
