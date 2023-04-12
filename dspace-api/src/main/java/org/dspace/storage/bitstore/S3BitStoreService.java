@@ -44,8 +44,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
@@ -357,8 +356,11 @@ public class S3BitStoreService extends BaseBitStoreService {
             putValueIfExistsKey(attrs, metadata, "checksum_algorithm", CSA);
 
             if (attrs.contains("checksum")) {
-                try (InputStream in = get(bitstream)) {
-                    byte[] md5Digest = MessageDigest.getInstance(CSA).digest(IOUtils.toByteArray(in));
+                try (InputStream in = get(bitstream);
+                     DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA))
+                ) {
+                    Utils.copy(dis, NullOutputStream.NULL_OUTPUT_STREAM);
+                    byte[] md5Digest = dis.getMessageDigest().digest();
                     metadata.put("checksum", Utils.toHex(md5Digest));
                 } catch (NoSuchAlgorithmException nsae) {
                     // Should never happen
