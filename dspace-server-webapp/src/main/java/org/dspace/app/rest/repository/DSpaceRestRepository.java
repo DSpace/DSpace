@@ -36,6 +36,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -195,7 +197,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Delete the object identified by its ID
      */
-    public void deleteById(ID id) {
+    /**
+     * Method should be synchronized to avoid hibernate partial deletion bug when deleting multiple bitstreams:
+     * https://github.com/DSpace/DSpace/issues/8694
+     */
+    public synchronized void deleteById(ID id) {
         Context context = obtainContext();
         try {
             getThisRepository().delete(context, id);
