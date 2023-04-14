@@ -126,9 +126,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             if (bit == null) {
                 throw new ResourceNotFoundException("The bitstream with uuid " + id + " could not be found");
             }
-            // if (bit.isDeleted()) {
-            //     throw new ResourceNotFoundException("The bitstream with uuid " + id + " was already deleted");
-            // }
             Community community = bit.getCommunity();
             if (community != null) {
                 communityService.setLogo(context, community, null);
