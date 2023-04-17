@@ -12,6 +12,9 @@ on:
       - 'dspace-**'
   pull_request:
 
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   docker:
     # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
@@ -31,21 +34,30 @@ jobs:
       # We turn off 'latest' tag by default.
       TAGS_FLAVOR: |
         latest=false
+      # Architectures / Platforms for which we will build Docker images
+      # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
+      # If this is NOT a PR (e.g. a tag or merge commit), also build for ARM64. NOTE: The ARM64 build takes MUCH
+      # longer (around 45mins or so) which is why we only run it when pushing a new Docker image.
+      PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
 
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
 
       # https://github.com/docker/login-action
       - name: Login to DockerHub
         # Only login if not a PR, as PRs only trigger a Docker build and not a push
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
@@ -57,7 +69,7 @@ jobs:
       # Get Metadata for docker_build_deps step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-dependencies' image
         id: meta_build_deps
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: dspace/dspace-dependencies
           tags: ${{ env.IMAGE_TAGS }}
@@ -66,10 +78,11 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: Build and push 'dspace-dependencies' image
         id: docker_build_deps
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.dependencies
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -83,7 +96,7 @@ jobs:
       # Get Metadata for docker_build step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace' image
         id: meta_build
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: dspace/dspace
           tags: ${{ env.IMAGE_TAGS }}
@@ -91,10 +104,11 @@ jobs:
 
       - name: Build and push 'dspace' image
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -108,7 +122,7 @@ jobs:
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-test' image
         id: meta_build_test
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: dspace/dspace
           tags: ${{ env.IMAGE_TAGS }}
@@ -119,10 +133,11 @@ jobs:
 
       - name: Build and push 'dspace-test' image
         id: docker_build_test
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.test
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
@@ -136,7 +151,7 @@ jobs:
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-cli' image
         id: meta_build_cli
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: dspace/dspace-cli
           tags: ${{ env.IMAGE_TAGS }}
@@ -144,13 +159,40 @@ jobs:
 
       - name: Build and push 'dspace-cli' image
         id: docker_build_cli
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.cli
+          platforms: ${{ env.PLATFORMS }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
           # but we ONLY do an image push to DockerHub if it's NOT a PR
           push: ${{ github.event_name != 'pull_request' }}
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build_cli.outputs.tags }}
           labels: ${{ steps.meta_build_cli.outputs.labels }}
+
+      ###########################################
+      # Build/Push the 'dspace/dspace-solr' image
+      ###########################################
+      # Get Metadata for docker_build_solr step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-solr' image
+        id: meta_build_solr
+        uses: docker/metadata-action@v4
+        with:
+          images: dspace/dspace-solr
+          tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
+
+      - name: Build and push 'dspace-solr' image
+        id: docker_build_solr
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./dspace/src/main/docker/dspace-solr/Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_solr.outputs.tags }}
+          labels: ${{ steps.meta_build_solr.outputs.labels }}

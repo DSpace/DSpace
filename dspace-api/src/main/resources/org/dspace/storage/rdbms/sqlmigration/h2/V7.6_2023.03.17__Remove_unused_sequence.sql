@@ -1,0 +1,13 @@
+--
+-- The contents of this file are subject to the license and copyright
+-- detailed in the LICENSE and NOTICE files at the root of the source
+-- tree and available online at
+--
+-- http://www.dspace.org/license/
+--
+
+-----------------------------------------------------------------------------------
+-- Drop the 'history_seq' sequence (related table deleted at Dspace-1.5)
+-----------------------------------------------------------------------------------
+
+DROP SEQUENCE history_seq;

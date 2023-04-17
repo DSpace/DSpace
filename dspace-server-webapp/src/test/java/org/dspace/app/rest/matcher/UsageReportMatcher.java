@@ -49,13 +49,18 @@ public class UsageReportMatcher {
      * @param points     List of points to match to the json of UsageReport's list of points
      * @return The matcher
      */
-    public static Matcher<? super Object> matchUsageReport(String id, String reportType,
-                                                           List<UsageReportPointRest> points) {
+    public static Matcher<? super Object> matchUsageReport(
+        String id, String reportType, List<UsageReportPointRest> points
+    ) {
         return allOf(
             matchUsageReport(id, reportType),
             hasJsonPath("$.points", Matchers.containsInAnyOrder(
-                points.stream().map(point -> UsageReportPointMatcher
-                    .matchUsageReportPoint(point.getId(), point.getType(), point.getValues().get("views")))
-                      .collect(Collectors.toList()))));
+                points.stream()
+                      .map(point -> UsageReportPointMatcher.matchUsageReportPoint(
+                          point.getId(), point.getLabel(), point.getType(), point.getValues().get("views")
+                      ))
+                      .collect(Collectors.toList()))
+            )
+        );
     }
 }

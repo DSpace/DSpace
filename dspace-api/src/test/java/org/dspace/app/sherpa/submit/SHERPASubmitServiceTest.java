@@ -11,7 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
@@ -109,20 +108,18 @@ public class SHERPASubmitServiceTest extends AbstractUnitTest {
 
         // Get responses from SHERPA submit service, which should inspect item ISSNs and perform search
         // on the mock SHERPA service
-        List<SHERPAResponse> responses = sherpaSubmitService.searchRelatedJournals(context, testItem);
+        SHERPAResponse response = sherpaSubmitService.searchRelatedJournals(context, testItem);
 
         // Make sure response is not null or empty
-        assertTrue("Response list should not be null or empty",
-            responses != null && !responses.isEmpty());
+        assertTrue("Response should not be null", response != null);
 
         // For each response (there should be only one based on test data) perform the standard set
         // of thorough parsing tests
-        for (SHERPAResponse response : responses) {
-            // Assert response is not error, or fail with message
-            assertFalse("Response was flagged as 'isError'", response.isError());
 
-            // Skip remainder of parsing tests - these are already done in SHERPAServiceTEst
-        }
+        // Assert response is not error, or fail with message
+        assertFalse("Response was flagged as 'isError'", response.isError());
+
+        // Skip remainder of parsing tests - these are already done in SHERPAServiceTEst
     }
 
 }

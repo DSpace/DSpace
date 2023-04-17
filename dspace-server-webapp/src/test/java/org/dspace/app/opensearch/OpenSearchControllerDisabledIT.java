@@ -40,8 +40,8 @@ public class OpenSearchControllerDisabledIT extends AbstractControllerIntegratio
                                 .param("query", "dog"))
                    //The status has to be 404 Not Found
                    .andExpect(status().isNotFound())
-                   //We expect the content type to be "application/html"
-                   .andExpect(content().contentType("text/html"))
+                   //We expect the content type to be "text/html"
+                   .andExpect(content().contentType("text/html;charset=UTF-8"))
                    .andExpect(content().string("OpenSearch Service is disabled"))
         ;
     }
@@ -52,7 +52,7 @@ public class OpenSearchControllerDisabledIT extends AbstractControllerIntegratio
         getClient().perform(get("/opensearch/service"))
                    //The status has to be 404 Not Found
                    .andExpect(status().isNotFound())
-                   .andExpect(content().contentType("text/html"))
+                   .andExpect(content().contentType("text/html;charset=UTF-8"))
                    .andExpect(content().string("OpenSearch Service is disabled"))
         ;
     }

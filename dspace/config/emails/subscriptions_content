@@ -1,0 +1,16 @@
+## E-mail sent to designated address about updates on subscribed items
+##
+## Parameters: {0} Collections updates
+##             {1} Communities updates
+#set($subject = 'DSpace Subscription')
+
+This email is sent from DSpace based on the chosen subscription preferences.
+
+Communities
+-----------
+List of changed items : ${params[0]}
+
+Collections
+-----------
+List of changed items : ${params[1]}
+

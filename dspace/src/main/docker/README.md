@@ -1,7 +1,9 @@
 # Docker images supporting DSpace
 
 ***
-:warning: **NOT PRODUCTION READY**  The below Docker images/resources are not guaranteed "production ready" at this time. They have been built for development/testing only. Therefore, DSpace Docker images may not be fully secured or up-to-date. While you are welcome to base your own images on these DSpace images/resources, these should not be used "as is" in any production scenario.
+:warning: **THESE IMAGES ARE NOT PRODUCTION READY**  The below Docker Compose images/resources were built for development/testing only.  Therefore, they may not be fully secured or up-to-date, and should not be used in production.
+
+If you wish to run DSpace on Docker in production, we recommend building your own Docker images. You are welcome to borrow ideas/concepts from the below images in doing so. But, the below images should not be used "as is" in any production scenario.
 ***
 
 ## Dockerfile.dependencies
@@ -128,6 +130,23 @@ docker run -i -t -d -p 80:80 -p 443:443 dspace/dspace-shibboleth
 
 This image can also be rebuilt using the `../docker-compose/docker-compose-shibboleth.yml` script.
 
+## dspace/src/main/docker/dspace-solr/Dockerfile
+
+This Dockerfile builds a Solr image with DSpace Solr configsets included. It
+can be pulled / built following the [docker compose resources](../docker-compose/README.md)
+documentation. Or, to just build and/or run Solr:
+
+```bash
+docker-compose build dspacesolr
+docker-compose -p d7 up -d dspacesolr
+```
+
+If you're making iterative changes to the DSpace Solr configsets you'll need to rebuild /
+restart the `dspacesolr` container for the changes to be deployed. From DSpace root:
+
+```bash
+docker-compose -p d7 up --detach --build dspacesolr
+```
 
 ## test/ folder
 

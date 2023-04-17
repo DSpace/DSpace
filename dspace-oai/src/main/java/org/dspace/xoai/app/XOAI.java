@@ -8,6 +8,10 @@
 package org.dspace.xoai.app;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_PARAM;
+import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_START;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 import java.io.ByteArrayOutputStream;
@@ -38,6 +42,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
@@ -77,6 +83,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class XOAI {
     private static Logger log = LogManager.getLogger(XOAI.class);
 
+    // needed because the solr query only returns 10 rows by default
     private final Context context;
     private boolean optimize;
     private final boolean verbose;
@@ -94,8 +101,8 @@ public class XOAI {
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
 
-    private final static ConfigurationService configurationService = DSpaceServicesFactory
-            .getInstance().getConfigurationService();
+    private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
+            .getConfigurationService();
 
     private List<XOAIExtensionItemCompilePlugin> extensionPlugins;
 
@@ -152,9 +159,8 @@ public class XOAI {
                 System.out.println("Using full import.");
                 result = this.indexAll();
             } else {
-                SolrQuery solrParams = new SolrQuery("*:*")
-                    .addField("item.lastmodified")
-                    .addSort("item.lastmodified", ORDER.desc).setRows(1);
+                SolrQuery solrParams = new SolrQuery("*:*").addField("item.lastmodified")
+                        .addSort("item.lastmodified", ORDER.desc).setRows(1);
 
                 SolrDocumentList results = DSpaceSolrSearch.query(solrServerResolver.getServer(), solrParams);
                 if (results.getNumFound() == 0) {
@@ -166,7 +172,6 @@ public class XOAI {
 
             }
             solrServerResolver.getServer().commit();
-
 
             if (optimize) {
                 println("Optimizing Index");
@@ -183,12 +188,10 @@ public class XOAI {
     }
 
     private int index(Date last) throws DSpaceSolrIndexerException, IOException {
-        System.out
-            .println("Incremental import. Searching for documents modified after: "
-                         + last.toString());
+        System.out.println("Incremental import. Searching for documents modified after: " + last.toString());
         /*
-         * Index all changed or new items or items whose visibility is viable to
-         * change due to an embargo.
+         * Index all changed or new items or items whose visibility is viable to change
+         * due to an embargo.
          */
         try {
             Iterator<Item> discoverableChangedItems = itemService
@@ -204,31 +207,55 @@ public class XOAI {
     }
 
     /**
-     * Get all items already in the index which are viable to change visibility
-     * due to an embargo. Only consider those which haven't been modified
-     * anyways since the last update, so they aren't updated twice in one import
-     * run.
+     * Get all items already in the index which are viable to change visibility due
+     * to an embargo. Only consider those which haven't been modified anyways since
+     * the last update, so they aren't updated twice in one import run.
      *
-     * @param last
-     *            maximum date for an item to be considered for an update
-     * @return Iterator over list of items which might have changed their
-     *         visibility since the last update.
+     * @param last maximum date for an item to be considered for an update
+     * @return Iterator over list of items which might have changed their visibility
+     *         since the last update.
      * @throws DSpaceSolrIndexerException
      */
     private Iterator<Item> getItemsWithPossibleChangesBefore(Date last) throws DSpaceSolrIndexerException, IOException {
         try {
-            SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
-            SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
+            SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id").setRows(100)
+                    .addSort("item.handle", SolrQuery.ORDER.asc);
+            SolrClient solrClient = solrServerResolver.getServer();
+
             List<Item> items = new LinkedList<>();
-            for (int i = 0; i < documents.getNumFound(); i++) {
-                Item item = itemService.find(context,
-                        UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
-                if (item.getLastModified().before(last)) {
-                    items.add(item);
+            boolean done = false;
+            /*
+             * Using solr cursors to paginate and prevent the query from returning 10
+             * SolrDocument objects only.
+             */
+            String cursorMark = CURSOR_MARK_START;
+            String nextCursorMark = EMPTY;
+
+            while (!done) {
+                params.set(CURSOR_MARK_PARAM, cursorMark);
+                QueryResponse response = solrClient.query(params);
+                nextCursorMark = response.getNextCursorMark();
+
+                for (SolrDocument document : response.getResults()) {
+                    Item item = itemService.find(context, UUID.fromString((String) document.getFieldValue("item.id")));
+                    if (nonNull(item)) {
+                        if (nonNull(item.getLastModified())) {
+                            if (item.getLastModified().before(last)) {
+                                items.add(item);
+                            }
+                        } else {
+                            log.warn("Skipping item with id " + item.getID());
+                        }
+                    }
                 }
+
+                if (cursorMark.equals(nextCursorMark)) {
+                    done = true;
+                }
+                cursorMark = nextCursorMark;
             }
             return items.iterator();
-        } catch (SolrServerException | SQLException | DSpaceSolrException ex) {
+        } catch (SolrServerException | SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }
@@ -250,11 +277,10 @@ public class XOAI {
     }
 
     /**
-     * Check if an item is already indexed. Using this, it is possible to check
-     * if withdrawn or nondiscoverable items have to be indexed at all.
+     * Check if an item is already indexed. Using this, it is possible to check if
+     * withdrawn or nondiscoverable items have to be indexed at all.
      *
-     * @param item
-     *            Item that should be checked for its presence in the index.
+     * @param item Item that should be checked for its presence in the index.
      * @return has it been indexed?
      */
     private boolean checkIfIndexed(Item item) throws IOException {
@@ -266,11 +292,11 @@ public class XOAI {
             return false;
         }
     }
-     /**
+
+    /**
      * Check if an item is flagged visible in the index.
      *
-     * @param item
-     *            Item that should be checked for its presence in the index.
+     * @param item Item that should be checked for its presence in the index.
      * @return has it been indexed?
      */
     private boolean checkIfVisibleInOAI(Item item) throws IOException {
@@ -287,8 +313,7 @@ public class XOAI {
         }
     }
 
-    private int index(Iterator<Item> iterator)
-        throws DSpaceSolrIndexerException {
+    private int index(Iterator<Item> iterator) throws DSpaceSolrIndexerException {
         try {
             int i = 0;
             int batchSize = configurationService.getIntProperty("oai.import.batch.size", 1000);
@@ -302,7 +327,7 @@ public class XOAI {
                     } else {
                         list.add(this.index(item));
                     }
-                    //Uncache the item to keep memory consumption low
+                    // Uncache the item to keep memory consumption low
                     context.uncacheEntity(item);
 
                 } catch (SQLException | IOException | XMLStreamException | WritingXmlException ex) {
@@ -334,12 +359,11 @@ public class XOAI {
     }
 
     /**
-     * Method to get the most recent date on which the item changed concerning
-     * the OAI deleted status (policy start and end dates for all anonymous READ
+     * Method to get the most recent date on which the item changed concerning the
+     * OAI deleted status (policy start and end dates for all anonymous READ
      * policies and the standard last modification date)
      *
-     * @param item
-     *            Item
+     * @param item Item
      * @return date
      * @throws SQLException
      */
@@ -382,17 +406,16 @@ public class XOAI {
         boolean isIndexed = this.checkIfIndexed(item);
 
         /*
-         * If the item is not under embargo, it should be visible. If it is,
-         * make it invisible if this is the first time it is indexed. For
-         * subsequent index runs, keep the current status, so that if the item
-         * is embargoed again, it is flagged as deleted instead and does not
-         * just disappear, or if it is still under embargo, it won't become
-         * visible and be known to harvesters as deleted before it gets
-         * disseminated for the first time. The item has to be indexed directly
-         * after publication even if it is still embargoed, because its
-         * lastModified date will not change when the embargo end date (or start
-         * date) is reached. To circumvent this, an item which will change its
-         * status in the future will be marked as such.
+         * If the item is not under embargo, it should be visible. If it is, make it
+         * invisible if this is the first time it is indexed. For subsequent index runs,
+         * keep the current status, so that if the item is embargoed again, it is
+         * flagged as deleted instead and does not just disappear, or if it is still
+         * under embargo, it won't become visible and be known to harvesters as deleted
+         * before it gets disseminated for the first time. The item has to be indexed
+         * directly after publication even if it is still embargoed, because its
+         * lastModified date will not change when the embargo end date (or start date)
+         * is reached. To circumvent this, an item which will change its status in the
+         * future will be marked as such.
          */
 
         boolean isPublic = isEmbargoed ? (isIndexed ? isCurrentlyVisible : false) : true;
@@ -404,33 +427,31 @@ public class XOAI {
         doc.addField("item.willChangeStatus", willChangeStatus(item));
 
         /*
-         * Mark an item as deleted not only if it is withdrawn, but also if it
-         * is made private, because items should not simply disappear from OAI
-         * with a transient deletion policy. Do not set the flag for still
-         * invisible embargoed items, because this will override the item.public
-         * flag.
+         * Mark an item as deleted not only if it is withdrawn, but also if it is made
+         * private, because items should not simply disappear from OAI with a transient
+         * deletion policy. Do not set the flag for still invisible embargoed items,
+         * because this will override the item.public flag.
          */
 
         doc.addField("item.deleted",
                 (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false)));
 
         /*
-         * An item that is embargoed will potentially not be harvested by
-         * incremental harvesters if the from and until params do not encompass
-         * both the standard lastModified date and the anonymous-READ resource
-         * policy start date. The same is true for the end date, where
-         * harvesters might not get a tombstone record. Therefore, consider all
-         * relevant policy dates and the standard lastModified date and take the
-         * most recent of those which have already passed.
+         * An item that is embargoed will potentially not be harvested by incremental
+         * harvesters if the from and until params do not encompass both the standard
+         * lastModified date and the anonymous-READ resource policy start date. The same
+         * is true for the end date, where harvesters might not get a tombstone record.
+         * Therefore, consider all relevant policy dates and the standard lastModified
+         * date and take the most recent of those which have already passed.
          */
-        doc.addField("item.lastmodified", SolrUtils.getDateFormatter()
-                .format(this.getMostRecentModificationDate(item)));
+        doc.addField("item.lastmodified",
+                SolrUtils.getDateFormatter().format(this.getMostRecentModificationDate(item)));
 
         if (item.getSubmitter() != null) {
             doc.addField("item.submitter", item.getSubmitter().getEmail());
         }
 
-        for (Collection col: item.getCollections()) {
+        for (Collection col : item.getCollections()) {
             doc.addField("item.collections", "col_" + col.getHandle().replace("/", "_"));
         }
         for (Community com : collectionsService.flatParentCommunities(context, item)) {
@@ -457,8 +478,7 @@ public class XOAI {
 
         // Message output before processing - for debugging purposes
         if (verbose) {
-            println(String.format("Item %s with handle %s is about to be indexed",
-                    item.getID().toString(), handle));
+            println(String.format("Item %s with handle %s is about to be indexed", item.getID().toString(), handle));
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -476,8 +496,7 @@ public class XOAI {
         doc.addField("item.compile", out.toString());
 
         if (verbose) {
-            println(String.format("Item %s with handle %s indexed",
-                    item.getID().toString(), handle));
+            println(String.format("Item %s with handle %s indexed", item.getID().toString(), handle));
         }
 
         return doc;
@@ -510,12 +529,10 @@ public class XOAI {
         return pub;
     }
 
-
     private static boolean getKnownExplanation(Throwable t) {
         if (t instanceof ConnectException) {
-            System.err.println("Solr server ("
-                    + configurationService.getProperty("oai.solr.url", "")
-                    + ") is down, turn it on.");
+            System.err.println(
+                    "Solr server (" + configurationService.getProperty("oai.solr.url", "") + ") is down, turn it on.");
             return true;
         }
 
@@ -544,7 +561,7 @@ public class XOAI {
     }
 
     private static void cleanCache(XOAIItemCacheService xoaiItemCacheService, XOAICacheService xoaiCacheService)
-        throws IOException {
+            throws IOException {
         System.out.println("Purging cached OAI responses.");
         xoaiItemCacheService.deleteAll();
         xoaiCacheService.deleteAll();
@@ -557,10 +574,8 @@ public class XOAI {
 
     public static void main(String[] argv) throws IOException, ConfigurationException {
 
-
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(new Class[] {
-            BasicConfiguration.class
-        });
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(
+                new Class[] { BasicConfiguration.class });
 
         XOAICacheService cacheService = applicationContext.getBean(XOAICacheService.class);
         XOAIItemCacheService itemCacheService = applicationContext.getBean(XOAIItemCacheService.class);
@@ -571,20 +586,18 @@ public class XOAI {
             CommandLineParser parser = new DefaultParser();
             Options options = new Options();
             options.addOption("c", "clear", false, "Clear index before indexing");
-            options.addOption("o", "optimize", false,
-                              "Optimize index at the end");
+            options.addOption("o", "optimize", false, "Optimize index at the end");
             options.addOption("v", "verbose", false, "Verbose output");
             options.addOption("h", "help", false, "Shows some help");
             options.addOption("n", "number", true, "FOR DEVELOPMENT MUST DELETE");
             CommandLine line = parser.parse(options, argv);
 
-            String[] validSolrCommands = {COMMAND_IMPORT, COMMAND_CLEAN_CACHE};
-            String[] validDatabaseCommands = {COMMAND_CLEAN_CACHE, COMMAND_COMPILE_ITEMS, COMMAND_ERASE_COMPILED_ITEMS};
-
+            String[] validSolrCommands = { COMMAND_IMPORT, COMMAND_CLEAN_CACHE };
+            String[] validDatabaseCommands = { COMMAND_CLEAN_CACHE, COMMAND_COMPILE_ITEMS,
+                COMMAND_ERASE_COMPILED_ITEMS };
 
             boolean solr = true; // Assuming solr by default
             solr = !("database").equals(configurationService.getProperty("oai.storage", "solr"));
-
 
             boolean run = false;
             if (line.getArgs().length > 0) {
@@ -607,10 +620,7 @@ public class XOAI {
 
                 if (COMMAND_IMPORT.equals(command)) {
                     ctx = new Context(Context.Mode.READ_ONLY);
-                    XOAI indexer = new XOAI(ctx,
-                                            line.hasOption('o'),
-                                            line.hasOption('c'),
-                                            line.hasOption('v'));
+                    XOAI indexer = new XOAI(ctx, line.hasOption('o'), line.hasOption('c'), line.hasOption('v'));
 
                     applicationContext.getAutowireCapableBeanFactory().autowireBean(indexer);
 
@@ -635,8 +645,7 @@ public class XOAI {
                 }
 
                 System.out.println("OAI 2.0 manager action ended. It took "
-                                       + ((System.currentTimeMillis() - start) / 1000)
-                                       + " seconds.");
+                        + ((System.currentTimeMillis() - start) / 1000) + " seconds.");
             } else {
                 usage();
             }
@@ -688,7 +697,7 @@ public class XOAI {
 
     private static void usage() {
         boolean solr = true; // Assuming solr by default
-        solr = !("database").equals(configurationService.getProperty("oai.storage","solr"));
+        solr = !("database").equals(configurationService.getProperty("oai.storage", "solr"));
 
         if (solr) {
             System.out.println("OAI Manager Script");

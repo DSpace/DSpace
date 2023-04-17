@@ -7,14 +7,15 @@
  */
 package org.dspace.iiif.canvasdimension;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -231,9 +232,7 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
             .withName("Bitstream2.jpg")
             .withMimeType("image/jpeg")
             .build();
-
         context.restoreAuthSystemState();
-
         String id = parentCommunity.getID().toString();
         execCanvasScript(id);
 
@@ -354,6 +353,40 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
     }
 
+
+    @Test
+    public void processItemWithJp2File() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create a new Item
+        iiifItem = ItemBuilder.createItem(context, col1)
+                              .withTitle("Test Item")
+                              .withIssueDate("2017-10-17")
+                              .enableIIIF()
+                              .build();
+
+        // Add jp2 image to verify image server call for dimensions
+        InputStream input = this.getClass().getResourceAsStream("cat.jp2");
+        bitstream = BitstreamBuilder
+            .createBitstream(context, iiifItem, input)
+            .withName("Bitstream2.jp2")
+            .withMimeType("image/jp2")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String id = iiifItem.getID().toString();
+
+        execCanvasScript(id);
+
+        assertTrue(bitstream.getMetadata().stream()
+                            .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_HEIGHT))
+                            .anyMatch(m -> m.getValue().contentEquals("64")));
+        assertTrue(bitstream.getMetadata().stream()
+                            .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_WIDTH))
+                            .anyMatch(m -> m.getValue().contentEquals("64")));
+
+    }
+
     @Test
     public void processParentCommunityWithMaximum() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -408,7 +441,8 @@ public class CanvasDimensionsIT extends AbstractIntegrationTestWithDatabase  {
 
         execCanvasScriptWithMaxRecs(id);
         // check System.out for number of items processed.
-        assertEquals("2 IIIF items were processed.\n", outContent.toString());
+        Pattern regex = Pattern.compile(".*2 IIIF items were processed", Pattern.DOTALL);
+        assertTrue(regex.matcher(StringUtils.chomp(outContent.toString())).find());
     }
 
     @Test

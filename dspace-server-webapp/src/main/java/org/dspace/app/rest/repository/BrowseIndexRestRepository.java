@@ -7,12 +7,16 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.CrossLinks;
 import org.dspace.core.Context;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +55,37 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
         } catch (BrowseException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Find a browse index by a list of fields (first match will be returned)
+     * @param fields
+     * @return
+     * @throws SQLException
+     */
+    @SearchRestMethod(name = "byFields")
+    public BrowseIndexRest findByFields(@Parameter(value = "fields", required = true) String[] fields)
+            throws SQLException {
+        BrowseIndexRest bi = null;
+        BrowseIndex bix = null;
+        try {
+            // Find the browse index definition that matches any field - once found, return
+            for (String field : fields) {
+                CrossLinks cl = new CrossLinks();
+                if (cl.hasLink(field)) {
+                    // Get the index name for this
+                    String browseIndexName = cl.getLinkType(field);
+                    bix = BrowseIndex.getBrowseIndex(browseIndexName);
+                    break;
+                }
+            }
+        } catch (BrowseException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (bix != null) {
+            bi = converter.toRest(bix, utils.obtainProjection());
+        }
+        return bi;
     }
 
     @Override

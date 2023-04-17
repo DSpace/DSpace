@@ -18,7 +18,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.license.CCLicense;
-import org.jdom.Document;
+import org.jdom2.Document;
 
 /**
  * Service interface class for the Creative commons licensing.

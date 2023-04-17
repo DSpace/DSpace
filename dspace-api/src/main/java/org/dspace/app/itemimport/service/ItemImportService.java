@@ -16,6 +16,7 @@ import org.dspace.app.itemimport.BatchUpload;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -211,6 +212,13 @@ public interface ItemImportService {
     public void setTest(boolean isTest);
 
     /**
+     * Set exclude-content flag.
+     *
+     * @param isExcludeContent true or false
+     */
+    public void setExcludeContent(boolean isExcludeContent);
+
+    /**
      * Set resume flag
      *
      * @param isResume true or false
@@ -235,4 +243,10 @@ public interface ItemImportService {
      * @param isQuiet true or false
      */
     public void setQuiet(boolean isQuiet);
+
+    /**
+     * Set the DSpace Runnable Handler
+     * @param handler
+     */
+    public void setHandler(DSpaceRunnableHandler handler);
 }

@@ -117,7 +117,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 // check if we have a previous item
                 if (previous != null) {
                     try {
-                        // If we have a reviewer he/she might not have the
+                        // If we have a reviewer they might not have the
                         // rights to edit the metadata of thes previous item.
                         // Temporarly grant them:
                         context.turnOffAuthorisationSystem();

@@ -10,7 +10,6 @@ package org.dspace.core;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -173,7 +172,7 @@ public class LegacyPluginServiceImpl implements PluginService {
         throws PluginInstantiationException {
         // cache of config data for Sequence Plugins; format its
         // <interface-name> -> [ <classname>.. ]  (value is Array)
-        Map<String, String[]> sequenceConfig = new HashMap<String, String[]>();
+        Map<String, String[]> sequenceConfig = new HashMap<>();
 
         // cache the configuration for this interface after grovelling it once:
         // format is  prefix.<interface> = <classname>
@@ -220,10 +219,7 @@ public class LegacyPluginServiceImpl implements PluginService {
 
     // Map of named plugin classes, [intfc,name] -> class
     // Also contains intfc -> "marker" to mark when interface has been loaded.
-    private Map<String, String> namedPluginClasses = new HashMap<String, String>();
-
-    // Map of cached (reusable) named plugin instances, [class,name] -> instance
-    private Map<Serializable, Object> namedInstanceCache = new HashMap<Serializable, Object>();
+    private final Map<String, String> namedPluginClasses = new HashMap<>();
 
     // load and cache configuration data for the given interface.
     private void configureNamedPlugin(String iname)
@@ -413,14 +409,14 @@ public class LegacyPluginServiceImpl implements PluginService {
             String iname = interfaceClass.getName();
             configureNamedPlugin(iname);
             String prefix = iname + SEP;
-            ArrayList<String> result = new ArrayList<String>();
+            ArrayList<String> result = new ArrayList<>();
 
             for (String key : namedPluginClasses.keySet()) {
                 if (key.startsWith(prefix)) {
                     result.add(key.substring(prefix.length()));
                 }
             }
-            if (result.size() == 0) {
+            if (result.isEmpty()) {
                 log.error("Cannot find any names for named plugin, interface=" + iname);
             }
 
@@ -508,10 +504,10 @@ public class LegacyPluginServiceImpl implements PluginService {
          */
 
         // tables of config keys for each type of config line:
-        Map<String, String> singleKey = new HashMap<String, String>();
-        Map<String, String> sequenceKey = new HashMap<String, String>();
-        Map<String, String> namedKey = new HashMap<String, String>();
-        Map<String, String> selfnamedKey = new HashMap<String, String>();
+        Map<String, String> singleKey = new HashMap<>();
+        Map<String, String> sequenceKey = new HashMap<>();
+        Map<String, String> namedKey = new HashMap<>();
+        Map<String, String> selfnamedKey = new HashMap<>();
 
         // Find all property keys starting with "plugin."
         List<String> keys = configurationService.getPropertyKeys("plugin.");
@@ -533,7 +529,7 @@ public class LegacyPluginServiceImpl implements PluginService {
         // 2. Build up list of all interfaces and test that they are loadable.
         // don't bother testing that they are "interface" rather than "class"
         // since either one will work for the Plugin Manager.
-        ArrayList<String> allInterfaces = new ArrayList<String>();
+        ArrayList<String> allInterfaces = new ArrayList<>();
         allInterfaces.addAll(singleKey.keySet());
         allInterfaces.addAll(sequenceKey.keySet());
         allInterfaces.addAll(namedKey.keySet());
@@ -547,7 +543,6 @@ public class LegacyPluginServiceImpl implements PluginService {
         //  - each class is loadable.
         //  - plugin.selfnamed values are each  subclass of SelfNamedPlugin
         //  - save classname in allImpls
-        Map<String, String> allImpls = new HashMap<String, String>();
 
         // single plugins - just check that it has a valid impl. class
         ii = singleKey.keySet().iterator();
@@ -558,9 +553,6 @@ public class LegacyPluginServiceImpl implements PluginService {
                 log.error("Single plugin config not found for: " + SINGLE_PREFIX + key);
             } else {
                 val = val.trim();
-                if (checkClassname(val, "implementation class")) {
-                    allImpls.put(val, val);
-                }
             }
         }
 
@@ -571,12 +563,6 @@ public class LegacyPluginServiceImpl implements PluginService {
             String[] vals = configurationService.getArrayProperty(SEQUENCE_PREFIX + key);
             if (vals == null || vals.length == 0) {
                 log.error("Sequence plugin config not found for: " + SEQUENCE_PREFIX + key);
-            } else {
-                for (String val : vals) {
-                    if (checkClassname(val, "implementation class")) {
-                        allImpls.put(val, val);
-                    }
-                }
             }
         }
 
@@ -591,7 +577,6 @@ public class LegacyPluginServiceImpl implements PluginService {
             } else {
                 for (String val : vals) {
                     if (checkClassname(val, "selfnamed implementation class")) {
-                        allImpls.put(val, val);
                         checkSelfNamed(val);
                     }
                 }
@@ -609,15 +594,6 @@ public class LegacyPluginServiceImpl implements PluginService {
                 log.error("Named plugin config not found for: " + NAMED_PREFIX + key);
             } else {
                 checkNames(key);
-                for (String val : vals) {
-                    // each named plugin has two parts to the value, format:
-                    // [classname] = [plugin-name]
-                    String val_split[] = val.split("\\s*=\\s*");
-                    String classname = val_split[0];
-                    if (checkClassname(classname, "implementation class")) {
-                        allImpls.put(classname, classname);
-                    }
-                }
             }
         }
     }
