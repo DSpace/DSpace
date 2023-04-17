@@ -392,3 +392,15 @@ ALTER TABLE user_metadata
 
 ALTER TABLE user_metadata
     ADD CONSTRAINT user_registration_user_metadata_fk FOREIGN KEY (user_registration_id) REFERENCES user_registration(user_registration_id);
+
+ALTER TABLE eperson
+    ALTER COLUMN netid TYPE character varying(256);
+
+ALTER TABLE eperson
+    ALTER COLUMN email TYPE character varying(256);
+
+ALTER TABLE metadatafieldregistry
+    ALTER COLUMN element TYPE character varying(128);
+
+ALTER TABLE handle
+    ALTER COLUMN url TYPE character varying(8192);
