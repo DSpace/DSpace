@@ -233,10 +233,15 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 handler.logInfo("***End of Test Run***");
             }
         } finally {
-            // clean work dir
             if (zip) {
+                // clean source and work dirs
                 FileUtils.deleteDirectory(new File(sourcedir));
                 FileUtils.deleteDirectory(workDir);
+
+                // conditionally clean workFile if import was done in the UI and it still exists
+                if (workFile != null) {
+                    workFile.delete();
+                }
             }
 
             Date endTime = new Date();
@@ -311,7 +316,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             workFile = new File(itemImportService.getTempWorkDir() + File.separator
                     + zipfilename + "-" + context.getCurrentUser().getID());
             FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
-            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
+            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                               + File.separator + context.getCurrentUser().getID());
             sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
         } else {
             throw new IllegalArgumentException(
