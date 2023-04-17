@@ -674,8 +674,17 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         throws SQLException, AuthorizeException {
 
         if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream)) {
-
-            List<Group> authorizedGroups = getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
+            // Get DEFAULT_BITSTREAM_READ policy from the collection
+            List<Group> defaultBitstreamReadGroups =
+                    getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_BITSTREAM_READ);
+            // Get DEFAULT_ITEM_READ policy from the collection
+            List<Group> defaultItemReadGroups =
+                    getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
+            // By default, use DEFAULT_BITSTREAM_READ. Otherwise, use DEFAULT_ITEM_READ
+            List<Group> authorizedGroups = defaultBitstreamReadGroups;
+            if (defaultBitstreamReadGroups.isEmpty()) {
+                authorizedGroups = defaultItemReadGroups;
+            }
 
             removeAllPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
 
