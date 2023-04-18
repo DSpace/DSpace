@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -69,6 +70,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
 
     private static final String publicationTitle = "A Tale of Two Cities";
     private static final String personTitle = "Person Test";
+    private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
     @Autowired
     private ItemService itemService;
@@ -126,6 +128,10 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
         checkMetadata();
         checkMetadataWithAnotherSchema();
         checkBitstream();
+
+        // confirm that TEMP_DIR still exists
+        File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+        assertTrue(workTempDir.exists());
     }
 
     @Test

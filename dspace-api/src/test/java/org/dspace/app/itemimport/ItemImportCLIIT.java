@@ -8,6 +8,7 @@
 package org.dspace.app.itemimport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -48,6 +49,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private static final String ZIP_NAME = "saf.zip";
     private static final String publicationTitle = "A Tale of Two Cities";
     private static final String personTitle = "Person Test";
+    private static final String TEMP_DIR = ItemImport.TEMP_DIR;
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
@@ -226,6 +228,10 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
         checkMetadata();
         checkMetadataWithAnotherSchema();
         checkBitstream();
+
+        // confirm that TEMP_DIR still exists
+        File workTempDir = new File(workDir + File.separator + TEMP_DIR);
+        assertTrue(workTempDir.exists());
     }
 
     @Test
