@@ -16,7 +16,6 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
