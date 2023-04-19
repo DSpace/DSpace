@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -38,6 +40,8 @@ public class BundleRest extends DSpaceObjectRest {
     public static final String BITSTREAMS = "bitstreams";
     public static final String PRIMARY_BITSTREAM = "primaryBitstream";
 
+    private UUID primaryBitstream;
+
     @Override
     @JsonIgnore
     public String getId() {
@@ -51,5 +55,13 @@ public class BundleRest extends DSpaceObjectRest {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    public UUID getPrimarybitstream() {
+        return primaryBitstream;
+    }
+
+    public void setPrimarybitstream(UUID primaryBitstream) {
+        this.primaryBitstream = primaryBitstream;
     }
 }
