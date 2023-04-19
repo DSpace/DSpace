@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.contentreport.QueryOperator;
 
 /**
@@ -35,6 +36,19 @@ public class FilteredItemsQueryPredicate {
         predicate.operator = operator;
         predicate.value = value;
         return predicate;
+    }
+
+    /**
+     * Shortcut method that builds a FilteredItemsQueryPredicate from a colon-separated string value.
+     * @param value Colon-separated string value (field:operator:object or field:operator)
+     * @return a FilteredItemsQueryPredicate instance built from the provided value
+     */
+    public static FilteredItemsQueryPredicate of(String value) {
+        String[] tokens = value.split("\\s*\\:\\s*");
+        String field = tokens.length > 0 ? tokens[0].trim() : "";
+        QueryOperator operator = tokens.length > 1 ? QueryOperator.get(tokens[1].trim()) : null;
+        String object = tokens.length > 2 ? StringUtils.trimToEmpty(tokens[2]) : "";
+        return of(field, operator, object);
     }
 
     public String getField() {

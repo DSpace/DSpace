@@ -40,22 +40,19 @@ public class FilteredCollectionsQuery {
         return query;
     }
 
+    public static FilteredCollectionsQuery of(Collection<Filter> filters) {
+        var query = new FilteredCollectionsQuery();
+        Arrays.stream(Filter.values()).forEach(f -> query.filters.put(f, Boolean.FALSE));
+        filters.forEach(f -> query.filters.put(f, Boolean.TRUE));
+        return query;
+    }
+
     public Map<Filter, Boolean> getFilters() {
         return filters;
     }
 
     public void setFilters(Map<Filter, Boolean> filters) {
         this.filters = filters;
-    }
-
-    /**
-     * The setFilters() method above must not be overloaded, otherwise any
-     * attempt to deserialize FilteredCollectionsQuery instances from a
-     * JSON payload will result in an error 415 (Unsupported Media Type).
-     */
-    public void setFiltersFromCollection(Collection<Filter> filters) {
-        Arrays.stream(Filter.values()).forEach(f -> this.filters.put(f, Boolean.FALSE));
-        filters.forEach(f -> this.filters.put(f, Boolean.TRUE));
     }
 
     public Set<Filter> getEnabledFilters() {

@@ -30,8 +30,8 @@ public class ContentReportSupportHalLinkFactory
         throws Exception {
 
         list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn().getContentReportSupport()));
-        list.add(buildLink("filteredcollections", getMethodOn().getFilteredCollections("", null, null)));
-        list.add(buildLink("filtereditems", getMethodOn().getFilteredItems()));
+        list.add(buildLink("filteredcollections", getMethodOn().getFilteredCollections(null, null, null)));
+        list.add(buildLink("filtereditems", getMethodOn().getFilteredItems(null, null, null, null, null, null, null, null, null)));
     }
 
     @Override
