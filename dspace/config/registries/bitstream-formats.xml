@@ -116,6 +116,15 @@
   </bitstream-type>
 
   <bitstream-type>
+    <mimetype>text/vtt</mimetype>
+    <short_description>WebVTT</short_description>
+    <description>Web Video Text Tracks Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>vtt</extension>
+  </bitstream-type>
+
+  <bitstream-type>
     <mimetype>application/msword</mimetype>
     <short_description>Microsoft Word</short_description>
     <description>Microsoft Word</description>
