@@ -62,13 +62,16 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh run
-  # DSpace database container
+  # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
+    # Uses a custom Postgres image with pgcrypto installed
+    image: "${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-dspace-7_x}"
+    build:
+      # Must build out of subdirectory to have access to install script for pgcrypto
+      context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
     environment:
       PGDATA: /pgdata
-    # Uses a custom Postgres image with pgcrypto installed
-    image: dspace/dspace-postgres-pgcrypto
     networks:
       dspacenet:
     ports:
@@ -77,6 +80,7 @@ services:
     stdin_open: true
     tty: true
     volumes:
+    # Keep Postgres data directory between reboots
     - pgdata:/pgdata
   # DSpace Solr container
   dspacesolr:

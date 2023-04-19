@@ -6,13 +6,17 @@
 # http://www.dspace.org/license/
 #
 
-# This will be deployed as dspace/dspace-postgres-pgcrpyto:latest
-FROM postgres:11
+# To build for example use:
+# docker build --build-arg POSTGRES_VERSION=11 --build-arg POSTGRES_PASSWORD=mypass -f ./dspace/src/main/docker/dspace-postgres-pgcrypto/Dockerfile .
+# This will be published as dspace/dspace-postgres-pgcrypto:$DSPACE_VERSION
+
+ARG POSTGRES_VERSION=11
+ARG POSTGRES_PASSWORD=dspace
+
+FROM postgres:${POSTGRES_VERSION}-alpine
 
 ENV POSTGRES_DB dspace
 ENV POSTGRES_USER dspace
-ENV POSTGRES_PASSWORD dspace
 
-RUN apt-get update
-
+# Copy over script which will initialize database and install pgcrypto extension
 COPY install-pgcrypto.sh /docker-entrypoint-initdb.d/

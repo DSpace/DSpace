@@ -6,14 +6,20 @@
 # http://www.dspace.org/license/
 #
 
-# This will be deployed as dspace/dspace-postgres-pgcrpyto:loadsql
-FROM postgres:11
+# To build for example use:
+# docker build --build-arg POSTGRES_VERSION=11 --build-arg POSTGRES_PASSWORD=mypass -f ./dspace/src/main/docker/dspace-postgres-pgcrypto-curl/Dockerfile .
+# This will be published as dspace/dspace-postgres-pgcrypto:$DSPACE_VERSION-loadsql
+
+ARG POSTGRES_VERSION=11
+ARG POSTGRES_PASSWORD=dspace
+
+FROM postgres:${POSTGRES_VERSION}-alpine
 
 ENV POSTGRES_DB dspace
 ENV POSTGRES_USER dspace
-ENV POSTGRES_PASSWORD dspace
+
+# Install curl which is necessary to load SQL file
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 # Load a SQL dump.  Set LOADSQL to a URL for the sql dump file.
-RUN apt-get update && apt-get install -y curl
-
 COPY install-pgcrypto.sh /docker-entrypoint-initdb.d/
