@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -216,24 +217,61 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Override
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException {
         Context context = new Context(Context.Mode.BATCH_EDIT);
-        int commitCounter = 0;
+
+        int offset = 0;
+        int limit = 100;
+
+        int cleanedBitstreamCount = 0;
+
+        int deletedBitstreamCount = bitstreamService.countDeletedBitstreams(context);
+        System.out.println("Found " + deletedBitstreamCount + " deleted bistream to cleanup");
 
         try {
             context.turnOffAuthorisationSystem();
 
-            List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context);
-            for (Bitstream bitstream : storage) {
-                UUID bid = bitstream.getID();
-                List<String> wantedMetadata = List.of("size_bytes", "modified");
-                Map<String, Object> receivedMetadata = this.getStore(bitstream.getStoreNumber())
-                    .about(bitstream, wantedMetadata);
+            while (cleanedBitstreamCount < deletedBitstreamCount) {
+
+                List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context, limit, offset);
+
+                if (CollectionUtils.isEmpty(storage)) {
+                    break;
+                }
+
+                for (Bitstream bitstream : storage) {
+                    UUID bid = bitstream.getID();
+                    List<String> wantedMetadata = List.of("size_bytes", "modified");
+                    Map<String, Object> receivedMetadata = this.getStore(bitstream.getStoreNumber())
+                        .about(bitstream, wantedMetadata);
 
 
-                // Make sure entries which do not exist are removed
-                if (MapUtils.isEmpty(receivedMetadata)) {
-                    log.debug("bitstore.about is empty, so file is not present");
+                    // Make sure entries which do not exist are removed
+                    if (MapUtils.isEmpty(receivedMetadata)) {
+                        log.debug("bitstore.about is empty, so file is not present");
+                        if (deleteDbRecords) {
+                            log.debug("deleting record");
+                            if (verbose) {
+                                System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                            }
+                            checksumHistoryService.deleteByBitstream(context, bitstream);
+                            if (verbose) {
+                                System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                            }
+                            bitstreamService.expunge(context, bitstream);
+                        }
+                        context.uncacheEntity(bitstream);
+                        continue;
+                    }
+
+                    // This is a small chance that this is a file which is
+                    // being stored -- get it next time.
+                    if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString()))) {
+                        log.debug("file is recent");
+                        context.uncacheEntity(bitstream);
+                        continue;
+                    }
+
                     if (deleteDbRecords) {
-                        log.debug("deleting record");
+                        log.debug("deleting db record");
                         if (verbose) {
                             System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
                         }
@@ -243,64 +281,42 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                         }
                         bitstreamService.expunge(context, bitstream);
                     }
+
+                    if (isRegisteredBitstream(bitstream.getInternalId())) {
+                        context.uncacheEntity(bitstream);
+                        continue; // do not delete registered bitstreams
+                    }
+
+
+                    // Since versioning allows for multiple bitstreams, check if the internal
+                    // identifier isn't used on
+                    // another place
+                    if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
+                        this.getStore(bitstream.getStoreNumber()).remove(bitstream);
+
+                        String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
+                        if (log.isDebugEnabled()) {
+                            log.debug(message);
+                        }
+                        if (verbose) {
+                            System.out.println(message);
+                        }
+                    }
+
                     context.uncacheEntity(bitstream);
-                    continue;
                 }
 
-                // This is a small chance that this is a file which is
-                // being stored -- get it next time.
-                if (isRecent(Long.valueOf(receivedMetadata.get("modified").toString()))) {
-                    log.debug("file is recent");
-                    context.uncacheEntity(bitstream);
-                    continue;
+                // Commit actual changes to DB after dispatch events
+                System.out.print("Performing incremental commit to the database...");
+                context.commit();
+                System.out.println(" Incremental commit done!");
+
+                cleanedBitstreamCount = cleanedBitstreamCount + storage.size();
+
+                if (!deleteDbRecords) {
+                    offset = offset + limit;
                 }
 
-                if (deleteDbRecords) {
-                    log.debug("deleting db record");
-                    if (verbose) {
-                        System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
-                    }
-                    checksumHistoryService.deleteByBitstream(context, bitstream);
-                    if (verbose) {
-                        System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
-                    }
-                    bitstreamService.expunge(context, bitstream);
-                }
-
-                if (isRegisteredBitstream(bitstream.getInternalId())) {
-                    context.uncacheEntity(bitstream);
-                    continue;            // do not delete registered bitstreams
-                }
-
-
-                // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on
-                // another place
-                if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
-                    this.getStore(bitstream.getStoreNumber()).remove(bitstream);
-
-                    String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
-                    if (log.isDebugEnabled()) {
-                        log.debug(message);
-                    }
-                    if (verbose) {
-                        System.out.println(message);
-                    }
-                }
-
-                // Make sure to commit our outstanding work every 100
-                // iterations. Otherwise you risk losing the entire transaction
-                // if we hit an exception, which isn't useful at all for large
-                // amounts of bitstreams.
-                commitCounter++;
-                if (commitCounter % 100 == 0) {
-                    context.dispatchEvents();
-                    // Commit actual changes to DB after dispatch events
-                    System.out.print("Performing incremental commit to the database...");
-                    context.commit();
-                    System.out.println(" Incremental commit done!");
-                }
-
-                context.uncacheEntity(bitstream);
             }
 
             System.out.print("Committing changes to the database...");

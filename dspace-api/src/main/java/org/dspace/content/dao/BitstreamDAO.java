@@ -29,7 +29,7 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
 
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
 
-    public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException;
+    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException;
 
     public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException;
 

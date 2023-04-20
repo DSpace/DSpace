@@ -79,6 +79,39 @@ jobs:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
 
-      # https://github.com/codecov/codecov-action
+      # Upload code coverage report to artifact, so that it can be shared with the 'codecov' job (see below)
+      - name: Upload code coverage report to Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.type }} coverage report
+          path: 'dspace/target/site/jacoco-aggregate/jacoco.xml'
+          retention-days: 14
+
+  # Codecov upload is a separate job in order to allow us to restart this separate from the entire build/test
+  # job above. This is necessary because Codecov uploads seem to randomly fail at times.
+  # See https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
+  codecov:
+    # Must run after 'tests' job above
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Download artifacts from previous 'tests' job
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v3
+
+      # Now attempt upload to Codecov using its action.
+      # NOTE: We use a retry action to retry the Codecov upload if it fails the first time.
+      #
+      # Retry action: https://github.com/marketplace/actions/retry-action
+      # Codecov action: https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v3
+        uses: Wandalen/wretry.action@v1.0.36
+        with:
+          action: codecov/codecov-action@v3
+          # Try upload 5 times max
+          attempt_limit: 5
+          # Run again in 30 seconds
+          attempt_delay: 30000
