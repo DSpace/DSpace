@@ -183,7 +183,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @return a list of all bitstreams that have been "deleted"
      * @throws SQLException if database error
      */
-    public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException;
+    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException;
 
 
     /**
