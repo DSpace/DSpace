@@ -7,7 +7,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>cris-2022.03.01-SNAPSHOT</version>
+        <version>7.6-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -149,7 +149,7 @@
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -218,7 +218,7 @@
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -330,13 +330,6 @@
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
