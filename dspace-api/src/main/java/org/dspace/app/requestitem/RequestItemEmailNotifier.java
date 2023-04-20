@@ -175,9 +175,12 @@ public class RequestItemEmailNotifier {
                     }
                 } else {
                     Bitstream bitstream = ri.getBitstream();
+                    // #8636 Anyone receiving the email can respond to the request without authenticating into DSpace
+                    context.turnOffAuthorisationSystem();
                     email.addAttachment(bitstreamService.retrieve(context, bitstream),
                             bitstream.getName(),
                             bitstream.getFormat(context).getMIMEType());
+                    context.restoreAuthSystemState();
                 }
                 email.send();
             } else {
