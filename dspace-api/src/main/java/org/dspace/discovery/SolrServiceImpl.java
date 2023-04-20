@@ -256,7 +256,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
             if (solrSearchCore.getSolr() != null) {
-                indexObjectServiceFactory.getIndexableObjectFactory(searchUniqueID).delete(searchUniqueID);
+                IndexFactory index = indexObjectServiceFactory.getIndexableObjectFactory(searchUniqueID);
+                if (index != null) {
+                    index.delete(searchUniqueID);
+                } else {
+                    log.warn("Object not found in Solr index: " + searchUniqueID);
+                }
                 if (commit) {
                     solrSearchCore.getSolr().commit();
                 }
