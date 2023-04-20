@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -35,8 +36,11 @@ import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -55,6 +59,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -684,4 +689,581 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 ));
     }
 
+    @Test
+    public void testFindOnePrimaryBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Without Primary Bistream")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        bundle2 = BundleBuilder.createBundle(context, item)
+                               .withName("With Primary Bistream")
+                               .withBitstream(bitstream1)
+                               .withPrimaryBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        // without primary bitstream
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", nullValue()));
+
+        // with primary bitstream
+        getClient().perform(get("/api/core/bundles/" + bundle2.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle2.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(),
+                                                                          bundle2.getID(),
+                                                                          bundle2.getHandle(),
+                                                                          bundle2.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+    }
+
+    @Test
+    public void testPatchAddPrimaryBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new AddOperation("/primarybitstream", bitstream1.getID().toString()));
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", nullValue()));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                .content(getPatchContent(operations)))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+    }
+
+    @Test
+    public void testPatchAddPrimaryBitstreamNoValue() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        JSONObject patchBodyWithoutValue = new JSONObject();
+        patchBodyWithoutValue.put("op", "add");
+        patchBodyWithoutValue.put("path", "/primarybitstream");
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(patchBodyWithoutValue.toString()))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchAddPrimaryBitstreamInvalidUuid() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new AddOperation("/primarybitstream", "invalid uuid"));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchAddPrimaryBitstreamNonExistingBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new AddOperation("/primarybitstream", UUID.randomUUID()));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPatchAddPrimaryBitstreamNotInBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        // bitstream1 was not added to bundle1
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new AddOperation("/primarybitstream", bitstream1.getID().toString()));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPatchAddPrimaryBitstreamAlreadyPresent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withPrimaryBitstream(bitstream1)
+                               .build();
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new AddOperation("/primarybitstream", bitstream2.getID().toString()));
+
+        // can't perform add operation if primary bitstream is already set
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchReplacePrimaryBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1).withBitstream(bitstream2)
+                               .withPrimaryBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new ReplaceOperation("/primarybitstream", bitstream2.getID().toString()));
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                        .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                               bundle1.getID(),
+                                                                               bundle1.getHandle(),
+                                                                               bundle1.getType())))
+                        .andExpect(jsonPath("$.primarybitstream", is(bitstream2.getID().toString())));
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", is(bitstream2.getID().toString())));
+    }
+
+    @Test
+    public void testPatchReplacePrimaryBitstreamNoValue() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        JSONObject patchBodyWithoutValue = new JSONObject();
+        patchBodyWithoutValue.put("op", "replace");
+        patchBodyWithoutValue.put("path", "/primarybitstream");
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(patchBodyWithoutValue.toString()))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchReplacePrimaryBitstreamInvalidUuid() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new ReplaceOperation("/primarybitstream", "invalid uuid"));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchReplacePrimaryBitstreamNonExistingBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .withPrimaryBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new ReplaceOperation("/primarybitstream", UUID.randomUUID()));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testPatchReplacePrimaryBitstreamNotInBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        // bitstream2 was not added to bundle1
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .withPrimaryBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new ReplaceOperation("/primarybitstream", bitstream2.getID().toString()));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void testPatchReplacePrimaryBitstreamAlreadyPresent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new ReplaceOperation("/primarybitstream", bitstream1.getID().toString()));
+
+        // can't perform replace operation if primary bitstream is still null
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPatchRemovePrimaryBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .withPrimaryBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new RemoveOperation("/primarybitstream"));
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                        .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                               bundle1.getID(),
+                                                                               bundle1.getHandle(),
+                                                                               bundle1.getType())))
+                        .andExpect(jsonPath("$.primarybitstream", nullValue()));
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BundleMatcher.matchLinks(bundle1.getID())))
+                   .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle1.getName(),
+                                                                          bundle1.getID(),
+                                                                          bundle1.getHandle(),
+                                                                          bundle1.getType())))
+                   .andExpect(jsonPath("$.primarybitstream", nullValue()));
+    }
+
+    @Test
+    public void testPatchRemovePrimaryBitstreamAlreadyPresent() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("Bundle Title")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new RemoveOperation("/primarybitstream"));
+
+        // can't perform remove operation if primary bitstream is still null
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
+                                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                     .content(getPatchContent(operations)))
+                        .andExpect(status().isBadRequest());
+    }
 }

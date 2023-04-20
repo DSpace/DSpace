@@ -25,6 +25,7 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
     private Bundle bundle;
     private Item item;
     private String name;
+    private Bitstream primaryBitstream;
     private final List<Bitstream> bitstreams = new ArrayList<>();
 
     protected BundleBuilder(Context context) {
@@ -44,6 +45,11 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
 
     public BundleBuilder withName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public BundleBuilder withPrimaryBitstream(Bitstream bitstream) {
+        this.primaryBitstream = bitstream;
         return this;
     }
 
@@ -77,6 +83,10 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
 
         for (Bitstream bitstream: bitstreams) {
             bundleService.addBitstream(context, bundle, bitstream);
+        }
+
+        if (primaryBitstream != null) {
+            bundle.setPrimaryBitstreamID(primaryBitstream);
         }
 
         return bundle;
