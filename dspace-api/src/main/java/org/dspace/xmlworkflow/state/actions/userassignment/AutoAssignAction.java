@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.xmlworkflow.Role;
@@ -80,24 +80,28 @@ public class AutoAssignAction extends UserSelectionAction {
                         }
                         //Delete our workflow item role since the users have been assigned
                         workflowItemRoleService.delete(c, workflowItemRole);
+                        if (role.isDeleteTemporaryGroup() && workflowItemRole.getGroup() != null) {
+                            // Delete temporary groups created after members have workflow task assigned
+                            groupService.delete(c, workflowItemRole.getGroup());
+                        }
                     }
                 } else {
-                    log.warn(LogManager.getHeader(c, "Error while executing auto assign action",
+                    log.warn(LogHelper.getHeader(c, "Error while executing auto assign action",
                                                   "No valid next action. Workflow item:" + wfi.getID()));
                 }
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+            log.error(LogHelper.getHeader(c, "Error while executing auto assign action",
                                            "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
                       e);
             throw e;
         } catch (AuthorizeException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+            log.error(LogHelper.getHeader(c, "Error while executing auto assign action",
                                            "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
                       e);
             throw e;
         } catch (IOException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+            log.error(LogHelper.getHeader(c, "Error while executing auto assign action",
                                            "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
                       e);
             throw e;
@@ -127,7 +131,7 @@ public class AutoAssignAction extends UserSelectionAction {
     protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig,
                                         EPerson user) throws SQLException, AuthorizeException, IOException {
         if (claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null) {
-            workflowRequirementsService.addClaimedUser(c, wfi, step, c.getCurrentUser());
+            workflowRequirementsService.addClaimedUser(c, wfi, step, user);
             XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .createOwnedTask(c, wfi, step, actionConfig, user);
         }

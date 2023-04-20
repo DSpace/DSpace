@@ -40,8 +40,8 @@ import org.dspace.core.Utils;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Document;
-import org.jdom.transform.JDOMSource;
+import org.jdom2.Document;
+import org.jdom2.transform.JDOMSource;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -67,7 +67,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     protected static final String BSN_LICENSE_URL = "license_url";
 
     /**
-     * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it
+     * @deprecated the bitstream with the license in the textual format it
      * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     @Deprecated
@@ -219,7 +219,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             return getLicenseURI(item);
         }
 
-        // JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
+        // backward compatibility see https://jira.duraspace.org/browse/DS-2604
         return getStringFromBitstream(context, item, BSN_LICENSE_URL);
     }
 
@@ -430,9 +430,10 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     }
 
-    private void addLicenseField(Context context, Item item, String field, String value) throws SQLException {
+    private void addLicenseField(Context context, Item item, String field, String language, String value)
+        throws SQLException {
         String[] params = splitField(field);
-        itemService.addMetadata(context, item, params[0], params[1], params[2], params[3], value);
+        itemService.addMetadata(context, item, params[0], params[1], params[2], language, value);
 
     }
 
@@ -605,7 +606,10 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             }
         }
 
-        updateJurisdiction(fullParamMap);
+        // Replace the jurisdiction unless default value is set to none
+        if (!"none".equals(jurisdiction)) {
+            updateJurisdiction(fullParamMap);
+        }
 
         return fullParamMap;
     }
@@ -688,12 +692,12 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         String uriField = getCCField("uri");
         String nameField = getCCField("name");
 
-        addLicenseField(context, item, uriField, licenseUri);
+        addLicenseField(context, item, uriField, null, licenseUri);
         if (configurationService.getBooleanProperty("cc.submit.addbitstream")) {
             setLicenseRDF(context, item, fetchLicenseRDF(doc));
         }
         if (configurationService.getBooleanProperty("cc.submit.setname")) {
-            addLicenseField(context, item, nameField, licenseName);
+            addLicenseField(context, item, nameField, "en", licenseName);
         }
     }
 

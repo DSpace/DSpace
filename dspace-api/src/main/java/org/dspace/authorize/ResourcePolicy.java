@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.solr.common.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -40,9 +41,16 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "resourcepolicy")
 public class ResourcePolicy implements ReloadableEntity<Integer> {
+    /** This policy was set on submission, to give the submitter access. */
     public static String TYPE_SUBMISSION = "TYPE_SUBMISSION";
+
+    /** This policy was set to allow access by a workflow group. */
     public static String TYPE_WORKFLOW = "TYPE_WORKFLOW";
+
+    /** This policy was explicitly set on this object. */
     public static String TYPE_CUSTOM = "TYPE_CUSTOM";
+
+    /** This policy was copied from the containing object's default policies. */
     public static String TYPE_INHERITED = "TYPE_INHERITED";
 
     @Id
@@ -92,7 +100,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     private String rptype;
 
     @Lob
-    @Type(type = "org.hibernate.type.MaterializedClobType")
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "rpdescription")
     private String rpdescription;
 
@@ -120,6 +128,9 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
             return false;
         }
         final ResourcePolicy other = (ResourcePolicy) obj;
+        if (!StringUtils.equals(getRpName(), other.getRpName())) {
+            return false;
+        }
         if (getAction() != other.getAction()) {
             return false;
         }
@@ -169,6 +180,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      *
      * @return the internal identifier
      */
+    @Override
     public Integer getID() {
         return id;
     }

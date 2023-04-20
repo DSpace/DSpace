@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
+
+    <bean id="openAIRERestConnector" class="org.dspace.external.OpenAIRERestConnector">
+        <constructor-arg value="${openaire.api.url:https://api.openaire.eu}"/>
+		<property name="tokenEnabled" value="${openaire.token.enabled:false}"/>
+		<property name="tokenServiceUrl" value="${openaire.token.url:https://aai.openaire.eu/oidc/token}"/>
+		<property name="clientId" value="${openaire.token.clientId}"/>
+		<property name="clientSecret" value="${openaire.token.clientSecret}"/>
+    </bean>
+
+	<bean class="org.dspace.external.provider.impl.OpenAIREFundingDataProvider" init-method="init">
+		<property name="sourceIdentifier" value="openAIREFunding" />
+		<property name="connector" ref="openAIRERestConnector" />
+		<property name="metadataFields" ref="mapOfmetadata"/>
+		<property name="supportedEntityTypes">
+			<list>
+				<value>Project</value>
+			</list>
+		</property>
+	</bean>
+
+    <util:map id="mapOfmetadata"
+        map-class="java.util.HashMap" key-type="java.lang.String" value-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <entry key="awardNumber" value-ref="openaireAwardNumber" />
+        <entry key="fundingStream" value-ref="openaireFundingStream" />
+        <entry key="awardURI" value-ref="openaireAwardURI" />
+        <entry key="funderName" value-ref="openaireFunderName" />
+        <entry key="funderIdentifier" value-ref="openaireFunderIdentifier" />
+        <entry key="dcTitle" value-ref="openaireTitle" />
+        <entry key="titleAlternative" value-ref="openaireTitleAlternative" />
+        <entry key="coverageSpatial" value-ref="openaireSpatial" />
+        <entry key="dcSubject" value-ref="openaireSubject" />
+    </util:map>
+
+    <bean id="openaireAwardNumber" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.awardNumber"/>
+    </bean>
+
+    <bean id="openaireFundingStream" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.fundingStream"/>
+    </bean>
+    
+    <bean id="openaireAwardURI" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.awardURI"/>
+    </bean>
+
+    <bean id="openaireFunderName" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="project.funder.name"/>
+    </bean>
+
+    <bean id="openaireFunderIdentifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="project.funder.identifier"/>
+    </bean>
+
+    <bean id="openaireTitle" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <bean id="openaireTitleAlternative" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title.alternative"/>
+    </bean>
+
+    <bean id="openaireSpatial" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.coverage.spatial"/>
+    </bean>
+
+    <bean id="openaireSubject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
+</beans>

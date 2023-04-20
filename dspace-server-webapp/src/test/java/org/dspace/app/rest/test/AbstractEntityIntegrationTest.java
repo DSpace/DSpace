@@ -11,6 +11,7 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,6 +19,8 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
 
     @Autowired
     private EntityTypeService entityTypeService;
+    @Autowired
+    protected RelationshipTypeService relationshipTypeService;
 
     /**
      * This method will call the setUp method from AbstractControllerIntegrationTest.
@@ -41,7 +44,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
     public void setUp() throws Exception {
         super.setUp();
 
-        if (entityTypeService.findAll(context).size() > 0) {
+        if (entityTypeService.findAll(context).size() > 1) {
             //Don't initialize the setup more than once
             return;
         }

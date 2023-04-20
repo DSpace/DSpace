@@ -16,7 +16,7 @@ import static java.util.Collections.singletonList;
 import static org.apache.commons.cli.Option.builder;
 import static org.apache.commons.lang.time.DateFormatUtils.format;
 import static org.apache.logging.log4j.LogManager.getLogger;
-import static org.dspace.core.LogManager.getHeader;
+import static org.dspace.core.LogHelper.getHeader;
 import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 
 import java.io.IOException;

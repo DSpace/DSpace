@@ -12,7 +12,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
@@ -20,14 +24,23 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.WorkspaceItemDAO;
+import org.dspace.content.logic.Filter;
+import org.dspace.content.logic.FilterUtils;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.event.Event;
+import org.dspace.identifier.DOI;
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.identifier.Identifier;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +67,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     protected ItemService itemService;
     @Autowired(required = true)
     protected WorkflowService workflowService;
+    @Autowired(required = true)
+    protected DOIService doiService;
 
 
     protected WorkspaceItemServiceImpl() {
@@ -66,12 +81,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         if (workspaceItem == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_workspace_item",
+                log.debug(LogHelper.getHeader(context, "find_workspace_item",
                                                "not_found,workspace_item_id=" + id));
             }
         } else {
             if (log.isDebugEnabled()) {
-                log.debug(LogManager.getHeader(context, "find_workspace_item",
+                log.debug(LogHelper.getHeader(context, "find_workspace_item",
                                                "workspace_item_id=" + id));
             }
         }
@@ -80,6 +95,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public WorkspaceItem create(Context context, Collection collection, boolean template)
+            throws AuthorizeException, SQLException {
+        return create(context, collection, null, template);
+    }
+
+    @Override
+    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template)
         throws AuthorizeException, SQLException {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
@@ -89,7 +110,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
 
         // Create an item
-        Item item = itemService.create(context, workspaceItem);
+        Item item;
+        if (uuid != null) {
+            item = itemService.create(context, workspaceItem, uuid);
+        } else {
+            item = itemService.create(context, workspaceItem);
+        }
         item.setSubmitter(context.getCurrentUser());
 
         // Now create the policies for the submitter to modify item and contents
@@ -107,9 +133,30 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         authorizeService
             .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
 
-
         // Copy template if appropriate
         Item templateItem = collection.getTemplateItem();
+
+        Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
+        Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
+
+        if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
+                !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
+            throw new IllegalStateException("The template item has entity type : (" +
+                      templateItemEntityType.get().getValue() + ") different than collection entity type : " +
+                      colEntityType.get().getValue());
+        }
+
+        if (template && colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
+            MetadataValue original = colEntityType.get();
+            MetadataField metadataField = original.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            // NOTE: dspace.entity.type = <blank> does not make sense
+            //       the collection entity type is by default blank when a collection is first created
+            if (StringUtils.isNotBlank(original.getValue())) {
+                itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                                        metadataField.getQualifier(), original.getLanguage(), original.getValue());
+            }
+        }
 
         if (template && (templateItem != null)) {
             List<MetadataValue> md = itemService.getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -124,9 +171,29 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         }
 
         itemService.update(context, item);
+
+        // If configured, register identifiers (eg handle, DOI) now. This is typically used with the Show Identifiers
+        // submission step which previews minted handles and DOIs during the submission process. Default: false
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("identifiers.submission.register", false)) {
+            try {
+                // Get map of filters to use for identifier types, while the item is in progress
+                Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters(true);
+                IdentifierServiceFactory.getInstance().getIdentifierService().register(context, item, filters);
+                // Look for a DOI and move it to PENDING
+                DOI doi = doiService.findDOIByDSpaceObject(context, item);
+                if (doi != null) {
+                    doi.setStatus(DOIIdentifierProvider.PENDING);
+                    doiService.update(context, doi);
+                }
+            } catch (IdentifierException e) {
+                log.error("Could not register identifier(s) for item {}: {}", item.getID(), e.getMessage());
+            }
+        }
+
         workspaceItem.setItem(item);
 
-        log.info(LogManager.getHeader(context, "create_workspace_item",
+        log.info(LogHelper.getHeader(context, "create_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID()
                                           + "item_id=" + item.getID() + "collection_id="
                                           + collection.getID()));
@@ -135,6 +202,15 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 itemService.getIdentifiers(context, item)));
 
         return workspaceItem;
+    }
+
+    private Optional<MetadataValue> getDSpaceEntityType(DSpaceObject dSpaceObject) {
+        return Objects.nonNull(dSpaceObject) ? dSpaceObject.getMetadata()
+                                                           .stream()
+                                                           .filter(x -> x.getMetadataField().toString('.')
+                                                                         .equalsIgnoreCase("dspace.entity.type"))
+                                                           .findFirst()
+                                             : Optional.empty();
     }
 
     @Override
@@ -168,16 +244,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public List<WorkspaceItem> findAllSupervisedItems(Context context) throws SQLException {
-        return workspaceItemDAO.findWithSupervisedGroup(context);
-    }
-
-    @Override
-    public List<WorkspaceItem> findSupervisedItemsByEPerson(Context context, EPerson ePerson) throws SQLException {
-        return workspaceItemDAO.findBySupervisedGroupMember(context, ePerson);
-    }
-
-    @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         return workspaceItemDAO.findAll(context);
     }
@@ -191,7 +257,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
         // Authorisation is checked by the item.update() method below
 
-        log.info(LogManager.getHeader(context, "update_workspace_item",
+        log.info(LogHelper.getHeader(context, "update_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID()));
 
         // Update the item
@@ -219,13 +285,9 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                              + "original submitter to delete a workspace item");
         }
 
-        log.info(LogManager.getHeader(context, "delete_workspace_item",
+        log.info(LogHelper.getHeader(context, "delete_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
-
-        // Need to delete the epersongroup2workspaceitem row first since it refers
-        // to workspaceitem ID
-        workspaceItem.getSupervisorGroups().clear();
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
@@ -256,19 +318,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         Item item = workspaceItem.getItem();
         authorizeService.authorizeAction(context, item, Constants.WRITE);
 
-        log.info(LogManager.getHeader(context, "delete_workspace_item",
+        log.info(LogHelper.getHeader(context, "delete_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
 
         //        deleteSubmitPermissions();
-
-        // Need to delete the workspaceitem row first since it refers
-        // to item ID
-        try {
-            workspaceItem.getSupervisorGroups().clear();
-        } catch (Exception e) {
-            log.error("failed to clear supervisor group", e);
-        }
 
         workspaceItemDAO.delete(context, workspaceItem);
 

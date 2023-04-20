@@ -7,16 +7,24 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.RelationshipType.Tilted.LEFT;
+import static org.dspace.content.RelationshipType.Tilted.RIGHT;
+
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
@@ -34,6 +42,12 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     protected RelationshipService relationshipService;
 
     @Autowired(required = true)
+    protected RelationshipTypeService relationshipTypeService;
+
+    @Autowired(required = true)
+    protected ItemService itemService;
+
+    @Autowired(required = true)
     protected VirtualMetadataPopulator virtualMetadataPopulator;
 
     @Autowired(required = true)
@@ -44,12 +58,25 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         Context context = new Context();
         List<RelationshipMetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
-            String entityType = getEntityTypeStringFromMetadata(item);
-            if (StringUtils.isNotBlank(entityType)) {
+            EntityType entityType = itemService.getEntityType(context, item);
+            if (entityType != null) {
+                // NOTE: The following code will add metadata fields of type relation.*.latestForDiscovery
+                //       (e.g. relation.isAuthorOfPublication.latestForDiscovery).
+                //       These fields contain the UUIDs of the items that have a relationship with current item,
+                //       from the perspective of the other item. In other words, given a relationship with this item,
+                //       the current item should have "latest status" in order for the other item to appear in
+                //       relation.*.latestForDiscovery fields.
+                fullMetadataValueList.addAll(findLatestForDiscoveryMetadataValues(context, item, entityType));
+
+                // NOTE: The following code will, among other things,
+                //       add metadata fields of type relation.* (e.g. relation.isAuthorOfPublication).
+                //       These fields contain the UUIDs of the items that have a relationship with current item,
+                //       from the perspective of this item. In other words, given a relationship with this item,
+                //       the other item should have "latest status" in order to appear in relation.* fields.
                 List<Relationship> relationships = relationshipService.findByItem(context, item, -1, -1, true);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
-                        .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,
+                        .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType.getLabel(),
                                 relationship, enableVirtualMetadata));
                 }
 
@@ -60,16 +87,90 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         return fullMetadataValueList;
     }
 
-    public String getEntityTypeStringFromMetadata(Item item) {
-        List<MetadataValue> list = item.getMetadata();
-        for (MetadataValue mdv : list) {
-            if (StringUtils.equals(mdv.getMetadataField().getMetadataSchema().getName(), "dspace")
-                && StringUtils.equals(mdv.getMetadataField().getElement(), "entity")
-                && StringUtils.equals(mdv.getMetadataField().getQualifier(), "type")) {
-                return mdv.getValue();
+    /**
+     * Create the list of relation.*.latestForDiscovery virtual metadata values for the given item.
+     * @param context the DSpace context.
+     * @param item the item.
+     * @param itemEntityType the entity type of the item.
+     * @return a list (may be empty) of metadata values of type relation.*.latestForDiscovery.
+     */
+    protected List<RelationshipMetadataValue> findLatestForDiscoveryMetadataValues(
+        Context context, Item item, EntityType itemEntityType
+    ) throws SQLException {
+        final String schema = MetadataSchemaEnum.RELATION.getName();
+        final String qualifier = "latestForDiscovery";
+
+        List<RelationshipMetadataValue> mdvs = new LinkedList<>();
+
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, itemEntityType);
+        for (RelationshipType relationshipType : relationshipTypes) {
+            // item is on left side of this relationship type
+            // NOTE: On the left item, we should index the uuids of the right items. If the relationship type is
+            //       "tilted right", it means that we expect a huge amount of right items, so we don't index their uuids
+            //       on the left item as a storage/performance improvement.
+            //       As a consequence, when searching for related items (using discovery)
+            //       on the pages of the right items you won't be able to find the left item.
+            if (relationshipType.getTilted() != RIGHT && relationshipType.getLeftType().equals(itemEntityType)) {
+                String element = relationshipType.getLeftwardType();
+                List<ItemUuidAndRelationshipId> data = relationshipService
+                    .findByLatestItemAndRelationshipType(context, item, relationshipType, true);
+                mdvs.addAll(constructLatestForDiscoveryMetadataValues(context, schema, element, qualifier, data));
+            }
+
+            // item is on right side of this relationship type
+            // NOTE: On the right item, we should index the uuids of the left items. If the relationship type is
+            //       "tilted left", it means that we expect a huge amount of left items, so we don't index their uuids
+            //       on the right item as a storage/performance improvement.
+            //       As a consequence, when searching for related items (using discovery)
+            //       on the pages of the left items you won't be able to find the right item.
+            if (relationshipType.getTilted() != LEFT && relationshipType.getRightType().equals(itemEntityType)) {
+                String element = relationshipType.getRightwardType();
+                List<ItemUuidAndRelationshipId> data = relationshipService
+                    .findByLatestItemAndRelationshipType(context, item, relationshipType, false);
+                mdvs.addAll(constructLatestForDiscoveryMetadataValues(context, schema, element, qualifier, data));
             }
         }
-        return null;
+
+        return mdvs;
+    }
+
+    /**
+     * Turn the given data into a list of relation.*.latestForDiscovery virtual metadata values.
+     * @param context the DSpace context.
+     * @param schema the schema for all metadata values.
+     * @param element the element for all metadata values.
+     * @param qualifier the qualifier for all metadata values.
+     * @param data a POJO containing the item uuid and relationship id.
+     * @return a list (may be empty) of metadata values of type relation.*.latestForDiscovery.
+     */
+    protected List<RelationshipMetadataValue> constructLatestForDiscoveryMetadataValues(
+        Context context, String schema, String element, String qualifier, List<ItemUuidAndRelationshipId> data
+    ) {
+        String mdf = new MetadataFieldName(schema, element, qualifier).toString();
+
+        return data.stream()
+            .map(datum -> {
+                RelationshipMetadataValue mdv = constructMetadataValue(context, mdf);
+                if (mdv == null) {
+                    return null;
+                }
+
+                mdv.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + datum.getRelationshipId());
+                mdv.setValue(datum.getItemUuid().toString());
+                // NOTE: place has no meaning for relation.*.latestForDiscovery metadata fields
+                mdv.setPlace(-1);
+                mdv.setUseForPlace(false);
+
+                return mdv;
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
+    @Deprecated
+    public String getEntityTypeStringFromMetadata(Item item) {
+        return itemService.getEntityTypeLabel(item);
     }
 
     @Override

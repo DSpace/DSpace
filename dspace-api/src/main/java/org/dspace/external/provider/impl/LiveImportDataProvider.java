@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
-import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -27,7 +27,7 @@ import org.dspace.importer.external.service.components.QuerySource;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class LiveImportDataProvider implements ExternalDataProvider {
+public class LiveImportDataProvider extends AbstractExternalDataProvider {
     /**
      * The {@link QuerySource} live import provider
      */
@@ -57,7 +57,7 @@ public class LiveImportDataProvider implements ExternalDataProvider {
 
     /**
      * This method set the MetadataSource for the ExternalDataProvider
-     * @param metadataSource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
+     * @param querySource Source {@link org.dspace.importer.external.service.components.QuerySource} implementation used to process the input data
      */
     public void setMetadataSource(QuerySource querySource) {
         this.querySource = querySource;

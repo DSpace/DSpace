@@ -168,4 +168,25 @@ public interface AuthenticationService {
      */
     public Iterator<AuthenticationMethod> authenticationMethodIterator();
 
+    /**
+     * Retrieves the currently used authentication method name based on the context and the request
+     *
+     * @param context A valid DSpace context.
+     * @param request The request that started this operation, or null if not applicable.
+     * @return the currently used authentication method name
+     */
+    public String getAuthenticationMethod(Context context, HttpServletRequest request);
+
+    /**
+     * Check if the given current password is valid to change the password of the
+     * given ePerson.
+     *
+     * @param  context         The DSpace context
+     * @param  ePerson         the ePerson related to the password change
+     * @param  currentPassword The current password to check
+     * @return                 true if the provided password matches with current
+     *                         password
+     */
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword);
+
 }

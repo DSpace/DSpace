@@ -8,10 +8,9 @@
 package org.dspace.content;
 
 /**
- * Series and report number, as stored in relation.ispartofseries
+ * Series and report number, as stored in {@code relation.ispartofseries}.
  *
  * @author Robert Tansley
- * @version $Id$
  */
 public class DCSeriesNumber {
     /**
@@ -70,6 +69,7 @@ public class DCSeriesNumber {
      *
      * @return the series and number as they should be stored in the DB
      */
+    @Override
     public String toString() {
         if (series == null) {
             return (null);

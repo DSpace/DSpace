@@ -140,6 +140,7 @@
          <dc-qualifier>ispartofseries</dc-qualifier>
          <repeatable>true</repeatable>
          <label>Series/Report No.</label>
+         <type-bind>Technical Report</type-bind>
          <input-type>series</input-type>
          <hint>Enter the series and number assigned to this item by your community.</hint>
          <required></required>
@@ -282,6 +283,91 @@ it, please enter the types and the actual numbers or codes.</hint>
          <label>Description</label>
          <input-type>textarea</input-type>
          <hint>Enter the description of the journal volume</hint>
+       </field>
+     </row>
+   </form>
+
+   <form name="qualdroptest">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Identifiers</label>
+         <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+         <hint>If the item has any identification numbers or codes associated with
+           it, please enter the types and the actual numbers or codes.</hint>
+         <required>please give an identifier</required>
+       </field>
+     </row>
+   </form>
+
+   <form name="typebindtest">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the main title of the item.</hint>
+         <required>You must enter a main title for this item.</required>
+         <!--    <language value-pairs-name="common_iso_languages">true</language> -->
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>issued</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Date of Issue</label>
+         <style>col-sm-4</style>
+         <input-type>date</input-type>
+         <hint>Please give the date of previous publication or public distribution.
+           You can leave out the day and/or month if they aren't
+           applicable.</hint>
+         <required>You must enter at least the year.</required>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Type</label>
+         <input-type value-pairs-name="common_types">dropdown</input-type>
+         <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
+         <required></required>
+       </field>
+     </row>
+     <row>
+       <!-- ISBN bound to type Book and required -->
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>isbn</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>ISBN</label>
+         <type-bind>Book</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Enter the ISBN of the book.</hint>
+         <required>An ISBN is required.</required>
+       </field>
+       <!-- ISBN bound to type Book chapter and NOT required and NOT repeatable -->
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>isbn</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>ISBN of Book</label>
+         <type-bind>Book chapter</type-bind>
+         <input-type>onebox</input-type>
+         <hint>Enter the ISBN of the book in which this chapter appears.</hint>
+         <required></required>
        </field>
      </row>
    </form>

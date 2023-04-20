@@ -631,7 +631,7 @@ public class Packager {
             //otherwise, just disseminate a single object to a single package file
             dip.disseminate(context, dso, pkgParams, pkgFile);
 
-            if (pkgFile != null && pkgFile.exists()) {
+            if (pkgFile.exists()) {
                 System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
             }
         }

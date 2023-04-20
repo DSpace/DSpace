@@ -25,10 +25,38 @@
         <property name="timeout" value="5000"/>
     </bean>
 
-
     <bean class="org.dspace.app.sherpa.submit.SHERPASubmitService"
           id="org.dspace.app.sherpa.submit.SHERPASubmitService">
         <property name="sherpaService" ref="org.dspace.app.sherpa.SHERPAService"/>
         <property name="configuration" ref="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService"/>
+    </bean>
+
+    <bean class="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService"
+          id="org.dspace.app.sherpa.submit.SHERPASubmitConfigurationService">
+        <property name="issnItemExtractors">
+            <list>
+                <bean class="org.dspace.app.sherpa.submit.MetadataValueISSNExtractor">
+                    <property name="metadataList">
+                        <list>
+                            <value>dc.identifier.issn</value>
+                        </list>
+                    </property>
+                </bean>
+                <!-- Use the follow if you have the SHERPARoMEOJournalTitle enabled
+                <bean class="org.dspace.app.sherpa.submit.MetadataAuthorityISSNExtractor">
+                    <property name="metadataList">
+                        <list>
+                            <value>dc.title.alternative</value>
+                        </list>
+                    </property>
+                </bean>  -->
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.app.sherpa.cache.SherpaCacheEvictService">
+         <property name="sherpaSubmitService"
+                   ref="org.dspace.app.sherpa.submit.SHERPASubmitService"/>
+         <property name="cacheManager" ref="cacheManager" />
     </bean>
 </beans>

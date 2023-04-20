@@ -14,8 +14,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
 /**
- * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
- * System </a>.
+ * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
+ * System</a>.
  *
  * <p>
  * Currently, this class simply maps handles to local facilities; handles which
@@ -24,7 +24,6 @@ import org.dspace.core.Context;
  * </p>
  *
  * @author Peter Breton
- * @version $Revision$
  */
 public interface HandleService {
 
@@ -42,7 +41,6 @@ public interface HandleService {
     public String resolveToURL(Context context, String handle)
         throws SQLException;
 
-
     /**
      * Try to detect a handle in a URL.
      *
@@ -56,18 +54,18 @@ public interface HandleService {
         throws SQLException;
 
     /**
-     * Provides handle canonical prefix using http://hdl.handle.net if not
+     * Provides handle canonical prefix using https://hdl.handle.net if not
      * overridden by the configuration property handle.canonical.prefix.
      *
      * No attempt is made to verify that handle is in fact valid.
      *
-     * @param handle The handle
+     *
      * @return The canonical form
      */
     public String getCanonicalPrefix();
 
     /**
-     * Transforms handle into a URI using http://hdl.handle.net if not
+     * Transforms handle into a URI using https://hdl.handle.net if not
      * overridden by the configuration property handle.canonical.prefix.
      *
      * No attempt is made to verify that handle is in fact valid.
@@ -103,16 +101,18 @@ public interface HandleService {
         throws SQLException, IllegalStateException;
 
     /**
-     * Creates a handle entry, but with a handle supplied by the caller (new
-     * Handle not generated)
+     * Creates a handle entry, but with a handle supplied by the caller (new Handle
+     * not generated)
      *
      * @param context        DSpace context
      * @param dso            DSpaceObject
      * @param suppliedHandle existing handle value
      * @param force          FIXME: currently unused
      * @return the Handle
-     * @throws SQLException          An exception that provides information on a database access error or other errors.
-     * @throws IllegalStateException if specified handle is already in use by another object
+     * @throws SQLException          An exception that provides information on a
+     *                               database access error or other errors.
+     * @throws IllegalStateException if specified handle is already in use by
+     *                               another object
      */
     public String createHandle(Context context, DSpaceObject dso, String suppliedHandle, boolean force)
         throws SQLException, IllegalStateException;
@@ -192,4 +192,12 @@ public interface HandleService {
      * @return
      */
     String parseHandle(String identifier);
+
+    /**
+     * Gets the additional prefixes used for handles,
+     * mapped in configuration file.
+     * 
+     * @return `String[]` array of prefixes
+     */
+    String[] getAdditionalPrefixes();
 }

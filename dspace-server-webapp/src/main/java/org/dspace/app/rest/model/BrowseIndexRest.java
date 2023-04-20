@@ -43,6 +43,8 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
     @JsonProperty(value = "metadata")
     List<String> metadataList;
 
+    String dataType;
+
     List<SortOption> sortOptions;
 
     String order;
@@ -72,6 +74,14 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
 
     public void setMetadataList(List<String> metadataList) {
         this.metadataList = metadataList;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getOrder() {

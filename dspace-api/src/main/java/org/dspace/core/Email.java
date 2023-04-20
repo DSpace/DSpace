@@ -48,6 +48,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.services.ConfigurationService;
@@ -149,14 +152,14 @@ public class Email {
     private static final String RESOURCE_REPOSITORY_NAME = "Email";
     private static final Properties VELOCITY_PROPERTIES = new Properties();
     static {
-        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADER, "string");
-        VELOCITY_PROPERTIES.put("string.resource.loader.description",
+        VELOCITY_PROPERTIES.put(Velocity.RESOURCE_LOADERS, "string");
+        VELOCITY_PROPERTIES.put("resource.loader.string.description",
                 "Velocity StringResource loader");
-        VELOCITY_PROPERTIES.put("string.resource.loader.class",
+        VELOCITY_PROPERTIES.put("resource.loader.string.class",
                 StringResourceLoader.class.getName());
-        VELOCITY_PROPERTIES.put("string.resource.loader.repository.name",
+        VELOCITY_PROPERTIES.put("resource.loader.string.repository.name",
                 RESOURCE_REPOSITORY_NAME);
-        VELOCITY_PROPERTIES.put("string.resource.loader.repository.static",
+        VELOCITY_PROPERTIES.put("resource.loader.string.repository.static",
                 "false");
     }
 
@@ -334,7 +337,13 @@ public class Email {
         }
 
         StringWriter writer = new StringWriter();
-        template.merge(vctx, writer);
+        try {
+            template.merge(vctx, writer);
+        } catch (MethodInvocationException | ParseErrorException
+                | ResourceNotFoundException ex) {
+            LOG.error("Template not merged:  {}", ex.getMessage());
+            throw new MessagingException("Template not merged", ex);
+        }
         String fullMessage = writer.toString();
 
         // Set some message header fields
@@ -346,7 +355,7 @@ public class Email {
         for (String headerName : config.getArrayProperty("mail.message.headers")) {
             String headerValue = (String) vctx.get(headerName);
             if ("subject".equalsIgnoreCase(headerName)) {
-                if (null != subject) {
+                if (null != headerValue) {
                     subject = headerValue;
                 }
             } else if ("charset".equalsIgnoreCase(headerName)) {
@@ -571,7 +580,7 @@ public class Email {
     /**
      * @author arnaldo
      */
-    public class InputStreamDataSource implements DataSource {
+    public static class InputStreamDataSource implements DataSource {
         private final String name;
         private final String contentType;
         private final ByteArrayOutputStream baos;
@@ -612,7 +621,7 @@ public class Email {
      * Wrap ConfigurationService to prevent templates from modifying
      * the configuration.
      */
-    public class UnmodifiableConfigurationService {
+    public static class UnmodifiableConfigurationService {
         private final ConfigurationService configurationService;
 
         /**

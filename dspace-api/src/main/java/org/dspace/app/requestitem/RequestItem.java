@@ -27,12 +27,11 @@ import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
 /**
- * Object representing an Item Request
+ * Object representing an Item Request.
  */
 @Entity
 @Table(name = "requestitem")
 public class RequestItem implements ReloadableEntity<Integer> {
-
 
     @Id
     @Column(name = "requestitem_id")
@@ -54,8 +53,6 @@ public class RequestItem implements ReloadableEntity<Integer> {
     @Column(name = "request_name", length = 64)
     private String reqName;
 
-    //    @Column(name = "request_message")
-//    @Lob
     @Column(name = "request_message", columnDefinition = "text")
     private String reqMessage;
 
@@ -82,8 +79,8 @@ public class RequestItem implements ReloadableEntity<Integer> {
 
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(Context, Bitstream, Item,
-     * boolean, String, String, String)}
+     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(
+     * Context, Bitstream, Item, boolean, String, String, String)}
      */
     protected RequestItem() {
     }
@@ -97,6 +94,9 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.allfiles = allfiles;
     }
 
+    /**
+     * @return {@code true} if all of the Item's files are requested.
+     */
     public boolean isAllfiles() {
         return allfiles;
     }
@@ -105,6 +105,9 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.reqMessage = reqMessage;
     }
 
+    /**
+     * @return a message from the requester.
+     */
     public String getReqMessage() {
         return reqMessage;
     }
@@ -113,6 +116,9 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.reqName = reqName;
     }
 
+    /**
+     * @return Human-readable name of the user requesting access.
+     */
     public String getReqName() {
         return reqName;
     }
@@ -121,6 +127,9 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.reqEmail = reqEmail;
     }
 
+    /**
+     * @return address of the user requesting access.
+     */
     public String getReqEmail() {
         return reqEmail;
     }
@@ -129,6 +138,9 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.token = token;
     }
 
+    /**
+     * @return a unique request identifier which can be emailed.
+     */
     public String getToken() {
         return token;
     }

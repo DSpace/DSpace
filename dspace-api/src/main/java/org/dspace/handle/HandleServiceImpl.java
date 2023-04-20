@@ -9,12 +9,14 @@ package org.dspace.handle;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.SiteService;
@@ -25,10 +27,9 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 /**
- * Interface to the <a href="http://www.handle.net" target=_new>CNRI Handle
- * System </a>.
+ * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
+ * System</a>.
  *
  * <p>
  * Currently, this class simply maps handles to local facilities; handles which
@@ -37,13 +38,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * </p>
  *
  * @author Peter Breton
- * @version $Revision$
  */
 public class HandleServiceImpl implements HandleService {
     /**
-     * log4j category
+     * log category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Prefix registered to no one
@@ -84,9 +84,7 @@ public class HandleServiceImpl implements HandleService {
         String url = configurationService.getProperty("dspace.ui.url")
             + "/handle/" + handle;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Resolved " + handle + " to " + url);
-        }
+        log.debug("Resolved {} to {}", handle, url);
 
         return url;
     }
@@ -96,7 +94,7 @@ public class HandleServiceImpl implements HandleService {
         throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.ui.url")
             + "/handle/";
-        String handleResolver = configurationService.getProperty("handle.canonical.prefix");
+        String handleResolver = getCanonicalPrefix();
 
         String handle = null;
 
@@ -126,10 +124,8 @@ public class HandleServiceImpl implements HandleService {
         // Let the admin define a new prefix, if not then we'll use the
         // CNRI default. This allows the admin to use "hdl:" if they want to or
         // use a locally branded prefix handle.myuni.edu.
-        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
-        if (StringUtils.isBlank(handlePrefix)) {
-            handlePrefix = "http://hdl.handle.net/";
-        }
+        String handlePrefix = configurationService.getProperty("handle.canonical.prefix",
+                "https://hdl.handle.net/");
 
         return handlePrefix;
     }
@@ -151,10 +147,10 @@ public class HandleServiceImpl implements HandleService {
         handle.setResourceTypeId(dso.getType());
         handleDAO.save(context, handle);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Created new handle for "
-                          + Constants.typeText[dso.getType()] + " (ID=" + dso.getID() + ") " + handleId);
-        }
+        log.debug("Created new handle for {} (ID={}) {}",
+            () -> Constants.typeText[dso.getType()],
+            () -> dso.getID(),
+            () -> handleId);
 
         return handleId;
     }
@@ -205,10 +201,10 @@ public class HandleServiceImpl implements HandleService {
         dso.addHandle(handle);
         handleDAO.save(context, handle);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Created new handle for "
-                          + Constants.typeText[dso.getType()] + " (ID=" + dso.getID() + ") " + suppliedHandle);
-        }
+        log.debug("Created new handle for {} (ID={}) {}",
+            () -> Constants.typeText[dso.getType()],
+            () -> dso.getID(),
+            () -> suppliedHandle);
 
         return suppliedHandle;
     }
@@ -216,29 +212,29 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public void unbindHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        List<Handle> handles = getInternalHandles(context, dso);
-        if (CollectionUtils.isNotEmpty(handles)) {
-            for (Handle handle : handles) {
+        Iterator<Handle> handles = dso.getHandles().iterator();
+        if (handles.hasNext()) {
+            while (handles.hasNext()) {
+                final Handle handle = handles.next();
+                handles.remove();
                 //Only set the "resouce_id" column to null when unbinding a handle.
                 // We want to keep around the "resource_type_id" value, so that we
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
 
-                //Also remove the handle from the DSO list to keep a consistent model
-                dso.getHandles().remove(handle);
 
                 handleDAO.save(context, handle);
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Unbound Handle " + handle.getHandle() + " from object " + Constants.typeText[dso
-                        .getType()] + " id=" + dso.getID());
-                }
+                log.debug("Unbound Handle {} from object {} id={}",
+                    () -> handle.getHandle(),
+                    () -> Constants.typeText[dso.getType()],
+                    () -> dso.getID());
             }
         } else {
             log.trace(
-                "Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso
-                    .getID() + ". Handle could have been unbinded before.");
+                "Cannot find Handle entry to unbind for object {} id={}. Handle could have been unbound before.",
+                    Constants.typeText[dso.getType()], dso.getID());
         }
     }
 
@@ -261,7 +257,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String findHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        List<Handle> handles = getInternalHandles(context, dso);
+        List<Handle> handles = dso.getHandles();
         if (CollectionUtils.isEmpty(handles)) {
             return null;
         } else {
@@ -284,7 +280,7 @@ public class HandleServiceImpl implements HandleService {
     public List<String> getHandlesForPrefix(Context context, String prefix)
         throws SQLException {
         List<Handle> handles = handleDAO.findByPrefix(context, prefix);
-        List<String> handleStrings = new ArrayList<String>(handles.size());
+        List<String> handleStrings = new ArrayList<>(handles.size());
         for (Handle handle : handles) {
             handleStrings.add(handle.getHandle());
         }
@@ -296,7 +292,7 @@ public class HandleServiceImpl implements HandleService {
         String prefix = configurationService.getProperty("handle.prefix");
         if (StringUtils.isBlank(prefix)) {
             prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
-            log.error("handle.prefix is not configured; using " + prefix);
+            log.error("handle.prefix is not configured; using {}", prefix);
         }
         return prefix;
     }
@@ -333,20 +329,6 @@ public class HandleServiceImpl implements HandleService {
     ////////////////////////////////////////
     // Internal methods
     ////////////////////////////////////////
-
-    /**
-     * Return the handle for an Object, or null if the Object has no handle.
-     *
-     * @param context DSpace context
-     * @param dso     DSpaceObject for which we require our handles
-     * @return The handle for object, or null if the object has no handle.
-     * @throws SQLException If a database error occurs
-     */
-    protected List<Handle> getInternalHandles(Context context, DSpaceObject dso)
-        throws SQLException {
-        return handleDAO.getHandlesByDSpaceObject(context, dso);
-    }
-
     /**
      * Find the database row corresponding to handle.
      *
@@ -410,7 +392,7 @@ public class HandleServiceImpl implements HandleService {
         }
 
         // Check additional prefixes supported in the config file
-        String[] additionalPrefixes = configurationService.getArrayProperty("handle.additional.prefixes");
+        String[] additionalPrefixes = getAdditionalPrefixes();
         for (String additionalPrefix : additionalPrefixes) {
             if (identifier.startsWith(additionalPrefix + "/")) {
                 // prefix is the equivalent of 123456789 in 123456789/???; don't strip
@@ -419,5 +401,10 @@ public class HandleServiceImpl implements HandleService {
         }
 
         return null;
+    }
+
+    @Override
+    public String[] getAdditionalPrefixes() {
+        return configurationService.getArrayProperty("handle.additional.prefixes");
     }
 }

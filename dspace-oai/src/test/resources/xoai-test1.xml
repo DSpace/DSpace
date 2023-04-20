@@ -115,7 +115,7 @@
                     <field name="format">text/html</field>
                     <field name="size">39970</field>
                     <field name="url">
-                        http://demo.dspace.org/xmlui/bitstream/10673/4/1/Lily-cat-of-day.htm
+                        http://demo.dspace.org/bitstream/10673/4/1/Lily-cat-of-day.htm
                     </field>
                     <field name="checksum">aae901336b56ae14070fdec8c79dd48e</field>
                     <field name="checksumAlgorithm">MD5</field>
@@ -125,7 +125,7 @@
                     <field name="name">cl_style.css</field>
                     <field name="format">text/css</field>
                     <field name="size">1181</field>
-                    <field name="url">http://demo.dspace.org/xmlui/bitstream/10673/4/2/cl_style.css
+                    <field name="url">http://demo.dspace.org/bitstream/10673/4/2/cl_style.css
                     </field>
                     <field name="checksum">58178d41c221520d88333b9d482b31b8</field>
                     <field name="checksumAlgorithm">MD5</field>
@@ -136,7 +136,7 @@
                     <field name="format">image/jpeg</field>
                     <field name="size">83390</field>
                     <field name="url">
-                        http://demo.dspace.org/xmlui/bitstream/10673/4/3/kitty-1257950690.jpg
+                        http://demo.dspace.org/bitstream/10673/4/3/kitty-1257950690.jpg
                     </field>
                     <field name="checksum">729596bb3ad09ebe958a150787418212</field>
                     <field name="checksumAlgorithm">MD5</field>
@@ -147,7 +147,7 @@
                     <field name="format">image/jpeg</field>
                     <field name="size">86057</field>
                     <field name="url">
-                        http://demo.dspace.org/xmlui/bitstream/10673/4/4/kitty-1257950690_002.jpg
+                        http://demo.dspace.org/bitstream/10673/4/4/kitty-1257950690_002.jpg
                     </field>
                     <field name="checksum">37c07c8488042d064bd945765d9e2f98</field>
                     <field name="checksumAlgorithm">MD5</field>
@@ -157,7 +157,7 @@
                     <field name="name">logo.png</field>
                     <field name="format">image/png</field>
                     <field name="size">4157</field>
-                    <field name="url">http://demo.dspace.org/xmlui/bitstream/10673/4/5/logo.png</field>
+                    <field name="url">http://demo.dspace.org/bitstream/10673/4/5/logo.png</field>
                     <field name="checksum">d64fb5f69c7820685d5ed3037b9670ed</field>
                     <field name="checksumAlgorithm">MD5</field>
                     <field name="sid">5</field>
@@ -166,7 +166,7 @@
                     <field name="name">style.css</field>
                     <field name="format">text/css</field>
                     <field name="size">49623</field>
-                    <field name="url">http://demo.dspace.org/xmlui/bitstream/10673/4/6/style.css</field>
+                    <field name="url">http://demo.dspace.org/bitstream/10673/4/6/style.css</field>
                     <field name="checksum">89c2a0557993a8665574c0b52fc1582d</field>
                     <field name="checksumAlgorithm">MD5</field>
                     <field name="sid">6</field>
@@ -175,7 +175,7 @@
                     <field name="name">stylesheet.css</field>
                     <field name="format">text/css</field>
                     <field name="size">877</field>
-                    <field name="url">http://demo.dspace.org/xmlui/bitstream/10673/4/7/stylesheet.css
+                    <field name="url">http://demo.dspace.org/bitstream/10673/4/7/stylesheet.css
                     </field>
                     <field name="checksum">d2b580ac1c89ae88dc05dcd9108b002e</field>
                     <field name="checksumAlgorithm">MD5</field>
@@ -191,7 +191,7 @@
                     <field name="originalName">license.txt</field>
                     <field name="format">text/plain; charset=utf-8</field>
                     <field name="size">1748</field>
-                    <field name="url">http://demo.dspace.org/xmlui/bitstream/10673/4/8/license.txt
+                    <field name="url">http://demo.dspace.org/bitstream/10673/4/8/license.txt
                     </field>
                     <field name="checksum">8a4605be74aa9ea9d79846c1fba20a33</field>
                     <field name="checksumAlgorithm">MD5</field>

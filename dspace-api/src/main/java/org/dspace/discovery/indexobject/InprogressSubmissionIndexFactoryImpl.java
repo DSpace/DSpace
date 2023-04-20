@@ -14,13 +14,18 @@ import java.util.List;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.indexobject.factory.CollectionIndexFactory;
 import org.dspace.discovery.indexobject.factory.InprogressSubmissionIndexFactory;
 import org.dspace.discovery.indexobject.factory.ItemIndexFactory;
 import org.dspace.eperson.EPerson;
+import org.dspace.supervision.SupervisionOrder;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.util.SolrUtils;
+import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,6 +40,9 @@ public abstract class InprogressSubmissionIndexFactoryImpl
     protected CollectionIndexFactory indexableCollectionService;
     @Autowired
     protected ItemIndexFactory indexableItemService;
+
+    @Autowired
+    protected SupervisionOrderService supervisionOrderService;
 
 
     @Override
@@ -57,6 +65,8 @@ public abstract class InprogressSubmissionIndexFactoryImpl
                     submitter.getFullName());
         }
 
+        addSupervisedByFacetIndex(context, item, doc);
+
         doc.addField("inprogress.item", new IndexableItem(inProgressSubmission.getItem()).getUniqueIndexID());
 
         // get the location string (for searching by collection & community)
@@ -68,7 +78,24 @@ public abstract class InprogressSubmissionIndexFactoryImpl
         locations.add("l" + inProgressSubmission.getCollection().getID());
 
         // Add item metadata
-        indexableItemService.addDiscoveryFields(doc, context, item, SearchUtils.getAllDiscoveryConfigurations(item));
+        List<DiscoveryConfiguration> discoveryConfigurations;
+        if (inProgressSubmission instanceof WorkflowItem) {
+            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations((WorkflowItem) inProgressSubmission);
+        } else if (inProgressSubmission instanceof WorkspaceItem) {
+            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations((WorkspaceItem) inProgressSubmission);
+        } else {
+            discoveryConfigurations = SearchUtils.getAllDiscoveryConfigurations(item);
+        }
+        indexableItemService.addDiscoveryFields(doc, context, item, discoveryConfigurations);
         indexableCollectionService.storeCommunityCollectionLocations(doc, locations);
+    }
+
+    private void addSupervisedByFacetIndex(Context context, Item item, SolrInputDocument doc) throws SQLException {
+        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(context, item);
+        for (SupervisionOrder supervisionOrder : supervisionOrders) {
+            addFacetIndex(doc, "supervisedBy", supervisionOrder.getGroup().getID().toString(),
+                supervisionOrder.getGroup().getName());
+        }
+
     }
 }

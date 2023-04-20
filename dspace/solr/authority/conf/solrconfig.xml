@@ -79,6 +79,7 @@
         <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
         <useColdSearcher>false</useColdSearcher>
         <maxWarmingSearchers>2</maxWarmingSearchers>
+        <slowQueryThresholdMillis>1000</slowQueryThresholdMillis>
     </query>
 
     <!-- Controls how the Solr HTTP RequestDispatcher responds to requests -->

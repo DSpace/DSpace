@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.RoleMembers;
@@ -87,7 +87,7 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
                         xmlWorkflowService.getMyDSpaceLink()
                 );
             } catch (MessagingException e) {
-                log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
+                log.info(LogHelper.getHeader(c, "error emailing user(s) for claimed task",
                                           "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
             }
         }
@@ -136,7 +136,7 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
     protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig,
                                         EPerson user) throws SQLException, AuthorizeException, IOException {
         if (claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null) {
-            workflowRequirementsService.addClaimedUser(c, wfi, step, c.getCurrentUser());
+            workflowRequirementsService.addClaimedUser(c, wfi, step, user);
             XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
                                      .createOwnedTask(c, wfi, step, actionConfig, user);
         }

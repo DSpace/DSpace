@@ -10,12 +10,15 @@ package org.dspace.app.sherpa.v2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -33,7 +36,10 @@ import org.json.JSONTokener;
  * @author Kim Shepherd
  *
  */
-public class SHERPAResponse {
+public class SHERPAResponse implements Serializable {
+
+    private static final long serialVersionUID = 2732963970169240597L;
+
     // Is this response to be treated as an error?
     private boolean error;
 
@@ -51,6 +57,9 @@ public class SHERPAResponse {
 
     // SHERPA URI (the human page version of this API response)
     private String uri;
+
+    @JsonIgnore
+    private Date retrievalTime = new Date();
 
     // Format enum - currently only JSON is supported
     public enum SHERPAFormat {
@@ -72,13 +81,18 @@ public class SHERPAResponse {
     }
 
     /**
+     * Create an empty SHERPAResponse representation
+     */
+    public SHERPAResponse() {}
+
+    /**
      * Parse the SHERPA v2 API JSON and construct Romeo policy data for display
      * This method does not return a value, but rather populates the metadata and journals objects
      * with data parsed from the JSON.
      * @param jsonData - the JSON input stream from the API result response body
      */
     private void parseJSON(InputStream jsonData) throws IOException {
-        InputStreamReader streamReader = new InputStreamReader(jsonData);
+        InputStreamReader streamReader = new InputStreamReader(jsonData, StandardCharsets.UTF_8);
         JSONTokener jsonTokener = new JSONTokener(streamReader);
         JSONObject httpResponse;
         try {
@@ -90,10 +104,10 @@ public class SHERPAResponse {
                 // - however, we only ever want one result since we're passing an "equals ISSN" query
                 if (items.length() > 0) {
                     metadata = new SHERPASystemMetadata();
-                    this.journals = new LinkedList<>();
+                    this.journals = new ArrayList<>();
                     // Iterate search result items
                     for (int itemIndex = 0; itemIndex < items.length(); itemIndex++) {
-                        List<SHERPAPublisher> sherpaPublishers = new LinkedList<>();
+                        List<SHERPAPublisher> sherpaPublishers = new ArrayList<>();
                         List<SHERPAPublisherPolicy> policies = new ArrayList<>();
                         SHERPAPublisher sherpaPublisher = new SHERPAPublisher();
                         SHERPAJournal sherpaJournal = new SHERPAJournal();
@@ -289,7 +303,7 @@ public class SHERPAResponse {
 
         // Is the item in DOAJ?
         if (item.has("listed_in_doaj")) {
-            sherpaJournal.setInDOAJ(("yes".equals(item.getString("listed_in_doaj"))));
+            sherpaJournal.setInDOAJ("yes".equals(item.getString("listed_in_doaj")));
         }
 
         return sherpaJournal;
@@ -403,7 +417,6 @@ public class SHERPAResponse {
         // published = pdfversion
         // These strings can be used to construct i18n messages.
         String articleVersion = "unknown";
-        String versionLabel = "Unknown";
 
         // Each 'permitted OA' can actually refer to multiple versions
         if (permitted.has("article_version")) {
@@ -480,6 +493,12 @@ public class SHERPAResponse {
         }
         permittedVersion.setLicenses(sherpaLicenses);
 
+        if (permitted.has("embargo")) {
+            JSONObject embargo = permitted.getJSONObject("embargo");
+            SHERPAEmbargo SHERPAEmbargo = new SHERPAEmbargo(embargo.getInt("amount"), embargo.getString("units"));
+            permittedVersion.setEmbargo(SHERPAEmbargo);
+        }
+
         return permittedVersion;
     }
 
@@ -542,5 +561,9 @@ public class SHERPAResponse {
 
     public SHERPASystemMetadata getMetadata() {
         return metadata;
+    }
+
+    public Date getRetrievalTime() {
+        return retrievalTime;
     }
 }

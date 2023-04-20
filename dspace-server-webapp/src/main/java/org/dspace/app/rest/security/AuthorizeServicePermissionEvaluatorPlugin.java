@@ -62,7 +62,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
         try {
             if (targetId != null) {
@@ -76,7 +76,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                     return false;
                 }
 
-                ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+                ePerson = context.getCurrentUser();
 
                 if (dSpaceObjectService != null && dsoId != null) {
                     DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);

@@ -11,6 +11,8 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -34,8 +36,9 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
     @Autowired(required = true)
     protected ItemService itemService;
 
-    public ItemMarkingAvailabilityBitstreamStrategy() {
+    private static final Logger LOG = LogManager.getLogger();
 
+    public ItemMarkingAvailabilityBitstreamStrategy() {
     }
 
     @Override
@@ -43,14 +46,14 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
         throws SQLException {
 
         List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        if (bundles.size() == 0) {
+        if (bundles.isEmpty()) {
             ItemMarkingInfo markInfo = new ItemMarkingInfo();
             markInfo.setImageName(nonAvailableImageName);
 
             return markInfo;
         } else {
             Bundle originalBundle = bundles.iterator().next();
-            if (originalBundle.getBitstreams().size() == 0) {
+            if (originalBundle.getBitstreams().isEmpty()) {
                 ItemMarkingInfo markInfo = new ItemMarkingInfo();
                 markInfo.setImageName(nonAvailableImageName);
 
@@ -72,8 +75,7 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
                 try {
                     bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
                 } catch (UnsupportedEncodingException e) {
-
-                    e.printStackTrace();
+                    LOG.warn("DSpace uses an unsupported encoding", e);
                 }
 
                 signInfo.setLink(bsLink);

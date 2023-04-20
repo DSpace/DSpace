@@ -20,6 +20,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.utils.DiscoverQueryBuilder;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
@@ -51,12 +52,25 @@ public class SearchUtils {
      */
     private SearchUtils() { }
 
+    /**
+     * Return an instance of the {@link SearchService}.
+     */
     public static SearchService getSearchService() {
         if (searchService == null) {
             org.dspace.kernel.ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
             searchService = manager.getServiceByName(SearchService.class.getName(), SearchService.class);
         }
         return searchService;
+    }
+
+    /**
+     * Clear the cached {@link SearchService} instance, forcing it to be retrieved from the service manager again
+     * next time {@link SearchUtils#getSearchService} is called.
+     * In practice, this is only necessary for integration tests in some environments
+     * where the cached version may no longer be up to date between tests.
+     */
+    public static void clearCachedSearchService() {
+        searchService = null;
     }
 
     public static DiscoveryConfiguration getDiscoveryConfiguration() {
@@ -169,5 +183,11 @@ public class SearchUtils {
     private static void addConfigurationIfExists(Set<DiscoveryConfiguration> result, String confName) {
         DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName(confName);
         result.add(configurationExtra);
+    }
+
+    public static DiscoverQueryBuilder getQueryBuilder() {
+        ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
+        return manager
+            .getServiceByName(DiscoverQueryBuilder.class.getName(), DiscoverQueryBuilder.class);
     }
 }

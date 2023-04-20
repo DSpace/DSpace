@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
+ * ChoiceAuthority source that reads the hierarchical vocabularies
  * from {@code ${dspace.dir}/config/controlled-vocabularies/*.xml} and turns
  * them into autocompleting authorities.
  *
@@ -136,7 +136,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     protected String buildString(Node node) {
-        if (node.getNodeType() == Node.DOCUMENT_NODE) {
+        if (node.getNodeType() == Node.DOCUMENT_NODE || (
+            node.getParentNode() != null &&
+            node.getParentNode().getNodeType() == Node.DOCUMENT_NODE)) {
             return ("");
         } else {
             String parentValue = buildString(node.getParentNode());

@@ -29,7 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to view information on all the groups he or she is a member of (READ permission).
+ * An authenticated user is allowed to view information on all the groups they are a member of (READ permission).
  * This {@link RestPermissionEvaluatorPlugin} implements that requirement by validating the group membership.
  */
 @Component
@@ -61,12 +61,17 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = context.getCurrentUser();
         try {
             UUID dsoId = UUID.fromString(targetId.toString());
 
             Group group = groupService.find(context, dsoId);
+
+            // if the group is one of the special groups of the context it is readable
+            if (context.getSpecialGroups().contains(group)) {
+                return true;
+            }
 
             // anonymous user
             if (ePerson == null) {

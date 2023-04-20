@@ -8,15 +8,14 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
+import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -33,14 +32,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<UploadBitstreamAccessConditionDTO> {
+public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<AccessConditionDTO> {
 
 
     @Autowired
     ItemService itemService;
 
     @Autowired
-    AuthorizeService authorizeService;
+    private ResourcePolicyService resourcePolicyService;
 
     @Autowired
     UploadConfigurationService uploadConfigurationService;
@@ -48,32 +47,31 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     @Override
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
+        //"absolutePath": "files/0/accessConditions"
         //"path": "/sections/upload/files/0/accessConditions"
-        String[] split = getAbsolutePath(path).split("/");
+        String[] splitAbsPath = getAbsolutePath(path).split("/");
+        String[] splitPath = path.split("/");
         Item item = source.getItem();
 
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         ;
-        Collection<UploadConfiguration>  uploadConfigsCollection = uploadConfigurationService.getMap().values();
-        Iterator<UploadConfiguration> uploadConfigs = uploadConfigsCollection.iterator();
+        UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(splitPath[2]);
         for (Bundle bb : bundle) {
             int idx = 0;
             for (Bitstream bitstream : bb.getBitstreams()) {
-                if (idx == Integer.parseInt(split[1])) {
+                if (idx == Integer.parseInt(splitAbsPath[1])) {
 
-                    List<UploadBitstreamAccessConditionDTO> newAccessConditions =
-                                                            new ArrayList<UploadBitstreamAccessConditionDTO>();
-                    if (split.length == 3) {
-                        authorizeService.removePoliciesActionFilter(context, bitstream, Constants.READ);
+                    List<AccessConditionDTO> newAccessConditions = new ArrayList<AccessConditionDTO>();
+                    if (splitAbsPath.length == 3) {
+                        resourcePolicyService.removePolicies(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
                         newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
-                    } else if (split.length == 4) {
+                    } else if (splitAbsPath.length == 4) {
                         // contains "-", call index-based accessConditions it make not sense
                         newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
                     }
 
-                    // TODO manage duplicate policy
                     if (CollectionUtils.isNotEmpty(newAccessConditions)) {
-                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfigs, bitstream,
+                        BitstreamResourcePolicyUtils.findApplyResourcePolicy(context, uploadConfig, bitstream,
                                                                              newAccessConditions);
                     }
                 }
@@ -83,12 +81,12 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO[]> getArrayClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO[].class;
+    protected Class<AccessConditionDTO[]> getArrayClassForEvaluation() {
+        return AccessConditionDTO[].class;
     }
 
     @Override
-    protected Class<UploadBitstreamAccessConditionDTO> getClassForEvaluation() {
-        return UploadBitstreamAccessConditionDTO.class;
+    protected Class<AccessConditionDTO> getClassForEvaluation() {
+        return AccessConditionDTO.class;
     }
 }

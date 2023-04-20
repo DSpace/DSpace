@@ -15,12 +15,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -34,7 +37,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
 import org.dspace.eperson.dao.GroupDAO;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -51,8 +54,6 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,7 +64,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements GroupService {
-    private static final Logger log = LoggerFactory.getLogger(GroupServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected GroupDAO groupDAO;
@@ -110,7 +111,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // Create a table row
         Group g = groupDAO.create(context, new Group());
 
-        log.info(LogManager.getHeader(context, "create_group", "group_id="
+        log.info(LogHelper.getHeader(context, "create_group", "group_id="
             + g.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.GROUP, g.getID(), null, getIdentifiers(context, g)));
@@ -472,15 +473,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public void delete(Context context, Group group) throws SQLException {
         if (group.isPermanent()) {
-            log.error("Attempt to delete permanent Group $", group.getName());
+            log.error("Attempt to delete permanent Group {}", group::getName);
             throw new SQLException("Attempt to delete a permanent Group");
         }
 
         context.addEvent(new Event(Event.DELETE, Constants.GROUP, group.getID(),
                                    group.getName(), getIdentifiers(context, group)));
-
-        //Remove the supervised group from any workspace items linked to us.
-        group.getSupervisedItems().clear();
 
         // Remove any ResourcePolicies that reference this group
         authorizeService.removeGroupPolicies(context, group);
@@ -502,7 +500,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         groupDAO.delete(context, group);
         rethinkGroupCache(context, false);
 
-        log.info(LogManager.getHeader(context, "delete_group", "group_id="
+        log.info(LogHelper.getHeader(context, "delete_group", "group_id="
             + group.getID()));
     }
 
@@ -595,7 +593,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             group.clearGroupsChanged();
         }
 
-        log.info(LogManager.getHeader(context, "update_group", "group_id="
+        log.info(LogHelper.getHeader(context, "update_group", "group_id="
             + group.getID()));
     }
 
@@ -714,7 +712,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                     // if the group is used for one or more roles on a single collection,
                     // admins can eventually manage it
                     List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
-                    if (collectionRoles != null && collectionRoles.size() > 0) {
+                    if (collectionRoles != null && !collectionRoles.isEmpty()) {
                         Set<Collection> colls = new HashSet<>();
                         for (CollectionRole cr : collectionRoles) {
                             colls.add(cr.getCollection());
@@ -735,13 +733,24 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             groups.add(group);
                             List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
                                                             Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
-                            if (policies.size() > 0) {
-                                return policies.get(0).getdSpaceObject();
+
+                            Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
+                                    collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
+                                    group.getName())).findFirst();
+
+                            if (defaultPolicy.isPresent()) {
+                                return defaultPolicy.get().getdSpaceObject();
                             }
                             policies = resourcePolicyService.find(context, null, groups,
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
-                            if (policies.size() > 0) {
-                                return policies.get(0).getdSpaceObject();
+
+                            defaultPolicy = policies.stream()
+                                    .filter(p -> StringUtils.equals(collectionService.getDefaultReadGroupName(
+                                            (Collection) p.getdSpaceObject(), "BITSTREAM"), group.getName()))
+                                    .findFirst();
+
+                            if (defaultPolicy.isPresent()) {
+                                return defaultPolicy.get().getdSpaceObject();
                             }
                         }
                     }
@@ -816,5 +825,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public List<Group> findByMetadataField(final Context context, final String searchValue,
                                            final MetadataField metadataField) throws SQLException {
         return groupDAO.findByMetadataField(context, searchValue, metadataField);
+    }
+
+    @Override
+    public String getName(Group dso) {
+        return dso.getName();
     }
 }

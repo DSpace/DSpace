@@ -60,6 +60,10 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     private Item leftItem;
     private Item rightItem;
     private Collection collection;
+    private Collection collection2;
+    private Collection collection3;
+    private Collection collection4;
+    private Collection collection5;
     private RelationshipType relationshipType;
     private Relationship relationship;
     private String adminAuthToken;
@@ -98,7 +102,33 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         collection = CollectionBuilder.createCollection(context, community)
             .withName("Collection")
             .withAdminGroup(collectionAdmin)
+            .withEntityType("Publication")
             .build();
+
+        collection2 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 2")
+                .withAdminGroup(collectionAdmin)
+                .withEntityType("Person")
+                .build();
+
+        collection3 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 3")
+                .withAdminGroup(collectionAdmin)
+                .withEntityType("JournalIssue")
+                .build();
+
+        collection4 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 4")
+                .withAdminGroup(collectionAdmin)
+                .withEntityType("JournalVolume")
+                .build();
+
+        collection5 = CollectionBuilder.createCollection(context, community)
+                .withName("Collection 4")
+                .withAdminGroup(collectionAdmin)
+                .withEntityType("Project")
+                .build();
+
         context.restoreAuthSystemState();
     }
 
@@ -122,11 +152,9 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         leftItem = ItemBuilder.createItem(context, collection)
             .withTitle("Left item")
-            .withEntityType("Publication")
             .build();
-        rightItem = ItemBuilder.createItem(context, collection)
+        rightItem = ItemBuilder.createItem(context, collection2)
             .withTitle("Right item")
-            .withEntityType("Person")
             .withPersonIdentifierFirstName("firstName")
             .withPersonIdentifierLastName("familyName")
             .build();
@@ -144,14 +172,12 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     private void initJournalVolumeIssue() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        leftItem = ItemBuilder.createItem(context, collection)
+        leftItem = ItemBuilder.createItem(context, collection3)
             .withTitle("Left item")
-            .withEntityType("JournalIssue")
             .withPublicationIssueNumber("2")
             .build();
-        rightItem = ItemBuilder.createItem(context, collection)
+        rightItem = ItemBuilder.createItem(context, collection4)
             .withTitle("Right item")
-            .withEntityType("JournalVolume")
             .withPublicationVolumeNumber("30")
             .build();
         relationshipType = relationshipTypeService
@@ -167,19 +193,16 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
     private void initPersonProjectPublication() throws Exception {
         context.turnOffAuthorisationSystem();
-        personItem = ItemBuilder.createItem(context, collection)
+        personItem = ItemBuilder.createItem(context, collection2)
             .withTitle("Person 1")
             .withPersonIdentifierFirstName("Donald")
             .withPersonIdentifierLastName("Smith")
-            .withEntityType("Person")
             .build();
-        projectItem = ItemBuilder.createItem(context, collection)
+        projectItem = ItemBuilder.createItem(context, collection5)
             .withTitle("Project 1")
-            .withEntityType("Project")
             .build();
         publicationItem = ItemBuilder.createItem(context, collection)
             .withTitle("Publication 1")
-            .withEntityType("Publication")
             .build();
         personProjectRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
             entityTypeService.findByEntityType(context, "Person"),
@@ -209,7 +232,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(1));
+        assertThat(publicationRelationships.size(), equalTo(2));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
@@ -219,7 +242,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(1));
+        assertThat(projectRelationships.size(), equalTo(2));
     }
 
     @Test
@@ -800,7 +823,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(1));
+        assertThat(publicationRelationships.size(), equalTo(2));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
@@ -810,7 +833,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(1));
+        assertThat(projectRelationships.size(), equalTo(2));
     }
 
     @Test
@@ -855,7 +878,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(1));
+        assertThat(publicationRelationships.size(), equalTo(2));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
@@ -865,7 +888,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(1));
+        assertThat(projectRelationships.size(), equalTo(2));
     }
 
     @Test
@@ -968,7 +991,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(1));
+        assertThat(publicationRelationships.size(), equalTo(2));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
@@ -978,7 +1001,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(1));
+        assertThat(projectRelationships.size(), equalTo(2));
     }
 
     @Test
@@ -1000,7 +1023,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
             "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
-        assertThat(publicationRelationships.size(), equalTo(1));
+        assertThat(publicationRelationships.size(), equalTo(2));
 
         projectItem = itemService.find(context, projectItem.getID());
         List<MetadataValue> projectAuthorList =
@@ -1010,7 +1033,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(projectAuthorList.get(0).getAuthority(), startsWith("virtual::"));
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
             "relation", "isPersonOfProject", Item.ANY, Item.ANY);
-        assertThat(projectRelationships.size(), equalTo(1));
+        assertThat(projectRelationships.size(), equalTo(2));
     }
 
     @Test

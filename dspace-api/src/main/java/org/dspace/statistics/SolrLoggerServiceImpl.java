@@ -8,7 +8,6 @@
 package org.dspace.statistics;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,9 +17,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -142,6 +144,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private ClientInfoService clientInfoService;
     @Autowired
     private SolrStatisticsCore solrStatisticsCore;
+    @Autowired
+    private GeoIpService geoIpService;
 
     /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreURL;
@@ -173,32 +177,29 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
+
+        if (null != statisticsCoreURL) {
+            Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
+            statisticsCoreBase = statisticsPath
+                .getName(statisticsPath.getNameCount() - 1)
+                .toString();
+        } else {
+            log.warn("Unable to find solr-statistics.server parameter in DSpace configuration. This is required for " +
+                     "sharding statistics.");
+            statisticsCoreBase = null;
+        }
+
         solr = solrStatisticsCore.getSolr();
 
         // Read in the file so we don't have to do it all the time
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
 
         DatabaseReader service = null;
-        // Get the db file for the location
-        String dbPath = configurationService.getProperty("usage-statistics.dbfile");
-        if (dbPath != null) {
-            try {
-                File dbFile = new File(dbPath);
-                service = new DatabaseReader.Builder(dbFile).build();
-            } catch (FileNotFoundException fe) {
-                log.error(
-                    "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
-                        "based reports! Please see the DSpace installation instructions for instructions to install " +
-                        "this file.",
-                    fe);
-            } catch (IOException e) {
-                log.error(
-                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
-                        "DSpace installation instructions for more details.",
-                    e);
-            }
-        } else {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+        try {
+            service = geoIpService.getDatabaseReader();
+        } catch (IllegalStateException ex) {
+            log.error(ex);
         }
         locationService = service;
     }
@@ -212,7 +213,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
                          EPerson currentUser) {
-        if (solr == null || locationService == null) {
+        if (solr == null) {
             return;
         }
         initSolrYearCores();
@@ -253,7 +254,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
-        if (solr == null || locationService == null) {
+        if (solr == null) {
             return;
         }
         initSolrYearCores();

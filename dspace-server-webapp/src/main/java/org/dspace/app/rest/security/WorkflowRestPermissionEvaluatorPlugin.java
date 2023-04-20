@@ -20,6 +20,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
@@ -31,7 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * An authenticated user is allowed to interact with workflow item only if they belong to a task that she own or could
+ * An authenticated user is allowed to interact with workflow item only if they belong to a task that they own or could
  * claim.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
@@ -56,6 +57,9 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
     @Autowired
     private EPersonService ePersonService;
 
+    @Autowired
+    private SupervisionOrderService supervisionOrderService;
+
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
@@ -68,14 +72,14 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
         }
 
         Request request = requestService.getCurrentRequest();
-        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
         try {
             ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
             if (ePerson == null) {
                 return false;
             }
-            Integer dsoId = Integer.parseInt(targetId.toString());
+            int dsoId = Integer.parseInt(targetId.toString());
             XmlWorkflowItem workflowItem = workflowItemService.find(context, dsoId);
             // submitter can see their inprogress submission
             if (ePerson.equals(workflowItem.getSubmitter())) {
@@ -89,6 +93,11 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
             if (claimedTaskService.findByWorkflowIdAndEPerson(context, workflowItem, ePerson) != null) {
                 return true;
             }
+
+            if (supervisionOrderService.isSupervisor(context, ePerson, workflowItem.getItem())) {
+                return true;
+            }
+
         } catch (SQLException | AuthorizeException | IOException e) {
             log.error(e.getMessage(), e);
         }

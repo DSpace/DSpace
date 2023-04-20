@@ -21,9 +21,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.EPersonNameNotProvidedException;
+import org.dspace.app.rest.exception.PasswordNotValidException;
 import org.dspace.app.rest.exception.RESTEmptyWorkflowGroupException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
@@ -34,7 +34,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.service.SiteService;
+import org.dspace.authorize.service.ValidatePasswordService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EmptyWorkflowGroupException;
@@ -74,10 +74,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     private AccountService accountService;
 
     @Autowired
-    private AuthorizationFeatureService authorizationFeatureService;
-
-    @Autowired
-    private SiteService siteService;
+    private ValidatePasswordService validatePasswordService;
 
     @Autowired
     private RegistrationDataService registrationDataService;
@@ -129,6 +126,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             eperson.setEmail(epersonRest.getEmail());
             eperson.setNetid(epersonRest.getNetid());
             if (epersonRest.getPassword() != null) {
+                if (!validatePasswordService.isPasswordValid(epersonRest.getPassword())) {
+                    throw new PasswordNotValidException();
+                }
                 es.setPassword(eperson, epersonRest.getPassword());
             }
             es.update(context, eperson);
@@ -207,8 +207,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             }
         }
         String password = epersonRest.getPassword();
-        if (!accountService.verifyPasswordStructure(password)) {
-            throw new DSpaceBadRequestException("The given password is invalid");
+        if (StringUtils.isBlank(password)) {
+            throw new DSpaceBadRequestException("A password is required");
         }
     }
 
@@ -293,16 +293,21 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
-        if (StringUtils.isNotBlank(request.getParameter("token"))) {
-            boolean passwordChangeFound = false;
-            for (Operation operation : patch.getOperations()) {
-                if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
-                    passwordChangeFound = true;
-                }
+        boolean passwordChangeFound = false;
+        for (Operation operation : patch.getOperations()) {
+            if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
+                passwordChangeFound = true;
             }
+        }
+        if (StringUtils.isNotBlank(request.getParameter("token"))) {
             if (!passwordChangeFound) {
                 throw new AccessDeniedException("Refused to perform the EPerson patch based on a token without " +
                                                     "changing the password");
+            }
+        } else {
+            if (passwordChangeFound && !StringUtils.equals(context.getAuthenticationMethod(), "password")) {
+                throw new AccessDeniedException("Refused to perform the EPerson patch based to change the password " +
+                                                        "for non \"password\" authentication");
             }
         }
         patchDSpaceObject(apiCategory, model, uuid, patch);
@@ -331,6 +336,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
+                Link.of("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
     }
 }

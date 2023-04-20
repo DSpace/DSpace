@@ -23,7 +23,7 @@ import org.dspace.xmlworkflow.storedcomponents.dao.ClaimedTaskDAO;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ClaimedTask object.
- * This class is responsible for all database calls for the ClaimedTask object and is autowired by spring
+ * This class is responsible for all database calls for the ClaimedTask object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -56,7 +56,7 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
                                 criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.owner), ePerson)
             )
         );
-        return uniqueResult(context, criteriaQuery, false, ClaimedTask.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, ClaimedTask.class);
 
 
     }
@@ -101,7 +101,7 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
                                 criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.actionId), actionID)
             )
         );
-        return uniqueResult(context, criteriaQuery, false, ClaimedTask.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, ClaimedTask.class);
     }
 
     @Override

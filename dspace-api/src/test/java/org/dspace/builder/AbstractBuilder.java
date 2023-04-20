@@ -11,7 +11,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.alerts.service.SystemWideAlertService;
+import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -39,11 +43,19 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.eperson.service.SubscribeService;
+import org.dspace.orcid.factory.OrcidServiceFactory;
+import org.dspace.orcid.service.OrcidHistoryService;
+import org.dspace.orcid.service.OrcidQueueService;
+import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -89,6 +101,15 @@ public abstract class AbstractBuilder<T, S> {
     static RelationshipTypeService relationshipTypeService;
     static EntityTypeService entityTypeService;
     static ProcessService processService;
+    static RequestItemService requestItemService;
+    static VersioningService versioningService;
+    static OrcidHistoryService orcidHistoryService;
+    static OrcidQueueService orcidQueueService;
+    static OrcidTokenService orcidTokenService;
+    static SystemWideAlertService systemWideAlertService;
+    static SubscribeService subscribeService;
+    static SupervisionOrderService supervisionOrderService;
+
 
     protected Context context;
 
@@ -101,7 +122,7 @@ public abstract class AbstractBuilder<T, S> {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractDSpaceObjectBuilder.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected AbstractBuilder(Context context) {
         this.context = context;
@@ -136,12 +157,22 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = ContentServiceFactory.getInstance().getRelationshipTypeService();
         entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
         processService = ScriptServiceFactory.getInstance().getProcessService();
+        requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
+        versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                 .getServiceByName(VersioningService.class.getName(), VersioningService.class);
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
         inProgressUserService = XmlWorkflowServiceFactory.getInstance().getInProgressUserService();
         poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
         workflowItemRoleService = XmlWorkflowServiceFactory.getInstance().getWorkflowItemRoleService();
+        orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
+        orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
+        orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
+        systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                      .getServicesByType(SystemWideAlertService.class).get(0);
+        subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
+        supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
     }
 
 
@@ -172,6 +203,12 @@ public abstract class AbstractBuilder<T, S> {
         relationshipTypeService = null;
         entityTypeService = null;
         processService = null;
+        requestItemService = null;
+        versioningService = null;
+        orcidTokenService = null;
+        systemWideAlertService = null;
+        subscribeService = null;
+        supervisionOrderService = null;
 
     }
 

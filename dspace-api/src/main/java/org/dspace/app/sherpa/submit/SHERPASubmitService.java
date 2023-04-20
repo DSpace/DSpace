@@ -9,7 +9,6 @@ package org.dspace.app.sherpa.submit;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +17,7 @@ import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 
 /**
  * SHERPASubmitService is
@@ -63,19 +62,19 @@ public class SHERPASubmitService {
      * issnItemExtractor(s) in the SHERPA spring configuration.
      * The ISSNs are not validated with a regular expression or other rules - any values
      * extracted will be included in API queries.
+     * Return the first not empty response from Sherpa
      * @see "dspace-dspace-addon-sherpa-configuration-services.xml"
      * @param context   DSpace context
      * @param item      DSpace item containing ISSNs to be checked
      * @return          SHERPA v2 API response (policy data)
      */
-    public List<SHERPAResponse> searchRelatedJournals(Context context, Item item) {
+    public SHERPAResponse searchRelatedJournals(Context context, Item item) {
         Set<String> issns = getISSNs(context, item);
         if (issns == null || issns.size() == 0) {
             return null;
         } else {
             // SHERPA v2 API no longer supports "OR'd" ISSN search, perform individual searches instead
             Iterator<String> issnIterator = issns.iterator();
-            List<SHERPAResponse> responses = new LinkedList<>();
             while (issnIterator.hasNext()) {
                 String issn = issnIterator.next();
                 SHERPAResponse response = sherpaService.searchByJournalISSN(issn);
@@ -83,14 +82,13 @@ public class SHERPASubmitService {
                     // Continue with loop
                     log.warn("Failed to look up SHERPA ROMeO result for ISSN: " + issn
                         + ": " + response.getMessage());
+                    return response;
+                } else if (!response.getJournals().isEmpty()) {
+                    // return this response, if it is not empty
+                    return response;
                 }
-                // Store this response, even if it has an error (useful for UI reporting)
-                responses.add(response);
             }
-            if (responses.isEmpty()) {
-                responses.add(new SHERPAResponse("SHERPA ROMeO lookup failed"));
-            }
-            return responses;
+            return new SHERPAResponse();
         }
     }
 
@@ -115,7 +113,7 @@ public class SHERPASubmitService {
     public Set<String> getISSNs(Context context, Item item) {
         Set<String> issns = new LinkedHashSet<String>();
         if (configuration.getIssnItemExtractors() == null) {
-            log.warn(LogManager.getHeader(context, "searchRelatedJournals",
+            log.warn(LogHelper.getHeader(context, "searchRelatedJournals",
                                           "no issnItemExtractors defined"));
             return null;
         }

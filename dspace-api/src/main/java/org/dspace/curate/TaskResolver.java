@@ -15,11 +15,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -64,7 +66,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class TaskResolver {
     // logging service
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(TaskResolver.class);
+    private static final Logger log = LogManager.getLogger(TaskResolver.class);
 
     // base directory of task scripts & catalog name
     protected static final String CATALOG = "task.catalog";
@@ -94,7 +96,7 @@ public class TaskResolver {
         if (script.exists()) {
             BufferedReader reader = null;
             try {
-                reader = new BufferedReader(new FileReader(script));
+                reader = new BufferedReader(new FileReader(script, StandardCharsets.UTF_8));
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith("#") && line.indexOf("$td=") > 0) {
@@ -136,7 +138,7 @@ public class TaskResolver {
         catalog.put(taskName, descriptor);
         Writer writer = null;
         try {
-            writer = new FileWriter(new File(scriptDir, CATALOG));
+            writer = new FileWriter(new File(scriptDir, CATALOG), StandardCharsets.UTF_8);
             catalog.store(writer, "do not edit");
         } catch (IOException ioE) {
             log.error("Error saving scripted task catalog: " + CATALOG);
@@ -179,7 +181,7 @@ public class TaskResolver {
                 File script = new File(scriptDir, tokens[1]);
                 if (script.exists()) {
                     try {
-                        Reader reader = new FileReader(script);
+                        Reader reader = new FileReader(script, StandardCharsets.UTF_8);
                         engine.eval(reader);
                         reader.close();
                         // third token is the constructor expression for the class
@@ -212,7 +214,7 @@ public class TaskResolver {
             File catalogFile = new File(scriptDir, CATALOG);
             if (catalogFile.exists()) {
                 try {
-                    Reader reader = new FileReader(catalogFile);
+                    Reader reader = new FileReader(catalogFile, StandardCharsets.UTF_8);
                     catalog.load(reader);
                     reader.close();
                 } catch (IOException ioE) {

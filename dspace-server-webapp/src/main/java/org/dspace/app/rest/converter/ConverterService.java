@@ -31,7 +31,6 @@ import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
-import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.RequestService;
@@ -39,6 +38,7 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
@@ -53,9 +53,12 @@ import org.springframework.stereotype.Service;
 /**
  * Converts domain objects from the DSpace service layer to rest objects, and from rest objects to resource
  * objects, applying {@link Projection}s where applicable.
- *
+ * <P>
+ * MUST be loaded @Lazy, as this service requires other services to be preloaded (especially DSpaceConverter components)
+ * and that can result in circular references if those services need this ConverterService (and many do).
  * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  */
+@Lazy
 @Service
 public class ConverterService {
 
@@ -78,9 +81,6 @@ public class ConverterService {
 
     @Autowired
     private List<Projection> projections;
-
-    @Autowired
-    private DSpacePermissionEvaluator dSpacePermissionEvaluator;
 
     @Autowired
     private WebSecurityExpressionEvaluator webSecurityExpressionEvaluator;
@@ -202,17 +202,18 @@ public class ConverterService {
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, Projection projection) {
+        if (pageable == null) {
+            pageable = utils.getPageable(pageable);
+        }
+        List<M> pageableObjects = utils.getPageObjectList(modelObjects, pageable);
         List<R> transformedList = new LinkedList<>();
-        for (M modelObject : modelObjects) {
+        for (M modelObject : pageableObjects) {
             R transformedObject = toRest(modelObject, projection);
             if (transformedObject != null) {
                 transformedList.add(transformedObject);
             }
         }
-        if (pageable == null) {
-            pageable = utils.getPageable(pageable);
-        }
-        return utils.getPage(transformedList, pageable);
+        return new PageImpl(transformedList, pageable, modelObjects.size());
     }
 
     /**

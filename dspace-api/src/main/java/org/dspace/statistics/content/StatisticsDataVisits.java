@@ -285,13 +285,8 @@ public class StatisticsDataVisits extends StatisticsData {
             DatasetQuery firsDataset = datasetQueries.get(0);
             //Do the first query
 
-            ObjectCount[] topCounts1 = null;
-//            if (firsDataset.getQueries().size() == 1) {
-            topCounts1 =
+            ObjectCount[] topCounts1 =
                 queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(), filterQuery, facetMinCount);
-//            } else {
-//                TODO: do this
-//            }
             // Check if we have more queries that need to be done
             if (datasetQueries.size() == 2) {
                 DatasetQuery secondDataSet = datasetQueries.get(1);
@@ -313,7 +308,6 @@ public class StatisticsDataVisits extends StatisticsData {
                 }
                 for (int i = 0; i < topCounts1.length; i++) {
                     ObjectCount count1 = topCounts1[i];
-                    ObjectCount[] currentResult = new ObjectCount[topCounts2.length];
 
                     // Make sure we have a dataSet
                     if (dataset == null) {
@@ -627,6 +621,10 @@ public class StatisticsDataVisits extends StatisticsData {
         }
 
         if (dsoId != null && query.dsoType != -1) {
+            // Store the UUID of the DSO as an attribute. Needed in particular for Bitstream download usage reports,
+            // as the Bitstream itself won't be available when converting points to their REST representation
+            attrs.put("id", dsoId);
+
             switch (query.dsoType) {
                 case Constants.BITSTREAM:
                     Bitstream bit = bitstreamService.findByIdOrLegacyId(context, dsoId);
@@ -645,7 +643,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     // be null if a handle has not yet been assigned. In this case reference the
                     // item its internal id. In the last case where the bitstream is not associated
                     // with an item (such as a community logo) then reference the bitstreamID directly.
-                    String identifier = null;
+                    String identifier;
                     if (owningItem != null && owningItem.getHandle() != null) {
                         identifier = "handle/" + owningItem.getHandle();
                     } else if (owningItem != null) {

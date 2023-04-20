@@ -45,7 +45,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.LogHelper;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.core.Utils;
 import org.dspace.workflow.WorkflowException;
@@ -166,7 +166,7 @@ public class PDFPackager
 
             workspaceItemService.update(context, wi);
             success = true;
-            log.info(LogManager.getHeader(context, "ingest",
+            log.info(LogHelper.getHeader(context, "ingest",
                                           "Created new Item, db ID=" + String.valueOf(myitem.getID()) +
                                               ", WorkspaceItem ID=" + String.valueOf(wi.getID())));
 

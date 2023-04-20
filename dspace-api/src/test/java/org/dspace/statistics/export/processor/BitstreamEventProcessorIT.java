@@ -37,13 +37,13 @@ import org.junit.Test;
  */
 public class BitstreamEventProcessorIT extends AbstractIntegrationTestWithDatabase {
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private String encodedUrl;
 
-
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         configurationService.setProperty("irus.statistics.tracker.enabled", true);

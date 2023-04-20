@@ -240,8 +240,8 @@ public class SolrUpgradePre6xStatistics {
     /**
      * Print a status message appended with the processing time for the operation
      *
-     * @param header
-     *            Message to display
+     * @param numProcessed
+     *            count of records processed so far.
      * @param fromStart
      *            if true, report on processing time since the start of the program
      */
@@ -447,7 +447,7 @@ public class SolrUpgradePre6xStatistics {
         runReport();
         logTime(false);
         for (int processed = updateRecords(MIGQUERY); (processed != 0)
-                && (numProcessed < numRec); processed = updateRecords(MIGQUERY)) {
+                && (numProcessed <= numRec); processed = updateRecords(MIGQUERY)) {
             printTime(numProcessed, false);
             batchUpdateStats();
             if (context.getCacheSize() > CACHE_LIMIT) {

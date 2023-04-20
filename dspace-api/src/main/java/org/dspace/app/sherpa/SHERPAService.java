@@ -31,6 +31,7 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 
 /**
  * SHERPAService is responsible for making the HTTP call to the SHERPA v2 API
@@ -43,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Kim Shepherd
  */
 public class SHERPAService {
+
     private CloseableHttpClient client = null;
 
     private int maxNumberOfTries;
@@ -73,6 +75,7 @@ public class SHERPAService {
     /**
      * Complete initialization of the Bean.
      */
+    @SuppressWarnings("unused")
     @PostConstruct
     private void init() {
         // Get endoint and API key from configuration
@@ -90,6 +93,7 @@ public class SHERPAService {
      * @param query ISSN string to pass in an "issn equals" API query
      * @return      SHERPAResponse containing an error or journal policies
      */
+    @Cacheable(key = "#query", cacheNames = "sherpa.searchByJournalISSN")
     public SHERPAResponse searchByJournalISSN(String query) {
         return performRequest("publication", "issn", "equals", query, 0, 1);
     }
@@ -412,4 +416,5 @@ public class SHERPAService {
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
+
 }
