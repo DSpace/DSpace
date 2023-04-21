@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
@@ -24,6 +25,7 @@ import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,8 +61,8 @@ public class ScriptProcessesController {
      * @return              The ProcessResource object for the created process
      * @throws Exception    If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ResponseEntity<RepresentationModel<?>> startProcess(
         @PathVariable(name = "name") String scriptName,
         @RequestParam(name = "file", required = false) List<MultipartFile> files)
@@ -73,6 +75,15 @@ public class ScriptProcessesController {
         ProcessResource processResource = converter.toResource(processRest);
         context.complete();
         return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, new HttpHeaders(), processResource);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, consumes = "!" + MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public ResponseEntity<RepresentationModel<?>> startProcessInvalidMimeType(
+        @PathVariable(name = "name") String scriptName,
+        @RequestParam(name = "file", required = false) List<MultipartFile> files)
+        throws Exception {
+        throw new DSpaceBadRequestException("Invalid mimetype");
     }
 
 }

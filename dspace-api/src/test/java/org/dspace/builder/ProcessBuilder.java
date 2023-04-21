@@ -113,6 +113,9 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
     }
 
     public static void deleteProcess(Integer integer) throws SQLException, IOException {
+        if (integer == null) {
+            return;
+        }
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             Process process = processService.find(c, integer);

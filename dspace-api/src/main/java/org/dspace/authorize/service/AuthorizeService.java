@@ -533,6 +533,15 @@ public interface AuthorizeService {
     boolean isCollectionAdmin(Context context) throws SQLException;
 
     /**
+     * Checks that the context's current user is an item admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is an item admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isItemAdmin(Context context) throws SQLException;
+
+    /**
      * Checks that the context's current user is a community or collection admin in the site.
      *
      * @param context   context with the current user
