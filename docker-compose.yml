@@ -72,6 +72,7 @@ services:
       context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
     environment:
       PGDATA: /pgdata
+      POSTGRES_PASSWORD: dspace
     networks:
       dspacenet:
     ports:
