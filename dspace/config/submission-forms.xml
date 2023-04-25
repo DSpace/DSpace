@@ -85,7 +85,7 @@
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Author</label>
-                    <input-type>autocomplete</input-type>
+                    <input-type>clarin-name</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
                     <required></required>
                     <!-- Example ACL field definition.
