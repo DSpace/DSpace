@@ -181,6 +181,7 @@ The remainder of these instructions assume you are using ngrok (though other pro
 Prerequisites
 - Start DSpace 7 using one of the options listed above
 - Build the DSpace CLI image if needed.  See the instructions above.
+- A collection of AIPs to load into your instance of DSpace. You can either [make these yourself from another instance of DSpace](https://github.com/DSpace-Labs/AIP-Files#to-create-test-data), or you can use a pre-built set. We have [a few you can use](https://github.com/DSpace-Labs/AIP-Files#sample-datasets), but probably the most useful is the [set of AIPs we use for our DSpace demo site](https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-site-aips).
 
 Create an admin account.  By default, the dspace-cli container runs the dspace command.
 ```
