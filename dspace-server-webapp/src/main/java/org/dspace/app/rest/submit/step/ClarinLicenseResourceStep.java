@@ -25,9 +25,14 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
- * License step for DSpace Spring Rest. Expose the license information about the in progress submission.
+ * Clarin License Resource License step for DSpace Spring Rest. This Step will show license selector
+ * where the user could choose license for the bitstream.
  *
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ *
+ * This class is inspired by the class LicenseStep created by
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
  */
 public class ClarinLicenseResourceStep extends AbstractProcessingStep {
 
