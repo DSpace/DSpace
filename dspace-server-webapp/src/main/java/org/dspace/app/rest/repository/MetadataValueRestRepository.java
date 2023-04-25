@@ -152,13 +152,19 @@ public class MetadataValueRestRepository extends DSpaceRestRepository<MetadataVa
             DiscoverResult searchResult = searchService.search(context, discoverQuery);
             for (IndexableObject object : searchResult.getIndexableObjects()) {
                 if (object instanceof IndexableItem) {
-                    // get metadata values of the item
+                    // Get the item which has the metadata with the search value
                     List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(
                             ((IndexableItem) object).getIndexedObject(), metadataField);
 
+                    // The Item could have more metadata than the metadata with searching value, filter that metadata
+                    String finalSearchValue = searchValue;
+                    List<MetadataValue> filteredMetadataValues = metadataValues.stream()
+                            .filter(metadataValue -> metadataValue.getValue().contains(finalSearchValue))
+                            .collect(Collectors.toList());
+
                     // convert metadata values to the wrapper
                     List<MetadataValueWrapper> metadataValueWrapperList =
-                            this.convertMetadataValuesToWrappers(metadataValues);
+                            this.convertMetadataValuesToWrappers(filteredMetadataValues);
                     metadataValueWrappers.addAll(metadataValueWrapperList);
                 }
             }

@@ -46,6 +46,8 @@ public class MetadataValueRestRepositoryIT extends AbstractControllerIntegration
     private Item publicItem;
     private Item sponsorItem;
 
+    private Collection col;
+
     public static final String METADATAVALUES_ENDPOINT = "/api/core/metadatavalues/";
     private static final String SEARCH_BYVALUE_ENDPOINT = METADATAVALUES_ENDPOINT + "search/byValue";
 
@@ -63,7 +65,7 @@ public class MetadataValueRestRepositoryIT extends AbstractControllerIntegration
                 .withName("Parent Community")
                 .build();
 
-        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
+        col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
 
         // 2. Create item and add it to the collection
         publicItem = ItemBuilder.createItem(context, col)
@@ -286,6 +288,46 @@ public class MetadataValueRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
+
+    /**
+     * If the Item has more metadata values in the metadata field e.g. it has more authors, return only the
+     * values which matches the search value.
+     */
+    @Test
+    public void shouldReturnOneSuggestionWhenInputHasMoreMetadataValues() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item cuteItem = ItemBuilder.createItem(context, col)
+                .withAuthor(AUTHOR)
+                .withAuthor("second author")
+                .withAuthor("third author")
+                .withMetadata(SPONSOR_SCHEMA, SPONSOR_ELEMENT, null, SPONSOR_VALUE )
+                .build();
+        context.restoreAuthSystemState();
+
+        MetadataValue titleMetadataValue = itemService.getMetadataByMetadataString(cuteItem,
+                StringUtils.join(Arrays.asList(SCHEMA, ELEMENT, QUALIFIER),".")).get(0);
+
+        String metadataSchema = titleMetadataValue.getMetadataField().getMetadataSchema().getName();
+        String metadataElement = titleMetadataValue.getMetadataField().getElement();
+        String metadataQualifier = titleMetadataValue.getMetadataField().getQualifier();
+        String searchValue = titleMetadataValue.getValue();
+
+        getClient().perform(get(SEARCH_BYVALUE_ENDPOINT)
+                        .param("schema", metadataSchema)
+                        .param("element",metadataElement)
+                        .param("qualifier",metadataQualifier)
+                        .param("searchValue",searchValue))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.metadatavalues", Matchers.hasItem(
+                        MetadataValueMatcher.matchMetadataValueByKeys(titleMetadataValue.getValue(),
+                                titleMetadataValue.getLanguage(), titleMetadataValue.getAuthority(),
+                                titleMetadataValue.getConfidence(), titleMetadataValue.getPlace()))
+                ))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
 
     private MetadataValue getTitleMetadataValue() {
         return itemService.getMetadataByMetadataString(publicItem,
