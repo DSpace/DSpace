@@ -121,21 +121,14 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     @Override
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Bitstream bit = null;
-        boolean wasAllreadyDeleted = false;
         try {
             bit = bs.find(context, id);
             if (bit == null) {
                 throw new ResourceNotFoundException("The bitstream with uuid " + id + " could not be found");
             }
-             /**
-              * Deletion of bitstreams can fail, and items can get stucked. Moving the test after deletion 
-              * allow re-delete the bitstream and still return the expected error
-              * https://github.com/DSpace/DSpace/issues/8694
-              */
             if (bit.isDeleted()) {
-                wasAllreadyDeleted = true;
+                throw new ResourceNotFoundException("The bitstream with uuid " + id + " was already deleted");
             }
-            
             Community community = bit.getCommunity();
             if (community != null) {
                 communityService.setLogo(context, community, null);
@@ -151,9 +144,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             bs.delete(context, bit);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
-        }
-        if(wasAllreadyDeleted){
-            throw new ResourceNotFoundException("The bitstream with uuid " + id + " was already deleted");
         }
     }
 
