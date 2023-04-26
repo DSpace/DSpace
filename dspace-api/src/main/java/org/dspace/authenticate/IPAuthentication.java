@@ -17,6 +17,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -36,21 +37,21 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * <P>
  * e.g. {@code authentication.ip.MIT = 18., 192.25.0.0/255.255.0.0}
  * <P>
- * Negative matches can be included by prepending the range with a '-'. For example if you want
- * to include all of a class B network except for users of a contained class c network, you could use:
+ * Negative matches can be included by prepending the range with a '-'.
+ * For example if you want to include all of a class B network except for users
+ * of a contained class c network, you could use:
  * <P>
  * 111.222,-111.222.333.
  * <p>
  * For supported IP ranges see {@link org.dspace.authenticate.IPMatcher}.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 public class IPAuthentication implements AuthenticationMethod {
     /**
      * Our logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IPAuthentication.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Whether to look for x-forwarded headers for logging IP addresses
@@ -88,8 +89,8 @@ public class IPAuthentication implements AuthenticationMethod {
      * will never fail if the configuration is bad -- a warning will be logged.
      */
     public IPAuthentication() {
-        ipMatchers = new ArrayList<IPMatcher>();
-        ipNegativeMatchers = new ArrayList<IPMatcher>();
+        ipMatchers = new ArrayList<>();
+        ipNegativeMatchers = new ArrayList<>();
         ipMatcherGroupIDs = new HashMap<>();
         ipMatcherGroupNames = new HashMap<>();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -169,7 +170,7 @@ public class IPAuthentication implements AuthenticationMethod {
         if (request == null) {
             return Collections.EMPTY_LIST;
         }
-        List<Group> groups = new ArrayList<Group>();
+        List<Group> groups = new ArrayList<>();
 
         // Get the user's IP address
         String addr = clientInfoService.getClientIp(request);
@@ -249,9 +250,8 @@ public class IPAuthentication implements AuthenticationMethod {
             }
 
             log.debug(LogHelper.getHeader(context, "authenticated",
-                                           "special_groups=" + gsb.toString()
-                                           + " (by IP=" + addr + ", useProxies=" + useProxies.toString() + ")"
-                                          ));
+                    "special_groups={} (by IP={}, useProxies={})"),
+                    gsb.toString(), addr, useProxies.toString());
         }
 
         return groups;
