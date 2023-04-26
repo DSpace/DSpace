@@ -90,4 +90,52 @@
     <scope_note>Links to data in TEITOK</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>local</schema>
+    <element>demo</element>
+    <qualifier>uri</qualifier>
+    <scope_note>URL of the demo</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>size</element>
+    <qualifier>info</qualifier>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>submission</element>
+    <qualifier>note</qualifier>
+    <scope_note>A submitter's note for editor/reviewer</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>has</element>
+    <qualifier>files</qualifier>
+    <scope_note>True if the item contains any bitstreams</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>branding</element>
+    <scope_note>LRT/LINDAT (Name of Community)</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>bitstream</element>
+    <qualifier>file</qualifier>
+    <scope_note>Files inside a bitstream if an archive</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>refbox</element>
+    <qualifier>format</qualifier>
+    <scope_note>If the default refbox citation is not enough, use this field to provide a format string
+      . Check/extend html.xsl for available variables.</scope_note>
+  </dc-type>
+
 </dspace-dc-types>

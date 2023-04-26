@@ -54,7 +54,7 @@ public class LogMissingFn implements ExtensionFunction {
             return new XdmAtomicValue("");
         }
         return new XdmAtomicValue(checks(XslLogUtil.logMissing(xdmValues[0].itemAt(0).getStringValue(),
-                xdmValues[0].itemAt(1).getStringValue())));
+                xdmValues[1].itemAt(0).getStringValue())));
     }
 
     private String checks(String got) {

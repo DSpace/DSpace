@@ -8,11 +8,10 @@
 
 package org.dspace.xoai.services.impl.resources.functions;
 
+import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.dspace.xoai.services.impl.resources.functions.StringXSLFunction.BASE;
 
 import java.util.Objects;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 
 import net.sf.saxon.s9api.DocumentBuilder;
@@ -25,6 +24,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.SequenceType;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
+import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,13 +32,17 @@ import org.w3c.dom.NodeList;
 
 /**
  * Serves as proxy for call from XSL engine.
+ *
  * @author Marian Berger (marian.berger at dataquest.sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public abstract class NodeListXslFunction implements ExtensionFunction {
 
     protected abstract String getFnName();
 
     protected abstract NodeList getNodeList(String param);
+
+    private static final Logger log = getLogger(NodeListXslFunction.class);
 
     @Override
     final public QName getName() {
@@ -62,26 +66,13 @@ public abstract class NodeListXslFunction implements ExtensionFunction {
         if (Objects.isNull(xdmValues) || Arrays.isNullOrContainsNull(xdmValues)) {
             return new XdmAtomicValue("");
         }
+
         NodeList nodeList = getNodeList(xdmValues[0].itemAt(0).getStringValue());
+        Node oneNode = nodeList.item(0);
+
         DocumentBuilder db = new Processor(false).newDocumentBuilder();
-        if (Objects.isNull(nodeList)) {
-            try {
-                nodeList = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().getChildNodes();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-        Node parent = null;
-        try {
-            parent = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                parent.appendChild(nodeList.item(i));
-            }
-            return db.build(new DOMSource(parent));
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-            return null;
-        }
+        DOMSource sourceObj = new DOMSource(oneNode);
+        var res = db.wrap(sourceObj);
+        return res;
     }
 }
