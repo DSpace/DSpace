@@ -11,6 +11,9 @@ ALTER TABLE handle ADD url varchar;
 ALTER TABLE handle ADD dead BOOL;
 ALTER TABLE handle ADD dead_since TIMESTAMP WITH TIME ZONE;
 
+-- MetadataField table
+-- Because of metashareSchema
+ALTER TABLE metadatafieldregistry ALTER COLUMN element TYPE VARCHAR(128);
 
 -- LICENSES
 --

@@ -10,6 +10,7 @@
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Format ref="cmdi" />
+            <Format ref="oai_metasharev2" />
             <Format ref="olac" />
             <Format ref="xoai"/>
             <Format ref="didl"/>
@@ -121,6 +122,12 @@
             <Namespace>http://www.clarin.eu/cmd/</Namespace>
             <SchemaLocation>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</SchemaLocation>
 <!--            <Filter ref="ExcludeItemsInComOrCol"/>-->
+        </Format>
+        <Format id="oai_metasharev2">
+            <Prefix>oai_metasharev2</Prefix>
+            <XSLT>metadataFormats/metasharev2.xsl</XSLT>
+            <Namespace>http://www.ilsp.gr/META-XMLSchema</Namespace>
+            <SchemaLocation>http://metashare.ilsp.gr/META-XMLSchema/v2.0/META-SHARE-Resource.xsd</SchemaLocation>
         </Format>
         <Format id="mets">
             <Prefix>mets</Prefix>

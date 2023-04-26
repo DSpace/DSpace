@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -23,9 +22,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- *  Class is copied from the LINDAT/CLARIAH-CZ (This class is taken from UFAL-clarin. https://github.com/ufal/clarin-dspace/blob
+ *  Class is copied from the LINDAT/CLARIAH-CZ (This class is taken from UFAL-clarin.
+ *  https://github.com/ufal/clarin-dspace/blob
  *  * /si-master-origin/dspace-oai/src/main/java/cz/cuni/mff/ufal/utils/LicenseUtil.java) and modified by
+ *
  *  @author Marian Berger (marian.berger at dataquest.sk)
+ *  @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class LicenseUtil {
 
@@ -198,15 +200,18 @@ public class LicenseUtil {
         return "available-restrictedUse";
     }
 
-    public static org.w3c.dom.NodeList uriToRestrictions(String uri) throws ParserConfigurationException {
+    public static org.w3c.dom.NodeList uriToRestrictions(String uri)
+            throws ParserConfigurationException {
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
+        javax.xml.parsers.DocumentBuilder builder;
+        builder = factory.newDocumentBuilder();
 
         Document doc = builder.newDocument();
         Element root = doc.createElement("restrictions");
 
         String restrictions = _uri2restrictions.get(uri);
-        if (Objects.nonNull(restrictions)) {
+        if (Objects.isNull(restrictions)) {
             restrictions = "other";
         }
 
@@ -217,7 +222,6 @@ public class LicenseUtil {
         }
 
         return root.getElementsByTagName("restriction");
-
     }
 
     public static void main(String[] args) throws Exception {
