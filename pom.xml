@@ -84,48 +84,31 @@
              (NOTE: individual POMs can override specific settings). -->
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.15.0</version>
+                </plugin>
                 <!-- Use to enforce particular versions of Java and Maven,
                      and to ensure no conflicting dependencies -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
-                            <id>enforce-java</id>
                             <goals>
                                 <goal>enforce</goal>
                             </goals>
                             <configuration>
                                 <rules>
+                                    <requireMavenVersion>
+                                        <version>3.3.0</version>
+                                    </requireMavenVersion>
                                     <requireJavaVersion>
                                         <version>${java.version}</version>
                                     </requireJavaVersion>
-                                    <requireMavenVersion>
-                                        <version>[3.0.5,)</version>
-                                    </requireMavenVersion>
-                                </rules>
-                            </configuration>
-                        </execution>
-                        <!-- Make sure that we do not have conflicting dependencies-->
-                        <execution>
-                            <id>enforce-versions</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
                                     <DependencyConvergence />
-                                </rules>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>ban-dependencies</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
                                     <bannedDependencies>
                                         <excludes>
                                             <exclude>log4j:log4j</exclude>
