@@ -54,11 +54,6 @@ public class IPAuthentication implements AuthenticationMethod {
     private static final Logger log = LogManager.getLogger();
 
     /**
-     * Whether to look for x-forwarded headers for logging IP addresses
-     */
-    protected static Boolean useProxies;
-
-    /**
      * All the IP matchers
      */
     protected List<IPMatcher> ipMatchers;
@@ -250,8 +245,8 @@ public class IPAuthentication implements AuthenticationMethod {
             }
 
             log.debug(LogHelper.getHeader(context, "authenticated",
-                    "special_groups={} (by IP={}, useProxies={})"),
-                    gsb.toString(), addr, useProxies.toString());
+                    "special_groups={} (by IP={})"),
+                    gsb.toString(), addr);
         }
 
         return groups;
