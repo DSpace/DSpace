@@ -20,13 +20,13 @@ import org.springframework.stereotype.Component;
  * <br><code>
  * curl -X PATCH http://${dspace.server.url}/api/core/bundles/<:bundle-uuid>
  * -H "Content-Type: application/json"
- * -d '[{"op": "remove", "path": "/primarybitstream"}]'
+ * -d '[{"op": "remove", "path": "/primaryBitstreamUUID"}]'
  * </code>
  */
 @Component
-public class BundlePrimaryBitstreamRemoveOperation<R> extends PatchOperation<R> {
+public class BundlePrimaryBitstreamUUIDRemoveOperation<R> extends PatchOperation<R> {
 
-    private static final String OPERATION_PATH_PRIMARY_BITSTREAM = "/primarybitstream";
+    private static final String OPERATION_PATH_PRIMARY_BITSTREAM_UUID = "/primaryBitstreamUUID";
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -39,7 +39,7 @@ public class BundlePrimaryBitstreamRemoveOperation<R> extends PatchOperation<R> 
             bundle.unsetPrimaryBitstreamID();
             return resource;
         } else {
-            throw new DSpaceBadRequestException("BundlePrimaryBitstreamRemoveOperation " +
+            throw new DSpaceBadRequestException("BundlePrimaryBitstreamUUIDRemoveOperation " +
                                                     "does not support this operation");
         }
     }
@@ -48,6 +48,6 @@ public class BundlePrimaryBitstreamRemoveOperation<R> extends PatchOperation<R> 
     public boolean supports(Object objectToMatch, Operation operation) {
         return (objectToMatch instanceof Bundle
             && operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE)
-            && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_PRIMARY_BITSTREAM));
+            && operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH_PRIMARY_BITSTREAM_UUID));
     }
 }

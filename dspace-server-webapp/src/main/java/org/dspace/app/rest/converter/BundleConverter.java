@@ -26,7 +26,7 @@ public class BundleConverter
         BundleRest bundleRest = super.convert(obj, projection);
         Bitstream primaryBitstream = obj.getPrimaryBitstream();
         if (primaryBitstream != null) {
-            bundleRest.setPrimarybitstream(primaryBitstream.getID());
+            bundleRest.setPrimaryBitstreamUUID(primaryBitstream.getID());
         }
         return bundleRest;
     }

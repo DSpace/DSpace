@@ -40,7 +40,7 @@ public class BundleRest extends DSpaceObjectRest {
     public static final String BITSTREAMS = "bitstreams";
     public static final String PRIMARY_BITSTREAM = "primaryBitstream";
 
-    private UUID primaryBitstream;
+    private UUID primaryBitstreamUUID;
 
     @Override
     @JsonIgnore
@@ -57,11 +57,11 @@ public class BundleRest extends DSpaceObjectRest {
         return NAME;
     }
 
-    public UUID getPrimarybitstream() {
-        return primaryBitstream;
+    public UUID getPrimaryBitstreamUUID() {
+        return primaryBitstreamUUID;
     }
 
-    public void setPrimarybitstream(UUID primaryBitstream) {
-        this.primaryBitstream = primaryBitstream;
+    public void setPrimaryBitstreamUUID(UUID primaryBitstream) {
+        this.primaryBitstreamUUID = primaryBitstream;
     }
 }

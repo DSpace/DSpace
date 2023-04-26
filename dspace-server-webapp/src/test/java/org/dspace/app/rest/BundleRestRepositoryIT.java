@@ -724,7 +724,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", nullValue()));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", nullValue()));
 
         // with primary bitstream
         getClient().perform(get("/api/core/bundles/" + bundle2.getID()))
@@ -736,7 +736,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle2.getID(),
                                                                           bundle2.getHandle(),
                                                                           bundle2.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream1.getID().toString())));
     }
 
     @Test
@@ -759,7 +759,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new AddOperation("/primarybitstream", bitstream1.getID().toString()));
+        operations.add(new AddOperation("/primaryBitstreamUUID", bitstream1.getID().toString()));
 
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
@@ -770,7 +770,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", nullValue()));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", nullValue()));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -784,7 +784,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream1.getID().toString())));
 
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
@@ -795,7 +795,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream1.getID().toString())));
     }
 
     @Test
@@ -819,7 +819,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         JSONObject patchBodyWithoutValue = new JSONObject();
         patchBodyWithoutValue.put("op", "add");
-        patchBodyWithoutValue.put("path", "/primarybitstream");
+        patchBodyWithoutValue.put("path", "/primaryBitstreamUUID");
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -848,7 +848,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new AddOperation("/primarybitstream", "invalid uuid"));
+        operations.add(new AddOperation("/primaryBitstreamUUID", "invalid uuid"));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -877,7 +877,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new AddOperation("/primarybitstream", UUID.randomUUID()));
+        operations.add(new AddOperation("/primaryBitstreamUUID", UUID.randomUUID()));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -906,7 +906,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new AddOperation("/primarybitstream", bitstream1.getID().toString()));
+        operations.add(new AddOperation("/primaryBitstreamUUID", bitstream1.getID().toString()));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -942,7 +942,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new AddOperation("/primarybitstream", bitstream2.getID().toString()));
+        operations.add(new AddOperation("/primaryBitstreamUUID", bitstream2.getID().toString()));
 
         // can't perform add operation if primary bitstream is already set
         String token = getAuthToken(admin.getEmail(), password);
@@ -981,7 +981,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new ReplaceOperation("/primarybitstream", bitstream2.getID().toString()));
+        operations.add(new ReplaceOperation("/primaryBitstreamUUID", bitstream2.getID().toString()));
 
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
@@ -992,7 +992,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream1.getID().toString())));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -1006,7 +1006,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                                bundle1.getID(),
                                                                                bundle1.getHandle(),
                                                                                bundle1.getType())))
-                        .andExpect(jsonPath("$.primarybitstream", is(bitstream2.getID().toString())));
+                        .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream2.getID().toString())));
 
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
@@ -1017,7 +1017,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", is(bitstream2.getID().toString())));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream2.getID().toString())));
     }
 
     @Test
@@ -1041,7 +1041,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         JSONObject patchBodyWithoutValue = new JSONObject();
         patchBodyWithoutValue.put("op", "replace");
-        patchBodyWithoutValue.put("path", "/primarybitstream");
+        patchBodyWithoutValue.put("path", "/primaryBitstreamUUID");
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -1070,7 +1070,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new ReplaceOperation("/primarybitstream", "invalid uuid"));
+        operations.add(new ReplaceOperation("/primaryBitstreamUUID", "invalid uuid"));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -1100,7 +1100,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new ReplaceOperation("/primarybitstream", UUID.randomUUID()));
+        operations.add(new ReplaceOperation("/primaryBitstreamUUID", UUID.randomUUID()));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -1138,7 +1138,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new ReplaceOperation("/primarybitstream", bitstream2.getID().toString()));
+        operations.add(new ReplaceOperation("/primaryBitstreamUUID", bitstream2.getID().toString()));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -1167,7 +1167,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new ReplaceOperation("/primarybitstream", bitstream1.getID().toString()));
+        operations.add(new ReplaceOperation("/primaryBitstreamUUID", bitstream1.getID().toString()));
 
         // can't perform replace operation if primary bitstream is still null
         String token = getAuthToken(admin.getEmail(), password);
@@ -1198,7 +1198,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new RemoveOperation("/primarybitstream"));
+        operations.add(new RemoveOperation("/primaryBitstreamUUID"));
 
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
@@ -1209,7 +1209,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", is(bitstream1.getID().toString())));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", is(bitstream1.getID().toString())));
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(patch("/api/core/bundles/" + bundle1.getID())
@@ -1223,7 +1223,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                                bundle1.getID(),
                                                                                bundle1.getHandle(),
                                                                                bundle1.getType())))
-                        .andExpect(jsonPath("$.primarybitstream", nullValue()));
+                        .andExpect(jsonPath("$.primaryBitstreamUUID", nullValue()));
 
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                    .andExpect(status().isOk())
@@ -1234,7 +1234,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                           bundle1.getID(),
                                                                           bundle1.getHandle(),
                                                                           bundle1.getType())))
-                   .andExpect(jsonPath("$.primarybitstream", nullValue()));
+                   .andExpect(jsonPath("$.primaryBitstreamUUID", nullValue()));
     }
 
     @Test
@@ -1257,7 +1257,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         List<Operation> operations = new ArrayList<>();
-        operations.add(new RemoveOperation("/primarybitstream"));
+        operations.add(new RemoveOperation("/primaryBitstreamUUID"));
 
         // can't perform remove operation if primary bitstream is still null
         String token = getAuthToken(admin.getEmail(), password);
