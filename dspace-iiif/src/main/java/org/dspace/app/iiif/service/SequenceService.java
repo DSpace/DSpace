@@ -63,13 +63,14 @@ public class SequenceService extends AbstractResourceService {
      * @param item the DSpace Item
      * @param bnd a DSpace bundle
      * @param bitstream a DSpace bitstream
+     * @param index the index
      */
-    public CanvasGenerator addCanvas(Context context, Item item, Bundle bnd, Bitstream bitstream) {
+    public CanvasGenerator addCanvas(Context context, Item item, Bundle bnd, Bitstream bitstream, Integer index) {
         String mimeType = utils.getBitstreamMimeType(bitstream, context);
         String canvasId = utils.getCanvasId(bitstream);
         String manifestId = item.getID().toString();
         CanvasGenerator canvasGenerator =
-                canvasService.getCanvas(context, manifestId, bitstream, bnd, item, canvasId, mimeType);
+                canvasService.getCanvas(context, manifestId, bitstream, bnd, item, canvasId, mimeType, index);
         sequenceGenerator.addCanvas(canvasGenerator);
         return canvasGenerator;
     }

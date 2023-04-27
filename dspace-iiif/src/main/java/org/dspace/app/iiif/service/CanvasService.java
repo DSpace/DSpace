@@ -167,6 +167,11 @@ public class CanvasService extends AbstractResourceService {
         return DEFAULT_CANVAS_HEIGHT;
     }
 
+    protected CanvasGenerator getCanvas(Context context, String manifestId, Bitstream bitstream, Bundle bundle,
+            Item item, String canvasId, String mimeType) {
+        return getCanvas(context, manifestId, bitstream, bundle, item, canvasId, mimeType, null);
+    }
+
     /**
      * Creates a single {@code CanvasGenerator}.
      *
@@ -177,12 +182,22 @@ public class CanvasService extends AbstractResourceService {
      * @param item  DSpace item
      * @param canvasID  the canvas identifier
      * @param mimeType  bitstream mimetype
+     * @param index  the index (1-based)
      * @return a canvas generator
      */
     protected CanvasGenerator getCanvas(Context context, String manifestId, Bitstream bitstream, Bundle bundle,
-            Item item, String canvasId, String mimeType) {
+            Item item, String canvasId, String mimeType, Integer index) {
         String canvasNaming = utils.getCanvasNaming(item, I18nUtil.getMessage("iiif.canvas.default-naming"));
-        String label = utils.getIIIFLabel(bitstream, canvasNaming + " " + canvasId);
+        String defaultLabel = "";
+        if (StringUtils.isNotBlank(canvasNaming)) {
+            defaultLabel = canvasNaming + " ";
+        }
+        if (index != null) {
+            defaultLabel += index;
+        } else {
+            defaultLabel += canvasId;
+        }
+        String label = utils.getIIIFLabel(bitstream, defaultLabel);
 
         setCanvasDimensions(bitstream);
 
