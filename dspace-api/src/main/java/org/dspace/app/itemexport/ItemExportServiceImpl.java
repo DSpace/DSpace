@@ -572,7 +572,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 for (Collection collection : collections) {
                     ArrayList<UUID> items = new ArrayList<>();
                     // get all the items in each collection
-                    Iterator<Item> iitems = itemService.findByCollection(context, collection);
+                    Iterator<Item> iitems = itemService.findByCollectionReadOnly(context, collection);
                     try {
                         while (iitems.hasNext()) {
                             Item item = iitems.next();
@@ -599,7 +599,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 ArrayList<UUID> items = new ArrayList<>();
 
                 // get all the items in the collection
-                Iterator<Item> iitems = itemService.findByCollection(context, collection);
+                Iterator<Item> iitems = itemService.findByCollectionReadOnly(context, collection);
                 try {
                     while (iitems.hasNext()) {
                         Item item = iitems.next();

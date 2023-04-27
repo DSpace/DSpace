@@ -116,9 +116,18 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
         } else {
             //otherwise, just find every item and process
-            Iterator<Item> itemIterator = itemService.findAll(context);
-            while (itemIterator.hasNext() && processed < max2Process) {
-                applyFiltersItem(context, itemIterator.next());
+            int limit = 100;
+            int offset = 0;
+
+            Iterator<Item> items = itemService.findAll(context, limit, offset);
+
+            while (items.hasNext() && processed < max2Process) {
+                while (items.hasNext() && processed < max2Process) {
+                    applyFiltersItem(context, items.next());
+                }
+                offset += limit;
+                context.commit();
+                items = itemService.findAll(context, limit, offset);
             }
         }
     }
@@ -144,9 +153,19 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         throws Exception {
         //only apply filters if collection not in skip-list
         if (!inSkipList(collection.getHandle())) {
-            Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
-            while (itemIterator.hasNext() && processed < max2Process) {
-                applyFiltersItem(context, itemIterator.next());
+            int limit = 100;
+            int offset = 0;
+
+            Iterator<Item> items = itemService.findAllByCollection(context, collection, limit, offset);
+
+            while (items.hasNext() && processed < max2Process) {
+                while (items.hasNext() && processed < max2Process) {
+                    applyFiltersItem(context, items.next());
+                }
+                offset += limit;
+                context.commit();
+                collection = context.reloadEntity(collection);
+                items = itemService.findAllByCollection(context, collection, limit, offset);
             }
         }
     }

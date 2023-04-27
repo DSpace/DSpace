@@ -55,14 +55,14 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAll(Context context, boolean archived) throws SQLException {
-        Query query = createQuery(context, "FROM Item WHERE inArchive=:in_archive ORDER BY id");
+        Query query = createQuery(context, "FROM Item WHERE inArchive=:in_archive ORDER BY sorting_number");
         query.setParameter("in_archive", archived);
         return iterate(query);
     }
 
     @Override
     public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException {
-        Query query = createQuery(context, "FROM Item WHERE inArchive=:in_archive ORDER BY id");
+        Query query = createQuery(context, "FROM Item WHERE inArchive=:in_archive ORDER BY sorting_number");
         query.setParameter("in_archive", archived);
         query.setFirstResult(offset);
         query.setMaxResults(limit);
@@ -73,7 +73,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException {
         Query query = createQuery(context,
-                "FROM Item WHERE inArchive=:in_archive or withdrawn=:withdrawn ORDER BY id");
+                "FROM Item WHERE inArchive=:in_archive or withdrawn=:withdrawn ORDER BY sorting_number");
         query.setParameter("in_archive", archived);
         query.setParameter("withdrawn", withdrawn);
         return iterate(query);
@@ -88,7 +88,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             "SELECT i FROM Item as i " +
             "LEFT JOIN Version as v ON i = v.item " +
             "WHERE i.inArchive=true or i.withdrawn=true or (i.inArchive=false and v.id IS NOT NULL) " +
-            "ORDER BY i.id"
+            "ORDER BY sorting_number"
         );
         return iterate(query);
     }
@@ -105,7 +105,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         if (lastModified != null) {
             queryStr.append(" AND last_modified > :last_modified");
         }
-        queryStr.append(" ORDER BY i.id");
+        queryStr.append(" ORDER BY sorting_number");
 
         Query query = createQuery(context, queryStr.toString());
         query.setParameter("in_archive", archived);
@@ -120,7 +120,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
         Query query = createQuery(context,
-                "FROM Item WHERE inArchive=:in_archive and submitter=:submitter ORDER BY id");
+                "FROM Item WHERE inArchive=:in_archive and submitter=:submitter ORDER BY sorting_number");
         query.setParameter("in_archive", true);
         query.setParameter("submitter", eperson);
         return iterate(query);
@@ -132,7 +132,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         if (!retrieveAllItems) {
             return findBySubmitter(context, eperson);
         }
-        Query query = createQuery(context, "FROM Item WHERE submitter=:submitter ORDER BY id");
+        Query query = createQuery(context, "FROM Item WHERE submitter=:submitter ORDER BY sorting_number");
         query.setParameter("submitter", eperson);
         return iterate(query);
     }
@@ -164,7 +164,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         if (value != null) {
             hqlQueryString += " AND STR(metadatavalue.value) = :text_value";
         }
-        Query query = createQuery(context, hqlQueryString + " ORDER BY item.id");
+        Query query = createQuery(context, hqlQueryString + " ORDER BY sorting_number");
 
         query.setParameter("in_archive", inArchive);
         query.setParameter("metadata_field", metadataField);
@@ -280,7 +280,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 criteria.add(Subqueries.notExists(subcriteria));
             }
         }
-        criteria.addOrder(Order.asc("item.id"));
+        criteria.addOrder(Order.asc("item.sorting_number"));
 
         log.debug(String.format("Running custom query with %d filters", index));
 
@@ -294,7 +294,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         Query query = createQuery(context,
                   "SELECT item FROM Item as item join item.metadata metadatavalue " +
                   "WHERE item.inArchive=:in_archive AND metadatavalue.metadataField = :metadata_field AND " +
-                      "metadatavalue.authority = :authority ORDER BY item.id");
+                      "metadatavalue.authority = :authority ORDER BY sorting_number");
         query.setParameter("in_archive", inArchive);
         query.setParameter("metadata_field", metadataField);
         query.setParameter("authority", authority);
@@ -306,7 +306,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                                                    Integer offset) throws SQLException {
         Query query = createQuery(context,
               "select i from Item i join i.collections c " +
-              "WHERE :collection IN c AND i.inArchive=:in_archive ORDER BY i.id");
+              "WHERE :collection IN c AND i.inArchive=:in_archive ORDER BY sorting_number");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", true);
         if (offset != null) {
@@ -329,8 +329,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 criteriaBuilder.notEqual(itemRoot.get(Item_.owningCollection), collection),
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
                 criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
-        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(Item_.id)));
-        criteriaQuery.groupBy(itemRoot.get(Item_.id));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(Item_.sortingNumber)));
+        criteriaQuery.groupBy(itemRoot.get(Item_.sortingNumber));
         return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
     }
 
@@ -350,7 +350,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
         Query query = createQuery(context,
-                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY i.id");
+                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY sorting_number");
         query.setParameter("collection", collection);
 
         return iterate(query);
@@ -360,7 +360,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
         Query query = createQuery(context,
-                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY i.id");
+                "select i from Item i join i.collections c WHERE :collection IN c ORDER BY sorting_number");
         query.setParameter("collection", collection);
 
         if (offset != null) {
@@ -406,7 +406,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
         throws SQLException {
         Query query = createQuery(context,
-                "SELECT i FROM Item i WHERE last_modified > :last_modified ORDER BY id");
+                "SELECT i FROM Item i WHERE last_modified > :last_modified ORDER BY sorting_number");
         query.setParameter("last_modified", since, TemporalType.TIMESTAMP);
         return iterate(query);
     }

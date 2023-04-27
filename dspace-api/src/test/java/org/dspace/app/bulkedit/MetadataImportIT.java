@@ -211,7 +211,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                 itemService.getMetadata(importedItem, "person", "birthDate", null, Item.ANY)
                            .get(0).getValue(), "2000"));
         context.turnOffAuthorisationSystem();
-        itemService.delete(context, importedItem);
+        itemService.delete(context, itemService.find(context, importedItem.getID()));
         context.restoreAuthSystemState();
     }
 
@@ -237,7 +237,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private Item findItemByName(String name) throws SQLException {
         Item importedItem = null;
-        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
+        List<Item> allItems = IteratorUtils.toList(itemService.findAllReadOnly(context));
         for (Item item : allItems) {
             if (item.getName().equals(name)) {
                 importedItem = item;

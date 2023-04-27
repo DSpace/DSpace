@@ -352,7 +352,7 @@ public class SimpleDSORelationsConverterPlugin
         }
 
         // add all items
-        Iterator<Item> items = itemService.findAllByCollection(context, collection);
+        Iterator<Item> items = itemService.findAllByCollectionReadOnly(context, collection);
         while (items.hasNext()) {
             String id = RDFUtil.generateIdentifier(context, items.next());
             if (id != null) {

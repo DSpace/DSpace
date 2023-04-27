@@ -166,7 +166,7 @@ public class StatisticsImporter {
                 System.out.println("Found " + localCollections.size());
 
                 System.out.print("Loading local items... ");
-                Iterator<Item> items = itemService.findAll(c);
+                Iterator<Item> items = itemService.findAllReadOnly(c);
                 localItems = new ArrayList<>();
                 Item i;
                 while (items.hasNext()) {

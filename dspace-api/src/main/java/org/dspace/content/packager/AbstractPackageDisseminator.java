@@ -121,7 +121,7 @@ public abstract class AbstractPackageDisseminator
                     case Constants.COLLECTION:
                         //Also find all Items in this Collection and disseminate
                         Collection collection = (Collection) dso;
-                        Iterator<Item> iterator = itemService.findByCollection(context, collection);
+                        Iterator<Item> iterator = itemService.findByCollectionReadOnly(context, collection);
                         while (iterator.hasNext()) {
                             Item item = iterator.next();
 

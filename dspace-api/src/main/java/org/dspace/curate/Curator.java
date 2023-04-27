@@ -512,14 +512,23 @@ public class Curator {
                 return false;
             }
             Context context = curationContext();
-            Iterator<Item> iter = itemService.findByCollection(context, coll);
+            int limit = 100;
+            int offset = 0;
+
+            Iterator<Item> iter = itemService.findByCollection(context, coll, limit, offset);
             while (iter.hasNext()) {
-                Item item = iter.next();
-                boolean shouldContinue = tr.run(item);
-                context.uncacheEntity(item);
-                if (!shouldContinue) {
-                    return false;
+                while (iter.hasNext()) {
+                    Item item = iter.next();
+                    boolean shouldContinue = tr.run(item);
+                    context.uncacheEntity(item);
+                    if (!shouldContinue) {
+                        return false;
+                    }
                 }
+                offset += limit;
+                context.commit();
+                coll = context.reloadEntity(coll);
+                iter = itemService.findByCollection(context, coll, limit, offset);
             }
         } catch (SQLException sqlE) {
             throw new IOException(sqlE.getMessage(), sqlE);

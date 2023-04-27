@@ -211,7 +211,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
             items = myItems.iterator();
         } else {
             handler.logInfo("Exporting from collection: " + idString);
-            items = itemService.findByCollection(context, collection);
+            items = itemService.findByCollectionReadOnly(context, collection);
         }
         itemExportService.exportAsZip(context, items, destDirName, zipFileName,
                 seqStart, migrate, excludeBitstreams);

@@ -73,6 +73,8 @@ public class GoogleMetadataTest extends AbstractUnitTest {
 
     private Community community;
 
+    private Collection collection;
+
     /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
@@ -87,7 +89,7 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         try {
             context.turnOffAuthorisationSystem();
             community = ContentServiceFactory.getInstance().getCommunityService().create(null, context);
-            Collection collection = ContentServiceFactory.getInstance().getCollectionService()
+            collection = ContentServiceFactory.getInstance().getCollectionService()
                                                          .create(context, community);
             WorkspaceItem wi = ContentServiceFactory.getInstance().getWorkspaceItemService()
                                                     .create(context, collection, true);
@@ -394,6 +396,10 @@ public class GoogleMetadataTest extends AbstractUnitTest {
 
             //Context might have been committed in the test method, so best to reload to entity so we're sure that it
             // is attached.
+            it = context.reloadEntity(it);
+            ContentServiceFactory.getInstance().getItemService().delete(context, it);
+            collection = context.reloadEntity(collection);
+            ContentServiceFactory.getInstance().getCollectionService().delete(context, collection);
             community = context.reloadEntity(community);
             ContentServiceFactory.getInstance().getCommunityService().delete(context, community);
             community = null;

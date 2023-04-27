@@ -560,6 +560,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             Collection collection = collections.next();
             community.removeCollection(collection);
             removeCollection(context, community, collection);
+            community = context.reloadEntity(community);
         }
         // delete subcommunities
         Iterator<Community> subCommunities = community.getSubcommunities().iterator();
@@ -568,6 +569,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             Community subComm = subCommunities.next();
             community.removeSubCommunity(subComm);
             delete(context, subComm);
+            community = context.reloadEntity(community);
         }
 
         // Remove the logo

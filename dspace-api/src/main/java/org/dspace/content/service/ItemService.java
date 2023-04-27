@@ -91,7 +91,7 @@ public interface ItemService
      * @return an iterator over the items in the archive.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findAll(Context context) throws SQLException;
+    public Iterator<Item> findAllReadOnly(Context context) throws SQLException;
 
     /**
      * Get all the items in the archive. Only items with the "in archive" flag
@@ -114,7 +114,7 @@ public interface ItemService
      * @throws SQLException if database error
      */
     @Deprecated
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException;
+    public Iterator<Item> findAllUnfilteredReadOnly(Context context) throws SQLException;
 
     /**
      * Find all items that are:
@@ -127,7 +127,7 @@ public interface ItemService
      * @return iterator over all regular items.
      * @throws SQLException if database error.
      */
-    public Iterator<Item> findAllRegularItems(Context context) throws SQLException;
+    public Iterator<Item> findAllRegularItemsReadOnly(Context context) throws SQLException;
 
     /**
      * Find all the items in the archive by a given submitter. The order is
@@ -176,7 +176,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException;
+    public Iterator<Item> findByCollectionReadOnly(Context context, Collection collection) throws SQLException;
 
     /**
      * Get all the archived items in this collection. The order is indeterminate.
@@ -256,7 +256,7 @@ public interface ItemService
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
+    public Iterator<Item> findAllByCollectionReadOnly(Context context, Collection collection) throws SQLException;
 
     /**
      * See whether this Item is contained by a given Collection.
@@ -497,7 +497,7 @@ public interface ItemService
      * already applied to the bundle/bitstream. Collection's policies are inherited
      * if there are no other policies defined or if the append mode is defined by
      * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
-     * 
+     *
      * @param context             DSpace context object
      * @param item                Item to adjust policies on
      * @param collection          Collection
@@ -515,7 +515,7 @@ public interface ItemService
      * inherited as appropriate. Collection's policies are inherited if there are no
      * other policies defined or if the append mode is defined by the configuration
      * via the core.authorization.installitem.inheritance-read.append-mode property
-     * 
+     *
      * @param context              DSpace context object
      * @param item                 Item to adjust policies on
      * @param collection           Collection
