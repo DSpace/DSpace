@@ -143,12 +143,9 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     /**
      * Generates a Search API response from the word_highlighting solr query response.
      *
-     * The function assumes that the solr query responses contains page IDs
+     * The function assumes that the solr query responses contains canvas identifiers
      * (taken from the ALTO Page ID element) in the following format:
-     * Page.0, Page.1, Page.2....
-     *
-     * The identifier values must be aligned with zero-based IIIF canvas identifiers:
-     * c0, c1, c2....
+     * Page.{canvasId0}, Page.{canvasId1}, Page.{canvasId2}....
      *
      * This convention must be followed when indexing ALTO files into the word_highlighting
      * solr index. If it is not followed, word highlights will not align canvases.
@@ -187,15 +184,15 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                     for (final JsonNode snippet : ocrNode.get("snippets")) {
                         if (snippet != null) {
                             // Get a canvas ID based on snippet's pages
-                            String pageId = getCanvasId(snippet.get("pages"));
-                            if (pageId != null) {
+                            String canvasId = getCanvasId(snippet.get("pages"));
+                            if (canvasId != null) {
                                 // Loop through array of highlights for each snippet.
                                 for (final JsonNode highlights : snippet.get("highlights")) {
                                     if (highlights != null) {
                                         // May be multiple word highlights on a page, so loop through them.
                                         for (int i = 0; i < highlights.size(); i++) {
                                             // Add annotation associated with each highlight
-                                            AnnotationGenerator anno = getAnnotation(highlights.get(i), pageId, uuid);
+                                            AnnotationGenerator anno = getAnnotation(highlights.get(i), canvasId, uuid);
                                             if (anno != null) {
                                                 searchResult.addResource(anno);
                                             }
@@ -215,10 +212,10 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
     /**
      * Returns the annotation generator for the highlight.
      * @param highlight highlight node from Solr response
-     * @param pageId page id from solr response
+     * @param canvasId canvas id from solr response
      * @return generator for a single annotation
      */
-    private AnnotationGenerator getAnnotation(JsonNode highlight, String pageId, UUID uuid) {
+    private AnnotationGenerator getAnnotation(JsonNode highlight, String canvasId, UUID uuid) {
         String text = highlight.get("text") != null ? highlight.get("text").asText() : null;
         int ulx = highlight.get("ulx") != null ? highlight.get("ulx").asInt() : -1;
         int uly = highlight.get("uly") != null ? highlight.get("uly").asInt() : -1;
@@ -229,7 +226,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
 
         if (text != null && w != null && h != null) {
             String params = ulx + "," + uly + "," + w + "," + h;
-            return createSearchResultAnnotation(params, text, pageId, uuid);
+            return createSearchResultAnnotation(params, text, canvasId, uuid);
         }
         return null;
     }
@@ -251,7 +248,7 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
                 if (pageId != null) {
                     String[] identArr = pageId.asText().split("\\.");
                     // the canvas id.
-                    return "c" + identArr[1];
+                    return identArr[1];
                 }
             }
         }
@@ -263,13 +260,13 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
      *
      * @param params word coordinate parameters used for highlighting.
      * @param text word text
-     * @param pageId the page id returned by solr
+     * @param canvasId the canvas id returned by solr
      * @param uuid the dspace item identifier
      * @return a single annotation object that contains word highlights on a single page (canvas)
      */
-    private AnnotationGenerator createSearchResultAnnotation(String params, String text, String pageId, UUID uuid) {
-        String annotationIdentifier = this.endpoint + uuid + "/annot/" + pageId + "-" + params;
-        String canvasIdentifier = this.endpoint + uuid + "/canvas/" + pageId + "#xywh=" + params;
+    private AnnotationGenerator createSearchResultAnnotation(String params, String text, String canvasId, UUID uuid) {
+        String annotationIdentifier = this.endpoint + uuid + "/annot/" + canvasId + "#" + params;
+        String canvasIdentifier = this.endpoint + uuid + "/canvas/" + canvasId + "#xywh=" + params;
         contentAsText.setText(text);
         CanvasGenerator canvas = new CanvasGenerator(canvasIdentifier);
 
