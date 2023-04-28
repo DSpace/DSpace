@@ -79,6 +79,8 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     /**
      * A description of the synchronized resource.
      */
+    @Lob
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "description")
     private String description;
 

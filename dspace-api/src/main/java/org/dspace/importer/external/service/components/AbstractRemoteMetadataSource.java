@@ -183,6 +183,7 @@ public abstract class AbstractRemoteMetadataSource {
                 log.warn("Error in trying operation " + operationId + " " + retry + " " + warning + ", retrying !", e);
 
             } finally {
+                this.lastRequest = System.currentTimeMillis();
                 lock.unlock();
             }
 
@@ -262,5 +263,7 @@ public abstract class AbstractRemoteMetadataSource {
      */
     public abstract void init() throws Exception;
 
-
+    public void setInterRequestTime(final long interRequestTime) {
+        this.interRequestTime = interRequestTime;
+    }
 }

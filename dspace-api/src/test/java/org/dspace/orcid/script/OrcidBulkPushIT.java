@@ -216,6 +216,62 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testWithVeryLongTitleQueueRecords() throws Exception {
+        Item firstProfileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
+        Item firstEntity = createPublication("Publication with a very very very very very very very very very " +
+                "very very very very very very very very very very very very very very very very very very very very " +
+                "very very very very very very very very very very very very very very very very very even " +
+                "extremely long title");
+
+        when(orcidClientMock.push(any(), eq("0000-1111-2222-3333"), any()))
+                .thenReturn(createdResponse("12345"));
+
+        when(orcidClientMock.update(any(), eq("0000-1111-2222-3333"), any(), eq("98765")))
+                .thenReturn(updatedResponse("98765"));
+
+        when(orcidClientMock.deleteByPutCode(
+                any(),
+                eq("0000-1111-2222-3333"),
+                eq("22222"),
+                eq("/work"))
+        ).thenReturn(deletedResponse());
+
+        createOrcidQueue(context, firstProfileItem, firstEntity);
+        createOrcidQueue(context, firstProfileItem, "Description", "Publication", "22222");
+
+        context.commit();
+
+        TestDSpaceRunnableHandler handler = runBulkSynchronization(false);
+
+        String firstProfileItemId = firstProfileItem.getID().toString();
+
+        assertThat(handler.getInfoMessages(), hasSize(5));
+        assertThat(handler.getInfoMessages(), containsInAnyOrder(
+                "Found 2 queue records to synchronize with ORCID",
+                "Addition of Publication for profile with ID: " + firstProfileItemId,
+                "History record created with status 201. The operation was completed successfully",
+                "Deletion of Publication for profile with ID: " + firstProfileItemId + " by put code 22222",
+                "History record created with status 204. The operation was completed successfully"));
+
+        assertThat(handler.getErrorMessages(), empty());
+        assertThat(handler.getWarningMessages(), empty());
+
+        verify(orcidClientMock).push(any(), eq("0000-1111-2222-3333"), any());
+        verify(orcidClientMock).deleteByPutCode(
+                any(),
+                eq("0000-1111-2222-3333"),
+                eq("22222"),
+                eq("/work"));
+
+        verifyNoMoreInteractions(orcidClientMock);
+
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        assertThat(historyRecords, hasSize(2));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
+        assertThat(historyRecords, hasItem(matches(history(firstProfileItem, 204, DELETE))));
+    }
+
+    @Test
     public void testWithOneValidationError() throws Exception {
 
         Item firstProfileItem = createProfileItemItem("0000-1111-2222-3333", eperson, BATCH);
