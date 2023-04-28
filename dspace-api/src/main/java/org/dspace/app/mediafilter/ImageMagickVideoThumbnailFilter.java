@@ -25,8 +25,8 @@ import org.im4java.core.IMOperation;
  * no bigger than. Creates only JPEGs.
  */
 public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter {
-    private static final int DEFAULT_WIDTH = 340;
-    private static final int DEFAULT_HEIGHT = 280;
+    private static final int DEFAULT_WIDTH = 180;
+    private static final int DEFAULT_HEIGHT = 120;
     private static final int FRAME_NUMBER = 100;
 
     /**
