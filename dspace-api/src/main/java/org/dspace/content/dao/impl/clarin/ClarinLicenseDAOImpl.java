@@ -8,9 +8,14 @@
 package org.dspace.content.dao.impl.clarin;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.clarin.ClarinLicense;
+import org.dspace.content.clarin.ClarinLicense_;
 import org.dspace.content.dao.clarin.ClarinLicenseDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -37,5 +42,16 @@ public class ClarinLicenseDAOImpl extends AbstractHibernateDAO<ClarinLicense> im
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return singleResult(query);
+    }
+
+    @Override
+    public List<ClarinLicense> findByNameLike(Context context, String name) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClarinLicense.class);
+        Root<ClarinLicense> clarinLicenseRoot = criteriaQuery.from(ClarinLicense.class);
+        criteriaQuery.select(clarinLicenseRoot);
+        criteriaQuery.where(criteriaBuilder.like(clarinLicenseRoot.get(ClarinLicense_.name), "%" + name + "%"));
+        criteriaQuery.orderBy(criteriaBuilder.asc(clarinLicenseRoot.get(ClarinLicense_.name)));
+        return list(context, criteriaQuery, false, ClarinLicense.class, -1, -1);
     }
 }

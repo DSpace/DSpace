@@ -45,6 +45,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * This is the repository responsible to manage Clarin License Rest object
@@ -98,6 +99,22 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
             throw new RuntimeException(e.getMessage(), e);
         }
         clarinLicenseList.add(clarinLicense);
+        return converter.toRestPage(clarinLicenseList, pageable, utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "byNameLike")
+    public Page<ClarinLicenseRest> findByNameLike(@Parameter(value = "name", required = true) String name,
+                                              Pageable pageable) {
+        List<ClarinLicense> clarinLicenseList;
+        try {
+            Context context = obtainContext();
+            clarinLicenseList = clarinLicenseService.findByNameLike(context, name);
+            if (CollectionUtils.isEmpty(clarinLicenseList)) {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         return converter.toRestPage(clarinLicenseList, pageable, utils.obtainProjection());
     }
 
