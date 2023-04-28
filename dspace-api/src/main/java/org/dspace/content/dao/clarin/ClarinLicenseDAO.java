@@ -8,6 +8,7 @@
 package org.dspace.content.dao.clarin;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.core.Context;
@@ -24,5 +25,7 @@ import org.dspace.core.GenericDAO;
 public interface ClarinLicenseDAO extends GenericDAO<ClarinLicense> {
 
     ClarinLicense findByName(Context context, String name) throws SQLException;
+
+    List<ClarinLicense> findByNameLike(Context context, String name) throws SQLException;
 
 }

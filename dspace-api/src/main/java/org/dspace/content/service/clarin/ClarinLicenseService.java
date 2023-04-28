@@ -57,7 +57,25 @@ public interface ClarinLicenseService {
      */
     ClarinLicense find(Context context, int valueId) throws SQLException;
 
+    /**
+     * Find the Clarin License by the full clarin license name.
+     *
+     * @param context DSpace context object
+     * @param name the full clarin license name
+     * @return Clarin License with searching name.
+     * @throws SQLException
+     */
     ClarinLicense findByName(Context context, String name) throws SQLException;
+
+    /**
+     * Find the Clarin License by the substring of the clarin license name.
+     *
+     * @param context DSpace context object
+     * @param name substring of the clarin license name
+     * @return List of clarin licenses which contains searching string in it's name
+     * @throws SQLException
+     */
+    List<ClarinLicense> findByNameLike(Context context, String name) throws SQLException;
 
     void addLicenseMetadataToItem(Context context, ClarinLicense clarinLicense, Item item) throws SQLException;
 

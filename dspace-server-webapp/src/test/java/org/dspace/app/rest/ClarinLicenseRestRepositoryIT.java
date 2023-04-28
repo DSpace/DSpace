@@ -208,6 +208,51 @@ public class ClarinLicenseRestRepositoryIT extends AbstractControllerIntegration
                         Matchers.containsString("/api/core/clarinlicenses")));
     }
 
+    /**
+     * Should find one license by the name.
+     */
+    @Test
+    public void searchBy() throws Exception {
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/core/clarinlicenses/search/byName")
+                        .param("name", "CL Name1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.clarinlicenses", Matchers.hasItem(
+                        ClarinLicenseMatcher.matchClarinLicense(firstCLicense))
+                ));
+    }
+
+    /**
+     * Should find all licenses by the common substring of it's the name.
+     */
+    @Test
+    public void searchByLike() throws Exception {
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/core/clarinlicenses/search/byNameLike")
+                        .param("name", "Name"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.clarinlicenses", Matchers.hasItem(
+                        ClarinLicenseMatcher.matchClarinLicense(firstCLicense))
+                ))
+                .andExpect(jsonPath("$._embedded.clarinlicenses", Matchers.hasItem(
+                        ClarinLicenseMatcher.matchClarinLicense(secondCLicense))
+                ))
+                .andExpect(jsonPath("$._embedded.clarinlicenses[0].clarinLicenseLabel", Matchers.is(
+                        ClarinLicenseLabelMatcher.matchClarinLicenseLabel(
+                                Objects.requireNonNull(getNonExtendedLicenseLabel(firstCLicense.getLicenseLabels()))))
+                ))
+                .andExpect(jsonPath("$._embedded.clarinlicenses[0].extendedClarinLicenseLabels",
+                        Matchers.hasItem(
+                                ClarinLicenseLabelMatcher.matchClarinLicenseLabel(
+                                        Objects.requireNonNull(getExtendedLicenseLabels(
+                                                firstCLicense.getLicenseLabels())))
+                        )))
+                .andExpect(jsonPath("$._links.self.href",
+                        Matchers.containsString("/api/core/clarinlicenses")));
+    }
+
     @Test
     public void create() throws Exception {
         ClarinLicenseRest clarinLicenseRest = new ClarinLicenseRest();
