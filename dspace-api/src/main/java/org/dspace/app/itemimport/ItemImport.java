@@ -79,7 +79,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected String zipfilename = null;
     protected boolean help = false;
     protected File workDir = null;
-    private File workFile = null;
+    protected File workFile = null;
 
     protected static final CollectionService collectionService =
             ContentServiceFactory.getInstance().getCollectionService();
@@ -239,6 +239,9 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             if (zip) {
                 FileUtils.deleteDirectory(new File(sourcedir));
                 FileUtils.deleteDirectory(workDir);
+                if (remoteUrl && workFile != null && workFile.exists()) {
+                    workFile.delete();
+                }
             }
 
             Date endTime = new Date();
@@ -308,7 +311,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             handler.writeFilestream(context, MAPFILE_FILENAME, mapfileInputStream, MAPFILE_BITSTREAM_TYPE);
         } finally {
             mapFile.delete();
-            workFile.delete();
         }
     }
 
