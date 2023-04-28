@@ -54,6 +54,7 @@ public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter 
         }
     }
 
+    @Override
     public File getThumbnailFile(File f, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
