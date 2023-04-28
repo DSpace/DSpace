@@ -27,6 +27,7 @@ import org.im4java.core.IMOperation;
 public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter {
     private static final int DEFAULT_WIDTH = 340;
     private static final int DEFAULT_HEIGHT = 280;
+    private static final int FRAME_NUMBER = 100;
 
     /**
      * @param currentItem item
@@ -62,7 +63,7 @@ public class ImageMagickVideoThumbnailFilter extends ImageMagickThumbnailFilter 
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
         op.autoOrient();
-        op.addImage("VIDEO:" + f.getAbsolutePath() + "[100]");
+        op.addImage("VIDEO:" + f.getAbsolutePath() + "[" + FRAME_NUMBER + "]");
         op.thumbnail(configurationService.getIntProperty("thumbnail.maxwidth", DEFAULT_WIDTH),
                         configurationService.getIntProperty("thumbnail.maxheight", DEFAULT_HEIGHT));
         op.addImage(f2.getAbsolutePath());
