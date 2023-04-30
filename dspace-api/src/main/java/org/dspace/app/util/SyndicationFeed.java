@@ -51,6 +51,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
@@ -233,7 +234,7 @@ public class SyndicationFeed {
                           localize(labels, MSG_FEED_TITLE) : defaultTitle);
 
         if (defaultDescriptionField == null || defaultDescriptionField == "") {
-            defaultDescriptionField = "No Description";
+            defaultDescriptionField = I18nUtil.getMessage("org.dspace.app.util.SyndicationFeed.no-description");
         }
 
         feed.setDescription(defaultDescriptionField);
