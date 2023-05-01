@@ -11,8 +11,8 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,8 +23,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -50,6 +53,7 @@ import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -63,6 +67,13 @@ import org.springframework.http.MediaType;
  */
 public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
+    private static final String SECTIONS_TRADITIONALPAGEONE_DC_CONTRIBUTOR_AUTHOR =
+        "/sections/traditionalpageone/dc.contributor.author/%1$s";
+
+    private static final String getPath(Object element) {
+        return String.format(SECTIONS_TRADITIONALPAGEONE_DC_CONTRIBUTOR_AUTHOR, element);
+    }
+
     @Autowired
     private RelationshipTypeService relationshipTypeService;
 
@@ -74,6 +85,9 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private Collection collection;
     private Collection collection2;
@@ -296,8 +310,6 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                                                        .withTitle("Publication 1")
                                                        .withEntityType("Publication")
                                                        .build();
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
 
         // Make sure we grab the latest instance of the Item from the database before adding a regular author
         WorkspaceItem publication = workspaceItemService.find(context, publicationWorkspaceItem.getID());
@@ -920,6 +932,41 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         replaceTraditionalPageOneAuthorTest(3, expectedOrder);
     }
 
+    @Test
+    public void replaceMultipleTraditionalPageOnePlainTextAuthorTest() throws Exception {
+        final boolean virtualMetadataEnabled =
+            configurationService.getBooleanProperty("item.enable-virtual-metadata", false);
+
+        configurationService.setProperty("item.enable-virtual-metadata", false);
+        try {
+            initPlainTextPublicationWorkspace();
+
+            Map<Integer, String> replacedAuthors =
+                Map.of(
+                    0, authorsOriginalOrder.get(4),
+                    1, authorsOriginalOrder.get(1),
+                    2, authorsOriginalOrder.get(2),
+                    3, authorsOriginalOrder.get(3),
+                    4, authorsOriginalOrder.get(0)
+                );
+
+            List<String> expectedOrder =
+                List.of(
+                    authorsOriginalOrder.get(4),
+                    authorsOriginalOrder.get(1),
+                    authorsOriginalOrder.get(2),
+                    authorsOriginalOrder.get(3),
+                    authorsOriginalOrder.get(0)
+                );
+
+            replaceTraditionalPageMultipleAuthorsTest(replacedAuthors, expectedOrder);
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            configurationService.setProperty("item.enable-virtual-metadata", virtualMetadataEnabled);
+        }
+    }
+
 
     /**
      * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
@@ -1393,24 +1440,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         ops.add(moveOperation);
         String patchBody = getPatchContent(ops);
 
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
-                .content(patchBody)
-                .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk());
-
-        String authorField = "dc.contributor.author";
-        getClient(token).perform(get("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
-                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(0), 0)),
-                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(1), 1)),
-                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
-                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
-                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4))
-                )));
+        assertReplacementOrder(expectedOrder, patchBody);
     }
 
     /**
@@ -1450,33 +1480,66 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * @param expectedOrder     A list of author names sorted in the expected order
      */
     private void replaceTraditionalPageOneAuthorTest(int path, List<String> expectedOrder) throws Exception {
-        List<Operation> ops = new ArrayList<Operation>();
-        MetadataValueRest value = new MetadataValueRest();
-        value.setValue(replacedAuthor);
+        String patchBody =
+            getPatchContent(
+                List.of(
+                    this.mapToReplaceOperation(path, replacedAuthor)
+                )
+            );
 
-        ReplaceOperation replaceOperation = new ReplaceOperation("/sections/traditionalpageone/dc.contributor.author/"
-                                                                         + path, value);
-        ops.add(replaceOperation);
+        assertReplacementOrder(expectedOrder, patchBody);
+    }
+
+    private void replaceTraditionalPageMultipleAuthorsTest(
+        Map<Integer, String> values, List<String> expectedOrder
+    ) throws Exception {
+        List<Operation> ops =
+            values
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getKey))
+                .map(entry -> mapToReplaceOperation(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+
         String patchBody = getPatchContent(ops);
 
+        assertReplacementOrder(expectedOrder, patchBody);
+    }
+
+    private ReplaceOperation mapToReplaceOperation(int path, String author) {
+        return new ReplaceOperation(getPath(path), new MetadataValueRest(author));
+    }
+
+    private void assertReplacementOrder(List<String> expectedOrder, String patchBody) throws Exception, SQLException {
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
-                                         .content(patchBody)
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
-                        .andExpect(status().isOk());
+        getClient(token)
+            .perform(
+                patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
+                .content(patchBody)
+                .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON)
+            )
+            .andExpect(status().isOk());
 
         String authorField = "dc.contributor.author";
-        getClient(token).perform(get("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
-                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(0), 0)),
-                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(1), 1)),
-                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
-                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
-                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4))
-                   )));
+        getClient(token)
+            .perform(get("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                content().contentType(contentType)
+            )
+            .andExpect(
+                jsonPath(
+                    "$.sections.traditionalpageone",
+                    Matchers.allOf(
+                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(0), 0)),
+                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(1), 1)),
+                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
+                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
+                        Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4))
+                    )
+                )
+            );
     }
 
     /**
@@ -1490,8 +1553,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         List<Operation> ops = new ArrayList<Operation>();
         MetadataValueRest value = new MetadataValueRest();
         value.setValue(addedAuthor);
-        AddOperation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author/" + path,
-                                                     value);
+        AddOperation addOperation = new AddOperation(getPath(path), value);
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
@@ -1525,8 +1587,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      */
     private void removeTraditionalPageOneAuthorTest(int path, List<String> expectedOrder) throws Exception {
         List<Operation> ops = new ArrayList<Operation>();
-        RemoveOperation removeOperation = new RemoveOperation("/sections/traditionalpageone/dc.contributor.author/"
-                                                                      + path);
+        RemoveOperation removeOperation = new RemoveOperation(getPath(path));
         ops.add(removeOperation);
         String patchBody = getPatchContent(ops);
 
@@ -1600,8 +1661,10 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * @param path  The "path" index to use for the Move operation
      */
     private MoveOperation getTraditionalPageOneMoveAuthorOperation(int from, int path) {
-        return new MoveOperation("/sections/traditionalpageone/dc.contributor.author/" + path,
-                "/sections/traditionalpageone/dc.contributor.author/" + from);
+        return new MoveOperation(
+            getPath(path),
+            getPath(from)
+        );
     }
 
     /**
