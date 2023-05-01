@@ -11,13 +11,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.api.services.analytics.model.GaData;
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.iiif.model.generator.AnnotationListGenerator;
+import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -100,6 +103,16 @@ public class AnnotationListService extends AbstractResourceService {
             AnnotationGenerator annotation = new AnnotationGenerator(IIIF_ENDPOINT + bitstream.getID())
                 .setMotivation(AnnotationGenerator.LINKING)
                 .setResource(getLinksGenerator(mimetype, bitstream));
+            for (MetadataValue meta: bitstream.getMetadata()) {
+                String element = meta.getMetadataField().getElement();
+                String qualifier = meta.getMetadataField().getQualifier();
+                if (element.contains("iiif") && qualifier.contains("canvasid")) {
+                    String canvas = IIIF_ENDPOINT + bitstream.getID() + "/canvas/" + meta.getValue();
+                    CanvasGenerator c = new CanvasGenerator(canvas);
+                    annotation.setOnCanvas(c);
+                }
+            }
+
             annotationList.addResource(annotation);
         }
         return utils.asJson(annotationList.generateResource());
