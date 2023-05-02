@@ -132,8 +132,9 @@ public class WordHighlightSolrSearch implements SearchAnnotationService {
         solrQuery.set("hl.ocr.fl", "ocr_text");
         solrQuery.set("hl.ocr.contextBlock", "line");
         solrQuery.set("hl.ocr.contextSize", "2");
-        solrQuery.set("hl.snippets", "10");
-        solrQuery.set("hl.ocr.trackPages", "off");
+        solrQuery.set("hl.ocr.maxPassages", "8192");
+        solrQuery.set("hl.snippets", "8192");
+        solrQuery.set("hl.ocr.trackPages", "on");
         solrQuery.set("hl.ocr.limitBlock","page");
         solrQuery.set("hl.ocr.absoluteHighlights", "true");
 
