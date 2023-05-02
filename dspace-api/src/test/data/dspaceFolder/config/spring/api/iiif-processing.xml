@@ -5,8 +5,9 @@
        default-lazy-init="true">
 
     <bean id="iiifCanvasDimensionServiceFactory" class="org.dspace.iiif.canvasdimension.factory.IIIFCanvasDimensionServiceFactoryImpl"/>
-    <bean id="annotationLinkServiceFactory" class="org.dspace.iiif.annotationlink.factory.AnnotationLinkServiceFactoryImpl"/>
+    <bean id="annotationLinkServiceFactory" class="org.dspace.iiif.ocrcanvas.factory.AnnotationLinkServiceFactoryImpl"/>
     <bean class="org.dspace.iiif.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
+    <bean class="org.dspace.iiif.ocrcanvas.AnnotationLinkServiceImpl" scope="prototype"/>
     <bean class="org.dspace.iiif.MockIIIFApiQueryServiceImpl" id="org.dspace.iiif.IIIFApiQueryService"
           autowire-candidate="true"/>
 </beans>

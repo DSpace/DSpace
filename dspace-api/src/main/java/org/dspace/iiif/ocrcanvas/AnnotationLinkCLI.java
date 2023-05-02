@@ -1,4 +1,11 @@
-package org.dspace.iiif.annotationlink;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.iiif.ocrcanvas;
 
 import java.util.Date;
 import java.util.UUID;
@@ -20,8 +27,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.iiif.annotationlink.factory.AnnotationLinkServiceFactory;
-import org.dspace.iiif.annotationlink.service.AnnotationLinkService;
+import org.dspace.iiif.ocrcanvas.factory.AnnotationLinkServiceFactory;
+import org.dspace.iiif.ocrcanvas.service.AnnotationLinkService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -41,8 +48,11 @@ public class AnnotationLinkCLI {
         if (!iiifEnabled) {
             System.out.println("WARNING: IIIF is not enabled on this DSpace server.");
         }
+        AnnotationLinkService annotationLinkService = AnnotationLinkServiceFactory.getInstance()
+                                                                                  .getAnnotationLinkService();
 
-        AnnotationLinkService annotationLinkService = AnnotationLinkServiceFactory.getInstance().getAnnotationLinkService();
+        annotationLinkService.setDeleteAction(false);
+        annotationLinkService.setReplaceAction(false);
 
         String identifier = null;
         String eperson = null;
@@ -51,11 +61,16 @@ public class AnnotationLinkCLI {
 
         CommandLineParser parser = new DefaultParser();
 
+
         Options options = new Options();
         options.addOption("i", "identifier", true,
             "link OCR files and image bitstreams belonging to this identifier");
         options.addOption("e", "eperson", true,
             "email of eperson setting the canvas dimensions");
+        options.addOption("r", "replace", false,
+            "replace existing canvasid metadata for ocr bitstreams");
+        options.addOption("d", "delete", false,
+            "delete existing canvasid metadata from ocr bitstreams");
         options.addOption("h", "help", false,
             "display help");
 
@@ -84,6 +99,14 @@ public class AnnotationLinkCLI {
         if (line.hasOption('e')) {
             eperson = line.getOptionValue('e');
         }
+        if (line.hasOption('r')) {
+            System.out.println("\nReplace the existing canvasid metadata for ocr files.\n");
+            annotationLinkService.setReplaceAction(true);
+        }
+        if (line.hasOption('d')) {
+            System.out.println("\nDelete any existing canvasid metadata from ocr files.\n");
+            annotationLinkService.setDeleteAction(true);
+        }
         if (line.hasOption('i')) {
             identifier = line.getOptionValue('i');
         } else {
@@ -102,8 +125,7 @@ public class AnnotationLinkCLI {
         }
 
         if (dso == null) {
-            throw new IllegalArgumentException("Cannot resolve "
-                + identifier + " to a DSpace object.");
+            throw new IllegalArgumentException("Cannot resolve " + identifier + " to a DSpace object.");
         }
 
         EPerson user;
@@ -127,6 +149,8 @@ public class AnnotationLinkCLI {
 
         context.setCurrentUser(user);
 
+        System.out.println("\nProcessing OCR files.\n");
+
         int processed = 0;
         switch (dso.getType()) {
             case Constants.COMMUNITY:
@@ -138,6 +162,9 @@ public class AnnotationLinkCLI {
             case Constants.ITEM:
                 annotationLinkService.processItem(context, (Item) dso);
                 processed = 1;
+                break;
+            default:
+                System.out.println("Unsupported object type.");
                 break;
         }
         if (processed >= 1) {

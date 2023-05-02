@@ -1,4 +1,11 @@
-package org.dspace.iiif.annotationlink.service;
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.iiif.ocrcanvas.service;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -31,5 +38,17 @@ public interface AnnotationLinkService {
      * @throws Exception
      */
     void processItem(Context context, Item item) throws Exception;
+
+    /**
+     * Sets the replace property to allow for updating canvasid values.
+     * @param replace
+     */
+    void setReplaceAction(boolean replace);
+
+    /**
+     * Sets the deletion property to allow removal of existing canvasid metadata on OCR bitstreams.
+     * @param delete
+     */
+    void setDeleteAction(boolean delete);
 
 }

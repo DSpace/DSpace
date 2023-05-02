@@ -346,10 +346,10 @@
         </step>
     </command>
     <command>
-        <name>iiif-ocr-annotation-link</name>
-        <description>Add the associated image bitstream UUID to OCR file bitstream metadata.</description>
+        <name>iiif-ocr-canvas-link</name>
+        <description>Add the image bitstream UUID to the corresponding OCR bitstream metadata.</description>
         <step>
-            <class>org.dspace.iiif.annotationlink.AnnotationLinkCLI</class>
+            <class>org.dspace.iiif.ocrcanvas.AnnotationLinkCLI</class>
         </step>
     </command>
 </commands>

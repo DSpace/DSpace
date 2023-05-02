@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import com.google.api.services.analytics.model.GaData;
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.iiif.model.generator.AnnotationListGenerator;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
@@ -42,6 +41,8 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 public class AnnotationListService extends AbstractResourceService {
 
+    private static final String METADATA_CANVASID_ELEMENT = "iiif";
+    private static final String METADATA_CANVASID_QUALIFIER = "canvasid";
 
     @Autowired
     IIIFUtils utils;
@@ -106,7 +107,7 @@ public class AnnotationListService extends AbstractResourceService {
             for (MetadataValue meta: bitstream.getMetadata()) {
                 String element = meta.getMetadataField().getElement();
                 String qualifier = meta.getMetadataField().getQualifier();
-                if (element.contains("iiif") && qualifier.contains("canvasid")) {
+                if (element.contains(METADATA_CANVASID_ELEMENT) && qualifier.contains(METADATA_CANVASID_QUALIFIER)) {
                     String canvas = IIIF_ENDPOINT + bitstream.getID() + "/canvas/" + meta.getValue();
                     CanvasGenerator c = new CanvasGenerator(canvas);
                     annotation.setOnCanvas(c);
