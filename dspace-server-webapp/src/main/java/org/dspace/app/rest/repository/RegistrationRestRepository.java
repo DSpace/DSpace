@@ -87,7 +87,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     public Page<RegistrationRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
-    
+
     @Override
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
@@ -136,7 +136,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                 log.error("Something went wrong with sending forgot password info email: "
                               + registrationRest.getEmail(), e);
             }
-           } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
+        } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
             try {
                 String email = registrationRest.getEmail();
                 if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
@@ -157,7 +157,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         return null;
     }
 
-    
     @Override
     public Class<RegistrationRest> getDomainClass() {
         return RegistrationRest.class;
