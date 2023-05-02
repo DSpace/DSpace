@@ -1617,11 +1617,6 @@
                 <artifactId>icu4j</artifactId>
                 <version>62.1</version>
             </dependency>
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>11.2.0.4.0</version>
-            </dependency>
             <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
                 <groupId>org.dspace</groupId>

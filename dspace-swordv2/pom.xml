@@ -22,38 +22,6 @@
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>oracle-support</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc6</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>postgres-support</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
