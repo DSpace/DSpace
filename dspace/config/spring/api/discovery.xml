@@ -193,6 +193,7 @@
                 <ref bean="searchFilterRights" />
                 <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterItemsCommunity"/>
+                <ref bean="searchFilterType"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -213,7 +214,7 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
-                <value>(search.resourcetype:Item AND latestVersion:true) OR search.resourcetype:Collection OR search.resourcetype:Community</value>
+                <value>search.resourcetype:Item OR search.resourcetype:Collection OR search.resourcetype:Community</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
@@ -2349,6 +2350,19 @@
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
 
+    <bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="itemtype"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.type</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="type" value="standard"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
     <bean id="searchFilterEntityType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="entityType"/>
         <property name="metadataFields">
@@ -2419,15 +2433,6 @@
         <property name="indexFieldName" value="original_bundle_descriptions"/>
         <property name="metadataFields">
             <list/>
-        </property>
-    </bean>
-
-    <bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="itemtype" />
-        <property name="metadataFields">
-            <list>
-                <value>dc.type</value>
-            </list>
         </property>
     </bean>
 
