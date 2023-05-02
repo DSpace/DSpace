@@ -66,7 +66,7 @@ public class ItemImportCLI extends ItemImport {
             handler.logError("Must run with either add, replace, or remove (run with -h flag for details)");
             throw new UnsupportedOperationException("Must run with either add, replace, or remove");
         } else if ("add".equals(command) || "replace".equals(command)) {
-            if (sourcedir == null) {
+            if (!remoteUrl && sourcedir == null) {
                 handler.logError("A source directory containing items must be set (run with -h flag for details)");
                 throw new UnsupportedOperationException("A source directory containing items must be set");
             }
