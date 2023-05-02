@@ -86,6 +86,10 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
+                if (stepConfig.isHiddenForInProgressSubmission(obj)) {
+                    continue;
+                }
+
                 /*
                  * First, load the step processing class (using the current
                  * class loader)
