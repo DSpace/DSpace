@@ -56,8 +56,22 @@ public interface SolrLoggerService {
     public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
                          EPerson currentUser);
 
+    /**
+     * Store a usage event into Solr.
+     *
+     * @param dspaceObject the object used.
+     * @param request      the current request context.
+     * @param currentUser  the current session's user.
+     * @param referrer     the optional referrer.
+     */
+    public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
+                         EPerson currentUser, String referrer);
+
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser);
+
+    public void postView(DSpaceObject dspaceObject,
+                         String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer);
 
     public void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
                            List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope);
