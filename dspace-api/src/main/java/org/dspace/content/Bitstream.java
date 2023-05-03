@@ -23,6 +23,7 @@ import javax.persistence.Transient;
 
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.clarin.ClarinBitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -83,6 +84,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * {@link org.dspace.content.service.BitstreamService#create(Context, Bundle, InputStream)}
      * or
      * {@link org.dspace.content.service.BitstreamService#create(Context, InputStream)}
+     * or
+     * {@link ClarinBitstreamService#create(Context, Bundle)}
      */
     protected Bitstream() {
     }

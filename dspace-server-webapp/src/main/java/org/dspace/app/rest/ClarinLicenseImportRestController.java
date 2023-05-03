@@ -17,6 +17,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
@@ -27,8 +28,10 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseLabel;
+import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.clarin.ClarinLicenseLabelService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
+import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,13 +56,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/licenses/import")
 public class ClarinLicenseImportRestController {
     private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(BitstreamRestController.class);
+            .getLogger(ClarinLicenseImportRestController.class);
     private Dictionary<Integer, Integer> licenseLabelsIds = new Hashtable<>();
     private Dictionary<Integer, Set<ClarinLicenseLabel>> licenseToLicenseLabel = new Hashtable<>();
     @Autowired
     private ClarinLicenseLabelService clarinLicenseLabelService;
     @Autowired
     private ClarinLicenseService clarinLicenseService;
+    @Autowired
+    private ClarinUserRegistrationService clarinUserRegistrationService;
 
     /**
      * This method import labels in json format into database.
@@ -248,16 +253,21 @@ public class ClarinLicenseImportRestController {
                     String name = jsonLicense.get("name").isNull() ? null : jsonLicense.get("name").asText();
                     String definition = jsonLicense.get("definition").isNull() ?
                             null : jsonLicense.get("definition").asText();
-                    //eperson_id is only require if the license iswas reated by an andmin and not imported
-                    //Integer eperson_id = jsonLicense.get("eperson_id").isNull() ?
-                    //        null : jsonLicense.get("eperson_id").asInt();
                     Integer label_id = jsonLicense.get("label_id").isNull() ?
                             null : jsonLicense.get("label_id").asInt();
-
                     Integer confirmation = jsonLicense.get("confirmation").isNull() ?
                             null : jsonLicense.get("confirmation").asInt();
                     String required_info = jsonLicense.get("required_info").isNull() ?
                             null : jsonLicense.get("required_info").asText();
+                    //eperson_id is only require if the license iswas reated by an andmin and not imported
+                    String epersonIdString = jsonLicense.get("eperson_id").asText();
+                    UUID epersonId = UUID.fromString(epersonIdString);
+                    List<ClarinUserRegistration> userRegistrations = clarinUserRegistrationService.findByEPersonUUID(
+                            context, epersonId);
+                    ClarinUserRegistration userRegistration = userRegistrations.size() > 0 ?
+                            userRegistrations.get(0) : null;
+                    //TODO
+                    //String createdOnString = jsonLicense.get("created_on").asText();
 
                     if (Objects.nonNull(clarinLicenseService.findByName(context, name))) {
                         errors.add(label_id);
@@ -267,6 +277,7 @@ public class ClarinLicenseImportRestController {
                     ClarinLicenseLabel label = null;
                     if (Objects.nonNull(label_id) && Objects.nonNull(this.licenseLabelsIds.get(label_id))) {
                         label = this.clarinLicenseLabelService.find(context, this.licenseLabelsIds.get(label_id));
+                        label_id = this.licenseLabelsIds.get(label_id);
                     }
 
                     if (Objects.isNull(label_id) || Objects.isNull(label)) {
@@ -285,7 +296,7 @@ public class ClarinLicenseImportRestController {
                     license.setName(name);
                     license.setLicenseLabels(licenseLabels);
                     license.setDefinition(definition);
-                    //license.setEperson(eperson_id)
+                    license.setEperson(userRegistration);
                     license.setConfirmation(confirmation);
                     license.setRequiredInfo(required_info);
 
