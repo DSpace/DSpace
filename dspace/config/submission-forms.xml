@@ -90,6 +90,7 @@
                     <required></required>
                     <!-- Example ACL field definition.
                          Uncomment it and the Author input field will be showed only for the admin.
+                     policy=(allow|deny),action=(read|write),grantee-type=(user|group),grantee-id=(<UUID>)
                     <acl>
                         policy=deny,action=read,grantee-type=user,grantee-id=*
                     </acl> -->
