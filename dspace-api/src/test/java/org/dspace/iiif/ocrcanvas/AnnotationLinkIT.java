@@ -10,10 +10,8 @@ package org.dspace.iiif.ocrcanvas;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
@@ -24,7 +22,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,13 +45,9 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
     private static final String METADATA_CANVASID_FIELD = METADATA_CANVASID_SCHEMA + "." +
         METADATA_CANVASID_ELEMENT + "."  + METADATA_CANVASID_QUALIFIER;
 
-    private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    private final PrintStream originalOut = System.out;
 
     @Before
     public void setup() throws IOException {
-
-        System.setOut(new PrintStream(outContent));
 
         context.turnOffAuthorisationSystem();
 
@@ -72,13 +65,6 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
         col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
         context.restoreAuthSystemState();
-    }
-
-    @After
-    @Override
-    public void destroy() throws Exception {
-        System.setOut(originalOut);
-        super.destroy();
     }
 
     @Test
