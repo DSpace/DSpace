@@ -119,7 +119,7 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("permitAll()")
     public Page<ClarinLicenseRest> findAll(Context context, Pageable pageable) {
         try {
             List<ClarinLicense> clarinLicenseList = clarinLicenseService.findAll(context);

@@ -185,11 +185,6 @@ public class ClarinLicenseServiceImpl implements ClarinLicenseService {
 
     @Override
     public List<ClarinLicense> findAll(Context context) throws SQLException, AuthorizeException {
-        if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException(
-                     "You must be an admin to create an CLARIN License");
-        }
-
         return clarinLicenseDAO.findAll(context, ClarinLicense.class);
     }
 

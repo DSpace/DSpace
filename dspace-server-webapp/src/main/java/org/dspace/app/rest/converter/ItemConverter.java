@@ -113,7 +113,7 @@ public class ItemConverter
                 if (!metadataExposureService
                         .isHidden(context, metadataField.getMetadataSchema().getName(),
                                   metadataField.getElement(),
-                                  metadataField.getQualifier())) {
+                                  metadataField.getQualifier(), obj)) {
                     returnList.add(mv);
                 }
             }
