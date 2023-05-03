@@ -51,6 +51,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
@@ -91,6 +92,7 @@ public class SyndicationFeed {
 
     // default DC fields for entry
     protected String defaultTitleField = "dc.title";
+    protected String defaultDescriptionField = "dc.description";
     protected String defaultAuthorField = "dc.contributor.author";
     protected String defaultDateField = "dc.date.issued";
     private static final String[] defaultDescriptionFields =
@@ -196,15 +198,15 @@ public class SyndicationFeed {
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
-            feed.setDescription(localize(labels, MSG_FEED_DESCRIPTION));
+            defaultDescriptionField = localize(labels, MSG_FEED_DESCRIPTION);
             objectURL = resolveURL(request, null);
         } else {
             Bitstream logo = null;
             if (dso instanceof IndexableCollection) {
                 Collection col = ((IndexableCollection) dso).getIndexedObject();
                 defaultTitle = col.getName();
-                feed.setDescription(collectionService.getMetadataFirstValue(col,
-                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY));
+                defaultDescriptionField = collectionService.getMetadataFirstValue(col,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
                 logo = col.getLogo();
                 String cols = configurationService.getProperty("webui.feed.podcast.collections");
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
@@ -214,8 +216,8 @@ public class SyndicationFeed {
             } else if (dso instanceof IndexableCommunity) {
                 Community comm = ((IndexableCommunity) dso).getIndexedObject();
                 defaultTitle = comm.getName();
-                feed.setDescription(communityService.getMetadataFirstValue(comm,
-                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY));
+                defaultDescriptionField = communityService.getMetadataFirstValue(comm,
+                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
                 logo = comm.getLogo();
                 String comms = configurationService.getProperty("webui.feed.podcast.communities");
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {
@@ -230,6 +232,12 @@ public class SyndicationFeed {
         }
         feed.setTitle(labels.containsKey(MSG_FEED_TITLE) ?
                           localize(labels, MSG_FEED_TITLE) : defaultTitle);
+
+        if (defaultDescriptionField == null || defaultDescriptionField == "") {
+            defaultDescriptionField = I18nUtil.getMessage("org.dspace.app.util.SyndicationFeed.no-description");
+        }
+
+        feed.setDescription(defaultDescriptionField);
         feed.setLink(objectURL);
         feed.setPublishedDate(new Date());
         feed.setUri(objectURL);
