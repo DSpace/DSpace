@@ -185,4 +185,14 @@ public class SearchFilterMatcher {
                 checkOperators()
         );
     }
+
+    public static Matcher<? super Object> clarinItemsTypeFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("itemtype")),
+                hasJsonPath("$.hasFacets", is(false)),
+                hasJsonPath("$.type", is("text")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
+        );
+    }
 }

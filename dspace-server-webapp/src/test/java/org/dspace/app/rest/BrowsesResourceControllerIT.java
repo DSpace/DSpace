@@ -59,29 +59,32 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     public void findAll() throws Exception {
         //When we call the root endpoint
         getClient().perform(get("/api/discover/browses"))
-                   //The status has to be 200 OK
-                   .andExpect(status().isOk())
-                   //We expect the content type to be "application/hal+json;charset=UTF-8"
-                   .andExpect(content().contentType(contentType))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
 
-                   //Our default Discovery config has 5 browse indexes, so we expect this to be reflected in the page
-                   // object
-                   .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(5)))
-                   .andExpect(jsonPath("$.page.totalPages", is(1)))
-                   .andExpect(jsonPath("$.page.number", is(0)))
+                //Our default Discovery config has 4 browse indexes so we expect this to be reflected in the page
+                // object
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(8)))
+                .andExpect(jsonPath("$.page.totalPages", is(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //The array of browse index should have a size 5
-                   .andExpect(jsonPath("$._embedded.browses", hasSize(5)))
+                //The array of browse index should have a size 8
+                .andExpect(jsonPath("$._embedded.browses", hasSize(8)))
 
-                   //Check that all (and only) the default browse indexes are present
-                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
-                       BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
-                       BrowseIndexMatcher.contributorBrowseIndex("asc"),
-                       BrowseIndexMatcher.titleBrowseIndex("asc"),
-                       BrowseIndexMatcher.subjectBrowseIndex("asc"),
-                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")
-                   )))
+                //Check that all (and only) the default browse indexes are present
+                .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
+                        BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
+                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
+                        BrowseIndexMatcher.titleBrowseIndex("asc"),
+                        BrowseIndexMatcher.subjectBrowseIndex("asc"),
+                        BrowseIndexMatcher.publisherBrowseIndex("asc"),
+                        BrowseIndexMatcher.languageBrowseIndex("asc"),
+                        BrowseIndexMatcher.itemtypeBrowseIndex("asc"),
+                        BrowseIndexMatcher.rightsBrowseIndex("asc")
+                )))
         ;
     }
 
