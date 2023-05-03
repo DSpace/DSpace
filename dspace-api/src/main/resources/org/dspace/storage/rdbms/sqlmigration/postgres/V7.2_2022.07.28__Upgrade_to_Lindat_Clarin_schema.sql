@@ -482,4 +482,5 @@ ALTER TABLE eperson
         ALTER COLUMN email TYPE character varying(256);
 
 ALTER TABLE metadatafieldregistry
-    ALTER COLUMN element TYPE character varying(128);
+
+ALTER COLUMN element TYPE character varying(128);

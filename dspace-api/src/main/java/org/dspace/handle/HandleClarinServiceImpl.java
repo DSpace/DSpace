@@ -26,7 +26,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataFieldServiceImpl;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -53,13 +52,14 @@ public class HandleClarinServiceImpl implements HandleClarinService {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldServiceImpl.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HandleClarinServiceImpl.class);
 
     @Autowired(required = true)
     protected HandleDAO handleDAO;
 
     @Autowired(required = true)
     protected HandleClarinDAO handleClarinDAO;
+
     protected SiteService siteService;
 
     @Autowired(required = true)

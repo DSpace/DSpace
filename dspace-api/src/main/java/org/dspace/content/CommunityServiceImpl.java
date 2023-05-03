@@ -119,7 +119,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // of 'anonymous' READ
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
 
-        authorizeService.createResourcePolicy(context, newCommunity, anonymousGroup, null, Constants.READ, null);
+        authorizeService.createResourcePolicy(context, newCommunity, anonymousGroup,null,
+                Constants.READ, null);
 
         communityDAO.save(context, newCommunity);
 
@@ -241,20 +242,28 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         if (is != null) {
             Bitstream newLogo = bitstreamService.create(context, is);
-            community.setLogo(newLogo);
 
-            // now create policy for logo bitstream
-            // to match our READ policy
-            List<ResourcePolicy> policies = authorizeService
-                    .getPoliciesActionFilter(context, community, Constants.READ);
-            authorizeService.addPolicies(context, policies, newLogo);
-
-            log.info(LogHelper.getHeader(context, "set_logo",
-                                          "community_id=" + community.getID() + "logo_bitstream_id="
-                                              + newLogo.getID()));
+            //added for data migration by Upgrade Dspace-Clarin
+            addLogo(context, community, newLogo);
         }
 
         return community.getLogo();
+    }
+
+    @Override
+    public void addLogo(Context context, Community community, Bitstream newLogo)
+            throws SQLException, AuthorizeException {
+        community.setLogo(newLogo);
+
+        // now create policy for logo bitstream
+        // to match our READ policy
+        List<ResourcePolicy> policies = authorizeService
+                .getPoliciesActionFilter(context, community, Constants.READ);
+        authorizeService.addPolicies(context, policies, newLogo);
+
+        log.info(LogHelper.getHeader(context, "set_logo",
+                "community_id=" + community.getID() + "logo_bitstream_id="
+                        + newLogo.getID()));
     }
 
     @Override

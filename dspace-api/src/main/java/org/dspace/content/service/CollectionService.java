@@ -133,6 +133,17 @@ public interface CollectionService
         IOException, SQLException;
 
     /**
+     * Add the created logo bitstream to collection and create policy to logo bitstream.
+     * This method is added for data migration by Upgrade Clarin, where bitstream already exists.
+     * @param context   context
+     * @param collection collection
+     * @param newLogo   bitstream of new logo
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public void addLogo(Context context, Collection collection, Bitstream newLogo)
+            throws SQLException, AuthorizeException;
+    /**
      * Create a workflow group for the given step if one does not already exist.
      * Returns either the newly created group or the previously existing one.
      * Note that while the new group is created in the database, the association

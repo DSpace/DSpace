@@ -192,7 +192,6 @@ public class ClarinUserMetadataRestController {
             log.error("Cannot send the email because: " + e.getMessage());
             throw new MessagingException(e.getMessage());
         }
-
     }
 
     private String getEmailFromUserMetadata(List<ClarinUserMetadataRest> clarinUserMetadataRestList) {

@@ -29,8 +29,10 @@ import org.dspace.app.rest.converter.ClarinLicenseConverter;
 import org.dspace.app.rest.converter.ClarinLicenseLabelConverter;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.ClarinUserRegistrationBuilder;
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseLabel;
+import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.clarin.ClarinLicenseLabelService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Context;
@@ -81,6 +83,10 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void importLicensesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration userRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         JSONParser parser = new JSONParser();
         BufferedReader bufferReader = new BufferedReader(new FileReader(getClass().getResource(LICENSE_LABELS)
@@ -155,7 +161,7 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             node.set("license_id", jsonNodeFactory.textNode(jsonObject.get("license_id").toString()));
             node.set("name", jsonNodeFactory.textNode(jsonObject.get("name").toString()));
             node.set("definition", jsonNodeFactory.textNode(jsonObject.get("definition").toString()));
-            node.set("eperson_id", jsonNodeFactory.textNode(jsonObject.get("eperson_id").toString()));
+            node.set("eperson_id", jsonNodeFactory.textNode(admin.getID().toString()));
             node.set("label_id", jsonNodeFactory.textNode(jsonObject.get("label_id").toString()));
             node.set("confirmation", jsonNodeFactory.textNode(jsonObject.get("confirmation").toString()));
             node.set("required_info", jsonNodeFactory.textNode(Objects.isNull(jsonObject.get("required_info")) ?
@@ -163,13 +169,11 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             nodes.add(node);
 
             //for test control
-
-
             license = new ClarinLicense();
             license.setId(Integer.parseInt(jsonObject.get("license_id").toString()));
             license.setName(jsonObject.get("name").toString());
             license.setDefinition(jsonObject.get("definition").toString());
-            //license.setEpersonID(Integer.parseInt(jsonObject.get("eperson_id").toString()));
+            license.setEperson(userRegistration);
             Set<ClarinLicenseLabel> labels = new HashSet<>();
             labels.add(this.licenseLabelIDDictionary.get(Integer.parseInt(jsonObject.get("label_id").toString())));
             license.setLicenseLabels(labels);
@@ -201,6 +205,7 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             Assert.assertEquals(clarinLicense.getRequiredInfo(), oldLicense.getRequiredInfo());
             Assert.assertEquals(clarinLicense.getLicenseLabels().size(), extendedMappingDictionary.get(
                     oldLicense.getID()).size());
+            Assert.assertEquals(clarinLicense.getEperson().getID(), userRegistration.getID());
             List<ClarinLicenseLabel> clarinLicenseLabels = clarinLicense.getLicenseLabels();
             for (ClarinLicenseLabel label: clarinLicenseLabels) {
                 ClarinLicenseLabel oldLabel = licenseLabelDictionary.get(label.getLabel());
@@ -376,6 +381,10 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void licenseIDDoesntExist() throws Exception {
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration userRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         JSONParser parser = new JSONParser();
         BufferedReader bufferReader = new BufferedReader(new FileReader(getClass().getResource(LICENSES_TEST)
@@ -394,6 +403,7 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             node.set("definition", jsonNodeFactory.textNode(jsonObject.get("definition").toString()));
             node.set("eperson_id", jsonNodeFactory.textNode(jsonObject.get("eperson_id").toString()));
             node.set("label_id", jsonNodeFactory.textNode(jsonObject.get("label_id").toString()));
+            node.set("eperson_id", jsonNodeFactory.textNode(admin.getID().toString()));
             node.set("confirmation", jsonNodeFactory.textNode(jsonObject.get("confirmation").toString()));
             node.set("required_info", jsonNodeFactory.textNode(Objects.isNull(jsonObject.get("required_info")) ?
                     null : jsonObject.get("required_info").toString()));
@@ -410,6 +420,10 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void licenseIDisNull() throws Exception {
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration userRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         JSONParser parser = new JSONParser();
         BufferedReader bufferReader = new BufferedReader(new FileReader(getClass().getResource(LICENSES_TEST)
@@ -429,6 +443,7 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             node.set("definition", jsonNodeFactory.textNode(jsonObject.get("definition").toString()));
             node.set("eperson_id", jsonNodeFactory.textNode(jsonObject.get("eperson_id").toString()));
             node.set("label_id", jsonNodeFactory.textNode(jsonObject.get("label_id").toString()));
+            node.set("eperson_id", jsonNodeFactory.textNode(admin.getID().toString()));
             node.set("confirmation", jsonNodeFactory.textNode(jsonObject.get("confirmation").toString()));
             node.set("required_info", jsonNodeFactory.textNode(Objects.isNull(jsonObject.get("required_info")) ?
                     null : jsonObject.get("required_info").toString()));
@@ -445,6 +460,10 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void licenseIncorrectArgument() throws Exception {
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration userRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         JSONParser parser = new JSONParser();
         BufferedReader bufferReader = new BufferedReader(new FileReader(getClass().getResource(LICENSES_TEST)
@@ -462,6 +481,7 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             node.set("license_id", jsonNodeFactory.textNode(jsonObject.get("license_id").toString()));
             node.set("eperson_id", jsonNodeFactory.textNode(jsonObject.get("eperson_id").toString()));
             node.set("label_id", jsonNodeFactory.textNode(jsonObject.get("label_id").toString()));
+            node.set("eperson_id", jsonNodeFactory.textNode(admin.getID().toString()));
             node.set("confirmation", jsonNodeFactory.textNode(jsonObject.get("confirmation").toString()));
             node.set("required_info", jsonNodeFactory.textNode(Objects.isNull(jsonObject.get("required_info")) ?
                     null : jsonObject.get("required_info").toString()));
@@ -477,6 +497,10 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
     }
 
     public void licenseLabelDoesntExist() throws Exception {
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration userRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         JSONParser parser = new JSONParser();
         BufferedReader bufferReader = new BufferedReader(new FileReader(getClass().getResource(LICENSES_TEST)
@@ -495,6 +519,7 @@ public class ClarinLicenseImportControllerIT extends AbstractControllerIntegrati
             node.set("license_id", jsonNodeFactory.textNode(jsonObject.get("license_id").toString()));
             node.set("eperson_id", jsonNodeFactory.textNode(jsonObject.get("eperson_id").toString()));
             node.set("label_id", jsonNodeFactory.textNode("1000"));
+            node.set("eperson_id", jsonNodeFactory.textNode(admin.getID().toString()));
             node.set("confirmation", jsonNodeFactory.textNode(jsonObject.get("confirmation").toString()));
             node.set("required_info", jsonNodeFactory.textNode(Objects.isNull(jsonObject.get("required_info")) ?
                     null : jsonObject.get("required_info").toString()));

@@ -113,7 +113,7 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 )))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("/api/core/handles")))
-                .andExpect(jsonPath("$.page.size", is(100)));;
+                .andExpect(jsonPath("$.page.size", is(100)));
         this.cleanHandles();
     }
 
