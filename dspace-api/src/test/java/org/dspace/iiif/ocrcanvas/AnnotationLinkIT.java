@@ -107,10 +107,11 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
 
         String itemID = iiifItem.getID().toString();
         execScript(itemID);
-
+        String canvasIdPrefix = itemID + "/canvas/";
         assertTrue(ocrBitstream.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix + imageBitstream.getID().toString())));
 
     }
 
@@ -140,10 +141,11 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
 
         String itemID = iiifItem.getID().toString();
         execScript(itemID);
-
+        String canvasIdPrefix = itemID + "/canvas/";
         assertTrue(ocrBitstream.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix + imageBitstream.getID().toString())));
 
     }
 
@@ -173,10 +175,12 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
 
         String itemID = iiifItem.getID().toString();
         execScript(itemID);
+        String canvasIdPrefix = itemID + "/canvas/";
 
         assertTrue(ocrBitstream.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix + imageBitstream.getID().toString())));
 
     }
 
@@ -224,12 +228,17 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
 
         String id = parentCommunity.getID().toString();
         execScript(id);
+        String canvasIdPrefix = iiifItem.getID().toString() + "/canvas/";
+        String canvasIdPrefix2 = iiifItem2.getID().toString() + "/canvas/";
+
         assertTrue(ocrBitstream.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix + imageBitstream.getID().toString())));
         assertTrue(ocrBitstream2.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream2.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix2 + imageBitstream2.getID().toString())));
 
     }
 
@@ -277,12 +286,17 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
 
         String id = col1.getID().toString();
         execScript(id);
+        String canvasIdPrefix = iiifItem.getID().toString() + "/canvas/";
+        String canvasIdPrefix2 = iiifItem2.getID().toString() + "/canvas/";
+
         assertTrue(ocrBitstream.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix + imageBitstream.getID().toString())));
         assertTrue(ocrBitstream2.getMetadata().stream()
                                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                                .anyMatch(m -> m.getValue().contentEquals(imageBitstream2.getID().toString())));
+                                .anyMatch(m -> m.getValue()
+                                                .contentEquals(canvasIdPrefix2 + imageBitstream2.getID().toString())));
 
     }
 
@@ -384,9 +398,12 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
         String itemID = itemForReplace.getID().toString();
 
         execReplaceScript(itemID);
+        String canvasIdPrefix = itemForReplace.getID().toString() + "/canvas/";
+
         assertTrue(ocrBitstreamForReplace.getMetadata().stream()
                                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_CANVASID_FIELD))
-                               .anyMatch(m -> m.getValue().contentEquals(imageBitstream.getID().toString())));
+                               .anyMatch(m -> m.getValue()
+                                               .contentEquals(canvasIdPrefix + imageBitstream.getID().toString())));
 
     }
 
@@ -437,7 +454,6 @@ public class AnnotationLinkIT extends AbstractIntegrationTestWithDatabase {
     private int execDeleteScript(String id) throws Exception {
         return runDSpaceScript("iiif-ocr-canvas-link", "-e", "admin@email.com", "-i", id, "-d");
     }
-
 
     private int execReplaceScript(String id) throws Exception {
         return runDSpaceScript("iiif-ocr-canvas-link", "-e", "admin@email.com", "-i", id, "-r");

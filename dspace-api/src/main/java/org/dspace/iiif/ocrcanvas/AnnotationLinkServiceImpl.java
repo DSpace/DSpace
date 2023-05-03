@@ -165,7 +165,8 @@ public class AnnotationLinkServiceImpl implements AnnotationLinkService {
                 }
             }
             UUID bitstreamId = iiifImageBitstreams.get(i).getID();
-            bitstreamService.addMetadata(context, ocrFiles.get(i), metadataField, null, bitstreamId.toString());
+            String canvasId = item.getID() + "/canvas/" + bitstreamId.toString();
+            bitstreamService.addMetadata(context, ocrFiles.get(i), metadataField, null, canvasId);
         }
         String action = "Added";
         if (replace) {

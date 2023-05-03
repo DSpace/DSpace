@@ -108,7 +108,7 @@ public class AnnotationListService extends AbstractResourceService {
                 String element = meta.getMetadataField().getElement();
                 String qualifier = meta.getMetadataField().getQualifier();
                 if (element.contains(METADATA_CANVASID_ELEMENT) && qualifier.contains(METADATA_CANVASID_QUALIFIER)) {
-                    String canvas = IIIF_ENDPOINT + bitstream.getID() + "/canvas/" + meta.getValue();
+                    String canvas = IIIF_ENDPOINT +  meta.getValue();
                     CanvasGenerator c = new CanvasGenerator(canvas);
                     annotation.setOnCanvas(c);
                 }
