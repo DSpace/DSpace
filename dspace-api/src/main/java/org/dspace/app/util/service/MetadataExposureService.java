@@ -9,6 +9,7 @@ package org.dspace.app.util.service;
 
 import java.sql.SQLException;
 
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
@@ -62,4 +63,19 @@ public interface MetadataExposureService {
      */
     public boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException;
+
+    /**
+     * Returns whether the given metadata field should be exposed (visible). The metadata field is in the DSpace's DC
+     * notation: schema.element.qualifier
+     *
+     * @param context   DSpace context
+     * @param schema    metadata field schema (namespace), e.g. "dc"
+     * @param element   metadata field element
+     * @param qualifier metadata field qualifier
+     * @param item      check if the user is submitter of this item
+     * @return true (hidden) or false (exposed)
+     * @throws SQLException if database error
+     */
+    public boolean isHidden(Context context, String schema, String element, String qualifier, Item item)
+            throws SQLException;
 }
