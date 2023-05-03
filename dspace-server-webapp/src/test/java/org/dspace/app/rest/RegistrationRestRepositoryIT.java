@@ -299,6 +299,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
         // when reCAPTCHA enabled and request doesn't contain "X-Recaptcha-Token” header
         getClient().perform(post("/api/eperson/registrations")
+                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
                    .andExpect(status().isForbidden());
