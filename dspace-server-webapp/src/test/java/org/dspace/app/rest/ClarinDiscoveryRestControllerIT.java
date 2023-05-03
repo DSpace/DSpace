@@ -995,7 +995,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SearchFilterMatcher.isJournalOfPublicationRelation(),
                         SearchFilterMatcher.clarinLicenseRightsFilter(),
                         SearchFilterMatcher.clarinItemsLanguageFilter(),
-                        SearchFilterMatcher.clarinItemsCommunityFilter()
+                        SearchFilterMatcher.clarinItemsCommunityFilter(),
+                        SearchFilterMatcher.clarinItemsTypeFilter()
                 )))
                 //These sortOptions need to be present as it's the default in the configuration
                 .andExpect(jsonPath("$.sortOptions", contains(

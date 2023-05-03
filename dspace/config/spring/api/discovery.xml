@@ -1664,8 +1664,6 @@
                 <value>dc.type</value>
             </list>
         </property>
-        <property name="facetLimit" value="5"/>
-        <property name="type" value="standard"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
