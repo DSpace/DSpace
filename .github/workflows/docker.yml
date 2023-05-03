@@ -170,3 +170,86 @@ jobs:
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build_cli.outputs.tags }}
           labels: ${{ steps.meta_build_cli.outputs.labels }}
+
+      ###########################################
+      # Build/Push the 'dspace/dspace-solr' image
+      ###########################################
+      # Get Metadata for docker_build_solr step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-solr' image
+        id: meta_build_solr
+        uses: docker/metadata-action@v4
+        with:
+          images: dspace/dspace-solr
+          tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
+
+      - name: Build and push 'dspace-solr' image
+        id: docker_build_solr
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./dspace/src/main/docker/dspace-solr/Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_solr.outputs.tags }}
+          labels: ${{ steps.meta_build_solr.outputs.labels }}
+
+      ###########################################################
+      # Build/Push the 'dspace/dspace-postgres-pgcrypto' image
+      ###########################################################
+      # Get Metadata for docker_build_postgres step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-postgres-pgcrypto' image
+        id: meta_build_postgres
+        uses: docker/metadata-action@v4
+        with:
+          images: dspace/dspace-postgres-pgcrypto
+          tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
+
+      - name: Build and push 'dspace-postgres-pgcrypto' image
+        id: docker_build_postgres
+        uses: docker/build-push-action@v3
+        with:
+          # Must build out of subdirectory to have access to install script for pgcrypto
+          context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
+          dockerfile: Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_postgres.outputs.tags }}
+          labels: ${{ steps.meta_build_postgres.outputs.labels }}
+
+      ###########################################################
+      # Build/Push the 'dspace/dspace-postgres-pgcrypto' image ('-loadsql' tag)
+      ###########################################################
+      # Get Metadata for docker_build_postgres_loadsql step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-postgres-pgcrypto-loadsql' image
+        id: meta_build_postgres_loadsql
+        uses: docker/metadata-action@v4
+        with:
+          images: dspace/dspace-postgres-pgcrypto
+          tags: ${{ env.IMAGE_TAGS }}
+          # Suffix all tags with "-loadsql". Otherwise, it uses the same
+          # tagging logic as the primary 'dspace/dspace-postgres-pgcrypto' image above.
+          flavor: ${{ env.TAGS_FLAVOR }}
+            suffix=-loadsql
+
+      - name: Build and push 'dspace-postgres-pgcrypto-loadsql' image
+        id: docker_build_postgres_loadsql
+        uses: docker/build-push-action@v3
+        with:
+          # Must build out of subdirectory to have access to install script for pgcrypto
+          context: ./dspace/src/main/docker/dspace-postgres-pgcrypto-curl/
+          dockerfile: Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build_postgres_loadsql.outputs.tags }}
+          labels: ${{ steps.meta_build_postgres_loadsql.outputs.labels }}

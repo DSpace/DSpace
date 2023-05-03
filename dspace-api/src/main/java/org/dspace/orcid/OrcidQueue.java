@@ -64,6 +64,8 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     /**
      * A description of the resource to be synchronized.
      */
+    @Lob
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "description")
     private String description;
 
