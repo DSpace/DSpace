@@ -35,6 +35,11 @@ public class ApplicationConfig {
     @Value("${iiif.cors.allowed-origins}")
     private String[] iiifCorsAllowedOrigins;
 
+    // Allowed Signposting CORS origins ("Access-Control-Allow-Origin" header)
+    // Can be overridden in DSpace configuration
+    @Value("${signposting.cors.allowed-origins}")
+    private String[] signpostingCorsAllowedOrigins;
+
     // Whether to allow credentials (cookies) in CORS requests ("Access-Control-Allow-Credentials" header)
     // Defaults to true. Can be overridden in DSpace configuration
     @Value("${rest.cors.allow-credentials:true}")
@@ -44,6 +49,11 @@ public class ApplicationConfig {
     // Defaults to true. Can be overridden in DSpace configuration
     @Value("${iiif.cors.allow-credentials:true}")
     private boolean iiifCorsAllowCredentials;
+
+    // Whether to allow credentials (cookies) in CORS requests ("Access-Control-Allow-Credentials" header)
+    // Defaults to true. Can be overridden in DSpace configuration
+    @Value("${signposting.cors.allow-credentials:true}")
+    private boolean signpostingCorsAllowCredentials;
 
     // Configured User Interface URL (default: http://localhost:4000)
     @Value("${dspace.ui.url:http://localhost:4000}")
@@ -91,6 +101,14 @@ public class ApplicationConfig {
     }
 
     /**
+     * Returns the signposting.cors.allowed-origins (for Signposting access) defined in DSpace configuration.
+     * @return allowed origins
+     */
+    public String[] getSignpostingAllowedOriginsConfig() {
+        return this.signpostingCorsAllowedOrigins;
+    }
+
+    /**
      * Return whether to allow credentials (cookies) on CORS requests. This is used to set the
      * CORS "Access-Control-Allow-Credentials" header in Application class.
      * @return true or false
@@ -106,5 +124,14 @@ public class ApplicationConfig {
      */
     public boolean getIiifAllowCredentials() {
         return iiifCorsAllowCredentials;
+    }
+
+    /**
+     * Return whether to allow credentials (cookies) on Signposting requests. This is used to set the
+     * CORS "Access-Control-Allow-Credentials" header in Application class. Defaults to false.
+     * @return true or false
+     */
+    public boolean getSignpostingAllowCredentials() {
+        return signpostingCorsAllowCredentials;
     }
 }
