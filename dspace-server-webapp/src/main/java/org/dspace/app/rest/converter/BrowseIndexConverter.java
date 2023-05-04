@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_FLAT;
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +36,15 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
         bir.setId(obj.getName());
         bir.setDataType(obj.getDataType());
         bir.setOrder(obj.getDefaultOrder());
-        bir.setMetadataBrowse(obj.isMetadataIndex());
         List<String> metadataList = new ArrayList<String>();
         if (obj.isMetadataIndex()) {
             for (String s : obj.getMetadata().split(",")) {
                 metadataList.add(s.trim());
             }
+            bir.setBrowseType(BROWSE_TYPE_VALUE_LIST);
         } else {
             metadataList.add(obj.getSortOption().getMetadata());
+            bir.setBrowseType(BROWSE_TYPE_FLAT);
         }
         bir.setMetadataList(metadataList);
 
