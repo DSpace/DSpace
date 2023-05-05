@@ -17,9 +17,12 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -291,5 +294,21 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         bundleService.moveBitstreamToBundle(context, targetBundle, bitstream);
 
         return converter.toRest(targetBundle, utils.obtainProjection());
+    }
+
+    /**
+     * Method that will transform the provided PATCH json body into a list of operations.
+     * The operations will be handled by a supporting class resolved by the
+     * {@link org.dspace.app.rest.repository.patch.ResourcePatch#patch} method.
+     *
+     * @param context The context
+     * @param jsonNode the json body provided from the request body
+     */
+    public void patchBitstreamsInBulk(Context context, JsonNode jsonNode) throws SQLException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
+        Patch patch = patchConverter.convert(jsonNode);
+        resourcePatch.patch(obtainContext(), null, patch.getOperations());
+        context.commit();
     }
 }
