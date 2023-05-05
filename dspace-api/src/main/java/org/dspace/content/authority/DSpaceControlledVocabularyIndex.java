@@ -9,6 +9,7 @@ package org.dspace.content.authority;
 
 import java.util.Set;
 
+import org.dspace.browse.BrowseIndex;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
 /**
@@ -18,7 +19,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
  *
  * @author Marie Verdonck (Atmire) on 04/05/2023
  */
-public class DSpaceControlledVocabularyIndex {
+public class DSpaceControlledVocabularyIndex extends BrowseIndex {
 
     protected DSpaceControlledVocabulary vocabulary;
     protected Set<String> metadataFields;
@@ -26,6 +27,7 @@ public class DSpaceControlledVocabularyIndex {
 
     public DSpaceControlledVocabularyIndex(DSpaceControlledVocabulary controlledVocabulary, Set<String> metadataFields,
                                            DiscoverySearchFilterFacet facetConfig) {
+        super(controlledVocabulary.vocabularyName);
         this.vocabulary = controlledVocabulary;
         this.metadataFields = metadataFields;
         this.facetConfig = facetConfig;
