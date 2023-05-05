@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
     @Autowired
     BitstreamService bitstreamService;
-    private static final String OPERATION_PATH_BITSTREAM_REMOVE = "/bitstreams/";
+    public static final String OPERATION_PATH_BITSTREAM_REMOVE = "/bitstreams/";
 
     @Override
     public Bitstream perform(Context context, Bitstream resource, Operation operation) throws SQLException {

@@ -7,22 +7,29 @@
  */
 package org.dspace.app.rest;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.app.rest.repository.patch.operation.BitstreamRemoveOperation.OPERATION_PATH_BITSTREAM_REMOVE;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +37,8 @@ import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -52,10 +61,13 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MvcResult;
 
 public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -2279,6 +2291,223 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                              ));
     }
 
+    @Test
+    public void deleteBitstreamsInBulk() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 2")
+                                      .build();
 
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        Bitstream bitstream4 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream4 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+        String token = getAuthToken(admin.getEmail(), password);
+
+        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isNoContent());
+
+        // Verify that only the three bitstreams were deleted and the fourth one still exists
+        Assert.assertTrue(bitstreamNotFound(token, bitstream1, bitstream2, bitstream3));
+        Assert.assertTrue(bitstreamExists(token, bitstream4));
+    }
+
+    @Test
+    public void deleteBitstreamsInBulk_invalidUUID() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 2")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        Bitstream bitstream4 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream4 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        // For the third bitstream, use an invalid UUID
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        UUID randomUUID = UUID.randomUUID();
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + randomUUID);
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+        String token = getAuthToken(admin.getEmail(), password);
+
+        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+
+        MvcResult result = getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                                  .andExpect(status().isUnprocessableEntity())
+                                  .andReturn();
+
+        // Verify our custom error message is returned when an invalid UUID is used
+        assertEquals("Bitstream with uuid " + randomUUID + " could not be found in the repository",
+                            result.getResponse().getErrorMessage());
+
+        // Verify that no bitstreams were deleted since the request was invalid
+        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+    }
+
+    @Test
+    public void deleteBitstreamsInBulk_invalidRequestSize() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 2")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        Bitstream bitstream4 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream4 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        // But set the patch.operations.limit property to 2, so that the request is invalid
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+        String token = getAuthToken(admin.getEmail(), password);
+
+        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+        DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("patch.operations.limit", 2);
+
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isBadRequest());
+
+        // Verify that no bitstreams were deleted since the request was invalid
+        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+    }
+
+    public boolean bitstreamExists(String token, Bitstream ...bitstreams) throws Exception {
+        for (Bitstream bitstream : bitstreams) {
+            if (getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                                .andReturn().getResponse().getStatus() != SC_OK) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean bitstreamNotFound(String token, Bitstream ...bitstreams) throws Exception {
+        for (Bitstream bitstream : bitstreams) {
+            if (getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                                .andReturn().getResponse().getStatus() != SC_NOT_FOUND) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
