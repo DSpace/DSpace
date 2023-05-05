@@ -38,6 +38,7 @@
                 <value>yyyy-MMM-dd</value>
                 <value>yyyy-MMM</value>
                 <value>yyyy-MM-dd</value>
+                <value>yyyy</value>
             </list>
         </property>
         <property name="year" ref="yearContrib"/>

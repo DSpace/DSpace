@@ -37,6 +37,7 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -51,6 +52,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -67,6 +70,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ItemService itemService;
+
+    @Autowired
+    BundleService bundleService;
 
     private Collection collection;
     private Item item;
@@ -513,6 +519,77 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                         BitstreamMatcher.matchBitstreamEntry(bitstream2),
                         BitstreamMatcher.matchBitstreamEntry(bitstream1)
                 )));
+    }
+
+    @Test
+    public void patchReplaceMultipleDescriptionBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        List<String> bundleDescriptions = List.of(
+            "FIRST",
+            "SECOND",
+            "THIRD"
+        );
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+            .withName("testname")
+            .build();
+
+        this.bundleService
+            .addMetadata(
+                context, bundle1,
+                MetadataSchemaEnum.DC.getName(), "description", null,
+                Item.ANY, bundleDescriptions
+            );
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+            .perform(get("/api/core/bundles/" + bundle1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(0), 0),
+                        MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(1), 1),
+                        MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(2), 2)
+                    )
+                )
+            );
+
+        List<Operation> ops = List.of(
+            new ReplaceOperation("/metadata/dc.description/0", bundleDescriptions.get(2)),
+            new ReplaceOperation("/metadata/dc.description/1", bundleDescriptions.get(0)),
+            new ReplaceOperation("/metadata/dc.description/2", bundleDescriptions.get(1))
+        );
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+            .perform(patch("/api/core/bundles/" + bundle1.getID())
+            .content(requestBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(
+                 jsonPath("$.metadata",
+                     Matchers.allOf(
+                         MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(2), 0),
+                         MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(0), 1),
+                         MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(1), 2)
+                     )
+                 )
+             );
+        getClient(token)
+            .perform(get("/api/core/bundles/" + bundle1.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(2), 0),
+                        MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(0), 1),
+                        MetadataMatcher.matchMetadata("dc.description", bundleDescriptions.get(1), 2)
+                    )
+                )
+            );
     }
 
     @Test

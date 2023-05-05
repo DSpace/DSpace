@@ -292,7 +292,14 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
                 countAttempt++;
+
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
+
                 response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response)) {
@@ -316,7 +323,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
                 countAttempt++;
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
                 response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response2)) {
@@ -418,7 +431,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
                 countAttempt++;
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
+
                 response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response)) {
@@ -441,7 +460,12 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
                 countAttempt++;
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
                 response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response2)) {

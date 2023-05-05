@@ -59,7 +59,16 @@ public class CrossLinks {
      * @return true/false
      */
     public boolean hasLink(String metadata) {
-        return links.containsKey(metadata);
+        return findLinkType(metadata) != null;
+    }
+
+    /**
+     * Is there a link for the given browse name (eg 'author')
+     * @param browseIndexName
+     * @return true/false
+     */
+    public boolean hasBrowseName(String browseIndexName) {
+        return links.containsValue(browseIndexName);
     }
 
     /**
@@ -69,6 +78,41 @@ public class CrossLinks {
      * @return type
      */
     public String getLinkType(String metadata) {
-        return links.get(metadata);
+        return findLinkType(metadata);
+    }
+
+    /**
+     * Get full map of field->indexname link configurations
+     * @return
+     */
+    public Map<String, String> getLinks() {
+        return links;
+    }
+
+    /**
+     * Find and return the browse name for a given metadata field.
+     * If the link key contains a wildcard eg dc.subject.*, it should
+     * match dc.subject.other, etc.
+     * @param metadata
+     * @return
+     */
+    public String findLinkType(String metadata) {
+        // Resolve wildcards properly, eg. dc.subject.other matches a configuration for dc.subject.*
+        for (String key : links.keySet()) {
+            if (null != key && key.endsWith(".*")) {
+                // A substring of length-1, also substracting the wildcard should work as a "startsWith"
+                // check for the field eg. dc.subject.* -> dc.subject is the start of dc.subject.other
+                if (null != metadata && metadata.startsWith(key.substring(0, key.length() - 1 - ".*".length()))) {
+                    return links.get(key);
+                }
+            } else {
+                // Exact match, if the key field has no .* wildcard
+                if (links.containsKey(metadata)) {
+                    return links.get(key);
+                }
+            }
+        }
+        // No match
+        return null;
     }
 }

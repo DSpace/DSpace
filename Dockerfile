@@ -31,7 +31,7 @@ ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.12
+ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 # Need wget to install ant
