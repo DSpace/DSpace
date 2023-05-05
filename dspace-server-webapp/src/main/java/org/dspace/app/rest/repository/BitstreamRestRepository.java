@@ -43,6 +43,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +77,9 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     private HandleService handleService;
+
+    @Autowired
+    ConfigurationService configurationService;
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
@@ -305,9 +309,14 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
      * @param jsonNode the json body provided from the request body
      */
     public void patchBitstreamsInBulk(Context context, JsonNode jsonNode) throws SQLException {
+        int operationsLimit = configurationService.getIntProperty("patch.operations.limit", 1000);
         ObjectMapper mapper = new ObjectMapper();
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);
+        if (patch.getOperations().size() > operationsLimit) {
+            throw new DSpaceBadRequestException("The number of operations in the patch is over the limit of " +
+                                                operationsLimit);
+        }
         resourcePatch.patch(obtainContext(), null, patch.getOperations());
         context.commit();
     }
