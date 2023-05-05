@@ -20,6 +20,7 @@ import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -44,6 +45,8 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -56,6 +59,8 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -1933,6 +1938,78 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void patchCommunityMetadataUnauthorized() throws Exception {
         runPatchMetadataTests(eperson, 403);
+    }
+
+    @Test
+    public void patchReplaceMultipleDescriptionCommunity() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        List<String> communityDescriptions = List.of(
+            "FIRST",
+            "SECOND",
+            "THIRD"
+        );
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        this.communityService
+            .addMetadata(
+                context, parentCommunity,
+                MetadataSchemaEnum.DC.getName(), "description", null,
+                Item.ANY, communityDescriptions
+            );
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+            .perform(get("/api/core/communities/" + parentCommunity.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(0), 0),
+                        MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(1), 1),
+                        MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(2), 2)
+                    )
+                )
+            );
+
+        List<Operation> ops = List.of(
+            new ReplaceOperation("/metadata/dc.description/0", communityDescriptions.get(2)),
+            new ReplaceOperation("/metadata/dc.description/1", communityDescriptions.get(0)),
+            new ReplaceOperation("/metadata/dc.description/2", communityDescriptions.get(1))
+        );
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+            .perform(patch("/api/core/communities/" + parentCommunity.getID())
+            .content(requestBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(
+                 jsonPath("$.metadata",
+                     Matchers.allOf(
+                         MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(2), 0),
+                         MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(0), 1),
+                         MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(1), 2)
+                     )
+                 )
+             );
+        getClient(token)
+            .perform(get("/api/core/communities/" + parentCommunity.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(2), 0),
+                        MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(0), 1),
+                        MetadataMatcher.matchMetadata("dc.description", communityDescriptions.get(1), 2)
+                    )
+                )
+            );
     }
 
     private void runPatchMetadataTests(EPerson asUser, int expectedStatus) throws Exception {

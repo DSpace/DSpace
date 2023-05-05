@@ -9,6 +9,7 @@ package org.dspace.content.service;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -110,6 +111,177 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
+    }
+
+    @Test
+    public void preserveMetadataOrder() throws Exception {
+        context.turnOffAuthorisationSystem();
+        itemService
+            .addMetadata(
+                context, item, dcSchema, contributorElement, authorQualifier, null, "test, one", null, 0, 2
+            );
+        MetadataValue placeZero =
+            itemService
+                .addMetadata(
+                    context, item, dcSchema, contributorElement, authorQualifier, null, "test, two", null, 0, 0
+                );
+        itemService
+            .addMetadata(
+                context, item, dcSchema, contributorElement, authorQualifier, null, "test, three", null, 0, 1
+            );
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        // check the correct order using default method `getMetadata`
+        List<MetadataValue> defaultMetadata =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+
+        assertThat(defaultMetadata,hasSize(3));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, two", null, 0, defaultMetadata.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, defaultMetadata.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, defaultMetadata.get(2)
+        );
+
+        // check the correct order using the method `getMetadata` without virtual fields
+        List<MetadataValue> nonVirtualMetadatas =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+
+        // if we don't reload the item the place order is not applied correctly
+        // item = context.reloadEntity(item);
+
+        assertThat(nonVirtualMetadatas,hasSize(3));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, two", null, 0, nonVirtualMetadatas.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, nonVirtualMetadatas.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, nonVirtualMetadatas.get(2)
+        );
+
+        context.turnOffAuthorisationSystem();
+
+        item = context.reloadEntity(item);
+
+        // now just add one metadata to be the last
+        this.itemService.addMetadata(
+            context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, latest", null, 0
+        );
+        // now just remove first metadata
+        this.itemService.removeMetadataValues(context, item, List.of(placeZero));
+        // now just add one metadata to place 0
+        this.itemService.addAndShiftRightMetadata(
+            context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, new", null, 0, 0
+        );
+
+        // check the metadata using method `getMetadata`
+        defaultMetadata =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+
+        // check correct places
+        assertThat(defaultMetadata,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, defaultMetadata.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, defaultMetadata.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, defaultMetadata.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, defaultMetadata.get(3)
+        );
+
+        // check metadata using nonVirtualMethod
+        nonVirtualMetadatas =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+
+        // check correct places
+        assertThat(nonVirtualMetadatas,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, nonVirtualMetadatas.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, nonVirtualMetadatas.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, nonVirtualMetadatas.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, nonVirtualMetadatas.get(3)
+        );
+
+        // check both lists
+        assertThat(defaultMetadata.size(), equalTo(nonVirtualMetadatas.size()));
+        assertThat(defaultMetadata.get(0), equalTo(nonVirtualMetadatas.get(0)));
+        assertThat(defaultMetadata.get(1), equalTo(nonVirtualMetadatas.get(1)));
+        assertThat(defaultMetadata.get(2), equalTo(nonVirtualMetadatas.get(2)));
+        assertThat(defaultMetadata.get(3), equalTo(nonVirtualMetadatas.get(3)));
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        item = context.reloadEntity(item);
+
+        // check after commit
+        defaultMetadata =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+
+        // check correct places
+        assertThat(defaultMetadata,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, defaultMetadata.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, defaultMetadata.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, defaultMetadata.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, defaultMetadata.get(3)
+        );
+
+        // check metadata using nonVirtualMethod
+        nonVirtualMetadatas =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+
+        // check correct places
+        assertThat(nonVirtualMetadatas,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, nonVirtualMetadatas.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, nonVirtualMetadatas.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, nonVirtualMetadatas.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, nonVirtualMetadatas.get(3)
+        );
+
+        // check both lists
+        assertThat(defaultMetadata.size(), equalTo(nonVirtualMetadatas.size()));
+        assertThat(defaultMetadata.get(0), equalTo(nonVirtualMetadatas.get(0)));
+        assertThat(defaultMetadata.get(1), equalTo(nonVirtualMetadatas.get(1)));
+        assertThat(defaultMetadata.get(2), equalTo(nonVirtualMetadatas.get(2)));
+        assertThat(defaultMetadata.get(3), equalTo(nonVirtualMetadatas.get(3)));
+
     }
 
     @Test
