@@ -10,8 +10,6 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -153,48 +151,6 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
             bs.delete(context, bit);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    protected void deleteList(Context context, List<DSpaceObject> dsoList)
-        throws SQLException, AuthorizeException {
-        // check if list is empty
-        if (dsoList.isEmpty()) {
-            throw new ResourceNotFoundException("No bitstreams given.");
-        }
-        // check if every DSO is a Bitstream
-        if (dsoList.stream().anyMatch(dso -> !(dso instanceof Bitstream))) {
-            throw new UnprocessableEntityException("Not all given items are bitstreams.");
-        }
-        // check that they're all part of the same Item
-        List<DSpaceObject> parents = new ArrayList<>();
-        for (DSpaceObject dso : dsoList) {
-            Bitstream bit = bs.find(context, dso.getID());
-            DSpaceObject bitstreamParent = bs.getParentObject(context, bit);
-            if (bit == null) {
-                throw new ResourceNotFoundException("The bitstream with uuid " + dso.getID() + " could not be found");
-            }
-            // we have to check if the bitstream has already been deleted
-            if (bit.isDeleted()) {
-                throw new UnprocessableEntityException("The bitstream with uuid " + bit.getID()
-                                                           + " was already deleted");
-            } else {
-                parents.add(bitstreamParent);
-            }
-        }
-        if (parents.stream().distinct().count() > 1) {
-            throw new UnprocessableEntityException("Not all given items are part of the same Item.");
-        }
-        // delete all Bitstreams
-        Iterator<DSpaceObject> iterator = dsoList.iterator();
-        while (iterator.hasNext()) {
-            Bitstream bit = (Bitstream) iterator.next();
-            try {
-                bs.delete(context, bit);
-            } catch (SQLException | IOException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
         }
     }
 

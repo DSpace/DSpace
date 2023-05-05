@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_HEX32;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG;
@@ -56,8 +55,6 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1053,13 +1050,6 @@ public class RestResourceController implements InitializingBean {
         return deleteInternal(apiCategory, model, uuid);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, consumes = {"text/uri-list"})
-    public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                         @PathVariable String model)
-        throws HttpRequestMethodNotSupportedException {
-        return deleteUriListInternal(request, apiCategory, model);
-    }
-
     /**
      * Internal method to delete resource.
      *
@@ -1074,29 +1064,6 @@ public class RestResourceController implements InitializingBean {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         repository.deleteById(id);
-        return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
-    }
-
-    public <ID extends Serializable> ResponseEntity<RepresentationModel<?>> deleteUriListInternal(
-        HttpServletRequest request,
-        String apiCategory,
-        String model)
-        throws HttpRequestMethodNotSupportedException {
-        checkModelPluralForm(apiCategory, model);
-        DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        Context context = obtainContext(request);
-        List<String> dsoStringList = utils.getStringListFromRequest(request);
-        List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, dsoStringList);
-        if (dsoStringList.size() != dsoList.size()) {
-            throw new ResourceNotFoundException("One or more bitstreams could not be found.");
-        }
-        try {
-            repository.delete(dsoList);
-        } catch (ClassCastException e) {
-            log.error("Something went wrong whilst creating the object for apiCategory: " + apiCategory +
-                          " and model: " + model, e);
-            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 

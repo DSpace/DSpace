@@ -26,7 +26,6 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.BeanNameAware;
@@ -255,23 +254,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     public void deleteAll() {
         // TODO Auto-generated method stub
 
-    }
-
-    public void delete(List<DSpaceObject> dsoList) {
-        Context context = obtainContext();
-        try {
-            getThisRepository().deleteList(context, dsoList);
-            context.commit();
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex.getMessage(), ex);
-        }
-    }
-
-    protected void deleteList(Context context, List<DSpaceObject> list)
-        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     @Override
