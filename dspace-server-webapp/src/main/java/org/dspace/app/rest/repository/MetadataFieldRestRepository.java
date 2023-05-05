@@ -14,6 +14,7 @@ import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
@@ -45,10 +46,10 @@ import org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
 /**
  * This is the repository responsible to manage MetadataField Rest object
  *
@@ -213,7 +214,13 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
-        discoverQuery.setSortField("fieldName_sort", DiscoverQuery.SORT_ORDER.asc);
+        Iterator<Sort.Order> orderIterator = pageable.getSort().iterator();
+        if (orderIterator.hasNext()) {
+            Sort.Order order = orderIterator.next();
+            discoverQuery.setSortField(order.getProperty() + "_sort",
+                                       order.getDirection() == Sort.Direction.ASC ? DiscoverQuery.SORT_ORDER.asc :
+                                           DiscoverQuery.SORT_ORDER.desc);
+        }
         discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
         discoverQuery.setMaxResults(pageable.getPageSize());
         return discoverQuery;
@@ -254,13 +261,13 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         if (isBlank(metadataFieldRest.getElement())) {
             throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
         } else if (metadataFieldRest.getElement().contains(".")) {
-            throw new DSpaceBadRequestException("metadata element (in request body) cannot contain dots");
+            throw new UnprocessableEntityException("metadata element (in request body) cannot contain dots");
         }
 
         if (isBlank(metadataFieldRest.getQualifier())) {
             metadataFieldRest.setQualifier(null);
         } else if (metadataFieldRest.getQualifier().contains(".")) {
-            throw new DSpaceBadRequestException("metadata qualifier (in request body) cannot contain dots");
+            throw new UnprocessableEntityException("metadata qualifier (in request body) cannot contain dots");
         }
 
         // create
@@ -310,12 +317,12 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         try {
             metadataFieldRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataFieldRest.class);
         } catch (JsonProcessingException e) {
-            throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
+            throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 
         MetadataField metadataField = metadataFieldService.find(context, id);
         if (metadataField == null) {
-            throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
+            throw new UnprocessableEntityException("metadata field with id: " + id + " not found");
         }
 
         if (!Objects.equals(metadataFieldRest.getElement(), metadataField.getElement())) {

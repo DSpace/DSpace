@@ -88,7 +88,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
 
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace")
-                                                             .build();
+            .build();
         context.restoreAuthSystemState();
 
         MetadataSchemaRest metadataSchemaRest = metadataSchemaConverter.convert(metadataSchema, Projection.DEFAULT);
@@ -114,6 +114,27 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         } finally {
             MetadataSchemaBuilder.deleteMetadataSchema(idRef.get());
         }
+    }
+
+    @Test
+    public void createUnprocessableEntity_prefixContainingDots() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace")
+            .build();
+        context.restoreAuthSystemState();
+
+        MetadataSchemaRest metadataSchemaRest = metadataSchemaConverter.convert(metadataSchema, Projection.DEFAULT);
+        metadataSchemaRest.setPrefix("test.SchemaName");
+        metadataSchemaRest.setNamespace(TEST_NAMESPACE);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken)
+            .perform(post("/api/core/metadataschemas")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test

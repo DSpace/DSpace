@@ -93,11 +93,11 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         // validate fields
         if (isBlank(metadataSchemaRest.getPrefix())) {
             throw new UnprocessableEntityException("metadata schema name cannot be blank");
+        } else if (metadataSchemaRest.getPrefix().contains(".")) {
+            throw new UnprocessableEntityException("metadata schema namespace cannot contain dots");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
-        } else if (metadataSchemaRest.getNamespace().contains(".")) {
-            throw new UnprocessableEntityException("metadata schema namespace cannot contain dots");
         }
 
         // create
@@ -144,7 +144,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         try {
             metadataSchemaRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataSchemaRest.class);
         } catch (JsonProcessingException e) {
-            throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
+            throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 
         MetadataSchema metadataSchema = metadataSchemaService.find(context, id);

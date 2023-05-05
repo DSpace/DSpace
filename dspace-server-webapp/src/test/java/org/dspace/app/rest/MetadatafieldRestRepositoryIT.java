@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -565,6 +566,70 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void findByFieldName_sortByFieldNameASC() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+                                                                           "http://www.dspace.org/ns/aschema").build();
+
+        MetadataField metadataField1 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "2", null, "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "1", null, "AScopeNote").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "1", "a", "AScopeNote").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+                                .param("query", schema.getName())
+                                .param("sort", "fieldName,ASC"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.metadatafields", contains(
+                MetadataFieldMatcher.matchMetadataField(metadataField2),
+                MetadataFieldMatcher.matchMetadataField(metadataField3),
+                MetadataFieldMatcher.matchMetadataField(metadataField1)
+            )))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(3)));
+    }
+
+    @Test
+    public void findByFieldName_sortByFieldNameDESC() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+                                                                           "http://www.dspace.org/ns/aschema").build();
+
+        MetadataField metadataField1 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "2", null, "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "1", null, "AScopeNote").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "1", "a", "AScopeNote").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+                                .param("query", schema.getName())
+                                .param("sort", "fieldName,DESC"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.metadatafields", contains(
+                MetadataFieldMatcher.matchMetadataField(metadataField1),
+                MetadataFieldMatcher.matchMetadataField(metadataField3),
+                MetadataFieldMatcher.matchMetadataField(metadataField2)
+            )))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(3)));
+    }
+
+    @Test
     public void createSuccess() throws Exception {
 
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
@@ -575,7 +640,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
-            assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, QUALIFIER), nullValue());
+            assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                          metadataFieldRest.getQualifier()), nullValue());
 
             getClient(authToken)
                 .perform(post("/api/core/metadatafields")
@@ -606,7 +672,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         Integer id = null;
         try {
-            assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, null), nullValue());
+            assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                          null), nullValue());
 
             id = read(
                     getClient(authToken)
@@ -641,7 +708,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
-            assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, QUALIFIER), nullValue());
+            assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                          metadataFieldRest.getQualifier()), nullValue());
 
             getClient(authToken)
                 .perform(post("/api/core/metadatafields")
@@ -687,6 +755,46 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                 .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
                 .contentType(contentType))
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void createUnprocessableEntity_elementContainingDots() throws Exception {
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setElement("testElement.ForCreate");
+        metadataFieldRest.setQualifier(QUALIFIER);
+        metadataFieldRest.setScopeNote(SCOPE_NOTE);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                      metadataFieldRest.getQualifier()), nullValue());
+
+        getClient(authToken)
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", String.valueOf(metadataSchema.getID()))
+                         .param("projection", "full")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createUnprocessableEntity_qualifierContainingDots() throws Exception {
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setElement(ELEMENT);
+        metadataFieldRest.setQualifier("testQualifier.ForCreate");
+        metadataFieldRest.setScopeNote(SCOPE_NOTE);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                      metadataFieldRest.getQualifier()), nullValue());
+
+        getClient(authToken)
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", String.valueOf(metadataSchema.getID()))
+                         .param("projection", "full")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
