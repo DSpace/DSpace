@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -2158,7 +2159,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 // The browse definition ID should be "author"
                 .andExpect(jsonPath("$.id", is("author")))
                 // It should be configured as a metadata browse
-                .andExpect(jsonPath("$.metadataBrowse", is(true)))
+                .andExpect(jsonPath("$.browseType", is(BROWSE_TYPE_VALUE_LIST)))
         ;
     }
 
@@ -2175,7 +2176,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 // The browse definition ID should be "author"
                 .andExpect(jsonPath("$.id", is("author")))
                 // It should be configured as a metadata browse
-                .andExpect(jsonPath("$.metadataBrowse", is(true)));
+                .andExpect(jsonPath("$.browseType", is(BROWSE_TYPE_VALUE_LIST)));
     }
 
     @Test
