@@ -141,7 +141,6 @@ public class DOIConsumer implements Consumer {
                             + item.getID() + " and DOI " + doi + ".", ex);
                 }
             }
-            ctx.commit();
         }
     }
 
