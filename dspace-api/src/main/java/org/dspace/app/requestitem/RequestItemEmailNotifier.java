@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 
@@ -59,9 +58,12 @@ public class RequestItemEmailNotifier {
     @Inject
     protected RequestItemService requestItemService;
 
+    protected final RequestItemAuthorExtractor requestItemAuthorExtractor;
+
     @Inject
-    @Named("requestItemAuthorExtractor") // alias for selected strategy bean
-    protected RequestItemAuthorExtractor requestItemAuthorExtractor;
+    public RequestItemEmailNotifier(RequestItemAuthorExtractor requestItemAuthorExtractor) {
+        this.requestItemAuthorExtractor = requestItemAuthorExtractor;
+    }
 
     /**
      * Send the request to the approver(s).

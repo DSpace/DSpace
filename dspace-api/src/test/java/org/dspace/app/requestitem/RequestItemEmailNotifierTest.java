@@ -20,6 +20,7 @@ import javax.mail.internet.InternetAddress;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -28,7 +29,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.BeforeClass;
@@ -45,6 +48,11 @@ public class RequestItemEmailNotifierTest
 
     public static final String TRANSPORT_CLASS_KEY = "mail.smtp.class";
 
+    private static ConfigurationService configurationService;
+    private static BitstreamService bitstreamService;
+    private static HandleService handleService;
+    private static RequestItemService requestItemService;
+
     public RequestItemEmailNotifierTest() {
         super();
     }
@@ -52,6 +60,15 @@ public class RequestItemEmailNotifierTest
     @BeforeClass
     public static void setUpClass() {
         AbstractBuilder.init(); // AbstractUnitTest doesn't do this for us.
+
+        configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        bitstreamService
+                = ContentServiceFactory.getInstance().getBitstreamService();
+        handleService
+                = HandleServiceFactory.getInstance().getHandleService();
+        requestItemService
+                = RequestItemServiceFactory.getInstance().getRequestItemService();
     }
 
     /**
@@ -96,11 +113,6 @@ public class RequestItemEmailNotifierTest
         ri.setReqEmail(REQUESTOR_ADDRESS);
         ri.setReqName(REQUESTOR_NAME);
 
-        // Ensure that mail is "sent".
-        final ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        configurationService.setProperty("mail.server.disabled", "false");
-
         // Install a fake transport for RFC2822 email addresses.
         Session session = DSpaceServicesFactory.getInstance().getEmailService().getSession();
         Provider transportProvider = new Provider(Provider.Type.TRANSPORT,
@@ -110,26 +122,25 @@ public class RequestItemEmailNotifierTest
         session.setProvider(transportProvider);
         session.setProtocolForAddress("rfc822", DUMMY_PROTO);
 
-        // Instantiate and initialize the unit, using the "help desk" strategy.
-        RequestItemEmailNotifier requestItemEmailNotifier
-                = new RequestItemEmailNotifier();
-        requestItemEmailNotifier.bitstreamService
-                = ContentServiceFactory.getInstance().getBitstreamService();
-        requestItemEmailNotifier.configurationService = configurationService;
-        requestItemEmailNotifier.handleService
-                = HandleServiceFactory.getInstance().getHandleService();
-        requestItemEmailNotifier.requestItemService
-                = RequestItemServiceFactory.getInstance().getRequestItemService();
-        requestItemEmailNotifier.requestItemAuthorExtractor
-                =  DSpaceServicesFactory.getInstance()
-                    .getServiceManager()
-                        .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
-                                RequestItemAuthorExtractor.class);
-
         // Configure the help desk strategy.
         configurationService.setProperty("mail.helpdesk", HELPDESK_ADDRESS);
         configurationService.setProperty("mail.helpdesk.name", HELPDESK_NAME);
         configurationService.setProperty("request.item.helpdesk.override", "true");
+
+        // Ensure that mail is "sent".
+        configurationService.setProperty("mail.server.disabled", "false");
+
+        // Instantiate and initialize the unit, using the "help desk" strategy.
+        RequestItemEmailNotifier requestItemEmailNotifier
+                = new RequestItemEmailNotifier(
+                        DSpaceServicesFactory.getInstance()
+                                .getServiceManager()
+                                .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
+                                        RequestItemAuthorExtractor.class));
+        requestItemEmailNotifier.bitstreamService = bitstreamService;
+        requestItemEmailNotifier.configurationService = configurationService;
+        requestItemEmailNotifier.handleService = handleService;
+        requestItemEmailNotifier.requestItemService = requestItemService;
 
         // Test the unit.  Template supplies the Subject: value
         requestItemEmailNotifier.sendResponse(context, ri, null, TEST_MESSAGE);
