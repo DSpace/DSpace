@@ -13,17 +13,25 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * This class provides extra configuration for our Spring Boot Application
+ * This class provides extra configuration for our Spring Boot Application.
  * <p>
- * NOTE: @ComponentScan on "org.dspace.app.configuration" provides a way for other DSpace modules or plugins
- * to "inject" their own Spring configurations / subpaths into our Spring Boot webapp.
+ * NOTE: @ComponentScan on "org.dspace.app.configuration" provides a way for
+ * other DSpace modules or plugins to "inject" their own Spring configurations /
+ * subpaths into our Spring Boot webapp.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Tim Donohue
  */
 @Configuration
-@ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
-        "org.dspace.app.configuration", "org.dspace.iiif", "org.dspace.app.iiif"})
+@ComponentScan( {
+    "org.dspace.app.rest.converter",
+    "org.dspace.app.rest.repository",
+    "org.dspace.app.rest.utils",
+    "org.dspace.app.configuration",
+    "org.dspace.iiif",
+    "org.dspace.app.iiif",
+    "org.dspace.app.requestitem"
+})
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)
     // Can be overridden in DSpace configuration
