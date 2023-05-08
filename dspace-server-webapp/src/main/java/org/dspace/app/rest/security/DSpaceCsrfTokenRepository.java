@@ -150,6 +150,19 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
         return new DefaultCsrfToken(this.headerName, this.parameterName, token);
     }
 
+    /**
+     * Retrieve the csrf token from the header of the request, if present, otherwise return null
+     * As opposed to the regular loadToken method, which retrieves the token from the cookies instead
+     */
+    public CsrfToken loadTokenFromHeader(HttpServletRequest request) {
+        String token = request.getHeader(this.headerName);
+        if (!StringUtils.hasLength(token)) {
+            return null;
+        }
+
+        return new DefaultCsrfToken(this.headerName, this.parameterName, token);
+    }
+
 
     /**
      * Sets the name of the HTTP request parameter that should be used to provide a token.
