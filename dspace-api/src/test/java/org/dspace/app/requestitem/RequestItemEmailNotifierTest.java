@@ -123,7 +123,8 @@ public class RequestItemEmailNotifierTest
         requestItemEmailNotifier.requestItemAuthorExtractor
                 =  DSpaceServicesFactory.getInstance()
                     .getServiceManager()
-                        .getServiceByName("HelpdeskStrategy", RequestItemAuthorExtractor.class);
+                        .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
+                                RequestItemAuthorExtractor.class);
 
         // Configure the help desk strategy.
         configurationService.setProperty("mail.helpdesk", HELPDESK_ADDRESS);
