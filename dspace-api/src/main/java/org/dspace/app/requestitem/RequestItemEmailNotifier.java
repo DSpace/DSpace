@@ -167,12 +167,12 @@ public class RequestItemEmailNotifier {
                             if (!bitstream.getFormat(context).isInternal() &&
                                     requestItemService.isRestricted(context,
                                     bitstream)) {
-                                    // #8636 Anyone receiving the email can respond to the request without authenticating into DSpace
-                                    context.turnOffAuthorisationSystem();
-                                    email.addAttachment(bitstreamService.retrieve(context,
-                                            bitstream), bitstream.getName(),
-                                            bitstream.getFormat(context).getMIMEType());
-                                    context.restoreAuthSystemState();
+                                // #8636 Anyone receiving the email can respond to the request without authenticating into DSpace
+                                context.turnOffAuthorisationSystem();
+                                email.addAttachment(bitstreamService.retrieve(context,
+                                        bitstream), bitstream.getName(),
+                                        bitstream.getFormat(context).getMIMEType());
+                                context.restoreAuthSystemState();
                             }
                         }
                     }
