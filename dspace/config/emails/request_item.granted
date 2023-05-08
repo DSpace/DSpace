@@ -1,0 +1,26 @@
+## Sent to the person requesting a copy of a restricted document when the
+## request is granted.
+##
+## Parameters:
+##  {0} name of the requestor
+##  {1} unique ID of the requested Item
+##  {2} title of the requested Item
+##  {3} name of the grantor
+##  {4} email address of the grantor
+##  {5} custom message sent by the grantor.
+#set($subject = 'Request for Copy of Restricted Document is Granted')
+Dear ${params[0]}:
+
+In response to your request I have the pleasure to send you in attachment a copy of the file(s) concerning the document:
+
+  ${params[2]}
+  ${params[1]}
+
+of which I am an author.
+#if( $params[5] )
+
+${params[5]}
+#end
+
+Best regards,
+${params[3]} <${params[4]}>
