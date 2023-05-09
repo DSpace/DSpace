@@ -7,12 +7,9 @@
  */
 package org.dspace.app.rest.repository;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.bulkaccesscontrol.model.BulkAccessConditionConfiguration;
 import org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -49,7 +46,7 @@ public class BulkAccessConditionRestRepository extends DSpaceRestRepository<Bulk
         }
 
         BulkAccessConditionConfiguration bulkConfiguration =
-            bulkAccessConditionConfigurationService.getBulkAccessConditionConfigurations().get(id);
+            bulkAccessConditionConfigurationService.getBulkAccessConditionConfiguration(id);
 
         return Objects.nonNull(bulkConfiguration) ?
             converter.toRest(bulkConfiguration, utils.obtainProjection()) : null;
@@ -59,19 +56,13 @@ public class BulkAccessConditionRestRepository extends DSpaceRestRepository<Bulk
     @PreAuthorize("permitAll()")
     public Page<BulkAccessConditionRest> findAll(Context context, Pageable pageable) {
 
-        List<BulkAccessConditionConfiguration> configurations = new ArrayList<>();
-
         if (!isAuthorized(context)) {
             throw new RESTAuthorizationException("Only admin users of community or collection or item " +
                 "are allowed to bulk access condition");
         }
 
-        Map<String, BulkAccessConditionConfiguration> bulkConfiguration =
+        List<BulkAccessConditionConfiguration> configurations =
             bulkAccessConditionConfigurationService.getBulkAccessConditionConfigurations();
-
-        if (Objects.nonNull(bulkConfiguration) && CollectionUtils.isNotEmpty(bulkConfiguration.values())) {
-            configurations = new ArrayList<>(bulkConfiguration.values());
-        }
 
         return converter.toRestPage(configurations, pageable, configurations.size(), utils.obtainProjection());
     }

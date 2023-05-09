@@ -109,10 +109,10 @@
 
     <bean id="bulkAccessConditionConfigurationService"
           class="org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService">
-        <property name="BulkAccessConditionConfigurations">
-            <map>
-                <entry key="default" value-ref="defaultBulkAccessConditionConfiguration"/>
-            </map>
+        <property name="bulkAccessConditionConfigurations">
+            <list>
+                <ref bean="defaultBulkAccessConditionConfiguration"/>
+            </list>
         </property>
     </bean>
 
