@@ -80,7 +80,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
-        List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(context);
+        List<ScriptConfiguration> scriptConfigurations =
+            scriptService.getScriptConfigurations(context);
         return converter.toRestPage(scriptConfigurations, pageable, utils.obtainProjection());
     }
 

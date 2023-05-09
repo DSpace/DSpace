@@ -9,9 +9,11 @@ package org.dspace.identifier.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.logic.Filter;
 import org.dspace.core.Context;
 import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
@@ -102,6 +104,52 @@ public interface IdentifierService {
      * @throws IdentifierException if identifier error
      */
     void register(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException;
+
+    /**
+     *
+     * Register identifiers for a DSO, with a map of logical filters for each Identifier class to apply
+     * at the time of local registration.
+     *
+     * @param context The relevant DSpace Context.
+     * @param dso     DSpace object to be registered
+     * @param typeFilters   If a service supports a given Identifier implementation, apply the associated filter
+     * @throws AuthorizeException  if authorization error
+     * @throws SQLException        if database error
+     * @throws IdentifierException if identifier error
+     */
+    void register(Context context, DSpaceObject dso, Map<Class<? extends Identifier>, Filter> typeFilters)
+        throws AuthorizeException, SQLException, IdentifierException;
+
+    /**
+     *
+     * Register identifier(s) for the given DSO just with providers that support that Identifier class, and
+     * apply the given filter if that provider extends FilteredIdentifierProvider
+     *
+     * @param context The relevant DSpace Context.
+     * @param dso     DSpace object to be registered
+     * @param type    Type of identifier to register
+     * @param filter   If a service supports a given Identifier implementation, apply this specific filter
+     * @throws AuthorizeException  if authorization error
+     * @throws SQLException        if database error
+     * @throws IdentifierException if identifier error
+     */
+    void register(Context context, DSpaceObject dso, Class<? extends Identifier> type, Filter filter)
+            throws AuthorizeException, SQLException, IdentifierException;
+
+    /**
+     *
+     * Register identifier(s) for the given DSO just with providers that support that Identifier class, and
+     * apply the given filter if that provider extends FilteredIdentifierProvider
+     *
+     * @param context The relevant DSpace Context.
+     * @param dso     DSpace object to be registered
+     * @param type    Type of identifier to register
+     * @throws AuthorizeException  if authorization error
+     * @throws SQLException        if database error
+     * @throws IdentifierException if identifier error
+     */
+    void register(Context context, DSpaceObject dso, Class<? extends Identifier> type)
+            throws AuthorizeException, SQLException, IdentifierException;
 
     /**
      * Used to Register a specific Identifier (for example a Handle, hdl:1234.5/6).

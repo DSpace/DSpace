@@ -20,7 +20,7 @@
     <!--   default-autowire-candidates="*Service,*DAO,javax.sql.DataSource"> -->
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
-
+    <bean id="always_true_filter" scope="singleton" class="org.dspace.content.logic.TrueFilter"/>
 
     <!-- DEFINE CONDITIONS
         Define condition beans below for use as sub-statements in operator and filter beans
@@ -168,6 +168,17 @@
         </property>
     </bean>
 
+    <bean id="is-archived_condition" class="org.dspace.content.logic.condition.IsArchivedCondition">
+        <property name="parameters">
+            <map></map>
+        </property>
+    </bean>
+    <bean id="is-withdrawn_condition" class="org.dspace.content.logic.condition.IsWithdrawnCondition">
+        <property name="parameters">
+            <map></map>
+        </property>
+    </bean>
+
     <!-- DEFINE OPERATORS
         Operators can be defined too, if a particular AND or OR statement needs to be re-used a lot, though
         it may be easier in most cases to turn that into a filter and reference the filter in other sub-statements
@@ -195,11 +206,15 @@
             <bean class="org.dspace.content.logic.operator.And">
                 <property name="statements">
                     <list>
+                        <!-- Make sure the item is archived -->
+                        <ref bean="is-archived_condition"/>
+                        <!-- Make sure the item is not withdrawn -->
+                        <bean class="org.dspace.content.logic.operator.Not">
+                            <property name="statements" ref="is-withdrawn_condition"/>
+                        </bean>
                         <!-- Don't create new DOIs for items that already have one  -->
                         <bean class="org.dspace.content.logic.operator.Not">
-                            <property name="statements">
-                                <ref bean="dc-identifier-uri-contains-doi_condition"/>
-                            </property>
+                            <property name="statements" ref="dc-identifier-uri-contains-doi_condition"/>
                         </bean>
                         <!-- Create DOIs for items only that do have at least one bitstream. -->
                         <ref bean="has-at-least-one-bitstream_condition"/>
@@ -226,16 +241,12 @@
 
     <!-- A very simple demonstration filter, using the metadata match condition -->
     <bean id="simple-demo_filter" class="org.dspace.content.logic.DefaultFilter">
-        <property name="statement">
-            <ref bean="title-contains-demo_condition"/>
-        </property>
+        <property name="statement" ref="title-contains-demo_condition"/>
     </bean>
 
     <!-- A very simple filter for items with at least one bitstream -->
     <bean id="has-bitstream_filter" class="org.dspace.content.logic.DefaultFilter">
-        <property name="statement">
-            <ref bean="has-at-least-one-bitstream_condition"/>
-        </property>
+        <property name="statement" ref="has-at-least-one-bitstream_condition"/>
     </bean>
 
     <!--
@@ -334,6 +345,5 @@
             </bean>
         </property>
     </bean>
-
 
 </beans>

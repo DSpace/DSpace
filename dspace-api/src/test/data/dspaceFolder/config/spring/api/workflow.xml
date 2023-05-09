@@ -153,6 +153,7 @@
     <bean id="scoreassignedreviewer" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).ITEM}"/>
         <property name="name" value="Reviewer"/>
+        <property name="deleteTemporaryGroup" value="true"/>
     </bean>
 
 

@@ -18,7 +18,6 @@ import org.dspace.core.Context;
  * A condition to evaluate an item based on how many bitstreams it has in a particular bundle
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class BitstreamCountCondition extends AbstractCondition {
     /**
