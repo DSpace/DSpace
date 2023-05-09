@@ -75,4 +75,38 @@
         </property>
     </bean>
 
+    <bean id="defaultBulkAccessConditionConfiguration"
+          class="org.dspace.app.bulkaccesscontrol.model.BulkAccessConditionConfiguration">
+        <property name="name" value="default"/>
+        <property name="itemAccessConditionOptions">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="administrator"/>
+                <ref bean="embargoed" />
+                <ref bean="lease"/>
+            </list>
+        </property>
+        <property name="bitstreamAccessConditionOptions">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="administrator"/>
+                <ref bean="embargoed" />
+                <ref bean="lease"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="bulkAccessConditionConfigurationService"
+          class="org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService">
+        <property name="BulkAccessConditionConfigurations">
+            <map>
+                <entry key="default">
+                    <list>
+                        <ref bean="defaultBulkAccessConditionConfiguration"/>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
 </beans>
