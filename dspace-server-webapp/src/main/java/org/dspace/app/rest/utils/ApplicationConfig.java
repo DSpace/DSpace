@@ -23,14 +23,18 @@ import org.springframework.context.annotation.Configuration;
  * @author Tim Donohue
  */
 @Configuration
+// Component scanning ignores any parent {@code ApplicationContext}s, so any
+// bean which is in the scope of both will be duplicated.  dspace-services makes
+// its context the parent of this one.  If a bean is explicitly configured in
+// the parent, it won't be so configured in this context and you may have
+// trouble.  IOW be careful what you add here.
 @ComponentScan( {
     "org.dspace.app.rest.converter",
     "org.dspace.app.rest.repository",
     "org.dspace.app.rest.utils",
     "org.dspace.app.configuration",
     "org.dspace.iiif",
-    "org.dspace.app.iiif",
-    "org.dspace.app.requestitem"
+    "org.dspace.app.iiif"
 })
 public class ApplicationConfig {
     // Allowed CORS origins ("Access-Control-Allow-Origin" header)

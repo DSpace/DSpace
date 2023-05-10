@@ -17,9 +17,10 @@
         meld the lists from two or more other strategies.
     </description>
 
-    <context:annotation-config /> <!-- allows us to use Spring annotations in beans -->
+    <context:annotation-config /> <!-- allows us to use Spring annotations -->
 
-    <bean class="org.dspace.app.requestitem.RequestItemEmailNotifier">
+    <bean class="org.dspace.app.requestitem.RequestItemEmailNotifier"
+          lazy-init='false'>
         <description>
             This sends various emails between the requestor and the grantor.
         </description>
