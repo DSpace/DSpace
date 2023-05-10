@@ -176,6 +176,24 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Withdrawn item 1")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry").withSubject("WithdrawnEntry")
+                                      .withdrawn()
+                                      .build();
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Private item 1")
+                                       .withIssueDate("2016-02-13")
+                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                       .withSubject("AnotherTest").withSubject("TestingForMore")
+                                       .withSubject("ExtraEntry").withSubject("PrivateEntry")
+                                       .makeUnDiscoverable()
+                                       .build();
+
+
 
         context.restoreAuthSystemState();
 
@@ -369,6 +387,23 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withSubject("AnotherTest")
                                       .build();
 
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+                                         .withTitle("Withdrawn item 1")
+                                         .withIssueDate("2016-02-13")
+                                         .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                         .withSubject("AnotherTest").withSubject("TestingForMore")
+                                         .withSubject("ExtraEntry").withSubject("WithdrawnEntry")
+                                         .withdrawn()
+                                         .build();
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Private item 1")
+                                       .withIssueDate("2016-02-13")
+                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                       .withSubject("AnotherTest").withSubject("TestingForMore")
+                                       .withSubject("ExtraEntry").withSubject("PrivateEntry")
+                                       .makeUnDiscoverable()
+                                       .build();
+
         context.restoreAuthSystemState();
 
         //** WHEN **
@@ -407,6 +442,276 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                        ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "zPublic item more", "2017-10-17")
                    )));
 
+        //** WHEN **
+        //An anonymous user browses the items that correspond with the PrivateEntry subject query
+        getClient().perform(get("/api/discover/browses/subject/items")
+                                    .param("filterValue", "PrivateEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements because the item is private
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+
+        //** WHEN **
+        //An anonymous user browses the items that correspond with the WithdrawnEntry subject query
+        getClient().perform(get("/api/discover/browses/subject/items")
+                                    .param("filterValue", "WithdrawnEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements because the item is withdrawn
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+    }
+
+    @Test
+    public void findBrowseBySubjectItemsWithScope() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Two public items with the same subject and another public item that contains that same subject, but also
+        // another one
+        //   All of the items are readable by an Anonymous user
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("zPublic item more")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry").withSubject("AnotherTest")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2016-02-14")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest")
+                                      .build();
+
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+                                         .withTitle("Withdrawn item 1")
+                                         .withIssueDate("2016-02-13")
+                                         .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                         .withSubject("AnotherTest").withSubject("TestingForMore")
+                                         .withSubject("ExtraEntry").withSubject("WithdrawnEntry")
+                                         .withdrawn()
+                                         .build();
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Private item 1")
+                                       .withIssueDate("2016-02-13")
+                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                       .withSubject("AnotherTest").withSubject("TestingForMore")
+                                       .withSubject("ExtraEntry").withSubject("PrivateEntry")
+                                       .makeUnDiscoverable()
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses the items that correspond with the ExtraEntry subject query
+        getClient().perform(get("/api/discover/browses/subject/items")
+                                .param("scope", String.valueOf(col2.getID()))
+                                .param("filterValue", "ExtraEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements in collection 2
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+
+        //** WHEN **
+        //An anonymous user browses the items that correspond with the AnotherTest subject query
+        getClient().perform(get("/api/discover/browses/subject/items")
+                                    .param("scope", String.valueOf(col2.getID()))
+                                    .param("filterValue", "AnotherTest"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be only two elements, the ones that we've added with the requested subject
+                   // in collection 2
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   //Verify that the title of the public and embargoed items are present and sorted descending
+                   .andExpect(jsonPath("$._embedded.items", contains(
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13"),
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-14")
+                   )));
+
+        //** WHEN **
+        //An anonymous user browses the items that correspond with the PrivateEntry subject query
+        getClient().perform(get("/api/discover/browses/subject/items")
+                                    .param("scope", String.valueOf(col2.getID()))
+                                    .param("filterValue", "PrivateEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements because the item is private
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+
+        //** WHEN **
+        //An anonymous user browses the items that correspond with the WithdrawnEntry subject query
+        getClient().perform(get("/api/discover/browses/subject/items")
+                                    .param("scope", String.valueOf(col2.getID()))
+                                    .param("filterValue", "WithdrawnEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements because the item is withdrawn
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+    }
+
+    @Test
+    public void findBrowseBySubjectItemsWithScopeAsAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Two public items with the same subject and another public item that contains that same subject, but also
+        // another one
+        //   All of the items are readable by an Anonymous user
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("zPublic item more")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry").withSubject("AnotherTest")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2016-02-14")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest")
+                                      .build();
+
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+                                         .withTitle("Withdrawn item 1")
+                                         .withIssueDate("2016-02-13")
+                                         .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                         .withSubject("AnotherTest").withSubject("TestingForMore")
+                                         .withSubject("ExtraEntry").withSubject("WithdrawnEntry")
+                                         .withdrawn()
+                                         .build();
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Private item 1")
+                                       .withIssueDate("2016-02-13")
+                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                       .withSubject("AnotherTest").withSubject("TestingForMore")
+                                       .withSubject("ExtraEntry").withSubject("PrivateEntry")
+                                       .makeUnDiscoverable()
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+
+        //** WHEN **
+        //An admin user browses the items that correspond with the ExtraEntry subject query
+        getClient(adminToken).perform(get("/api/discover/browses/subject/items")
+                                .param("scope", String.valueOf(col2.getID()))
+                                .param("filterValue", "ExtraEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements in collection 2
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+
+        //** WHEN **
+        //An admin user browses the items that correspond with the AnotherTest subject query
+        getClient(adminToken).perform(get("/api/discover/browses/subject/items")
+                                    .param("scope", String.valueOf(col2.getID()))
+                                    .param("filterValue", "AnotherTest"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be only two elements, the ones that we've added with the requested subject
+                   // in collection 2
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   //Verify that the title of the public and embargoed items are present and sorted descending
+                   .andExpect(jsonPath("$._embedded.items", contains(
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13"),
+                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-14")
+                   )));
+
+        //** WHEN **
+        //An admin user browses the items that correspond with the PrivateEntry subject query
+        getClient(adminToken).perform(get("/api/discover/browses/subject/items")
+                                    .param("scope", String.valueOf(col2.getID()))
+                                    .param("filterValue", "PrivateEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements because the item is private
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
+
+        //** WHEN **
+        //An admin user browses the items that correspond with the WithdrawnEntry subject query
+        getClient(adminToken).perform(get("/api/discover/browses/subject/items")
+                                    .param("scope", String.valueOf(col2.getID()))
+                                    .param("filterValue", "WithdrawnEntry"))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   //We expect there to be no elements because the item is withdrawn
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$.page.size", is(20)));
     }
 
     @Test
@@ -501,13 +806,181 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(
                            not(matchMetadata("dc.title", "This is a private item")),
                            not(matchMetadata("dc.title", "Internal publication")))));
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by item endpoint
+        //sorted descending by tile
+        getClient(adminToken).perform(get("/api/discover/browses/title/items")
+                                .param("sort", "title,desc"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(4)))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                                                                            "Public item 2",
+                                                                                            "2016-02-13"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                                                                                            "Public item 1",
+                                                                                            "2017-10-17"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(internalItem,
+                                                                                            "Internal publication",
+                                                                                            "2016-09-19"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(embargoedItem,
+                                                                                            "An embargoed publication",
+                                                                                            "2017-08-10")
+                                                )))
+
+                   //The private and internal items must not be present
+                   .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(
+                           not(matchMetadata("dc.title", "This is a private item")),
+                           not(matchMetadata("dc.title", "Internal publication")))));
+    }
+
+    @Test
+    public void findBrowseByTitleItemsWithScope() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Two public items that are readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("Java").withSubject("Unit Testing")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("Angular").withSubject("Unit Testing")
+                                      .build();
+
+        //3. An item that has been made private
+        Item privateItem = ItemBuilder.createItem(context, col2)
+                                      .withTitle("This is a private item")
+                                      .withIssueDate("2015-03-12")
+                                      .withAuthor("Duck, Donald")
+                                      .withSubject("Cartoons").withSubject("Ducks")
+                                      .makeUnDiscoverable()
+                                      .build();
+
+        //4. An item with an item-level embargo
+        Item embargoedItem = ItemBuilder.createItem(context, col2)
+                                        .withTitle("An embargoed publication")
+                                        .withIssueDate("2017-08-10")
+                                        .withAuthor("Mouse, Mickey")
+                                        .withSubject("Cartoons").withSubject("Mice")
+                                        .withEmbargoPeriod("12 months")
+                                        .build();
+
+        //5. An item that is only readable for an internal groups
+        Group internalGroup = GroupBuilder.createGroup(context)
+                                          .withName("Internal Group")
+                                          .build();
+
+        Item internalItem = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Internal publication")
+                                       .withIssueDate("2016-09-19")
+                                       .withAuthor("Doe, John")
+                                       .withSubject("Unknown")
+                                       .withReaderGroup(internalGroup)
+                                       .build();
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by item endpoint
+        //sorted descending by tile
+        getClient().perform(get("/api/discover/browses/title/items")
+                                .param("scope", String.valueOf(col2.getID()))
+                                .param("sort", "title,desc"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                                                                            "Public item 2",
+                                                                                            "2016-02-13"))))
+
+                   //The private and internal items must not be present
+                   .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(
+                           not(matchMetadata("dc.title", "This is a private item")),
+                           not(matchMetadata("dc.title", "Internal publication")))));
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        //** WHEN **
+        //An admin user browses the items in the Browse by item endpoint
+        //sorted descending by tile
+        getClient(adminToken).perform(get("/api/discover/browses/title/items")
+                                .param("scope", String.valueOf(col2.getID()))
+                                .param("sort", "title,desc"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                     .andExpect(jsonPath("$._embedded.items", contains(
+                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
+                                                                             "Public item 2",
+                                                                             "2016-02-13"),
+                                 ItemMatcher.matchItemWithTitleAndDateIssued(internalItem,
+                                                                             "Internal publication",
+                                                                             "2016-09-19"),
+                                 ItemMatcher.matchItemWithTitleAndDateIssued(embargoedItem,
+                                                                             "An embargoed publication",
+                                                                             "2017-08-10")
+
+                         )))
+
+
+                             //The private and internal items must not be present
+                   .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(
+                           not(matchMetadata("dc.title", "This is a private item"))
+                           )));
     }
 
     @Test
     /**
      * This test was introduced to reproduce the bug DS-4269 Pagination links must be consistent also when there is not
      * explicit pagination parameters in the request (i.e. defaults apply)
-     * 
+     *
      * @throws Exception
      */
     public void browsePaginationWithoutExplicitParams() throws Exception {
@@ -623,6 +1096,18 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2016-01-12")
                                 .build();
 
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+                                         .withTitle("Withdrawn item 1")
+                                         .withIssueDate("2016-02-13")
+                                         .withdrawn()
+                                         .build();
+
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Private item 1")
+                                       .makeUnDiscoverable()
+                                       .build();
+
+
         context.restoreAuthSystemState();
 
         //** WHEN **
@@ -682,6 +1167,159 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(item7,
                                                                                             "Item 7", "2016-01-12")
                                        )));
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        //The next page gives us the last two items
+        getClient(adminToken).perform(get("/api/discover/browses/dateissued/items")
+                                .param("sort", "title,asc")
+                                .param("size", "5")
+                                .param("page", "1"))
+
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the first five items to be present
+                   .andExpect(jsonPath("$.page.size", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(7)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(1)))
+
+                   //Verify that the title and date of the items match and that they are sorted ascending
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(ItemMatcher.matchItemWithTitleAndDateIssued(item6,
+                                                                                            "Item 6", "2016-01-13"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item7,
+                                                                                            "Item 7", "2016-01-12")
+                                       )));
+    }
+
+    @Test
+    public void testPaginationBrowseByDateIssuedItemsWithScope() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 7 public items that are readable by Anonymous
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item 1")
+                                .withIssueDate("2017-10-17")
+                                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Item 2")
+                                .withIssueDate("2016-02-13")
+                                .build();
+
+        Item item3 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item 3")
+                                .withIssueDate("2016-02-12")
+                                .build();
+
+        Item item4 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Item 4")
+                                .withIssueDate("2016-02-11")
+                                .build();
+
+        Item item5 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item 5")
+                                .withIssueDate("2016-02-10")
+                                .build();
+
+        Item item6 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Item 6")
+                                .withIssueDate("2016-01-13")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item 7")
+                                .withIssueDate("2016-01-12")
+                                .build();
+
+        Item withdrawnItem1 = ItemBuilder.createItem(context, col2)
+                                         .withTitle("Withdrawn item 1")
+                                         .withIssueDate("2016-02-13")
+                                         .withdrawn()
+                                         .build();
+
+        Item privateItem1 = ItemBuilder.createItem(context, col2)
+                                       .withTitle("Private item 1")
+                                       .makeUnDiscoverable()
+                                       .build();
+
+
+        context.restoreAuthSystemState();
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by date issued endpoint
+        //sorted ascending by tile with a page size of 5
+        getClient().perform(get("/api/discover/browses/dateissued/items")
+                                .param("scope", String.valueOf(col2.getID()))
+                                .param("sort", "title,asc")
+                                .param("size", "5"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the first five items to be present
+                   .andExpect(jsonPath("$.page.size", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the title and date of the items match and that they are sorted ascending
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                                                                            "Item 2", "2016-02-13"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                                                                            "Item 4", "2016-02-11"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item6,
+                                                                                            "Item 6", "2016-01-13")
+                                       )));
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/discover/browses/dateissued/items")
+                                .param("scope", String.valueOf(col2.getID()))
+                                .param("sort", "title,asc")
+                                .param("size", "5"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the first five items to be present
+                   .andExpect(jsonPath("$.page.size", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   .andExpect(jsonPath("$.page.totalPages", is(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the title and date of the items match and that they are sorted ascending
+                   .andExpect(jsonPath("$._embedded.items",
+                                       contains(
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                                                                            "Item 2", "2016-02-13"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                                                                            "Item 4", "2016-02-11"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(item6,
+                                                                                            "Item 6", "2016-01-13")
+                                       )));
+
     }
 
     @Test
@@ -1111,7 +1749,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
                    //We expect the totalElements to be the 1 item present in the collection
                    .andExpect(jsonPath("$.page.totalElements", is(1)))
-                   //As this is is a small collection, we expect to go-to page 0
+                   //As this is a small collection, we expect to go-to page 0
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Blade")))
 
@@ -1121,6 +1759,33 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                             "Blade Runner",
                                                                                             "1982-06-25")
                                        )));
+
+        //Test filtering with spaces:
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by Title endpoint
+        //with startsWith set to Blade Runner and scope set to Col 1
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=Blade Runner")
+                .param("scope", col1.getID().toString())
+                .param("size", "2"))
+
+            //** THEN **
+            //The status has to be 200 OK
+            .andExpect(status().isOk())
+            //We expect the content type to be "application/hal+json;charset=UTF-8"
+            .andExpect(content().contentType(contentType))
+
+            //We expect the totalElements to be the 1 item present in the collection
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            //As this is a small collection, we expect to go-to page 0
+            .andExpect(jsonPath("$.page.number", is(0)))
+            .andExpect(jsonPath("$._links.self.href", containsString("startsWith=Blade Runner")))
+
+            //Verify that the index jumps to the "Blade Runner" item.
+            .andExpect(jsonPath("$._embedded.items",
+                contains(ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                    "Blade Runner",
+                    "1982-06-25")
+                )));
     }
 
     @Test
@@ -1459,5 +2124,58 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
                                                  nullValue()));
+    }
+
+    /**
+     * Expect a single author browse definition
+     * @throws Exception
+     */
+    @Test
+    public void findOneLinked() throws Exception {
+        // When we call the search endpoint
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.contributor.author"))
+                // The status has to be 200 OK
+                .andExpect(status().isOk())
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // The browse definition ID should be "author"
+                .andExpect(jsonPath("$.id", is("author")))
+                // It should be configured as a metadata browse
+                .andExpect(jsonPath("$.metadataBrowse", is(true)))
+        ;
+    }
+
+    @Test
+    public void findOneLinkedPassingTwoFields() throws Exception {
+        // When we call the search endpoint
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.contributor.author")
+                        .param("fields", "dc.date.issued"))
+                // The status has to be 200 OK
+                .andExpect(status().isOk())
+                // We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                // The browse definition ID should be "author"
+                .andExpect(jsonPath("$.id", is("author")))
+                // It should be configured as a metadata browse
+                .andExpect(jsonPath("$.metadataBrowse", is(true)));
+    }
+
+    @Test
+    public void findUnconfiguredFields() throws Exception {
+        // When we call the search endpoint with a field that isn't configured for any browse links
+        getClient().perform(get("/api/discover/browses/search/byFields")
+                        .param("fields", "dc.identifier.uri"))
+                // The status has to be 204 NO CONTENT
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findBrowseLinksWithMissingParameter() throws Exception {
+        // When we call the search endpoint with a field that isn't configured for any browse links
+        getClient().perform(get("/api/discover/browses/search/byFields"))
+                // The status has to be 400 BAD REQUEST
+                .andExpect(status().isBadRequest());
     }
 }

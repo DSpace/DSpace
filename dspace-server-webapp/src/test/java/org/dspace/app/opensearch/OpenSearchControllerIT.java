@@ -185,6 +185,32 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void validSortTest() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", "")
+                                .param("sort", "dc.date.issued"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/totalResults").string("0"))
+        ;
+    }
+
+    @Test
+    public void invalidSortTest() throws Exception {
+        //When we call the root endpoint
+        getClient().perform(get("/opensearch/search")
+                                .param("query", "")
+                                .param("sort", "dc.invalid.field"))
+                   //We get an exception for such a sort field
+                   //The status has to be 400 ERROR
+                   .andExpect(status().is(400))
+        ;
+    }
+
+    @Test
     public void serviceDocumentTest() throws Exception {
         //When we call the root endpoint
         getClient().perform(get("/opensearch/service"))
@@ -222,5 +248,25 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                 <Url type="application/rss+xml; charset=UTF-8" template="http://localhost:8080/server/opensearch/search?query={searchTerms}&amp;start={startIndex?}&amp;rpp={count?}&amp;format=rss" />
             </OpenSearchDescription>
         */
+    }
+
+    @Test
+    public void emptyDescriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .build();
+
+        getClient().perform(get("/opensearch/search")
+                   .param("format", "rss")
+                   .param("scope", collection1.getID().toString())
+                   .param("query", "*"))
+                   .andExpect(status().isOk())
+                   .andExpect(xpath("rss/channel/description").string("No Description"));
     }
 }

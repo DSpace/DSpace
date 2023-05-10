@@ -9,6 +9,7 @@ package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -88,6 +89,11 @@ public class RequestItemServiceImpl implements RequestItemService {
             log.error(e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
+        return requestItemDAO.findByItem(context, item);
     }
 
     @Override

@@ -10,7 +10,9 @@ package org.dspace.storage.bitstore;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,6 +64,9 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
 
     @Mock
     private Bitstream bitstream;
+
+    @Mock
+    private Bitstream externalBitstream;
 
     @Before
     public void setUp() throws Exception {
@@ -232,6 +237,24 @@ public class S3BitStoreServiceTest extends AbstractUnitTest {
                 )
         );
 
+    }
+
+    @Test
+    public void handleRegisteredIdentifierPrefixInS3() {
+        String trueBitStreamId = "012345";
+        String registeredBitstreamId = s3BitStoreService.REGISTERED_FLAG + trueBitStreamId;
+        // Should be detected as registered bitstream
+        assertTrue(this.s3BitStoreService.isRegisteredBitstream(registeredBitstreamId));
+    }
+
+    @Test
+    public void stripRegisteredBitstreamPrefixWhenCalculatingPath() {
+        // Set paths and IDs
+        String s3Path = "UNIQUE_S3_PATH/test/bitstream.pdf";
+        String registeredBitstreamId = s3BitStoreService.REGISTERED_FLAG + s3Path;
+        // Paths should be equal, since the getRelativePath method should strip the registered -R prefix
+        String relativeRegisteredPath = this.s3BitStoreService.getRelativePath(registeredBitstreamId);
+        assertEquals(s3Path, relativeRegisteredPath);
     }
 
     @Test
