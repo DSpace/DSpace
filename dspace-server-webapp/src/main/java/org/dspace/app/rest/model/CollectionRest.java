@@ -74,4 +74,16 @@ public class CollectionRest extends DSpaceObjectRest {
     public String getType() {
         return NAME;
     }
+
+    private int archivedItems;
+
+    public int getArchivedItems() {
+        return archivedItems;
+    }
+
+    public void setArchivedItems(int archivedItems) {
+        this.archivedItems = archivedItems;
+    }
+
+
 }

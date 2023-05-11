@@ -31,6 +31,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
@@ -1046,5 +1048,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, entityType, community, q);
         return (int) resp.getTotalSearchResults();
     }
+
+    @Override
+    public int countArchivedItem(Collection collection) throws ItemCountException {
+        //TODO load ItemCounter on bean creation
+        Context context = new Context();
+        return new ItemCounter(context).getCount(collection);
+    }
+
 
 }

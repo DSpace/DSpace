@@ -10,6 +10,7 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -53,4 +54,6 @@ public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> 
     int countRows(Context context) throws SQLException;
 
     List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+
+    int countArchivedItems(Context context, UUID id) throws SQLException;
 }
