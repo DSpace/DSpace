@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkaccesscontrol.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +28,9 @@ public class AccessConditionItem {
     }
 
     public List<AccessCondition> getAccessConditions() {
+        if (accessConditions == null) {
+            return new ArrayList<>();
+        }
         return accessConditions;
     }
 
