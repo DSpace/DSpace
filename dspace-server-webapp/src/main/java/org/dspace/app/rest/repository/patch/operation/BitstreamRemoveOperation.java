@@ -14,10 +14,13 @@ import java.util.UUID;
 import org.dspace.app.rest.exception.RESTBitstreamNotFoundException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,6 +41,8 @@ import org.springframework.stereotype.Component;
 public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
     @Autowired
     BitstreamService bitstreamService;
+    @Autowired
+    AuthorizeService authorizeService;
     public static final String OPERATION_PATH_BITSTREAM_REMOVE = "/bitstreams/";
 
     @Override
@@ -47,10 +52,10 @@ public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
         if (bitstreamToDelete == null) {
             throw new RESTBitstreamNotFoundException(bitstreamIDtoDelete);
         }
+        authorizeBitstreamRemoveAction(context, bitstreamToDelete, Constants.DELETE);
 
         try {
             bitstreamService.delete(context, bitstreamToDelete);
-            bitstreamService.update(context, bitstreamToDelete);
         } catch (AuthorizeException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -61,5 +66,13 @@ public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
     public boolean supports(Object objectToMatch, Operation operation) {
         return objectToMatch == null && operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE) &&
             operation.getPath().trim().startsWith(OPERATION_PATH_BITSTREAM_REMOVE);
+    }
+
+    public void authorizeBitstreamRemoveAction(Context context, Bitstream bitstream, int operation) throws SQLException {
+        try {
+            authorizeService.authorizeAction(context, bitstream, operation);
+        } catch (AuthorizeException e) {
+            throw new AccessDeniedException("The current user is not allowed to remove the bitstream", e);
+        }
     }
 }

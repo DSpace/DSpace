@@ -51,7 +51,6 @@ public class BitstreamCategoryRestController {
      * @throws SQLException if an error occurs while accessing the database.
      * @throws AuthorizeException if the user is not authorized to perform the requested operation.
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request,
                                                         @RequestBody(required = true) JsonNode jsonNode)

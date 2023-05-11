@@ -46,6 +46,7 @@ import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Bitstream;
@@ -56,6 +57,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -85,6 +88,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    CollectionService collectionService;
+
+    @Autowired
+    CommunityService communityService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -2488,6 +2497,296 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Verify that no bitstreams were deleted since the request was invalid
         Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+    }
+
+    @Test
+    public void deleteBitstreamsInBulk_Unauthorized() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 2")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        Bitstream bitstream4 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream4 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+        String token = getAuthToken(admin.getEmail(), password);
+
+        Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
+
+        getClient().perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void deleteBitstreamsInBulk_Forbidden() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection")
+                                                 .build();
+        Item publicItem1 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection)
+                                      .withTitle("Test item 2")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteBitstreamsInBulk_collectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection 1")
+                                                 .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 2")
+                                           .build();
+        EPerson col1Admin = EPersonBuilder.createEPerson(context)
+                                         .withEmail("col1admin@test.com")
+                                         .withPassword(password)
+                                         .build();
+        EPerson col2Admin = EPersonBuilder.createEPerson(context)
+                                          .withEmail("col2admin@test.com")
+                                          .withPassword(password)
+                                          .build();
+        Group col1_AdminGroup = collectionService.createAdministrators(context, col1);
+        Group col2_AdminGroup = collectionService.createAdministrators(context, col2);
+        groupService.addMember(context, col1_AdminGroup, col1Admin);
+        groupService.addMember(context, col2_AdminGroup, col2Admin);
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test item 2")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        Bitstream bitstream4 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream4 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(col1Admin.getEmail(), password);
+        //  Should return forbidden since one of the bitstreams does not originate form collection 1
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+
+        // Remove the bitstream that does not originate from the collection we are administrator of, should return OK
+        ops.remove(2);
+        patchBody = getPatchContent(ops);
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isNoContent());
+
+        // Change the token to the admin of collection 2
+        token = getAuthToken(col2Admin.getEmail(), password);
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        ops = new ArrayList<>();
+        removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp1);
+        removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp2);
+        removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream4.getID());
+        ops.add(removeOp3);
+        patchBody = getPatchContent(ops);
+
+        //  Should return forbidden since one of the bitstreams does not originate form collection 2
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isForbidden());
+        // Remove the bitstream that does not originate from the collection we are administrator of, should return OK
+        ops.remove(0);
+        patchBody = getPatchContent(ops);
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void deleteBitstreamsInBulk_communityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 2")
+                                           .build();
+        EPerson parentCommunityAdmin = EPersonBuilder.createEPerson(context)
+                                          .withEmail("parentComAdmin@test.com")
+                                          .withPassword(password)
+                                          .build();
+        Group parentComAdminGroup = communityService.createAdministrators(context, parentCommunity);
+        groupService.addMember(context, parentComAdminGroup, parentCommunityAdmin);
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test item 1")
+                                      .build();
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Test item 2")
+                                      .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        Bitstream bitstream1 = null;
+        Bitstream bitstream2 = null;
+        Bitstream bitstream3 = null;
+        Bitstream bitstream4 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 1")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream 2")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream3 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 3")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream4 = BitstreamBuilder.createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream 4")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Add three out of four bitstreams to the list of bitstreams to be deleted
+        List<Operation> ops = new ArrayList<>();
+        RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
+        ops.add(removeOp1);
+        RemoveOperation removeOp2 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream2.getID());
+        ops.add(removeOp2);
+        RemoveOperation removeOp3 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream3.getID());
+        ops.add(removeOp3);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(parentCommunityAdmin.getEmail(), password);
+        // Bitstreams originate from two different collections, but those collections live in the same community, so
+        // a community admin should be able to delete them
+        getClient(token).perform(patch("/api/core/bitstreams")
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isNoContent());
     }
 
     public boolean bitstreamExists(String token, Bitstream ...bitstreams) throws Exception {
