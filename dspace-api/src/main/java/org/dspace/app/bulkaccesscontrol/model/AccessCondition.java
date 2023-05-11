@@ -9,9 +9,12 @@ package org.dspace.app.bulkaccesscontrol.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.dspace.app.bulkaccesscontrol.BulkAccessControl;
+import org.dspace.util.MultiFormatDateDeserializer;
+
 /**
- * Class that model the value of ACCESS_CONDITION_CELL
- * of sheet BITSTREAM_METADATA of the Bulk import excel.
+ * Class that model the values of an Access Condition as expressed in the {@link BulkAccessControl} input file
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  */
@@ -21,8 +24,10 @@ public class AccessCondition {
 
     private  String description;
 
+    @JsonDeserialize(using = MultiFormatDateDeserializer.class)
     private  Date startDate;
 
+    @JsonDeserialize(using = MultiFormatDateDeserializer.class)
     private  Date endDate;
 
     public AccessCondition() {
