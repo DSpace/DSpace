@@ -58,6 +58,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * The tests will verify that for each object, the correct facets are provided and that all the necessary fields to
  * power these facets are indexed properly.
+ *
+ * This file requires the discovery configuration in the following test file:
+ * src/test/data/dspaceFolder/config/spring/api/test-discovery.xml
  */
 public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -263,6 +266,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-parent-community-1" is correctly used for Parent Community 1.
+     */
     public void ScopeBasedIndexingAndSearchTestParentCommunity1() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(parentCommunity1.getID())))
@@ -301,6 +307,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-sub-community-1-1" is correctly used for Subcommunity 11.
+     */
     public void ScopeBasedIndexingAndSearchTestSubCommunity11() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity11.getID())))
@@ -330,6 +339,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-collection-1-1-1" is correctly used for Collection 111.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection111() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection111.getID())))
@@ -357,6 +369,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the first encountered custom parent configuration "discovery-sub-community-1-1" is inherited
+     *  correctly for Collection 112.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection112() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection112.getID())))
@@ -382,6 +398,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the first encountered custom parent configuration "discovery-parent-community-1" is inherited
+     *  correctly for Subcommunity 12.
+     */
     public void ScopeBasedIndexingAndSearchTestSubcommunity12() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity12.getID())))
@@ -411,6 +431,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-collection-1-2-1" is correctly used for Collection 121.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection121() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection121.getID())))
@@ -436,6 +459,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the first encountered custom parent configuration "discovery-parent-community-1" is inherited
+     *  correctly for Collection 122.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection122() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection122.getID())))
@@ -463,6 +490,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the default configuration is inherited correctly when no other custom configuration can be inherited
+     *  for Parent Community 2.
+     */
     public void ScopeBasedIndexingAndSearchTestParentCommunity2() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(parentCommunity2.getID())))
@@ -481,6 +512,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-sub-community-2-1" is correctly used for Subcommunity 21.
+     */
     public void ScopeBasedIndexingAndSearchTestSubCommunity21() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity21.getID())))
@@ -510,6 +544,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-collection-2-1-1" is correctly used for Collection 211.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection211() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection211.getID())))
@@ -537,6 +574,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the first encountered custom parent configuration "discovery-sub-community-2-1" is inherited
+     *  correctly for Collection 212.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection212() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection212.getID())))
@@ -562,6 +603,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the default configuration is inherited correctly when no other custom configuration can be inherited
+     *  for Subcommunity 22.
+     */
     public void ScopeBasedIndexingAndSearchTestSubcommunity22() throws Exception {
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(subcommunity22.getID())))
 
@@ -579,6 +624,9 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the custom configuration "discovery-collection-2-2-1" is correctly used for Collection 221.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection221() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection221.getID())))
@@ -604,6 +652,10 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    /**
+     *  Verify that the default configuration is inherited correctly when no other custom configuration can be inherited
+     *  for Collection 222.
+     */
     public void ScopeBasedIndexingAndSearchTestCollection222() throws Exception {
 
         getClient().perform(get("/api/discover/facets").param("scope", String.valueOf(collection222.getID())))
