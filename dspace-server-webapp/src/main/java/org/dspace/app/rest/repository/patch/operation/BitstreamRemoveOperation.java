@@ -68,7 +68,8 @@ public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
             operation.getPath().trim().startsWith(OPERATION_PATH_BITSTREAM_REMOVE);
     }
 
-    public void authorizeBitstreamRemoveAction(Context context, Bitstream bitstream, int operation) throws SQLException {
+    public void authorizeBitstreamRemoveAction(Context context, Bitstream bitstream, int operation)
+        throws SQLException {
         try {
             authorizeService.authorizeAction(context, bitstream, operation);
         } catch (AuthorizeException e) {
