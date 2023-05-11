@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,7 @@ public class DiscoveryConfigurationService {
      * own configuration, we take the one of the first parent that does.
      * This cache ensures we do not have to go up the hierarchy every time.
      */
-    private final Map<UUID, DiscoveryConfiguration> comColToDiscoveryConfigurationMap = new HashMap<>();
+    private final Map<UUID, DiscoveryConfiguration> comColToDiscoveryConfigurationMap = new ConcurrentHashMap<>();
 
     public Map<String, DiscoveryConfiguration> getMap() {
         return map;
