@@ -99,7 +99,7 @@ pipeline {
     stage('test') {
       steps {
         sh '''
-          mvn clean install -DskipUnitTests=false -DskipIntegrationTests=false -Dsurefire.rerunFailingTestsCount=3 -Dfailsafe.rerunFailingTestsCount=3 -Dlicense.skip=true
+          mvn clean install -DskipUnitTests=false -DskipIntegrationTests=false -Dsurefire.rerunFailingTestsCount=3 -Dfailsafe.rerunFailingTestsCount=3
         '''
       }
       post {
