@@ -184,7 +184,7 @@ public class AccessConditionOption {
      * @param endDate                End date of the resource policy. If {@link #getHasEndDate()}
      *                                    returns false, endDate should be null. Otherwise endDate may not be null.
      */
-    private void validateResourcePolicy(Context context, String name, Date startDate, Date endDate)
+    public void validateResourcePolicy(Context context, String name, Date startDate, Date endDate)
            throws SQLException, AuthorizeException, ParseException {
         if (getHasStartDate() && Objects.isNull(startDate)) {
             throw new IllegalStateException("The access condition " + getName() + " requires a start date.");
