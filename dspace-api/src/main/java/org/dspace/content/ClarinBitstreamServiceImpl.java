@@ -7,11 +7,13 @@
  */
 package org.dspace.content;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -24,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
 import org.dspace.storage.bitstore.DSBitStoreService;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -54,6 +57,8 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
     protected BundleService bundleService;
     @Autowired
     protected BitstreamService bitstreamService;
+    @Autowired
+    private BitstreamStorageService bitstreamStorageService;
 
     protected ClarinBitstreamServiceImpl() {
     }
@@ -82,8 +87,7 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
     }
 
     @Override
-    public boolean addExistingFile(Context context, Bitstream bitstream, Long expectedSizeBytes,
-                                   String expectedCheckSum, String expectedChecksumAlgorithm)
+    public boolean validation(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -95,9 +99,13 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
         }
         //get file from assetstore based on internal_id
         //recalculate check fields
-        storeService.put(bitstream, new ByteArrayInputStream(storeService.get(bitstream).readAllBytes()));
+        Map wantedMetadata = new HashMap();
+        wantedMetadata.put("size_bytes", null);
+        wantedMetadata.put("checksum", null);
+        wantedMetadata.put("checksum_algorithm", null);
+        Map checksumMap = storeService.about(bitstream, wantedMetadata);
         //check that new calculated values match the expected values
-        if (!valid(bitstream, expectedSizeBytes, expectedCheckSum, expectedChecksumAlgorithm)) {
+        if (MapUtils.isEmpty(checksumMap) || !valid(bitstream, checksumMap)) {
             //an error occurred - expected and calculated values do not match
             //delete all created data
             bitstreamService.delete(context, bitstream);
@@ -113,16 +121,20 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
 
     /**
      * Validation control.
-     * Control that expected values (method attributes) match with bitstream calculated values.
+     * Control that expected values (bitstream attributes) match with calculated values.
      * @param bitstream bitstream
-     * @param expectedSizeBytes expected size bytes
-     * @param expectedCheckSum expected checksum
-     * @param expectedChecksumAlgorithm expected checksum algorithm
+     * @param checksumMap calculated values
      * @return bitstream values match with expected values
      */
-    private boolean valid(Bitstream bitstream, long expectedSizeBytes,
-                                     String expectedCheckSum, String expectedChecksumAlgorithm) {
-        return bitstream.getSizeBytes() == expectedSizeBytes && bitstream.getChecksum().equals(expectedCheckSum) &&
-                bitstream.getChecksumAlgorithm().equals(expectedChecksumAlgorithm);
+    private boolean valid(Bitstream bitstream, Map checksumMap) {
+        if (!checksumMap.containsKey("checksum") || !checksumMap.containsKey("checksum_algorithm") ||
+                !checksumMap.containsKey("size_bytes")) {
+            log.error("Cannot validate of bitstream with id: " + bitstream.getID() +
+                    ", because there were no calculated all required fields.");
+            return false;
+        }
+        return bitstream.getSizeBytes() == Long.valueOf(checksumMap.get("size_bytes").toString()) &&
+                bitstream.getChecksum().equals(checksumMap.get("checksum").toString()) &&
+                bitstream.getChecksumAlgorithm().equals(checksumMap.get("checksum_algorithm").toString());
     }
 }

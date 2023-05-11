@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BitstreamFormatBuilder;
 import org.dspace.builder.BundleBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -94,7 +95,7 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                 .withName("TESTINGBUNDLE")
                 .build();
         token = getAuthToken(admin.getEmail(), password);
-        bitstreamFormat = bitstreamFormatService.create(context);
+        bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context).build();
         String input = "Hello, World!";
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt",
                 MediaType.TEXT_PLAIN_VALUE,

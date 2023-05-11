@@ -36,23 +36,20 @@ public interface ClarinBitstreamService {
     public Bitstream create(Context context, Bundle bundle) throws SQLException, AuthorizeException;
 
     /**
-     * Add an existing file to bitstream.
+     * Validation between expected values and calculated values based on existing file.
      * The file must be stored in assetstore under internal_id. Internal_id must be specified in input bitstream.
-     * Method transforms data from assetstore back into a stream of bits and fills the bitstream
+     * Method finds data in assetstore and calculates the bitstream
      * check fields (checksum, sizeBytes, checksum algorithm).
+     * These calculated values are compared with expected values from input bitstream.
      * The bitstream is stored into database only if the error was not occur:
      * calculated and expected check fields values match.
      * @param context context
-     * @param bitstream bitstream with entered internal_id
-     * @param expectedSizeBytes expected size
-     * @param expectedCheckSum expected checksum
-     * @param expectedChecksumAlgorithm expected checksum algorithm
-     * @return existing file was successfully added to the bitstream
+     * @param bitstream bitstream
+     * @return validation was successfully
      * @throws IOException If a problem occurs while storing the bits
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
-    public boolean addExistingFile(Context context, Bitstream bitstream, Long expectedSizeBytes,
-                                  String expectedCheckSum, String expectedChecksumAlgorithm)
+    public boolean validation(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException ;
 }
