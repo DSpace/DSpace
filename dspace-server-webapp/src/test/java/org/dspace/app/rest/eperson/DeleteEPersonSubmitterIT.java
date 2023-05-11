@@ -24,9 +24,11 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItemAuthor;
 import org.dspace.app.requestitem.RequestItemAuthorExtractor;
+import org.dspace.app.requestitem.RequestItemHelpdeskStrategy;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -46,6 +48,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -76,7 +79,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
     protected RequestItemAuthorExtractor requestItemAuthorExtractor =
             DSpaceServicesFactory.getInstance()
                                  .getServiceManager()
-                                 .getServiceByName("org.dspace.app.requestitem.RequestItemAuthorExtractor",
+                                 .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
                                          RequestItemAuthorExtractor.class);
 
 
@@ -85,15 +88,8 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
     private EPerson submitterForVersion2;
     private EPerson workflowUser;
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DeleteEPersonSubmitterIT.class);
+    private static final Logger log = LogManager.getLogger();
 
-    /**
-     * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
-     *
-     * Other methods can be annotated with @Before here or in subclasses but no
-     * execution order is guaranteed
-     */
     @Before
     @Override
     public void setUp() throws Exception {
@@ -114,8 +110,8 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
 
     /**
-     * This test verifies that when the submitter Eperson is deleted, the delete succeeds and the item will have
-     * 'null' as submitter
+     * This test verifies that when the submitter Eperson is deleted, the delete
+     * succeeds and the item will have 'null' as submitter.
      *
      * @throws Exception
      */
@@ -140,12 +136,21 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
         assertNull(retrieveItemSubmitter(installItem.getID()));
 
+        // Don't depend on external configuration; set up helpdesk as needed.
+        final String HELPDESK_EMAIL = "dspace-help@example.com";
+        final String HELPDESK_NAME = "Help Desk";
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        configurationService.setProperty("mail.helpdesk", HELPDESK_EMAIL);
+        configurationService.setProperty("mail.helpdesk.name", HELPDESK_NAME);
+        configurationService.setProperty("request.item.helpdesk.override", "true");
 
+        // Test it.
         Item item = itemService.find(context, installItem.getID());
         List<RequestItemAuthor> requestItemAuthor = requestItemAuthorExtractor.getRequestItemAuthor(context, item);
 
-        assertEquals("Help Desk", requestItemAuthor.get(0).getFullName());
-        assertEquals("dspace-help@myu.edu", requestItemAuthor.get(0).getEmail());
+        assertEquals(HELPDESK_NAME, requestItemAuthor.get(0).getFullName());
+        assertEquals(HELPDESK_EMAIL, requestItemAuthor.get(0).getEmail());
     }
 
     /**
