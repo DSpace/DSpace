@@ -4,9 +4,7 @@ Home: <https://drum.lib.umd.edu/>
 
 ## Documentation
 
-The original DSpace documentation:
-
-* [README-DSPACE.md](README.md)
+The original Dspace documentation is in the "README.md" file.
 
 ## Development Environment
 
