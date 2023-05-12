@@ -10,12 +10,11 @@ package org.dspace.app.bulkaccesscontrol;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.dspace.authorize.ResourcePolicy.TYPE_INHERITED;
+import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -363,18 +362,26 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
         if (containsConstraints(accessControl.getBitstream())) {
             findMatchedBitstreams(item, accessControl.getBitstream().getConstraints().getUuid())
-        item.getBundles(Constants.CONTENT_BUNDLE_NAME).stream()
-                .flatMap(bundle -> bundle.getBitstreams().stream())
-                .filter(bitstream -> uuids == null ||
-                    uuids.size() == 0 ||
-                    uuids.contains(bitstream.getID().toString()))
                 .forEach(bitstream -> updateBitstreamPolicies(bitstream, item, accessControl));
+        } else {
+            item.getBundles(CONTENT_BUNDLE_NAME).stream()
+                .flatMap(bundle -> bundle.getBitstreams().stream())
+                .forEach(bitstream ->
+                    updateBitstreamPolicies(bitstream, item, accessControl));
+        }
     }
 
     private boolean containsConstraints(AccessConditionBitstream bitstream) {
         return Objects.nonNull(bitstream) &&
             Objects.nonNull(bitstream.getConstraints()) &&
             isNotEmpty(bitstream.getConstraints().getUuid());
+    }
+
+    private List<Bitstream> findMatchedBitstreams(Item item, List<String> uuids) {
+        return item.getBundles(CONTENT_BUNDLE_NAME).stream()
+                   .flatMap(bundle -> bundle.getBitstreams().stream())
+                   .filter(bitstream -> uuids.contains(bitstream.getID().toString()))
+                   .collect(Collectors.toList());
     }
 
     private void updateBitstreamPolicies(Bitstream bitstream, Item item, AccessControl accessControl) {
