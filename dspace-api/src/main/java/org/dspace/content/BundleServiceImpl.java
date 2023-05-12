@@ -7,13 +7,12 @@
  */
 package org.dspace.content;
 
-import static org.dspace.core.Constants.ADD;
-import static org.dspace.core.Constants.REMOVE;
-import static org.dspace.core.Constants.WRITE;
+import static org.dspace.core.Constants.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -174,7 +173,18 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // copy authorization policies from bundle to bitstream
         // FIXME: multiple inclusion is affected by this...
         authorizeService.inheritPolicies(context, bundle, bitstream);
-        if (owningItem != null) {
+        // The next logic is a bit overly cautious but ensures that if there are any future start dates
+        // on the item or bitstream read policies, that we'll skip inheriting anything from the owning collection
+        // just in case. In practice, the item install process would overwrite these anyway but it may satisfy
+        // some other bitstream creation methods and integration tests
+        boolean isEmbargoed = false;
+        for (ResourcePolicy resourcePolicy : authorizeService.getPoliciesActionFilter(context, owningItem, READ)) {
+            if (!resourcePolicyService.isDateValid(resourcePolicy)) {
+                isEmbargoed = true;
+                break;
+            }
+        }
+        if (owningItem != null && !isEmbargoed) {
             // Resolve owning collection
             Collection owningCollection = owningItem.getOwningCollection();
             if (owningCollection != null) {
