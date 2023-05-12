@@ -34,6 +34,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -173,6 +174,28 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // copy authorization policies from bundle to bitstream
         // FIXME: multiple inclusion is affected by this...
         authorizeService.inheritPolicies(context, bundle, bitstream);
+        if (owningItem != null) {
+            // Resolve owning collection
+            Collection owningCollection = owningItem.getOwningCollection();
+            if (owningCollection != null) {
+                // Get DEFAULT_BITSTREAM_READ policy from the collection
+                List<Group> defaultBitstreamReadGroups =
+                        authorizeService.getAuthorizedGroups(context, owningCollection,
+                                Constants.DEFAULT_BITSTREAM_READ);
+                log.info(defaultBitstreamReadGroups.size());
+                // If this collection is configured with a DEFAULT_BITSTREAM_READ group, overwrite the READ policy
+                // inherited from the bundle with this policy.
+                if (!defaultBitstreamReadGroups.isEmpty()) {
+                    // Remove read policies from the bitstream
+                    authorizeService.removePoliciesActionFilter(context, bitstream, Constants.READ);
+                    for (Group defaultBitstreamReadGroup : defaultBitstreamReadGroups) {
+                        // Inherit this policy as READ, directly from the collection roles
+                        authorizeService.addPolicy(context, bitstream,
+                                Constants.READ, defaultBitstreamReadGroup, ResourcePolicy.TYPE_INHERITED);
+                    }
+                }
+            }
+        }
         bitstreamService.update(context, bitstream);
     }
 
