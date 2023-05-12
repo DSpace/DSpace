@@ -234,8 +234,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             DOIIdentifierProvider doiIdentifierProvider = DSpaceServicesFactory.getInstance().getServiceManager()
                     .getServiceByName("org.dspace.identifier.DOIIdentifierProvider", DOIIdentifierProvider.class);
             if (doiIdentifierProvider != null) {
-                String doiValue = doiIdentifierProvider.mint(context, item, new TrueFilter());
-                doiIdentifierProvider.register(context, item, doiValue, new TrueFilter());
+                String doiValue = doiIdentifierProvider.register(context, item, new TrueFilter());
                 identifierRest.setValue(doiValue);
                 // Get new status
                 DOI doi = doiService.findByDoi(context, doiValue);
