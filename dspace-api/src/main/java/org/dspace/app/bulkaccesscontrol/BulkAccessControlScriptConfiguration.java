@@ -39,11 +39,8 @@ public class BulkAccessControlScriptConfiguration<T extends BulkAccessControl> e
 
         try {
             if (Objects.isNull(commandLineParameters)) {
-                throw new IllegalArgumentException();
-            } else if (commandLineParameters.stream()
-                                            .map(DSpaceCommandLineParameter::getName)
-                                            .noneMatch("-u"::equals)) {
-                throw new IllegalArgumentException();
+                return authorizeService.isAdmin(context) || authorizeService.isComColAdmin(context)
+                    || authorizeService.isItemAdmin(context);
             } else {
                 List<String> dspaceObjectIDs =
                     commandLineParameters.stream()

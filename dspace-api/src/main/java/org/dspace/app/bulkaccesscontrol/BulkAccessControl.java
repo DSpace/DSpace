@@ -57,12 +57,8 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.utils.DSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DSpaceRunnable} to perform a bulk access control via json file.
@@ -72,13 +68,9 @@ import org.slf4j.LoggerFactory;
  */
 public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptConfiguration<BulkAccessControl>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BulkAccessControl.class);
-
     private DSpaceObjectUtils dSpaceObjectUtils;
 
     private SearchService searchService;
-
-    private ConfigurationService configurationService;
 
     private ItemService itemService;
 
@@ -107,7 +99,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         this.searchService = SearchUtils.getSearchService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.bulkAccessConditionConfigurationService = new DSpace().getServiceManager().getServiceByName(
             "bulkAccessConditionConfigurationService", BulkAccessConditionConfigurationService.class);
         this.dSpaceObjectUtils = new DSpace().getServiceManager().getServiceByName(
@@ -359,29 +350,21 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
     }
 
     private void updateBitstreamsPolicies(Item item, AccessControl accessControl) {
+        AccessConditionBitstream.Constraint constraints = accessControl.getBitstream().getConstraints();
 
-        if (containsConstraints(accessControl.getBitstream())) {
-            findMatchedBitstreams(item, accessControl.getBitstream().getConstraints().getUuid())
-                .forEach(bitstream -> updateBitstreamPolicies(bitstream, item, accessControl));
-        } else {
-            item.getBundles(CONTENT_BUNDLE_NAME).stream()
-                .flatMap(bundle -> bundle.getBitstreams().stream())
-                .forEach(bitstream ->
-                    updateBitstreamPolicies(bitstream, item, accessControl));
-        }
+        item.getBundles(CONTENT_BUNDLE_NAME).stream()
+            .flatMap(bundle -> bundle.getBitstreams().stream())
+            .filter(bitstream -> constraints == null ||
+                constraints.getUuid() == null ||
+                constraints.getUuid().size() == 0 ||
+                constraints.getUuid().contains(bitstream.getID().toString()))
+            .forEach(bitstream -> updateBitstreamPolicies(bitstream, item, accessControl));
     }
 
     private boolean containsConstraints(AccessConditionBitstream bitstream) {
         return Objects.nonNull(bitstream) &&
             Objects.nonNull(bitstream.getConstraints()) &&
             isNotEmpty(bitstream.getConstraints().getUuid());
-    }
-
-    private List<Bitstream> findMatchedBitstreams(Item item, List<String> uuids) {
-        return item.getBundles(CONTENT_BUNDLE_NAME).stream()
-                   .flatMap(bundle -> bundle.getBitstreams().stream())
-                   .filter(bitstream -> uuids.contains(bitstream.getID().toString()))
-                   .collect(Collectors.toList());
     }
 
     private void updateBitstreamPolicies(Bitstream bitstream, Item item, AccessControl accessControl) {
@@ -440,7 +423,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    private void assignSpecialGroupsInContext() throws SQLException {
+    private void assignSpecialGroupsInContext() {
         for (UUID uuid : handler.getSpecialGroups()) {
             context.setSpecialGroup(uuid);
         }
