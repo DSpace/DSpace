@@ -152,7 +152,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         try {
             accessControl = mapper.readValue(inputStream, AccessControl.class);
         } catch (IOException e) {
-            handler.logError("Error parsing json file");
+            handler.logError("Error parsing json file " + e.getMessage());
             throw new IllegalArgumentException("Error parsing json file", e);
         }
 
@@ -234,7 +234,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         if (uuids.length > 1  && containsConstraints(bitstream)) {
             handler.logError("constraint isn't supported when multiple uuids are provided");
             throw new BulkAccessControlException("constraint isn't supported when multiple uuids are provided");
-        } else {
+        } else if (uuids.length == 1 && containsConstraints(bitstream)) {
             DSpaceObject dso =
                 dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(uuids[0]));
 
@@ -256,7 +256,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             itemAccessConditions.get(accessCondition.getName()).validateResourcePolicy(
                 context, accessCondition.getName(), accessCondition.getStartDate(), accessCondition.getEndDate());
         } catch (Exception e) {
-            handler.logError("invalid access condition" + e.getMessage());
+            handler.logError("invalid access condition, " + e.getMessage());
             handler.handleException(e);
         }
     }
@@ -274,7 +274,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
         while (itemIterator.hasNext()) {
 
-            Item item = itemIterator.next();
+            Item item = context.reloadEntity(itemIterator.next());
 
             if (Objects.nonNull(accessControl.getItem())) {
                 updateItemPolicies(item, accessControl);
@@ -370,7 +370,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
     private void updateBitstreamsPolicies(Item item, AccessControl accessControl) {
 
         if (containsConstraints(accessControl.getBitstream())) {
-            findMatchedBitstreams(item, accessControl.getBitstream().getConstraint().getUuids())
+            findMatchedBitstreams(item, accessControl.getBitstream().getConstraints().getUuid())
                 .forEach(bitstream -> updateBitstreamPolicies(bitstream, item, accessControl));
         } else {
             findAllBitstreams(item)
@@ -381,8 +381,8 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     private boolean containsConstraints(AccessConditionBitstream bitstream) {
         return Objects.nonNull(bitstream) &&
-            Objects.nonNull(bitstream.getConstraint()) &&
-            isNotEmpty(bitstream.getConstraint().getUuids());
+            Objects.nonNull(bitstream.getConstraints()) &&
+            isNotEmpty(bitstream.getConstraints().getUuid());
     }
 
     private List<Bitstream> findMatchedBitstreams(Item item, List<String> uuids) {

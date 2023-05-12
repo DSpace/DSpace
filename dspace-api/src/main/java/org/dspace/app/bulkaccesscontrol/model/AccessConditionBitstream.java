@@ -17,7 +17,7 @@ public class AccessConditionBitstream {
 
     private String mode;
 
-    private Constraint constraint;
+    private Constraint constraints;
 
     private List<AccessCondition> accessConditions;
 
@@ -29,12 +29,12 @@ public class AccessConditionBitstream {
         this.mode = mode;
     }
 
-    public Constraint getConstraint() {
-        return constraint;
+    public Constraint getConstraints() {
+        return constraints;
     }
 
-    public void setConstraint(Constraint constraint) {
-        this.constraint = constraint;
+    public void setConstraints(Constraint constraints) {
+        this.constraints = constraints;
     }
 
     public List<AccessCondition> getAccessConditions() {
@@ -50,14 +50,14 @@ public class AccessConditionBitstream {
 
     public class Constraint {
 
-        private List<String> uuids;
+        private List<String> uuid;
 
-        public List<String> getUuids() {
-            return uuids;
+        public List<String> getUuid() {
+            return uuid;
         }
 
-        public void setUuids(List<String> uuids) {
-            this.uuids = uuids;
+        public void setUuid(List<String> uuid) {
+            this.uuid = uuid;
         }
     }
 
