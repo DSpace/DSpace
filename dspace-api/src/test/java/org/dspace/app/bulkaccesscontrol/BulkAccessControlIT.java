@@ -339,7 +339,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             "      \"accessConditions\": [\n" +
             "          {\n" +
             "            \"name\": \"embargo\",\n" +
-            "            \"endDate\": \"2024-06-24T23:59:59.999+0000\"\n" +
+            "            \"endDate\": \"2024-06-24T00:00:00Z\"\n" +
             "          }\n" +
             "      ]\n" +
             "   }}\n";
@@ -363,7 +363,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             "      \"accessConditions\": [\n" +
             "          {\n" +
             "            \"name\": \"lease\",\n" +
-            "            \"startDate\": \"2024-06-24T23:59:59.999+0000\"\n" +
+            "            \"startDate\": \"2024-06-24T00:00:00Z\"\n" +
             "          }\n" +
             "      ]\n" +
             "   }}\n";
@@ -519,6 +519,8 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         Community subCommunityThree = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                                       .withName("sub community two")
                                                       .build();
+                                              .withName("sub community three")
+                                              .build();
 
         Collection collectionOne = CollectionBuilder.createCollection(context, subCommunityOne)
                                                     .withName("collection one")
@@ -532,9 +534,9 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
                                                       .withName("collection three")
                                                       .build();
 
-        ItemBuilder.createItem(context, collectionOne).build();
+        Item itemOne = ItemBuilder.createItem(context, collectionOne).build();
 
-        ItemBuilder.createItem(context, collectionTwo).build();
+        Item itemTwo = ItemBuilder.createItem(context, collectionTwo).build();
 
         Item itemThree = ItemBuilder.createItem(context, collectionThree).withTitle("item three title").build();
 
@@ -547,7 +549,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
             "      \"accessConditions\": [\n" +
             "          {\n" +
             "            \"name\": \"embargo\",\n" +
-            "            \"startDate\": \"2024-06-24T00:00:00.000Z\"\n" +
+            "            \"startDate\": \"2024-06-24\"\n" +
             "          }\n" +
             "      ]\n" +
             "   }}\n";
@@ -568,28 +570,26 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         assertThat(testDSpaceRunnableHandler.getErrorMessages(), empty());
         assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
 
-        Iterator<Item> itemIteratorOne = itemService.findByCollection(context, collectionOne);
-        Iterator<Item> itemIteratorTwo = itemService.findByCollection(context, collectionTwo);
+        itemOne = context.reloadEntity(itemOne);
+        itemTwo = context.reloadEntity(itemTwo);
         itemThree = context.reloadEntity(itemThree);
         itemFour = context.reloadEntity(itemFour);
 
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
 
-
-//        matchItemsResourcePolicies(itemIteratorOne, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24", null);
-//        matchItemsResourcePolicies(itemIteratorTwo, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24", null);
-//        matchItemResourcePolicies(itemThree, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24", null);
-
-        assertThat(itemThree.getResourcePolicies(), hasSize(2));
-        assertThat(itemThree.getResourcePolicies(), containsInAnyOrder(
-            matches(Constants.READ, anonymousGroup, ResourcePolicy.TYPE_INHERITED),
-            matches(READ, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24T00:00:00.000Z", null, null)
+        assertThat(itemOne.getResourcePolicies(), hasSize(1));
+        assertThat(itemOne.getResourcePolicies(), hasItem(
+                matches(Constants.READ, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24", null, null)
         ));
 
-        // just a note here is working fine
+        assertThat(itemTwo.getResourcePolicies(), hasSize(1));
+        assertThat(itemTwo.getResourcePolicies(), hasItem(
+                matches(Constants.READ, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24", null, null)
+        ));
+
+        assertThat(itemThree.getResourcePolicies(), hasSize(1));
         assertThat(itemThree.getResourcePolicies(), hasItem(
-            matches(READ, anonymousGroup, "embargo", TYPE_CUSTOM,
-                itemThree.getResourcePolicies().get(0).getStartDate(), null, null)
+                matches(Constants.READ, anonymousGroup, "embargo", TYPE_CUSTOM, "2024-06-24", null, null)
         ));
 
         assertThat(itemFour.getResourcePolicies().size(), is(1));

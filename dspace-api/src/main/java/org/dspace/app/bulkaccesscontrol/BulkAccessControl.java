@@ -14,11 +14,15 @@ import static org.dspace.authorize.ResourcePolicy.TYPE_INHERITED;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -81,7 +85,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     private String filename;
 
-    private String[] uuids;
+    private List<String> uuids;
 
     private Context context;
 
@@ -124,12 +128,13 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             .collect(Collectors.toMap(AccessConditionOption::getName, Function.identity()));
 
         filename = commandLine.getOptionValue('f');
-        uuids = commandLine.getOptionValues('u');
+        uuids = commandLine.hasOption('u') ? Arrays.asList(commandLine.getOptionValues('u')) : null;
     }
 
     @Override
     public void internalRun() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
         AccessControl accessControl;
         context = new Context(Context.Mode.BATCH_EDIT);
         assignCurrentUserInContext();
@@ -137,12 +142,9 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
         context.turnOffAuthorisationSystem();
 
-        if (uuids == null) {
-            handler.logError("A target uuid must be provided (run with -h flag for details)");
-            throw new IllegalArgumentException("A target uuid must be provided");
-        } else if (uuids.length <= 0) {
-            handler.logError("A target uuid must be provided with at least on uuid");
-            throw new IllegalArgumentException("A target uuid must be provided with at least on uuid");
+        if (uuids == null || uuids.size() == 0) {
+            handler.logError("A target uuid must be provided with at least on uuid (run with -h flag for details)");
+            throw new IllegalArgumentException("At least one target uuid must be provided");
         }
 
         InputStream inputStream = handler.getFileStream(context, filename)
@@ -155,7 +157,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             handler.logError("Error parsing json file " + e.getMessage());
             throw new IllegalArgumentException("Error parsing json file", e);
         }
-
         try {
             validate(accessControl);
             updateItemsAndBitstreamsPolices(accessControl);
@@ -231,12 +232,12 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
     }
 
     private void validateConstraint(AccessConditionBitstream bitstream) throws SQLException {
-        if (uuids.length > 1  && containsConstraints(bitstream)) {
+        if (uuids.size() > 1  && containsConstraints(bitstream)) {
             handler.logError("constraint isn't supported when multiple uuids are provided");
             throw new BulkAccessControlException("constraint isn't supported when multiple uuids are provided");
-        } else if (uuids.length == 1 && containsConstraints(bitstream)) {
+        } else if (uuids.size() == 1 && containsConstraints(bitstream)) {
             DSpaceObject dso =
-                dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(uuids[0]));
+                dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(uuids.get(0)));
 
             if (Objects.nonNull(dso) && dso.getType() != Constants.ITEM) {
                 handler.logError("constraint is not supported when uuid isn't an Item");
@@ -296,11 +297,11 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    private String buildSolrQuery(String[] uuids) throws SQLException {
-        String [] query = new String[uuids.length];
+    private String buildSolrQuery(List<String> uuids) throws SQLException {
+        String [] query = new String[uuids.size()];
 
         for (int i = 0 ; i < query.length ; i++) {
-            DSpaceObject dso = dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(uuids[i]));
+            DSpaceObject dso = dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(uuids.get(i)));
 
             if (dso.getType() == Constants.COMMUNITY) {
                 query[i] = "location.comm:" + dso.getID();
@@ -348,55 +349,32 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
     }
 
     private void setItemPolicies(Item item, AccessControl accessControl) throws SQLException, AuthorizeException {
-
         AccessConditionItem itemControl = accessControl.getItem();
-
-        if (isAdjustPoliciesNeeded(item, itemControl.getMode(), itemControl.getAccessConditions())) {
-            itemService.adjustItemPolicies(context, item, item.getOwningCollection());
-        }
-
         accessControl
             .getItem()
             .getAccessConditions()
             .forEach(accessCondition -> createResourcePolicy(item, accessCondition,
                 itemAccessConditions.get(accessCondition.getName())));
-    }
 
-    private boolean isAdjustPoliciesNeeded(Item item, String mode, List<AccessCondition> accessConditions) {
-        return (isAppendModeDisabled() && item.isArchived()) ||
-            (REPLACE_MODE.equals(mode) && CollectionUtils.isEmpty(accessConditions));
+        itemService.adjustItemPolicies(context, item, item.getOwningCollection());
     }
 
     private void updateBitstreamsPolicies(Item item, AccessControl accessControl) {
 
         if (containsConstraints(accessControl.getBitstream())) {
             findMatchedBitstreams(item, accessControl.getBitstream().getConstraints().getUuid())
+        item.getBundles(Constants.CONTENT_BUNDLE_NAME).stream()
+                .flatMap(bundle -> bundle.getBitstreams().stream())
+                .filter(bitstream -> uuids == null ||
+                    uuids.size() == 0 ||
+                    uuids.contains(bitstream.getID().toString()))
                 .forEach(bitstream -> updateBitstreamPolicies(bitstream, item, accessControl));
-        } else {
-            findAllBitstreams(item)
-                .forEach(bitstream ->
-                    updateBitstreamPolicies(bitstream, item, accessControl));
-        }
     }
 
     private boolean containsConstraints(AccessConditionBitstream bitstream) {
         return Objects.nonNull(bitstream) &&
             Objects.nonNull(bitstream.getConstraints()) &&
             isNotEmpty(bitstream.getConstraints().getUuid());
-    }
-
-    private List<Bitstream> findMatchedBitstreams(Item item, List<String> uuids) {
-        return item.getBundles().stream()
-                   .flatMap(bundle -> bundle.getBitstreams().stream())
-                   .filter(bitstream -> uuids.contains(bitstream.getID().toString()))
-                   .collect(Collectors.toList());
-    }
-
-    private List<Bitstream> findAllBitstreams(Item item) {
-        return item.getBundles()
-                   .stream()
-                   .flatMap(bundle -> bundle.getBitstreams().stream())
-                   .collect(Collectors.toList());
     }
 
     private void updateBitstreamPolicies(Bitstream bitstream, Item item, AccessControl accessControl) {
@@ -424,17 +402,12 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     private void setBitstreamPolicies(Bitstream bitstream, Item item, AccessControl accessControl)
         throws SQLException, AuthorizeException {
-
         AccessConditionBitstream bitstreamControl = accessControl.getBitstream();
-
-        if (isAdjustPoliciesNeeded(item, bitstreamControl.getMode(), bitstreamControl.getAccessConditions())) {
-            itemService.adjustBitstreamPolicies(context, item, item.getOwningCollection(), bitstream);
-        }
-
         accessControl.getBitstream()
                      .getAccessConditions()
                      .forEach(accessCondition -> createResourcePolicy(bitstream, accessCondition,
                          uploadAccessConditions.get(accessCondition.getName())));
+        itemService.adjustBitstreamPolicies(context, item, item.getOwningCollection(), bitstream);
     }
 
     private void createResourcePolicy(DSpaceObject obj, AccessCondition accessCondition,
@@ -464,11 +437,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         for (UUID uuid : handler.getSpecialGroups()) {
             context.setSpecialGroup(uuid);
         }
-    }
-
-    private boolean isAppendModeDisabled() {
-        return !configurationService.getBooleanProperty(
-            "core.authorization.installitem.inheritance-read.append-mode");
     }
 
     @Override
