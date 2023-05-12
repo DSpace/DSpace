@@ -7,9 +7,11 @@
  */
 package org.dspace.content.dao.impl;
 
-import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -179,13 +181,5 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
             returnList.add(new AbstractMap.SimpleEntry<>((Collection) o[0], (Long) o[1]));
         }
         return returnList;
-    }
-
-    @Override
-    public int countArchivedItems(Context context, UUID collectionId) throws SQLException {
-        return ((BigInteger) getHibernateSession(context)
-                .createNativeQuery("select count(*) from collection2item ci left join item i on i.uuid = ci.item_id where i.in_archive and uuid(ci.collection_id)=uuid(:collectionId)")
-                .setParameter("collectionId", collectionId.toString())
-                .getSingleResult()).intValue();
     }
 }

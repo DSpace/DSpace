@@ -713,8 +713,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public int getArchivedItems(Community community) throws ItemCountException {
-        //TODO load ItemCounter on bean creation
-        Context context = new Context();
-        return new ItemCounter(context).getCount(community);
+        return ItemCounter.getInstance().getCount(community);
     }
 }

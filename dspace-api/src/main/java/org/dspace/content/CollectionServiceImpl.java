@@ -1051,10 +1051,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public int countArchivedItem(Collection collection) throws ItemCountException {
-        //TODO load ItemCounter on bean creation
-        Context context = new Context();
-        return new ItemCounter(context).getCount(collection);
+        return ItemCounter.getInstance().getCount(collection);
     }
-
-
 }

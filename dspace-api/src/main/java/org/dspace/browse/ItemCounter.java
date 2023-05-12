@@ -18,6 +18,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.web.ContextUtil;
 
 /**
  * This class provides a standard interface to all item counting
@@ -49,6 +50,8 @@ public class ItemCounter {
      */
     private Context context;
 
+    private static ItemCounter instance;
+
     protected ItemService itemService;
     protected ConfigurationService configurationService;
 
@@ -63,6 +66,13 @@ public class ItemCounter {
         this.dao = ItemCountDAOFactory.getInstance(this.context);
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    }
+
+    public static ItemCounter getInstance() throws ItemCountException {
+        if (instance == null) {
+            instance = new ItemCounter(ContextUtil.obtainCurrentRequestContext());
+        }
+        return instance;
     }
 
     /**

@@ -265,9 +265,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         return communityService;
     }
 
-    public int getAllItems() {
+    public int countArchivedItem() {
         try {
-           return communityService.getArchivedItems(this);
+            return communityService.getArchivedItems(this);
         } catch (ItemCountException e) {
             throw new RuntimeException(e);
         }

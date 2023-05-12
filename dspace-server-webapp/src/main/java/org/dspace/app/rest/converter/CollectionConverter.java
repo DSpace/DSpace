@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +26,7 @@ public class CollectionConverter extends DSpaceObjectConverter<Collection, Colle
     @Override
     public CollectionRest convert(Collection collection, Projection projection) {
         CollectionRest resource = super.convert(collection, projection);
-        resource.setArchivedItems(collection.getAllItems());
+        resource.setArchivedItems(collection.countArchivedItem());
         return resource;
     }
     @Override
