@@ -1,95 +1,153 @@
 # DRUM Features
 
-Summary of DRUM enhancements to base DSpace functionality.
+This summary of DRUM enhancements to the base DSpace functionality is primarily
+derived from the Jira issues that were part of the "Upgrade DRUM to DSpace 7
+Jira epic ([LIBDRUM-645](https://umd-dit.atlassian.net/browse/LIBDRUM-645)).
 
-## Administration
+Only features that required customization are indicated below. Stock DSpace
+behavior used by features is not recorded.
 
-    add collection to community mapping
-    select/display the bundle of a bitstream
-    add preservation bundle 
+Customizations for both the DRUM back-end and DRUM Angular front-end are
+recorded in this list.
 
 ## Authentication/Authorization
 
-    dual authentication: password/CAS
-    CAS authentication
-        login
-        gateway login
-        logout
-        automatic registration
-        admin override (force login as a specific user)
-        remove password updating on profile page
-    LDAP authorization
-        determine faculty status
-        department affiliation for submission
-        admin: Unit -> Group mapping
-        admin: display Ldap info on Eperson edit page
+See [dspace/docs/CASAuthentication.md](CASAuthentication.md) for additional
+information.
+
+* LIBDRUM-657 - "UMD Login" via CAS provided as a log-in option, in addition to
+  the standard DSPace username/password login
+  * First-time users are automatically registered using user's information
+      from LDAP.
+  * "CAS Authenticated" special group is added to session of CAS users
+  * Faculty status of user is determined using LDAP
+  * Determines the department affiliation for submission from LDAP using the Unit
+    to Group mapping
+
+* LDAP
+  * LIBDRUM-660 - User profile page modified to display to administrators
+    UM Directory information from LDAP (Name, Email, Phone, Faculty, UM Appt,
+    Groups)
+  * LIBDRUM-669 - Group membership based on LDAP attributes is displayed in the
+    user profile page (see also LIBDRUM-703)
 
 ## Electronic Theses and Dissertations (ETD)
 
-    bitstream start/end authorization
-    custom embargoed bitstream messaging
-    embargoed item statistics
-    loader
-        transform Proquest metadata to dublin core
-        transform Proquest metadata to marc and transfer to TSD
-        map into department etd collection
-        email notification: duplicate titles, .csv with embargoes, load report, marc transfer
-    ETD Departments
-    
-## Item/Community/Collection display
+* LIBDRUM-671 - "ETD Department" CRUD functionality
+* LIBDRUM-680 - Loader for loading Proquest ETDs into DRUM
+  * transform Proquest metadata to dublin core
+  * transform Proquest metadata to marc and transfer to TSD
+  * map into department etd collection
+  * email notification
 
-    live links for urls
-    add handle display for Community/Collection
-    change contributor.sponsor to relation.isAvailableAt
-    bitstream views statistic (No. of Downloads)
+## Embargo
 
-## Loaders (other than ETD)
-legacy, single-use loaders; do not need testing
+See [dspace/docs/DrumEmbargoAndAccessRestrictions.md](DrumEmbargoAndAccessRestrictions.md)
+for additional information
 
-    CS Tech Reports
-    ISR
-    CISSM
+* LIBDRUM-678 - ETD Embargo Policies
+  * ETD embargo policies for date-based and "forever" embargoes
+  * Embargoed files are marked as "Restriced Access" in the GUI
+  * Restricted access page some different messages based on date-based
+    and "forever" embargoes.
 
-## Navigation
+* LIBDRUM-679 - Added "Embargo List" page for administrators reporting all the
+  embargoed bitstreams, and enabling CSV download for administrators.
 
-    community groups (display, admin)
-    remove /index.jsp from url
-    navbar: mydspace links
-    navbar: login status placement
-    add context link to search help
+## Submissions
+
+* LIBDRUM-675 - For default submission workflow:
+  * "Author" field is required
+  * "Advisor" field added
+  * See also LIBDRUM-728
+
+* LIBDRUM-711 - "Equitable Access" field added to default submission form
+  * Automatically maps Equitable Access-submitted materials to the
+    "Equitable Access" group.
+
+* LIBDRUM-727 - "Creative Commons" license field added to submission form
+
+* LIBDRUM-729 - List of available types for "Type"  was simplified from DSpace
+  defaults
+
+* LIBDRUM-747 - "Modifying access conditions" section allowing users to create
+  item embargoes was removed.
+
+## Data Community
+
+* LIBDRUM-682:
+  * Modified submission form fields based on item type of "Dataset" or
+    "Software"
+  * "Dataset" or "Sofware" items automatically mapped to "UMD Data Community"
+
+## Minority Health and Health Equity Archive (MHHEA)
+
+* LIBDRUM-684 - Created custom workdfow and submission form for submissions to
+  the MHHEA group
+* See also LIBDRUM-728
+
+## Community Groups
+
+* LIBDRUM-664 - Enable communities to orgranized to groups (i.e.,
+  "UM Community", "Faculty (UM Department)", "UM Libraries").
+* See also LIBDRUM-701
+
+## JSON-LD
+
+* LIBDRUM-715 - JSON-LD "Website" descriptor added
+* LIBDRUM-683 - JSON-LD "Dataset" descriptor added for "Dataset" items (used by
+  Google Dataset Search)
+
+## WuFoo Feedback Form
+
+See [dspace/docs/DrumWufooFeedback.md](DrumWufooFeedback.md) for additional
+information.
+
+* LIBDRUM-748 - Wufoo feedback form was added.
+
+## User Interface Changes
+
+* General UI Changes
+  * LIBDRUM-654 - Standard UMD header banner added
+  * LIBDRUM-655 - SSDR-standard Envirnoment Banners added for non-production servers
+  * LIBDRUM-659 - Custom "DRUM" theme
+  * LIBDRUM-745 - Page Footer modifications
+  * LIBDRUM-737 - Replaced "DSpace" text with "DRUM"
+* Home page modifications:
+  * LIBDRUM-702 - Display community lists grouped by community groups
+  * LIBDRUM-704 - Display "Recent Submissions" list
+* LIBDRUM-656 - Bitstream download count added on item pages, vieweable by any user (including
+  users that are not logged in).
+* LIBDRUM-658 - Following fields added to the "Simple" item view:
+  * Citation: dc.identifier.citation
+  * Advisor: dc.contributor.advisor
+  * DRUM DOI: dc.identifier
+  * LIBDRUM-740 - Fields/Labels displayed based on item type
+* LIBDRUM-685 - "Author" browse index only displays values from
+  "contributor.author" index
+* LIBDRUM-698 - Standard DSpace "End User Agreement" is suppresed
+* LIBDRUM-735 - Default License Agreement for submissions was updated for DRUM
+* LIBDRUM-738 - "Statistics" navigation bar entry removed for non-administrators
+  * "No. of Downloads" for bitstreams displays for all (even anoynomous) users
+* LIBDRUM-739 - "Has Files" removed from search options
+* LIBDRUM-746 - "Abstract" field modified to not preserve line breaks when
+  displayed
+
+## DRUM DOI
+
+See [dspace/docs/DrumDOI.md](DrumDOI.md) for additional information.
+
+* LIBDRUM-753 - "Random" DOIs are minted for items
+
+## Cron Jobs
+
+See [dspace/docs/DrumCronTasks.md](DrumCronTasks.md) for additional information.
+
+* LIBDRUM-720 - DSpace Cron jobs
 
 ## Miscellaneous
 
-    duplicate title detection
-    static browse page for crawlers
-    fix bitstream servlet when user is not authorized
-    upgrade to Handle server 6.2
-    fix audio upload problem?
-    fix bitstream format registry problem?
-    fix oai-pmh to xml escape set names
-    add ability for attachments on email notices
-
-## Search / Browse
-
-    add Advisor to advanced search
-    fix diacritic problem: add synonyms with a non-diacritic version
-    fix browse of items in multiple collections
-    change author browse to contributor.author instead of contributor.*
-
-## Statistics
-
-    add item,bitstream views count (with monthly update)
-    add Item option to not update last modified date
-    view standard stats from admin interface
-    embargo statistics
-
-## Submission
-
-    select multiple collections
-    require contributor.author
-    add contributor.advisor
-    require date.issued for all submission types
-    show required submission metadata fields (submit/edit-metadata.jsp)
-    allow bitstream editing in workflow mode in addition to workspace (submission) mode (submit/upload-file-list.jsp)
-    make citation required if previously published
-    add "Submit to This Collection"
+* LIBDRUM-662 - Custom "Unit" to manage the UMD Campus Units, and manage access
+  to Faculty collections. (see also LIBDRUM-676)
+* LIBDRUM-666 - "Preservation" bundle type option provided for bitstreams
+  bundles

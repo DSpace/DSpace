@@ -1,40 +1,40 @@
 # DRUM 7 Docker Development Environment
 
-This document contains instructions for building DRUM 7 dspace environment
-using docker.
+This document contains instructions for building a local development instance
+of a DSpace 7-based DRUM using Docker.
 
 ## Development Setup
 
 This repository uses the "GitHub Flow" branching model, with "drum-main" as the
 main branch for DRUM development.
 
-1. Clone the Git repository and switch to the directory:
+1) Clone the Git repository and switch to the directory:
 
     ```bash
-    git clone -b drum-main git@github.com:umd-lib/DSpace.git drum
-    cd drum
+    $ git clone -b drum-main git@github.com:umd-lib/DSpace.git drum
+    $ cd drum
     ```
 
-2. Optional: Build the dependent images.
+2) Optional: Build the dependent images.
 
     ```bash
-    docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies-7_x:latest .
-    docker build -f Dockerfile.ant -t docker.lib.umd.edu/drum-ant:latest .
-    cd dspace/src/main/docker/dspace-postgres-pgcrypto
-    docker build -t docker.lib.umd.edu/dspace-postgres:latest .
-    cd -
+    $ docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies-7_x:latest .
+    $ docker build -f Dockerfile.ant -t docker.lib.umd.edu/drum-ant:latest .
+    $ cd dspace/src/main/docker/dspace-postgres-pgcrypto
+    $ docker build -t docker.lib.umd.edu/dspace-postgres:latest .
+    $ cd -
     ```
 
-3. Create the local configuration file
+3) Create the local configuration file
 
     ```bash
-    cp dspace/config/local.cfg.EXAMPLE dspace/config/local.cfg
+    $ cp dspace/config/local.cfg.EXAMPLE dspace/config/local.cfg
     ```
 
-4. Edit the local configuration file:
+4) Edit the local configuration file:
 
     ```bash
-    vi dspace/config/local.cfg
+    $ vi dspace/config/local.cfg
     ```
 
    and enter values for the following properties:
@@ -49,70 +49,104 @@ main branch for DRUM development.
    the actual value added to the file would be similar to
    `uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot`.
 
-5. Build the application and client docker images:
+5) Follow the instructions at [dspace/docs/DrumDBRestore.md](DrumDBRestore.md)
+   to populate the Postgres database with a DSpace 7 database dump from
+   Kubernetes.
+
+   **Note:** If populating the Postgres database from a DSpace 6 database
+   snapshot, use [dspace/docs/DrumDBRestoreFromDSpace6.md](DrumDBRestoreFromDSpace6.md)
+
+6) Build the application and client Docker images:
+
+   **Note:** If building for development, use the instructions in the
+   "Quick Builds for development" section below, in place of the following
+   steps.
 
     ```bash
     # Build the dspace image
-    docker compose -f docker-compose.yml build
+    $ docker compose -f docker-compose.yml build
 
     ```
 
-6. Follow the instructions at [DRUM7DBRestore.md](./DRUM7DBRestore.md) to restore DRUM's DSpace 6 DB dump to DSpace 7.
-
-7. Start all the containers
+7) Start all the containers
 
     ```bash
-    docker compose -p d7 up
+    $ docker compose -p d7 up
     ```
 
     Once the REST API starts, it should be accessible at [http://localhost:8080/server]
 
 ## Quick Builds for development
 
-The cut-short the long build time that is needed to build the entire project, we can do a two stage build where the base build does a full maven build, and for subsequent changes, we can do a build only builds the overlays modules that contain our overriding customization Java classes.
+To shortcut the long build time that is needed to build the entire project, we
+can do a two stage build where the base build does a full Maven build, and for
+subsequent changes, only build the "overlays" modules that contain our
+customized Java classes.
 
 ```bash
 # Base build
-docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
+$ docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
 
 # Overlay modules build
-docker build -f Dockerfile.dev-additions -t docker.lib.umd.edu/drum:7_x-dev .
+$ docker build -f Dockerfile.dev-additions -t docker.lib.umd.edu/drum:7_x-dev .
 ```
 
-Also, we can start the dspace container and the dependencies (db & solr) in separate commands. This would allow us to individually stop and start the dspace container.
+Also, we can start the "dspace" container and the dependencies ("dspacedb"
+and "dspacesolr") in separate commands. This allows the "dspace"
+container to be started/stopped individually.
 
 ```bash
 # Start the db and solr container in detached mode
-docker compose -p d7 up -d dspacedb dspacesolr
+$ docker compose -p d7 up -d dspacedb dspacesolr
 
 # Start the dspace container
-docker compose -p d7 up dspace
+$ docker compose -p d7 up dspace
 ```
+
+## Visual Studio Code IDE Setup
+
+The following is the suggested setup for Visual Studio Code for DSpace
+development:
+
+* Install the "Extension Pack for Java" (vscjava.vscode-java-pack) extension
+* Install the "Checkstyle for Java" (shengchen.vscode-checkstyle) extension
+  * Follow the instructions in the Lyrasis
+    ["Code Style Guide"](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide#CodeStyleGuide-VSCode)
+    to configure the Checkstyle plugin and formatting options.
+* The debug configuration necessary for the VS Code to attach to the Tomcat
+  running on the Docker is maintained within in ".vscode" directory.
 
 ## Debugging
 
-The `JAVA_TOOL_OPTIONS` configuration included in the docker compose starts the jpda debugger for tomcat. The [.vscode/launch.json](.vscode/launch.json) contains the VS Code debug configuration needed to attach to the tomcat. Follow the instructions at <https://confluence.umd.edu/display/LIB/DSpace+Development+IDE+Setup> to install the necessary extensions to be able to debug.
+The `JAVA_TOOL_OPTIONS` configuration included in the Docker compose starts the
+jpda debugger for Tomcat. The [.vscode/launch.json](/.vscode/launch.json)
+file contains the VS Code debug configuration needed to attach to Tomcat. See
+the "Visual Studio Code IDE Setup" section for the extensions neeeded for
+debugging.
 
 To start debugging,
 
-1. Ensure that the dspace docker container is up and running.
-2. Open to the "Run and Debug" panel (CMD + SHIFT + D) on VS Code.
-3. Click the green triange (Play)  "Debug (Attach to Tomcat)" button on top of the debug panel.
+1) Ensure that the dspace Docker container is up and running.
+
+2) Open to the "Run and Debug" panel (CMD + SHIFT + D) on VS Code.
+
+3) Click the green triange (Play)  "Debug (Attach to Tomcat)" button on top of
+   the debug panel.
 
 ## Useful commands
 
 ```bash
 # To stop all the containers
-docker compose -p d7 stop
+$ docker compose -p d7 stop
 
 # To stop just the dspace container
-docker compose -p d7 stop dspace
+$ docker compose -p d7 stop dspace
 
 # To restart just the dspace container
-docker compose -p d7 restart dspace
+$ docker compose -p d7 restart dspace
 
 # To attach to the dspace container
-docker exec -it dspace bash
+$ docker exec -it dspace bash
 ```
 
 ## Create an adminstrator user
@@ -149,7 +183,7 @@ By default the unit and integration tests are not run when building the project.
 To run both the unit and integration tests:
 
 ```bash
-mvn install -DskipUnitTests=false -DskipIntegrationTests=false
+$ mvn install -DskipUnitTests=false -DskipIntegrationTests=false
 ```
 
 ### Test Environments
@@ -181,13 +215,13 @@ standard DSpace or Spring configuration files, or any changes in a module's
 root directory:
 
 ```bash
-mvn install
+$ mvn install
 ```
 
 ## DSpace Scripts and Email Setup
 
-DSpace scripts (such as [../bin/load-etd](../bin/load-etd)) may send email as
-part of their operation. The development Docker images do not, by themselves,
+DSpace scripts (such as [dspace/bin/load-etd](../bin/load-etd)) may send email
+as part of their operation. The development Docker images do not, by themselves,
 support running the DSpace scripts or sending emails.
 
 The following changes enable the DSpace scripts to be run in the "dspace"
@@ -215,21 +249,21 @@ credentials.
 and extract the file, where “YYYY-MM” is the year/month of the download:
 
 ```bash
-cd /tmp
-gunzip dbip-city-lite-YYYY-MM.mmdb.gz
+$ cd /tmp
+$ gunzip dbip-city-lite-YYYY-MM.mmdb.gz
 ```
 
 This will result in a file named “dbip-city-lite-YYYY-MM.mmdb”. For simplicity,
 rename the file to “dbip-city-lite.mmdb”:
 
 ```bash
-mv /tmp/dbip-city-lite-<yyyy-MM>.mmdb /tmp/dbip-city-lite.mmdb
+$ mv /tmp/dbip-city-lite-<yyyy-MM>.mmdb /tmp/dbip-city-lite.mmdb
 ```
 
 2) Copy the "/tmp/dbip-city-lite.mmdb" file into the "dspace/config/" directory:
 
 ```bash
-cp /tmp/dbip-city-lite.mmdb dspace/config/
+$ cp /tmp/dbip-city-lite.mmdb dspace/config/
 ```
 
 3) Add the following line to the “dspace/config/local.cfg” file:
@@ -264,7 +298,7 @@ RUN apt-get update && \
 ### docker-compose.yml
 
 Add the following lines to the "docker-compose.yml" file, in the "service"
-stanza, to enable the "MailHog" <https://github.com/mailhog/MailHog> SMTP
+stanza, to enable the "MailHog" (<https://github.com/mailhog/MailHog>) SMTP
 capture tool as part of the Docker Compose stack:
 
 ```yaml
