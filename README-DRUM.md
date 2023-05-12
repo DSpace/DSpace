@@ -1,98 +1,121 @@
 # Digital Repository at the University of Maryland (DRUM)
 
-Home: <http://drum.lib.umd.edu/>
-
-See <http://drum.lib.umd.edu/help/about_drum.jsp> for more information.
+Home: <https://drum.lib.umd.edu/>
 
 ## Documentation
 
 The original DSpace documentation:
 
-* [README-DSPACE.md](README-DSPACE.md)
-* [DSpace Manual](dspace/docs/pdf/DSpace-Manual.pdf)
+* [README-DSPACE.md](README.md)
 
-### Development Environment
+## Development Environment
 
-Instructions for building and running drum locally can be found at:
-[Drum7DockerDevelopmentEnvironment.md](/dspace/docs/Drum7DockerDevelopmentEnvironment.md)
+Instructions for building and running drum locally can be found in
+[dspace/docs/Drum7DockerDevelopmentEnvironment.md](/dspace/docs/Drum7DockerDevelopmentEnvironment.md)
 
-### Building Images for K8s Deployment
+## Building Images for K8s Deployment
 
-#### DSpace Image
+As of May 2023,  MacBooks utilizing Apple Silicon (the "arm64" architecture)
+are unable to directly generate the "amd64" Docker images used by Kubernetes.
 
-Dockerfile.dependencies is used to pre-cache maven downloads that will be used
-in subsequent DSpace docker builds.
+The following procedure uses the Docker "buildx" functionality and the
+Kubernetes "build" namespace to build the Docker images. This procedure should
+work on both "arm64" and "amd64" MacBooks.
 
-```bash
-docker build -t docker.lib.umd.edu/drum-dependencies-6_x:latest -f Dockerfile.dependencies .
-```
+All images will be automatically pushed to the Nexus.
 
-This Dockerfile builds a drum tomcat image.
+### Local Machine Setup
 
-```bash
-docker build -t docker.lib.umd.edu/drum:<VERSION> .
-```
+See <https://confluence.umd.edu/display/LIB/Docker+Builds+in+Kubernetes> in
+Confluence for information about setting up a MacBook to use the Kubernetes
+"build" namespace.
 
-The version would follow the drum project version. For example, a release
-version could be `6.3/drum-4.2`, and we can suffix the version number
-with `-rcX` or use `latest` as the version for non-production images.
+### Creating the Docker images
 
-#### Postgres Image
+1) In an empty directory, checkout the Git repository and switch into the
+   directory:
 
-To build postgres image with pgcrypto module.
+    ```bash
+    $ git clone git@github.com:umd-lib/DSpace.git drum
+    $ cd drum
+    ```
 
-```bash
-cd dspace/src/main/docker/dspace-postgres-pgcrypto
-docker build -t docker.lib.umd.edu/dspace-postgres:<VERSION> .
-```
+2) Checkout the appropriate Git tag, branch, or commit for the Docker images.
 
-We could follow the same versioning scheme as the main drum image, but we don't
-necessarily have create new image versions for postgres for every patch or
-hotfix version increments. The postgres image can be built when there is a
-relevant change.
+3) Set up a "DRUM_TAG" environment variable:
 
-#### Solr Image
+    ```bash
+    $ export DRUM_TAG=<DOCKER_IMAGE_TAG>
+    ```
 
-To build postgres image with pgcrypto module.
+   where \<DOCKER_IMAGE_TAG> is the Docker image tag to associate with the
+   Docker images. This will typically be the Git tag for the DRUM version,
+   or some other identifier, such as a Git commit hash. For example, using the
+   Git tag of "7.4/drum-0":
 
-```bash
-cd dspace/solr
-docker build -t docker.lib.umd.edu/drum-solr:<VERSION> .
-```
+    ```bash
+    $ export DRUM_TAG=7.4/drum-0
+    ```
 
-We could follow the same versioning scheme as the main drum image, but we don't
-necessariliy have create new image versions for solr for every patch or hotfix
-version increments. The solr image can be built when there is a relevant change.
+4) Set up a "DRUM_DIR" environment variable referring to the current
+   directory:
 
-### Deployment
+    ```bash
+    $ export DRUM_DIR=`pwd`
+    ```
 
-The `dspace-installer` directory that contains all the artifacts and the ant
-script to perform the deployment. The `installer-dist` maven profile creates a
-tar file of the installer directory which can be pushed to the UMD nexus by
-using the `deploy-release` or `deploy-snapshot` profile.
+5) Switch to the Kubernetes "build" namespace:
 
-```bash
-# Switch to the dspace directory
-cd /apps/git/drum/dspace
+    ```bash
+    $ kubectl config use-context build
+    ```
 
-# Deploy a snapshot version to nexus
-# (use this profile if the current project version is a SNAPSHOT version)
-mvn -P installer-dist,deploy-snapshot
+6) Create the "docker.lib.umd.edu/drum-dependencies-7_x" Docker image. This
+   image is used to pre-cache Maven downloads that will be used in subsequent
+   DSpace docker builds:
 
-# Deploy a release version to nexus
-mvn -P installer-dist,deploy-release
-```
+    ```bash
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -t docker.lib.umd.edu/drum-dependencies-7_x:latest -f Dockerfile.dependencies .
+    ```
 
-*NOTE:* For the Nexus deployment to succeed, the nexus server, username and
-password needs to be configured in the `.m2/setting.xml` and a prior successful
-`mvn install`.
+7) Create the "docker.lib.umd.edu/drum" Docker image:
+
+    ```bash
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum:$DRUM_TAG .
+    ```
+
+8) Create the "docker.lib.umd.edu/dspace-postgres", which is a Postgres image
+   with "pgcrypto" module:
+
+    **Note:** The "Dockerfile" for the "dspace-postgres" image specifies
+    only the major Postgres version as the base image. This allows Postgres
+    minor version updates to be retrieved automatically. It may not be
+    necessary to create new "dspace-postgres" image versions for every DRUM
+    patch or hotfix version increment.
+
+    ```bash
+    $ cd $DRUM_DIR/dspace/src/main/docker/dspace-postgres-pgcrypto
+
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/dspace-postgres:$DRUM_TAG .
+    ```
+
+9) Create the "docker.lib.umd.edu/drum-solr":
+
+    **Note:** The "Dockerfile" for the "drum-solr" image specifies only the
+    major Solr version as the base image. This allows Solr minor version updates
+    to be retrieved automatically. It may not be necessary to create new
+    "drum-solr" image versions for every DRUM patch or hotfix version increment.
+
+    ```bash
+    $ cd $DRUM_DIR/dspace/solr
+
+    $ docker buildx build --platform linux/amd64 --builder=kube --push --no-cache -f Dockerfile -t docker.lib.umd.edu/drum-solr:$DRUM_TAG .
+    ```
 
 ### Features
 
 * [DrumFeatures](dspace/docs/DrumFeatures.md) - Summary of DRUM enhancements to
   base DSpace functionality
-* [DrumFeaturesandCode](dspace/docs/DrumFeaturesandCode.md) - DRUM enhancements
-  with implementation details
 * [DrumConfigurationCustomization](dspace/docs/DrumConfigurationCustomization.md) -
   Information about customizing DSpace for DRUM.
 * [docs](dspace/docs) - additional documentation
