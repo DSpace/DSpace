@@ -8,10 +8,14 @@
 package org.dspace.app.itemimport;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.content.Collection;
@@ -62,7 +66,7 @@ public class ItemImportCLI extends ItemImport {
             handler.logError("Must run with either add, replace, or remove (run with -h flag for details)");
             throw new UnsupportedOperationException("Must run with either add, replace, or remove");
         } else if ("add".equals(command) || "replace".equals(command)) {
-            if (sourcedir == null) {
+            if (!remoteUrl && sourcedir == null) {
                 handler.logError("A source directory containing items must be set (run with -h flag for details)");
                 throw new UnsupportedOperationException("A source directory containing items must be set");
             }
@@ -96,10 +100,25 @@ public class ItemImportCLI extends ItemImport {
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         // If this is a zip archive, unzip it first
         if (zip) {
-            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
-                    + File.separator + context.getCurrentUser().getID());
-            sourcedir = itemImportService.unzip(
-                    new File(sourcedir + File.separator + zipfilename), workDir.getAbsolutePath());
+            if (!remoteUrl) {
+                workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                        + File.separator + context.getCurrentUser().getID());
+                sourcedir = itemImportService.unzip(
+                        new File(sourcedir + File.separator + zipfilename), workDir.getAbsolutePath());
+            } else {
+                // manage zip via remote url
+                Optional<InputStream> optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+                if (optionalFileStream.isPresent()) {
+                    workFile = new File(itemImportService.getTempWorkDir() + File.separator
+                            + zipfilename + "-" + context.getCurrentUser().getID());
+                    FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
+                } else {
+                    throw new IllegalArgumentException(
+                            "Error reading file, the file couldn't be found for filename: " + zipfilename);
+                }
+                workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
+                sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+            }
         }
     }
 
@@ -119,6 +138,12 @@ public class ItemImportCLI extends ItemImport {
         if (commandLine.hasOption('z')) {
             zip = true;
             zipfilename = commandLine.getOptionValue('z');
+        }
+
+        if (commandLine.hasOption('u')) { // remote url
+            zip = true;
+            remoteUrl = true;
+            zipfilename = commandLine.getOptionValue('u');
         }
     }
 

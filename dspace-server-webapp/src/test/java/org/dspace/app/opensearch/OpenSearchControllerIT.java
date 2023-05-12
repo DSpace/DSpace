@@ -249,4 +249,24 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
             </OpenSearchDescription>
         */
     }
+
+    @Test
+    public void emptyDescriptionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .build();
+
+        getClient().perform(get("/opensearch/search")
+                   .param("format", "rss")
+                   .param("scope", collection1.getID().toString())
+                   .param("query", "*"))
+                   .andExpect(status().isOk())
+                   .andExpect(xpath("rss/channel/description").string("No Description"));
+    }
 }
