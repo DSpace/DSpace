@@ -209,6 +209,13 @@
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
             <type>sherpaPolicy</type>
         </step-definition>
+
+        <!-- New step for show / mint identifiers -->
+        <step-definition id="identifiers">
+            <heading>submit.progressbar.identifiers</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
+            <type>identifiers</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -233,7 +240,9 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-
+            <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
+                 that identifiers.cfg and identifier-service.xml are properly configured. -->
+            <!--<step id="identifiers"/>-->
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>

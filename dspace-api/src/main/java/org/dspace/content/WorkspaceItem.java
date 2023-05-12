@@ -8,8 +8,6 @@
 package org.dspace.content;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,8 +15,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
@@ -27,7 +23,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowItem;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -77,14 +72,6 @@ public class WorkspaceItem
 
     @Column(name = "page_reached")
     private Integer pageReached = -1;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "epersongroup2workspaceitem",
-        joinColumns = {@JoinColumn(name = "workspace_item_id")},
-        inverseJoinColumns = {@JoinColumn(name = "eperson_group_id")}
-    )
-    private final List<Group> supervisorGroups = new ArrayList<>();
 
     /**
      * Protected constructor, create object using:
@@ -226,15 +213,4 @@ public class WorkspaceItem
         publishedBefore = b;
     }
 
-    public List<Group> getSupervisorGroups() {
-        return supervisorGroups;
-    }
-
-    void removeSupervisorGroup(Group group) {
-        supervisorGroups.remove(group);
-    }
-
-    void addSupervisorGroup(Group group) {
-        supervisorGroups.add(group);
-    }
 }

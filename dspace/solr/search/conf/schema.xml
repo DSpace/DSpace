@@ -264,6 +264,9 @@
     <!-- used to track which group(s) have submit permissions -->
     <field name="submit" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
+    <!-- used to track which eperson(s) have edit permissions on items -->
+    <field name="edit" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
+
     <!-- used to track entity type of collections -->
     <field name="search.entitytype" type="string" indexed="true" stored="true" required="false" />
    
@@ -299,6 +302,9 @@
 
     <!--Dynamic field used for sidebar filters & SOLR browse by value -->
     <dynamicField name="*_filter" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
+    <!--Dynamic field used to index the facet/filter value, split on each word to end,
+        so that the facet search can search all words in a facet-->
+    <dynamicField name="*_prefix" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_authority" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_keyword" type="keywordFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />
 

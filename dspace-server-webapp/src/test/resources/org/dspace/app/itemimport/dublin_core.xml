@@ -1,0 +1,5 @@
+<dublin_core>
+    <dcvalue element="title" qualifier="none">A Tale of Two Cities</dcvalue>
+    <dcvalue element="date" qualifier="issued">1990</dcvalue>
+    <dcvalue element="title" qualifier="alternative" language="fr">J'aime les Printemps</dcvalue>
+</dublin_core>

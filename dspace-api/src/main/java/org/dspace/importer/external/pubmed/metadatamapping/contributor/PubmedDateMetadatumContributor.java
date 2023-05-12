@@ -121,12 +121,14 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
                 int j = 0;
                 // Use the first dcDate that has been formatted (Config should go from most specific to most lenient)
-                while (j < dateFormatsToAttempt.size() && dcDate == null) {
+                while (j < dateFormatsToAttempt.size()) {
                     String dateFormat = dateFormatsToAttempt.get(j);
                     try {
                         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
                         Date date = formatter.parse(dateString);
                         dcDate = new DCDate(date);
+                        values.add(metadataFieldMapping.toDCValue(field, formatter.format(date)));
+                        break;
                     } catch (ParseException e) {
                         // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
                         // time one of those formats fails.
@@ -136,9 +138,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                     }
                     j++;
                 }
-                if (dcDate != null) {
-                    values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));
-                } else {
+                if (dcDate == null) {
                     log.info(
                             "Failed parsing " + dateString + ", check " +
                                 "the configured dataformats in config/spring/api/pubmed-integration.xml");

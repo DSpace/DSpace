@@ -132,6 +132,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     private Authorization authorization;
     private EPersonRest ePersonRest;
+    private EPersonRest adminRest;
     private final String feature = CanChangePasswordFeature.NAME;
 
 
@@ -150,6 +151,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testStatusAuthenticatedAsAdmin() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+
+        AuthorizationFeature canChangePasswordFeature = authorizationFeatureService.find(CanChangePasswordFeature.NAME);
+        adminRest = ePersonConverter.convert(context.reloadEntity(admin), DefaultProjection.DEFAULT);
+        authorization = new Authorization(admin, canChangePasswordFeature, adminRest);
 
         getClient(token).perform(get("/api/authn/status").param("projection", "full"))
                         .andExpect(status().isOk())
@@ -1390,64 +1395,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShortLivedTokenUsingGet() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        // Verify the main session salt doesn't change
-        String salt = eperson.getSessionSalt();
-
-        getClient(token).perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(TRUSTED_IP))
-        )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.token", notNullValue()))
-            .andExpect(jsonPath("$.type", is("shortlivedtoken")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")))
-            // Verify generating short-lived token doesn't change our CSRF token
-            // (so, neither the CSRF cookie nor header are sent back)
-            .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
-            .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
-
-        assertEquals(salt, eperson.getSessionSalt());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testShortLivedTokenUsingGetFromUntrustedIpShould403() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(UNTRUSTED_IP))
-        )
-            .andExpect(status().isForbidden());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testShortLivedTokenUsingGetFromUntrustedIpWithForwardHeaderShould403() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(UNTRUSTED_IP))
-                .header("X-Forwarded-For", TRUSTED_IP) // this should not affect the test result
-        )
-            .andExpect(status().isForbidden());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
     public void testShortLivedTokenWithCSRFSentViaParam() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1468,15 +1415,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testShortLivedTokenNotAuthenticated() throws Exception {
         getClient().perform(post("/api/authn/shortlivedtokens"))
-            .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void testShortLivedTokenNotAuthenticatedUsingGet() throws Exception {
-        getClient().perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(TRUSTED_IP))
-        )
             .andExpect(status().isUnauthorized());
     }
 
@@ -1586,22 +1524,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String shortLivedToken = getShortLivedToken(token);
 
         getClient().perform(post("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken))
-            .andExpect(status().isForbidden());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testGenerateShortLivedTokenWithShortLivedTokenUsingGet() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        String shortLivedToken = getShortLivedToken(token);
-
-        getClient().perform(
-            get("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken)
-                .with(ip(TRUSTED_IP))
-        )
             .andExpect(status().isForbidden());
 
         // Logout, invalidating token

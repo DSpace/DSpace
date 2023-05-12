@@ -944,4 +944,11 @@ public class Context implements AutoCloseable {
     public void setAuthenticationMethod(final String authenticationMethod) {
         this.authenticationMethod = authenticationMethod;
     }
+
+    /**
+     * Check if the user of the context is switched.
+     */
+    public boolean isContextUserSwitched() {
+        return currentUserPreviousState != null;
+    }
 }

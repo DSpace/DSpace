@@ -17,7 +17,13 @@
   <dc-type>
 	<schema>workflow</schema>
     <element>score</element>
-    <scope_note>Metadata field used for the score review</scope_note>
+    <scope_note>Metadata field used for the score review rating</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>workflow</schema>
+    <element>review</element>
+    <scope_note>Metadata field used for the score review description</scope_note>
   </dc-type>
 
 </dspace-dc-types>

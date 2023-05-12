@@ -48,7 +48,6 @@
     <bean class="org.dspace.content.MetadataSchemaServiceImpl"/>
     <bean class="org.dspace.content.MetadataValueServiceImpl"/>
     <bean class="org.dspace.content.SiteServiceImpl"/>
-    <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
     <bean class="org.dspace.content.RelationshipServiceImpl"/>
     <bean class="org.dspace.content.EntityTypeServiceImpl"/>
@@ -60,12 +59,16 @@
     <bean class="org.dspace.scripts.ProcessServiceImpl"/>
     <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 
+    <bean class="org.dspace.alerts.SystemWideAlertServiceImpl"/>
+
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
 
     <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
 
     <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
+
+    <bean class="org.dspace.handle.hdlresolver.HdlResolverServiceImpl"/>
 
     <bean class='org.dspace.service.impl.HttpConnectionPoolService'
           id='solrHttpConnectionPoolService'
@@ -99,8 +102,7 @@
     <bean class="org.dspace.eperson.GroupServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.SupervisorServiceImpl"/>
-
+    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
@@ -142,6 +144,11 @@
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
+
+    <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
+    <bean class="org.dspace.authorize.RegexPasswordValidator" />
+
+    <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
 </beans>
 

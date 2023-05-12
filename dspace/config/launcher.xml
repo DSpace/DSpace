@@ -90,13 +90,6 @@
         </step>
     </command>
     <command>
-        <name>export</name>
-        <description>Export items or collections</description>
-        <step>
-            <class>org.dspace.app.itemexport.ItemExportCLITool</class>
-        </step>
-    </command>
-    <command>
         <name>generate-sitemaps</name>
         <description>Generate search engine and html sitemaps</description>
         <step>
@@ -108,13 +101,6 @@
         <description>Manage the OAI-PMH harvesting of external collections</description>
         <step>
             <class>org.dspace.app.harvest.Harvest</class>
-        </step>
-    </command>
-    <command>
-        <name>import</name>
-        <description>Import items into DSpace</description>
-        <step>
-            <class>org.dspace.app.itemimport.ItemImportCLITool</class>
         </step>
     </command>
     <command>
@@ -301,13 +287,6 @@
         <description>Build DSpace community and collection structure</description>
         <step>
             <class>org.dspace.administer.StructBuilder</class>
-        </step>
-    </command>
-    <command>
-        <name>sub-daily</name>
-        <description>Send daily subscription notices</description>
-        <step>
-            <class>org.dspace.eperson.SubscribeCLITool</class>
         </step>
     </command>
     <command>
