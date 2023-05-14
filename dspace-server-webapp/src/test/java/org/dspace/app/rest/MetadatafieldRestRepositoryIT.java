@@ -50,12 +50,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-    private static final String ELEMENT = "test element";
-    private static final String QUALIFIER = "test qualifier";
+    private static final String ELEMENT = "test_element";
+    private static final String QUALIFIER = "test_qualifier";
     private static final String SCOPE_NOTE = "test scope_note";
 
-    private static final String ELEMENT_UPDATED = "test element updated";
-    private static final String QUALIFIER_UPDATED = "test qualifier updated";
+    private static final String ELEMENT_UPDATED = "test_element_updated";
+    private static final String QUALIFIER_UPDATED = "test_qualifier_updated";
     private static final String SCOPE_NOTE_UPDATED = "test scope_note updated";
 
     private MetadataSchema metadataSchema;
@@ -758,7 +758,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void createUnprocessableEntity_elementContainingDots() throws Exception {
+    public void createUnprocessableEntity_elementContainingInvalidCharacters() throws Exception {
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setElement("testElement.ForCreate");
         metadataFieldRest.setQualifier(QUALIFIER);
@@ -775,16 +775,64 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                          .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isUnprocessableEntity());
+
+        metadataFieldRest.setElement("testElement,ForCreate");
+        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                      metadataFieldRest.getQualifier()), nullValue());
+
+        getClient(authToken)
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", String.valueOf(metadataSchema.getID()))
+                         .param("projection", "full")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        metadataFieldRest.setElement("testElement ForCreate");
+        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                      metadataFieldRest.getQualifier()), nullValue());
+
+        getClient(authToken)
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", String.valueOf(metadataSchema.getID()))
+                         .param("projection", "full")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void createUnprocessableEntity_qualifierContainingDots() throws Exception {
+    public void createUnprocessableEntity_qualifierContainingInvalidCharacters() throws Exception {
         MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
         metadataFieldRest.setElement(ELEMENT);
         metadataFieldRest.setQualifier("testQualifier.ForCreate");
         metadataFieldRest.setScopeNote(SCOPE_NOTE);
 
         String authToken = getAuthToken(admin.getEmail(), password);
+        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                      metadataFieldRest.getQualifier()), nullValue());
+
+        getClient(authToken)
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", String.valueOf(metadataSchema.getID()))
+                         .param("projection", "full")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        metadataFieldRest.setQualifier("testQualifier,ForCreate");
+        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
+                                                      metadataFieldRest.getQualifier()), nullValue());
+
+        getClient(authToken)
+            .perform(post("/api/core/metadatafields")
+                         .param("schemaId", String.valueOf(metadataSchema.getID()))
+                         .param("projection", "full")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        metadataFieldRest.setQualifier("testQualifier ForCreate");
         assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
                                                       metadataFieldRest.getQualifier()), nullValue());
 

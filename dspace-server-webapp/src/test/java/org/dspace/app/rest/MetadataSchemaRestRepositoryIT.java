@@ -117,7 +117,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void createUnprocessableEntity_prefixContainingDots() throws Exception {
+    public void createUnprocessableEntity_prefixContainingInvalidCharacters() throws Exception {
         context.turnOffAuthorisationSystem();
 
         MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace")
@@ -130,6 +130,20 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
+        getClient(authToken)
+            .perform(post("/api/core/metadataschemas")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        metadataSchemaRest.setPrefix("test,SchemaName");
+        getClient(authToken)
+            .perform(post("/api/core/metadataschemas")
+                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
+                         .contentType(contentType))
+            .andExpect(status().isUnprocessableEntity());
+
+        metadataSchemaRest.setPrefix("test SchemaName");
         getClient(authToken)
             .perform(post("/api/core/metadataschemas")
                          .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))

@@ -260,14 +260,18 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         if (isBlank(metadataFieldRest.getElement())) {
             throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
-        } else if (metadataFieldRest.getElement().contains(".")) {
-            throw new UnprocessableEntityException("metadata element (in request body) cannot contain dots");
+        } else if (!metadataFieldRest.getElement().matches("^[^. ,]{1,64}$")) {
+            throw new UnprocessableEntityException(
+                "metadata element (in request body) cannot contain dots, commas or spaces and should be smaller than" +
+                    " 64 characters");
         }
 
         if (isBlank(metadataFieldRest.getQualifier())) {
             metadataFieldRest.setQualifier(null);
-        } else if (metadataFieldRest.getQualifier().contains(".")) {
-            throw new UnprocessableEntityException("metadata qualifier (in request body) cannot contain dots");
+        } else if (!metadataFieldRest.getQualifier().matches("^[^. ,]{1,64}$")) {
+            throw new UnprocessableEntityException(
+                "metadata qualifier (in request body) cannot contain dots, commas or spaces and should be smaller" +
+                    " than 64 characters");
         }
 
         // create

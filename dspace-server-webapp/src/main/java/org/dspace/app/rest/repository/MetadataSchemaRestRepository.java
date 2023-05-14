@@ -93,8 +93,10 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         // validate fields
         if (isBlank(metadataSchemaRest.getPrefix())) {
             throw new UnprocessableEntityException("metadata schema name cannot be blank");
-        } else if (metadataSchemaRest.getPrefix().contains(".")) {
-            throw new UnprocessableEntityException("metadata schema namespace cannot contain dots");
+        } else if (!metadataSchemaRest.getPrefix().matches("^[^. ,]{1,32}$")) {
+            throw new UnprocessableEntityException(
+                "metadata schema namespace cannot contain dots, commas or spaces and should be smaller than" +
+                    " 32 characters");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
