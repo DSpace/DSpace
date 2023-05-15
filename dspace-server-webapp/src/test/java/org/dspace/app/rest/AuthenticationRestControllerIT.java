@@ -456,37 +456,40 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 //                        .andExpect(status().isNoContent());
 //    }
 
-    @Test
-    public void testShibbolethEndpointCannotBeUsedWithShibDisabled() throws Exception {
-        // Enable only password login
-        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
-
-        String uiURL = configurationService.getProperty("dspace.ui.url");
-
-        // Verify /api/authn/shibboleth endpoint does not work
-        // NOTE: this is the same call as in testStatusShibAuthenticatedWithCookie())
-        String token = getClient().perform(get("/api/authn/shibboleth")
-                .header("Referer", "https://myshib.example.com")
-                .param("redirectUrl", uiURL)
-                .requestAttr("SHIB-MAIL", eperson.getEmail())
-                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
-                .andExpect(status().isUnauthorized())
-                .andReturn().getResponse().getHeader("Authorization");
-
-        getClient(token).perform(get("/api/authn/status"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.authenticated", is(false)))
-                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist());
-
-        getClient(token).perform(
-                get("/api/authz/authorizations/search/object")
-                        .param("embed", "feature")
-                        .param("feature", feature)
-                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.page.totalElements", is(0)))
-                   .andExpect(jsonPath("$._embedded").doesNotExist());
-    }
+    // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
+    // requirements. This test was copied and updated following the Clarin updates to the
+    // `ClarinAuthenticationRestControllerIT#testShibbolethEndpointCannotBeUsedWithShibDisabled` method.
+//    @Test
+//    public void testShibbolethEndpointCannotBeUsedWithShibDisabled() throws Exception {
+//        // Enable only password login
+//        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
+//
+//        String uiURL = configurationService.getProperty("dspace.ui.url");
+//
+//        // Verify /api/authn/shibboleth endpoint does not work
+//        // NOTE: this is the same call as in testStatusShibAuthenticatedWithCookie())
+//        String token = getClient().perform(get("/api/authn/shibboleth")
+//                .header("Referer", "https://myshib.example.com")
+//                .param("redirectUrl", uiURL)
+//                .requestAttr("SHIB-MAIL", eperson.getEmail())
+//                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+//                .andExpect(status().isUnauthorized())
+//                .andReturn().getResponse().getHeader("Authorization");
+//
+//        getClient(token).perform(get("/api/authn/status"))
+//                        .andExpect(status().isOk())
+//                        .andExpect(jsonPath("$.authenticated", is(false)))
+//                        .andExpect(jsonPath("$.authenticationMethod").doesNotExist());
+//
+//        getClient(token).perform(
+//                get("/api/authz/authorizations/search/object")
+//                        .param("embed", "feature")
+//                        .param("feature", feature)
+//                        .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+//                   .andExpect(status().isOk())
+//                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+//                   .andExpect(jsonPath("$._embedded").doesNotExist());
+//    }
 
     // NOTE: This test is similar to testStatusShibAuthenticatedWithCookie(), but proves the same process works
     // for Password Authentication in theory (NOTE: at this time, there's no way to create an auth cookie via the
