@@ -17,11 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Rest controller handling security related requests
+ */
 @RequestMapping(value = "/api/security")
 @RestController
 public class SecurityRestController {
     DSpaceCsrfTokenRepository csrfTokenRepository = new DSpaceCsrfTokenRepository();
 
+    /**
+     * The csrf endpoint checks the current csrf cookie and header, resetting it if any of the two are missing, or
+     * they don't match anymore
+     */
     @RequestMapping(value = "/csrf", method = RequestMethod.POST)
     public ResponseEntity csrf(HttpServletRequest request, HttpServletResponse response) {
         CsrfToken token = csrfTokenRepository.loadToken(request);
@@ -30,7 +37,7 @@ public class SecurityRestController {
             CsrfToken newToken = csrfTokenRepository.generateToken(request);
             csrfTokenRepository.saveToken(newToken, request, response);
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 }

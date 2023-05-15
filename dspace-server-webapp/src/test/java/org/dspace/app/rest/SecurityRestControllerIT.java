@@ -25,7 +25,7 @@ public class SecurityRestControllerIT extends AbstractControllerIntegrationTest 
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(post("/api/security/csrf"))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(header().string(
                         HttpHeaders.SET_COOKIE,
                         StringContains.containsString("DSPACE-XSRF-COOKIE")
@@ -38,7 +38,7 @@ public class SecurityRestControllerIT extends AbstractControllerIntegrationTest 
 
         getClient(token).perform(post("/api/security/csrf").cookie(
                 new Cookie("DSPACE-XSRF-COOKIE", "5f12f98b-5de3-4ee1-bd5f-95b784bd17cf")))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(header().string(
                         HttpHeaders.SET_COOKIE,
                         StringContains.containsString("DSPACE-XSRF-COOKIE")
@@ -51,7 +51,7 @@ public class SecurityRestControllerIT extends AbstractControllerIntegrationTest 
 
         getClient(token).perform(post("/api/security/csrf").header("X-XSRF-TOKEN",
                         "5f12f98b-5de3-4ee1-bd5f-95b784bd17cf"))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(header().string(
                         HttpHeaders.SET_COOKIE,
                         StringContains.containsString("DSPACE-XSRF-COOKIE")
@@ -65,7 +65,7 @@ public class SecurityRestControllerIT extends AbstractControllerIntegrationTest 
         getClient(token).perform(post("/api/security/csrf").header("X-XSRF-TOKEN",
                         "5f12f98b-5de3-4ee1-bd5f-95b784bd17cf").cookie(
                         new Cookie("DSPACE-XSRF-COOKIE", "1427c36d-6d4c-423a-939d-8ddf0115b5c6")))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(header().string(
                         HttpHeaders.SET_COOKIE,
                         StringContains.containsString("DSPACE-XSRF-COOKIE")
@@ -79,7 +79,7 @@ public class SecurityRestControllerIT extends AbstractControllerIntegrationTest 
         getClient(token).perform(post("/api/security/csrf").header("X-XSRF-TOKEN",
                         "5f12f98b-5de3-4ee1-bd5f-95b784bd17cf").cookie(
                         new Cookie("DSPACE-XSRF-COOKIE", "5f12f98b-5de3-4ee1-bd5f-95b784bd17cf")))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andExpect(header().doesNotExist(HttpHeaders.SET_COOKIE));
     }
 
