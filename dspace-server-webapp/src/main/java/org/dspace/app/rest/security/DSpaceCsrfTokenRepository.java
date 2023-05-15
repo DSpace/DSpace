@@ -83,6 +83,9 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
     /**
      * This method has been modified for DSpace.
      * <P>
+     * It filters out GET requests to avoid them refreshing the token when one is already being set by the csrf endpoint
+     * on SecurityRestController
+     * <P>
      * It now uses ResponseCookie to build the cookie, so that the "SameSite" attribute can be applied.
      * <P>
      * It also sends the token (if not empty) in both the cookie and the custom "DSPACE-XSRF-TOKEN" header
@@ -93,6 +96,9 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
     @Override
     public void saveToken(CsrfToken token, HttpServletRequest request,
                           HttpServletResponse response) {
+        if (request.getMethod().equals("GET")) {
+            return;
+        }
         String tokenValue = token == null ? "" : token.getToken();
         Cookie cookie = new Cookie(this.cookieName, tokenValue);
         cookie.setSecure(request.isSecure());
