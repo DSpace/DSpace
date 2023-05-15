@@ -78,6 +78,16 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
 
     private static final Logger log = LogManager.getLogger(org.dspace.app.rest.security.ShibbolethLoginFilter.class);
 
+    /**
+     * Property which handles information if the IdP send required information.
+     */
+    private boolean isMissingHeadersFromIdp = false;
+
+    /**
+     * The netId of the user for which IdP send required information, but without Email.
+     */
+    private String netId = "";
+
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ClarinVerificationTokenService clarinVerificationTokenService = ClarinServiceFactory.getInstance()
             .getClarinVerificationTokenService();
@@ -91,6 +101,10 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
+        // Reset properties in every login request
+        this.setMissingHeadersFromIdp(false);
+        this.netId = "";
+
         // First, if Shibboleth is not enabled, throw an immediate ProviderNotFoundException
         // This tells Spring Security that authentication failed
         if (!ClarinShibAuthentication.isEnabled()) {
@@ -147,16 +161,14 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
         try {
             if (StringUtils.isEmpty(netid) || StringUtils.isEmpty(idp)) {
                 log.error("Cannot load the netid or idp from the request headers.");
-                this.redirectToMissingHeadersPage(res);
-                return null;
+                this.setMissingHeadersFromIdp(true);
             }
 
             // The Idp hasn't sent the email - the user will be redirected to the page where he must fill in that
             // missing email
             if (StringUtils.isBlank(email)) {
                 log.error("Cannot load the shib email header from the request headers.");
-                this.redirectToWriteEmailPage(req, res);
-                return null;
+                this.setMissingUserEmail(req, res);
             }
         } catch (IOException e) {
             throw new RuntimeException("Cannot redirect the user to the Shibboleth authentication error page" +
@@ -215,7 +227,31 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
         String authenticateHeaderValue = restAuthenticationService.getWwwAuthenticateHeaderValue(request, response);
 
         response.setHeader("WWW-Authenticate", authenticateHeaderValue);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed!");
+
+        // Get redirect URL from request parameter
+        String redirectUrl = request.getParameter("redirectUrl");
+
+        // If redirectUrl unspecified, default to the configured UI
+        if (StringUtils.isEmpty(redirectUrl)) {
+            redirectUrl = configurationService.getProperty("dspace.ui.url");
+        }
+
+
+        String loginUrl = "/login/";
+        redirectUrl += loginUrl;
+
+        String missingHeadersUrl = "missing-headers";
+        String userWithoutEmailUrl = "auth-failed";
+
+        // Compose the redirect URL
+        if (this.isMissingHeadersFromIdp) {
+            redirectUrl += missingHeadersUrl;
+        } else if (StringUtils.isNotEmpty(this.netId)) {
+            // netId is set if the user doesn't have the email
+            redirectUrl += userWithoutEmailUrl + "?netid=" + this.netId;
+        }
+
+        response.sendRedirect(redirectUrl);
         log.error("Authentication failed (status:{})",
                 HttpServletResponse.SC_UNAUTHORIZED, failed);
     }
@@ -261,9 +297,10 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
     /**
      * The IdP hasn't sent the `Shib-Identity-Provider` or `SHIB-NETID` header. The user is redirected to the
      * static error page (The UI process error message).
+     *
      */
-    protected void redirectToMissingHeadersPage(HttpServletResponse res) throws IOException {
-        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, MISSING_HEADERS_FROM_IDP);
+    protected void setMissingHeadersFromIdp(boolean value) {
+        this.isMissingHeadersFromIdp = value;
     }
 
     /**
@@ -272,7 +309,7 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
      * The request headers passed by IdP are stored into the `verification_token` table the `shib_headers` column
      * for later usage. After successful signing in the `verification_token` record is removed from the DB.
      */
-    protected void redirectToWriteEmailPage(HttpServletRequest req,
+    protected void setMissingUserEmail(HttpServletRequest req,
                                             HttpServletResponse res) throws IOException {
         Context context = ContextUtil.obtainContext(req);
         String authenticateHeaderValue = restAuthenticationService.getWwwAuthenticateHeaderValue(req, res);
@@ -303,14 +340,7 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
                     + e.getMessage());
         }
 
-        // Add header values to the error message to retrieve them in the FE. That headers are needed for the
-        // next processing.
-        String separator = ",";
-        String[] headers = new String[] {USER_WITHOUT_EMAIL_EXCEPTION, netid};
-        String errorMessage = StringUtils.join(headers, separator);
-
-        res.setHeader("WWW-Authenticate", authenticateHeaderValue);
-        res.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
+        this.netId = netid;
     }
 
     private String getEpersonEmail(EPerson ePerson) {

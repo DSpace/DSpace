@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.security;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.impl.CanChangePasswordFeature;
@@ -20,7 +17,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -28,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  */
+// This class is ignored because all tests was copied and updated due to CLARIN requirements into
+// `ClarinShibbolethLoginFilterIT`
+@Ignore
 public class ShibbolethLoginFilterIT extends AbstractControllerIntegrationTest {
 
     @Autowired
@@ -122,18 +122,21 @@ public class ShibbolethLoginFilterIT extends AbstractControllerIntegrationTest {
 //
 //    }
 
-    @Test
-    public void testNoRedirectIfShibbolethDisabled() throws Exception {
-        // Enable Password authentication ONLY
-        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
-
-        // Test redirecting to a trusted URL (same as previous test).
-        // This time we should be unauthorized as Shibboleth is disabled.
-        getClient().perform(get("/api/authn/shibboleth")
-                       .param("redirectUrl", "http://localhost:8080/server/api/authn/status")
-                       .requestAttr("SHIB-MAIL", eperson.getEmail()))
-                .andExpect(status().isUnauthorized());
-    }
+    // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
+    // requirements. This test was copied and updated following the Clarin updates to the
+    // `ClarinShibbolethLoginFilter#testNoRedirectIfShibbolethDisabled` method.
+//    @Test
+//    public void testNoRedirectIfShibbolethDisabled() throws Exception {
+//        // Enable Password authentication ONLY
+//        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
+//
+//        // Test redirecting to a trusted URL (same as previous test).
+//        // This time we should be unauthorized as Shibboleth is disabled.
+//        getClient().perform(get("/api/authn/shibboleth")
+//                       .param("redirectUrl", "http://localhost:8080/server/api/authn/status")
+//                       .requestAttr("SHIB-MAIL", eperson.getEmail()))
+//                .andExpect(status().isUnauthorized());
+//    }
 
     // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
     // requirements. This test was copied and updated following the Clarin updates to the
@@ -163,29 +166,38 @@ public class ShibbolethLoginFilterIT extends AbstractControllerIntegrationTest {
 //                .andExpect(status().isBadRequest());
 //    }
 
-    @Test
-    public void testNoRedirectIfInvalidShibAttributes() throws Exception {
-        // In this request, we use a SHIB-MAIL attribute which does NOT match an EPerson.
-        getClient().perform(get("/api/authn/shibboleth")
-                .requestAttr("SHIB-MAIL", "not-an-eperson@example.com"))
-                .andExpect(status().isUnauthorized());
-    }
+    // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
+    // requirements. This test was copied and updated following the Clarin updates to the
+    // `ClarinShibbolethLoginFilter#testNoRedirectIfInvalidShibAttributes` method.
+//    @Test
+//    public void testNoRedirectIfInvalidShibAttributes() throws Exception {
+//        // In this request, we use a SHIB-MAIL attribute which does NOT match an EPerson.
+//        getClient().perform(get("/api/authn/shibboleth")
+//                .requestAttr("SHIB-MAIL", "not-an-eperson@example.com"))
+//                .andExpect(status().isUnauthorized());
+//    }
 
-    @Test
-    public void testRedirectRequiresShibAttributes() throws Exception {
-        // Verify this endpoint doesn't work if no SHIB-* attributes are set
-        getClient().perform(get("/api/authn/shibboleth"))
-                .andExpect(status().isUnauthorized());
-    }
+    // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
+    // requirements. This test was copied and updated following the Clarin updates to the
+    // `ClarinShibbolethLoginFilter#testRedirectRequiresShibAttributes` method.
+//    @Test
+//    public void testRedirectRequiresShibAttributes() throws Exception {
+//        // Verify this endpoint doesn't work if no SHIB-* attributes are set
+//        getClient().perform(get("/api/authn/shibboleth"))
+//                .andExpect(status().isUnauthorized());
+//    }
 
-    @Test
-    public void testRedirectRequiresShibAttributes2() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        // Verify this endpoint also doesn't work using a regular auth token (again if SHIB-* attributes missing)
-        getClient(token).perform(get("/api/authn/shibboleth"))
-                .andExpect(status().isUnauthorized());
-    }
+    // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
+    // requirements. This test was copied and updated following the Clarin updates to the
+    // `ClarinShibbolethLoginFilter#testRedirectRequiresShibAttributes2` method.
+//    @Test
+//    public void testRedirectRequiresShibAttributes2() throws Exception {
+//        String token = getAuthToken(eperson.getEmail(), password);
+//
+//        // Verify this endpoint also doesn't work using a regular auth token (again if SHIB-* attributes missing)
+//        getClient(token).perform(get("/api/authn/shibboleth"))
+//                .andExpect(status().isUnauthorized());
+//    }
 
     // Note: This test was commented because the Shibboleth Authentication was customized following the Clarin
     // requirements. This test was copied and updated following the Clarin updates to the
