@@ -156,7 +156,13 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
     @Override
     public String register(Context context, DSpaceObject dso, Filter filter)
             throws IdentifierException {
+        if (!(dso instanceof Item)) {
+            // DOIs are currently assigned only to Items
+            return null;
+        }
+
         String doi = mint(context, dso, filter);
+
         register(context, dso, doi, filter);
 
         return doi;
