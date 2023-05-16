@@ -8,6 +8,7 @@
 package org.dspace.scripts;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +37,9 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public List<ScriptConfiguration> getScriptConfigurations(Context context) {
         return serviceManager.getServicesByType(ScriptConfiguration.class).stream().filter(
-            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context)).collect(Collectors.toList());
+            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context))
+                             .sorted(Comparator.comparing(ScriptConfiguration::getName))
+                             .collect(Collectors.toList());
     }
 
     @Override

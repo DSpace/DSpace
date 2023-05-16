@@ -1,5 +1,10 @@
 # Oracle Flyway Database Migrations (i.e. Upgrades)
 
+---
+WARNING: Oracle Support is deprecated.
+See https://github.com/DSpace/DSpace/issues/8214
+---
+
 The SQL scripts in this directory are Oracle-specific database migrations. They are
 used to automatically upgrade your DSpace database using [Flyway](http://flywaydb.org/).
 As such, these scripts are automatically called by Flyway when the DSpace

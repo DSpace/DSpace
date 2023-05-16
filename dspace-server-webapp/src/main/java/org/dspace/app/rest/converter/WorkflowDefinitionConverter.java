@@ -15,6 +15,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,8 @@ public class WorkflowDefinitionConverter implements DSpaceConverter<Workflow, Wo
     @Autowired
     protected XmlWorkflowFactory xmlWorkflowFactory;
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     ConverterService converter;
 

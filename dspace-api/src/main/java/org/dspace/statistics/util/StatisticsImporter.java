@@ -348,9 +348,9 @@ public class StatisticsImporter {
 
                 // Get the eperson details
                 EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, user);
-                int epersonId = 0;
+                UUID epersonId = null;
                 if (eperson != null) {
-                    eperson.getID();
+                    epersonId = eperson.getID();
                 }
 
                 // Save it in our server
@@ -365,12 +365,10 @@ public class StatisticsImporter {
                 sid.addField("city", city);
                 sid.addField("latitude", latitude);
                 sid.addField("longitude", longitude);
-                if (epersonId > 0) {
+                if (epersonId != null) {
                     sid.addField("epersonid", epersonId);
                 }
-                if (dns != null) {
-                    sid.addField("dns", dns.toLowerCase());
-                }
+                sid.addField("dns", dns.toLowerCase());
 
                 solrLoggerService.storeParents(sid, dso);
                 solr.add(sid);

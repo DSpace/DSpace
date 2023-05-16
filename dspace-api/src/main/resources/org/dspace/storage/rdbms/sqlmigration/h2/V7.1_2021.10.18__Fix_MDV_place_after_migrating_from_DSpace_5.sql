@@ -9,10 +9,11 @@
 ----------------------------------------------------
 -- Make sure the metadatavalue.place column starts at 0 instead of 1
 ----------------------------------------------------
+
 CREATE LOCAL TEMPORARY TABLE mdv_minplace (
   dspace_object_id UUID NOT NULL,
   metadata_field_id INT NOT NULL,
-  minplace INT NOT NULL,
+  minplace INT NOT NULL
 );
 
 INSERT INTO mdv_minplace

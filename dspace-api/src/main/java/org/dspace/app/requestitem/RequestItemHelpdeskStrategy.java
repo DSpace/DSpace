@@ -8,6 +8,8 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
@@ -16,36 +18,47 @@ import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 
 /**
- * RequestItem strategy to allow DSpace support team's helpdesk to receive requestItem request
- * With this enabled, then the Item author/submitter doesn't receive the request, but the helpdesk instead does.
+ * RequestItem strategy to allow DSpace support team's help desk to receive
+ * requestItem requests.  With this enabled, the Item author/submitter doesn't
+ * receive the request, but the help desk instead does.
  *
- * Failover to the RequestItemSubmitterStrategy, which means the submitter would get the request if there is no
- * specified helpdesk email.
+ * <p>Fails over to the {@link RequestItemSubmitterStrategy}, which means the
+ * submitter would get the request if there is no specified help desk email.
  *
  * @author Sam Ottenhoff
  * @author Peter Dietz
  */
-public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
+public class RequestItemHelpdeskStrategy
+        extends RequestItemSubmitterStrategy {
+    static final String P_HELPDESK_OVERRIDE
+            = "request.item.helpdesk.override";
+    static final String P_MAIL_HELPDESK = "mail.helpdesk";
+
     @Autowired(required = true)
     protected EPersonService ePersonService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     public RequestItemHelpdeskStrategy() {
     }
 
     @Override
-    public RequestItemAuthor getRequestItemAuthor(Context context, Item item) throws SQLException {
-        ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
+    @NonNull
+    public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
+            throws SQLException {
         boolean helpdeskOverridesSubmitter = configurationService
             .getBooleanProperty("request.item.helpdesk.override", false);
         String helpDeskEmail = configurationService.getProperty("mail.helpdesk");
 
         if (helpdeskOverridesSubmitter && StringUtils.isNotBlank(helpDeskEmail)) {
-            return getHelpDeskPerson(context, helpDeskEmail);
+            List<RequestItemAuthor> authors = new ArrayList<>(1);
+            authors.add(getHelpDeskPerson(context, helpDeskEmail));
+            return authors;
         } else {
             //Fallback to default logic (author of Item) if helpdesk isn't fully enabled or setup
             return super.getRequestItemAuthor(context, item);
@@ -53,16 +66,18 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
     }
 
     /**
-     * Return a RequestItemAuthor object for the specified helpdesk email address.
-     * It makes an attempt to find if there is a matching eperson for the helpdesk address, to use the name,
-     * Otherwise it falls back to a helpdeskname key in the Messages.props.
+     * Return a RequestItemAuthor object for the specified help desk email address.
+     * It makes an attempt to find if there is a matching {@link EPerson} for
+     * the help desk address, to use its name.  Otherwise it falls back to the
+     * {@code helpdeskname} key in {@code Messages.properties}.
      *
      * @param context       context
      * @param helpDeskEmail email
      * @return RequestItemAuthor
      * @throws SQLException if database error
      */
-    public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail) throws SQLException {
+    public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail)
+            throws SQLException {
         context.turnOffAuthorisationSystem();
         EPerson helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
         context.restoreAuthSystemState();

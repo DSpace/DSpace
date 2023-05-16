@@ -18,6 +18,7 @@ import java.util.TimeZone;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.builder.AbstractBuilder;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
@@ -104,6 +105,7 @@ public class AbstractDSpaceIntegrationTest {
 
         // Unload DSpace services
         AbstractBuilder.destroy();
+        SearchUtils.clearCachedSearchService();
 
         // NOTE: We explicitly do NOT stop/destroy the kernel, as it is cached
         // in the Spring ApplicationContext. By default, to speed up tests,

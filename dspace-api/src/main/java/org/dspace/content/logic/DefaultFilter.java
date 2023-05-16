@@ -7,7 +7,8 @@
  */
 package org.dspace.content.logic;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -17,11 +18,11 @@ import org.dspace.core.Context;
  * statement as a property (unlike an operator) and takes no parameters (unlike a condition)
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class DefaultFilter implements Filter {
     private LogicalStatement statement;
-    private static Logger log = Logger.getLogger(Filter.class);
+    private String name;
+    private final static Logger log = LogManager.getLogger();
 
     /**
      * Set statement from Spring configuration in item-filters.xml
@@ -42,5 +43,16 @@ public class DefaultFilter implements Filter {
      */
     public boolean getResult(Context context, Item item) throws LogicalStatementException {
         return this.statement.getResult(context, item);
+    }
+
+    @Override
+    public void setBeanName(String name) {
+        log.debug("Initialize bean " + name);
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

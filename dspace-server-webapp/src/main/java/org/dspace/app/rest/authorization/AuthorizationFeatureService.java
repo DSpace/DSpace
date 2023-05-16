@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 
 /**
  * This service provides access to the Authorization Features and check if the feature is allowed or not in a specific
@@ -34,7 +35,8 @@ public interface AuthorizationFeatureService {
      *            feature pass the {@link SiteRest} object
      * @return true if the user associated with the context has access to the feature
      */
-    boolean isAuthorized(Context context, AuthorizationFeature feature, BaseObjectRest object) throws SQLException;
+    boolean isAuthorized(Context context, AuthorizationFeature feature, BaseObjectRest object)
+        throws SQLException, SearchServiceException;
 
     /**
      * Get all the authorization features defined in the system

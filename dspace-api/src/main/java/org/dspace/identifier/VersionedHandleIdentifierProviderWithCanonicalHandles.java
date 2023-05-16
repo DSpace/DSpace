@@ -117,7 +117,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 // check if we have a previous item
                 if (previous != null) {
                     try {
-                        // If we have a reviewer he/she might not have the
+                        // If we have a reviewer they might not have the
                         // rights to edit the metadata of thes previous item.
                         // Temporarly grant them:
                         context.turnOffAuthorisationSystem();
@@ -306,6 +306,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
         } catch (IllegalStateException | SQLException e) {
             log.error(LogHelper.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
@@ -424,6 +425,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             if (handleService.resolveToObject(context, identifierPreviousItem) == null) {
                 handleService.createHandle(context, previous.getItem(), identifierPreviousItem, true);
             }
+        }
+
+        DSpaceObject itemWithCanonicalHandle = handleService.resolveToObject(context, canonical);
+        if (itemWithCanonicalHandle != null) {
+            if (itemWithCanonicalHandle.getID() != previous.getItem().getID()) {
+                log.warn("The previous version's item (" + previous.getItem().getID() +
+                        ") does not match with the item containing handle " + canonical +
+                        " (" + itemWithCanonicalHandle.getID() + ")");
+            }
+            // Move the original handle from whatever item it's on to the newest version
+            handleService.modifyHandleDSpaceObject(context, canonical, dso);
+        } else {
+            handleService.createHandle(context, dso, canonical);
         }
 
         // add a new Identifier for this item: 12345/100.x

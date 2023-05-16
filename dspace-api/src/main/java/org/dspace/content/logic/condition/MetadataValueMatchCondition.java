@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.logic.LogicalStatementException;
@@ -22,11 +23,10 @@ import org.dspace.core.Context;
  * in a given metadata field
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class MetadataValueMatchCondition extends AbstractCondition {
 
-    private static Logger log = Logger.getLogger(MetadataValueMatchCondition.class);
+    private final static Logger log = LogManager.getLogger();
 
     /**
      * Return true if any value for a specified field in the item matches a specified regex pattern

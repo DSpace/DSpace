@@ -49,6 +49,16 @@ public class EntityTypeServiceInitializer implements Callback {
         }
     }
 
+    /**
+     * The callback name, Flyway will use this to sort the callbacks alphabetically before executing them
+     * @return The callback name
+     */
+    @Override
+    public String getCallbackName() {
+        // Return class name only (not prepended by package)
+        return EntityTypeServiceInitializer.class.getSimpleName();
+    }
+
     @Override
     public boolean supports(Event event, org.flywaydb.core.api.callback.Context context) {
         // Must run AFTER all migrations complete, since it is dependent on Hibernate

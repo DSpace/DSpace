@@ -121,6 +121,7 @@ public class Author extends XmlElement implements SwordElementInterface {
      *
      * @return A XOM Element.
      */
+    @Override
     public Element marshall() {
         Element element = new Element(getQualifiedName(), xmlName.getNamespace());
 
@@ -155,8 +156,8 @@ public class Author extends XmlElement implements SwordElementInterface {
             handleIncorrectElement(author, validationProperties);
         }
 
-        ArrayList<SwordValidationInfo> validationItems = new ArrayList<SwordValidationInfo>();
-        ArrayList<SwordValidationInfo> attributeItems = new ArrayList<SwordValidationInfo>();
+        ArrayList<SwordValidationInfo> validationItems = new ArrayList<>();
+        ArrayList<SwordValidationInfo> attributeItems = new ArrayList<>();
 
         processUnexpectedAttributes(author, attributeItems);
 
@@ -194,6 +195,7 @@ public class Author extends XmlElement implements SwordElementInterface {
         return result;
     }
 
+    @Override
     public SwordValidationInfo validate(Properties validationContext) {
         return validate(null, null, validationContext);
     }
@@ -208,7 +210,7 @@ public class Author extends XmlElement implements SwordElementInterface {
                                                                SwordValidationInfo.MISSING_ELEMENT_ERROR,
                                                                SwordValidationInfoType.ERROR);
             result.addValidationInfo(info);
-        } else if (elements == null && name != null) {
+        } else if (elements == null) {
             result.addValidationInfo(name.validate(validationContext));
         }
 
@@ -230,6 +232,7 @@ public class Author extends XmlElement implements SwordElementInterface {
      *
      * @param author The element to unmarshall.
      */
+    @Override
     public void unmarshall(Element author)
         throws UnmarshallException {
         unmarshall(author, null);

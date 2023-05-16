@@ -15,11 +15,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
@@ -28,6 +31,9 @@ import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -43,8 +49,10 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -67,6 +75,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private ItemService itemService;
+
     @Test
     public void findAllTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
@@ -1215,6 +1227,92 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 + parentCommunity.getLogo().getID(), expectedStatus);
     }
 
+    @Test
+    public void patchReplaceMultipleDescriptionBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        List<String> bitstreamDescriptions = List.of(
+            "FIRST",
+            "SECOND",
+            "THIRD"
+        );
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 =
+            CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1).withTitle("Test").build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        this.bitstreamService
+            .addMetadata(
+                context, bitstream,
+                MetadataSchemaEnum.DC.getName(), "description", null,
+                Item.ANY, bitstreamDescriptions
+            );
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+            .perform(get("/api/core/bitstreams/" + bitstream.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(0), 0),
+                        MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(1), 1),
+                        MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(2), 2)
+                    )
+                )
+            );
+
+        List<Operation> ops = List.of(
+            new ReplaceOperation("/metadata/dc.description/0", bitstreamDescriptions.get(2)),
+            new ReplaceOperation("/metadata/dc.description/1", bitstreamDescriptions.get(0)),
+            new ReplaceOperation("/metadata/dc.description/2", bitstreamDescriptions.get(1))
+        );
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+            .perform(patch("/api/core/bitstreams/" + bitstream.getID())
+            .content(requestBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(
+                 jsonPath("$.metadata",
+                     Matchers.allOf(
+                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(2), 0),
+                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(0), 1),
+                         MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(1), 2)
+                     )
+                 )
+             );
+        getClient(token)
+            .perform(get("/api/core/bitstreams/" + bitstream.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(2), 0),
+                        MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(0), 1),
+                        MetadataMatcher.matchMetadata("dc.description", bitstreamDescriptions.get(1), 2)
+                    )
+                )
+            );
+    }
+
 
     @Test
     public void testHiddenMetadataForAnonymousUser() throws Exception {
@@ -1480,11 +1578,19 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                     .build();
         }
 
-        Bundle secondBundle = BundleBuilder.createBundle(context, publicItem1)
-                .withName("second bundle")
-                .withBitstream(bitstream).build();
+        // Add default content bundle to list of bundles
+        List<Bundle> bundles = itemService.getBundles(publicItem1, Constants.CONTENT_BUNDLE_NAME);
 
-        Bundle bundle = bitstream.getBundles().get(0);
+        // Add this bitstream to a second bundle & append to list of bundles
+        bundles.add(BundleBuilder.createBundle(context, publicItem1)
+                .withName("second bundle")
+                .withBitstream(bitstream).build());
+
+        // While in DSpace code, Bundles are *unordered*, in Hibernate v5 + H2 v2.x, they are returned sorted by UUID.
+        // So, we reorder this list of created Bundles by UUID to get their expected return order.
+        // NOTE: Once on Hibernate v6, this might need "toString()" removed as it may sort UUIDs based on RFC 4412.
+        Comparator<Bundle> compareByUUID = Comparator.comparing(b -> b.getID().toString());
+        bundles.sort(compareByUUID);
 
         //Get bundle should contain the first bundle in the list
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
@@ -1492,10 +1598,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$",
                         BundleMatcher.matchProperties(
-                            bundle.getName(),
-                            bundle.getID(),
-                            bundle.getHandle(),
-                            bundle.getType()
+                            bundles.get(0).getName(),
+                            bundles.get(0).getID(),
+                            bundles.get(0).getHandle(),
+                            bundles.get(0).getType()
                     )
                 ));
     }
