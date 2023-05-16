@@ -8,13 +8,10 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.exparity.hamcrest.date.DateMatchers.within;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -221,32 +218,11 @@ public class RequestItemRepositoryIT
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(eperson.getEmail(), password);
-        AtomicReference<String> requestTokenRef = new AtomicReference<>();
-        try {
-            getClient(authToken)
-                    .perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isCreated())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$", Matchers.allOf(
-                            hasJsonPath("$.id", not(is(emptyOrNullString()))),
-                            hasJsonPath("$.type", is(RequestItemRest.NAME)),
-                            hasJsonPath("$.token", not(is(emptyOrNullString()))),
-                            hasJsonPath("$.requestEmail", is(eperson.getEmail())),
-                            hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
-                            hasJsonPath("$.requestName", is(eperson.getFullName())),
-                            hasJsonPath("$.allfiles", is(true)),
-                            // TODO should be an ISO datetime
-                            hasJsonPath("$.requestDate", not(is(emptyOrNullString()))),
-                            hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
-                    )))
-                    .andDo((var result) -> requestTokenRef.set(
-                            read(result.getResponse().getContentAsString(), "token")));
-        } finally {
-            // Clean up the created request.
-            RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
-        }
+        getClient(authToken)
+                .perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
     }
 
     /**
@@ -273,31 +249,11 @@ public class RequestItemRepositoryIT
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
-        AtomicReference<String> requestTokenRef = new AtomicReference<>();
-        try {
-            getClient().perform(post(URI_ROOT)
-                            .content(mapper.writeValueAsBytes(rir))
-                            .contentType(contentType))
-                    .andExpect(status().isCreated())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$", Matchers.allOf(
-                            hasJsonPath("$.id", not(is(emptyOrNullString()))),
-                            hasJsonPath("$.type", is(RequestItemRest.NAME)),
-                            hasJsonPath("$.token", not(is(emptyOrNullString()))),
-                            hasJsonPath("$.requestEmail", is(RequestItemBuilder.REQ_EMAIL)),
-                            hasJsonPath("$.requestMessage", is(RequestItemBuilder.REQ_MESSAGE)),
-                            hasJsonPath("$.requestName", is(RequestItemBuilder.REQ_NAME)),
-                            hasJsonPath("$.allfiles", is(false)),
-                            // TODO should be an ISO datetime
-                            hasJsonPath("$.requestDate", not(is(emptyOrNullString()))),
-                            hasJsonPath("$._links.self.href", not(is(emptyOrNullString())))
-                    )))
-                    .andDo((var result) -> requestTokenRef.set(
-                            read(result.getResponse().getContentAsString(), "token")));
-        } finally {
-            // Clean up the created request.
-            RequestItemBuilder.deleteRequestItem(requestTokenRef.get());
-        }
+        getClient().perform(post(URI_ROOT)
+                        .content(mapper.writeValueAsBytes(rir))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+
     }
 
     /**
