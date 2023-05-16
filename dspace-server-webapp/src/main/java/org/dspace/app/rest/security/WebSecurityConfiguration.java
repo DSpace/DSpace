@@ -100,6 +100,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // (both are defined below as methods).
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
             .csrf()
+                .ignoringAntMatchers("/api/statistics/**")
                 .csrfTokenRepository(this.getCsrfTokenRepository())
                 .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
             .and()
