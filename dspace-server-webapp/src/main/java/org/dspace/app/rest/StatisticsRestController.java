@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import java.util.Arrays;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
