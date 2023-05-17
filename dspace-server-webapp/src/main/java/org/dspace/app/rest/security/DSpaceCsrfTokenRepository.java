@@ -142,6 +142,19 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
         }
     }
 
+    /**
+     * Check the current CSRF token in the request's cookie and header and if any of them are missing, or they don't
+     * match, create a new token and save it on the response
+     */
+    public void saveNewTokenIfCookieAndHeaderMatch(HttpServletRequest request, HttpServletResponse response) {
+        CsrfToken token = loadToken(request);
+        CsrfToken headerToken = loadTokenFromHeader(request);
+        if (token == null || headerToken == null || !token.getToken().equals(headerToken.getToken())) {
+            CsrfToken newToken = generateToken(request);
+            saveToken(newToken, request, response);
+        }
+    }
+
     @Override
     public CsrfToken loadToken(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, this.cookieName);

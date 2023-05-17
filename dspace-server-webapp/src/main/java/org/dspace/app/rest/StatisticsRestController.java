@@ -10,6 +10,9 @@ package org.dspace.app.rest;
 import java.util.Arrays;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -20,6 +23,7 @@ import org.dspace.app.rest.model.hateoas.ViewEventResource;
 import org.dspace.app.rest.repository.SearchEventRestRepository;
 import org.dspace.app.rest.repository.StatisticsRestRepository;
 import org.dspace.app.rest.repository.ViewEventRestRepository;
+import org.dspace.app.rest.security.DSpaceCsrfTokenRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + RestAddressableModel.STATISTICS)
 public class StatisticsRestController implements InitializingBean {
+    DSpaceCsrfTokenRepository csrfTokenRepository = new DSpaceCsrfTokenRepository();
 
     @Autowired
     private Utils utils;
@@ -91,13 +96,21 @@ public class StatisticsRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/viewevents")
-    public ResponseEntity<RepresentationModel<?>> postViewEvent() throws Exception {
+    public ResponseEntity<RepresentationModel<?>> postViewEvent(HttpServletRequest request,
+                                                                HttpServletResponse response) throws Exception {
+        // WebSecurityConfiguration disabled CSRF for these endpoints, so they don't fail when the tokens are missing,
+        // but we should still add the proper response headers in these cases
+        csrfTokenRepository.saveNewTokenIfCookieAndHeaderMatch(request, response);
         ViewEventResource result = converter.toResource(viewEventRestRepository.createViewEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/searchevents")
-    public ResponseEntity<RepresentationModel<?>> postSearchEvent() throws Exception {
+    public ResponseEntity<RepresentationModel<?>> postSearchEvent(HttpServletRequest request,
+                                                                  HttpServletResponse response) throws Exception {
+        // WebSecurityConfiguration disabled CSRF for these endpoints, so they don't fail when the tokens are missing,
+        // but we should still add the proper response headers in these cases
+        csrfTokenRepository.saveNewTokenIfCookieAndHeaderMatch(request, response);
         SearchEventResource result = converter.toResource(searchEventRestRepository.createSearchEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }

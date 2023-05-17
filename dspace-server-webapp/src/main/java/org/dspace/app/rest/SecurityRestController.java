@@ -31,12 +31,7 @@ public class SecurityRestController {
      */
     @RequestMapping(value = "/csrf", method = RequestMethod.POST)
     public ResponseEntity csrf(HttpServletRequest request, HttpServletResponse response) {
-        CsrfToken token = csrfTokenRepository.loadToken(request);
-        CsrfToken headerToken = csrfTokenRepository.loadTokenFromHeader(request);
-        if (token == null || headerToken == null || !token.getToken().equals(headerToken.getToken())) {
-            CsrfToken newToken = csrfTokenRepository.generateToken(request);
-            csrfTokenRepository.saveToken(newToken, request, response);
-        }
+        csrfTokenRepository.saveNewTokenIfCookieAndHeaderMatch(request, response);
         return ResponseEntity.ok().build();
     }
 
