@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -218,12 +220,34 @@ public class RequestItemRepositoryIT
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
         String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken)
-                .perform(post(URI_ROOT)
-                        .content(mapper.writeValueAsBytes(rir))
-                        .contentType(contentType))
-                .andExpect(status().isCreated());
-    }
+        try {
+                getClient(authToken)
+                        .perform(post(URI_ROOT)
+                                .content(mapper.writeValueAsBytes(rir))
+                                .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        // verify the body is empty
+                        .andExpect(jsonPath("$").doesNotExist());
+        } finally {
+                Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
+                String token = null;
+                for (Iterator<RequestItem> it = itemRequests; it.hasNext();) {
+                        RequestItem requestItem = it.next();
+                        // Find the created request via the eperson email
+                        if (requestItem.getReqEmail().equals(eperson.getEmail())) {
+                                // Verify request data
+                                assertEquals(eperson.getFullName(), requestItem.getReqName());
+                                assertEquals(item.getID(), requestItem.getItem().getID());
+                                assertEquals(RequestItemBuilder.REQ_MESSAGE, requestItem.getReqMessage());
+                                assertEquals(true, requestItem.isAllfiles());
+                                assertNotNull(requestItem.getToken());
+                                token = requestItem.getToken();
+                        }
+                }
+                // Cleanup created request
+                RequestItemBuilder.deleteRequestItem(token);
+        }
+}
 
     /**
      * Test of createAndReturn method, with an UNauthenticated user.
@@ -249,11 +273,33 @@ public class RequestItemRepositoryIT
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
-        getClient().perform(post(URI_ROOT)
-                        .content(mapper.writeValueAsBytes(rir))
-                        .contentType(contentType))
-                .andExpect(status().isCreated());
-
+        try{
+                getClient().perform(post(URI_ROOT)
+                                .content(mapper.writeValueAsBytes(rir))
+                                .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        // verify the body is empty
+                        .andExpect(jsonPath("$").doesNotExist());
+        }finally{
+                Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
+                String token = null;
+                for (Iterator<RequestItem> it = itemRequests; it.hasNext();) {
+                        RequestItem requestItem = it.next();
+                        // Find the created request via the eperson email
+                        if (requestItem.getReqEmail().equals(RequestItemBuilder.REQ_EMAIL)) {
+                                // Verify request data
+                                assertEquals(item.getID(), requestItem.getItem().getID());
+                                assertEquals(RequestItemBuilder.REQ_MESSAGE, requestItem.getReqMessage());
+                                assertEquals(RequestItemBuilder.REQ_NAME, requestItem.getReqName());
+                                assertEquals(bitstream.getID(), requestItem.getBitstream().getID());
+                                assertEquals(false, requestItem.isAllfiles());
+                                assertNotNull(requestItem.getToken());
+                                token = requestItem.getToken();
+                        }
+                }
+                // Cleanup created request
+                RequestItemBuilder.deleteRequestItem(token);
+        }
     }
 
     /**
