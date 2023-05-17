@@ -221,7 +221,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                         continue;
                     }
                 }
-                System.out.format("Custom Thumbnail exists for %s for item %s.  Thumbnail will not be generated.%n",
+                System.out.format("Custom thumbnail exists for %s for item %s. Thumbnail will not be generated.%n",
                         nsrc, item.getHandle());
                 return false;
             }
