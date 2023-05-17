@@ -208,7 +208,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 if (description != null) {
                     if (replaceRegex.matcher(description).matches()) {
                         if (verbose) {
-                            System.out.format("%s %s matches pattern and is replacable.%n",
+                            System.out.format("%s %s matches pattern and is replaceable.%n",
                                     description, nsrc);
                         }
                         continue;
