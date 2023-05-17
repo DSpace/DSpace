@@ -100,7 +100,7 @@ public class StatisticsRestController implements InitializingBean {
                                                                 HttpServletResponse response) throws Exception {
         // WebSecurityConfiguration disabled CSRF for these endpoints, so they don't fail when the tokens are missing,
         // but we should still add the proper response headers in these cases
-        csrfTokenRepository.saveNewTokenIfCookieAndHeaderMatch(request, response);
+        csrfTokenRepository.saveNewTokenWhenCookieAndHeaderDontMatch(request, response);
         ViewEventResource result = converter.toResource(viewEventRestRepository.createViewEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
@@ -110,7 +110,7 @@ public class StatisticsRestController implements InitializingBean {
                                                                   HttpServletResponse response) throws Exception {
         // WebSecurityConfiguration disabled CSRF for these endpoints, so they don't fail when the tokens are missing,
         // but we should still add the proper response headers in these cases
-        csrfTokenRepository.saveNewTokenIfCookieAndHeaderMatch(request, response);
+        csrfTokenRepository.saveNewTokenWhenCookieAndHeaderDontMatch(request, response);
         SearchEventResource result = converter.toResource(searchEventRestRepository.createSearchEvent());
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
     }
