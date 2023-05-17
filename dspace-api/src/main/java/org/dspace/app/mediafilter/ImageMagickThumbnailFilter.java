@@ -116,7 +116,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         return f2;
     }
 
-    public File getImageFile(File f, int page, boolean verbose)
+    public File getImageFile(File f, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
         f2.deleteOnExit();
@@ -155,7 +155,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.define("pdf:use-cropbox=true");
         }
 
-        String s = "[" + page + "]";
+        String s = "[0]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
