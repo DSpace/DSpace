@@ -706,7 +706,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
             lname = shibheaders.get_single(lnameHeader);
         }
 
-        if (email == null || (fnameHeader != null && fname == null) || (lnameHeader != null && lname == null)) {
+        if ( email == null && netid == null) {
             // We require that there be an email, first name, and last name. If we
             // don't have at least these three pieces of information then we fail.
             String message = "Unable to register new eperson because we are unable to find an email address along " +
@@ -715,20 +715,11 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
             message += "  Email Header: '" + emailHeader + "'='" + email + "' \n";
             message += "  First Name Header: '" + fnameHeader + "'='" + fname + "' \n";
             message += "  Last Name Header: '" + lnameHeader + "'='" + lname + "'";
-            log.error(message);
-
+            log.error( String.format(
+                    "Could not identify a user from [%s] - we have not received enough information " +
+                            "(email, netid, eppn, ...). \n\nDetails:\n%s\n\nHeaders received:\n%s",
+                    org, message, request.getHeaderNames().toString()) );
             return null; // TODO should this throw an exception?
-        }
-
-        // Truncate values of parameters that are too big.
-        if (fname != null && fname.length() > NAME_MAX_SIZE) {
-            log.warn(
-                    "Truncating eperson's first name because it is longer than " + NAME_MAX_SIZE + ": '" + fname + "'");
-            fname = fname.substring(0, NAME_MAX_SIZE);
-        }
-        if (lname != null && lname.length() > NAME_MAX_SIZE) {
-            log.warn("Truncating eperson's last name because it is longer than " + NAME_MAX_SIZE + ": '" + lname + "'");
-            lname = lname.substring(0, NAME_MAX_SIZE);
         }
 
         // Turn off authorizations to create a new user

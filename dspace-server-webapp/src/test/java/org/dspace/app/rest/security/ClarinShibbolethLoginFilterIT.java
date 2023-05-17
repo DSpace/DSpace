@@ -167,17 +167,13 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
     public void userFillInEmailAndShouldBeRegisteredByVerificationToken() throws Exception {
         String netId = "123456";
         String email = "test@mail.epic";
-        String firstname = "Test";
-        String lastname = "Buddy";
         String idp = "Test Idp";
 
         // Try to authenticate but the Shibboleth doesn't send the email in the header, so the user won't be registered
         // but the user will be redirected to the page where he will fill in the user email.
         getClient().perform(get("/api/authn/shibboleth")
                         .header("Shib-Identity-Provider", idp)
-                        .header("SHIB-NETID", netId)
-                        .header("SHIB-GIVENNAME", firstname)
-                        .header("SHIB-SURNAME", lastname))
+                        .header("SHIB-NETID", netId))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("http://localhost:4000/login/auth-failed?netid=" + netId));
 
@@ -201,8 +197,6 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
         EPerson ePerson = ePersonService.findByNetid(context, netId);
         assertTrue(Objects.nonNull(ePerson));
         assertEquals(ePerson.getEmail(), email);
-        assertEquals(ePerson.getFirstName(), firstname);
-        assertEquals(ePerson.getLastName(), lastname);
 
         // The user is registered now log him
         getClient().perform(get("/api/authn/shibboleth")
@@ -215,17 +209,13 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
         getClient().perform(get("/api/authn/shibboleth")
                         .header("Shib-Identity-Provider", idp)
                         .header("SHIB-NETID", netId)
-                        .header("SHIB-GIVENNAME", firstname)
-                        .header("SHIB-SURNAME", lastname)
                         .header("SHIB-MAIL", email))
                 .andExpect(status().isFound());
 
         // Try to sign in the user by the netid if the eperson exist
         getClient().perform(get("/api/authn/shibboleth")
                         .header("Shib-Identity-Provider", idp)
-                        .header("SHIB-NETID", netId)
-                        .header("SHIB-GIVENNAME", firstname)
-                        .header("SHIB-SURNAME", lastname))
+                        .header("SHIB-NETID", netId))
                 .andExpect(status().isFound());
 
         // Delete created eperson - clean after the test
