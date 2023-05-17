@@ -209,14 +209,14 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                     if (replaceRegex.matcher(description).matches()) {
                         if (verbose) {
                             System.out.format("%s %s matches pattern and is replaceable.%n",
-                                    description, nsrc);
+                                    description, n);
                         }
                         continue;
                     }
                     if (description.equals(getDescription())) {
                         if (verbose) {
                             System.out.format("%s %s is replaceable.%n",
-                                    getDescription(), nsrc);
+                                    getDescription(), n);
                         }
                         continue;
                     }
