@@ -273,14 +273,14 @@ public class RequestItemRepositoryIT
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
-        try{
+        try {
                 getClient().perform(post(URI_ROOT)
                                 .content(mapper.writeValueAsBytes(rir))
                                 .contentType(contentType))
                         .andExpect(status().isCreated())
                         // verify the body is empty
                         .andExpect(jsonPath("$").doesNotExist());
-        }finally{
+        } finally {
                 Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
                 String token = null;
                 for (Iterator<RequestItem> it = itemRequests; it.hasNext();) {
