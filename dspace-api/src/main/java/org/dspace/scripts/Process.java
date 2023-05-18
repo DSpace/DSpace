@@ -71,7 +71,7 @@ public class Process implements ReloadableEntity<Integer> {
     private ProcessStatus processStatus;
 
     @Lob
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "parameters")
     private String parameters;
 
