@@ -35,9 +35,11 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseLabel;
+import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
+import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,6 +63,8 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
 
     @Autowired
     ClarinLicenseService clarinLicenseService;
+    @Autowired
+    ClarinUserRegistrationService userRegistrationService;
 
     @Autowired
     WorkspaceItemService wis;
@@ -151,6 +155,16 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
                     "license label cannot be null or empty");
         }
 
+        List<ClarinUserRegistration> userRegistrations = userRegistrationService.findByEPersonUUID(context,
+                context.getCurrentUser().getID());
+        // Do not allow to create a license by the user which doesn't have data in the `user_registration` table
+        // because that could mean he is not logged in. That is not-logical situation, by theory it shouldn't happen.
+        if (CollectionUtils.isEmpty(userRegistrations)) {
+            throw new UnprocessableEntityException("Clarin License user registration, " +
+                    "cannot be null");
+        }
+        ClarinUserRegistration userRegistration = userRegistrations.get(0);
+
         // create
         ClarinLicense clarinLicense;
         clarinLicense = clarinLicenseService.create(context);
@@ -160,6 +174,7 @@ public class ClarinLicenseRestRepository extends DSpaceRestRepository<ClarinLice
         clarinLicense.setDefinition(clarinLicenseRest.getDefinition());
         clarinLicense.setConfirmation(clarinLicenseRest.getConfirmation());
         clarinLicense.setRequiredInfo(clarinLicenseRest.getRequiredInfo());
+        clarinLicense.setEperson(userRegistration);
 
         clarinLicenseService.update(context, clarinLicense);
         // return
