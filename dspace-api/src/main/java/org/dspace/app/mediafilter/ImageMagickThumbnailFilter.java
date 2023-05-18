@@ -116,6 +116,13 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         return f2;
     }
 
+    /**
+     * Return an image from a bitstream with specific processing options for
+     * PDFs. This is only used by ImageMagickPdfThumbnailFilter in order to
+     * generate an intermediate image file for use with getThumbnailFile. It
+     * is unfortunate that this means we convert from PDF to JPEG to JPEG,
+     * which incurs generation loss.
+     */
     public File getImageFile(File f, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
         File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
