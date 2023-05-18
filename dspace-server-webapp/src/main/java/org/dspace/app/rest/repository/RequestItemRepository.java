@@ -205,8 +205,8 @@ public class RequestItemRepository
         } catch (IOException | SQLException ex) {
             throw new RuntimeException("Request not sent.", ex);
         }
-
-        return requestItemConverter.convert(ri, Projection.DEFAULT);
+        // #8636 - Security issue: Should not return RequestItemRest to avoid token exposure
+        return null;
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?

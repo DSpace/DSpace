@@ -195,7 +195,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Delete the object identified by its ID
      */
-    public void deleteById(ID id) {
+    /**
+     * Method should be synchronized to avoid hibernate partial deletion bug when deleting multiple bitstreams:
+     * https://github.com/DSpace/DSpace/issues/8694
+     */
+    public synchronized void deleteById(ID id) {
         Context context = obtainContext();
         try {
             getThisRepository().delete(context, id);
