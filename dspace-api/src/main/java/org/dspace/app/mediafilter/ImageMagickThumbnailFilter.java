@@ -119,13 +119,14 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
     /**
      * Return an image from a bitstream with specific processing options for
      * PDFs. This is only used by ImageMagickPdfThumbnailFilter in order to
-     * generate an intermediate image file for use with getThumbnailFile. It
-     * is unfortunate that this means we convert from PDF to JPEG to JPEG,
-     * which incurs generation loss.
+     * generate an intermediate image file for use with getThumbnailFile.
      */
     public File getImageFile(File f, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
-        File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
+        // Writing an intermediate file to disk is inefficient, but since we're
+        // doing it anyway, we should use a lossless format. IM's internal MIFF
+        // is lossless like PNG and TIFF, but much faster.
+        File f2 = new File(f.getParentFile(), f.getName() + ".miff");
         f2.deleteOnExit();
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
