@@ -96,9 +96,19 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
     @Override
     public void saveToken(CsrfToken token, HttpServletRequest request,
                           HttpServletResponse response) {
-        if (request.getMethod().equals("GET")) {
+        // Custom conditions on which to avoid certain default CSRF strategies to add csrf cookies to the response
+        if (request.getMethod().equals("GET") || request.getRequestURI().contains("/api/statistics/")) {
             return;
         }
+        saveTokenWithoutConditions(token, request, response);
+    }
+
+    /**
+     * Save the csrf token to the response (see saveToken method), assuming custom conditional checks have already been
+     * applied
+     */
+    public void saveTokenWithoutConditions(CsrfToken token, HttpServletRequest request,
+                          HttpServletResponse response) {
         String tokenValue = token == null ? "" : token.getToken();
         Cookie cookie = new Cookie(this.cookieName, tokenValue);
         cookie.setSecure(request.isSecure());
@@ -126,9 +136,9 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
             sameSite = "Lax";
         }
         ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), cookie.getValue())
-                                              .path(cookie.getPath()).maxAge(cookie.getMaxAge())
-                                              .domain(cookie.getDomain()).httpOnly(cookie.isHttpOnly())
-                                              .secure(cookie.getSecure()).sameSite(sameSite).build();
+                .path(cookie.getPath()).maxAge(cookie.getMaxAge())
+                .domain(cookie.getDomain()).httpOnly(cookie.isHttpOnly())
+                .secure(cookie.getSecure()).sameSite(sameSite).build();
 
         // Write the ResponseCookie to the Set-Cookie header
         // This cookie is only used by the backend & not needed by client
@@ -151,7 +161,7 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
         CsrfToken headerToken = loadTokenFromHeader(request);
         if (token == null || headerToken == null || !token.getToken().equals(headerToken.getToken())) {
             CsrfToken newToken = generateToken(request);
-            saveToken(newToken, request, response);
+            saveTokenWithoutConditions(newToken, request, response);
         }
     }
 
