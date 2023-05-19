@@ -22,6 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -104,6 +106,9 @@ public class SubmissionConfigReader {
      * always reload from scratch)
      */
     private SubmissionConfig lastSubmissionConfig = null;
+    
+    protected static final CollectionService collectionService
+                = ContentServiceFactory.getInstance().getCollectionService();
 
     /**
      * Load Submission Configuration from the
@@ -335,17 +340,22 @@ public class SubmissionConfigReader {
      * by the collection handle.
      */
     private void processMap(Node e) throws SAXException {
+        // create a context
+        Context context = new Context();
+
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             if (nd.getNodeName().equals("name-map")) {
                 String id = getAttribute(nd, "collection-handle");
+                String entityType = getAttribute(nd, "collection-entity-type");
                 String value = getAttribute(nd, "submission-name");
                 String content = getValue(nd);
-                if (id == null) {
+                if (id == null && entityType == null) {
                     throw new SAXException(
-                        "name-map element is missing collection-handle attribute in 'item-submission.xml'");
+                        "name-map element is missing collection-handle or collection-entity-type attribute " +
+                            "in 'item-submission.xml'");
                 }
                 if (value == null) {
                     throw new SAXException(
@@ -355,7 +365,17 @@ public class SubmissionConfigReader {
                     throw new SAXException(
                         "name-map element has content in 'item-submission.xml', it should be empty.");
                 }
-                collectionToSubmissionConfig.put(id, value);
+                if (id != null) {
+                    collectionToSubmissionConfig.put(id, value);
+
+                } else {
+                    // get all collections for this entity-type
+                    List<Collection> collections = collectionService.findAllCollectionsByEntityType( context,
+                                    entityType);
+                    for (Collection collection : collections) {
+                        collectionToSubmissionConfig.putIfAbsent(collection.getHandle(), value);                        
+                    }
+                }
             } // ignore any child node that isn't a "name-map"
         }
     }

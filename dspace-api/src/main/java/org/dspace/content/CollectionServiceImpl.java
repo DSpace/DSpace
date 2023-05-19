@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -1045,6 +1046,27 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, entityType, community, q);
         return (int) resp.getTotalSearchResults();
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
+            throws SearchServiceException {
+        List<Collection> collectionList = new ArrayList<>();
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
+
+        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+        List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
+
+        for (IndexableObject solrCollection : solrIndexableObjects) {
+            Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
+            collectionList.add(c);
+        }
+        return collectionList;
     }
 
 }
