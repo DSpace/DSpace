@@ -65,7 +65,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
      * A description of the resource to be synchronized.
      */
     @Lob
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "description")
     private String description;
 
@@ -89,7 +89,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
      */
     @Lob
     @Column(name = "metadata")
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     private String metadata;
 
     /**
