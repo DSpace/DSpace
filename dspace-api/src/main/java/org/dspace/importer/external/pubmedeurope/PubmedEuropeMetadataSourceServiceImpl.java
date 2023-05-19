@@ -294,6 +294,8 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
             String response = liveImportClient.executeHttpGetRequest(1000, buildURI(1, query), params);
 
             SAXBuilder saxBuilder = new SAXBuilder();
+            // disallow DTD parsing to ensure no XXE attacks can occur
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
             Document document = saxBuilder.build(new StringReader(response));
             Element root = document.getRootElement();
             Element element = root.getChild("hitCount");
@@ -365,6 +367,8 @@ public class PubmedEuropeMetadataSourceServiceImpl extends AbstractImportMetadat
                 String cursorMark = StringUtils.EMPTY;
                 if (StringUtils.isNotBlank(response)) {
                     SAXBuilder saxBuilder = new SAXBuilder();
+                    // disallow DTD parsing to ensure no XXE attacks can occur
+                    saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
                     Document document = saxBuilder.build(new StringReader(response));
                     XPathFactory xpfac = XPathFactory.instance();
                     XPathExpression<Element> xPath = xpfac.compile("//responseWrapper/resultList/result",
