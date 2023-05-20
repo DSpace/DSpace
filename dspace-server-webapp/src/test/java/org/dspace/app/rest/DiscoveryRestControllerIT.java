@@ -5679,6 +5679,63 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
 
+    /**
+     * This test is intended to verify that the value of <code>totalElements</code> returned from
+     * /api/discover/search/objects endpoint matches the value of <code>discoverMaxResults</code> that were used to
+     * create the same amount of collections for testing
+     * @throws Exception
+     */
+    @Test
+    public void discoverSearchObjectsTestForPageSizeEqualsTotalElements() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder
+                .createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder
+                .createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        // Note: this value should be relative with solr's max results per page, to verify the
+        var discoverMaxResults = 110;
+        for (int i = 0; i < discoverMaxResults; i++) {
+            Collection col1 = CollectionBuilder
+                    .createCollection(context, child1)
+                    .withName(String.format("Collection %03d", i))
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+                .perform(get("/api/discover/search/objects")
+                        .param("configuration", "default")
+                        .param("query", "")
+                        .param("scope", child1.getID().toString())
+                        .param("sort", "dc.title,ASC")
+                        .param("size", "150")
+                )
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("discover")))
+                // verify totalElements == discoverMaxResults
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 150, 1, discoverMaxResults)
+                )))
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
+                        Matchers.containsInRelativeOrder(
+                                SearchResultMatcher.matchOnItemName("collection", "collections", "Collection 050")
+                        )
+                ))
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+    }
+
     @Test
     public void discoverSearchPoolTaskObjectsTest() throws Exception {
         context.turnOffAuthorisationSystem();
