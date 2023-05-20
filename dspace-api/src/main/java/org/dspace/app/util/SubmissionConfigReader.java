@@ -25,6 +25,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
@@ -157,6 +158,9 @@ public class SubmissionConfigReader {
         } catch (FactoryConfigurationError fe) {
             throw new SubmissionConfigReaderException(
                 "Cannot create Item Submission Configuration parser", fe);
+        } catch (SearchServiceException se) {
+            throw new SubmissionConfigReaderException(
+                "Cannot perform a discovery search for Item Submission Configuration", se);
         } catch (Exception e) {
             throw new SubmissionConfigReaderException(
                 "Error creating Item Submission Configuration: " + e);
@@ -292,7 +296,7 @@ public class SubmissionConfigReader {
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
      */
-    private void doNodes(Node n) throws SAXException, SubmissionConfigReaderException {
+    private void doNodes(Node n) throws SAXException, SearchServiceException, SubmissionConfigReaderException {
         if (n == null) {
             return;
         }
@@ -339,7 +343,7 @@ public class SubmissionConfigReader {
      * the collection handle and item submission name, put name in hashmap keyed
      * by the collection handle.
      */
-    private void processMap(Node e) throws SAXException {
+    private void processMap(Node e) throws SAXException, SearchServiceException {
         // create a context
         Context context = new Context();
 
