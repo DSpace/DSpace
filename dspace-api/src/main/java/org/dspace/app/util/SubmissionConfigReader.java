@@ -107,7 +107,11 @@ public class SubmissionConfigReader {
      * always reload from scratch)
      */
     private SubmissionConfig lastSubmissionConfig = null;
-    
+
+    /**
+     * Collection Service instance, needed to interact with collection's 
+     * stored data
+     */
     protected static final CollectionService collectionService
                 = ContentServiceFactory.getInstance().getCollectionService();
 

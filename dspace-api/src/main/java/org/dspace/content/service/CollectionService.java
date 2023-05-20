@@ -455,7 +455,6 @@ public interface CollectionService
     public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
         throws SQLException, SearchServiceException;
 
-    
     /**
      * Returns a list of all collections for a specific entity type.
      * NOTE: for better performance, this method retrieves its results from an index (cache)
