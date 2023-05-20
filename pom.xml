@@ -22,10 +22,10 @@
         <spring.version>5.3.27</spring.version>
         <spring-boot.version>2.7.11</spring-boot.version>
         <spring-security.version>5.7.8</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.6.5.Final</hibernate.version>
-        <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.4.3</postgresql.driver.version>
-        <solr.client.version>8.11.1</solr.client.version>
+        <hibernate.version>5.6.15.Final</hibernate.version>
+        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.6.0</postgresql.driver.version>
+        <solr.client.version>8.11.2</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
@@ -38,10 +38,10 @@
         <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.51.v20230217</jetty.version>
-        <log4j.version>2.17.1</log4j.version>
-        <pdfbox-version>2.0.27</pdfbox-version>
-        <rome.version>1.18.0</rome.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>2.20.0</log4j.version>
+        <pdfbox-version>2.0.28</pdfbox-version>
+        <rome.version>1.19.0</rome.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <tika.version>2.3.0</tika.version>
         <!-- Sync with whatever version Tika uses -->
         <bouncycastle.version>1.70</bouncycastle.version>
