@@ -56,7 +56,8 @@ public class RequestItemEmailNotifier {
     private static final RequestItemAuthorExtractor requestItemAuthorExtractor
             = DSpaceServicesFactory.getInstance()
                     .getServiceManager()
-                    .getServiceByName(null, RequestItemAuthorExtractor.class);
+                    .getServiceByName("requestItemAuthorExtractor",
+                            RequestItemAuthorExtractor.class);
 
     private RequestItemEmailNotifier() {}
 
@@ -154,9 +155,9 @@ public class RequestItemEmailNotifier {
         email.setContent("body", message);
         email.setSubject(subject);
         email.addRecipient(ri.getReqEmail());
-        if (ri.isAccept_request()) {
-            // Attach bitstreams.
-            try {
+        // Attach bitstreams.
+        try {
+            if (ri.isAccept_request()) {
                 if (ri.isAllfiles()) {
                     Item item = ri.getItem();
                     List<Bundle> bundles = item.getBundles("ORIGINAL");
@@ -166,24 +167,39 @@ public class RequestItemEmailNotifier {
                             if (!bitstream.getFormat(context).isInternal() &&
                                     requestItemService.isRestricted(context,
                                     bitstream)) {
+                                // #8636 Anyone receiving the email can respond to the
+                                // request without authenticating into DSpace
+                                context.turnOffAuthorisationSystem();
                                 email.addAttachment(bitstreamService.retrieve(context,
                                         bitstream), bitstream.getName(),
                                         bitstream.getFormat(context).getMIMEType());
+                                context.restoreAuthSystemState();
                             }
                         }
                     }
                 } else {
                     Bitstream bitstream = ri.getBitstream();
+                    // #8636 Anyone receiving the email can respond to the request without authenticating into DSpace
+                    context.turnOffAuthorisationSystem();
                     email.addAttachment(bitstreamService.retrieve(context, bitstream),
                             bitstream.getName(),
                             bitstream.getFormat(context).getMIMEType());
+                    context.restoreAuthSystemState();
                 }
                 email.send();
-            } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
-                LOG.warn(LogHelper.getHeader(context,
-                        "error_mailing_requestItem", e.getMessage()));
-                throw new IOException("Reply not sent:  " + e.getMessage());
+            } else {
+                boolean sendRejectEmail = configurationService
+                    .getBooleanProperty("request.item.reject.email", true);
+                // Not all sites want the "refusal" to be sent back to the requester via
+                // email. However, by default, the rejection email is sent back.
+                if (sendRejectEmail) {
+                    email.send();
+                }
             }
+        } catch (MessagingException | IOException | SQLException | AuthorizeException e) {
+            LOG.warn(LogHelper.getHeader(context,
+                    "error_mailing_requestItem", e.getMessage()));
+            throw new IOException("Reply not sent:  " + e.getMessage());
         }
         LOG.info(LogHelper.getHeader(context,
                 "sent_attach_requestItem", "token={}"), ri.getToken());
@@ -220,8 +236,13 @@ public class RequestItemEmailNotifier {
         message.addArgument(bitstreamName);          // {0} bitstream name or "all"
         message.addArgument(item.getHandle());       // {1} Item handle
         message.addArgument(ri.getToken());          // {2} Request token
-        message.addArgument(approver.getFullName()); // {3} Approver's name
-        message.addArgument(approver.getEmail());    // {4} Approver's address
+        if (approver != null) {
+            message.addArgument(approver.getFullName()); // {3} Approver's name
+            message.addArgument(approver.getEmail());    // {4} Approver's address
+        } else {
+            message.addArgument("anonymous approver");                           // [3] Approver's name
+            message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address
+        }
 
         // Who gets this message?
         String recipient;

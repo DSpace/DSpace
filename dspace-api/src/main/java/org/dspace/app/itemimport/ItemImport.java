@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -67,16 +68,18 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected String eperson = null;
     protected String[] collections = null;
     protected boolean isTest = false;
+    protected boolean isExcludeContent = false;
     protected boolean isResume = false;
     protected boolean useWorkflow = false;
     protected boolean useWorkflowSendEmail = false;
     protected boolean isQuiet = false;
     protected boolean commandLineCollections = false;
     protected boolean zip = false;
+    protected boolean remoteUrl = false;
     protected String zipfilename = null;
     protected boolean help = false;
     protected File workDir = null;
-    private File workFile = null;
+    protected File workFile = null;
 
     protected static final CollectionService collectionService =
             ContentServiceFactory.getInstance().getCollectionService();
@@ -118,6 +121,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             isTest = true;
             handler.logInfo("**Test Run** - not actually importing items.");
         }
+
+        isExcludeContent = commandLine.hasOption('x');
 
         if (commandLine.hasOption('p')) {
             template = true;
@@ -204,6 +209,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 .getItemImportService();
         try {
             itemImportService.setTest(isTest);
+            itemImportService.setExcludeContent(isExcludeContent);
             itemImportService.setResume(isResume);
             itemImportService.setUseWorkflow(useWorkflow);
             itemImportService.setUseWorkflowSendEmail(useWorkflowSendEmail);
@@ -233,6 +239,9 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             if (zip) {
                 FileUtils.deleteDirectory(new File(sourcedir));
                 FileUtils.deleteDirectory(workDir);
+                if (remoteUrl && workFile != null && workFile.exists()) {
+                    workFile.delete();
+                }
             }
 
             Date endTime = new Date();
@@ -249,6 +258,17 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
      * @param context
      */
     protected void validate(Context context) {
+        // check zip type: uploaded file or remote url
+        if (commandLine.hasOption('z')) {
+            zipfilename = commandLine.getOptionValue('z');
+        } else if (commandLine.hasOption('u')) {
+            remoteUrl = true;
+            zipfilename = commandLine.getOptionValue('u');
+        }
+        if (StringUtils.isBlank(zipfilename)) {
+            throw new UnsupportedOperationException("Must run with either name of zip file or url of zip file");
+        }
+
         if (command == null) {
             handler.logError("Must run with either add, replace, or remove (run with -h flag for details)");
             throw new UnsupportedOperationException("Must run with either add, replace, or remove");
@@ -291,7 +311,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             handler.writeFilestream(context, MAPFILE_FILENAME, mapfileInputStream, MAPFILE_BITSTREAM_TYPE);
         } finally {
             mapFile.delete();
-            workFile.delete();
         }
     }
 
@@ -302,17 +321,24 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
      * @throws Exception
      */
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
-        Optional<InputStream> optionalFileStream = handler.getFileStream(context, zipfilename);
+        Optional<InputStream> optionalFileStream = Optional.empty();
+        if (!remoteUrl) {
+            // manage zip via upload
+            optionalFileStream = handler.getFileStream(context, zipfilename);
+        } else {
+            // manage zip via remote url
+            optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+        }
         if (optionalFileStream.isPresent()) {
             workFile = new File(itemImportService.getTempWorkDir() + File.separator
                     + zipfilename + "-" + context.getCurrentUser().getID());
             FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
-            workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
-            sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
         } else {
             throw new IllegalArgumentException(
                     "Error reading file, the file couldn't be found for filename: " + zipfilename);
         }
+        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
+        sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
     }
 
     /**
@@ -352,7 +378,6 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
      */
     protected void setZip() {
         zip = true;
-        zipfilename = commandLine.getOptionValue('z');
     }
 
     /**

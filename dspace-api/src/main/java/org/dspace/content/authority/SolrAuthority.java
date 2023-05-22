@@ -200,8 +200,8 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\:") + "*) or " + searchField + ":(" + text
-            .toLowerCase().replaceAll(":", "\\:") + ")";
+        return searchField + ":(" + text.toLowerCase().replaceAll(":", "\\\\:") + "*) or " + searchField + ":(" + text
+            .toLowerCase().replaceAll(":", "\\\\:") + ")";
     }
 
     @Override
@@ -225,7 +225,7 @@ public class SolrAuthority implements ChoiceAuthority {
                 log.debug("requesting label for key " + key + " using locale " + locale);
             }
             SolrQuery queryArgs = new SolrQuery();
-            queryArgs.setQuery("id:" + key);
+            queryArgs.setQuery("id:" + key.replaceAll(":", "\\\\:"));
             queryArgs.setRows(1);
             QueryResponse searchResponse = getSearchService().search(queryArgs);
             SolrDocumentList docs = searchResponse.getResults();

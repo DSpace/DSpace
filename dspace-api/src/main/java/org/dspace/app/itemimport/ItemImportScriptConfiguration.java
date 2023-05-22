@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link ItemImport} script
- * 
+ *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptConfiguration<T> {
@@ -64,7 +64,10 @@ public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptC
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("name of zip file")
                 .type(InputStream.class)
-                .hasArg().required().build());
+                .hasArg().build());
+        options.addOption(Option.builder("u").longOpt("url")
+                .desc("url of zip file")
+                .hasArg().build());
         options.addOption(Option.builder("c").longOpt("collection")
                 .desc("destination collection(s) Handle or database ID")
                 .hasArg().required(false).build());
@@ -80,6 +83,9 @@ public class ItemImportScriptConfiguration<T extends ItemImport> extends ScriptC
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
+                .hasArg(false).required(false).build());
+        options.addOption(Option.builder("x").longOpt("exclude-bitstreams")
+                .desc("do not load or expect content bitstreams")
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("p").longOpt("template")
                 .desc("apply template")

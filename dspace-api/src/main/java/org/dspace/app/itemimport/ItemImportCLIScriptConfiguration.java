@@ -13,7 +13,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * The {@link ScriptConfiguration} for the {@link ItemImportCLI} script
- * 
+ *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfiguration<ItemImportCLI> {
@@ -37,6 +37,9 @@ public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfigurat
         options.addOption(Option.builder("z").longOpt("zip")
                 .desc("name of zip file")
                 .hasArg().required(false).build());
+        options.addOption(Option.builder("u").longOpt("url")
+                .desc("url of zip file")
+                .hasArg().build());
         options.addOption(Option.builder("c").longOpt("collection")
                 .desc("destination collection(s) Handle or database ID")
                 .hasArg().required(false).build());
@@ -54,6 +57,9 @@ public class ItemImportCLIScriptConfiguration extends ItemImportScriptConfigurat
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("v").longOpt("validate")
                 .desc("test run - do not actually import items")
+                .hasArg(false).required(false).build());
+        options.addOption(Option.builder("x").longOpt("exclude-bitstreams")
+                .desc("do not load or expect content bitstreams")
                 .hasArg(false).required(false).build());
         options.addOption(Option.builder("p").longOpt("template")
                 .desc("apply template")

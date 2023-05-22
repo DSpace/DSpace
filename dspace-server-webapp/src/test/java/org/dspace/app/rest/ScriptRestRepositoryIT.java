@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -101,6 +102,25 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )));
     }
 
+    @Test
+    public void findAllScriptsSortedAlphabeticallyTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/scripts")
+                        .param("size", String.valueOf(scriptConfigurations.size())))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.scripts", contains(
+                            scriptConfigurations
+                                .stream()
+                                .sorted(Comparator.comparing(ScriptConfiguration::getName))
+                                .map(scriptConfiguration -> ScriptMatcher.matchScript(
+                                    scriptConfiguration.getName(),
+                                    scriptConfiguration.getDescription()
+                                ))
+                                .collect(Collectors.toList())
+                        )));
+    }
+
 
     @Test
     public void findAllScriptsUnauthorizedTest() throws Exception {
@@ -115,7 +135,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findAllScriptsPaginationTest() throws Exception {
         List<ScriptConfiguration> alphabeticScripts =
             scriptConfigurations.stream()
-                                .sorted(Comparator.comparing(s -> s.getClass().getName()))
+                                .sorted(Comparator.comparing(ScriptConfiguration::getName))
                                 .collect(Collectors.toList());
 
         int totalPages = scriptConfigurations.size();

@@ -19,7 +19,6 @@ import org.dspace.core.Context;
  * true if one or more sub-statements return true
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class Or extends AbstractOperator {
 

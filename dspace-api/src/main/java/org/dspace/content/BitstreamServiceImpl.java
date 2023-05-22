@@ -332,8 +332,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {
-        return bitstreamDAO.findDeletedBitstreams(context);
+    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException {
+        return bitstreamDAO.findDeletedBitstreams(context, limit, offset);
     }
 
     @Override
