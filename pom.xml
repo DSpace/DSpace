@@ -42,7 +42,7 @@
         <pdfbox-version>2.0.28</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <tika.version>2.3.0</tika.version>
+        <tika.version>2.5.0</tika.version>
         <!-- Sync with whatever version Tika uses -->
         <bouncycastle.version>1.70</bouncycastle.version>
 
