@@ -1054,7 +1054,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         List<Collection> collectionList = new ArrayList<>();
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
 

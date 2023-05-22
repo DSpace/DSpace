@@ -381,7 +381,7 @@ public class SubmissionConfigReader {
                     List<Collection> collections = collectionService.findAllCollectionsByEntityType( context,
                                     entityType);
                     for (Collection collection : collections) {
-                        collectionToSubmissionConfig.putIfAbsent(collection.getHandle(), value);                
+                        collectionToSubmissionConfig.putIfAbsent(collection.getHandle(), value);
                     }
                 }
             } // ignore any child node that isn't a "name-map"
