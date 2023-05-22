@@ -33,6 +33,7 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -223,11 +224,56 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
 
     @Test
     public void importArchivedItemTest() throws Exception {
+        String PROVENANCE_VALUE = "first provenance metadata value";
+        String DATE_VALUE = "2014-07-30T21:26:36Z";
+        String IDENTIFIER_VALUE = "some handle url";
+
         context.turnOffAuthorisationSystem();
         ObjectNode node = jsonNodeFactory.objectNode();
         node.set("withdrawn", jsonNodeFactory.textNode("false"));
         node.set("inArchive", jsonNodeFactory.textNode("true"));
         node.set("discoverable", jsonNodeFactory.textNode("false"));
+
+        // Metadata which should be kept after installing the new Item.
+        ObjectNode metadataNode = jsonNodeFactory.objectNode();
+
+        // `dc.description.provenance` metadata added into `metadata` of the ItemRest object
+        ObjectNode provenanceMetadataNode = jsonNodeFactory.objectNode();
+        provenanceMetadataNode.set("value", jsonNodeFactory.textNode(PROVENANCE_VALUE));
+        provenanceMetadataNode.set("language", jsonNodeFactory.textNode("en_US"));
+        provenanceMetadataNode.set("authority", jsonNodeFactory.nullNode());
+        provenanceMetadataNode.set("confidence", jsonNodeFactory.numberNode(-1));
+        provenanceMetadataNode.set("place", jsonNodeFactory.numberNode(-1));
+        metadataNode.set("dc.description.provenance", jsonNodeFactory.arrayNode().add(provenanceMetadataNode));
+
+        // `dc.date.available` metadata added into `metadata` of the ItemRest object
+        ObjectNode dateAvailableMetadataNode = jsonNodeFactory.objectNode();
+        dateAvailableMetadataNode.set("value", jsonNodeFactory.textNode(DATE_VALUE));
+        dateAvailableMetadataNode.set("language", jsonNodeFactory.nullNode());
+        dateAvailableMetadataNode.set("authority", jsonNodeFactory.nullNode());
+        dateAvailableMetadataNode.set("confidence", jsonNodeFactory.numberNode(-1));
+        dateAvailableMetadataNode.set("place", jsonNodeFactory.numberNode(-1));
+        metadataNode.set("dc.date.available", jsonNodeFactory.arrayNode().add(dateAvailableMetadataNode));
+
+        // `dc.date.accesioned` metadata added into `metadata` of the ItemRest object
+        ObjectNode dateAccesionedMetadataNode = jsonNodeFactory.objectNode();
+        dateAccesionedMetadataNode.set("value", jsonNodeFactory.textNode(DATE_VALUE));
+        dateAccesionedMetadataNode.set("language", jsonNodeFactory.nullNode());
+        dateAccesionedMetadataNode.set("authority", jsonNodeFactory.nullNode());
+        dateAccesionedMetadataNode.set("confidence", jsonNodeFactory.numberNode(-1));
+        dateAccesionedMetadataNode.set("place", jsonNodeFactory.numberNode(-1));
+        metadataNode.set("dc.date.accessioned", jsonNodeFactory.arrayNode().add(dateAccesionedMetadataNode));
+
+        // `dc.identifier.uri` metadata added into `metadata` of the ItemRest object
+        ObjectNode identifierMetadataNode = jsonNodeFactory.objectNode();
+        identifierMetadataNode.set("value", jsonNodeFactory.textNode(IDENTIFIER_VALUE));
+        identifierMetadataNode.set("language", jsonNodeFactory.nullNode());
+        identifierMetadataNode.set("authority", jsonNodeFactory.nullNode());
+        identifierMetadataNode.set("confidence", jsonNodeFactory.numberNode(-1));
+        identifierMetadataNode.set("place", jsonNodeFactory.numberNode(1));
+        metadataNode.set("dc.identifier.uri", jsonNodeFactory.arrayNode().add(identifierMetadataNode));
+
+        node.set("metadata", metadataNode);
         context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -241,16 +287,40 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
                         .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(),
                 "$.id"));
 
-        //workspaceitem should nt exist
+        // workspaceitem should nt exist
         List<WorkspaceItem> workflowItems = workspaceItemService.findAll(context);
         assertEquals(workflowItems.size(), 0);
-        //contoling of the created item
+        // contoling of the created item
         Item item = itemService.find(context, uuid);
         assertFalse(item.isWithdrawn());
         assertTrue(item.isArchived());
         assertFalse(item.isDiscoverable());
         assertEquals(item.getSubmitter().getID(), submitter.getID());
         assertEquals(item.getOwningCollection().getID(), col.getID());
+
+        // check `dc.description.provenance` - there should be just one value
+        List<MetadataValue> provenanceValues =
+                itemService.getMetadata(item, "dc", "description", "provenance", "en_US");
+        assertEquals(provenanceValues.size(), 1);
+        assertEquals(provenanceValues.get(0).getValue(), PROVENANCE_VALUE);
+
+        // check `dc.date.available` - there should be just one value
+        List<MetadataValue> dateAvailableValue =
+                itemService.getMetadata(item, "dc", "date", "available", null);
+        assertEquals(dateAvailableValue.size(), 1);
+        assertEquals(dateAvailableValue.get(0).getValue(), DATE_VALUE);
+
+        // check `dc.description.accessioned` - there should be just one value
+        List<MetadataValue> dateAvailableAccesioned =
+                itemService.getMetadata(item, "dc", "date", "accessioned", null);
+        assertEquals(dateAvailableAccesioned.size(), 1);
+        assertEquals(dateAvailableAccesioned.get(0).getValue(), DATE_VALUE);
+
+        // check `dc.identifier.uri` - there should be just one value
+        List<MetadataValue> identifierValue =
+                itemService.getMetadata(item, "dc", "identifier", "uri", null);
+        assertEquals(identifierValue.size(), 1);
+        assertEquals(identifierValue.get(0).getValue(), IDENTIFIER_VALUE);
 
         //clean all
         context.turnOffAuthorisationSystem();

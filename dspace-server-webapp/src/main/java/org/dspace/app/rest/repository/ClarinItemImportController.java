@@ -11,6 +11,9 @@ import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -29,6 +32,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -39,6 +43,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleClarinService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
@@ -84,6 +89,8 @@ public class ClarinItemImportController {
     private EPersonService ePersonService;
     @Autowired
     InstallItemService installItemService;
+    @Autowired
+    ConfigurationService configurationService;
 
     /**
      * Endpoint for import workspace item.
@@ -312,10 +319,40 @@ public class ClarinItemImportController {
         if (!Objects.isNull(itemRest.getHandle())) {
             item.addHandle(handleService.findByHandle(context, itemRest.getHandle()));
         }
+
+        // store metadata values which should not be updated by the import e.g., `dc.description.provenance`,
+        // `dc.date.available`, etc..
+        // Load these metadata fields from the `clarin-dspace.cfg`
+        List<String> notUpdateMetadataNames = Arrays.asList(configurationService
+                .getArrayProperty("import.metadata.field.not.update"));
+
+        // Store metadata values into ArrayList
+        List<MetadataValue> notUpdateThisMetadata = new ArrayList<>();
+        for (String metadataField : notUpdateMetadataNames) {
+            notUpdateThisMetadata.addAll(itemService.getMetadataByMetadataString(item, metadataField));
+        }
+
         //remove workspaceitem and create collection2item
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
         //set isArchived back to false
         itemToReturn.setArchived(itemRest.getInArchive());
+
+        // Clear updated metadata which shouldn't be updated and add the correct ones
+        for (String metadataField : notUpdateMetadataNames) {
+            itemService.removeMetadataValues(context, item, itemService
+                    .getMetadataByMetadataString(item, metadataField));
+        }
+
+        // Add stored metadata values into item
+        for (MetadataValue metadataValue : notUpdateThisMetadata) {
+            String schemaName = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            String lang = metadataValue.getLanguage();
+            String value = metadataValue.getValue();
+            itemService.addMetadata(context, item, schemaName, element, qualifier, lang, value);
+        }
+
         itemService.update(context, itemToReturn);
         itemRest = converter.toRest(itemToReturn, utils.obtainProjection());
         context.complete();
