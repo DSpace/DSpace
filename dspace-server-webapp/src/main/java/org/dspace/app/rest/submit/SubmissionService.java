@@ -58,6 +58,8 @@ import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigReaderService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
@@ -100,10 +102,10 @@ public class SubmissionService {
     private ConverterService converter;
     @Autowired
     private org.dspace.app.rest.utils.Utils utils;
-    private SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigReaderService submissionConfigReaderService;
 
     public SubmissionService() throws SubmissionConfigReaderException {
-        submissionConfigReader = new SubmissionConfigReader();
+        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
     }
 
     /**
@@ -329,7 +331,7 @@ public class SubmissionService {
             AInprogressSubmissionRest wsi, InProgressSubmission source, MultipartFile file) {
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
+            submissionConfigReaderService.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
         List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
         // we need to run the preProcess of all the appropriate steps and move on to the
         // upload and postProcess step
@@ -396,7 +398,7 @@ public class SubmissionService {
     public void evaluatePatchToInprogressSubmission(Context context, HttpServletRequest request,
             InProgressSubmission source, AInprogressSubmissionRest wsi, String section, Operation op) {
         boolean sectionExist = false;
-        SubmissionConfig submissionConfig = submissionConfigReader
+        SubmissionConfig submissionConfig = submissionConfigReaderService
                 .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
         List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
         // we need to run the preProcess of all the appropriate steps and move on to the

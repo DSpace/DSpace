@@ -7,14 +7,16 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigReaderService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +30,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionSectionConverter.class);
 
-    private SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigReaderService submissionConfigReaderService;
 
     @Override
     public SubmissionSectionRest convert(SubmissionStepConfig step, Projection projection) {
@@ -47,8 +49,8 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         SubmissionStepConfig step;
 
         try {
-            step = getSubmissionConfigReader().getStepConfig(obj.getId());
-        } catch (SubmissionConfigReaderException e) {
+            step = getSubmissionConfigReaderService().getStepConfig(obj.getId());
+        } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
             throw new RuntimeException(e);
         }
         return step;
@@ -59,10 +61,11 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         return SubmissionStepConfig.class;
     }
 
-    public SubmissionConfigReader getSubmissionConfigReader() throws SubmissionConfigReaderException {
-        if (submissionConfigReader == null) {
-            submissionConfigReader = new SubmissionConfigReader();
+    public SubmissionConfigReaderService getSubmissionConfigReaderService() 
+            throws SubmissionConfigReaderException, SQLException, IllegalStateException {
+        if (submissionConfigReaderService == null) {
+            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
         }
-        return submissionConfigReader;
+        return submissionConfigReaderService;
     }
 }

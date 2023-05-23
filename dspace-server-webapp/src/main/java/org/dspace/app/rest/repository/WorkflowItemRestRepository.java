@@ -40,6 +40,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.services.ConfigurationService;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigReaderService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -109,10 +111,10 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Autowired
     protected XmlWorkflowFactory workflowFactory;
 
-    private final SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigReaderService submissionConfigReaderService;
 
     public WorkflowItemRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReader = new SubmissionConfigReader();
+        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
     }
 
     @Override
