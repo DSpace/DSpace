@@ -31,6 +31,8 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Utils;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -81,7 +83,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             new HashMap<String, Map<String, List<String>>>();
 
     // the item submission reader
-    private SubmissionConfigReader itemSubmissionConfigReader;
+    private SubmissionConfigReaderService itemSubmissionConfigReaderService;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -126,7 +128,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     private synchronized void init() {
         if (!initialized) {
             try {
-                itemSubmissionConfigReader = new SubmissionConfigReader();
+                itemSubmissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
                 throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
@@ -231,7 +233,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             // there is an authority configured for the metadata valid for some collections,
             // check if it is the requested collection
             Map<String, ChoiceAuthority> controllerFormDef = controllerFormDefinitions.get(fieldKey);
-            SubmissionConfig submissionConfig = itemSubmissionConfigReader
+            SubmissionConfig submissionConfig = itemSubmissionConfigReaderService
                     .getSubmissionConfigByCollection(collection.getHandle());
             String submissionName = submissionConfig.getSubmissionName();
             // check if the requested collection has a submission definition that use an authority for the metadata
@@ -253,14 +255,14 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public void clearCache() {
+    public void clearCache() throws SubmissionConfigReaderException {
         controller.clear();
         authorities.clear();
         presentation.clear();
         closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
-        itemSubmissionConfigReader = null;
+        itemSubmissionConfigReaderService.reload();
         initialized = false;
     }
 
@@ -310,7 +312,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
      */
     private void autoRegisterChoiceAuthorityFromInputReader() {
         try {
-            List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReader
+            List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReaderService
                     .getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
             DCInputsReader dcInputsReader = new DCInputsReader();
 
@@ -481,10 +483,10 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         init();
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null && collection != null) {
-            SubmissionConfigReader configReader;
+            SubmissionConfigReaderService configReaderService;
             try {
-                configReader = new SubmissionConfigReader();
-                SubmissionConfig submissionName = configReader.getSubmissionConfigByCollection(collection.getHandle());
+                configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+                SubmissionConfig submissionName = configReaderService.getSubmissionConfigByCollection(collection.getHandle());
                 ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
