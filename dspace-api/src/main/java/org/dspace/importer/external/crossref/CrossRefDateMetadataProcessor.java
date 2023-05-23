@@ -24,7 +24,7 @@ import org.joda.time.LocalDate;
  * This class is used for CrossRef's Live-Import to extract
  * issued attribute.
  * Beans are configured in the crossref-integration.xml file.
- * 
+ *
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public class CrossRefDateMetadataProcessor implements JsonPathMetadataProcessor {
