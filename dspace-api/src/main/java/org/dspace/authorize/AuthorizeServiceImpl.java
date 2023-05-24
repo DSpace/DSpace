@@ -654,60 +654,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         }
     }
 
-    /**
-     * Generate Policies policies READ for the date in input adding reason. New policies are assigned automatically
-     * at the groups that
-     * have right on the collection. E.g., if the anonymous can access the collection policies are assigned to
-     * anonymous.
-     *
-     * @param context          The relevant DSpace Context.
-     * @param embargoDate      embargo end date
-     * @param reason           embargo reason
-     * @param dso              DSpace object
-     * @param owningCollection collection to get group policies from
-     * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
-     */
-    @Override
-    public void generateAutomaticPolicies(Context context, Date embargoDate,
-                                          String reason, DSpaceObject dso, Collection owningCollection)
-        throws SQLException, AuthorizeException {
-
-        if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream)) {
-
-            List<Group> authorizedGroups = getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
-
-            removeAllPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
-
-            // look for anonymous
-            boolean isAnonymousInPlace = false;
-            for (Group g : authorizedGroups) {
-                if (StringUtils.equals(g.getName(), Group.ANONYMOUS)) {
-                    isAnonymousInPlace = true;
-                }
-            }
-            if (!isAnonymousInPlace) {
-                // add policies for all the groups
-                for (Group g : authorizedGroups) {
-                    ResourcePolicy rp = createOrModifyPolicy(null, context, null, g, null, embargoDate, Constants.READ,
-                                                             reason, dso);
-                    if (rp != null) {
-                        resourcePolicyService.update(context, rp);
-                    }
-                }
-
-            } else {
-                // add policy just for anonymous
-                ResourcePolicy rp = createOrModifyPolicy(null, context, null,
-                                                         groupService.findByName(context, Group.ANONYMOUS), null,
-                                                         embargoDate, Constants.READ, reason, dso);
-                if (rp != null) {
-                    resourcePolicyService.update(context, rp);
-                }
-            }
-        }
-    }
-
     @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType) throws SQLException, AuthorizeException {
