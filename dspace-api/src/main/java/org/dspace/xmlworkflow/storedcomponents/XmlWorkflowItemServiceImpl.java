@@ -176,8 +176,9 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Override
     public void update(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
         // FIXME check auth
-        log.info(LogHelper.getHeader(context, "update_workflow_item",
-                                      "workflowitem_id=" + workflowItem.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_workflow_item", "workflowitem_id=" + workflowItem.getID()));
+        }
 
         // Update the item
         itemService.update(context, workflowItem.getItem());

@@ -33,11 +33,12 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener {
         if (event instanceof UsageEvent && !(event instanceof UsageSearchEvent)) {
             UsageEvent ue = (UsageEvent) event;
 
-            log.info(LogHelper.getHeader(
-                ue.getContext(),
-                formatAction(ue.getAction(), ue.getObject()),
-                formatMessage(ue.getObject()))
-            );
+            if (log.isDebugEnabled()) {
+                log.debug(LogHelper.getHeader(
+                    ue.getContext(),
+                    formatAction(ue.getAction(), ue.getObject()),
+                    formatMessage(ue.getObject())));
+            }
 
         }
     }

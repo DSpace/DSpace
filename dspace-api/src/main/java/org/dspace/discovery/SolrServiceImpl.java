@@ -157,7 +157,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     getIndexableObjectFactory(indexableObject);
             if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
                 update(context, indexableObjectFactory, indexableObject);
-                log.info(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                if (log.isDebugEnabled()) {
+                    log.debug(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                }
             }
         } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
             log.error(e.getMessage(), e);
@@ -219,7 +221,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 return;
             }
             String uniqueID = indexableObject.getUniqueIndexID();
-            log.info("Try to delete uniqueID:" + uniqueID);
+            if (log.isDebugEnabled()) {
+                log.debug("Try to delete uniqueID:" + uniqueID);
+            }
             indexObjectServiceFactory.getIndexableObjectFactory(indexableObject).delete(indexableObject);
             if (commit) {
                 solrSearchCore.getSolr().commit();
@@ -1531,7 +1535,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         getIndexableObjectFactory(indexableObject);
                 if (force || requiresIndexing(indexableObject.getUniqueIndexID(), indexableObject.getLastModified())) {
                     update(context, indexableObjectFactory, indexableObject, true);
-                    log.info(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                    if (log.isDebugEnabled()) {
+                        log.debug(LogHelper.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
+                    }
                 }
             } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
                 log.error(e.getMessage(), e);

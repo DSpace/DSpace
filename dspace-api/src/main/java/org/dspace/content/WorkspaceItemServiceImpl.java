@@ -193,10 +193,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         workspaceItem.setItem(item);
 
-        log.info(LogHelper.getHeader(context, "create_workspace_item",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID()
                                           + "item_id=" + item.getID() + "collection_id="
                                           + collection.getID()));
+        }
 
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
                 itemService.getIdentifiers(context, item)));
@@ -257,8 +259,10 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
         // Authorisation is checked by the item.update() method below
 
-        log.info(LogHelper.getHeader(context, "update_workspace_item",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID()));
+        }
 
         // Update the item
         itemService.update(context, workspaceItem.getItem());
@@ -285,9 +289,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                                              + "original submitter to delete a workspace item");
         }
 
-        log.info(LogHelper.getHeader(context, "delete_workspace_item",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
+        }
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
@@ -318,9 +324,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         Item item = workspaceItem.getItem();
         authorizeService.authorizeAction(context, item, Constants.WRITE);
 
-        log.info(LogHelper.getHeader(context, "delete_workspace_item",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_workspace_item",
                                       "workspace_item_id=" + workspaceItem.getID() + "item_id=" + item.getID()
                                           + "collection_id=" + workspaceItem.getCollection().getID()));
+        }
 
         //        deleteSubmitPermissions();
 

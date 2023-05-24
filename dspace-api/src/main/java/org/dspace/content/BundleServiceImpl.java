@@ -104,9 +104,9 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             bundle.addItem(item);
         }
 
-
-        log.info(LogHelper.getHeader(context, "create_bundle", "bundle_id="
-            + bundle.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "create_bundle", "bundle_id=" + bundle.getID()));
+        }
 
         // if we ever use the identifier service for bundles, we should
         // create the bundle before we create the Event and should add all
@@ -136,8 +136,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // Check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.ADD);
 
-        log.info(LogHelper.getHeader(context, "add_bitstream", "bundle_id="
-            + bundle.getID() + ",bitstream_id=" + bitstream.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "add_bitstream", "bundle_id="
+                + bundle.getID() + ",bitstream_id=" + bitstream.getID()));
+        }
 
         // First check that the bitstream isn't already in the list
         List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -182,8 +184,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // Check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.REMOVE);
 
-        log.info(LogHelper.getHeader(context, "remove_bitstream",
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "remove_bitstream",
                                       "bundle_id=" + bundle.getID() + ",bitstream_id=" + bitstream.getID()));
+        }
 
 
         context.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, bundle.getID(),
@@ -476,8 +480,10 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     public void update(Context context, Bundle bundle) throws SQLException, AuthorizeException {
         // Check authorisation
         //AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
-        log.info(LogHelper.getHeader(context, "update_bundle", "bundle_id="
-            + bundle.getID()));
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "update_bundle", "bundle_id="
+                + bundle.getID()));
+        }
 
         super.update(context, bundle);
         bundleDAO.save(context, bundle);
@@ -496,8 +502,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
     @Override
     public void delete(Context context, Bundle bundle) throws SQLException, AuthorizeException, IOException {
-        log.info(LogHelper.getHeader(context, "delete_bundle", "bundle_id="
-            + bundle.getID()));
+
+        if (log.isDebugEnabled()) {
+            log.debug(LogHelper.getHeader(context, "delete_bundle", "bundle_id="
+                + bundle.getID()));
+        }
 
         authorizeService.authorizeAction(context, bundle, Constants.DELETE);
 
