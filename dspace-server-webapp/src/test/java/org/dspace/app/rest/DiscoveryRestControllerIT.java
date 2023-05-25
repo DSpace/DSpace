@@ -1286,10 +1286,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        //Update this test since dc.date.accessioned is now configured for workspace configuration,
-        // which will return status 400 instead of 422 if left unchanged
         getClient().perform(get("/api/discover/search/objects")
-                   .param("sort", "person.familyName, ASC")
+                   .param("sort", "dc.date.accessioned, ASC")
                    .param("configuration", "workspace"))
                    .andExpect(status().isUnprocessableEntity());
     }
