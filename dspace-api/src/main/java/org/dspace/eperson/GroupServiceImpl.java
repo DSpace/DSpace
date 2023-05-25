@@ -353,8 +353,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         List<Group2GroupCache> groupCache = group2GroupCacheDAO.findByChildren(context, groups);
         // now we have all owning groups, also grab all parents of owning groups
-        // yes, I know this could have been done as one big query and a union,
-        // but doing the Oracle port taught me to keep to simple SQL!
         for (Group2GroupCache group2GroupCache : groupCache) {
             groups.add(group2GroupCache.getParent());
         }
