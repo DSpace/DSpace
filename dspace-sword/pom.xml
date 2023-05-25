@@ -24,25 +24,6 @@
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>oracle-support</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc6</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-
-
     <dependencies>
 
         <!-- Leave this out for the moment, as the source is in the tree -->
