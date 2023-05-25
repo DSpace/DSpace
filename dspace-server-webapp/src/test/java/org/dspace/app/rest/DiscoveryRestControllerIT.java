@@ -6473,7 +6473,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.facetType", equalTo("authority")))
                    //There always needs to be a self link available
                    .andExpect(jsonPath("$._links.self.href",
-                       containsString("api/discover/facets/supervisedBy?prefix=group%2520B&configuration=supervision")))
+                       containsString("api/discover/facets/supervisedBy?prefix=group%20B&configuration=supervision")))
                    //This is how the page object must look like because it's the default with size 20
                    .andExpect(jsonPath("$.page",
                        is(PageMatcher.pageEntry(0, 20))))
