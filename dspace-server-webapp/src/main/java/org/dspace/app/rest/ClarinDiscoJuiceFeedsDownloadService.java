@@ -100,6 +100,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
     }
 
     public String createFeedsContent() {
+        log.info("Going to create feeds content.");
         String[] feedsConfig = configurationService.getArrayProperty("discojuice.feeds");
         String shibbolethDiscoFeedUrl = configurationService.getProperty("shibboleth.discofeed.url");
 
@@ -160,7 +161,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
                 String old_country = (String)shibEntity.remove("country");
                 String new_country = guessCountry(shibEntity);
                 shibEntity.put("country", new_country);
-                log.info(String.format("For %s changed country from %s to %s", shibEntity.get("entityID"),
+                log.debug(String.format("For %s changed country from %s to %s", shibEntity.get("entityID"),
                         old_country, new_country));
             }
         }
@@ -287,7 +288,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
                         log.debug("Found code " + code + " for " + informationURL);
                         return code;
                     } else {
-                        log.info("Country or location is null for " + informationURL);
+                        log.debug("Country or location is null for " + informationURL);
                     }
                 } catch (IOException | GeoIp2Exception e) {
                     log.debug(e);
@@ -305,7 +306,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
                 return topLevel.toUpperCase();
             }
         } catch (MalformedURLException e) {
-            log.error(e.getMessage());
+            log.debug("ERROR: " + e.getMessage());
         }
         return "_all_"; // by default add "_all_", better search in dj
     }
