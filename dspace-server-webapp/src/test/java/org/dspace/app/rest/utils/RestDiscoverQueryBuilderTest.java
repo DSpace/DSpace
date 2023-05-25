@@ -115,6 +115,8 @@ public class RestDiscoverQueryBuilderTest {
 
         sortConfiguration.setSortFields(listSortField);
 
+        sortConfiguration.setDefaultSortField(defaultSort);
+
         discoveryConfiguration.setSearchSortConfiguration(sortConfiguration);
 
         DiscoverySearchFilterFacet subjectFacet = new DiscoverySearchFilterFacet();
@@ -165,6 +167,19 @@ public class RestDiscoverQueryBuilderTest {
         verify(discoverQueryBuilder, times(1)).buildQuery(context, null, discoveryConfiguration, null,
                                                           emptyList(), emptyList(), page.getPageSize(),
                                                           page.getOffset(), "SCORE", "ASC");
+    }
+
+    @Test
+    public void testSortByDefaultSortField() throws Exception {
+        page = PageRequest.of(2, 10, Sort.Direction.DESC, "dc.date.accessioned");
+        restQueryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), page);
+
+        verify(discoverQueryBuilder, times(1))
+                .buildQuery(context, null, discoveryConfiguration, null, emptyList(), emptyList(),
+                        page.getPageSize(), page.getOffset(),
+                        discoveryConfiguration.getSearchSortConfiguration().getDefaultSortField().getMetadataField(),
+                        discoveryConfiguration.getSearchSortConfiguration().getDefaultSortField()
+                                .getDefaultSortOrder().name().toUpperCase());
     }
 
     @Test(expected = DSpaceBadRequestException.class)

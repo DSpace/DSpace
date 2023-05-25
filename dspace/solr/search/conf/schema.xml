@@ -283,6 +283,7 @@
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
     <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
     <field name="lastModified" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
+    <copyField source="lastModified" dest="lastModified_dt" />
 
     <!-- used to filter out items that are older versions of another item -->
     <field name="latestVersion" type="boolean" indexed="true" stored="true" default="true" multiValued="false" omitNorms="true"/>
