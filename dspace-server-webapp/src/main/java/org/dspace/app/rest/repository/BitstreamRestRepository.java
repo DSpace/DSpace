@@ -265,7 +265,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
      * @param jsonNode the json body provided from the request body
      */
     public void patchBitstreamsInBulk(Context context, JsonNode jsonNode) throws SQLException {
-        int operationsLimit = configurationService.getIntProperty("patch.operations.limit", 1000);
+        int operationsLimit = configurationService.getIntProperty("rest.patch.operations.limit", 1000);
         ObjectMapper mapper = new ObjectMapper();
         JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
         Patch patch = patchConverter.convert(jsonNode);

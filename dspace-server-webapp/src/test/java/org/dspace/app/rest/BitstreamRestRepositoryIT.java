@@ -2565,7 +2565,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         // Add three out of four bitstreams to the list of bitstreams to be deleted
-        // But set the patch.operations.limit property to 2, so that the request is invalid
+        // But set the rest.patch.operations.limit property to 2, so that the request is invalid
         List<Operation> ops = new ArrayList<>();
         RemoveOperation removeOp1 = new RemoveOperation(OPERATION_PATH_BITSTREAM_REMOVE + bitstream1.getID());
         ops.add(removeOp1);
@@ -2577,7 +2577,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
 
         Assert.assertTrue(bitstreamExists(token, bitstream1, bitstream2, bitstream3, bitstream4));
-        DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("patch.operations.limit", 2);
+        DSpaceServicesFactory.getInstance().getConfigurationService().setProperty("rest.patch.operations.limit", 2);
 
         getClient(token).perform(patch("/api/core/bitstreams")
                                      .content(patchBody)
