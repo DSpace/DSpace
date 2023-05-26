@@ -23,6 +23,7 @@ import java.util.UUID;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.authorize.AuthorizeException;
@@ -77,6 +78,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected boolean remoteUrl = false;
     protected String zipfilename = null;
+    protected boolean zipvalid= false;
     protected boolean help = false;
     protected File workDir = null;
     protected File workFile = null;
@@ -235,11 +237,19 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 handler.logInfo("***End of Test Run***");
             }
         } finally {
-            // clean work dir
             if (zip) {
-                FileUtils.deleteDirectory(new File(sourcedir));
-                FileUtils.deleteDirectory(workDir);
-                if (remoteUrl && workFile != null && workFile.exists()) {
+                // if zip file was valid then clean sourcedir
+                if (zipvalid && sourcedir != null && new File(sourcedir).exists()) {
+                    FileUtils.deleteDirectory(new File(sourcedir));
+                }
+
+                // clean workdir
+                if (workDir != null && workDir.exists()) {
+                    FileUtils.deleteDirectory(workDir);
+                }
+
+                // conditionally clean workFile if import was done in the UI or via a URL and it still exists
+                if (workFile != null && workFile.exists()) {
                     workFile.delete();
                 }
             }
@@ -329,7 +339,14 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             // manage zip via remote url
             optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
         }
+
         if (optionalFileStream.isPresent()) {
+            // validate zip file
+            Optional<InputStream> validationFileStream = handler.getFileStream(context, zipfilename);
+            if (validationFileStream.isPresent()) {
+                validateZip(validationFileStream.get());
+            }
+
             workFile = new File(itemImportService.getTempWorkDir() + File.separator
                     + zipfilename + "-" + context.getCurrentUser().getID());
             FileUtils.copyInputStreamToFile(optionalFileStream.get(), workFile);
@@ -337,8 +354,30 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
             throw new IllegalArgumentException(
                     "Error reading file, the file couldn't be found for filename: " + zipfilename);
         }
-        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR);
+
+        workDir = new File(itemImportService.getTempWorkDir() + File.separator + TEMP_DIR
+                           + File.separator + context.getCurrentUser().getID());
         sourcedir = itemImportService.unzip(workFile, workDir.getAbsolutePath());
+    }
+
+    /**
+     * Confirm that the zip file has the correct MIME type
+     * @param inputStream
+     */
+    protected void validateZip(InputStream inputStream) {
+        Tika tika = new Tika();
+        try {
+            String mimeType = tika.detect(inputStream);
+            if (mimeType.equals("application/zip")) {
+                zipvalid = true;
+            } else {
+                handler.logError("A valid zip file must be supplied. The provided file has mimetype: " + mimeType);
+                throw new UnsupportedOperationException("A valid zip file must be supplied");
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException(
+                "There was an error while reading the zip file: " + zipfilename);
+        }
     }
 
     /**
