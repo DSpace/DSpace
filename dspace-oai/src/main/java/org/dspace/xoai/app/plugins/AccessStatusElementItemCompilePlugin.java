@@ -9,18 +9,19 @@ package org.dspace.xoai.app.plugins;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.xoai.app.XOAIExtensionItemCompilePlugin;
 import org.dspace.xoai.util.ItemUtils;
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 
 /**
  * AccessStatusElementItemCompilePlugin aims to add structured information about the
- * Access Status of the item (if any). 
+ * Access Status of the item (if any).
 
  * The xoai document will be enriched with a structure like that
  * <pre>
@@ -32,7 +33,7 @@ import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
  *   </element>;
  * }
  * </pre>
- * Returning Values are based on: 
+ * Returning Values are based on:
  * @see org.dspace.access.status.DefaultAccessStatusHelper  DefaultAccessStatusHelper
  */
 public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCompilePlugin {
