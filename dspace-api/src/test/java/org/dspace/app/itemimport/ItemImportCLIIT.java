@@ -269,7 +269,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
                    Path.of(tempDir.toString() + "/" + PDF_NAME));
 
         String[] args = new String[] { "import", "-a", "-e", admin.getEmail(), "-c", collection.getID().toString(),
-                                       "-s", tempDir.toString(), "-z", PDF_NAME, "-m", tempDir.toString() + "/mapfile.out" };
+                                       "-s", tempDir.toString(), "-z", PDF_NAME, "-m", tempDir.toString()
+                                                                                       + "/mapfile.out" };
         try {
             perfomImportScript(args);
         } catch (Exception e) {

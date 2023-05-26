@@ -78,7 +78,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
     protected boolean zip = false;
     protected boolean remoteUrl = false;
     protected String zipfilename = null;
-    protected boolean zipvalid= false;
+    protected boolean zipvalid = false;
     protected boolean help = false;
     protected File workDir = null;
     protected File workFile = null;
