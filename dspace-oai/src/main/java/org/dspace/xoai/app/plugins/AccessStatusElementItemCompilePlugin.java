@@ -29,8 +29,8 @@ import org.dspace.xoai.util.ItemUtils;
  *   <element name="others">
  *       <element name="access-status">
  *          <field name="value">open.access</field>
- *       </element>;
- *   </element>;
+ *       </element>
+ *   </element>
  * }
  * </pre>
  * Returning Values are based on:
