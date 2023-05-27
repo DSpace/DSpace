@@ -75,6 +75,9 @@
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']"
                 mode="datacite"/>
+            <!-- ACCESS RIGHTS from access status mechanism -->
+            <xsl:apply-templates
+                select="doc:metadata/doc:element[@name='others']/doc:element[@name='access-status']" mode="datacite" />
             <!-- datacite:rights -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']" mode="datacite"/>
@@ -93,9 +96,6 @@
             <!-- CREATIVE COMMON LICENSE -->
             <xsl:apply-templates
                 select="doc:metadata/doc:element[@name='others']/doc:element[@name='cc']" mode="oaire" />
-            <!-- ACCESS RIGHTS -->
-            <xsl:apply-templates
-                select="doc:metadata/doc:element[@name='others']/doc:element[@name='access-status']" mode="datacite" />
         </oaire:resource>
     </xsl:template>
 
@@ -1162,11 +1162,11 @@
    <!-- Auxiliary templates - get global values -->
    <!--  -->
    
-    <!-- get the coar access rights globally -->
+    <!-- get the coar access rights globally from access status mechanism -->
     <xsl:template name="getRightsURI">
         <xsl:call-template name="resolveRightsURI">
             <xsl:with-param name="field"
-                select="//doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value'and ends-with(translate(text(), $uppercase, $smallcase),'access')]/text()"/>
+                select="/doc:metadata/doc:element[@name='others']/doc:element[@name='access-status']/doc:field[@name='value']/text()"/>
         </xsl:call-template>
     </xsl:template>
 
