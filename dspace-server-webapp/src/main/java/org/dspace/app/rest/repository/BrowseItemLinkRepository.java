@@ -137,7 +137,8 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
         // For second level browses on metadata indexes, we need to adjust the default sorting
         if (bi.isMetadataIndex() && bs.isSecondLevel() && bs.getSortBy() <= 0) {
-            bs.setSortBy(1);
+            //use bi.sortOption if available
+            bs.setSortBy(bi.getSortOption() != null ? bi.getSortOption().getNumber() : 1);
         }
 
         BrowseInfo binfo = be.browse(bs);

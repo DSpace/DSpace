@@ -221,7 +221,9 @@ public class BrowseEngine {
 
                 // make sure the incoming value is normalised
                 value = OrderFormat.makeSortString(value, scope.getFilterValueLang(),
-                                                   scope.getBrowseIndex().getDataType());
+                                                   scope.getBrowseIndex().getSortOption() == null ?
+                                                           scope.getBrowseIndex().getDataType() :
+                                                           scope.getBrowseIndex().getSortOption().getType());
 
                 dao.setAuthorityValue(scope.getAuthorityValue());
 
