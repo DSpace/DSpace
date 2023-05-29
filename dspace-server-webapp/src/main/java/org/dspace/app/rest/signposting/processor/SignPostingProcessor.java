@@ -10,8 +10,7 @@ package org.dspace.app.rest.signposting.processor;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.signposting.model.Linkset;
-import org.dspace.app.rest.signposting.model.Lset;
+import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
@@ -22,9 +21,15 @@ import org.dspace.core.Context;
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 public interface SignPostingProcessor<T extends DSpaceObject> {
-    void buildRelation(Context context, HttpServletRequest request,
-            T object, List<Linkset> linksets, Linkset primaryLinkset);
 
-    void buildLset(Context context, HttpServletRequest request,
-            T object, List<Lset> lsets);
+    /**
+     * Method for adding new linkset nodes into {@code linksetNodes}.
+     *
+     * @param context      context
+     * @param request      request
+     * @param object       object
+     * @param linksetNodes linkset nodes
+     */
+    void addLinkSetNodes(Context context, HttpServletRequest request,
+                         T object, List<LinksetNode> linksetNodes);
 }

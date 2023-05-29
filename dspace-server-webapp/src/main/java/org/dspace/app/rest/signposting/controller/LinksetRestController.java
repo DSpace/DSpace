@@ -14,17 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.signposting.model.Linkset;
+import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRest;
-import org.dspace.app.rest.signposting.model.Lset;
-import org.dspace.app.rest.signposting.model.Relation;
 import org.dspace.app.rest.signposting.model.TypedLinkRest;
-import org.dspace.app.rest.signposting.processor.BitstreamSignPostingProcessor;
-import org.dspace.app.rest.signposting.processor.ItemSignPostingProcessor;
+import org.dspace.app.rest.signposting.processor.bitstream.BitstreamSignpostingProcessor;
+import org.dspace.app.rest.signposting.processor.item.ItemSignpostingProcessor;
+import org.dspace.app.rest.signposting.utils.LinksetMapper;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Bitstream;
@@ -34,8 +32,6 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.handle.service.HandleService;
-import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -66,10 +62,6 @@ public class LinksetRestController {
     @Autowired
     private ItemService itemService;
     @Autowired
-    private HandleService handleService;
-    @Autowired
-    private ConfigurationService configurationService;
-    @Autowired
     private ConverterService converter;
 
     @PreAuthorize("permitAll()")
@@ -91,35 +83,20 @@ public class LinksetRestController {
         try {
             Context context = ContextUtil.obtainContext(request);
 
-            DSpaceObject dso = null;
-            dso = itemService.find(context, uuid);
+            Item dso = itemService.find(context, uuid);
             if (dso == null) {
                 throw new ResourceNotFoundException("No such Item: " + uuid);
             }
 
-            List<Linkset> linksets = new ArrayList<>();
-            Linkset primaryLinkset = new Linkset();
-            linksets.add(primaryLinkset);
-
+            List<LinksetNode> linksetNodes = new ArrayList<>();
             if (dso.getType() == Constants.ITEM) {
-                primaryLinkset.setAnchor(handleService.resolveToURL(
-                        context, dso.getHandle()));
-                List<ItemSignPostingProcessor> ispp = new DSpace().getServiceManager()
-                        .getServicesByType(ItemSignPostingProcessor.class);
-                for (ItemSignPostingProcessor sp : ispp) {
-                    sp.buildRelation(context, request, (Item) dso, linksets, primaryLinkset);
+                List<ItemSignpostingProcessor> ispp = new DSpace().getServiceManager()
+                        .getServicesByType(ItemSignpostingProcessor.class);
+                for (ItemSignpostingProcessor sp : ispp) {
+                    sp.addLinkSetNodes(context, request, dso, linksetNodes);
                 }
             }
-
-            LinksetRest linksetRest = null;
-            for (Linkset linkset : linksets) {
-                if (linksetRest == null) {
-                    linksetRest = converter.toRest(linkset, utils.obtainProjection());
-                } else {
-                    linksetRest.getLinkset().add(linkset);
-                }
-            }
-            return linksetRest;
+            return converter.toRest(LinksetMapper.map(linksetNodes), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -132,27 +109,24 @@ public class LinksetRestController {
         try {
             Context context = ContextUtil.obtainContext(request);
 
-            DSpaceObject dso = null;
-            dso = itemService.find(context, uuid);
-            if (dso == null) {
+            Item item = itemService.find(context, uuid);
+            if (item == null) {
                 throw new ResourceNotFoundException("No such Item: " + uuid);
             }
 
-            List<Lset> lsets = new ArrayList<>();
-            if (dso.getType() == Constants.ITEM) {
-                List<ItemSignPostingProcessor> ispp = new DSpace().getServiceManager()
-                        .getServicesByType(ItemSignPostingProcessor.class);
-                for (ItemSignPostingProcessor sp : ispp) {
-                    sp.buildLset(context, request, (Item) dso, lsets);
-                }
+            List<LinksetNode> linksetNodes = new ArrayList<>();
+            List<ItemSignpostingProcessor> ispp = new DSpace().getServiceManager()
+                    .getServicesByType(ItemSignpostingProcessor.class);
+            for (ItemSignpostingProcessor sp : ispp) {
+                sp.addLinkSetNodes(context, request, item, linksetNodes);
             }
 
             LinksetRest linksetRest = null;
-            for (Lset lset : lsets) {
+            for (LinksetNode linksetNode : linksetNodes) {
                 if (linksetRest == null) {
-                    linksetRest = converter.toRest(lset, utils.obtainProjection());
+                    linksetRest = converter.toRest(linksetNode, utils.obtainProjection());
                 } else {
-                    linksetRest.getLset().add(lset);
+                    linksetRest.getLinksetNodes().add(linksetNode);
                 }
             }
             return linksetRest;
@@ -167,8 +141,7 @@ public class LinksetRestController {
         try {
             Context context = ContextUtil.obtainContext(request);
 
-            DSpaceObject dso = null;
-            dso = bitstreamService.find(context, uuid);
+            DSpaceObject dso = bitstreamService.find(context, uuid);
             if (dso == null) {
                 dso = itemService.find(context, uuid);
                 if (dso == null) {
@@ -176,52 +149,26 @@ public class LinksetRestController {
                 }
             }
 
-            List<Linkset> linksets = new ArrayList<>();
-            Linkset primaryLinkset = new Linkset();
-            linksets.add(primaryLinkset);
-
+            List<LinksetNode> linksetNodes = new ArrayList<>();
             if (dso.getType() == Constants.ITEM) {
-                primaryLinkset.setAnchor(handleService.resolveToURL(
-                        context, dso.getHandle()));
-                List<ItemSignPostingProcessor> ispp = new DSpace().getServiceManager()
-                        .getServicesByType(ItemSignPostingProcessor.class);
-                for (ItemSignPostingProcessor sp : ispp) {
-                    sp.buildRelation(context, request, (Item) dso, linksets, primaryLinkset);
+                List<ItemSignpostingProcessor> ispp = new DSpace().getServiceManager()
+                        .getServicesByType(ItemSignpostingProcessor.class);
+                for (ItemSignpostingProcessor sp : ispp) {
+                    sp.addLinkSetNodes(context, request, (Item) dso, linksetNodes);
                 }
             } else {
-                List<BitstreamSignPostingProcessor> bspp = new DSpace().getServiceManager()
-                        .getServicesByType(BitstreamSignPostingProcessor.class);
-                for (BitstreamSignPostingProcessor sp : bspp) {
-                    sp.buildRelation(context, request, (Bitstream) dso, linksets, primaryLinkset);
+                List<BitstreamSignpostingProcessor> bspp = new DSpace().getServiceManager()
+                        .getServicesByType(BitstreamSignpostingProcessor.class);
+                for (BitstreamSignpostingProcessor sp : bspp) {
+                    sp.addLinkSetNodes(context, request, (Bitstream) dso, linksetNodes);
                 }
-                String url = configurationService.getProperty("dspace.ui.url");
-                primaryLinkset.setAnchor(url + "/bitstreams/" + dso.getID() + "/download");
             }
 
-            return linksets.stream()
-                    .flatMap(linkset -> mapTypedLinks(linkset).stream())
+            return linksetNodes.stream()
+                    .map(node -> new TypedLinkRest(node.getLink(), node.getRelation(), node.getType()))
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static List<TypedLinkRest> mapTypedLinks(Linkset linkset) {
-        return Stream.of(
-                mapTypedLinks(TypedLinkRest.Relation.LANDING_PAGE, linkset.getLandingPage()),
-                mapTypedLinks(TypedLinkRest.Relation.ITEM, linkset.getItem()),
-                mapTypedLinks(TypedLinkRest.Relation.CITE_AS, linkset.getCiteAs()),
-                mapTypedLinks(TypedLinkRest.Relation.AUTHOR, linkset.getAuthor()),
-                mapTypedLinks(TypedLinkRest.Relation.TYPE, linkset.getType()),
-                mapTypedLinks(TypedLinkRest.Relation.LICENSE, linkset.getLicense()),
-                mapTypedLinks(TypedLinkRest.Relation.COLLECTION, linkset.getCollection()),
-                mapTypedLinks(TypedLinkRest.Relation.LINKSET, linkset.getLinkset())
-        ).flatMap(List::stream).collect(Collectors.toList());
-    }
-
-    private static List<TypedLinkRest> mapTypedLinks(TypedLinkRest.Relation relationType, List<Relation> relations) {
-        return relations.stream()
-                .map(relation -> new TypedLinkRest(relation.getHref(), relationType, relation.getType()))
-                .collect(Collectors.toList());
     }
 }

@@ -12,14 +12,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * DTO object represents a relation to specific resource.
  */
-public class Relation {
+public class LinksetRelation {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String href;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
 
-    public Relation(String href, String type) {
+    public LinksetRelation(String href, String type) {
         this.href = href;
         this.type = type;
     }

@@ -8,7 +8,6 @@
 package org.dspace.app.rest.signposting.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -25,14 +24,14 @@ public class TypedLinkRest extends RestAddressableModel {
 
     private String href;
 
-    private Relation rel;
+    private LinksetRelationType rel;
 
     private String type;
 
     public TypedLinkRest() {
     }
 
-    public TypedLinkRest(String href, Relation rel, String type) {
+    public TypedLinkRest(String href, LinksetRelationType rel, String type) {
         this.href = href;
         this.rel = rel;
         this.type = type;
@@ -46,11 +45,11 @@ public class TypedLinkRest extends RestAddressableModel {
         this.href = href;
     }
 
-    public Relation getRel() {
+    public LinksetRelationType getRel() {
         return rel;
     }
 
-    public void setRel(Relation rel) {
+    public void setRel(LinksetRelationType rel) {
         this.rel = rel;
     }
 
@@ -71,27 +70,5 @@ public class TypedLinkRest extends RestAddressableModel {
     @Override
     public Class getController() {
         return RestResourceController.class;
-    }
-
-    public enum Relation {
-        LANDING_PAGE("landing page"),
-        ITEM("item"),
-        CITE_AS("cite-as"),
-        AUTHOR("author"),
-        TYPE("type"),
-        LICENSE("license"),
-        COLLECTION("collection"),
-        LINKSET("linkset");
-
-        private final String name;
-
-        Relation(String name) {
-            this.name = name;
-        }
-
-        @JsonValue
-        public String getName() {
-            return name;
-        }
     }
 }

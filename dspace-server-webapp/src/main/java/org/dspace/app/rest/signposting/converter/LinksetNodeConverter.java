@@ -9,8 +9,8 @@ package org.dspace.app.rest.signposting.converter;
 
 import org.dspace.app.rest.converter.DSpaceConverter;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRest;
-import org.dspace.app.rest.signposting.model.Lset;
 import org.springframework.stereotype.Component;
 
 
@@ -20,18 +20,18 @@ import org.springframework.stereotype.Component;
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 @Component
-public class LsetConverter implements DSpaceConverter<Lset, LinksetRest> {
+public class LinksetNodeConverter implements DSpaceConverter<LinksetNode, LinksetRest> {
 
     @Override
-    public LinksetRest convert(Lset lset, Projection projection) {
+    public LinksetRest convert(LinksetNode linkSetNode, Projection projection) {
         LinksetRest linksetRest = new LinksetRest();
         linksetRest.setProjection(projection);
-        linksetRest.getLset().add(lset);
+        linksetRest.getLinksetNodes().add(linkSetNode);
         return linksetRest;
     }
 
     @Override
-    public Class<Lset> getModelClass() {
-        return Lset.class;
+    public Class<LinksetNode> getModelClass() {
+        return LinksetNode.class;
     }
 }

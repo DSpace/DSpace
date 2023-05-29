@@ -1,46 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean class="org.dspace.app.rest.signposting.converter.LinksetHttpMessageConverter"/>
+    <bean class="org.dspace.app.rest.signposting.converter.LinksetHttpMessageConverter"/>
 
-	<bean id="itemAuthorSignPosting" class="org.dspace.app.rest.signposting.relation.ItemAuthorProcessor">
-		<property name="metadataField" value="dc.contributor.author" />
-		<property name="relation" value="author" />
-		<property name="retrievedExternally" value="orcid" />
-		<property name="pattern" value="http://orcid.org/{0}" />
-	</bean>
+    <bean name="mapConverterDSpaceToSchemaOrgUri" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="signposting/mapConverter-dspace-to-schema-org-uri.properties"/>
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+        <property name="defaultValue" value="https://schema.org/CreativeWork"/>
+    </bean>
 
-	<bean id="itemIdentifierSignPosting" class="org.dspace.app.rest.signposting.relation.ItemIdentifierProcessor">
-		<property name="metadataField" value="dc.identifier.doi" />
-		<property name="relation" value="cite-as" />
-		<property name="pattern" value="https://doi.org/{0}" />
-	</bean>
+    <bean id="itemAuthorSignPosting" class="org.dspace.app.rest.signposting.processor.item.ItemAuthorProcessor">
+        <property name="orcidMetadata" value="person.identifier.orcid"/>
+        <property name="pattern" value="http://orcid.org/{0}"/>
+    </bean>
 
-	<bean id="itemPublicationBoundarySignPosting" class="org.dspace.app.rest.signposting.relation.ItemPublicationBundaryProcessor">
-		<property name="pattern" value="{0}/{1}/{2}" />
-	</bean>
+    <bean id="itemIdentifierSignPosting" class="org.dspace.app.rest.signposting.processor.item.ItemIdentifierProcessor">
+        <property name="metadataField" value="dc.identifier.doi"/>
+        <property name="pattern" value="https://doi.org/{0}"/>
+    </bean>
 
-	<bean id="bitstreamPublicationBundarySignPosting" class="org.dspace.app.rest.signposting.relation.BitstreamPublicationBundaryProcessor" />
+    <bean id="itemContentBitstreamsProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemContentBitstreamsProcessor"/>
 
-	<bean id="bitstreamLinksetProcessor" class="org.dspace.app.rest.signposting.relation.BitstreamLinksetProcessor" />
+    <bean id="itemTypeProcessor" class="org.dspace.app.rest.signposting.processor.item.ItemTypeProcessor"/>
 
-	<bean id="bitstreamTypeProcessor" class="org.dspace.app.rest.signposting.relation.BitstreamTypeProcessor" >
-		<property name="metadataField" value="" />
-	</bean>
+    <bean id="itemLicenseTypeProcessor" class="org.dspace.app.rest.signposting.processor.item.ItemLicenseProcessor"/>
 
-	<bean id="bitstreamLicenseProcessor" class="org.dspace.app.rest.signposting.relation.BitstreamLicenseProcessor" >
-		<property name="metadataField" value="" />
-	</bean>
+    <bean id="bitstreamParentItemProcessor"
+          class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamParentItemProcessor"/>
 
-	<bean id="itemLandingPageProcessor" class="org.dspace.app.rest.signposting.relation.ItemLandingPageProcessor"/>
+    <bean id="bitstreamLinksetProcessor"
+          class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamLinksetProcessor"/>
 
-	<bean id="itemTypeProcessor" class="org.dspace.app.rest.signposting.relation.ItemTypeProcessor">
-		<property name="metadataField" value="" />
-	</bean>
-
-	<bean id="itemLicenseTypeProcessor" class="org.dspace.app.rest.signposting.relation.ItemLicenseProcessor">
-		<property name="metadataField" value="" />
-	</bean>
+    <!--	Enable if you want to collect information about resource type at the bitstream level.-->
+    <bean id="bitstreamTypeProcessor"
+          class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamTypeProcessor"/>
 
 </beans>

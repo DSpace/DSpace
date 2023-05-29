@@ -14,7 +14,7 @@ import static org.apache.commons.lang3.StringUtils.lowerCase;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.Logger;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -22,6 +22,8 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FrontendUrlService {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FrontendUrlService.class);
+    private static final Logger log = LoggerFactory.getLogger(FrontendUrlService.class);
 
     @Autowired
     private ConfigurationService configurationService;
@@ -42,14 +44,25 @@ public class FrontendUrlService {
     /**
      * Generates front-end url for specified item.
      *
-     * @param item item
+     * @param context context
+     * @param item    item
      * @return front-end url
      */
-    public String generateUrl(Item item) {
+    public String generateUrl(Context context, Item item) {
         String uiURL = configurationService.getProperty("dspace.ui.url");
-        Context context = new Context(Context.Mode.READ_ONLY);
         return generateUrlWithSearchService(item, uiURL, context)
                 .orElseGet(() -> uiURL + "/items/" + item.getID());
+    }
+
+    /**
+     * Generates front-end url for specified bitstream.
+     *
+     * @param bitstream bitstream
+     * @return front-end url
+     */
+    public String generateUrl(Bitstream bitstream) {
+        String uiURL = configurationService.getProperty("dspace.ui.url");
+        return uiURL + "/bitstreams/" + bitstream.getID() + "/download";
     }
 
     private Optional<String> generateUrlWithSearchService(Item item, String uiURLStem, Context context) {

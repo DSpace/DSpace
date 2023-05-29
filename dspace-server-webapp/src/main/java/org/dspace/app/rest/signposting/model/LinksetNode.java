@@ -12,23 +12,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * DTO object represents a node of a link set.
  */
-public class Lset {
+public class LinksetNode {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String link;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String relation;
+    private LinksetRelationType relation;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String anchor;
 
-    public Lset(String link, String relation, String type, String anchor) {
+    public LinksetNode(String link, LinksetRelationType relation, String type, String anchor) {
         this(link, relation, anchor);
         this.type = type;
     }
 
-    public Lset(String link, String relation, String anchor) {
+    public LinksetNode(String link, LinksetRelationType relation, String anchor) {
         this.link = link;
         this.relation = relation;
         this.anchor = anchor;
@@ -42,11 +42,11 @@ public class Lset {
         this.link = link;
     }
 
-    public String getRelation() {
+    public LinksetRelationType getRelation() {
         return relation;
     }
 
-    public void setRelation(String relation) {
+    public void setRelation(LinksetRelationType relation) {
         this.relation = relation;
     }
 

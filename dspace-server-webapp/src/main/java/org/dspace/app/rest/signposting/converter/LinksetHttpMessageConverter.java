@@ -8,6 +8,7 @@
 package org.dspace.app.rest.signposting.converter;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.IOException;
@@ -35,18 +36,18 @@ public class LinksetHttpMessageConverter extends AbstractGenericHttpMessageConve
     protected void writeInternal(LinksetRest linksetRest, Type type, HttpOutputMessage outputMessage)
             throws IOException, HttpMessageNotWritableException {
         StringBuilder responseBody = new StringBuilder();
-        linksetRest.getLset().forEach(lset -> {
-            if (isNotBlank(lset.getLink())) {
-                responseBody.append(format("<%s> ", lset.getLink()));
+        linksetRest.getLinksetNodes().forEach(linksetNodes -> {
+            if (isNotBlank(linksetNodes.getLink())) {
+                responseBody.append(format("<%s> ", linksetNodes.getLink()));
             }
-            if (isNotBlank(lset.getRelation())) {
-                responseBody.append(format("; rel=\"%s\" ", lset.getRelation()));
+            if (nonNull(linksetNodes.getRelation())) {
+                responseBody.append(format("; rel=\"%s\" ", linksetNodes.getRelation().getName()));
             }
-            if (isNotBlank(lset.getType())) {
-                responseBody.append(format("; type=\"%s\" ", lset.getType()));
+            if (isNotBlank(linksetNodes.getType())) {
+                responseBody.append(format("; type=\"%s\" ", linksetNodes.getType()));
             }
-            if (isNotBlank(lset.getAnchor())) {
-                responseBody.append(format("; anchor=\"%s\" ", lset.getAnchor()));
+            if (isNotBlank(linksetNodes.getAnchor())) {
+                responseBody.append(format("; anchor=\"%s\" ", linksetNodes.getAnchor()));
             }
             responseBody.append(", ");
         });

@@ -19,102 +19,90 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Linkset {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> author;
+    private List<LinksetRelation> author;
     @JsonProperty("cite-as")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> citeAs;
+    private List<LinksetRelation> citeAs;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> item;
+    private List<LinksetRelation> item;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> collection;
+    private List<LinksetRelation> collection;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> landingPage;
+    private List<LinksetRelation> type;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> type;
+    private List<LinksetRelation> license;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> license;
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<Relation> linkset;
+    private List<LinksetRelation> linkset;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String anchor;
 
-    public List<Relation> getAuthor() {
+    public List<LinksetRelation> getAuthor() {
         if (this.author == null) {
             this.author = new ArrayList<>();
         }
         return author;
     }
-    public void setAuthor(List<Relation> author) {
+    public void setAuthor(List<LinksetRelation> author) {
         this.author = author;
     }
 
-    public List<Relation> getCiteAs() {
+    public List<LinksetRelation> getCiteAs() {
         if (this.citeAs == null) {
             this.citeAs = new ArrayList<>();
         }
         return citeAs;
     }
-    public void setCiteAs(List<Relation> citeAs) {
+    public void setCiteAs(List<LinksetRelation> citeAs) {
         this.citeAs = citeAs;
     }
 
-    public List<Relation> getItem() {
+    public List<LinksetRelation> getItem() {
         if (this.item == null) {
             this.item = new ArrayList<>();
         }
         return item;
     }
-    public void setItem(List<Relation> item) {
+    public void setItem(List<LinksetRelation> item) {
         this.item = item;
     }
 
-    public List<Relation> getCollection() {
+    public List<LinksetRelation> getCollection() {
         if (this.collection == null) {
             this.collection = new ArrayList<>();
         }
         return collection;
     }
-    public void setCollection(List<Relation> collection) {
+    public void setCollection(List<LinksetRelation> collection) {
         this.collection = collection;
     }
 
-    public List<Relation> getLandingPage() {
-        if (landingPage == null) {
-            landingPage = new ArrayList<>();
-        }
-        return landingPage;
-    }
-    public void setLandingPage(List<Relation> landingPage) {
-        this.landingPage = landingPage;
-    }
-
-    public List<Relation> getType() {
+    public List<LinksetRelation> getType() {
         if (type == null) {
             type = new ArrayList<>();
         }
         return type;
     }
-    public void setType(List<Relation> type) {
+    public void setType(List<LinksetRelation> type) {
         this.type = type;
     }
 
-    public List<Relation> getLicense() {
+    public List<LinksetRelation> getLicense() {
         if (license == null) {
             license = new ArrayList<>();
         }
         return license;
     }
-    public void setLicense(List<Relation> license) {
+    public void setLicense(List<LinksetRelation> license) {
         this.license = license;
     }
 
-    public List<Relation> getLinkset() {
+    public List<LinksetRelation> getLinkset() {
         if (linkset == null) {
             linkset = new ArrayList<>();
         }
         return linkset;
     }
-    public void setLinkset(List<Relation> linkset) {
+    public void setLinkset(List<LinksetRelation> linkset) {
         this.linkset = linkset;
     }
 

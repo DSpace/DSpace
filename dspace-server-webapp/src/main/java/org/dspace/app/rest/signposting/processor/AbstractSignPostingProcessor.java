@@ -5,7 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.signposting.relation;
+package org.dspace.app.rest.signposting.processor;
+
+import org.dspace.app.rest.signposting.model.LinksetRelationType;
 
 /**
  * An abstract class of generic signposting relation.
@@ -13,11 +15,11 @@ package org.dspace.app.rest.signposting.relation;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.com)
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
-public abstract class ASignPostingProcessor {
+public abstract class AbstractSignPostingProcessor {
 
     private String metadataField;
 
-    private String relation;
+    private LinksetRelationType relation;
 
     private String pattern;
 
@@ -29,11 +31,11 @@ public abstract class ASignPostingProcessor {
         this.metadataField = metadataField;
     }
 
-    public String getRelation() {
+    public LinksetRelationType getRelation() {
         return relation;
     }
 
-    public void setRelation(String relation) {
+    public void setRelation(LinksetRelationType relation) {
         this.relation = relation;
     }
 
