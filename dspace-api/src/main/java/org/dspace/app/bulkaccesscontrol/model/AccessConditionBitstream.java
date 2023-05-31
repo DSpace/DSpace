@@ -10,7 +10,12 @@ package org.dspace.app.bulkaccesscontrol.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dspace.app.bulkaccesscontrol.BulkAccessControl;
+
 /**
+ * Class that model the value of bitstream node
+ * from json file of the {@link BulkAccessControl}
+ *
  * @author Mohamed Eskander (mohamed.eskander at 4science.it)
  */
 public class AccessConditionBitstream {

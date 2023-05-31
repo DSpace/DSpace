@@ -7,6 +7,7 @@
  */
 package org.dspace.app.bulkaccesscontrol;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.dspace.authorize.ResourcePolicy.TYPE_INHERITED;
@@ -15,12 +16,15 @@ import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.function.Function;
@@ -28,15 +32,16 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.bulkaccesscontrol.exception.BulkAccessControlException;
 import org.dspace.app.bulkaccesscontrol.model.AccessCondition;
 import org.dspace.app.bulkaccesscontrol.model.AccessConditionBitstream;
 import org.dspace.app.bulkaccesscontrol.model.AccessConditionItem;
-import org.dspace.app.bulkaccesscontrol.model.AccessControl;
 import org.dspace.app.bulkaccesscontrol.model.BulkAccessConditionConfiguration;
+import org.dspace.app.bulkaccesscontrol.model.BulkAccessControlInput;
 import org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService;
+import org.dspace.app.mediafilter.factory.MediaFilterServiceFactory;
+import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.app.util.DSpaceObjectUtilsImpl;
 import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -56,7 +61,10 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.utils.DSpace;
 
@@ -84,6 +92,12 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     private ResourcePolicyService resourcePolicyService;
 
+    protected EPersonService epersonService;
+
+    private ConfigurationService configurationService;
+
+    private MediaFilterService mediaFilterService;
+
     private Map<String, AccessConditionOption> itemAccessConditions;
 
     private Map<String, AccessConditionOption> uploadAccessConditions;
@@ -92,6 +106,10 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     private final String REPLACE_MODE = "replace";
 
+    private boolean help = false;
+
+    protected String eperson = null;
+
     @Override
     @SuppressWarnings("unchecked")
     public void setup() throws ParseException {
@@ -99,6 +117,10 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         this.searchService = SearchUtils.getSearchService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+        this.epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        mediaFilterService = MediaFilterServiceFactory.getInstance().getMediaFilterService();
+        mediaFilterService.setLogHandler(handler);
         this.bulkAccessConditionConfigurationService = new DSpace().getServiceManager().getServiceByName(
             "bulkAccessConditionConfigurationService", BulkAccessConditionConfigurationService.class);
         this.dSpaceObjectUtils = new DSpace().getServiceManager().getServiceByName(
@@ -117,18 +139,29 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             .stream()
             .collect(Collectors.toMap(AccessConditionOption::getName, Function.identity()));
 
+        help = commandLine.hasOption('h');
         filename = commandLine.getOptionValue('f');
         uuids = commandLine.hasOption('u') ? Arrays.asList(commandLine.getOptionValues('u')) : null;
     }
 
     @Override
     public void internalRun() throws Exception {
+
+        if (help) {
+            printHelp();
+            return;
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
-        AccessControl accessControl;
+        BulkAccessControlInput accessControl;
         context = new Context(Context.Mode.BATCH_EDIT);
-        assignCurrentUserInContext();
-        assignSpecialGroupsInContext();
+        setEPerson(context);
+
+        if (!isAuthorized(context)) {
+            handler.logError("Current user is not eligible to execute script bulk-access-control");
+            throw new AuthorizeException("Current user is not eligible to execute script bulk-access-control");
+        }
 
         context.turnOffAuthorisationSystem();
 
@@ -142,7 +175,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
                 + "found for filename: " + filename));
 
         try {
-            accessControl = mapper.readValue(inputStream, AccessControl.class);
+            accessControl = mapper.readValue(inputStream, BulkAccessControlInput.class);
         } catch (IOException e) {
             handler.logError("Error parsing json file " + e.getMessage());
             throw new IllegalArgumentException("Error parsing json file", e);
@@ -158,7 +191,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    private void validate(AccessControl accessControl) throws SQLException {
+    private void validate(BulkAccessControlInput accessControl) throws SQLException {
 
         AccessConditionItem item = accessControl.getItem();
         AccessConditionBitstream bitstream = accessControl.getBitstream();
@@ -187,7 +220,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         } else if (!(StringUtils.equalsAny(mode, ADD_MODE, REPLACE_MODE))) {
             handler.logError("wrong value for item mode<" + mode + ">");
             throw new BulkAccessControlException("wrong value for item mode<" + mode + ">");
-        } else if (ADD_MODE.equals(mode) && CollectionUtils.isEmpty(accessConditions)) {
+        } else if (ADD_MODE.equals(mode) && isEmpty(accessConditions)) {
             handler.logError("accessConditions of item must be provided with mode<" + ADD_MODE + ">");
             throw new BulkAccessControlException(
                 "accessConditions of item must be provided with mode<" + ADD_MODE + ">");
@@ -208,7 +241,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         } else if (!(StringUtils.equalsAny(mode, ADD_MODE, REPLACE_MODE))) {
             handler.logError("wrong value for bitstream mode<" + mode + ">");
             throw new BulkAccessControlException("wrong value for bitstream mode<" + mode + ">");
-        } else if (ADD_MODE.equals(mode) && CollectionUtils.isEmpty(accessConditions)) {
+        } else if (ADD_MODE.equals(mode) && isEmpty(accessConditions)) {
             handler.logError("accessConditions of bitstream must be provided with mode<" + ADD_MODE + ">");
             throw new BulkAccessControlException(
                 "accessConditions of bitstream must be provided with mode<" + ADD_MODE + ">");
@@ -252,7 +285,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    public void updateItemsAndBitstreamsPolices(AccessControl accessControl)
+    public void updateItemsAndBitstreamsPolices(BulkAccessControlInput accessControl)
         throws SQLException, SearchServiceException, AuthorizeException {
 
         int counter = 0;
@@ -328,18 +361,23 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         return discoverQuery;
     }
 
-    private void updateItemPolicies(Item item, AccessControl accessControl) throws SQLException, AuthorizeException {
+    private void updateItemPolicies(Item item, BulkAccessControlInput accessControl)
+        throws SQLException, AuthorizeException {
 
-        if (REPLACE_MODE.equals(accessControl.getItem().getMode())) {
+        AccessConditionItem acItem = accessControl.getItem();
+
+        if (REPLACE_MODE.equals(acItem.getMode())) {
             removeReadPolicies(item, TYPE_CUSTOM);
             removeReadPolicies(item, TYPE_INHERITED);
         }
 
         setItemPolicies(item, accessControl);
+        logInfo(acItem.getAccessConditions(), acItem.getMode(), item);
     }
 
-    private void setItemPolicies(Item item, AccessControl accessControl) throws SQLException, AuthorizeException {
-        AccessConditionItem itemControl = accessControl.getItem();
+    private void setItemPolicies(Item item, BulkAccessControlInput accessControl)
+        throws SQLException, AuthorizeException {
+
         accessControl
             .getItem()
             .getAccessConditions()
@@ -349,7 +387,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         itemService.adjustItemPolicies(context, item, item.getOwningCollection());
     }
 
-    private void updateBitstreamsPolicies(Item item, AccessControl accessControl) {
+    private void updateBitstreamsPolicies(Item item, BulkAccessControlInput accessControl) {
         AccessConditionBitstream.Constraint constraints = accessControl.getBitstream().getConstraints();
 
         item.getBundles(CONTENT_BUNDLE_NAME).stream()
@@ -367,15 +405,18 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             isNotEmpty(bitstream.getConstraints().getUuid());
     }
 
-    private void updateBitstreamPolicies(Bitstream bitstream, Item item, AccessControl accessControl) {
+    private void updateBitstreamPolicies(Bitstream bitstream, Item item, BulkAccessControlInput accessControl) {
 
-        if (REPLACE_MODE.equals(accessControl.getBitstream().getMode())) {
+        AccessConditionBitstream acBitstream = accessControl.getBitstream();
+
+        if (REPLACE_MODE.equals(acBitstream.getMode())) {
             removeReadPolicies(bitstream, TYPE_CUSTOM);
             removeReadPolicies(bitstream, TYPE_INHERITED);
         }
 
         try {
             setBitstreamPolicies(bitstream, item, accessControl);
+            logInfo(acBitstream.getAccessConditions(), acBitstream.getMode(), bitstream);
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);
         }
@@ -390,14 +431,16 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    private void setBitstreamPolicies(Bitstream bitstream, Item item, AccessControl accessControl)
+    private void setBitstreamPolicies(Bitstream bitstream, Item item, BulkAccessControlInput accessControl)
         throws SQLException, AuthorizeException {
-        AccessConditionBitstream bitstreamControl = accessControl.getBitstream();
+
         accessControl.getBitstream()
                      .getAccessConditions()
                      .forEach(accessCondition -> createResourcePolicy(bitstream, accessCondition,
                          uploadAccessConditions.get(accessCondition.getName())));
+
         itemService.adjustBitstreamPolicies(context, item, item.getOwningCollection(), bitstream);
+        mediaFilterService.updatePoliciesOfDerivativeBitstreams(context, item, bitstream);
     }
 
     private void createResourcePolicy(DSpaceObject obj, AccessCondition accessCondition,
@@ -415,25 +458,84 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    private void assignCurrentUserInContext() throws SQLException {
-        UUID uuid = getEpersonIdentifier();
-        if (uuid != null) {
-            EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
-            context.setCurrentUser(ePerson);
+    /**
+     * Set the eperson in the context
+     *
+     * @param context the context
+     * @throws SQLException if database error
+     */
+    protected void setEPerson(Context context) throws SQLException {
+        EPerson myEPerson = epersonService.find(context, this.getEpersonIdentifier());
+
+        if (myEPerson == null) {
+            handler.logError("EPerson cannot be found: " + this.getEpersonIdentifier());
+            throw new UnsupportedOperationException("EPerson cannot be found: " + this.getEpersonIdentifier());
+        }
+
+        context.setCurrentUser(myEPerson);
+    }
+
+    private void logInfo(List<AccessCondition> accessConditions, String mode, DSpaceObject dso) {
+        String type = dso.getClass().getSimpleName();
+
+        if (REPLACE_MODE.equals(mode) && isEmpty(accessConditions)) {
+            handler.logInfo("Cleaning " + type + " {" + dso.getID() + "} policies");
+            handler.logInfo("Inheriting policies from owning Collection in " + type + " {" + dso.getID() + "}");
+            return;
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append(mode.equals(ADD_MODE) ? "Adding " : "Replacing ")
+               .append(type)
+               .append(" {")
+               .append(dso.getID())
+               .append("} policy")
+               .append(mode.equals(ADD_MODE) ? " with " : " to ")
+               .append("access conditions:");
+
+        AppendAccessConditionsInfo(message, accessConditions);
+
+        handler.logInfo(message.toString());
+
+        if (REPLACE_MODE.equals(mode) && isAppendModeEnabled()) {
+            handler.logInfo("Inheriting policies from owning Collection in " + type + " {" + dso.getID() + "}");
         }
     }
 
-    private void assignSpecialGroupsInContext() {
-        for (UUID uuid : handler.getSpecialGroups()) {
-            context.setSpecialGroup(uuid);
+    private void AppendAccessConditionsInfo(StringBuilder message, List<AccessCondition> accessConditions) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        message.append("{");
+
+        for (int i = 0; i <  accessConditions.size(); i++) {
+            message.append(accessConditions.get(i).getName());
+
+            Optional.ofNullable(accessConditions.get(i).getStartDate())
+                    .ifPresent(date -> message.append(", start_date=" + dateFormat.format(date)));
+
+            Optional.ofNullable(accessConditions.get(i).getEndDate())
+                    .ifPresent(date -> message.append(", end_date=" + dateFormat.format(date)));
+
+            if (i != accessConditions.size() - 1) {
+                message.append(", ");
+            }
         }
+
+        message.append("}");
+    }
+
+    private boolean isAppendModeEnabled() {
+        return configurationService.getBooleanProperty("core.authorization.installitem.inheritance-read.append-mode");
+    }
+
+    protected boolean isAuthorized(Context context) {
+        return true;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public BulkAccessControlScriptConfiguration<BulkAccessControl> getScriptConfiguration() {
         return new DSpace().getServiceManager()
-                           .getServiceByName("bulk-access-control",BulkAccessControlScriptConfiguration.class);
+                           .getServiceByName("bulk-access-control", BulkAccessControlScriptConfiguration.class);
     }
 
 }

@@ -508,18 +508,19 @@ public interface ItemService
         throws SQLException, AuthorizeException;
 
     /**
-     * Adjust the Bundle and Bitstream policies to reflect what have been defined
+     * Adjust the Bitstream policies to reflect what have been defined
      * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
      * policies are removed and the policies defined at the item and collection
      * level are copied and inherited as appropriate. Custom selected Item policies
-     * are copied to the bundle/bitstream only if no explicit custom policies were
-     * already applied to the bundle/bitstream. Collection's policies are inherited
+     * are copied to the bitstream only if no explicit custom policies were
+     * already applied to the bitstream. Collection's policies are inherited
      * if there are no other policies defined or if the append mode is defined by
      * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
      *
      * @param context             DSpace context object
      * @param item                Item to adjust policies on
      * @param collection          Collection
+     * @param bitstream           Bitstream to adjust policies on
      * @throws SQLException       If database error
      * @throws AuthorizeException If authorization error
      */

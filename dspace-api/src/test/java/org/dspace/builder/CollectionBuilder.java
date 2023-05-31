@@ -7,6 +7,8 @@
  */
 package org.dspace.builder;
 
+import static org.dspace.core.Constants.DEFAULT_ITEM_READ;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +17,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataSchemaEnum;
@@ -236,6 +239,28 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         groupService.update(context, g);
         return this;
     }
+
+    /**
+     * remove the resource policies with type DEFAULT_ITEM_READ and
+     * add new policy with type DEFAULT_ITEM_READ of
+     * the new group to current collection.
+     *
+     * @param group the group
+     * @return this builder
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
+    public CollectionBuilder withDefaultItemRead(Group group) throws SQLException, AuthorizeException {
+        resourcePolicyService.removePolicies(context, collection, DEFAULT_ITEM_READ);
+
+        ResourcePolicy resourcePolicy = resourcePolicyService.create(context);
+        resourcePolicy.setGroup(group);
+        resourcePolicy.setAction(DEFAULT_ITEM_READ);
+        resourcePolicy.setdSpaceObject(collection);
+        resourcePolicyService.update(context, resourcePolicy);
+        return this;
+    }
+
 
     @Override
     public Collection build() {
