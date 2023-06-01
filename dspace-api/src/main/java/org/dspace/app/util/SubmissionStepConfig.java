@@ -176,6 +176,12 @@ public class SubmissionStepConfig implements Serializable {
         return visibilityOutside;
     }
 
+    /**
+     * Check if given submission section object is hidden for the current submission scope
+     *
+     * @param obj the InProgressSubmission to check
+     * @return true if the submission section is hidden, false otherwise
+     */
     public boolean isHiddenForInProgressSubmission(InProgressSubmission obj) {
 
         String scopeToCheck = getScope(obj);
