@@ -8,8 +8,6 @@
 package org.dspace.app.rest.submit.factory.impl;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +27,7 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
 import org.dspace.submit.model.AccessConditionOption;
+import org.dspace.util.MultiFormatDateParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,20 +144,12 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         }
     }
 
-    private Date parseDate(String date) {
-        List<SimpleDateFormat> knownPatterns = Arrays.asList(
-                                new SimpleDateFormat("yyyy-MM-dd"),
-                                new SimpleDateFormat("dd-MM-yyyy"),
-                                new SimpleDateFormat("yyyy/MM/dd"),
-                                new SimpleDateFormat("dd/MM/yyyy"));
-        for (SimpleDateFormat pattern : knownPatterns) {
-            try {
-                return pattern.parse(date);
-            } catch (ParseException e) {
-                log.error(e.getMessage(), e);
-            }
+    private Date parseDate(String dateString) {
+        Date date = MultiFormatDateParser.parse(dateString);
+        if (date == null) {
+            throw new UnprocessableEntityException("Provided format of date:" + dateString + " is not supported!");
         }
-        throw new UnprocessableEntityException("Provided format of date:" + date + " is not supported!");
+        return date;
     }
 
     private String getValue(Object value) {
