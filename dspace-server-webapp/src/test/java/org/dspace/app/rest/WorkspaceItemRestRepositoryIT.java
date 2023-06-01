@@ -8582,17 +8582,25 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
                                                           .withTitle("Workspace Item")
                                                           .withIssueDate("2023-01-01")
+                                                          .withType("book")
                                                           .build();
 
         context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient(adminToken)
             .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.test-outside-workflow-hidden").doesNotExist())
             .andExpect(jsonPath("$.sections.test-outside-submission-hidden").exists())
             .andExpect(jsonPath("$.sections.test-never-hidden").exists())
             .andExpect(jsonPath("$.sections.test-always-hidden").doesNotExist());
+
+        // Deposit the item
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+                .andExpect(status().isCreated());
 
     }
 }
