@@ -35,6 +35,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +46,7 @@ import org.springframework.stereotype.Component;
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
 @Component
-public class VersionedHandleIdentifierProvider extends IdentifierProvider {
+public class VersionedHandleIdentifierProvider extends IdentifierProvider implements InitializingBean {
     /**
      * log4j category
      */
@@ -70,6 +71,19 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
+
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedHandleIdentifierProvider.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
