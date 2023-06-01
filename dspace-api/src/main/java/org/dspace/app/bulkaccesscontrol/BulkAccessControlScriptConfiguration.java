@@ -76,7 +76,7 @@ public class BulkAccessControlScriptConfiguration<T extends BulkAccessControl> e
         if (options == null) {
             Options options = new Options();
 
-            options.addOption("u", "uuids", true, "target uuids of communities/collections/items");
+            options.addOption("u", "uuid", true, "target uuids of communities/collections/items");
             options.getOption("u").setType(String.class);
             options.getOption("u").setRequired(true);
 
