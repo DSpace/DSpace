@@ -23,6 +23,7 @@
         <name-map collection-handle="123456789/qualdrop-test" submission-name="qualdroptest"/>
         <name-map collection-handle="123456789/typebind-test" submission-name="typebindtest"/>
         <name-map collection-handle="123456789/accessCondition-not-discoverable" submission-name="accessConditionNotDiscoverable"/>
+        <name-map collection-handle="123456789/test-hidden" submission-name="test-hidden"/>
     </submission-map>
 
 
@@ -54,7 +55,6 @@
             <heading></heading>
             <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
             <type>collection</type>
-            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
         <step-definition id="traditionalpageone" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
@@ -149,6 +149,34 @@
             <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
             <type>identifiers</type>
         </step-definition>
+
+        <step-definition id="test-outside-workflow-hidden" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+            <scope visibilityOutside="hidden">workflow</scope>
+        </step-definition>
+
+        <step-definition id="test-outside-submission-hidden" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+            <scope visibilityOutside="hidden">submission</scope>
+        </step-definition>
+
+        <step-definition id="test-never-hidden" mandatory="true">
+            <heading></heading>
+            <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
+            <type>collection</type>
+        </step-definition>
+
+        <step-definition id="test-always-hidden" mandatory="true">
+            <heading></heading>
+            <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
+            <type>collection</type>
+            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -220,6 +248,13 @@
             <step id="collection"/>
             <step id="traditionalpageone"/>
             <step id="notDiscoverable"/>
+        </submission-process>
+
+        <submission-process name="test-hidden">
+            <step id="test-outside-workflow-hidden"/>
+            <step id="test-outside-submission-hidden"/>
+            <step id="test-never-hidden"/>
+            <step id="test-always-hidden"/>
         </submission-process>
 
     </submission-definitions>
