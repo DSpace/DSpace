@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +22,6 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.checker.service.MostRecentChecksumService;
 import org.dspace.content.Bitstream;
@@ -116,12 +114,18 @@ public class ClarinBitstreamImportController {
             bitstream = clarinBitstreamService.create(context, bundle);
             //internal_id contains path to file
             String internalId = request.getParameter("internal_id");
+            log.info("Going to process Bitstream with internal_id: " + internalId);
             bitstream.setInternalId(internalId);
             String storeNumberString = request.getParameter("storeNumber");
             bitstream.setStoreNumber(getIntegerFromString(storeNumberString));
             String sequenceIdString = request.getParameter("sequenceId");
-            Integer sequenceId = getIntegerFromString(sequenceIdString);
-            bitstream.setSequenceID(sequenceId);
+            // Update sequenceId only if it is not `null`, sequenceId is set up to -1 by default.
+            if (StringUtils.isNotBlank(sequenceIdString)) {
+                Integer sequenceId = getIntegerFromString(sequenceIdString);
+                bitstream.setSequenceID(sequenceId);
+            } else {
+                log.info("SequenceId is null. Bitstream UUID: " + bitstream.getID());
+            }
             //add bitstream format
             String bitstreamFormatIdString = request.getParameter("bitstreamFormat");
             Integer bitstreamFormatId = getIntegerFromString(bitstreamFormatIdString);
@@ -139,39 +143,46 @@ public class ClarinBitstreamImportController {
             bitstream.setChecksumAlgorithm(bitstreamRest.getCheckSum().getCheckSumAlgorithm());
             //do validation between input fields and calculated fields based on file from assetstore
             if (!clarinBitstreamService.validation(context, bitstream)) {
+                log.info("Validation failed - return null. Bitstream UUID: " + bitstream.getID());
                 return null;
             }
 
             if (bitstreamRest.getMetadata().getMap().size() > 0) {
                 metadataConverter.setMetadata(context, bitstream, bitstreamRest.getMetadata());
             }
-            if (Boolean.parseBoolean(deletedString)) {
-                bitstreamService.delete(context, bitstream);
-            } else {
-                //set bitstream as primary bitstream for bundle
-                //if bitstream is not primary bitstream, bundle is null
-                String primaryBundleUUIDString = request.getParameter("primaryBundle_id");
-                if (StringUtils.isNotBlank(primaryBundleUUIDString)) {
-                    UUID primaryBundleUUID = UUID.fromString(primaryBundleUUIDString);
-                    try {
-                        Bundle primaryBundle = bundleService.find(context, primaryBundleUUID);
-                        primaryBundle.setPrimaryBitstreamID(bitstream);
-                        bundleService.update(context, primaryBundle);
-                    } catch (SQLException e) {
-                        log.error("Something went wrong trying to find the Bundle with uuid: " +
-                                primaryBundleUUID, e);
-                    }
+
+            // set bitstream as primary bitstream for bundle
+            // if bitstream is not primary bitstream, bundle is null
+            String primaryBundleUUIDString = request.getParameter("primaryBundle_id");
+            if (StringUtils.isNotBlank(primaryBundleUUIDString)) {
+                log.info("Bitstream has primaryBundleUUIDString. Bistream UUID: " + bitstream.getID() );
+                UUID primaryBundleUUID = UUID.fromString(primaryBundleUUIDString);
+                try {
+                    Bundle primaryBundle = bundleService.find(context, primaryBundleUUID);
+                    primaryBundle.setPrimaryBitstreamID(bitstream);
+                    bundleService.update(context, primaryBundle);
+                } catch (SQLException e) {
+                    log.error("Something went wrong trying to find the Bundle with uuid: " +
+                            primaryBundleUUID, e);
                 }
             }
+            log.info("Going to update bitstream with UUID: " + bitstream.getID());
             bitstreamService.update(context, bitstream);
 
-            if (bundle != null) {
+            // If bitstream is deleted make it deleted
+            if (Boolean.parseBoolean(deletedString)) {
+                bitstreamService.delete(context, bitstream);
+                log.info("Bitstream with id: " + bitstream.getID() + " is deleted!");
+            }
+
+            if (!Objects.isNull(bundle)) {
                 List<Item> items = bundle.getItems();
                 if (!items.isEmpty()) {
                     item = items.get(0);
                 }
                 if (item != null && !(authorizeService.authorizeActionBoolean(context, item, Constants.WRITE)
                         && authorizeService.authorizeActionBoolean(context, item, Constants.ADD))) {
+                    log.info("You do not have write rights to update the Bundle's item.");
                     throw new AccessDeniedException("You do not have write rights to update the Bundle's item");
                 }
                 if (item != null) {
@@ -181,11 +192,12 @@ public class ClarinBitstreamImportController {
             }
             bitstreamRest = converter.toRest(bitstream, utils.obtainProjection());
             context.commit();
-        } catch (AuthorizeException | SQLException | IOException e) {
-            String message = "Something went wrong with trying to create the single bitstream for file " +
-                    "with internal_id: "
-                    + request.getParameter("internal_id")
-                    + " for bundle with uuid: " + bundle.getID();
+        } catch (Exception e) {
+            String message = "Something went wrong with trying to create the single bitstream for file "
+                    + "with internal_id: " + request.getParameter("internal_id");
+            if (!Objects.isNull(bundle)) {
+                message += " for bundle with uuid: " + bundle.getID();
+            }
             log.error(message, e);
             throw new RuntimeException("message", e);
         }
