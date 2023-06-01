@@ -163,8 +163,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             throw new AuthorizeException("Current user is not eligible to execute script bulk-access-control");
         }
 
-        context.turnOffAuthorisationSystem();
-
         if (uuids == null || uuids.size() == 0) {
             handler.logError("A target uuid must be provided with at least on uuid (run with -h flag for details)");
             throw new IllegalArgumentException("At least one target uuid must be provided");
@@ -184,7 +182,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             validate(accessControl);
             updateItemsAndBitstreamsPolices(accessControl);
             context.complete();
-            context.restoreAuthSystemState();
         } catch (Exception e) {
             handler.handleException(e);
             context.abort();
