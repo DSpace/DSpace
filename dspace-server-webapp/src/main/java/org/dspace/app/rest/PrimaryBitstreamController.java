@@ -18,7 +18,6 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
-import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.model.hateoas.BundleResource;
 import org.dspace.app.rest.repository.BundlePrimaryBitstreamLinkRepository;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -67,10 +66,15 @@ public class PrimaryBitstreamController {
      */
     @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'READ')")
     @RequestMapping(method = RequestMethod.GET)
-    public BitstreamResource getPrimaryBitstream(@PathVariable UUID uuid,
+    public ResponseEntity<RepresentationModel<?>> getPrimaryBitstream(@PathVariable UUID uuid,
                                                  HttpServletRequest request) {
         BitstreamRest bitstreamRest = repository.getPrimaryBitstream(null, uuid, null, utils.obtainProjection());
-        return converter.toResource(bitstreamRest);
+        if (bitstreamRest == null) {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        } else {
+            return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(),
+                                                    (RepresentationModel<?>) converter.toResource(bitstreamRest));
+        }
     }
 
     /**

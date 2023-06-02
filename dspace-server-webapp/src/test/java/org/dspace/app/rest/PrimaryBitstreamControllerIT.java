@@ -96,7 +96,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     public void testGetPrimaryBitstreamNonExisting() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get(getBundleUrl(bundle.getID())))
-                        .andExpect(status().isOk())
+                        .andExpect(status().isNoContent())
                         .andExpect(jsonPath("$").doesNotExist());
     }
 
