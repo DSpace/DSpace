@@ -171,15 +171,12 @@ public class RestDiscoverQueryBuilderTest {
 
     @Test
     public void testSortByDefaultSortField() throws Exception {
-        page = PageRequest.of(2, 10, Sort.Direction.DESC, "dc.date.accessioned");
+        page = PageRequest.of(2, 10);
         restQueryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), page);
 
         verify(discoverQueryBuilder, times(1))
                 .buildQuery(context, null, discoveryConfiguration, null, emptyList(), emptyList(),
-                        page.getPageSize(), page.getOffset(),
-                        discoveryConfiguration.getSearchSortConfiguration().getDefaultSortField().getMetadataField(),
-                        discoveryConfiguration.getSearchSortConfiguration().getDefaultSortField()
-                                .getDefaultSortOrder().name().toUpperCase());
+                        page.getPageSize(), page.getOffset(), null, null);
     }
 
     @Test(expected = DSpaceBadRequestException.class)

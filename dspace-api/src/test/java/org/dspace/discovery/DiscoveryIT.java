@@ -768,6 +768,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
                     .withTitle("item " + i)
                     .build();
         }
+        context.restoreAuthSystemState();
 
         // Build query with default parameters (except for workspaceConf)
         DiscoverQuery discoverQuery = SearchUtils.getQueryBuilder()
@@ -776,26 +777,21 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
         DiscoverResult result = searchService.search(context, discoverQuery);
 
-        if (defaultSortField.getMetadataField().equals("dc_date_accessioned")) {
-            // Verify that search results are sort by dc_date_accessioned
-            LinkedList<String> dc_date_accesioneds = result.getIndexableObjects().stream()
-                    .map(o -> ((Item) o.getIndexedObject()).getMetadata())
-                    .map(l -> l.stream().filter(m -> m.getMetadataField().toString().equals("dc_date_accessioned"))
-                                    .map(m -> m.getValue()).findFirst().orElse("")
-                    )
-                    .collect(Collectors.toCollection(LinkedList::new));
-            assertFalse(dc_date_accesioneds.isEmpty());
-            for (int i = 1; i < dc_date_accesioneds.size() - 1; i++) {
-                assertTrue(dc_date_accesioneds.get(i).compareTo(dc_date_accesioneds.get(i + 1)) >= 0);
-            }
-        } else if (defaultSortField.getMetadataField().equals("lastModified")) {
-            LinkedList<String> lastModifieds = result.getIndexableObjects().stream()
-                    .map(o -> ((Item) o.getIndexedObject()).getLastModified().toString())
-                    .collect(Collectors.toCollection(LinkedList::new));
-            assertFalse(lastModifieds.isEmpty());
-            for (int i = 1; i < lastModifieds.size() - 1; i++) {
-                assertTrue(lastModifieds.get(i).compareTo(lastModifieds.get(i + 1)) >= 0);
-            }
+        /*
+        // code example for testing against sort by dc_date_accessioned
+        LinkedList<String> dc_date_accesioneds = result.getIndexableObjects().stream()
+                .map(o -> ((Item) o.getIndexedObject()).getMetadata())
+                .map(l -> l.stream().filter(m -> m.getMetadataField().toString().equals("dc_date_accessioned"))
+                                .map(m -> m.getValue()).findFirst().orElse("")
+                )
+                .collect(Collectors.toCollection(LinkedList::new));
+        }*/
+        LinkedList<String> lastModifieds = result.getIndexableObjects().stream()
+                .map(o -> ((Item) o.getIndexedObject()).getLastModified().toString())
+                .collect(Collectors.toCollection(LinkedList::new));
+        assertFalse(lastModifieds.isEmpty());
+        for (int i = 1; i < lastModifieds.size() - 1; i++) {
+            assertTrue(lastModifieds.get(i).compareTo(lastModifieds.get(i + 1)) >= 0);
         }
     }
 
