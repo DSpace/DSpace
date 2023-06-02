@@ -49,6 +49,7 @@ import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -246,7 +247,9 @@ public class ClarinItemImportController {
         //create workflow item from workspace item
         XmlWorkflowItem wf = workflowService.start(context, wsi);
         context.commit();
-        return new ResponseEntity<>("Import workflowitem was successful", HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("workflowitem_id", wf.getID().toString());
+        return new ResponseEntity<>("Import workflowitem was successful", headers, HttpStatus.OK);
     }
 
     /**
