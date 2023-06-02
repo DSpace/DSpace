@@ -1358,7 +1358,7 @@
             <dependency>
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
-                <version>9.3.0</version>
+                <version>9.3.1</version>
 		<exclusions>
                     <!-- A later version is brought in by google-oauth-client -->
                     <exclusion>
