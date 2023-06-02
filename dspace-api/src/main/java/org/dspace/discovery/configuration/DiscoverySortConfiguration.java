@@ -9,6 +9,7 @@ package org.dspace.discovery.configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,12 +23,25 @@ public class DiscoverySortConfiguration {
 
     private List<DiscoverySortFieldConfiguration> sortFields = new ArrayList<DiscoverySortFieldConfiguration>();
 
+    /**
+     * Default sort configuration to use when needed
+     */
+    @Nullable private DiscoverySortFieldConfiguration defaultSortField;
+
     public List<DiscoverySortFieldConfiguration> getSortFields() {
         return sortFields;
     }
 
     public void setSortFields(List<DiscoverySortFieldConfiguration> sortFields) {
         this.sortFields = sortFields;
+    }
+
+    public DiscoverySortFieldConfiguration getDefaultSortField() {
+        return defaultSortField;
+    }
+
+    public void setDefaultSortField(DiscoverySortFieldConfiguration configuration) {
+        this.defaultSortField = configuration;
     }
 
     public DiscoverySortFieldConfiguration getSortFieldConfiguration(String sortField) {
