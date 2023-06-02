@@ -30,6 +30,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,8 @@ import org.springframework.stereotype.Component;
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Component
-public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider {
+public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider
+    implements InitializingBean {
     /**
      * log4j category
      */
@@ -64,6 +66,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
 
     @Autowired(required = true)
     private ItemService itemService;
+
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedHandleIdentifierProviderWithCanonicalHandles.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
