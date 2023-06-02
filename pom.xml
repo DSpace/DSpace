@@ -27,7 +27,7 @@
         <postgresql.driver.version>42.6.0</postgresql.driver.version>
         <solr.client.version>8.11.2</solr.client.version>
 
-        <ehcache.version>3.4.0</ehcache.version>
+        <ehcache.version>3.10.8</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.13.4</jackson.version>
