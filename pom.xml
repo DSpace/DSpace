@@ -1516,7 +1516,7 @@
             <dependency>
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
-                <version>1.5.0</version>
+                <version>1.7</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>
