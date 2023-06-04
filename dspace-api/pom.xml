@@ -821,6 +821,13 @@
             <groupId>eu.openaire</groupId>
             <artifactId>funders-model</artifactId>
             <version>2.0.0</version>
+            <exclusions>
+                <!-- Newer version pulled in via Jersey below -->
+                <exclusion>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
