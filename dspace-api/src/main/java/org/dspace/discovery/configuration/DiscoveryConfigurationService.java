@@ -92,6 +92,18 @@ public class DiscoveryConfigurationService {
         return configs;
     }
 
+    /**
+     * @return All configurations for {@link org.dspace.discovery.configuration.DiscoverySearchFilterFacet}
+     */
+    public List<DiscoverySearchFilterFacet> getAllFacetsConfig() {
+        List<DiscoverySearchFilterFacet> configs = new ArrayList<>();
+        for (String key : map.keySet()) {
+            DiscoveryConfiguration config = map.get(key);
+            configs.addAll(config.getSidebarFacets());
+        }
+        return configs;
+    }
+
     public static void main(String[] args) {
         System.out.println(DSpaceServicesFactory.getInstance().getServiceManager().getServicesNames().size());
         DiscoveryConfigurationService mainService = DSpaceServicesFactory.getInstance().getServiceManager()
