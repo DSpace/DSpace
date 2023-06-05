@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -746,8 +747,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
      */
     @Test
     public void searchWithDefaultSortServiceTest() throws SearchServiceException {
-
-        DiscoveryConfiguration workspaceConf = SearchUtils.getDiscoveryConfiguration("workspace", null);
+        DiscoveryConfiguration workspaceConf =
+            SearchUtils.getDiscoveryConfiguration(context, DISCOVER_WORKSPACE_CONFIGURATION_NAME, null);
         // Skip if no default sort option set for workspaceConf
         if (workspaceConf.getSearchSortConfiguration().getDefaultSortField() == null) {
             return;
