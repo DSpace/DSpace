@@ -308,7 +308,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.jquery</groupId>
             <artifactId>jquery-dist</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.0</version>
         </dependency>
         <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
              Made available at: webjars/toastr/build/toastr.min.js -->
