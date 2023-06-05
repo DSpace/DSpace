@@ -112,7 +112,7 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
      * @param context       The current DSpace context
      * @param bundleId      The UUID of the Bundle
      */
-    @PreAuthorize("hasPermission(#bundleId, 'BUNDLE', 'DELETE')")
+    @PreAuthorize("hasPermission(#bundleId, 'BUNDLE', 'WRITE')")
     public void deletePrimaryBitstream(Context context, UUID bundleId) {
         try {
             Bundle bundle = setPrimaryBitstream(context, bundleId, null, false);

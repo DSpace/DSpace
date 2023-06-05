@@ -134,7 +134,7 @@ public class PrimaryBitstreamController {
      * @param request   The HttpServletRequest
      * @return          The Bundle of which the primaryBitstream was deleted
      */
-    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'DELETE')")
+    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'WRITE')")
     @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<RepresentationModel<?>> deletePrimaryBitstream(@PathVariable UUID uuid,
                                                                          HttpServletRequest request) {

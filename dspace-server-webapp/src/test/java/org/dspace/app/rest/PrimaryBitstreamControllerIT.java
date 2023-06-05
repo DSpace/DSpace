@@ -52,6 +52,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     Item item;
     Bitstream bitstream;
     Bundle bundle;
+    Community community;
+    Collection collection;
 
     @Before
     @Override
@@ -59,8 +61,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         super.setUp();
 
         context.turnOffAuthorisationSystem();
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        community = CommunityBuilder.createCommunity(context).build();
+        collection = CollectionBuilder.createCollection(context, community).build();
         item = ItemBuilder.createItem(context, collection).build();
 
         // create bitstream in ORIGINAL bundle of item
@@ -142,7 +144,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     public void testPostPrimaryBitstreamAlreadyExists() throws Exception {
         context.turnOffAuthorisationSystem();
         bundle.setPrimaryBitstreamID(bitstream);
-        Bitstream bitstream2 = createSecondBitstream(bundle);
+        Bitstream bitstream2 = createBitstream(bundle);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -159,7 +161,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     public void testPostPrimaryBitstreamNotInBundle() throws Exception {
         context.turnOffAuthorisationSystem();
         Bundle bundle2 = BundleBuilder.createBundle(context, item).withName("Bundle2").build();
-        Bitstream bitstream2 = createSecondBitstream(bundle2);
+        Bitstream bitstream2 = createBitstream(bundle2);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -173,10 +175,94 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void testPostPrimaryBitstreamCommunityAdmin() throws Exception {
+        // create new structure with Admin permissions on Community
+        context.turnOffAuthorisationSystem();
+        Community com2 = CommunityBuilder.createCommunity(context).withAdminGroup(eperson).build();
+        Collection col2 = CollectionBuilder.createCollection(context, com2).build();
+        Item item2 = ItemBuilder.createItem(context, col2).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(post(getBundleUrl(bundle2.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream2.getID())))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
+                                                                           bundle2.getHandle(), bundle2.getType())));
+        // verify primaryBitstream was actually added
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testPostPrimaryBitstreamCollectionAdmin() throws Exception {
+        // create new structure with Admin permissions on Collection
+        context.turnOffAuthorisationSystem();
+        Collection col2 = CollectionBuilder.createCollection(context, community).withAdminGroup(eperson).build();
+        Item item2 = ItemBuilder.createItem(context, col2).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(post(getBundleUrl(bundle2.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream2.getID())))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
+                                                                           bundle2.getHandle(), bundle2.getType())));
+        // verify primaryBitstream was actually added
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testPostPrimaryBitstreamItemAdmin() throws Exception {
+        // create new structure with Admin permissions on Item
+        context.turnOffAuthorisationSystem();
+        Item item2 = ItemBuilder.createItem(context, collection).withAdminUser(eperson).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(post(getBundleUrl(bundle2.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream2.getID())))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
+                                                                           bundle2.getHandle(), bundle2.getType())));
+        // verify primaryBitstream was actually added
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testPostPrimaryBitstreamForbidden() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(post(getBundleUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testPostPrimaryBitstreamUnauthenticated() throws Exception {
+        getClient().perform(post(getBundleUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testUpdatePrimaryBitstream() throws Exception {
         context.turnOffAuthorisationSystem();
         bundle.setPrimaryBitstreamID(bitstream);
-        Bitstream bitstream2 = createSecondBitstream(bundle);
+        Bitstream bitstream2 = createBitstream(bundle);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -231,7 +317,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         bundle.setPrimaryBitstreamID(bitstream);
         Bundle bundle2 = BundleBuilder.createBundle(context, item).withName("Bundle2").build();
-        Bitstream bitstream2 = createSecondBitstream(bundle2);
+        Bitstream bitstream2 = createBitstream(bundle2);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -242,6 +328,105 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream is still the original one
         bundle = context.reloadEntity(bundle);
         Assert.assertEquals(bitstream, bundle.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testUpdatePrimaryBitstreamCommunityAdmin() throws Exception {
+        // create new structure with Admin permissions on Community
+        context.turnOffAuthorisationSystem();
+        Community com2 = CommunityBuilder.createCommunity(context).withAdminGroup(eperson).build();
+        Collection col2 = CollectionBuilder.createCollection(context, com2).build();
+        Item item2 = ItemBuilder.createItem(context, col2).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        bundle2.setPrimaryBitstreamID(bitstream2);
+        Bitstream bitstream3 = createBitstream(bundle2);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(put(getBundleUrl(bundle2.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream3.getID())))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
+                                                                           bundle2.getHandle(), bundle2.getType())));
+        // verify primaryBitstream was actually updated
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testUpdatePrimaryBitstreamCollectionAdmin() throws Exception {
+        // create new structure with Admin permissions on Collection
+        context.turnOffAuthorisationSystem();
+        Collection col2 = CollectionBuilder.createCollection(context, community).withAdminGroup(eperson).build();
+        Item item2 = ItemBuilder.createItem(context, col2).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        bundle2.setPrimaryBitstreamID(bitstream2);
+        Bitstream bitstream3 = createBitstream(bundle2);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(put(getBundleUrl(bundle2.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream3.getID())))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
+                                                                           bundle2.getHandle(), bundle2.getType())));
+        // verify primaryBitstream was actually updated
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testUpdatePrimaryBitstreamItemAdmin() throws Exception {
+        // create new structure with Admin permissions on Item
+        context.turnOffAuthorisationSystem();
+        Item item2 = ItemBuilder.createItem(context, collection).withAdminUser(eperson).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        bundle2.setPrimaryBitstreamID(bitstream2);
+        Bitstream bitstream3 = createBitstream(bundle2);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(put(getBundleUrl(bundle2.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream3.getID())))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
+                                                                           bundle2.getHandle(), bundle2.getType())));
+        // verify primaryBitstream was actually updated
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+    }
+
+    @Test
+    public void testUpdatePrimaryBitstreamForbidden() throws Exception {
+        context.turnOffAuthorisationSystem();
+        bundle.setPrimaryBitstreamID(bitstream);
+        Bitstream bitstream2 = createBitstream(bundle);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(put(getBundleUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream2.getID())))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testUpdatePrimaryBitstreamUnauthenticated() throws Exception {
+        context.turnOffAuthorisationSystem();
+        bundle.setPrimaryBitstreamID(bitstream);
+        Bitstream bitstream2 = createBitstream(bundle);
+        context.restoreAuthSystemState();
+
+        getClient().perform(put(getBundleUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream2.getID())))
+                        .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -276,6 +461,89 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         Assert.assertNull(bundle.getPrimaryBitstream());
     }
 
+    @Test
+    public void testDeletePrimaryBitstreamCommunityAdmin() throws Exception {
+        // create new structure with Admin permissions on Community
+        context.turnOffAuthorisationSystem();
+        Community com2 = CommunityBuilder.createCommunity(context).withAdminGroup(eperson).build();
+        Collection col2 = CollectionBuilder.createCollection(context, com2).build();
+        Item item2 = ItemBuilder.createItem(context, col2).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        bundle2.setPrimaryBitstreamID(bitstream2);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(delete(getBundleUrl(bundle2.getID())))
+                        .andExpect(status().isNoContent());
+        // verify primaryBitstream was actually deleted
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertNull(bundle2.getPrimaryBitstream());
+        // verify bitstream itself still exists
+        Assert.assertEquals(1, bundle2.getBitstreams().size());
+        Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+    }
+
+    @Test
+    public void testDeletePrimaryBitstreamCollectionAdmin() throws Exception {
+        // create new structure with Admin permissions on Collection
+        context.turnOffAuthorisationSystem();
+        Collection col2 = CollectionBuilder.createCollection(context, community).withAdminGroup(eperson).build();
+        Item item2 = ItemBuilder.createItem(context, col2).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        bundle2.setPrimaryBitstreamID(bitstream2);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(delete(getBundleUrl(bundle2.getID())))
+                        .andExpect(status().isNoContent());
+        // verify primaryBitstream was actually deleted
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertNull(bundle2.getPrimaryBitstream());
+        // verify bitstream itself still exists
+        Assert.assertEquals(1, bundle2.getBitstreams().size());
+        Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+    }
+
+    @Test
+    public void testDeletePrimaryBitstreamItemAdmin() throws Exception {
+        // create new structure with Admin permissions on Item
+        context.turnOffAuthorisationSystem();
+        Item item2 = ItemBuilder.createItem(context, collection).withAdminUser(eperson).build();
+        Bundle bundle2 = BundleBuilder.createBundle(context, item2).withName("ORIGINAL").build();
+        Bitstream bitstream2 = createBitstream(bundle2);
+        bundle2.setPrimaryBitstreamID(bitstream2);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(delete(getBundleUrl(bundle2.getID())))
+                        .andExpect(status().isNoContent());
+        // verify primaryBitstream was actually deleted
+        bundle2 = context.reloadEntity(bundle2);
+        Assert.assertNull(bundle2.getPrimaryBitstream());
+        // verify bitstream itself still exists
+        Assert.assertEquals(1, bundle2.getBitstreams().size());
+        Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+    }
+
+    @Test
+    public void testDeletePrimaryBitstreamForbidden() throws Exception {
+        bundle.setPrimaryBitstreamID(bitstream);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(delete(getBundleUrl(bundle.getID())))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testDeletePrimaryBitstreamUnauthenticated() throws Exception {
+        bundle.setPrimaryBitstreamID(bitstream);
+
+        getClient().perform(delete(getBundleUrl(bundle.getID())))
+                        .andExpect(status().isUnauthorized());
+    }
+
     private String getBundleUrl(UUID uuid) {
         return "/api/core/bundles/" + uuid + "/primaryBitstream";
     }
@@ -284,11 +552,11 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         return "/api/core/bitstreams/" + uuid;
     }
 
-    private Bitstream createSecondBitstream(Bundle bundle) throws Exception {
-        String bitstreamContent = "Second Bitstream";
+    private Bitstream createBitstream(Bundle bundle) throws Exception {
+        String bitstreamContent = "Bitstream Content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
              return BitstreamBuilder.createBitstream(context, bundle, is)
-                                         .withName("Bitstream2")
+                                         .withName("Bitstream")
                                          .withMimeType("text/plain")
                                          .build();
         }
