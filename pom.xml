@@ -1784,7 +1784,7 @@
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
-                <version>1.2.5</version>
+                <version>1.3.9</version>
             </dependency>
 
             <!-- json-path is needed by Spring HATEOAS -->
