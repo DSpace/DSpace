@@ -332,7 +332,9 @@ public class DiscoverQueryBuilder implements InitializingBean {
     }
 
     private String getDefaultSortDirection(DiscoverySortConfiguration searchSortConfiguration, String sortOrder) {
-        if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
+        if (searchSortConfiguration.getDefaultSortField() != null) {
+            sortOrder = searchSortConfiguration.getDefaultSortField().getDefaultSortOrder().name();
+        } else if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
                 !searchSortConfiguration.getSortFields().isEmpty()) {
             sortOrder = searchSortConfiguration.getSortFields().get(0).getDefaultSortOrder().name();
         }
@@ -342,7 +344,9 @@ public class DiscoverQueryBuilder implements InitializingBean {
     private String getDefaultSortField(DiscoverySortConfiguration searchSortConfiguration) {
         String sortBy;// Attempt to find the default one, if none found we use SCORE
         sortBy = "score";
-        if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
+        if (searchSortConfiguration.getDefaultSortField() != null) {
+            sortBy = searchSortConfiguration.getDefaultSortField().getMetadataField();
+        } else if (Objects.nonNull(searchSortConfiguration.getSortFields()) &&
                 !searchSortConfiguration.getSortFields().isEmpty()) {
             DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getSortFields().get(0);
             if (StringUtils.isBlank(defaultSort.getMetadataField())) {
