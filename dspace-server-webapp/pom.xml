@@ -322,7 +322,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.medialize</groupId>
             <artifactId>uri.js</artifactId>
-            <version>1.19.10</version>
+            <version>1.19.11</version>
         </dependency>
         <!-- Pull in current version of Underscore.js (https://underscorejs.org/) via WebJars
              Made available at: webjars/underscore/underscore-min.js -->
