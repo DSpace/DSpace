@@ -87,6 +87,8 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
      * to the currentUser in the context being an admin, however this can be overwritten by each script individually
      * if different rules apply
      * @param context   The relevant DSpace context
+     * @param commandLineParameters the parameters that will be used to start the process if known,
+     *        <code>null</code> otherwise
      * @return          A boolean indicating whether the script is allowed to execute or not
      */
     public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
