@@ -1,0 +1,32 @@
+package org.dspace.importer.external.crossref;
+
+import java.util.Collection;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+/**
+ *
+ * @author mwood
+ */
+public class CrossRefDateMetadataProcessorTest {
+    /**
+     * Test of processMetadata method, of class CrossRefDateMetadataProcessor.
+     */
+    @Test
+    public void testProcessMetadata() {
+        CrossRefDateMetadataProcessor unit = new CrossRefDateMetadataProcessor();
+        unit.setPathToArray("/dates");
+        Collection metadata = unit.processMetadata("{\"dates\": ["
+                + "[1957, 1, 27],"
+                + "[1957, 1],"
+                + "[1957]"
+                + "]}");
+        String[] metadataValues = (String[]) metadata.toArray(new String[3]);
+        assertEquals("[yyyy, MM, dd] should parse", "1957-01-27", metadataValues[0]);
+        assertEquals("[yyyy, MM] should parse", "1957-01", metadataValues[1]);
+        assertEquals("[yyyy] should parse", "1957", metadataValues[2]);
+    }
+}

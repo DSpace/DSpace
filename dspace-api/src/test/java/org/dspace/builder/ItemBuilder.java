@@ -13,6 +13,7 @@ import static org.dspace.content.authority.Choices.CF_ACCEPTED;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Period;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
@@ -291,7 +292,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
-    public ItemBuilder withEmbargoPeriod(String embargoPeriod) {
+    public ItemBuilder withEmbargoPeriod(Period embargoPeriod) {
         return setEmbargo(embargoPeriod, item);
     }
 
