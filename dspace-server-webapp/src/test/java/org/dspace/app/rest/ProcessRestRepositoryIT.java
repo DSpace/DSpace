@@ -222,22 +222,35 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getProcessFiles() throws Exception {
+        context.setCurrentUser(eperson);
         Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", new LinkedList<>()).build();
-
         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
-            processService.appendFile(context, process, is, "inputfile", "test.csv");
+            processService.appendFile(context, newProcess, is, "inputfile", "test.csv");
         }
-        Bitstream bitstream = processService.getBitstream(context, process, "inputfile");
+        Bitstream bitstream = processService.getBitstream(context, newProcess, "inputfile");
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/files"))
+        getClient(token).perform(get("/api/system/processes/" + newProcess.getID() + "/files"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.files[0].name", is("test.csv")))
                         .andExpect(jsonPath("$._embedded.files[0].uuid", is(bitstream.getID().toString())))
                         .andExpect(jsonPath("$._embedded.files[0].metadata['dspace.process.filetype']" +
                                                 "[0].value", is("inputfile")));
-
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                        .andExpect(status().isOk());
+        // also the user that triggered the process should be able to access the process' files
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken)
+                        .perform(get("/api/system/processes/" + newProcess.getID() + "/files"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.files[0].name", is("test.csv")))
+                        .andExpect(jsonPath("$._embedded.files[0].uuid", is(bitstream.getID().toString())))
+                        .andExpect(jsonPath("$._embedded.files[0].metadata['dspace.process.filetype']" +
+                                                "[0].value", is("inputfile")));
+        getClient(epersonToken)
+                        .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                        .andExpect(status().isOk());
     }
 
     @Test
@@ -245,25 +258,34 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", new LinkedList<>()).build();
 
         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
-            processService.appendFile(context, process, is, "inputfile", "test.csv");
+            processService.appendFile(context, newProcess, is, "inputfile", "test.csv");
         }
-        Bitstream bitstream = processService.getBitstream(context, process, "inputfile");
+        Bitstream bitstream = processService.getBitstream(context, newProcess, "inputfile");
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/files/inputfile"))
+        getClient(token).perform(get("/api/system/processes/" + newProcess.getID() + "/files/inputfile"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.bitstreams[0].name", is("test.csv")))
                         .andExpect(jsonPath("$._embedded.bitstreams[0].uuid", is(bitstream.getID().toString())))
                         .andExpect(jsonPath("$._embedded.bitstreams[0].metadata['dspace.process.filetype']" +
                                                 "[0].value", is("inputfile")));
-
+        // also the user that triggered the process should be able to access the process' files
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken)
+                        .perform(get("/api/system/processes/" + newProcess.getID() + "/files/inputfile"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.bitstreams[0].name", is("test.csv")))
+                        .andExpect(jsonPath("$._embedded.bitstreams[0].uuid", is(bitstream.getID().toString())))
+                        .andExpect(jsonPath("$._embedded.bitstreams[0].metadata['dspace.process.filetype']" +
+                                                "[0].value", is("inputfile")));
     }
 
     @Test
     public void getProcessFilesTypes() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", new LinkedList<>()).build();
         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
-            processService.appendFile(context, process, is, "inputfile", "test.csv");
+            processService.appendFile(context, newProcess, is, "inputfile", "test.csv");
         }
 
         List<String> fileTypesToCheck = new LinkedList<>();
@@ -271,12 +293,18 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/filetypes"))
+        getClient(token).perform(get("/api/system/processes/" + newProcess.getID() + "/filetypes"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ProcessFileTypesMatcher
-                            .matchProcessFileTypes("filetypes-" + process.getID(), fileTypesToCheck)));
+                            .matchProcessFileTypes("filetypes-" + newProcess.getID(), fileTypesToCheck)));
 
-
+        // also the user that triggered the process should be able to access the process' files
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken)
+                        .perform(get("/api/system/processes/" + newProcess.getID() + "/filetypes"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", ProcessFileTypesMatcher
+                            .matchProcessFileTypes("filetypes-" + newProcess.getID(), fileTypesToCheck)));
     }
 
     @Test
@@ -811,25 +839,42 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getProcessOutput() throws Exception {
+        context.setCurrentUser(eperson);
+        Process process1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                .withStartAndEndTime("10/01/1990", "20/01/1990")
+                .build();
+
         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
-            processService.appendLog(process.getID(), process.getName(), "testlog", ProcessLogLevel.INFO);
+            processService.appendLog(process1.getID(), process1.getName(), "testlog", ProcessLogLevel.INFO);
         }
-        processService.createLogBitstream(context, process);
+        processService.createLogBitstream(context, process1);
         List<String> fileTypesToCheck = new LinkedList<>();
         fileTypesToCheck.add("inputfile");
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/output"))
+        getClient(token).perform(get("/api/system/processes/" + process1.getID() + "/output"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.name",
-                                            is(process.getName() + process.getID() + ".log")))
+                                            is(process1.getName() + process1.getID() + ".log")))
                         .andExpect(jsonPath("$.type", is("bitstream")))
                         .andExpect(jsonPath("$.metadata['dc.title'][0].value",
-                                            is(process.getName() + process.getID() + ".log")))
+                                            is(process1.getName() + process1.getID() + ".log")))
                         .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
                                             is("script_output")));
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken)
+                        .perform(get("/api/system/processes/" + process1.getID() + "/output"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.name",
+                                            is(process1.getName() + process1.getID() + ".log")))
+                        .andExpect(jsonPath("$.type", is("bitstream")))
+                        .andExpect(jsonPath("$.metadata['dc.title'][0].value",
+                                            is(process1.getName() + process1.getID() + ".log")))
+                        .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
+                                            is("script_output")));
 
     }
 }
