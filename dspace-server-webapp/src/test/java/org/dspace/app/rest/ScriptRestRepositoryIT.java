@@ -136,9 +136,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllScriptsAnonymousUserTest() throws Exception {
+        // this should be changed once we allow anonymous user to execute some scripts
         getClient().perform(get("/api/system/scripts"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.page.totalElements", is(0)));
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -358,11 +358,47 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isNotFound());
     }
 
+    /**
+     * This test will create a basic structure of communities, collections and items with some local admins at each
+     * level and verify that the local admins, nor generic users can run scripts reserved to administrator
+     * (i.e. default one that don't override the default
+     * {@link ScriptConfiguration#isAllowedToExecute(org.dspace.core.Context, List)} method implementation
+     */
     @Test
     public void postProcessNonAdminAuthorizeException() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
+        context.turnOffAuthorisationSystem();
+        EPerson comAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("comAdmin@example.com")
+                .withPassword(password).build();
+        EPerson colAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("colAdmin@example.com")
+                .withPassword(password).build();
+        EPerson itemAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("itemAdmin@example.com")
+                .withPassword(password).build();
+        Community community = CommunityBuilder.createCommunity(context)
+                                          .withName("Community")
+                                          .withAdminGroup(comAdmin)
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                .withName("Collection")
+                                                .withAdminGroup(colAdmin)
+                                                .build();
+        Item item = ItemBuilder.createItem(context, collection).withAdminUser(itemAdmin)
+                                .withTitle("Test item to curate").build();
+        context.restoreAuthSystemState();
 
+        String token = getAuthToken(eperson.getEmail(), password);
+        String comAdmin_token = getAuthToken(eperson.getEmail(), password);
+        String colAdmin_token = getAuthToken(eperson.getEmail(), password);
+        String itemAdmin_token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(multipart("/api/system/scripts/mock-script/processes"))
+                        .andExpect(status().isForbidden());
+        getClient(comAdmin_token).perform(multipart("/api/system/scripts/mock-script/processes"))
+                        .andExpect(status().isForbidden());
+        getClient(colAdmin_token).perform(multipart("/api/system/scripts/mock-script/processes"))
+                        .andExpect(status().isForbidden());
+        getClient(itemAdmin_token).perform(multipart("/api/system/scripts/mock-script/processes"))
                         .andExpect(status().isForbidden());
     }
 
