@@ -18,6 +18,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.utils.DiscoverQueryBuilder;
@@ -73,35 +76,80 @@ public class SearchUtils {
         searchService = null;
     }
 
+    /**
+     * Retrieves the Discovery Configuration for a null context, prefix and DSpace object.
+     * This will result in returning the default configuration
+     * @return the default configuration
+     */
     public static DiscoveryConfiguration getDiscoveryConfiguration() {
-        return getDiscoveryConfiguration(null, null);
+        return getDiscoveryConfiguration(null, null, null);
     }
 
-    public static DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
-        return getDiscoveryConfiguration(null, dso);
+    /**
+     * Retrieves the Discovery Configuration with a null prefix for a DSpace object.
+     * @param context
+     *              the dabase context
+     * @param dso
+     *              the DSpace object
+     * @return the Discovery Configuration for the specified DSpace object
+     */
+    public static DiscoveryConfiguration getDiscoveryConfiguration(Context context, DSpaceObject dso) {
+        return getDiscoveryConfiguration(context, null, dso);
     }
 
     /**
      * Return the discovery configuration to use in a specific scope for the king of search identified by the prefix. A
      * null prefix mean the normal query, other predefined values are workspace or workflow
-     * 
+     *
+     *
+     * @param context
+     *            the database context
      * @param prefix
      *            the namespace of the configuration to lookup if any
      * @param dso
      *            the DSpaceObject
      * @return the discovery configuration for the specified scope
      */
-    public static DiscoveryConfiguration getDiscoveryConfiguration(String prefix, DSpaceObject dso) {
+    public static DiscoveryConfiguration getDiscoveryConfiguration(Context context, String prefix,
+                                                                   DSpaceObject dso) {
         if (prefix != null) {
             return getDiscoveryConfigurationByName(dso != null ? prefix + "." + dso.getHandle() : prefix);
         } else {
-            return getDiscoveryConfigurationByName(dso != null ? dso.getHandle() : null);
+            return getDiscoveryConfigurationByDSO(context, dso);
         }
     }
 
     /**
+     * Retrieve the configuration for the current dspace object and all its parents and add it to the provided set
+     * @param context           - The database context
+     * @param configurations    - The set of configurations to add the retrieved configurations to
+     * @param prefix            - The namespace of the configuration to lookup if any
+     * @param dso               - The DSpace Object
+     * @return the set of configurations with additional retrieved ones for the dspace object and parents
+     * @throws SQLException
+     */
+    public static Set<DiscoveryConfiguration> addDiscoveryConfigurationForParents(
+            Context context, Set<DiscoveryConfiguration> configurations, String prefix, DSpaceObject dso)
+            throws SQLException {
+        if (dso == null) {
+            configurations.add(getDiscoveryConfigurationByName(null));
+            return configurations;
+        }
+        if (prefix != null) {
+            configurations.add(getDiscoveryConfigurationByName(prefix + "." + dso.getHandle()));
+        } else {
+            configurations.add(getDiscoveryConfigurationByName(dso.getHandle()));
+        }
+
+        DSpaceObjectService<DSpaceObject> dSpaceObjectService = ContentServiceFactory.getInstance()
+                                                                                     .getDSpaceObjectService(dso);
+        DSpaceObject parentObject = dSpaceObjectService.getParentObject(context, dso);
+        return addDiscoveryConfigurationForParents(context, configurations, prefix, parentObject);
+    }
+
+    /**
      * Return the discovery configuration identified by the specified name
-     * 
+     *
      * @param configurationName the configuration name assigned to the bean in the
      *                          discovery.xml
      * @return the discovery configuration
@@ -111,6 +159,18 @@ public class SearchUtils {
         DiscoveryConfigurationService configurationService = getConfigurationService();
 
         return configurationService.getDiscoveryConfiguration(configurationName);
+    }
+
+    /**
+     * Return the discovery configuration for the provided DSO
+     * @param context   - The database context
+     * @param dso       - The DSpace object to retrieve the configuration for
+     * @return the discovery configuration for the provided DSO
+     */
+    public static DiscoveryConfiguration getDiscoveryConfigurationByDSO(
+        Context context, DSpaceObject dso) {
+        DiscoveryConfigurationService configurationService = getConfigurationService();
+        return configurationService.getDiscoveryDSOConfiguration(context, dso);
     }
 
     public static DiscoveryConfigurationService getConfigurationService() {
@@ -127,47 +187,55 @@ public class SearchUtils {
      * Method that retrieves a list of all the configuration objects from the given item
      * A configuration object can be returned for each parent community/collection
      *
+     * @param context   the database context
      * @param item the DSpace item
      * @return a list of configuration objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item) throws SQLException {
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Context context, Item item)
+            throws SQLException {
         List<Collection> collections = item.getCollections();
-        return getAllDiscoveryConfigurations(null, collections, item);
+        return getAllDiscoveryConfigurations(context, null, collections, item);
     }
 
     /**
      * Return all the discovery configuration applicable to the provided workspace item
+     *
+     * @param context
      * @param witem a workspace item
      * @return a list of discovery configuration
      * @throws SQLException
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(WorkspaceItem witem) throws SQLException {
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(final Context context,
+                                                                             WorkspaceItem witem) throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
         collections.add(witem.getCollection());
-        return getAllDiscoveryConfigurations("workspace", collections, witem.getItem());
+        return getAllDiscoveryConfigurations(context, "workspace", collections, witem.getItem());
     }
 
     /**
      * Return all the discovery configuration applicable to the provided workflow item
+     *
+     * @param context
      * @param witem a workflow item
      * @return a list of discovery configuration
      * @throws SQLException
      */
-    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(WorkflowItem witem) throws SQLException {
+    public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(final Context context,
+                                                                             WorkflowItem witem) throws SQLException {
         List<Collection> collections = new ArrayList<Collection>();
         collections.add(witem.getCollection());
-        return getAllDiscoveryConfigurations("workflow", collections, witem.getItem());
+        return getAllDiscoveryConfigurations(context, "workflow", collections, witem.getItem());
     }
 
-    private static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(String prefix,
+    private static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(final Context context,
+                                                                              String prefix,
                                                                               List<Collection> collections, Item item)
         throws SQLException {
         Set<DiscoveryConfiguration> result = new HashSet<>();
 
         for (Collection collection : collections) {
-            DiscoveryConfiguration configuration = getDiscoveryConfiguration(prefix, collection);
-            result.add(configuration);
+            addDiscoveryConfigurationForParents(context, result, prefix, collection);
         }
 
         //Add alwaysIndex configurations
