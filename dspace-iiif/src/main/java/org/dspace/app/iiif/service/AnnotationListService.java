@@ -13,11 +13,13 @@ import java.util.UUID;
 
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.iiif.model.generator.AnnotationListGenerator;
+import org.dspace.app.iiif.model.generator.CanvasGenerator;
 import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -39,6 +41,8 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 public class AnnotationListService extends AbstractResourceService {
 
+    private static final String METADATA_CANVASID_ELEMENT = "iiif";
+    private static final String METADATA_CANVASID_QUALIFIER = "canvasid";
 
     @Autowired
     IIIFUtils utils;
@@ -100,6 +104,16 @@ public class AnnotationListService extends AbstractResourceService {
             AnnotationGenerator annotation = new AnnotationGenerator(IIIF_ENDPOINT + bitstream.getID())
                 .setMotivation(AnnotationGenerator.LINKING)
                 .setResource(getLinksGenerator(mimetype, bitstream));
+            for (MetadataValue meta: bitstream.getMetadata()) {
+                String element = meta.getMetadataField().getElement();
+                String qualifier = meta.getMetadataField().getQualifier();
+                if (element.contains(METADATA_CANVASID_ELEMENT) && qualifier.contains(METADATA_CANVASID_QUALIFIER)) {
+                    String canvas = IIIF_ENDPOINT +  meta.getValue();
+                    CanvasGenerator c = new CanvasGenerator(canvas);
+                    annotation.setOnCanvas(c);
+                }
+            }
+
             annotationList.addResource(annotation);
         }
         return utils.asJson(annotationList.generateResource());

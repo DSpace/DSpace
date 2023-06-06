@@ -345,4 +345,11 @@
             <class>org.dspace.iiif.canvasdimension.CanvasDimensionCLI</class>
         </step>
     </command>
+    <command>
+        <name>iiif-ocr-canvas-link</name>
+        <description>Add the image bitstream UUID to the corresponding OCR bitstream metadata.</description>
+        <step>
+            <class>org.dspace.iiif.ocrcanvas.AnnotationLinkCLI</class>
+        </step>
+    </command>
 </commands>
