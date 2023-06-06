@@ -1,7 +1,10 @@
 package org.dspace.authority;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import static org.junit.Assert.assertNull;
 
 import java.util.Date;
@@ -28,7 +31,7 @@ public class AuthorityValueTest {
 
         // Test a date-time without zone or offset.
         expected = Date.from(LocalDateTime.of(1957, 01, 27, 01, 23, 45)
-                .atZone(ZoneOffset.of("-05"))
+                .atZone(ZoneId.systemDefault())
                 .toInstant());
         actual = AuthorityValue.stringToDate("1957-01-27T01:23:45");
         assertEquals("Local date-time should convert", expected, actual);
