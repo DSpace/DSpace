@@ -7,6 +7,9 @@
  */
 package org.dspace.xmlworkflow;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -27,8 +30,14 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -36,11 +45,15 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -52,12 +65,19 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
 
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
+            .getWorkspaceItemService();
     protected IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
                                                              .getServiceByName(IndexingService.class.getName(),
                                                                  IndexingService.class);
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
+    protected WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory.getInstance().
+            getWorkflowRequirementsService();
 
     /**
      * Cleans up the created workflow role groups after each test
@@ -195,6 +215,69 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         // Reviewers should have access to workflow item
         assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer1, Constants.WRITE));
         assertTrue(this.containsRPForUser(task.getWorkflowItem().getItem(), reviewer2, Constants.WRITE));
+    }
+
+    /**
+     * Test to verify that if a user submits an item into the workflow, a reviewmanager can select a multiple reviewer
+     * epersons
+     */
+    @Test
+    @Ignore
+    public void workflowDeleteGroup_WhileClaimedTasksExist() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(admin);
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org").build();
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
+            .withName("Collection WITH workflow")
+            .withWorkflowGroup("reviewer", admin)
+            .withSubmitterGroup(submitter)
+            .build();
+        context.restoreAuthSystemState();
+
+        Context context2 = new Context(Context.Mode.READ_WRITE);
+        context2.setCurrentUser(submitter);
+
+        // Get the `reviewer` group and assert valid
+        Group reviewers = xmlWorkflowService.getWorkflowRoleGroup(
+                context, colWithWorkflow, "reviewer", null);
+        assertNotNull(reviewers);
+
+        //Claim task
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context2, colWithWorkflow, admin)
+                .withTitle("Test workflow item to return to workspace").withIssueDate("2023-06-06").build();
+
+        //collectionService.setWorkflowGroup(context, colWithWorkflow, 1, null);
+        WorkflowUtils.deleteRoleGroup(context, colWithWorkflow, "reviewer");
+        groupService.delete(context, reviewers);
+        reviewers = xmlWorkflowService.getWorkflowRoleGroup(context2, colWithWorkflow, "reviewer", null);
+        assertNull(reviewers);
+
+        context.restoreAuthSystemState();
+
+        // Return the task ( in this case the item is sent back to submitter)
+        returnClaimedTask(claimedTask);
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, claimedTask.getWorkflowItem().getItem());
+        assertNotNull(workspaceItem);
+        assertEquals(claimedTask.getWorkflowItem().getSubmitter(), workspaceItem.getSubmitter());
+    }
+
+
+    private void returnClaimedTask(ClaimedTask taskToUnclaim) throws SQLException, IOException,
+            WorkflowConfigurationException, AuthorizeException, SearchServiceException {
+        final EPerson previousUser = context.getCurrentUser();
+        taskToUnclaim = context.reloadEntity(taskToUnclaim);
+        context.setCurrentUser(taskToUnclaim.getOwner());
+        XmlWorkflowItem workflowItem = taskToUnclaim.getWorkflowItem();
+        workflowService.deleteClaimedTask(context, workflowItem, taskToUnclaim);
+        workflowRequirementsService.removeClaimedUser(context, workflowItem, taskToUnclaim.getOwner(),
+                taskToUnclaim.getStepID());
+        context.commit();
+        indexer.commit();
+        context.setCurrentUser(previousUser);
     }
 
     private boolean containsRPForUser(Item item, EPerson user, int action) throws SQLException {

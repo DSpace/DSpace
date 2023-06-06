@@ -115,7 +115,10 @@ public class ClaimAction extends UserSelectionAction {
         } else {
             log.info(LogHelper.getHeader(c, "warning while activating claim action",
                                           "No group or person was found for the following roleid: " + getParent()
-                                              .getStep().getId()));
+                                              .getStep().getId()) + ". The item will be sent back to submitter");
+
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().sendWorkflowItemBackSubmission(
+                    c, wfi, c.getCurrentUser(), this.getProvenanceStartId(), "");
         }
 
     }
