@@ -19,9 +19,12 @@ import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.app.rest.repository.ScriptRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
+import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -49,6 +52,9 @@ public class ScriptProcessesController {
 
     @Autowired
     private ScriptRestRepository scriptRestRepository;
+
+    @Autowired
+    private ScriptService scriptService;
 
     @Autowired
     private RequestService requestService;
@@ -80,9 +86,17 @@ public class ScriptProcessesController {
     @RequestMapping(method = RequestMethod.POST, consumes = "!" + MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ResponseEntity<RepresentationModel<?>> startProcessInvalidMimeType(
-        @PathVariable(name = "name") String scriptName,
-        @RequestParam(name = "file", required = false) List<MultipartFile> files)
+        @PathVariable(name = "name") String scriptName)
         throws Exception {
+        if (log.isTraceEnabled()) {
+            log.trace("Starting Process for Script with name: " + scriptName);
+        }
+        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getHttpServletRequest());
+        ScriptConfiguration scriptToExecute = scriptService.getScriptConfiguration(scriptName);
+
+        if (scriptToExecute == null) {
+            throw new ResourceNotFoundException("The script for name: " + scriptName + " wasn't found");
+        }
         throw new DSpaceBadRequestException("Invalid mimetype");
     }
 

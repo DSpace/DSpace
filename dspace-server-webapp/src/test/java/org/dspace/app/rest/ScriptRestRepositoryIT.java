@@ -135,6 +135,13 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findAllScriptsAnonymousUserTest() throws Exception {
+        getClient().perform(get("/api/system/scripts"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
     public void findAllScriptsLocalAdminsTest() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson comAdmin = EPersonBuilder.createEPerson(context)
@@ -543,8 +550,13 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void postProcessAdminWithWrongContentTypeBadRequestException() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+                .perform(post("/api/system/scripts/mock-script/processes"))
+                .andExpect(status().isBadRequest());
+
         getClient(token).perform(post("/api/system/scripts/mock-script-invalid/processes"))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().isNotFound());
     }
 
     @Test
