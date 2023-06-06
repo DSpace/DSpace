@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
@@ -20,11 +21,11 @@ import org.dspace.app.rest.RestResourceController;
  */
 @LinksRest(links = {
     @LinkRest(
-            name = BrowseIndexRest.ITEMS,
+            name = BrowseIndexRest.LINK_ITEMS,
             method = "listBrowseItems"
     ),
     @LinkRest(
-            name = BrowseIndexRest.ENTRIES,
+            name = BrowseIndexRest.LINK_ENTRIES,
             method = "listBrowseEntries"
     )
 })
@@ -35,19 +36,37 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
 
     public static final String CATEGORY = RestAddressableModel.DISCOVER;
 
-    public static final String ITEMS = "items";
-    public static final String ENTRIES = "entries";
+    public static final String LINK_ITEMS = "items";
+    public static final String LINK_ENTRIES = "entries";
+    public static final String LINK_VOCABULARY = "vocabulary";
 
-    boolean metadataBrowse;
+    // if the browse index has two levels, the 1st level shows the list of entries like author names, subjects, types,
+    // etc. the second level is the actual list of items linked to a specific entry
+    public static final String BROWSE_TYPE_VALUE_LIST = "valueList";
+    // if the browse index has one level: the full list of items
+    public static final String BROWSE_TYPE_FLAT = "flatBrowse";
+    // if the browse index should display the vocabulary tree. The 1st level shows the tree.
+    // The second level is the actual list of items linked to a specific entry
+    public static final String BROWSE_TYPE_HIERARCHICAL = "hierarchicalBrowse";
 
+    // Shared fields
+    String browseType;
     @JsonProperty(value = "metadata")
     List<String> metadataList;
 
+    // Single browse index fields
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     String dataType;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<SortOption> sortOptions;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     String order;
+
+    // Hierarchical browse fields
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String facetType;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String vocabulary;
 
     @JsonIgnore
     @Override
@@ -58,14 +77,6 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
-    }
-
-    public boolean isMetadataBrowse() {
-        return metadataBrowse;
-    }
-
-    public void setMetadataBrowse(boolean metadataBrowse) {
-        this.metadataBrowse = metadataBrowse;
     }
 
     public List<String> getMetadataList() {
@@ -98,6 +109,38 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
 
     public void setSortOptions(List<SortOption> sortOptions) {
         this.sortOptions = sortOptions;
+    }
+
+    /**
+     * - valueList => if the browse index has two levels, the 1st level shows the list of entries like author names,
+     *      subjects, types, etc. the second level is the actual list of items linked to a specific entry
+     * - flatBrowse if the browse index has one level: the full list of items
+     * - hierarchicalBrowse if the browse index should display the vocabulary tree. The 1st level shows the tree.
+     *      The second level is the actual list of items linked to a specific entry
+     */
+    public void setBrowseType(String browseType) {
+        this.browseType = browseType;
+    }
+
+    public String getBrowseType() {
+        return browseType;
+    }
+
+    public void setFacetType(String facetType) {
+        this.facetType = facetType;
+    }
+
+    public String getFacetType() {
+        return facetType;
+    }
+
+    public void setVocabulary(String vocabulary) {
+        this.vocabulary = vocabulary;
+    }
+
+
+    public String getVocabulary() {
+        return vocabulary;
     }
 
     @Override

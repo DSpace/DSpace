@@ -153,6 +153,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO issn = createMetadatumDTO("dc", "identifier", "issn", "2415-3060");
         MetadatumDTO volume = createMetadatumDTO("oaire", "citation", "volume", "1");
         MetadatumDTO issue = createMetadatumDTO("oaire", "citation", "issue", "2");
+        MetadatumDTO publisher = createMetadatumDTO("dc", "publisher", null,
+                "Petro Mohyla Black Sea National University");
 
         metadatums.add(title);
         metadatums.add(author);
@@ -163,6 +165,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         metadatums.add(issn);
         metadatums.add(volume);
         metadatums.add(issue);
+        metadatums.add(publisher);
 
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -179,6 +182,8 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO issn2 = createMetadatumDTO("dc", "identifier", "issn", "2415-3060");
         MetadatumDTO volume2 = createMetadatumDTO("oaire", "citation", "volume", "1");
         MetadatumDTO issue2 = createMetadatumDTO("oaire", "citation", "issue", "2");
+        MetadatumDTO publisher2 = createMetadatumDTO("dc", "publisher", null,
+                "Petro Mohyla Black Sea National University");
 
         metadatums2.add(title2);
         metadatums2.add(author2);
@@ -189,6 +194,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         metadatums2.add(issn2);
         metadatums2.add(volume2);
         metadatums2.add(issue2);
+        metadatums2.add(publisher2);
 
         ImportRecord secondRecord = new ImportRecord(metadatums2);
         records.add(firstrRecord);
