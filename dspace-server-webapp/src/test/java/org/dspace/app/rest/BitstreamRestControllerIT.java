@@ -1261,11 +1261,11 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         // these formats are configured and files should be downloaded
-        verifyBitstreamDownload(rtf, "text/richtext", true);
-        verifyBitstreamDownload(xml, "text/xml", true);
-        verifyBitstreamDownload(txt, "text/plain", true);
+        verifyBitstreamDownload(rtf, "text/richtext;charset=UTF-8", true);
+        verifyBitstreamDownload(xml, "text/xml;charset=UTF-8", true);
+        verifyBitstreamDownload(txt, "text/plain;charset=UTF-8", true);
         // this format is not configured and should open inline
-        verifyBitstreamDownload(html, "text/html", false);
+        verifyBitstreamDownload(html, "text/html;charset=UTF-8", false);
     }
 
     private void verifyBitstreamDownload(Bitstream file, String contentType, boolean shouldDownload) throws Exception {
