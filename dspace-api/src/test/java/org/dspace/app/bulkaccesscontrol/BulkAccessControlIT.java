@@ -405,6 +405,98 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void performBulkAccessWithNotCommunityAdminEPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // add eperson to admin group
+        Community communityOne = CommunityBuilder.createCommunity(context)
+                                                 .withName("community")
+                                                 .withAdminGroup(eperson)
+                                                 .build();
+
+        Community communityTwo = CommunityBuilder.createCommunity(context)
+                                                 .withName("community")
+                                                 .build();
+
+        context.restoreAuthSystemState();
+
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
+
+        buildJsonFile(json);
+
+        String[] args = new String[] {"bulk-access-control",
+            "-u", communityOne.getID().toString(),
+            "-u", communityTwo.getID().toString(),
+            "-f", tempFilePath,
+            "-e", eperson.getEmail()};
+
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+
+        assertThat(testDSpaceRunnableHandler.getErrorMessages(), hasSize(1));
+        assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
+
+        assertThat(testDSpaceRunnableHandler.getErrorMessages(), hasItem(
+            containsString("Current user is not eligible to execute script bulk-access-control")
+        ));
+    }
+
+    @Test
+    public void performBulkAccessWithNotItemAdminEPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("community")
+                                              .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                    .withName("collection")
+                                                    .build();
+        // add eperson to admin group
+        Item itemOne = ItemBuilder.createItem(context, collection)
+                                  .withAdminUser(eperson)
+                                  .build();
+
+        Item itemTwo = ItemBuilder.createItem(context, collection).build();
+
+        context.restoreAuthSystemState();
+
+        String json = "{ \"item\": {\n" +
+            "      \"mode\": \"add\",\n" +
+            "      \"accessConditions\": [\n" +
+            "          {\n" +
+            "            \"name\": \"openaccess\"\n" +
+            "          }\n" +
+            "      ]\n" +
+            "   }}\n";
+
+        buildJsonFile(json);
+
+        String[] args = new String[] {"bulk-access-control",
+            "-u", itemOne.getID().toString(),
+            "-u", itemTwo.getID().toString(),
+            "-f", tempFilePath,
+            "-e", eperson.getEmail()};
+
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+
+        assertThat(testDSpaceRunnableHandler.getErrorMessages(), hasSize(1));
+        assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
+
+        assertThat(testDSpaceRunnableHandler.getErrorMessages(), hasItem(
+            containsString("Current user is not eligible to execute script bulk-access-control")
+        ));
+    }
+
+    @Test
     public void performBulkAccessWithoutRequiredParamTest() throws Exception {
 
         buildJsonFile("");

@@ -32,7 +32,7 @@ public class BulkAccessControlCliScriptConfiguration<T extends BulkAccessControl
         options.getOption("f").setType(InputStream.class);
         options.getOption("f").setRequired(true);
 
-        options.addOption("e", "eperson", true, "email of eperson doing importing");
+        options.addOption("e", "eperson", true, "email of EPerson used to perform actions");
         options.getOption("e").setRequired(true);
 
         options.addOption("h", "help", false, "help");

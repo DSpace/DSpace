@@ -48,6 +48,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -183,11 +184,22 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             updateItemsAndBitstreamsPolices(accessControl);
             context.complete();
         } catch (Exception e) {
+            e.printStackTrace();
             handler.handleException(e);
             context.abort();
         }
     }
 
+    /**
+     * check the validation of mapped json data, it must
+     * provide item or bitstream information or both of them
+     * and check the validation of item node if provided,
+     * and check the validation of bitstream node if provided.
+     *
+     * @param accessControl mapped json data
+     * @throws SQLException if something goes wrong in the database
+     * @throws BulkAccessControlException if accessControl is invalid
+     */
     private void validate(BulkAccessControlInput accessControl) throws SQLException {
 
         AccessConditionItem item = accessControl.getItem();
@@ -207,6 +219,16 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
+    /**
+     * check the validation of item node, the item mode
+     * must be provided with value 'add' or 'replace'
+     * if mode equals to add so the information
+     * of accessCondition must be provided,
+     * also checking that accessConditions information are valid.
+     *
+     * @param item the item node
+     * @throws BulkAccessControlException if item node is invalid
+     */
     private void validateItemNode(AccessConditionItem item) {
         String mode = item.getMode();
         List<AccessCondition> accessConditions = item.getAccessConditions();
@@ -228,6 +250,18 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
+    /**
+     * check the validation of bitstream node, the bitstream mode
+     * must be provided with value 'add' or 'replace'
+     * if mode equals to add so the information of accessConditions
+     * must be provided,
+     * also checking that constraint information is valid,
+     * also checking that accessConditions information are valid.
+     *
+     * @param bitstream the bitstream node
+     * @throws SQLException if something goes wrong in the database
+     * @throws BulkAccessControlException if bitstream node is invalid
+     */
     private void validateBitstreamNode(AccessConditionBitstream bitstream) throws SQLException {
         String mode = bitstream.getMode();
         List<AccessCondition> accessConditions = bitstream.getAccessConditions();
@@ -251,6 +285,15 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
+    /**
+     * check the validation of constraint node if provided,
+     * constraint isn't supported when multiple uuids are provided
+     * or when uuid isn't an Item
+     *
+     * @param bitstream the bitstream node
+     * @throws SQLException if something goes wrong in the database
+     * @throws BulkAccessControlException if constraint node is invalid
+     */
     private void validateConstraint(AccessConditionBitstream bitstream) throws SQLException {
         if (uuids.size() > 1  && containsConstraints(bitstream)) {
             handler.logError("constraint isn't supported when multiple uuids are provided");
@@ -266,6 +309,15 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
+    /**
+     * check the validation of access condition,
+     * the access condition name must equal to one of configured access conditions,
+     * then call {@link AccessConditionOption#validateResourcePolicy(
+     * Context, String, Date, Date)} if exception happens so, it's invalid.
+     *
+     * @param accessCondition the accessCondition
+     * @throws BulkAccessControlException if the accessCondition is invalid
+     */
     private void validateAccessCondition(AccessCondition accessCondition) {
 
         if (!itemAccessConditions.containsKey(accessCondition.getName())) {
@@ -282,7 +334,18 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    public void updateItemsAndBitstreamsPolices(BulkAccessControlInput accessControl)
+    /**
+     * find all items of provided {@link #uuids} from solr,
+     * then update the resource policies of items
+     * or bitstreams of items (only bitstreams of ORIGINAL bundles)
+     * and derivative bitstreams, or both of them.
+     *
+     * @param accessControl the access control input
+     * @throws SQLException if something goes wrong in the database
+     * @throws SearchServiceException if a search error occurs
+     * @throws AuthorizeException if an authorization error occurs
+     */
+    private void updateItemsAndBitstreamsPolices(BulkAccessControlInput accessControl)
         throws SQLException, SearchServiceException, AuthorizeException {
 
         int counter = 0;
@@ -358,6 +421,17 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         return discoverQuery;
     }
 
+    /**
+     * update the item resource policies,
+     * when mode equals to 'replace' will remove
+     * all current resource polices of types 'TYPE_CUSTOM'
+     * and 'TYPE_INHERITED' then, set the new resource policies.
+     *
+     * @param item the item
+     * @param accessControl the access control input
+     * @throws SQLException if something goes wrong in the database
+     * @throws AuthorizeException if an authorization error occurs
+     */
     private void updateItemPolicies(Item item, BulkAccessControlInput accessControl)
         throws SQLException, AuthorizeException {
 
@@ -372,6 +446,16 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         logInfo(acItem.getAccessConditions(), acItem.getMode(), item);
     }
 
+    /**
+     * create the new resource policies of item.
+     * then, call {@link ItemService#adjustItemPolicies(
+     * Context, Item, Collection)} to adjust item's default policies.
+     *
+     * @param item the item
+     * @param accessControl the access control input
+     * @throws SQLException if something goes wrong in the database
+     * @throws AuthorizeException if an authorization error occurs
+     */
     private void setItemPolicies(Item item, BulkAccessControlInput accessControl)
         throws SQLException, AuthorizeException {
 
@@ -384,6 +468,16 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         itemService.adjustItemPolicies(context, item, item.getOwningCollection());
     }
 
+    /**
+     * update the resource policies of all item's bitstreams
+     * or bitstreams specified into constraint node,
+     * and derivative bitstreams.
+     *
+     * <strong>NOTE:</strong> only bitstreams of ORIGINAL bundles
+     *
+     * @param item the item contains bitstreams
+     * @param accessControl the access control input
+     */
     private void updateBitstreamsPolicies(Item item, BulkAccessControlInput accessControl) {
         AccessConditionBitstream.Constraint constraints = accessControl.getBitstream().getConstraints();
 
@@ -396,12 +490,33 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             .forEach(bitstream -> updateBitstreamPolicies(bitstream, item, accessControl));
     }
 
+    /**
+     * check that the bitstream node is existed,
+     * and contains constraint node,
+     * and constraint contains uuids.
+     *
+     * @param bitstream the bitstream node
+     * @return true when uuids of constraint of bitstream is not empty,
+     * otherwise false
+     */
     private boolean containsConstraints(AccessConditionBitstream bitstream) {
         return Objects.nonNull(bitstream) &&
             Objects.nonNull(bitstream.getConstraints()) &&
             isNotEmpty(bitstream.getConstraints().getUuid());
     }
 
+    /**
+     * update the bitstream resource policies,
+     * when mode equals to replace will remove
+     * all current resource polices of types 'TYPE_CUSTOM'
+     * and 'TYPE_INHERITED' then, set the new resource policies.
+     *
+     * @param bitstream the bitstream
+     * @param item the item of bitstream
+     * @param accessControl the access control input
+     * @throws RuntimeException if something goes wrong in the database
+     * or an authorization error occurs
+     */
     private void updateBitstreamPolicies(Bitstream bitstream, Item item, BulkAccessControlInput accessControl) {
 
         AccessConditionBitstream acBitstream = accessControl.getBitstream();
@@ -420,6 +535,14 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
 
     }
 
+    /**
+     * remove dspace object's read policies.
+     *
+     * @param dso the dspace object
+     * @param type resource policy type
+     * @throws BulkAccessControlException if something goes wrong
+     * in the database or an authorization error occurs
+     */
     private void removeReadPolicies(DSpaceObject dso, String type) {
         try {
             resourcePolicyService.removePolicies(context, dso, type, Constants.READ);
@@ -428,6 +551,18 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
+    /**
+     * create the new resource policies of bitstream.
+     * then, call {@link ItemService#adjustItemPolicies(
+     * Context, Item, Collection)} to adjust bitstream's default policies.
+     * and also update the resource policies of its derivative bitstreams.
+     *
+     * @param bitstream the bitstream
+     * @param item the item of bitstream
+     * @param accessControl the access control input
+     * @throws SQLException if something goes wrong in the database
+     * @throws AuthorizeException if an authorization error occurs
+     */
     private void setBitstreamPolicies(Bitstream bitstream, Item item, BulkAccessControlInput accessControl)
         throws SQLException, AuthorizeException {
 
@@ -440,8 +575,17 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         mediaFilterService.updatePoliciesOfDerivativeBitstreams(context, item, bitstream);
     }
 
+    /**
+     * create the resource policy from the information
+     * comes from the access condition.
+     *
+     * @param obj the dspace object
+     * @param accessCondition the access condition
+     * @param accessConditionOption the access condition option
+     * @throws BulkAccessControlException if an exception occurs
+     */
     private void createResourcePolicy(DSpaceObject obj, AccessCondition accessCondition,
-                                      AccessConditionOption AccessConditionOption) {
+                                      AccessConditionOption accessConditionOption) {
 
         String name = accessCondition.getName();
         String description = accessCondition.getDescription();
@@ -449,7 +593,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         Date endDate = accessCondition.getEndDate();
 
         try {
-            AccessConditionOption.createResourcePolicy(context, obj, name, description, startDate, endDate);
+            accessConditionOption.createResourcePolicy(context, obj, name, description, startDate, endDate);
         } catch (Exception e) {
             throw new BulkAccessControlException(e);
         }

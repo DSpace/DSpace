@@ -74,8 +74,9 @@ public class BulkAccessConditionRestRepository extends DSpaceRestRepository<Bulk
 
     private boolean isAuthorized(Context context) {
         try {
-            return authorizeService.isAdmin(context) || authorizeService.isComColAdmin(context) ||
-                authorizeService.isItemAdmin(context);
+            return context.getCurrentUser() != null &&
+                (authorizeService.isAdmin(context) || authorizeService.isComColAdmin(context) ||
+                    authorizeService.isItemAdmin(context));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
