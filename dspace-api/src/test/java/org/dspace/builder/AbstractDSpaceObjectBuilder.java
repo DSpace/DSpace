@@ -9,7 +9,9 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
@@ -28,6 +30,7 @@ import org.dspace.eperson.Group;
  *
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @param <T> concrete type of DSpaceObject
  */
 public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     extends AbstractBuilder<T, DSpaceObjectService> {
@@ -124,7 +127,12 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setEmbargo(Period embargoPeriod, DSpaceObject dso) {
         // add policy just for anonymous
         try {
-            Date embargoDate = Date.from(Instant.now().plus(embargoPeriod));
+            Instant embargoInstant = LocalDate.now()
+                    .plus(embargoPeriod)
+                    .atStartOfDay()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant();
+            Date embargoDate = Date.from(embargoInstant);
 
             return setOnlyReadPermission(dso, groupService.findByName(context, Group.ANONYMOUS), embargoDate);
         } catch (Exception e) {
