@@ -184,7 +184,6 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             updateItemsAndBitstreamsPolices(accessControl);
             context.complete();
         } catch (Exception e) {
-            e.printStackTrace();
             handler.handleException(e);
             context.abort();
         }
@@ -480,6 +479,14 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
      */
     private void updateBitstreamsPolicies(Item item, BulkAccessControlInput accessControl) {
         AccessConditionBitstream.Constraint constraints = accessControl.getBitstream().getConstraints();
+
+        // look over all the bundles and force initialization of bitstreams collection
+        // to avoid lazy initialization exception
+        long count = item.getBundles()
+                         .stream()
+                         .flatMap(bundle ->
+                             bundle.getBitstreams().stream())
+                         .count();
 
         item.getBundles(CONTENT_BUNDLE_NAME).stream()
             .flatMap(bundle -> bundle.getBitstreams().stream())

@@ -1710,6 +1710,116 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void performBulkAccessWithReplaceModeOnItemsWithMultipleBundlesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+
+        Community parentCommunity = CommunityBuilder.createCommunity(context)
+                                                    .withName("parent community")
+                                                    .build();
+
+        Community subCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                                 .withName("sub community one")
+                                                 .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, subCommunity)
+                                                 .withName("collection one")
+                                                 .build();
+
+        Item itemOne = ItemBuilder.createItem(context, collection).build();
+        Item itemTwo = ItemBuilder.createItem(context, collection).build();
+        ItemBuilder.createItem(context, collection).build();
+
+        Bundle bundleOne = BundleBuilder.createBundle(context, itemOne)
+                                        .withName("ORIGINAL")
+                                        .build();
+
+        Bundle bundleTwo = BundleBuilder.createBundle(context, itemTwo)
+                                        .withName("ORIGINAL")
+                                        .build();
+
+        BundleBuilder.createBundle(context, itemTwo)
+                     .withName("ORIGINAL")
+                     .build();
+
+        BundleBuilder.createBundle(context, itemOne)
+                     .withName("TEXT")
+                     .build();
+
+        Bitstream bitstreamOne;
+        Bitstream bitstreamTwo;
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstreamOne =
+                BitstreamBuilder.createBitstream(context, bundleOne, is)
+                                .withName("bistream of bundle one")
+                                .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstreamTwo =
+                BitstreamBuilder.createBitstream(context, bundleTwo, is)
+                                .withName("bitstream of bundle two")
+                                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String jsonOne = "{\n" +
+            "  \"bitstream\": {\n" +
+            "    \"constraints\": {\n" +
+            "      \"uuid\": []\n" +
+            "    },\n" +
+            "    \"mode\": \"replace\",\n" +
+            "    \"accessConditions\": [\n" +
+            "      {\n" +
+            "        \"name\": \"administrator\",\n" +
+            "        \"startDate\": null,\n" +
+            "        \"endDate\": null\n" +
+            "      }\n" +
+            "    ]\n" +
+            "  }\n" +
+            "}";
+
+        buildJsonFile(jsonOne);
+
+        String[] args = new String[] {
+            "bulk-access-control",
+            "-u", subCommunity.getID().toString(),
+            "-f", tempFilePath,
+            "-e", admin.getEmail()
+        };
+
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+
+        assertThat(testDSpaceRunnableHandler.getErrorMessages(), empty());
+        assertThat(testDSpaceRunnableHandler.getWarningMessages(), empty());
+        assertThat(testDSpaceRunnableHandler.getInfoMessages(), hasSize(2));
+
+        assertThat(testDSpaceRunnableHandler.getInfoMessages(), containsInAnyOrder(
+            containsString("Replacing Bitstream {" + bitstreamOne.getID() +
+                "} policy to access conditions:{administrator}"),
+            containsString("Replacing Bitstream {" + bitstreamTwo.getID() +
+                "} policy to access conditions:{administrator}")
+        ));
+
+        bitstreamOne = context.reloadEntity(bitstreamOne);
+        bitstreamTwo = context.reloadEntity(bitstreamTwo);
+
+        assertThat(bitstreamOne.getResourcePolicies(), hasSize(1));
+        assertThat(bitstreamOne.getResourcePolicies(), hasItem(
+            matches(READ, adminGroup, "administrator", TYPE_CUSTOM)
+        ));
+
+        assertThat(bitstreamTwo.getResourcePolicies(), hasSize(1));
+        assertThat(bitstreamTwo.getResourcePolicies(), hasItem(
+            matches(READ, adminGroup, "administrator", TYPE_CUSTOM)
+        ));
+    }
+
+    @Test
     public void performBulkAccessWithHelpParamTest() throws Exception {
 
         String[] args = new String[] {"bulk-access-control", "-h"};
