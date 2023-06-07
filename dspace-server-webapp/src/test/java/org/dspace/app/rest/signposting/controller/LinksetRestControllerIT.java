@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.List;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -34,7 +33,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
@@ -57,7 +55,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     private static final String doiPattern = "https://doi.org/{0}";
     private static final String orcidPattern = "http://orcid.org/{0}";
     private static final String doi = "10.1007/978-3-642-35233-1_18";
-    private static final String AUTHOR = "Author";
+    private static final String PERSON_ENTITY_TYPE = "Person";
 
     private Collection collection;
 
@@ -247,11 +245,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         getClient().perform(get("/signposting/linksets/" + workspaceItem.getItem().getID() + "/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -265,11 +259,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -284,11 +274,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -305,11 +291,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
-                .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -390,20 +372,22 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findTypedLinkForItem() throws Exception {
+    public void findTypedLinkForItemWithAuthor() throws Exception {
         String bitstreamContent = "ThisIsSomeDummyText";
         String bitstreamMimeType = "text/plain";
         String orcidValue = "orcidValue";
 
         context.turnOffAuthorisationSystem();
 
-        Item author = ItemBuilder.createItem(context, collection)
-                .withMetadata("dspace", "entity", "type", AUTHOR)
+        Collection personCollection = CollectionBuilder.createCollection(context, parentCommunity)
+                .withEntityType(PERSON_ENTITY_TYPE)
+                .build();
+
+        Item author = ItemBuilder.createItem(context, personCollection)
+                .withPersonIdentifierLastName("familyName")
+                .withPersonIdentifierFirstName("firstName")
                 .withMetadata(PERSON.getName(), "identifier", "orcid", orcidValue)
                 .build();
-        List<MetadataValue> metadata = itemService.getMetadata(author, "dspace", "entity",
-                "type", Item.ANY, false);
-        itemService.removeMetadataValues(context, author, List.of(metadata.get(0)));
         Item publication = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
                 .withMetadata("dc", "identifier", "doi", doi)
@@ -420,7 +404,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
 
         EntityType publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-        EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, AUTHOR).build();
+        EntityType authorEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, PERSON_ENTITY_TYPE).build();
         RelationshipType isAuthorOfPublicationRelationshipType =
                 RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publicationEntityType, authorEntityType,
                         "isAuthorOfPublication", "isPublicationOfAuthor",
@@ -434,15 +418,20 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
+        String dcIdentifierUriMetadataValue = itemService
+                .getMetadataFirstValue(publication, "dc", "identifier", "uri", Item.ANY);
+
         getClient().perform(get("/signposting/links/" + publication.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.hasSize(4)))
+                        Matchers.hasSize(5)))
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(orcidPattern, orcidValue) + "' " +
                         "&& @.rel == 'author' " +
                         "&& @.type == 'text/html')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(doiPattern, doi) + "' " +
+                        "&& @.rel == 'cite-as')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + dcIdentifierUriMetadataValue + "' " +
                         "&& @.rel == 'cite-as')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + url + "/bitstreams/" + bitstream.getID() + "/download' " +
                         "&& @.rel == 'item' " +
@@ -569,18 +558,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        Matchers.hasSize(3)))
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/entities/publication/" + item.getID() + "' " +
-                        "&& @.rel == 'collection' " +
-                        "&& @.type == 'text/html')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "' " +
-                        "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "/json" +
-                        "' && @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset+json')]").exists());
+                .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();
@@ -613,18 +591,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        Matchers.hasSize(3)))
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/entities/publication/" + item.getID() + "' " +
-                        "&& @.rel == 'collection' " +
-                        "&& @.type == 'text/html')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "' " +
-                        "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "/json" +
-                        "' && @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset+json')]").exists());
+                .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();
@@ -656,18 +623,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        Matchers.hasSize(3)))
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/items/" + item.getID() + "' " +
-                        "&& @.rel == 'collection' " +
-                        "&& @.type == 'text/html')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "' " +
-                        "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "/json" +
-                        "' && @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset+json')]").exists());
+                .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();

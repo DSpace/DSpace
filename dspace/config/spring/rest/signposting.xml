@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean class="org.dspace.app.rest.signposting.converter.LinksetHttpMessageConverter"/>
 
@@ -10,31 +11,44 @@
         <property name="defaultValue" value="https://schema.org/CreativeWork"/>
     </bean>
 
-    <bean id="itemAuthorSignPosting" class="org.dspace.app.rest.signposting.processor.item.ItemAuthorProcessor">
-        <property name="orcidMetadata" value="person.identifier.orcid"/>
+    <bean id="itemAuthorSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemAuthorProcessor">
+        <property name="orcidMetadata" value="person.identifier.orcid">
+            <description>This metadata field must be used on Person entity.</description>
+        </property>
         <property name="pattern" value="http://orcid.org/{0}"/>
     </bean>
 
-    <bean id="itemIdentifierSignPosting" class="org.dspace.app.rest.signposting.processor.item.ItemIdentifierProcessor">
-        <property name="metadataField" value="dc.identifier.doi"/>
-        <property name="pattern" value="https://doi.org/{0}"/>
+    <bean id="itemIdentifierSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemIdentifierProcessor">
+        <property name="metadataConfigurations" ref="itemIdentifierSignpostingProcessorMetadataConfiguration"/>
     </bean>
+    <util:list id="itemIdentifierSignpostingProcessorMetadataConfiguration">
+        <bean class="org.dspace.app.rest.signposting.model.MetadataConfiguration">
+            <property name="metadataField" value="dc.identifier.doi"/>
+            <property name="pattern" value="https://doi.org/{0}"/>
+        </bean>
+        <bean class="org.dspace.app.rest.signposting.model.MetadataConfiguration">
+            <property name="metadataField" value="dc.identifier.uri"/>
+        </bean>
+    </util:list>
 
-    <bean id="itemContentBitstreamsProcessor"
+    <bean id="itemContentBitstreamsSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.item.ItemContentBitstreamsProcessor"/>
 
-    <bean id="itemTypeProcessor" class="org.dspace.app.rest.signposting.processor.item.ItemTypeProcessor"/>
+    <bean id="itemTypeSignpostingProcessor" class="org.dspace.app.rest.signposting.processor.item.ItemTypeProcessor"/>
 
-    <bean id="itemLicenseTypeProcessor" class="org.dspace.app.rest.signposting.processor.item.ItemLicenseProcessor"/>
+    <bean id="itemLicenseTypeSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemLicenseProcessor"/>
 
-    <bean id="bitstreamParentItemProcessor"
+    <bean id="bitstreamParentItemSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamParentItemProcessor"/>
 
-    <bean id="bitstreamLinksetProcessor"
+    <bean id="bitstreamLinksetSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamLinksetProcessor"/>
 
     <!--	Enable if you want to collect information about resource type at the bitstream level.-->
-    <bean id="bitstreamTypeProcessor"
+    <bean id="bitstreamTypeSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamTypeProcessor"/>
 
 </beans>

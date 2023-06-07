@@ -7,14 +7,19 @@
  */
 package org.dspace.app.rest.signposting.processor.item;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRelationType;
+import org.dspace.app.rest.signposting.model.MetadataConfiguration;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -35,6 +40,8 @@ public class ItemIdentifierProcessor extends ItemSignpostingProcessor {
      */
     private static final Logger log = Logger.getLogger(ItemIdentifierProcessor.class);
 
+    private List<MetadataConfiguration> metadataConfigurations;
+
     private final ItemService itemService;
 
     public ItemIdentifierProcessor(FrontendUrlService frontendUrlService, ItemService itemService) {
@@ -46,14 +53,23 @@ public class ItemIdentifierProcessor extends ItemSignpostingProcessor {
     @Override
     public void addLinkSetNodes(Context context, HttpServletRequest request,
                                 Item item, List<LinksetNode> linksetNodes) {
+        getMetadataConfigurations()
+                .forEach(metadataHandle -> handleMetadata(context, item, linksetNodes, metadataHandle));
+    }
+
+    private void handleMetadata(Context context,
+                                Item item,
+                                List<LinksetNode> linksetNodes,
+                                MetadataConfiguration metadataConfiguration) {
         try {
-            List<MetadataValue> identifiers = itemService.getMetadataByMetadataString(item, getMetadataField());
+            List<MetadataValue> identifiers = itemService
+                    .getMetadataByMetadataString(item, metadataConfiguration.getMetadataField());
             for (MetadataValue identifier : identifiers) {
-                if (identifier != null) {
+                if (nonNull(identifier)) {
                     String identifierValue = identifier.getValue();
-                    if (StringUtils.isNotBlank(identifierValue)) {
-                        if (StringUtils.isNotBlank(getPattern())) {
-                            identifierValue = MessageFormat.format(getPattern(), identifierValue);
+                    if (isNotBlank(identifierValue)) {
+                        if (isNotBlank(metadataConfiguration.getPattern())) {
+                            identifierValue = MessageFormat.format(metadataConfiguration.getPattern(), identifierValue);
                         }
                         linksetNodes.add(new LinksetNode(identifierValue, getRelation(), buildAnchor(context, item)));
                     }
@@ -64,4 +80,14 @@ public class ItemIdentifierProcessor extends ItemSignpostingProcessor {
         }
     }
 
+    public List<MetadataConfiguration> getMetadataConfigurations() {
+        if (isNull(metadataConfigurations)) {
+            metadataConfigurations = new ArrayList<>();
+        }
+        return metadataConfigurations;
+    }
+
+    public void setMetadataConfigurations(List<MetadataConfiguration> metadataConfigurations) {
+        this.metadataConfigurations = metadataConfigurations;
+    }
 }

@@ -76,7 +76,7 @@ public class LinksetRestController {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
     @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/json",
             method = RequestMethod.GET, produces = "application/linkset+json")
     public LinksetRest getJson(HttpServletRequest request, @PathVariable UUID uuid) {
@@ -102,7 +102,7 @@ public class LinksetRestController {
         }
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
     @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID,
             method = RequestMethod.GET, produces = "application/linkset")
     public LinksetRest getLset(HttpServletRequest request, @PathVariable UUID uuid) {
@@ -135,7 +135,7 @@ public class LinksetRestController {
         }
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ') && hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping(value = "/links" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
     public List<TypedLinkRest> getHeader(HttpServletRequest request, @PathVariable UUID uuid) {
         try {
