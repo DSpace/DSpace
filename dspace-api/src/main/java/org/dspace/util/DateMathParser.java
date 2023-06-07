@@ -26,12 +26,15 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
- * This class (Apache license) is copied from Apache Solr and add some tweaks to resolve unneeded dependency:
- * https://raw.githubusercontent.com/apache/lucene-solr/releases/lucene-solr/7.1.0/solr/core/src/java/org/apache/solr
- * /util/DateMathParser.java
+ * This class (Apache license) is copied from Apache Solr, adding some tweaks to
+ * resolve an unneeded dependency.  See
+ * <a href='https://raw.githubusercontent.com/apache/lucene-solr/releases/lucene-solr/7.1.0/solr/core/src/java/org/apache/solr/util/DateMathParser.java'>the original</a>.
  *
+ * <p>
  * A Simple Utility class for parsing "math" like strings relating to Dates.
  *
  * <p>
@@ -78,7 +81,7 @@ import java.util.regex.Pattern;
  * "<code>setNow</code>" in the interim).  The default value of 'now' is
  * the time at the moment the <code>DateMathParser</code> instance is
  * constructed, unless overridden by the {@link CommonParams#NOW NOW}
- * request param.
+ * request parameter.
  * </p>
  *
  * <p>
@@ -88,7 +91,7 @@ import java.util.regex.Pattern;
  * cascades to rounding of HOUR, MIN, MONTH, YEAR as well.  The default
  * <code>TimeZone</code> used is <code>UTC</code> unless  overridden by the
  * {@link CommonParams#TZ TZ}
- * request param.
+ * request parameter.
  * </p>
  *
  * <p>
@@ -101,6 +104,8 @@ import java.util.regex.Pattern;
  * @see SolrRequestInfo#getNOW
  */
 public class DateMathParser {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
@@ -119,12 +124,12 @@ public class DateMathParser {
 
     /**
      * A mapping from (uppercased) String labels identifying time units,
-     * to the corresponding {@link ChronoUnit} enum (e.g. "YEARS") used to
+     * to the corresponding {@link ChronoUnit} value (e.g. "YEARS") used to
      * set/add/roll that unit of measurement.
      *
      * <p>
      * A single logical unit of time might be represented by multiple labels
-     * for convenience (ie: <code>DATE==DAYS</code>,
+     * for convenience (i.e. <code>DATE==DAYS</code>,
      * <code>MILLI==MILLIS</code>)
      * </p>
      *
@@ -220,6 +225,7 @@ public class DateMathParser {
      *
      * @param now an optional fixed date to use as "NOW"
      * @param val the string to parse
+     * @return result of applying the parsed expression to "NOW".
      * @throws Exception
      */
     public static Date parseMath(Date now, String val) throws Exception {
@@ -308,6 +314,7 @@ public class DateMathParser {
     /**
      * Defines this instance's concept of "now".
      *
+     * @param n new value of "now".
      * @see #getNow
      */
     public void setNow(Date n) {
@@ -316,12 +323,12 @@ public class DateMathParser {
 
     /**
      * Returns a clone of this instance's concept of "now" (never null).
-     *
      * If setNow was never called (or if null was specified) then this method
      * first defines 'now' as the value dictated by the SolrRequestInfo if it
      * exists -- otherwise it uses a new Date instance at the moment getNow()
      * is first called.
      *
+     * @return "now".
      * @see #setNow
      * @see SolrRequestInfo#getNOW
      */
@@ -334,15 +341,20 @@ public class DateMathParser {
     }
 
     /**
-     * Parses a string of commands relative "now" are returns the resulting Date.
+     * Parses a date expression relative to "now".
      *
-     * @throws ParseException positions in ParseExceptions are token positions, not character positions.
+     * @param math a date expression such as "+24MONTHS".
+     * @return the result of applying the expression to the current time.
+     * @throws ParseException positions in ParseExceptions are token positions,
+     *          not character positions.
      */
     public Date parseMath(String math) throws ParseException {
         /* check for No-Op */
         if (0 == math.length()) {
             return getNow();
         }
+
+        LOG.debug("parsing {}", math);
 
         ZoneId zoneId = zone.toZoneId();
         // localDateTime is a date and time local to the timezone specified
@@ -394,11 +406,44 @@ public class DateMathParser {
             }
         }
 
+        LOG.debug("returning {}", localDateTime);
         return Date.from(ZonedDateTime.of(localDateTime, zoneId).toInstant());
     }
 
     private static Pattern splitter = Pattern.compile("\\b|(?<=\\d)(?=\\D)");
 
+    /**
+     * For manual testing.  With one argument, test one-argument parseMath.
+     * With two (or more) arguments, test two-argument parseMath.
+     *
+     * @param argv date math expressions.
+     * @throws java.lang.Exception passed through.
+     */
+    public static void main(String[] argv)
+            throws Exception {
+        DateMathParser parser = new DateMathParser();
+        try {
+            Date parsed;
+
+            if (argv.length <= 0) {
+                System.err.println("Date math expression(s) expected.");
+            }
+
+            if (argv.length > 0) {
+                parsed = parser.parseMath(argv[0]);
+                System.out.format("Applied %s to implicit current time:  %s%n",
+                        argv[0], parsed.toString());
+            }
+
+            if (argv.length > 1) {
+                parsed = DateMathParser.parseMath(new Date(), argv[1]);
+                System.out.format("Applied %s to explicit current time:  %s%n",
+                        argv[1], parsed.toString());
+            }
+        } catch (ParseException ex) {
+            System.err.format("Oops:  %s%n", ex.getMessage());
+        }
+    }
 }
 
 
