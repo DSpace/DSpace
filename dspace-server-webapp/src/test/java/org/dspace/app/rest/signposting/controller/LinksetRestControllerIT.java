@@ -295,6 +295,20 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneUnDiscoverableItemJsonLinksets() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Withdrawn Item")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .makeUnDiscoverable()
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findOneBitstreamJsonLinksets() throws Exception {
         String bitstreamContent = "ThisIsSomeDummyText";
         String bitstreamMimeType = "text/plain";
@@ -369,6 +383,19 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(content().string(Matchers.containsString(siteAsRelation)))
                 .andExpect(content().string(Matchers.containsString(itemRelation)))
                 .andExpect(content().string(Matchers.containsString(typeRelation)));
+    }
+
+    @Test
+    public void findOneUnDiscoverableItemLsetLinksets() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .makeUnDiscoverable()
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/linksets/" + item.getID())
+                        .header("Accept", "application/linkset"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -622,6 +649,23 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
+                        .header("Accept", "application/json"))
+                .andExpect(status().isUnauthorized());
+
+        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
+        metadataAuthorityService.clearCache();
+        choiceAuthorityService.clearCache();
+    }
+
+    @Test
+    public void findTypedLinkForUnDiscoverableItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .makeUnDiscoverable()
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/links/" + item.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isUnauthorized());
 
