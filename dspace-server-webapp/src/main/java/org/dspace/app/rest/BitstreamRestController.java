@@ -210,10 +210,12 @@ public class BitstreamRestController {
     private boolean checkFormatForContentDisposition(BitstreamFormat format) {
         List<String> formats = List.of((configurationService.getArrayProperty("webui.content_disposition_format")));
         boolean download = formats.contains(format.getMIMEType());
-        for (String ext : format.getExtensions()) {
-            if (formats.contains(ext)) {
-                download = true;
-                break;
+        if (!download) {
+            for (String ext : format.getExtensions()) {
+                if (formats.contains(ext)) {
+                    download = true;
+                    break;
+                }
             }
         }
         return download;
