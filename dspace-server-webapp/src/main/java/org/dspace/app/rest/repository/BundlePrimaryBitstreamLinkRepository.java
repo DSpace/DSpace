@@ -39,6 +39,10 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
 
     /**
      * Retrieves the primaryBitstream of a Bundle.
+     * Returns null if Bundle doesn't have a primaryBitstream.
+     * <br><code>
+     * curl -X GET "http://{dspace.server.url}/api/core/bundles/{bundle-uuid}/primaryBitstream"
+     * </code>
      *
      * @param request           The HttpServletRequest if relevant
      * @param bundleId          The UUID of the Bundle

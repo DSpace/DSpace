@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
 import org.dspace.app.rest.repository.BundlePrimaryBitstreamLinkRepository;
@@ -52,30 +51,6 @@ public class PrimaryBitstreamController {
     private ConverterService converter;
     @Autowired
     private Utils utils;
-
-    /**
-     * This method retrieves a primaryBitstream on the given Bundle.
-     * Returns null if Bundle doesn't have a primaryBitstream.
-     * <br><code>
-     * curl -X GET "http://{dspace.server.url}/api/core/bundles/{bundle-uuid}/primaryBitstream"
-     * </code>
-     *
-     * @param uuid      The UUID of the Bundle of which the primaryBitstream will be retrieved
-     * @param request   The HttpServletRequest
-     * @return          The primaryBitstream, or null if not found
-     */
-    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'READ')")
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<RepresentationModel<?>> getPrimaryBitstream(@PathVariable UUID uuid,
-                                                 HttpServletRequest request) {
-        BitstreamRest bitstreamRest = repository.getPrimaryBitstream(null, uuid, null, utils.obtainProjection());
-        if (bitstreamRest == null) {
-            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
-        } else {
-            return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(),
-                                                    (RepresentationModel<?>) converter.toResource(bitstreamRest));
-        }
-    }
 
     /**
      * This method creates a primaryBitstream on the given Bundle.
