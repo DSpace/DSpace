@@ -43,6 +43,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -753,6 +754,19 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public boolean isCollectionAdmin(Context context) throws SQLException {
         return performCheck(context, "search.resourcetype:" + IndexableCollection.TYPE);
+    }
+
+    /**
+     * Checks that the context's current user is an item admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is an item admin in the site
+     *                  false when this is not the case, or an exception occurred
+     * @throws java.sql.SQLException passed through.
+     */
+    @Override
+    public boolean isItemAdmin(Context context) throws SQLException {
+        return performCheck(context, "search.resourcetype:" + IndexableItem.TYPE);
     }
 
     /**
