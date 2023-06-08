@@ -159,6 +159,17 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                     resourceQuery.append(" OR g").append(group.getID());
                 }
 
+                // DS-8182: Also allow submitter to be able to search their own submission without explicit READ
+                // permission when they are in their workspace
+                // (check if we need this specific limitation, remove if not needed)
+                boolean isWorkspace = StringUtils.startsWith(
+                        discoveryQuery.getDiscoveryConfigurationName(),
+                        SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME
+                );
+                if (isWorkspace) {
+                    resourceQuery.append(" OR submitter_authority:(" + currentUser.getID() + ")");
+                }
+
                 resourceQuery.append(")");
 
                 String locations = DSpaceServicesFactory.getInstance()

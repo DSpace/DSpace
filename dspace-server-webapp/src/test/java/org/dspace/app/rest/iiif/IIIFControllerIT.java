@@ -936,6 +936,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Restricted item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubmitter(admin)
                 .enableIIIF()
                 .withIIIFCanvasWidth(2000)
                 .withIIIFCanvasHeight(3000)
@@ -1126,6 +1127,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
+                                      .withSubmitter(admin)
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .enableIIIF()
                                       .build();
@@ -1248,6 +1250,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
+                                      .withSubmitter(admin)
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .enableIIIF()
                                       .build();
