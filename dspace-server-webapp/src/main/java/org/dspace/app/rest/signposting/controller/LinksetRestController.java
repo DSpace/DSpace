@@ -139,6 +139,10 @@ public class LinksetRestController {
         }
     }
 
+    // In @PreAuthorize(...) we're using "&&" (and) instead of "||" (or) because if hasPermission() is unable
+    // to find object of specified type with specified uuid it returns "true".
+    // For example: if we pass uuid of Bitstream: hasPermission(#uuid, 'ITEM', 'READ') returns "true", because
+    // it will use ItemService with uuid of bitstream.
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ') && hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping(value = "/links" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
     public List<TypedLinkRest> getHeader(HttpServletRequest request, @PathVariable UUID uuid) {
