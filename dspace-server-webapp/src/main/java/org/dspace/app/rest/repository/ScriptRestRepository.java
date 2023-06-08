@@ -59,7 +59,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Override
     // authorization is verified inside the method
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ScriptRest findOne(Context context, String name) {
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
         if (scriptConfiguration != null) {
@@ -74,7 +74,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
 
     @Override
     // authorization check is performed inside the script service
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
         List<ScriptConfiguration> scriptConfigurations =
             scriptService.getScriptConfigurations(context);
