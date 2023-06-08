@@ -7,14 +7,18 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -24,6 +28,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
@@ -39,6 +44,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableItem;
@@ -728,6 +735,64 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertEquals(numberItemsSubject2, counter);
         for (Item item : itemsSubject2) {
             assertTrue(foundItems.contains(item));
+        }
+    }
+
+    /**
+     * Test designed to check if default sort option for Discovery is working, using <code>workspace</code>
+     * DiscoveryConfiguration <br/>
+     * <b>Note</b>: this test will be skipped if <code>workspace</code> do not have a default sort option set and of
+     * metadataType <code>dc_date_accessioned</code> or <code>lastModified</code>
+     * @throws SearchServiceException
+     */
+    @Test
+    public void searchWithDefaultSortServiceTest() throws SearchServiceException {
+        DiscoveryConfiguration workspaceConf =
+            SearchUtils.getDiscoveryConfiguration(context, DISCOVER_WORKSPACE_CONFIGURATION_NAME, null);
+        // Skip if no default sort option set for workspaceConf
+        if (workspaceConf.getSearchSortConfiguration().getDefaultSortField() == null) {
+            return;
+        }
+
+        DiscoverySortFieldConfiguration defaultSortField =
+                workspaceConf.getSearchSortConfiguration().getDefaultSortField();
+
+        // Populate the testing objects: create items in eperson's workspace and perform search in it
+        int numberItems = 10;
+        context.turnOffAuthorisationSystem();
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org").build();
+        context.setCurrentUser(submitter);
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItems; i++) {
+            ItemBuilder.createItem(context, collection)
+                    .withTitle("item " + i)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Build query with default parameters (except for workspaceConf)
+        DiscoverQuery discoverQuery = SearchUtils.getQueryBuilder()
+                .buildQuery(context, new IndexableCollection(collection), workspaceConf,"",null,"Item",null,null,
+                        null,null);
+
+        DiscoverResult result = searchService.search(context, discoverQuery);
+
+        /*
+        // code example for testing against sort by dc_date_accessioned
+        LinkedList<String> dc_date_accesioneds = result.getIndexableObjects().stream()
+                .map(o -> ((Item) o.getIndexedObject()).getMetadata())
+                .map(l -> l.stream().filter(m -> m.getMetadataField().toString().equals("dc_date_accessioned"))
+                                .map(m -> m.getValue()).findFirst().orElse("")
+                )
+                .collect(Collectors.toCollection(LinkedList::new));
+        }*/
+        LinkedList<String> lastModifieds = result.getIndexableObjects().stream()
+                .map(o -> ((Item) o.getIndexedObject()).getLastModified().toString())
+                .collect(Collectors.toCollection(LinkedList::new));
+        assertFalse(lastModifieds.isEmpty());
+        for (int i = 1; i < lastModifieds.size() - 1; i++) {
+            assertTrue(lastModifieds.get(i).compareTo(lastModifieds.get(i + 1)) >= 0);
         }
     }
 

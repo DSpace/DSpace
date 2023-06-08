@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ENTRIES)
+@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.LINK_ENTRIES)
 public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
@@ -127,7 +127,8 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
     @Override
     public boolean isEmbeddableRelation(Object data, String name) {
         BrowseIndexRest bir = (BrowseIndexRest) data;
-        if (bir.isMetadataBrowse() && "entries".equals(name)) {
+        if (bir.getBrowseType().equals(BrowseIndexRest.BROWSE_TYPE_VALUE_LIST) &&
+                name.equals(BrowseIndexRest.LINK_ENTRIES)) {
             return true;
         }
         return false;
