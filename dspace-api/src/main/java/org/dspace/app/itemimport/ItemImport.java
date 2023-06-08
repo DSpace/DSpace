@@ -332,17 +332,19 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
      */
     protected void readZip(Context context, ItemImportService itemImportService) throws Exception {
         Optional<InputStream> optionalFileStream = Optional.empty();
+        Optional<InputStream> validationFileStream = Optional.empty();
         if (!remoteUrl) {
             // manage zip via upload
             optionalFileStream = handler.getFileStream(context, zipfilename);
+            validationFileStream = handler.getFileStream(context, zipfilename);
         } else {
             // manage zip via remote url
             optionalFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
+            validationFileStream = Optional.ofNullable(new URL(zipfilename).openStream());
         }
 
-        if (optionalFileStream.isPresent()) {
+        if (validationFileStream.isPresent()) {
             // validate zip file
-            Optional<InputStream> validationFileStream = handler.getFileStream(context, zipfilename);
             if (validationFileStream.isPresent()) {
                 validateZip(validationFileStream.get());
             }
