@@ -7,16 +7,27 @@
  */
 package org.dspace.scripts.configuration;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.commons.cli.Options;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class represents an Abstract class that a ScriptConfiguration can inherit to further implement this
- * and represent a script's configuration
+ * and represent a script's configuration.
+ * By default script are available only to repository administrators script that have a broader audience
+ * must override the {@link #isAllowedToExecute(Context, List)} method.
  */
 public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements BeanNameAware {
+
+    @Autowired
+    protected AuthorizeService authorizeService;
 
     /**
      * The possible options for this script
@@ -70,14 +81,23 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
      * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this IndexDiscoveryScriptConfiguration
      */
     public abstract void setDspaceRunnableClass(Class<T> dspaceRunnableClass);
+
     /**
      * This method will return if the script is allowed to execute in the given context. This is by default set
      * to the currentUser in the context being an admin, however this can be overwritten by each script individually
      * if different rules apply
      * @param context   The relevant DSpace context
+     * @param commandLineParameters the parameters that will be used to start the process if known,
+     *        <code>null</code> otherwise
      * @return          A boolean indicating whether the script is allowed to execute or not
      */
-    public abstract boolean isAllowedToExecute(Context context);
+    public boolean isAllowedToExecute(Context context, List<DSpaceCommandLineParameter> commandLineParameters) {
+        try {
+            return authorizeService.isAdmin(context);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
+        }
+    }
 
     /**
      * The getter for the options of the Script
