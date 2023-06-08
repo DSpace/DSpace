@@ -131,8 +131,14 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
      * @param context       The current DSpace context
      * @param bundleId      The UUID of the Bundle
      * @param bitstream     The Bitstream to use as primaryBitstream
-     * @param shouldBeSet   Whether a primaryBitstream is should already be set
+     * @param shouldBeSet   Whether a primaryBitstream should already be set:
+     *                      primaryBitstream should be present before updating or deleting,
+     *                      it should be null before adding
      * @return              The Bundle
+     * @throws ResourceNotFoundException if the bundle is not found
+     * @throws DSpaceBadRequestException if primaryBitstream exists during an POST,
+     *                                   if primaryBitstream is null during an UPDATE or DELETE
+     * @throws UnprocessableEntityException if the bundle does not contain the bitstream
      */
     private Bundle setPrimaryBitstream(Context context, UUID bundleId, Bitstream bitstream, boolean shouldBeSet)
         throws SQLException {

@@ -82,7 +82,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         bundle.setPrimaryBitstreamID(bitstream);
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get(getBundleUrl(bundle.getID())))
+        getClient(token).perform(get(getBundlePrimaryBitstreamUrl(bundle.getID())))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", BitstreamMatcher.matchProperties(bitstream)));
     }
@@ -90,14 +90,14 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testGetPrimaryBitstreamBundleNotFound() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get(getBundleUrl(UUID.randomUUID())))
+        getClient(token).perform(get(getBundlePrimaryBitstreamUrl(UUID.randomUUID())))
                         .andExpect(status().isNotFound());
     }
 
     @Test
     public void testGetPrimaryBitstreamNonExisting() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get(getBundleUrl(bundle.getID())))
+        getClient(token).perform(get(getBundlePrimaryBitstreamUrl(bundle.getID())))
                         .andExpect(status().isNoContent())
                         .andExpect(jsonPath("$").doesNotExist());
     }
@@ -105,7 +105,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testPostPrimaryBitstream() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post(getBundleUrl(bundle.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isCreated())
@@ -119,7 +119,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testPostPrimaryBitstreamBundleNotFound() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post(getBundleUrl(UUID.randomUUID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(UUID.randomUUID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isNotFound());
@@ -131,7 +131,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testPostPrimaryBitstreamInvalidBitstream() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post(getBundleUrl(bundle.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(UUID.randomUUID())))
                         .andExpect(status().isUnprocessableEntity());
@@ -148,7 +148,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post(getBundleUrl(bundle.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isBadRequest());
@@ -165,7 +165,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post(getBundleUrl(bundle.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isUnprocessableEntity());
@@ -186,7 +186,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(post(getBundleUrl(bundle2.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle2.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isCreated())
@@ -208,7 +208,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(post(getBundleUrl(bundle2.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle2.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isCreated())
@@ -229,7 +229,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(post(getBundleUrl(bundle2.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle2.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isCreated())
@@ -244,7 +244,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     public void testPostPrimaryBitstreamForbidden() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(post(getBundleUrl(bundle.getID()))
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isForbidden());
@@ -252,7 +252,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
 
     @Test
     public void testPostPrimaryBitstreamUnauthenticated() throws Exception {
-        getClient().perform(post(getBundleUrl(bundle.getID()))
+        getClient().perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isUnauthorized());
@@ -266,7 +266,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put(getBundleUrl(bundle.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isOk())
@@ -280,7 +280,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testUpdatePrimaryBitstreamBundleNotFound() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put(getBundleUrl(UUID.randomUUID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(UUID.randomUUID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isNotFound());
@@ -291,7 +291,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         bundle.setPrimaryBitstreamID(bitstream);
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put(getBundleUrl(bundle.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(UUID.randomUUID())))
                         .andExpect(status().isUnprocessableEntity());
@@ -303,7 +303,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testUpdatePrimaryBitstreamNonExisting() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put(getBundleUrl(bundle.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isBadRequest());
@@ -321,7 +321,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(put(getBundleUrl(bundle.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isUnprocessableEntity());
@@ -344,7 +344,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(put(getBundleUrl(bundle2.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle2.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream3.getID())))
                         .andExpect(status().isOk())
@@ -368,7 +368,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(put(getBundleUrl(bundle2.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle2.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream3.getID())))
                         .andExpect(status().isOk())
@@ -391,7 +391,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(put(getBundleUrl(bundle2.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle2.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream3.getID())))
                         .andExpect(status().isOk())
@@ -410,7 +410,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(put(getBundleUrl(bundle.getID()))
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isForbidden());
@@ -423,7 +423,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         Bitstream bitstream2 = createBitstream(bundle);
         context.restoreAuthSystemState();
 
-        getClient().perform(put(getBundleUrl(bundle.getID()))
+        getClient().perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isUnauthorized());
@@ -434,7 +434,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         bundle.setPrimaryBitstreamID(bitstream);
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(bundle.getID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID())))
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle = context.reloadEntity(bundle);
@@ -447,14 +447,14 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     @Test
     public void testDeletePrimaryBitstreamBundleNotFound() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(UUID.randomUUID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(UUID.randomUUID())))
                         .andExpect(status().isNotFound());
     }
 
     @Test
     public void testDeletePrimaryBitstreamBundleNonExisting() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(bundle.getID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID())))
                         .andExpect(status().isBadRequest());
         // verify primaryBitstream is still null
         bundle = context.reloadEntity(bundle);
@@ -474,7 +474,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(bundle2.getID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle2.getID())))
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle2 = context.reloadEntity(bundle2);
@@ -496,7 +496,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(bundle2.getID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle2.getID())))
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle2 = context.reloadEntity(bundle2);
@@ -517,7 +517,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(bundle2.getID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle2.getID())))
                         .andExpect(status().isNoContent());
         // verify primaryBitstream was actually deleted
         bundle2 = context.reloadEntity(bundle2);
@@ -532,7 +532,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         bundle.setPrimaryBitstreamID(bitstream);
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(delete(getBundleUrl(bundle.getID())))
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID())))
                         .andExpect(status().isForbidden());
     }
 
@@ -540,11 +540,11 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     public void testDeletePrimaryBitstreamUnauthenticated() throws Exception {
         bundle.setPrimaryBitstreamID(bitstream);
 
-        getClient().perform(delete(getBundleUrl(bundle.getID())))
+        getClient().perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID())))
                         .andExpect(status().isUnauthorized());
     }
 
-    private String getBundleUrl(UUID uuid) {
+    private String getBundlePrimaryBitstreamUrl(UUID uuid) {
         return "/api/core/bundles/" + uuid + "/primaryBitstream";
     }
 

@@ -128,8 +128,7 @@ public class PrimaryBitstreamController {
     private Bitstream getBitstreamFromRequest(Context context, HttpServletRequest request) {
         List<DSpaceObject> dsoList = utils.constructDSpaceObjectList(context, utils.getStringListFromRequest(request));
         if (dsoList.size() != 1 || dsoList.get(0).getType() != BITSTREAM) {
-            throw new UnprocessableEntityException("No bitstream has been specified " +
-                                                       "or the data cannot be resolved to a bitstream.");
+            throw new UnprocessableEntityException("URI does not resolve to an existing bitstream.");
         }
         return (Bitstream) dsoList.get(0);
     }
