@@ -37,7 +37,7 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public List<ScriptConfiguration> getScriptConfigurations(Context context) {
         return serviceManager.getServicesByType(ScriptConfiguration.class).stream().filter(
-            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context))
+            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context, null))
                              .sorted(Comparator.comparing(ScriptConfiguration::getName))
                              .collect(Collectors.toList());
     }
