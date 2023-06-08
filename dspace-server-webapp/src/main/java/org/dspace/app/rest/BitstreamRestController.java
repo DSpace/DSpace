@@ -198,6 +198,10 @@ public class BitstreamRestController {
     }
 
     private boolean checkFormatForContentDisposition(BitstreamFormat format) {
+        // never automatically download undefined formats
+        if (format == null) {
+            return false;
+        }
         List<String> formats = List.of((configurationService.getArrayProperty("webui.content_disposition_format")));
         boolean download = formats.contains(format.getMIMEType());
         if (!download) {
