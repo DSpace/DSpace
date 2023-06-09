@@ -166,12 +166,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         bitstream.setStoreNumber(assetstore);
         bitstreamService.update(context, bitstream);
 
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("size_bytes", null);
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
+        List<String> wantedMetadata = List.of("size_bytes", "checksum", "checksum_algorithm");
+        Map<String, Object> receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
 
-        Map receivedMetadata = this.getStore(assetstore).about(bitstream, wantedMetadata);
         if (MapUtils.isEmpty(receivedMetadata)) {
             String message = "Not able to register bitstream:" + bitstream.getID() + " at path: " + bitstreamPath;
             log.error(message);
@@ -201,13 +198,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
-    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException {
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
-
-        Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
-        return receivedMetadata;
+    public Map<String, Object> computeChecksum(Context context, Bitstream bitstream) throws IOException {
+        return this.getStore(bitstream.getStoreNumber()).about(bitstream, List.of("checksum", "checksum_algorithm"));
     }
 
     @Override
@@ -247,10 +239,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
                 for (Bitstream bitstream : storage) {
                     UUID bid = bitstream.getID();
-                    Map wantedMetadata = new HashMap();
-                    wantedMetadata.put("size_bytes", null);
-                    wantedMetadata.put("modified", null);
-                    Map receivedMetadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, wantedMetadata);
+                    List<String> wantedMetadata = List.of("size_bytes", "modified");
+                    Map<String, Object> receivedMetadata = this.getStore(bitstream.getStoreNumber())
+                        .about(bitstream, wantedMetadata);
 
 
                     // Make sure entries which do not exist are removed
@@ -348,13 +339,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     @Nullable
     @Override
     public Long getLastModified(Bitstream bitstream) throws IOException {
-        Map attrs = new HashMap();
-        attrs.put("modified", null);
-        attrs = this.getStore(bitstream.getStoreNumber()).about(bitstream, attrs);
-        if (attrs == null || !attrs.containsKey("modified")) {
+        Map<String, Object> metadata = this.getStore(bitstream.getStoreNumber()).about(bitstream, List.of("modified"));
+        if (metadata == null || !metadata.containsKey("modified")) {
             return null;
         }
-        return Long.valueOf(attrs.get("modified").toString());
+        return Long.valueOf(metadata.get("modified").toString());
     }
 
     /**

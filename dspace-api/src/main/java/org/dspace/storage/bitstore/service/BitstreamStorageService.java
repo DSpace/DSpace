@@ -102,7 +102,7 @@ public interface BitstreamStorageService {
     public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
         throws SQLException, IOException, AuthorizeException;
 
-    public Map computeChecksum(Context context, Bitstream bitstream) throws IOException;
+    public Map<String, Object> computeChecksum(Context context, Bitstream bitstream) throws IOException;
 
     /**
      * Does the internal_id column in the bitstream row indicate the bitstream
