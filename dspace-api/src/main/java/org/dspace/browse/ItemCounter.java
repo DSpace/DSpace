@@ -50,6 +50,12 @@ public class ItemCounter {
      */
     private Context context;
 
+    /**
+     * This field is used to hold singular instance of a class.
+     * Singleton pattern is used but this class should be
+     * refactored to modern DSpace approach (injectible service).
+     */
+
     private static ItemCounter instance;
 
     protected ItemService itemService;
@@ -73,6 +79,13 @@ public class ItemCounter {
         this.useCache = configurationService.getBooleanProperty("webui.strengths.cache", true);
     }
 
+    /**
+     * Get the singular instance of a class.
+     * It creates a new instance at the first usage of this method.
+     *
+     * @return instance af a class
+     * @throws ItemCountException when error occurs
+     */
     public static ItemCounter getInstance() throws ItemCountException {
         if (instance == null) {
             instance = new ItemCounter(ContextUtil.obtainCurrentRequestContext());

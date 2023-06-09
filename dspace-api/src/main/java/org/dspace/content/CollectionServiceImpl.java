@@ -1069,6 +1069,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return collectionList;
     }
 
+    /**
+     * Returns total collection archived items
+     *
+     * @param collection       Collection
+     * @return                 total collection archived items
+     * @throws ItemCountException
+     */
     @Override
     public int countArchivedItem(Collection collection) throws ItemCountException {
         return ItemCounter.getInstance().getCount(collection);

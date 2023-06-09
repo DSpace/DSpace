@@ -294,5 +294,12 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
 
     int countTotal(Context context) throws SQLException;
 
+    /**
+     * Returns total community archived items
+     *
+     * @param community       Community
+     * @return                total community archived items
+     * @throws ItemCountException
+     */
     int getArchivedItems(Community community) throws ItemCountException;
 }

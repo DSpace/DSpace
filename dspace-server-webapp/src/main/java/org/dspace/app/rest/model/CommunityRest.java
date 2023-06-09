@@ -59,13 +59,13 @@ public class CommunityRest extends DSpaceObjectRest {
         return NAME;
     }
 
-    private int archivedItems;
+    private int archivedItemsCount;
 
-    public int getArchivedItems() {
-        return archivedItems;
+    public int getArchivedItemsCount() {
+        return archivedItemsCount;
     }
 
-    public void setArchivedItems(int archivedItems) {
-        this.archivedItems = archivedItems;
+    public void setArchivedItemsCount(int archivedItemsCount) {
+        this.archivedItemsCount = archivedItemsCount;
     }
 }

@@ -711,6 +711,13 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         return communityDAO.countRows(context);
     }
 
+    /**
+     * Returns total community archived items
+     *
+     * @param community       Community
+     * @return                total community archived items
+     * @throws ItemCountException
+     */
     @Override
     public int getArchivedItems(Community community) throws ItemCountException {
         return ItemCounter.getInstance().getCount(community);

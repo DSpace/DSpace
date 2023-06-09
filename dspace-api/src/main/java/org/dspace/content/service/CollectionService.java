@@ -470,5 +470,13 @@ public interface CollectionService
      */
     public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
         throws SearchServiceException;
+
+    /**
+     * Returns total collection archived items
+     *
+     * @param collection       Collection
+     * @return                 total collection archived items
+     * @throws ItemCountException
+     */
     int countArchivedItem(Collection collection) throws ItemCountException;
 }

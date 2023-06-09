@@ -26,9 +26,10 @@ public class CollectionConverter extends DSpaceObjectConverter<Collection, Colle
     @Override
     public CollectionRest convert(Collection collection, Projection projection) {
         CollectionRest resource = super.convert(collection, projection);
-        resource.setArchivedItems(collection.countArchivedItem());
+        resource.setArchivedItemsCount(collection.countArchivedItem());
         return resource;
     }
+
     @Override
     protected CollectionRest newInstance() {
         return new CollectionRest();
