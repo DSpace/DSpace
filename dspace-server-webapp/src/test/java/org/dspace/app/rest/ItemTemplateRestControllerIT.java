@@ -33,6 +33,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
@@ -243,6 +244,35 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                                      )))));
     }
 
+    /* Similar to patchTemplateItem(), except it is for collection admin, not repository admin
+        Test case was simplified, since it does not do anything else.
+     */
+    @Test
+    public void patchTemplateItemAsCollectionAdmin() throws Exception {
+        setupTestTemplate();
+
+        String itemId = installTestTemplate();
+
+        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
+                .withAction(Constants.ADMIN)
+                .withDspaceObject(childCollection).build();
+        String collAdminToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(collAdminToken).perform(patch(getTemplateItemUrlTemplate(itemId))
+                        .content(patchBody)
+                        .contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.type", is("itemtemplate"))
+                        )));
+
+        getClient(collAdminToken).perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.type", is("itemtemplate"))
+                        )));
+    }
+
     @Test
     public void patchIllegalInArchiveTemplateItem() throws Exception {
         setupTestTemplate();
@@ -335,6 +365,22 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
 
         getClient(adminAuthToken).perform(delete(getTemplateItemUrlTemplate(itemId)))
                                  .andExpect(status().isNoContent());
+    }
+
+    /*Similar to deleteTemplateItem(), except it is for collection admin, not repository admin
+     */
+    @Test
+    public void deleteTemplateItemAsCollectionAdmin() throws Exception {
+        setupTestTemplate();
+        String itemId = installTestTemplate();
+
+        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
+                .withAction(Constants.ADMIN)
+                .withDspaceObject(childCollection).build();
+        String collAdminToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(collAdminToken).perform(delete(getTemplateItemUrlTemplate(itemId)))
+                .andExpect(status().isNoContent());
     }
 
     @Test

@@ -1189,8 +1189,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.REMOVE, true);
         // Allow Item DELETE perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.DELETE);
-        // Allow Item WRITE perms (required to first delete identifiers)
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
 
         UUID id = item.getID();
         itemService.delete(context, item);

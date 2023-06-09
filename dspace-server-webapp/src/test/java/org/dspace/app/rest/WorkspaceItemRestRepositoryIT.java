@@ -8566,4 +8566,41 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                  )));
     }
 
+    @Test
+    public void testSubmissionWithHiddenSections() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-hidden")
+                                                 .withName("Collection 1")
+                                                 .build();
+
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                          .withTitle("Workspace Item")
+                                                          .withIssueDate("2023-01-01")
+                                                          .withType("book")
+                                                          .build();
+
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.test-outside-workflow-hidden").doesNotExist())
+            .andExpect(jsonPath("$.sections.test-outside-submission-hidden").exists())
+            .andExpect(jsonPath("$.sections.test-never-hidden").exists())
+            .andExpect(jsonPath("$.sections.test-always-hidden").doesNotExist());
+
+        // Deposit the item
+        getClient(adminToken).perform(post("/api/workflow/workflowitems")
+                .content("/api/submission/workspaceitems/" + workspaceItem.getID())
+                .contentType(textUriContentType))
+                .andExpect(status().isCreated());
+
+    }
 }
