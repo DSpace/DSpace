@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean class="org.dspace.orcid.service.impl.OrcidQueueServiceImpl" />
+    <bean class="org.dspace.orcid.service.impl.OrcidHistoryServiceImpl" />
+    
+    <bean class="org.dspace.orcid.service.impl.OrcidSynchronizationServiceImpl"/>
+    
+    <bean class="org.dspace.orcid.dao.impl.OrcidTokenDAOImpl"/>
+    
+    <bean id="org.dspace.orcid.service.OrcidTokenService" class="org.dspace.orcid.service.impl.OrcidTokenServiceImpl"/>
+    
+    <bean class="org.dspace.authenticate.OrcidAuthenticationBean" id="orcidAuthentication"/>
+    
+    <bean class="org.dspace.orcid.client.OrcidConfiguration">
+    	<property name="apiUrl" value="${orcid.api-url}" />
+    	<property name="publicUrl" value="${orcid.public-url}" />
+    	<property name="domainUrl" value="${orcid.domain-url}" />
+    	<property name="redirectUrl" value="${orcid.redirect-url}" />
+    	<property name="clientId" value="${orcid.application-client-id}" />
+    	<property name="clientSecret" value="${orcid.application-client-secret}" />
+    	<property name="tokenEndpointUrl" value="${orcid.token-url}" />
+    	<property name="authorizeEndpointUrl" value="${orcid.authorize-url}" />
+    	<property name="scopes" value="${orcid.scope}" />
+    </bean>
+    
+    <bean class="org.dspace.orcid.client.OrcidClientImpl" />
+    <bean id="metadataSignatureGenerator" class="org.dspace.orcid.service.impl.PlainMetadataSignatureGeneratorImpl" />
+    
+    <bean class="org.dspace.orcid.model.validator.impl.OrcidValidatorImpl" />
+    
+    <bean class="org.dspace.orcid.service.impl.OrcidEntityFactoryServiceImpl">
+    	<constructor-arg name="itemService" ref="org.dspace.content.ItemServiceImpl" />
+    	<constructor-arg name="entityFactories">
+    		<list>
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidWorkFactory">
+    				<property name="fieldMapping" ref="orcidWorkFactoryFieldMapping" />
+    			</bean>
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidFundingFactory">
+    				<property name="fieldMapping" ref="orcidFundingFactoryFieldMapping" />
+    			</bean>
+    		</list>
+   		</constructor-arg>
+	</bean>
+	
+	<bean id="orcidWorkFactoryFieldMapping" class="org.dspace.orcid.model.OrcidWorkFieldMapping" >
+		<property name="contributorFields" value="${orcid.mapping.work.contributors}" />
+		<property name="externalIdentifierFields" value="${orcid.mapping.work.external-ids}" />
+		<property name="publicationDateField" value="${orcid.mapping.work.publication-date}" />
+		<property name="titleField" value="${orcid.mapping.work.title}" />
+		<property name="journalTitleField" value="${orcid.mapping.work.journal-title}" />
+		<property name="shortDescriptionField" value="${orcid.mapping.work.short-description}" />
+		<property name="subTitleField" value="${orcid.mapping.work.sub-title}" />
+		<property name="languageField" value="${orcid.mapping.work.language}" />
+		<property name="languageConverter" ref="${orcid.mapping.work.language.converter}" />
+		<property name="typeField" value="${orcid.mapping.work.type}" />
+		<property name="typeConverter" ref="${orcid.mapping.work.type.converter}" />
+	</bean>
+	
+	<bean id="orcidFundingFactoryFieldMapping" class="org.dspace.orcid.model.OrcidFundingFieldMapping" >
+		<property name="contributorFields" value="${orcid.mapping.funding.contributors}" />
+		<property name="externalIdentifierFields" value="${orcid.mapping.funding.external-ids}" />
+		<property name="titleField" value="${orcid.mapping.funding.title}" />
+		<property name="typeField" value="${orcid.mapping.funding.type}" />
+		<property name="typeConverter" ref="${orcid.mapping.funding.type.converter}" />
+		<property name="amountField" value="${orcid.mapping.funding.amount}" />
+		<property name="amountCurrencyField" value="${orcid.mapping.funding.amount.currency}" />
+		<property name="amountCurrencyConverter" ref="${orcid.mapping.funding.amount.currency.converter}" />
+		<property name="descriptionField" value="${orcid.mapping.funding.description}" />
+		<property name="startDateField" value="${orcid.mapping.funding.start-date}" />
+		<property name="endDateField" value="${orcid.mapping.funding.end-date}" />
+		<property name="organizationRelationshipType" value="${orcid.mapping.funding.organization-relationship-type}" />
+	</bean>
+    
+    <bean class="org.dspace.orcid.model.factory.impl.OrcidCommonObjectFactoryImpl">
+    	<property name="contributorEmailField" value="${orcid.mapping.contributor.email}" />
+    	<property name="contributorOrcidField" value="${orcid.mapping.contributor.orcid}" />
+        <property name="organizationTitleField" value="${orcid.mapping.organization.title}" />
+    	<property name="organizationCityField" value="${orcid.mapping.organization.city}" />
+    	<property name="organizationCountryField" value="${orcid.mapping.organization.country}" />
+    	<property name="disambiguatedOrganizationIdentifierFields" value="${orcid.mapping.organization.identifiers}" />
+    </bean>
+    
+    <!-- Configuration of ORCID profile sections factory. 
+    Each entry of sectionFactories must be an implementation of OrcidProfileSectionFactory.-->
+    <bean class="org.dspace.orcid.service.impl.OrcidProfileSectionFactoryServiceImpl">
+    	<constructor-arg name="sectionFactories">
+    		<list>
+    		
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidSimpleValueObjectFactory">
+					<constructor-arg name="sectionType" value="OTHER_NAMES" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<property name="metadataFields" value="${orcid.mapping.other-names}" />
+				</bean>
+				
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidSimpleValueObjectFactory">
+					<constructor-arg name="sectionType" value="KEYWORDS" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<property name="metadataFields" value="${orcid.mapping.keywords}" />
+				</bean>
+				
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidSimpleValueObjectFactory">
+					<constructor-arg name="sectionType" value="COUNTRY" />
+					<constructor-arg name="preference" value="BIOGRAPHICAL" />
+					<property name="metadataFields" value="${orcid.mapping.country}" />
+				</bean>
+				
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidPersonExternalIdentifierFactory">
+					<constructor-arg name="sectionType" value="EXTERNAL_IDS" />
+					<constructor-arg name="preference" value="IDENTIFIERS" />
+					<property name="externalIds" value="${orcid.mapping.person-external-ids}" />
+				</bean>
+				
+    			<bean class="org.dspace.orcid.model.factory.impl.OrcidSimpleValueObjectFactory">
+					<constructor-arg name="sectionType" value="RESEARCHER_URLS" />
+					<constructor-arg name="preference" value="IDENTIFIERS" />
+					<property name="metadataFields" value="${orcid.mapping.researcher-urls}" />
+				</bean>
+				
+    		</list>
+    	</constructor-arg>
+    </bean>
+    
+    <bean name="mapConverterDSpaceToOrcidPublicationType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="orcid/mapConverter-dspace-to-orcid-publication-type.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value="other"/>
+	</bean>
+    
+    <bean name="mapConverterDSpaceToOrcidLanguageCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="orcid/mapConverter-dspace-to-orcid-language-code.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+    
+    <bean name="mapConverterDSpaceToOrcidFundingType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="orcid/mapConverter-dspace-to-orcid-funding-type.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+	
+	
+	<bean id="orcidPublicationDataProviderFieldMapping" class="org.dspace.orcid.model.OrcidWorkFieldMapping" >
+		<property name="contributorFields" value="${orcid.external-data.mapping.publication.contributors}" />
+		<property name="externalIdentifierFields" value="${orcid.external-data.mapping.publication.external-ids}" />
+		<property name="publicationDateField" value="${orcid.external-data.mapping.publication.issued-date}" />
+		<property name="titleField" value="${orcid.external-data.mapping.publication.title}" />
+		<property name="journalTitleField" value="${orcid.external-data.mapping.publication.is-part-of}" />
+		<property name="shortDescriptionField" value="${orcid.external-data.mapping.publication.description}" />
+		<property name="languageField" value="${orcid.external-data.mapping.publication.language}" />
+		<property name="languageConverter" ref="${orcid.external-data.mapping.publication.language.converter}" />
+		<property name="typeField" value="${orcid.external-data.mapping.publication.type}" />
+		<property name="typeConverter" ref="${orcid.external-data.mapping.publication.type.converter}" />
+	</bean>
+    
+    <bean name="mapConverterDSpaceToOrcidAmountCurrency" class="org.dspace.util.SimpleMapConverter" init-method="init">
+		<property name="converterNameFile" value="orcid/mapConverter-dspace-to-orcid-amount-currency.properties" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+		<property name="defaultValue" value=""/>
+	</bean>
+    
+    <bean name="mapConverterOrcidToDSpacePublicationType" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="orcid/mapConverter-orcid-to-dspace-publication-type.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value="Other"/>
+    </bean>
+    
+    <bean name="mapConverterOrcidToDSpaceLanguageCode" class="org.dspace.util.SimpleMapConverter" init-method="init">
+        <property name="converterNameFile" value="orcid/mapConverter-orcid-to-dspace-language-code.properties" />
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService" />
+        <property name="defaultValue" value=""/>
+    </bean>
+
+</beans>

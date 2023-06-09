@@ -12,14 +12,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,11 +65,6 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
 
     protected final String CONFIG_PREFIX = "metadata.hide.";
 
-    /**
-     * You can define hidden metadata could be seen by the submitter.
-     */
-    private final String SUBMITTER_CONST = "submitter";
-
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
@@ -86,12 +78,6 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
     @Override
     public boolean isHidden(Context context, String schema, String element, String qualifier)
         throws SQLException {
-        return this.isHidden(context, schema, element, qualifier, null);
-    }
-
-    @Override
-    public boolean isHidden(Context context, String schema, String element, String qualifier, Item item)
-            throws SQLException {
         boolean hidden = false;
 
         // for schema.element, just check schema->elementSet
@@ -114,13 +100,6 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
         if (hidden && context != null) {
             // the administrator's override
             hidden = !authorizeService.isAdmin(context);
-        }
-
-        // The user is not administrator, but he could be a submitter
-        if (hidden && Objects.nonNull(context) && Objects.nonNull(item) &&
-                this.submitterShouldSee(schema, element, qualifier)) {
-            // the submitters override
-            hidden = !item.getSubmitter().equals(context.getCurrentUser());
         }
 
         return hidden;
@@ -151,9 +130,7 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
             List<String> propertyKeys = configurationService.getPropertyKeys();
             for (String key : propertyKeys) {
                 if (key.startsWith(CONFIG_PREFIX)) {
-                    // hidden property could be boolean or a string (`submitter`)
-                    if (StringUtils.equals(configurationService.getProperty(key), SUBMITTER_CONST) ||
-                            configurationService.getBooleanProperty(key, true)) {
+                    if (configurationService.getBooleanProperty(key, true)) {
                         String mdField = key.substring(CONFIG_PREFIX.length());
                         String segment[] = mdField.split("\\.", 3);
 
@@ -181,15 +158,5 @@ public class MetadataExposureServiceImpl implements MetadataExposureService {
                 }
             }
         }
-    }
-
-    private boolean submitterShouldSee(String schema, String element, String qualifier) {
-        String composedMetadataField = schema + "." + element;
-        if (StringUtils.isNotBlank(qualifier)) {
-            composedMetadataField += "." + qualifier;
-        }
-
-        String hiddenPropertyValue = this.configurationService.getProperty(CONFIG_PREFIX + composedMetadataField);
-        return StringUtils.equals(hiddenPropertyValue, SUBMITTER_CONST);
     }
 }

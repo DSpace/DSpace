@@ -33,6 +33,11 @@ import org.dspace.eperson.Group;
 public interface CollectionService
         extends DSpaceObjectService<Collection>, DSpaceObjectLegacySupportService<Collection> {
 
+    /*
+     * Field used to sort community and collection lists at solr
+     */
+    public static final String SOLR_SORT_FIELD = "dc.title_sort";
+
     /**
      * Create a new collection with a new ID.
      * Once created the collection is added to the given community
@@ -45,7 +50,6 @@ public interface CollectionService
      */
     public Collection create(Context context, Community community) throws SQLException,
         AuthorizeException;
-
 
     /**
      * Create a new collection with the supplied handle and with a new ID.
@@ -127,17 +131,6 @@ public interface CollectionService
     public Bitstream setLogo(Context context, Collection collection, InputStream is) throws AuthorizeException,
         IOException, SQLException;
 
-    /**
-     * Add the created logo bitstream to collection and create policy to logo bitstream.
-     * This method is added for data migration by Upgrade Clarin, where bitstream already exists.
-     * @param context   context
-     * @param collection collection
-     * @param newLogo   bitstream of new logo
-     * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
-     */
-    public void addLogo(Context context, Collection collection, Bitstream newLogo)
-            throws SQLException, AuthorizeException;
     /**
      * Create a workflow group for the given step if one does not already exist.
      * Returns either the newly created group or the previously existing one.
@@ -462,4 +455,18 @@ public interface CollectionService
     public int countCollectionsWithSubmit(String q, Context context, Community community, String entityType)
         throws SQLException, SearchServiceException;
 
+    /**
+     * Returns a list of all collections for a specific entity type.
+     * NOTE: for better performance, this method retrieves its results from an index (cache)
+     *       and does not query the database directly.
+     *       This means that results may be stale or outdated until
+     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
+     * 
+     * @param context          DSpace Context
+     * @param entityType       limit the returned collection to those related to given entity type
+     * @return                 list of collections found
+     * @throws SearchServiceException    if search error
+     */
+    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
+        throws SearchServiceException;
 }

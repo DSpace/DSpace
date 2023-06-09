@@ -34,23 +34,16 @@
 
     <bean class="org.dspace.content.dao.impl.ProcessDAOImpl"/>
 
+    <bean class="org.dspace.alerts.dao.impl.SystemWideAlertDAOImpl"/>
+
     <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.GroupDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.RegistrationDataDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.SubscriptionDAOImpl"/>
+    <bean class="org.dspace.eperson.dao.impl.SubscriptionParameterDAOImpl"/>
 
     <bean class="org.dspace.handle.dao.impl.HandleDAOImpl"/>
-    <bean class="org.dspace.handle.dao.impl.HandleClarinDAOImpl"/>
-
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinLicenseDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinLicenseLabelDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinLicenseResourceMappingDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinUserRegistrationDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinUserMetadataDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinLicenseResourceUserAllowanceDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinItemDAOImpl"/>
-    <bean class="org.dspace.content.dao.impl.clarin.ClarinVerificationTokenDAOImpl"/>
 
     <bean class="org.dspace.harvest.dao.impl.HarvestedItemDAOImpl"/>
     <bean class="org.dspace.harvest.dao.impl.HarvestedCollectionDAOImpl"/>
@@ -70,7 +63,11 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
     <bean class="org.dspace.statistics.export.dao.impl.OpenURLTrackerDAOImpl"/>
+ 	
+    <bean class="org.dspace.orcid.dao.impl.OrcidQueueDAOImpl" />
+    <bean class="org.dspace.orcid.dao.impl.OrcidHistoryDAOImpl" />
 
+    <bean class="org.dspace.supervision.dao.impl.SupervisionOrderDaoImpl"/>
 
 
 </beans>

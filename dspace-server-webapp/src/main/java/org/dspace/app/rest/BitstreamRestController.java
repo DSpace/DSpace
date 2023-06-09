@@ -12,7 +12,6 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +21,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -31,7 +29,6 @@ import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.HttpHeadersInitializer;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.app.statistics.clarin.ClarinMatomoBitstreamTracker;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -101,9 +98,6 @@ public class BitstreamRestController {
     @Autowired
     Utils utils;
 
-    @Autowired
-    ClarinMatomoBitstreamTracker matomoBitstreamTracker;
-
     @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'READ')")
     @RequestMapping( method = {RequestMethod.GET, RequestMethod.HEAD}, value = "content")
     public ResponseEntity retrieve(@PathVariable UUID uuid, HttpServletResponse response,
@@ -137,19 +131,12 @@ public class BitstreamRestController {
         }
 
         try {
-            long filesize;
-            if (citationDocumentService.isCitationEnabledForBitstream(bit, context)) {
-                final Pair<InputStream, Long> citedDocument = citationDocumentService.makeCitedDocument(context, bit);
-                filesize = citedDocument.getRight();
-                citedDocument.getLeft().close();
-            } else {
-                filesize = bit.getSizeBytes();
-            }
+            long filesize = bit.getSizeBytes();
+            Boolean citationEnabledForBitstream = citationDocumentService.isCitationEnabledForBitstream(bit, context);
 
             HttpHeadersInitializer httpHeadersInitializer = new HttpHeadersInitializer()
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(name)
-                .withLength(filesize)
                 .withChecksum(bit.getChecksum())
                 .withMimetype(mimetype)
                 .with(request)
@@ -165,13 +152,10 @@ public class BitstreamRestController {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
-
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource =
-                new org.dspace.app.rest.utils.BitstreamResource(
-                    bit, name, uuid, filesize, currentUser != null ? currentUser.getID() : null);
-
-            // Track the download statistics - only if the downloading has started (the condition is inside the method)
-            matomoBitstreamTracker.trackBitstreamDownload(context, request, bit);
+                new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
+                    currentUser != null ? currentUser.getID() : null,
+                    context.getSpecialGroupUuids(), citationEnabledForBitstream);
 
             //We have all the data we need, close the connection to the database so that it doesn't stay open during
             //download/streaming

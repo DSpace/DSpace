@@ -20,7 +20,7 @@ USER dspace
 ADD --chown=dspace . /app/
 # Build DSpace (note: this build doesn't include the optional, deprecated "dspace-rest" webapp)
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package && \
+RUN mvn --no-transfer-progress package && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 
@@ -31,7 +31,7 @@ ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.12
+ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
 # Need wget to install ant
@@ -53,10 +53,10 @@ ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' containger to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Expose Tomcat port and AJP port
-EXPOSE 8080 8009 8000
+EXPOSE 8080 8009
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
-COPY scripts/restart_debug/* /usr/local/tomcat/bin
+
 # Link the DSpace 'server' webapp into Tomcat's webapps directory.
 # This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
 RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
@@ -65,6 +65,3 @@ RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
 # Please note that server webapp should only run on one path at a time.
 #RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
 #    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
-
-WORKDIR /usr/local/tomcat/bin
-RUN chmod u+x redebug.sh undebug.sh custom_run.sh

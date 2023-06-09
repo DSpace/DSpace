@@ -127,10 +127,6 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
     public WorkspaceItem findByItem(Context context, Item item)
         throws SQLException;
 
-    public List<WorkspaceItem> findAllSupervisedItems(Context context) throws SQLException;
-
-    public List<WorkspaceItem> findSupervisedItemsByEPerson(Context context, EPerson ePerson) throws SQLException;
-
     /**
      * Get all workspace items in the whole system
      *

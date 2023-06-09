@@ -6,6 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.submit.factory.impl;
+
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +30,7 @@ import org.dspace.core.Context;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionConfigurationService;
 import org.dspace.submit.model.AccessConditionOption;
+import org.dspace.util.TimeHelpers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +108,7 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         return null;
     }
 
-    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplare)
+    private AccessConditionDTO createDTO(ResourcePolicy rpToReplace, String attributeReplace, String valueToReplace)
             throws ParseException {
         AccessConditionDTO accessCondition = new AccessConditionDTO();
         accessCondition.setName(rpToReplace.getRpName());
@@ -114,13 +116,13 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         accessCondition.setEndDate(rpToReplace.getEndDate());
         switch (attributeReplace) {
             case "name":
-                accessCondition.setName(valueToReplare);
+                accessCondition.setName(valueToReplace);
                 return accessCondition;
             case "startDate":
-                accessCondition.setStartDate(parseDate(valueToReplare));
+                accessCondition.setStartDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
                 return accessCondition;
             case "endDate":
-                accessCondition.setEndDate(parseDate(valueToReplare));
+                accessCondition.setEndDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
                 return accessCondition;
             default:
                 throw new UnprocessableEntityException("The provided attribute: "
@@ -128,17 +130,17 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         }
     }
 
-    private void updatePolicy(Context context, String valueToReplare, String attributeReplace,
+    private void updatePolicy(Context context, String valueToReplace, String attributeReplace,
             ResourcePolicy rpToReplace) throws SQLException, AuthorizeException {
         switch (attributeReplace) {
             case "name":
-                rpToReplace.setRpName(valueToReplare);
+                rpToReplace.setRpName(valueToReplace);
                 break;
             case "startDate":
-                rpToReplace.setStartDate(parseDate(valueToReplare));
+                rpToReplace.setStartDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
                 break;
             case "endDate":
-                rpToReplace.setEndDate(parseDate(valueToReplare));
+                rpToReplace.setEndDate(TimeHelpers.toMidnightUTC(parseDate(valueToReplace)));
                 break;
             default:
                 throw new IllegalArgumentException("Attribute to replace is not valid:" + attributeReplace);

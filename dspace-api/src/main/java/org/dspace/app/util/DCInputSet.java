@@ -17,7 +17,6 @@ import org.dspace.core.Utils;
  * Class representing all DC inputs required for a submission, organized into pages
  *
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
- * @version $Revision$
  */
 
 public class DCInputSet {
@@ -32,14 +31,12 @@ public class DCInputSet {
 
     /**
      * constructor
+     *
      * @param formName       form name
-     * @param mandatoryFlags
      * @param rows           the rows
      * @param listMap        map
-     * @param complexDefinitions complex input field
      */
-    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap,
-                      DCInput.ComplexDefinitions complexDefinitions) {
+    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap) {
         this.formName = formName;
         this.inputs = new DCInput[rows.size()][];
         for (int i = 0; i < inputs.length; i++) {
@@ -47,7 +44,7 @@ public class DCInputSet {
             inputs[i] = new DCInput[fields.size()];
             for (int j = 0; j < inputs[i].length; j++) {
                 Map<String, String> field = rows.get(i).get(j);
-                inputs[i][j] = new DCInput(field, listMap, complexDefinitions);
+                inputs[i][j] = new DCInput(field, listMap);
             }
         }
     }

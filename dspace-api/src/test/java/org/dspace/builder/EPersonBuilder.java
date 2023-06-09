@@ -9,15 +9,11 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
@@ -36,6 +32,7 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             ePerson = c.reloadEntity(ePerson);
@@ -132,26 +129,14 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
-    private static void deleteUserRegistration(Context context, EPerson eperson)
-            throws SQLException, AuthorizeException {
-        if (Objects.isNull(eperson)) {
-            return;
-        }
+    public EPersonBuilder withOrcid(final String orcid) {
+        setMetadataSingleValue(ePerson, "eperson", "orcid", null, orcid);
+        return this;
+    }
 
-        List<ClarinUserRegistration> userRegistrations =
-                clarinUserRegistrationService.findByEPersonUUID(context, eperson.getID());
-        if (CollectionUtils.isEmpty(userRegistrations)) {
-            return;
-        }
-
-        ClarinUserRegistration userRegistration = userRegistrations.get(0);
-        if (Objects.isNull(userRegistration)) {
-            return;
-        }
-
-        context.turnOffAuthorisationSystem();
-        clarinUserRegistrationService.delete(context, userRegistration);
-        context.restoreAuthSystemState();
+    public EPersonBuilder withOrcidScope(final String scope) {
+        addMetadataValue(ePerson, "eperson", "orcid", "scope", scope);
+        return this;
     }
 
     public static void deleteEPerson(UUID uuid) throws SQLException, IOException {
@@ -160,8 +145,6 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
             EPerson ePerson = ePersonService.find(c, uuid);
             if (ePerson != null) {
                 try {
-                    // Try to delete user registration association
-                    deleteUserRegistration(c, ePerson);
                     ePersonService.delete(c, ePerson);
                 } catch (AuthorizeException e) {
                     // cannot occur, just wrap it to make the compiler happy

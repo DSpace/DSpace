@@ -15,26 +15,26 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
-import com.sun.syndication.feed.module.DCModule;
-import com.sun.syndication.feed.module.DCModuleImpl;
-import com.sun.syndication.feed.module.Module;
-import com.sun.syndication.feed.module.itunes.EntryInformation;
-import com.sun.syndication.feed.module.itunes.EntryInformationImpl;
-import com.sun.syndication.feed.module.itunes.types.Duration;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEnclosure;
-import com.sun.syndication.feed.synd.SyndEnclosureImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndImage;
-import com.sun.syndication.feed.synd.SyndImageImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
+import com.rometools.modules.itunes.EntryInformation;
+import com.rometools.modules.itunes.EntryInformationImpl;
+import com.rometools.modules.itunes.types.Duration;
+import com.rometools.rome.feed.module.DCModule;
+import com.rometools.rome.feed.module.DCModuleImpl;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEnclosure;
+import com.rometools.rome.feed.synd.SyndEnclosureImpl;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.feed.synd.SyndImage;
+import com.rometools.rome.feed.synd.SyndImageImpl;
+import com.rometools.rome.feed.synd.SyndPerson;
+import com.rometools.rome.feed.synd.SyndPersonImpl;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +51,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
@@ -91,6 +92,7 @@ public class SyndicationFeed {
 
     // default DC fields for entry
     protected String defaultTitleField = "dc.title";
+    protected String defaultDescriptionField = "dc.description";
     protected String defaultAuthorField = "dc.contributor.author";
     protected String defaultDateField = "dc.date.issued";
     private static final String[] defaultDescriptionFields =
@@ -193,20 +195,18 @@ public class SyndicationFeed {
         String defaultTitle = null;
         boolean podcastFeed = false;
         this.request = request;
-
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
-            feed.setDescription(localize(labels, MSG_FEED_DESCRIPTION));
+            defaultDescriptionField = localize(labels, MSG_FEED_DESCRIPTION);
             objectURL = resolveURL(request, null);
-            logoURL = configurationService.getProperty("webui.feed.logo.url");
         } else {
             Bitstream logo = null;
             if (dso instanceof IndexableCollection) {
                 Collection col = ((IndexableCollection) dso).getIndexedObject();
                 defaultTitle = col.getName();
-                feed.setDescription(collectionService.getMetadataFirstValue(col,
-                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY));
+                defaultDescriptionField = collectionService.getMetadataFirstValue(col,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
                 logo = col.getLogo();
                 String cols = configurationService.getProperty("webui.feed.podcast.collections");
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
@@ -216,8 +216,8 @@ public class SyndicationFeed {
             } else if (dso instanceof IndexableCommunity) {
                 Community comm = ((IndexableCommunity) dso).getIndexedObject();
                 defaultTitle = comm.getName();
-                feed.setDescription(communityService.getMetadataFirstValue(comm,
-                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY));
+                defaultDescriptionField = communityService.getMetadataFirstValue(comm,
+                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
                 logo = comm.getLogo();
                 String comms = configurationService.getProperty("webui.feed.podcast.communities");
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {
@@ -232,6 +232,12 @@ public class SyndicationFeed {
         }
         feed.setTitle(labels.containsKey(MSG_FEED_TITLE) ?
                           localize(labels, MSG_FEED_TITLE) : defaultTitle);
+
+        if (defaultDescriptionField == null || defaultDescriptionField == "") {
+            defaultDescriptionField = I18nUtil.getMessage("org.dspace.app.util.SyndicationFeed.no-description");
+        }
+
+        feed.setDescription(defaultDescriptionField);
         feed.setLink(objectURL);
         feed.setPublishedDate(new Date());
         feed.setUri(objectURL);
@@ -329,7 +335,8 @@ public class SyndicationFeed {
                     dcDescriptionField != null) {
                     DCModule dc = new DCModuleImpl();
                     if (dcCreatorField != null) {
-                        List<MetadataValue> dcAuthors = itemService.getMetadataByMetadataString(item, dcCreatorField);
+                        List<MetadataValue> dcAuthors = itemService
+                                .getMetadataByMetadataString(item, dcCreatorField);
                         if (dcAuthors.size() > 0) {
                             List<String> creators = new ArrayList<>();
                             for (MetadataValue author : dcAuthors) {
@@ -345,7 +352,8 @@ public class SyndicationFeed {
                         }
                     }
                     if (dcDescriptionField != null) {
-                        List<MetadataValue> v = itemService.getMetadataByMetadataString(item, dcDescriptionField);
+                        List<MetadataValue> v = itemService
+                                .getMetadataByMetadataString(item, dcDescriptionField);
                         if (v.size() > 0) {
                             StringBuilder descs = new StringBuilder();
                             for (MetadataValue d : v) {
@@ -376,6 +384,7 @@ public class SyndicationFeed {
                                     enc.setLength(bit.getSizeBytes());
                                     enc.setUrl(urlOfBitstream(request, bit));
                                     enclosures.add(enc);
+
                                 }
                             }
                         }
@@ -419,7 +428,7 @@ public class SyndicationFeed {
                     // with length of song in seconds
                     if (extent != null && extent.length() > 0) {
                         extent = extent.split(" ")[0];
-                        Integer duration = Integer.parseInt(extent);
+                        long duration = Long.parseLong(extent);
                         itunes.setDuration(new Duration(duration));             // <itunes:duration>
                     }
 

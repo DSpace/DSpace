@@ -18,7 +18,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.DspaceObjectClarinService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.InstallItemService;
@@ -29,9 +28,8 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
-import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.handle.service.HandleClarinService;
+import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -70,10 +68,9 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Autowired(required = true)
     private InstallItemService installItemService;
     @Autowired(required = true)
-    private SupervisedItemService supervisedItemService;
-    @Autowired(required = true)
     private SiteService siteService;
-
+    @Autowired(required = true)
+    private SubscribeService subscribeService;
     @Autowired(required = true)
     private RelationshipService relationshipService;
     @Autowired(required = true)
@@ -84,12 +81,6 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private EntityTypeService entityTypeService;
     @Autowired(required = true)
     private EntityService entityService;
-
-    @Autowired(required = true)
-    private DspaceObjectClarinService dspaceObjectClarinService;
-
-    @Autowired(required = true)
-    private HandleClarinService handleClarinService;
 
     @Override
     public List<DSpaceObjectService<? extends DSpaceObject>> getDSpaceObjectServices() {
@@ -157,13 +148,13 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     }
 
     @Override
-    public SupervisedItemService getSupervisedItemService() {
-        return supervisedItemService;
+    public SiteService getSiteService() {
+        return siteService;
     }
 
     @Override
-    public SiteService getSiteService() {
-        return siteService;
+    public SubscribeService getSubscribeService() {
+        return subscribeService ;
     }
 
     @Override
@@ -189,15 +180,5 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public RelationshipMetadataService getRelationshipMetadataService() {
         return relationshipMetadataService;
-    }
-
-    @Override
-    public DspaceObjectClarinService getDspaceObjectClarinService() {
-        return dspaceObjectClarinService;
-    }
-
-    @Override
-    public HandleClarinService getHandleClarinService() {
-        return handleClarinService;
     }
 }

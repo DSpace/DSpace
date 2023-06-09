@@ -126,6 +126,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
         }
 
+        // Sort the metadataValues if they have been modified,
+        // is used to preserve the default order.
+        if (dso.isMetadataModified()) {
+            values.sort(MetadataValueComparators.defaultComparator);
+        }
         // Create an array of matching values
         return values;
     }
@@ -243,67 +248,64 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
-        List<MetadataValue> newMetadata = new ArrayList<>(values.size());
+        List<MetadataValue> newMetadata = new ArrayList<>();
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
-
-            if (authorities != null && authorities.size() >= i) {
-                if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
-                    continue;
-                }
-            }
-            MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
-            newMetadata.add(metadataValue);
-
-            metadataValue.setPlace(placeSupplier.get());
-
-            metadataValue.setLanguage(lang == null ? null : lang.trim());
-
-            // Logic to set Authority and Confidence:
-            //  - normalize an empty string for authority to NULL.
-            //  - if authority key is present, use given confidence or NOVALUE if not given
-            //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
-            // authority lookup
-            //  - CF_UNSET signifies no authority nor meaningful confidence.
-            //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
-            if (authorityControlled) {
-                if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
-                    metadataValue.setAuthority(authorities.get(i));
-                    metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
-                } else {
-                    metadataValue.setAuthority(null);
-                    metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
-                }
-                // authority sanity check: if authority is required, was it supplied?
-                // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
-                // use a runtime exception
-                if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
-                                                                                               .length() == 0)) {
-                    throw new IllegalArgumentException("The metadata field \"" + metadataField
-                        .toString() + "\" requires an authority key but none was provided. Value=\"" + values
-                        .get(i) + "\"");
-                }
-            }
             if (values.get(i) != null) {
+                if (authorities != null && authorities.size() >= i) {
+                    if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                        continue;
+                    }
+                }
+                MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+                newMetadata.add(metadataValue);
+
+                metadataValue.setPlace(placeSupplier.get());
+
+                metadataValue.setLanguage(lang == null ? null : lang.trim());
+
+                // Logic to set Authority and Confidence:
+                //  - normalize an empty string for authority to NULL.
+                //  - if authority key is present, use given confidence or NOVALUE if not given
+                //  - otherwise, preserve confidence if meaningful value was given since it may document a failed
+                // authority lookup
+                //  - CF_UNSET signifies no authority nor meaningful confidence.
+                //  - it's possible to have empty authority & CF_ACCEPTED if e.g. user deletes authority key
+                if (authorityControlled) {
+                    if (authorities != null && authorities.get(i) != null && authorities.get(i).length() > 0) {
+                        metadataValue.setAuthority(authorities.get(i));
+                        metadataValue.setConfidence(confidences == null ? Choices.CF_NOVALUE : confidences.get(i));
+                    } else {
+                        metadataValue.setAuthority(null);
+                        metadataValue.setConfidence(confidences == null ? Choices.CF_UNSET : confidences.get(i));
+                    }
+                    // authority sanity check: if authority is required, was it supplied?
+                    // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so
+                    // use a runtime exception
+                    if (authorityRequired && (metadataValue.getAuthority() == null || metadataValue.getAuthority()
+                                                                                                   .length() == 0)) {
+                        throw new IllegalArgumentException("The metadata field \"" + metadataField
+                                .toString() + "\" requires an authority key but none was provided. Value=\"" + values
+                                .get(i) + "\"");
+                    }
+                }
                 // remove control unicode char
                 String temp = values.get(i).trim();
                 char[] dcvalue = temp.toCharArray();
                 for (int charPos = 0; charPos < dcvalue.length; charPos++) {
                     if (Character.isISOControl(dcvalue[charPos]) &&
-                        !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
-                        !String.valueOf(dcvalue[charPos]).equals("\n") &&
-                        !String.valueOf(dcvalue[charPos]).equals("\r")) {
+                            !String.valueOf(dcvalue[charPos]).equals("\u0009") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\n") &&
+                            !String.valueOf(dcvalue[charPos]).equals("\r")) {
                         dcvalue[charPos] = ' ';
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-            } else {
-                metadataValue.setValue(null);
-            }
-            //An update here isn't needed, this is persited upon the merge of the owning object
+                //An update here isn't needed, this is persited upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
-            dso.addDetails(metadataField.toString());
+                dso.addDetails(metadataField.toString());
+            }
         }
         setMetadataModified(dso);
         return newMetadata;
@@ -545,7 +547,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         int add = 4 - tokens.length;
         if (add > 0) {
-            tokens = (String[]) ArrayUtils.addAll(tokens, new String[add]);
+            tokens = ArrayUtils.addAll(tokens, new String[add]);
         }
 
         return tokens;
@@ -606,40 +608,51 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             //If two places are the same then the MetadataValue instance will be placed before the
             //RelationshipMetadataValue instance.
             //This is done to ensure that the order is correct.
-            metadataValues.sort(new Comparator<MetadataValue>() {
-                @Override
-                public int compare(MetadataValue o1, MetadataValue o2) {
-                    int compare = o1.getPlace() - o2.getPlace();
-                    if (compare == 0) {
-                        if (o1 instanceof RelationshipMetadataValue && o2 instanceof RelationshipMetadataValue) {
-                            return compare;
-                        } else if (o1 instanceof RelationshipMetadataValue) {
-                            return 1;
-                        } else if (o2 instanceof RelationshipMetadataValue) {
-                            return -1;
-                        }
+            metadataValues.sort((o1, o2) -> {
+                int compare = o1.getPlace() - o2.getPlace();
+                if (compare == 0) {
+                    if (o1 instanceof RelationshipMetadataValue && o2 instanceof RelationshipMetadataValue) {
+                        return compare;
+                    } else if (o1 instanceof RelationshipMetadataValue) {
+                        return 1;
+                    } else if (o2 instanceof RelationshipMetadataValue) {
+                        return -1;
                     }
-                    return compare;
                 }
+                return compare;
             });
             for (MetadataValue metadataValue : metadataValues) {
                 //Retrieve & store the place for each metadata value
-                if (StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX) &&
-                    ((RelationshipMetadataValue) metadataValue).isUseForPlace()) {
+                if (
+                    // For virtual MDVs with useForPlace=true,
+                    // update both the place of the metadatum and the place of the Relationship.
+                    // E.g. for an Author relationship,
+                    //   the place should be updated using the same principle as dc.contributor.author.
+                    StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
+                        && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
+                ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
                     Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
-                    if (relationship.getLeftItem().equals((Item) dso)) {
+                    if (relationship.getLeftItem().equals(dso)) {
                         relationship.setLeftPlace(mvPlace);
                     } else {
                         relationship.setRightPlace(mvPlace);
                     }
                     relationshipService.update(context, relationship);
 
-                } else if (!StringUtils.startsWith(metadataValue.getAuthority(),
-                                                   Constants.VIRTUAL_AUTHORITY_PREFIX)) {
+                } else if (
+                    // Otherwise, just set the place of the metadatum
+                    // ...unless the metadatum in question is a relation.* metadatum.
+                    // This case is a leftover from when a Relationship is removed and copied to metadata.
+                    // If we let its place change the order of any remaining Relationships will be affected.
+                    // todo: this makes it so these leftover MDVs can't be reordered later on
+                    !StringUtils.equals(
+                        metadataValue.getMetadataField().getMetadataSchema().getName(), "relation"
+                    )
+                ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);
                     metadataValue.setPlace(mvPlace);
                 }

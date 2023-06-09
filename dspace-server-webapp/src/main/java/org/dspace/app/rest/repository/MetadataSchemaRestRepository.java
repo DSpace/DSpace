@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
@@ -93,6 +93,10 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         // validate fields
         if (isBlank(metadataSchemaRest.getPrefix())) {
             throw new UnprocessableEntityException("metadata schema name cannot be blank");
+        } else if (!metadataSchemaRest.getPrefix().matches("^[^. ,]{1,32}$")) {
+            throw new UnprocessableEntityException(
+                "metadata schema namespace cannot contain dots, commas or spaces and should be smaller than" +
+                    " 32 characters");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
@@ -138,10 +142,20 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     protected MetadataSchemaRest put(Context context, HttpServletRequest request, String apiCategory, String model,
                                      Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
 
-        MetadataSchemaRest metadataSchemaRest = new Gson().fromJson(jsonNode.toString(), MetadataSchemaRest.class);
+        MetadataSchemaRest metadataSchemaRest;
+        try {
+            metadataSchemaRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataSchemaRest.class);
+        } catch (JsonProcessingException e) {
+            throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
+        }
 
-        if (isBlank(metadataSchemaRest.getPrefix())) {
-            throw new UnprocessableEntityException("metadata schema name cannot be blank");
+        MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
+        if (metadataSchema == null) {
+            throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
+        }
+
+        if (!Objects.equals(metadataSchemaRest.getPrefix(), metadataSchema.getName())) {
+            throw new UnprocessableEntityException("Metadata schema name cannot be updated.");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");
@@ -151,12 +165,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
             throw new UnprocessableEntityException("ID in request doesn't match path ID");
         }
 
-        MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
-        if (metadataSchema == null) {
-            throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
-        }
-
-        metadataSchema.setName(metadataSchemaRest.getPrefix());
         metadataSchema.setNamespace(metadataSchemaRest.getNamespace());
 
         try {

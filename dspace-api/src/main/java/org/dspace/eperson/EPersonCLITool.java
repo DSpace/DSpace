@@ -26,9 +26,6 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.clarin.ClarinUserRegistration;
-import org.dspace.content.factory.ClarinServiceFactory;
-import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -66,9 +63,6 @@ public class EPersonCLITool {
     private static final Option OPT_NEW_PASSWORD
             = new Option("w", "newPassword", false, "prompt for new password");
 
-    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true,
-            "organization the user belongs to");
-
     static final String ERR_PASSWORD_EMPTY = "The new password may not be empty.";
     static final String ERR_PASSWORD_NOMATCH = "Passwords do not match.  Password not set";
 
@@ -77,9 +71,6 @@ public class EPersonCLITool {
 
     private static ConsoleService consoleService
             = new ConsoleServiceImpl();
-
-    protected static ClarinUserRegistrationService clarinUserRegistrationService =
-            ClarinServiceFactory.getInstance().getClarinUserRegistration();
 
     /**
      * Default constructor
@@ -163,7 +154,6 @@ public class EPersonCLITool {
         options.addOption(OPT_PHONE);
         options.addOption(OPT_LANGUAGE);
         options.addOption(OPT_REQUIRE_CERTIFICATE);
-        options.addOption(OPT_ORGANIZATION);
 
         Option option = new Option("p", "password", true, "password to match the EPerson name");
         options.addOption(option);
@@ -226,13 +216,6 @@ public class EPersonCLITool {
 
         try {
             ePersonService.update(context, eperson);
-            ClarinUserRegistration clarinUserRegistration = new ClarinUserRegistration();
-            clarinUserRegistration.setOrganization(command.getOptionValue(OPT_ORGANIZATION.getOpt()));
-            clarinUserRegistration.setConfirmation(true);
-            clarinUserRegistration.setEmail(eperson.getEmail());
-            clarinUserRegistration.setPersonID(eperson.getID());
-            clarinUserRegistrationService.create(context, clarinUserRegistration);
-
             System.out.printf("Created EPerson %s\n", eperson.getID().toString());
         } catch (SQLException | AuthorizeException ex) {
             context.abort();

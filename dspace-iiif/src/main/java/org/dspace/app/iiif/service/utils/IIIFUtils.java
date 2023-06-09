@@ -14,6 +14,7 @@ import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -136,7 +137,7 @@ public class IIIFUtils {
      * @param b the DSpace bitstream to check
      * @return true if the bitstream can be used as IIIF resource
      */
-    private boolean isIIIFBitstream(Context context, Bitstream b) {
+    public boolean isIIIFBitstream(Context context, Bitstream b) {
         return checkImageMimeType(getBitstreamMimeType(b, context)) && b.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
                 .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
@@ -227,7 +228,7 @@ public class IIIFUtils {
      * @param mimetype
      * @return true if an image
      */
-    public boolean checkImageMimeType(String mimetype) {
+    private boolean checkImageMimeType(String mimetype) {
         if (mimetype != null && mimetype.contains("image/")) {
             return true;
         }
@@ -335,10 +336,24 @@ public class IIIFUtils {
     public String getBundleIIIFToC(Bundle bundle) {
         String label = bundle.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_LABEL))
-                .findFirst().map(m -> m.getValue()).orElse(bundle.getName());
+                .findFirst().map(m -> m.getValue()).orElse(getToCBundleLabel(bundle));
         return bundle.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_TOC))
                 .findFirst().map(m -> m.getValue() + TOC_SEPARATOR + label).orElse(label);
+    }
+
+    /**
+     * Excludes bundles found in the iiif.exclude.toc.bundle list
+     *
+     * @param bundle    the dspace bundle
+     * @return  bundle name or null if bundle is excluded
+     */
+    private String getToCBundleLabel(Bundle bundle) {
+        String[] iiifAlternate = configurationService.getArrayProperty("iiif.exclude.toc.bundle");
+        if (Arrays.stream(iiifAlternate).anyMatch(x -> x.contentEquals(bundle.getName()))) {
+            return null;
+        }
+        return bundle.getName();
     }
 
     /**

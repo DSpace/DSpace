@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -19,6 +18,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
@@ -26,8 +26,6 @@ import org.dspace.eperson.Group;
  * Builder class to build bitstreams in test cases
  */
 public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
-
-    public static final String ORIGINAL = "ORIGINAL";
 
     private Bitstream bitstream;
     private Item item;
@@ -159,12 +157,12 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     }
 
     private Bundle getOriginalBundle(Item item) throws SQLException, AuthorizeException {
-        List<Bundle> bundles = itemService.getBundles(item, ORIGINAL);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         Bundle targetBundle = null;
 
         if (bundles.size() < 1) {
             // not found, create a new one
-            targetBundle = bundleService.create(context, item, ORIGINAL);
+            targetBundle = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
         } else {
             // put bitstreams into first bundle
             targetBundle = bundles.iterator().next();
@@ -207,6 +205,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             bitstream = c.reloadEntity(bitstream);
@@ -222,27 +221,4 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return bitstreamService;
     }
 
-    /**
-     * Delete the Test bitstream referred to by the given uuid.
-     * Implemented for Clarin Dspace.
-     * @param uuid UUID of Test Bitstream to delete
-     * @throws SQLException
-     * @throws IOException
-     */
-    public static void deleteBitstream(UUID uuid) throws SQLException, IOException {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Bitstream bitstream = bitstreamService.find(c, uuid);
-            if (bitstream != null) {
-                try {
-                    bitstreamService.delete(c, bitstream);
-                    bitstreamService.expunge(c, bitstream);
-                    c.commit();
-                } catch (AuthorizeException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            c.complete();
-        }
-    }
 }

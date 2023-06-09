@@ -10,6 +10,7 @@ package org.dspace.identifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.Filter;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
@@ -44,7 +46,6 @@ public class IdentifierServiceImpl implements IdentifierService {
     protected HandleService handleService;
 
     protected IdentifierServiceImpl() {
-
     }
 
     @Autowired(required = true)
@@ -98,7 +99,7 @@ public class IdentifierServiceImpl implements IdentifierService {
 
     @Override
     public void register(Context context, DSpaceObject dso)
-        throws AuthorizeException, SQLException, IdentifierException {
+            throws AuthorizeException, SQLException, IdentifierException {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         for (IdentifierProvider service : providers) {
@@ -113,10 +114,98 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
+    public void register(Context context, DSpaceObject dso, Class<? extends Identifier> type, Filter filter)
+            throws AuthorizeException, SQLException, IdentifierException {
+        boolean registered = false;
+        // Iterate all services and register identifiers as appropriate
+        for (IdentifierProvider service : providers) {
+            if (service.supports(type)) {
+                try {
+                    if (service instanceof FilteredIdentifierProvider) {
+                        FilteredIdentifierProvider filteredService = (FilteredIdentifierProvider)service;
+                        filteredService.register(context, dso, filter);
+                    } else {
+                        service.register(context, dso);
+                    }
+                    registered = true;
+                } catch (IdentifierNotApplicableException e) {
+                    log.warn("Identifier not registered (inapplicable): " + e.getMessage());
+                }
+            }
+        }
+        if (!registered) {
+            throw new IdentifierException("Cannot register identifier: Didn't "
+                    + "find a provider that supports this identifier.");
+        }
+        // Update our item / collection / community
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
+    }
+
+    @Override
+    public void register(Context context, DSpaceObject dso, Class<? extends Identifier> type)
+            throws AuthorizeException, SQLException, IdentifierException {
+        boolean registered = false;
+        // Iterate all services and register identifiers as appropriate
+        for (IdentifierProvider service : providers) {
+            if (service.supports(type)) {
+                try {
+                    service.register(context, dso);
+                    registered = true;
+                } catch (IdentifierNotApplicableException e) {
+                    log.warn("Identifier not registered (inapplicable): " + e.getMessage());
+                }
+            }
+        }
+        if (!registered) {
+            throw new IdentifierException("Cannot register identifier: Didn't "
+                    + "find a provider that supports this identifier.");
+        }
+        // Update our item / collection / community
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
+    }
+
+    @Override
+    public void register(Context context, DSpaceObject dso, Map<Class<? extends Identifier>, Filter> typeFilters)
+            throws AuthorizeException, SQLException, IdentifierException {
+        // Iterate all services and register identifiers as appropriate
+        for (IdentifierProvider service : providers) {
+            try {
+                // If the service supports filtering, look through the map and the first supported class
+                // we find, set the filter and break. If no filter was seen for this type, just let the provider
+                // use its own implementation.
+                if (service instanceof FilteredIdentifierProvider) {
+                    FilteredIdentifierProvider filteredService = (FilteredIdentifierProvider)service;
+                    Filter filter = null;
+                    for (Class<? extends Identifier> type : typeFilters.keySet()) {
+                        if (filteredService.supports(type)) {
+                            filter = typeFilters.get(type);
+                            break;
+                        }
+                    }
+                    if (filter != null) {
+                        // Pass the found filter to the provider
+                        filteredService.register(context, dso, filter);
+                    } else {
+                        // Let the provider use the default filter / behaviour
+                        filteredService.register(context, dso);
+                    }
+                } else {
+                    service.register(context, dso);
+                }
+            } catch (IdentifierNotApplicableException e) {
+                log.warn("Identifier not registered (inapplicable): " + e.getMessage());
+            }
+        }
+        // Update our item / collection / community
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
+    }
+
+
+
+    @Override
     public void register(Context context, DSpaceObject object, String identifier)
         throws AuthorizeException, SQLException, IdentifierException {
-        //We need to commit our context because one of the providers might require the handle created above
-        // Next resolve all other services
+        // Iterate all services and register identifiers as appropriate
         boolean registered = false;
         for (IdentifierProvider service : providers) {
             if (service.supports(identifier)) {
@@ -132,7 +221,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             throw new IdentifierException("Cannot register identifier: Didn't "
                                               + "find a provider that supports this identifier.");
         }
-        //Update our item / collection / community
+        // pdate our item / collection / community
         contentServiceFactory.getDSpaceObjectService(object).update(context, object);
     }
 

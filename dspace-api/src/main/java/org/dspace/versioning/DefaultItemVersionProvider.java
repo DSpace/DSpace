@@ -15,10 +15,11 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Item;
+import org.dspace.content.Relationship;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.versioning.service.VersionHistoryService;
@@ -46,7 +47,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     @Autowired(required = true)
     protected IdentifierService identifierService;
     @Autowired(required = true)
-    protected HandleService handleService;
+    protected RelationshipService relationshipService;
 
     @Override
     public Item createNewItemAndAddItInWorkspace(Context context, Item nativeItem) {
@@ -92,10 +93,18 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
         }
     }
 
+    /**
+     * Copy all data (minus a few exceptions) from the old item to the new item.
+     * @param c the DSpace context.
+     * @param itemNew the new version of the item.
+     * @param previousItem the old version of the item.
+     * @return the new version of the item, with data from the old item.
+     */
     @Override
     public Item updateItemState(Context c, Item itemNew, Item previousItem) {
         try {
             copyMetadata(c, itemNew, previousItem);
+            copyRelationships(c, itemNew, previousItem);
             createBundlesAndAddBitstreams(c, itemNew, previousItem);
             try {
                 identifierService.reserve(c, itemNew);
@@ -111,11 +120,6 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             List<ResourcePolicy> policies =
                 authorizeService.findPoliciesByDSOAndType(c, previousItem, ResourcePolicy.TYPE_CUSTOM);
             authorizeService.addPolicies(c, policies, itemNew);
-
-            // Add metadata `dc.relation.replaces` to the new item. The metadata `dc.relation.isreplacedby`
-            // are added to the previous item in the VersionRestRepository.
-            manageRelationMetadata(c, itemNew, previousItem);
-
             itemService.update(c, itemNew);
             return itemNew;
         } catch (IOException | SQLException | AuthorizeException e) {
@@ -124,17 +128,47 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     }
 
     /**
-     * Add metadata `dc.relation.replaces` to the new item.
+     * Copy all relationships of the old item to the new item.
+     * At this point in the lifecycle of the item-version (before archival), only the opposite item receives
+     * "latest" status. On item archival of the item-version, the "latest" status of the relevant relationships
+     * will be updated.
+     * @param context the DSpace context.
+     * @param newItem the new version of the item.
+     * @param oldItem the old version of the item.
      */
-    private void manageRelationMetadata(Context c, Item itemNew, Item previousItem) throws SQLException {
-        // Remove copied `dc.relation.replaces` metadata for the new item.
-        itemService.clearMetadata(c, itemNew, "dc", "relation", "replaces", null);
-
-        // Add metadata `dc.relation.replaces` to the new item.
-        // The metadata value is: `dc.identifier.uri` from the previous item.
-        String identifierUriPrevItem = itemService.getMetadataFirstValue(previousItem, "dc",
-                "identifier","uri", Item.ANY);
-        itemService.addMetadata(c, itemNew, "dc", "relation", "replaces", null,
-                identifierUriPrevItem);
+    protected void copyRelationships(
+        Context context, Item newItem, Item oldItem
+    ) throws SQLException, AuthorizeException {
+        List<Relationship> oldRelationships = relationshipService.findByItem(context, oldItem, -1, -1, false, true);
+        for (Relationship oldRelationship : oldRelationships) {
+            if (oldRelationship.getLeftItem().equals(oldItem)) {
+                // current item is on left side of this relationship
+                relationshipService.create(
+                    context,
+                    newItem,  // new item
+                    oldRelationship.getRightItem(),
+                    oldRelationship.getRelationshipType(),
+                    oldRelationship.getLeftPlace(),
+                    oldRelationship.getRightPlace(),
+                    oldRelationship.getLeftwardValue(),
+                    oldRelationship.getRightwardValue(),
+                    Relationship.LatestVersionStatus.RIGHT_ONLY // only mark the opposite side as "latest" for now
+                );
+            } else if (oldRelationship.getRightItem().equals(oldItem)) {
+                // current item is on right side of this relationship
+                relationshipService.create(
+                    context,
+                    oldRelationship.getLeftItem(),
+                    newItem, // new item
+                    oldRelationship.getRelationshipType(),
+                    oldRelationship.getLeftPlace(),
+                    oldRelationship.getRightPlace(),
+                    oldRelationship.getLeftwardValue(),
+                    oldRelationship.getRightwardValue(),
+                    Relationship.LatestVersionStatus.LEFT_ONLY // only mark the opposite side as "latest" for now
+                );
+            }
+        }
     }
+
 }

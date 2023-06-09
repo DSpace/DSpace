@@ -29,7 +29,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -79,9 +78,6 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     @Autowired
     private WorkspaceItemService workspaceItemService;
 
-    @Autowired
-    private HandleService handleService;
-
     @SuppressWarnings("rawtypes")
     @Autowired(required = true)
     protected WorkflowItemService workflowItemService;
@@ -114,20 +110,12 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
             throw new UnprocessableEntityException("The given URI list could not be properly parsed to one result");
         }
 
-        boolean hasEntityType = StringUtils.isNotBlank(itemService.
-                                getMetadataFirstValue(item, "dspace", "entity", "type", Item.ANY));
-        boolean isBlockEntity = configurationService.getBooleanProperty("versioning.block.entity", true);
-
         EPerson submitter = item.getSubmitter();
-        boolean isAdmin = authorizeService.isAdmin(context);
+        boolean isAdmin = authorizeService.isAdmin(context, item);
         boolean canCreateVersion = configurationService.getBooleanProperty("versioning.submitterCanCreateNewVersion");
 
         if (!isAdmin && !(canCreateVersion && Objects.equals(submitter, context.getCurrentUser()))) {
             throw new AuthorizeException("The logged user doesn't have the rights to create a new version.");
-        }
-        if (hasEntityType  && isBlockEntity) {
-            throw new AuthorizeException("You are trying to create a new version for an entity" +
-                                         " which is blocked by the configuration");
         }
 
         WorkflowItem workflowItem = null;
@@ -152,23 +140,6 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         Version version = StringUtils.isNotBlank(summary) ?
                           versioningService.createNewVersion(context, item, summary) :
                           versioningService.createNewVersion(context, item);
-
-        if (Objects.isNull(version)) {
-            throw new RuntimeException("Cannot create the new version for the item with id: " + item.getID());
-        }
-        if (Objects.isNull(version.getItem())) {
-            throw new RuntimeException("Add metadata `dc.relation.isreplacedby` to the previous version item " +
-                    "because the new item wasn't assigned to the version object.");
-        }
-
-        // Add metadata `dc.relation.isreplacedby` to the previous version item.
-        // The metadata value is: `dc.identifier.uri` from the new item.
-        String handleref = handleService.getCanonicalForm(version.getItem().getHandle());
-        if (org.apache.commons.lang3.StringUtils.isBlank(handleref)) {
-            throw new RuntimeException("Cannot get handle in canonical form.");
-        }
-        itemService.addMetadata(context, item, "dc", "relation", "isreplacedby", null,
-                handleref);
         return converter.toRest(version, utils.obtainProjection());
     }
 

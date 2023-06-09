@@ -15,6 +15,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.DSpaceControlledVocabularyIndex;
 
 /**
  * Broker for ChoiceAuthority plugins, and for other information configured
@@ -220,4 +221,7 @@ public interface ChoiceAuthorityService {
      * @return the parent Choice object if any
      */
     public Choice getParentChoice(String authorityName, String vocabularyId, String locale);
+
+    public DSpaceControlledVocabularyIndex getVocabularyIndex(String nameVocab);
+
 }

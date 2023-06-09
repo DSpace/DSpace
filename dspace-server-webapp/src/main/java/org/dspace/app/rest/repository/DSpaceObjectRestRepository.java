@@ -15,7 +15,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
-import org.dspace.app.rest.utils.SolrOAIReindexer;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.DSpaceObjectService;
@@ -38,9 +37,6 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
     ResourcePatch<M> resourcePatch;
     @Autowired
     MetadataConverter metadataConverter;
-
-    @Autowired
-    private SolrOAIReindexer solrOAIReindexer;
 
     DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService) {
         this.dsoService = dsoService;
@@ -67,7 +63,6 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         }
         resourcePatch.patch(obtainContext(), dso, patch.getOperations());
         dsoService.update(obtainContext(), dso);
-        solrOAIReindexer.reindexItem(dso);
     }
 
     @Override

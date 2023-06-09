@@ -7,13 +7,8 @@
  */
 package org.dspace.submit.migration;
 
-import java.sql.SQLException;
-
 import org.apache.commons.cli.Options;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link SubmissionFormsMigration} script
@@ -22,9 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SubmissionFormsMigrationCliScriptConfiguration<T extends SubmissionFormsMigration>
     extends ScriptConfiguration<T> {
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     private Class<T> dspaceRunnableClass;
 
@@ -39,25 +31,13 @@ public class SubmissionFormsMigrationCliScriptConfiguration<T extends Submission
     }
 
     @Override
-    public boolean isAllowedToExecute(Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
-        }
-    }
-
-    @Override
     public Options getOptions() {
         if (options == null) {
             Options options = new Options();
 
             options.addOption("f", "input-forms", true, "Path to source input-forms.xml file location");
-            options.getOption("f").setType(String.class);
             options.addOption("s", "item-submission", true, "Path to source item-submission.xml file location");
-            options.getOption("s").setType(String.class);
             options.addOption("h", "help", false, "help");
-            options.getOption("h").setType(boolean.class);
 
             super.options = options;
         }

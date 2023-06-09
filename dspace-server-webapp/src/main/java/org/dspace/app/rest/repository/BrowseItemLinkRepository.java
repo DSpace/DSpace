@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.ITEMS)
+@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.LINK_ITEMS)
 public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
@@ -136,7 +136,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
         }
 
         // For second level browses on metadata indexes, we need to adjust the default sorting
-        if (bi != null && bi.isMetadataIndex() && bs.isSecondLevel() && bs.getSortBy() <= 0) {
+        if (bi.isMetadataIndex() && bs.isSecondLevel() && bs.getSortBy() <= 0) {
             bs.setSortBy(1);
         }
 
@@ -144,7 +144,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
         Pageable pageResultInfo =
                 PageRequest.of((binfo.getStart() - 1) / binfo.getResultsPerPage(), binfo.getResultsPerPage());
-        List<Item> tmpResult = new ArrayList<Item>();
+        List<Item> tmpResult = new ArrayList<>();
         for (Item bb : binfo.getBrowseItemResults()) {
             tmpResult.add(bb);
         }
@@ -155,7 +155,8 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
     @Override
     public boolean isEmbeddableRelation(Object data, String name) {
         BrowseIndexRest bir = (BrowseIndexRest) data;
-        if (!bir.isMetadataBrowse() && "items".equals(name)) {
+        if (bir.getBrowseType().equals(BrowseIndexRest.BROWSE_TYPE_FLAT) &&
+                name.equals(BrowseIndexRest.LINK_ITEMS)) {
             return true;
         }
         return false;

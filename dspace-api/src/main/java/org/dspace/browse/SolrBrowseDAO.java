@@ -8,7 +8,6 @@
 package org.dspace.browse;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -178,7 +178,6 @@ public class SolrBrowseDAO implements BrowseDAO {
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
             addDefaultFilterQueries(query);
-            addStatusFilter(query);
             if (distinct) {
                 DiscoverFacetField dff;
                 if (StringUtils.isNotBlank(startsWith)) {
@@ -208,6 +207,10 @@ public class SolrBrowseDAO implements BrowseDAO {
                 } else if (valuePartial) {
                     query.addFilterQueries("{!field f=" + facetField + "_partial}" + value);
                 }
+                if (StringUtils.isNotBlank(startsWith) && orderField != null) {
+                    query.addFilterQueries(
+                        "bi_" + orderField + "_sort:" + ClientUtils.escapeQueryChars(startsWith) + "*");
+                }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
                 query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
@@ -225,18 +228,6 @@ public class SolrBrowseDAO implements BrowseDAO {
         return sResponse;
     }
 
-    private void addStatusFilter(DiscoverQuery query) {
-        try {
-            if (!authorizeService.isAdmin(context)
-                && (authorizeService.isCommunityAdmin(context)
-                || authorizeService.isCollectionAdmin(context))) {
-                query.addFilterQueries(searcher.createLocationQueryForAdministrableItems(context));
-            }
-        } catch (SQLException ex) {
-            log.error("Error looking up authorization rights of current user", ex);
-        }
-    }
-
     private void addLocationScopeFilter(DiscoverQuery query) {
         if (container != null) {
             if (containerIDField.startsWith("collection")) {
@@ -248,9 +239,10 @@ public class SolrBrowseDAO implements BrowseDAO {
     }
 
     private void addDefaultFilterQueries(DiscoverQuery query) {
-        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(container);
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(context, container);
         discoveryConfiguration.getDefaultFilterQueries().forEach(query::addFilterQueries);
     }
+
     @Override
     public int doCountQuery() throws BrowseException {
         DiscoverResult resp = getSolrResponse();
@@ -340,7 +332,6 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverQuery query = new DiscoverQuery();
         addLocationScopeFilter(query);
         addDefaultFilterQueries(query);
-        addStatusFilter(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 

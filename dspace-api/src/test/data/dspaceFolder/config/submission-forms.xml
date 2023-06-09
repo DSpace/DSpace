@@ -79,9 +79,6 @@
          <input-type>onebox</input-type>
          <hint>Enter the main title of the item.</hint>
          <required>You must enter a main title for this item.</required>
-         <acl>
-           policy=deny,action=read,grantee-type=user,grantee-id=*
-         </acl>
          <!--    <language value-pairs-name="common_iso_languages">true</language> -->
        </field>
      </row>
@@ -184,33 +181,6 @@ it, please enter the types and the actual numbers or codes.</hint>
          <label>Language</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
          <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
-         <required></required>
-       </field>
-     </row>
-     <!-- Example row for the complex input type definition.
-            Uncomment it and the complex input will be showed in the submission UI. -->
-     <row>
-       <field>
-         <dc-schema>local</dc-schema>
-         <dc-element>contact</dc-element>
-         <dc-qualifier>person</dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Contact person</label>
-         <style>col-sm-5</style>
-         <input-type complex-definition-ref="contact_person">complex</input-type>
-         <hint>This is contact person</hint>
-         <required></required>
-       </field>
-     </row>
-     <row>
-       <field>
-         <dc-schema>local</dc-schema>
-         <dc-element>sponsor</dc-element>
-         <repeatable>true</repeatable>
-         <label>Funding</label>
-         <style>col-sm-5</style>
-         <input-type complex-definition-ref="funding">complex</input-type>
-         <hint>This is funding</hint>
          <required></required>
        </field>
      </row>
@@ -466,6 +436,35 @@ it, please enter the types and the actual numbers or codes.</hint>
         </field>
      </row>
   </form>
+
+   <form name="test-outside-workflow-hidden">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <required>Field required</required>
+       </field>
+     </row>
+   </form>
+
+   <form name="test-outside-submission-hidden">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Type</label>
+         <input-type>onebox</input-type>
+         <required>Field required</required>
+       </field>
+     </row>
+   </form>
+
  </form-definitions>
 
 
@@ -652,24 +651,5 @@ it, please enter the types and the actual numbers or codes.</hint>
    </value-pairs>
 
  </form-value-pairs>
-
-  <!-- Example of the complex input type definition.
-     Uncomment the example row of the complex input type definition to see this input in the submission UI. -->
-  <form-complex-definitions>
-    <definition name="contact_person">
-      <input name="givenname" input-type="text" label="Given name" required="true"/>
-      <input name="surname" input-type="text" label="Surname" required="true"/>
-      <input name="email" input-type="text" label="Email" regex="[^@]+@[^\.@]+\.[^@]+" required="true"/>
-      <input name="affiliation" input-type="text" label="Affiliation"/>
-    </definition>
-
-    <definition name="funding">
-      <input name="type" input-type="dropdown" label="Funding type" required="true" value-pairs-name="metashare_funding"/>
-      <input name="code"  input-type="autocomplete" label="Grant no. or funding project code" required="true"/>
-      <input name="orgname" input-type="text" label="Funding organization" required="true"/>
-      <input name="projname" input-type="autocomplete" label="Funding project name" required="true"/>
-      <input name="openaire_id" input-type="text" label="EU Project Identifier (OpenAIRE)" readonly="true" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation"/>
-    </definition>
-  </form-complex-definitions>
 
 </input-forms>

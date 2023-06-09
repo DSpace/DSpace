@@ -6,7 +6,9 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.converter;
+
 import java.text.ParseException;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
@@ -15,6 +17,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.submit.model.AccessConditionConfiguration;
 import org.dspace.submit.model.AccessConditionOption;
 import org.dspace.util.DateMathParser;
+import org.dspace.util.TimeHelpers;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,21 +30,21 @@ import org.springframework.stereotype.Component;
 public class SubmissionAccessOptionConverter
         implements DSpaceConverter<AccessConditionConfiguration, SubmissionAccessOptionRest> {
 
-    DateMathParser dateMathParser = new DateMathParser();
-
     @Override
     public SubmissionAccessOptionRest convert(AccessConditionConfiguration config, Projection projection) {
         SubmissionAccessOptionRest model = new SubmissionAccessOptionRest();
         model.setId(config.getName());
         model.setCanChangeDiscoverable(config.getCanChangeDiscoverable());
         model.setProjection(projection);
+        DateMathParser dateMathParser = new DateMathParser();
         for (AccessConditionOption option : config.getOptions()) {
             AccessConditionOptionRest optionRest = new AccessConditionOptionRest();
             optionRest.setHasStartDate(option.getHasStartDate());
             optionRest.setHasEndDate(option.getHasEndDate());
             if (StringUtils.isNotBlank(option.getStartDateLimit())) {
                 try {
-                    optionRest.setMaxStartDate(dateMathParser.parseMath(option.getStartDateLimit()));
+                    Date requested = dateMathParser.parseMath(option.getStartDateLimit());
+                    optionRest.setMaxStartDate(TimeHelpers.toMidnightUTC(requested));
                 } catch (ParseException e) {
                     throw new IllegalStateException("Wrong start date limit configuration for the access condition "
                             + "option named  " + option.getName());
@@ -49,7 +52,8 @@ public class SubmissionAccessOptionConverter
             }
             if (StringUtils.isNotBlank(option.getEndDateLimit())) {
                 try {
-                    optionRest.setMaxEndDate(dateMathParser.parseMath(option.getEndDateLimit()));
+                    Date requested = dateMathParser.parseMath(option.getEndDateLimit());
+                    optionRest.setMaxEndDate(TimeHelpers.toMidnightUTC(requested));
                 } catch (ParseException e) {
                     throw new IllegalStateException("Wrong end date limit configuration for the access condition "
                             + "option named  " + option.getName());

@@ -1,4 +1,17 @@
-#set($subject = 'Request copy of document')
+## E-mail sent to a restricted Item's author when a user requests a copy.
+##
+## Parameters: 0 requester's name
+##             1 requester's address
+##             2 name of a single bitstream, or "all"
+##             3 item Handle
+##             4 item title
+##             5 message from requester
+##             6 link back to DSpace for action
+##             7 corresponding author name
+##             8 corresponding author email
+##             9 configuration property "dspace.name"
+##             10 configuration property "mail.helpdesk"
+#set($subject = "${config.get('dspace.name')}: Request copy of document")
 
 Dear ${params[7]},
 
@@ -8,10 +21,12 @@ This request came along with the following message:
 
 "${params[5]}"
 
-To answer, click ${params[6]}. Whether you choose to grant or deny the request, we think that it''s in your best interest to respond.
+To answer, click ${params[6]}. Whether you choose to grant or deny the request, we think that it's in your best interest to respond.
 
-IF YOU ARE NOT AN AUTHOR OF THIS DOCUMENT, and only submitted the document on the author''s behalf, PLEASE REDIRECT THIS MESSAGE TO THE AUTHOR(S).  Only the author(s) should answer the request to send a copy.
+IF YOU ARE NOT AN AUTHOR OF THIS DOCUMENT, and only submitted the document on the author's behalf, PLEASE REDIRECT THIS MESSAGE TO THE AUTHOR(S).  Only the author(s) should answer the request to send a copy.
 
 IF YOU ARE AN AUTHOR OF THE REQUESTED DOCUMENT, thank you for your cooperation!
 
 If you have any questions concerning this request, please contact ${params[10]}.
+
+The ${config.get('dspace.name')} Team

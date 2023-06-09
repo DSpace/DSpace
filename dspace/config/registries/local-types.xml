@@ -23,119 +23,13 @@
     <namespace>http://dspace.org/namespace/local/</namespace>
   </dc-schema>
 
+<!--
   <dc-type>
     <schema>local</schema>
-    <element>hiddenButHarvestable</element>
-    <scope_note>Should item be harvestable thru OAI-PMH, but behave like private in frontend?</scope_note>
+    <element></element>
+    <qualifier></qualifier>
+    <scope_note>Description of example metadata field.</scope_note>
   </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>approximateDate</element>
-    <qualifier>issued</qualifier>
-    <scope_note>Date issued used where the point in time is uncertain; eg. a range.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>hasCMDI</element>
-    <scope_note>Indicates uploaded cmdi file</scope_note>
-  </dc-type>
-    
-  <dc-type>
-    <schema>local</schema>
-    <element>contact</element>
-    <qualifier>person</qualifier>
-    <scope_note>Contact person</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>sponsor</element>
-    <scope_note>Sponsor</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>bitstream</element>
-    <qualifier>redirectToURL</qualifier>
-    <scope_note>Get the bitstream from this URL.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>withdrawn</element>
-    <qualifier>reason</qualifier>
-    <scope_note>Store the withdrawal reason in addition to provenance</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>featuredService</element>
-    <qualifier>kontext</qualifier>
-    <scope_note>Links to data in kontext</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>featuredService</element>
-    <qualifier>pmltq</qualifier>
-    <scope_note>Links to data in PML-TQ</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>featuredService</element>
-    <qualifier>teitok</qualifier>
-    <scope_note>Links to data in TEITOK</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>demo</element>
-    <qualifier>uri</qualifier>
-    <scope_note>URL of the demo</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>size</element>
-    <qualifier>info</qualifier>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>submission</element>
-    <qualifier>note</qualifier>
-    <scope_note>A submitter's note for editor/reviewer</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>has</element>
-    <qualifier>files</qualifier>
-    <scope_note>True if the item contains any bitstreams</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>branding</element>
-    <scope_note>LRT/LINDAT (Name of Community)</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>bitstream</element>
-    <qualifier>file</qualifier>
-    <scope_note>Files inside a bitstream if an archive</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>local</schema>
-    <element>refbox</element>
-    <qualifier>format</qualifier>
-    <scope_note>If the default refbox citation is not enough, use this field to provide a format string
-      . Check/extend html.xsl for available variables.</scope_note>
-  </dc-type>
+-->
 
 </dspace-dc-types>

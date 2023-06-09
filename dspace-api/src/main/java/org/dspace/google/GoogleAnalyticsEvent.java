@@ -7,134 +7,93 @@
  */
 package org.dspace.google;
 
+import java.util.Objects;
+
+import org.springframework.util.Assert;
+
 /**
  * This is a dataholder class for an individual event to be sent to Google Analaytics
  *
  * @author April Herron
  */
-public class GoogleAnalyticsEvent {
+public final class GoogleAnalyticsEvent {
 
-    private String cid;
-    private String uip;
-    private String ua;
-    private String dr;
-    private String dp;
-    private String dt;
-    private long time;
+    private final String clientId;
+    private final String userIp;
+    private final String userAgent;
+    private final String documentReferrer;
+    private final String documentPath;
+    private final String documentTitle;
+    private final long time;
 
-    GoogleAnalyticsEvent(String cid, String uip, String ua, String dr, String dp, String dt, long time) {
-        this.cid = cid;
-        this.uip = uip;
-        this.ua = ua;
-        this.dr = dr;
-        this.dp = dp;
-        this.dt = dt;
-        this.time = time;
+    public GoogleAnalyticsEvent(String clientId, String userIp, String userAgent, String documentReferrer,
+        String documentPath, String documentTitle) {
+        Assert.notNull(clientId, "A client id is required to create a Google Analytics event");
+        this.clientId = clientId;
+        this.userIp = userIp;
+        this.userAgent = userAgent;
+        this.documentReferrer = documentReferrer;
+        this.documentPath = documentPath;
+        this.documentTitle = documentTitle;
+        this.time = System.currentTimeMillis();
     }
 
-    /**
-     * Return Client ID
-     */
-    public String getCid() {
-        return cid;
+    public String getClientId() {
+        return clientId;
     }
 
-    /**
-     * Set Client ID
-     */
-    public void setCid(String cid) {
-        this.cid = cid;
+    public String getUserIp() {
+        return userIp;
     }
 
-    /**
-     * Return User IP
-     */
-    public String getUip() {
-        return uip;
+    public String getUserAgent() {
+        return userAgent != null ? userAgent : "";
     }
 
-    /**
-     * Set User IP
-     */
-    public void setUip(String uip) {
-        this.uip = uip;
+    public String getDocumentReferrer() {
+        return documentReferrer != null ? documentReferrer : "";
     }
 
-    /**
-     * Returns User Agent
-     */
-    public String getUa() {
-        if (ua == null) {
-            return "";
-        } else {
-            return ua;
-        }
+    public String getDocumentPath() {
+        return documentPath;
     }
 
-    /**
-     * Set User Agent
-     */
-    public void setUa(String ua) {
-        this.ua = ua;
+    public String getDocumentTitle() {
+        return documentTitle;
     }
 
-    /**
-     * Return Document Referrer
-     */
-    public String getDr() {
-        if (dr == null) {
-            return "";
-        } else {
-            return dr;
-        }
-    }
-
-    /**
-     * Set Document Referrer
-     */
-    public void setDr(String dr) {
-        this.dr = dr;
-    }
-
-    /**
-     * Return Document Path
-     */
-    public String getDp() {
-        return dp;
-    }
-
-    /**
-     * Set Document Path
-     */
-    public void setDp(String dp) {
-        this.dp = dp;
-    }
-
-    /**
-     * Return Document Title
-     */
-    public String getDt() {
-        return dt;
-    }
-
-    /**
-     * Set Document Title
-     */
-    public void setDt(String dt) {
-        this.dt = dt;
-    }
-
-    /**
-     * Return Time of event
-     */
     public long getTime() {
         return time;
     }
 
-    /**
-     * Set Time of event
-     */
-    public void setTime(long time) {
-        this.time = time;
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientId, documentPath, documentReferrer, documentTitle, time, userAgent, userIp);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        GoogleAnalyticsEvent other = (GoogleAnalyticsEvent) obj;
+        return Objects.equals(clientId, other.clientId) && Objects.equals(documentPath, other.documentPath)
+            && Objects.equals(documentReferrer, other.documentReferrer)
+            && Objects.equals(documentTitle, other.documentTitle) && time == other.time
+            && Objects.equals(userAgent, other.userAgent) && Objects.equals(userIp, other.userIp);
+    }
+
+    @Override
+    public String toString() {
+        return "GoogleAnalyticsEvent [clientId=" + clientId + ", userIp=" + userIp + ", userAgent=" + userAgent
+            + ", documentReferrer=" + documentReferrer + ", documentPath=" + documentPath + ", documentTitle="
+            + documentTitle + ", time=" + time + "]";
+    }
+
 }

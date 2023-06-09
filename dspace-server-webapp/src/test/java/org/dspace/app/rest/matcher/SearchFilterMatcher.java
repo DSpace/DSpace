@@ -156,43 +156,4 @@ public class SearchFilterMatcher {
             checkOperators()
         );
     }
-    public static Matcher<? super Object> clarinLicenseRightsFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("rights")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("standard")),
-                hasJsonPath("$.openByDefault", is(false)),
-                checkOperators()
-        );
-    }
-
-    public static Matcher<? super Object> clarinItemsLanguageFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("language")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("standard")),
-                hasJsonPath("$.openByDefault", is(false)),
-                checkOperators()
-        );
-    }
-
-    public static Matcher<? super Object> clarinItemsCommunityFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("items_owning_community")),
-                hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("standard")),
-                hasJsonPath("$.openByDefault", is(false)),
-                checkOperators()
-        );
-    }
-
-    public static Matcher<? super Object> clarinItemsTypeFilter() {
-        return allOf(
-                hasJsonPath("$.filter", is("itemtype")),
-                hasJsonPath("$.hasFacets", is(false)),
-                hasJsonPath("$.type", is("text")),
-                hasJsonPath("$.openByDefault", is(false)),
-                checkOperators()
-        );
-    }
 }

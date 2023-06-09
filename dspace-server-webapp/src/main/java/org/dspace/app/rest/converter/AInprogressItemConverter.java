@@ -27,6 +27,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Abstract implementation providing the common functionalities for all the inprogressSubmission Converter
@@ -44,6 +45,8 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AInprogressItemConverter.class);
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 
@@ -82,6 +85,10 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
             witem.setSubmissionDefinition(def);
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
+
+                if (stepConfig.isHiddenForInProgressSubmission(obj)) {
+                    continue;
+                }
 
                 /*
                  * First, load the step processing class (using the current

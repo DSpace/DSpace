@@ -7,24 +7,15 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.sql.SQLException;
-
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends ScriptConfiguration<T> {
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     private Class<T> dspaceRunnableClass;
 
     private static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
-
 
     @Override
     public Class<T> getDspaceRunnableClass() {
@@ -36,29 +27,15 @@ public class MediaFilterScriptConfiguration<T extends MediaFilterScript> extends
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
-
-    @Override
-    public boolean isAllowedToExecute(final Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
-        }
-    }
-
     @Override
     public Options getOptions() {
         Options options = new Options();
         options.addOption("v", "verbose", false, "print all extracted text and other details to STDOUT");
-        options.getOption("v").setType(boolean.class);
         options.addOption("q", "quiet", false, "do not print anything except in the event of errors.");
-        options.getOption("q").setType(boolean.class);
         options.addOption("f", "force", false, "force all bitstreams to be processed");
-        options.getOption("f").setType(boolean.class);
         options.addOption("i", "identifier", true, "ONLY process bitstreams belonging to identifier");
         options.addOption("m", "maximum", true, "process no more than maximum items");
         options.addOption("h", "help", false, "help");
-        options.getOption("h").setType(boolean.class);
 
         Option pluginOption = Option.builder("p")
                                     .longOpt("plugins")

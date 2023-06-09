@@ -39,7 +39,6 @@
     <bean class="org.dspace.content.CollectionServiceImpl"/>
     <bean class="org.dspace.content.BitstreamFormatServiceImpl"/>
     <bean class="org.dspace.content.BitstreamServiceImpl"/>
-    <bean class="org.dspace.content.ClarinBitstreamServiceImpl"/>
     <bean class="org.dspace.content.BundleServiceImpl"/>
     <bean class="org.dspace.content.CommunityServiceImpl"/>
     <bean class="org.dspace.content.InstallItemServiceImpl"/>
@@ -49,7 +48,6 @@
     <bean class="org.dspace.content.MetadataSchemaServiceImpl"/>
     <bean class="org.dspace.content.MetadataValueServiceImpl"/>
     <bean class="org.dspace.content.SiteServiceImpl"/>
-    <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
     <bean class="org.dspace.content.RelationshipServiceImpl"/>
     <bean class="org.dspace.content.EntityTypeServiceImpl"/>
@@ -57,12 +55,20 @@
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
     <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
     <bean class="org.dspace.content.FeedbackServiceImpl"/>
-    <bean class="org.dspace.content.DspaceObjectClarinServiceImpl"/>
+
     <bean class="org.dspace.scripts.ProcessServiceImpl"/>
     <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 
+    <bean class="org.dspace.alerts.SystemWideAlertServiceImpl"/>
+
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
+
+    <bean class="org.dspace.profile.ResearcherProfileServiceImpl"/>
+
+    <bean class="org.dspace.profile.OrcidMetadataCopyingAction"/>
+
+    <bean class="org.dspace.handle.hdlresolver.HdlResolverServiceImpl"/>
 
     <bean class='org.dspace.service.impl.HttpConnectionPoolService'
           id='solrHttpConnectionPoolService'
@@ -74,17 +80,6 @@
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
-
-    <bean class="org.dspace.content.clarin.ClarinLicenseServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinLicenseLabelServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinLicenseResourceMappingServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinUserRegistrationServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinLicenseResourceUserAllowanceServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinUserMetadataServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinItemServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinVerificationTokenServiceImpl"/>
-    <bean class="org.dspace.content.clarin.ClarinWorkspaceItemServiceImpl"/>
-
     <bean class="org.dspace.core.NewsServiceImpl">
         <property name="acceptableFilenames">
             <list>
@@ -98,22 +93,19 @@
 
     <bean class="org.dspace.disseminate.CitationDocumentServiceImpl"/>
 
-    <!-- Ensure EmbargoService is initialized properly via init() method -->
+    <!-- Ensure EmbargoService and AccessStatusService are initialized properly via init() method -->
     <bean class="org.dspace.embargo.EmbargoServiceImpl" init-method="init"/>
+    <bean class="org.dspace.access.status.AccessStatusServiceImpl" init-method="init"/>
 
     <bean class="org.dspace.eperson.AccountServiceImpl"/>
     <bean class="org.dspace.eperson.EPersonServiceImpl"/>
     <bean class="org.dspace.eperson.GroupServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.SupervisorServiceImpl"/>
-
-    <bean class="org.dspace.authorize.AuthorizationBitstreamUtils"/>
-
+    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
     <bean class="org.dspace.event.EventServiceImpl"/>
 
     <bean class="org.dspace.handle.HandleServiceImpl"/>
-    <bean class="org.dspace.handle.HandleClarinServiceImpl"/>
 
     <bean class="org.dspace.harvest.HarvestedCollectionServiceImpl"/>
     <bean class="org.dspace.harvest.HarvestedItemServiceImpl"/>
@@ -153,13 +145,10 @@
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
 
-    <!-- Matomo statistics -->
-    <bean class="org.matomo.java.tracking.MatomoTracker">
-        <!-- TODO change me -->
-        <constructor-arg value="http://dev-5.pc:8135/matomo.php"/>
-    </bean>
-    <bean class="org.dspace.app.statistics.clarin.ClarinMatomoBitstreamTracker"/>
-    <bean class="org.dspace.app.statistics.clarin.ClarinMatomoOAITracker"/>
+    <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
+    <bean class="org.dspace.authorize.RegexPasswordValidator" />
+
+    <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
 </beans>
 

@@ -69,6 +69,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -499,13 +500,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(tokenParentAdmin).perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.is((CollectionMatcher.matchCollection(col1)))));
+                        Matchers.is(CollectionMatcher.matchCollection(col1))));
 
         String tokenCol1Admin = getAuthToken(col1Admin.getEmail(), "qwerty02");
         getClient(tokenCol1Admin).perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.is((CollectionMatcher.matchCollection(col1)))));
+                        Matchers.is(CollectionMatcher.matchCollection(col1))));
 
         String tokenCol2Admin = getAuthToken(col2Admin.getEmail(), "qwerty03");
         getClient(tokenCol2Admin).perform(get("/api/core/collections/" + col1.getID()))
@@ -1206,7 +1207,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                 )
                             )))
                             .andDo(result -> idRef
-                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
 
         getClient(authToken).perform(post("/api/core/collections")
@@ -2421,9 +2422,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                                        .build();
 
         List<Item> items = new ArrayList();
-        // This comparator is used to sort our test Items by java.util.UUID (which sorts them based on the RFC
-        // and not based on String comparison, see also https://stackoverflow.com/a/51031298/3750035 )
-        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID());
+        // Hibernate 5.x's org.hibernate.dialect.H2Dialect sorts UUIDs as if they are Strings.
+        // So, we must compare UUIDs as if they are strings.
+        // In Hibernate 6, the H2Dialect has been updated with native UUID type support, at which point
+        // we'd need to update the below comparator to compare them as java.util.UUID (which sorts based on RFC 4412).
+        Comparator<Item> compareByUUID = Comparator.comparing(i -> i.getID().toString());
 
         Item item0 = ItemBuilder.createItem(context, collection).withTitle("Item 0").build();
         items.add(item0);
@@ -2676,7 +2679,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String token = getAuthToken(topLevelCommunityAAdmin.getEmail(), password);
 
-        // Verify the community admin gets all the communities he's admin for
+        // Verify the community admin gets all the communities they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2721,7 +2724,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(subCommunityAAdmin.getEmail(), password);
 
-        // Verify the subcommunity admin gets all the communities he's admin for
+        // Verify the subcommunity admin gets all the communities they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2767,7 +2770,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(collectionAAdmin.getEmail(), password);
 
-        // Verify the collection admin gets all the communities he's admin for
+        // Verify the collection admin gets all the communities they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2906,7 +2909,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Verify an ePerson in a subgroup of a community admin group gets all the collections he's admin for
+        // Verify an ePerson in a subgroup of a community admin group gets all the collections they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -2962,7 +2965,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Verify an ePerson in a subgroup of a subcommunity admin group gets all the collections he's admin for
+        // Verify an ePerson in a subgroup of a subcommunity admin group gets all the collections they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -3018,7 +3021,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        // Verify an ePerson in a subgroup of a collection admin group gets all the collections he's admin for
+        // Verify an ePerson in a subgroup of a collection admin group gets all the collections they are admin for
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -3097,6 +3100,81 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         // Verify a non-authenticated user can't use this function
         getClient().perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void patchReplaceMultipleDescriptionCollection() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        List<String> collectionDescriptions = List.of(
+            "FIRST",
+            "SECOND",
+            "THIRD"
+        );
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("MyTest")
+                .build();
+
+        this.collectionService
+            .addMetadata(
+                context, col, MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY, collectionDescriptions
+            );
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+            .perform(get("/api/core/collections/" + col.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(0), 0),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(1), 1),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(2), 2)
+                    )
+                )
+            );
+
+        List<Operation> ops = List.of(
+            new ReplaceOperation("/metadata/dc.description/0", collectionDescriptions.get(2)),
+            new ReplaceOperation("/metadata/dc.description/1", collectionDescriptions.get(0)),
+            new ReplaceOperation("/metadata/dc.description/2", collectionDescriptions.get(1))
+        );
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+            .perform(patch("/api/core/collections/" + col.getID())
+            .content(requestBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(
+                 jsonPath("$.metadata",
+                     Matchers.allOf(
+                         MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(2), 0),
+                         MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(0), 1),
+                         MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(1), 2)
+                     )
+                 )
+             );
+        getClient(token)
+            .perform(get("/api/core/collections/" + col.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(2), 0),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(0), 1),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(1), 2)
+                    )
+                )
+            );
     }
 
     @Test

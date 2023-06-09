@@ -63,9 +63,9 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
     private ConfigurationService configurationService;
 
     // All OAI-PMH paths that we test against
-    private final String ROOT_PATH = "/oai";
+    private final String ROOT_PATH = "/oai/";
     private final String DEFAULT_CONTEXT_PATH = "request";
-    private final String DEFAULT_CONTEXT = ROOT_PATH + "/" + DEFAULT_CONTEXT_PATH;
+    private final String DEFAULT_CONTEXT = ROOT_PATH + DEFAULT_CONTEXT_PATH;
 
     // Mock to ensure XOAI caching is disabled for all tests (see @Before method)
     @MockBean
@@ -153,8 +153,8 @@ public class OAIpmhIT extends AbstractControllerIntegrationTest {
         getClient().perform(get(DEFAULT_CONTEXT).param("verb", "Identify"))
                    // Expect a 200 response code
                    .andExpect(status().isOk())
-                   // Expect the content type to be "text/xml"
-                   .andExpect(content().contentType("text/xml"))
+                   // Expect the content type to be "text/xml;charset=UTF-8"
+                   .andExpect(content().contentType("text/xml;charset=UTF-8"))
                    // Expect <scheme>oai</scheme>
                    .andExpect(xpath("OAI-PMH/Identify/description/oai-identifier/scheme").string("oai"))
                    // Expect protocol version 2.0

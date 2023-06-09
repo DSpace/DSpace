@@ -324,7 +324,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(
-                      new Link("/api/" + ResourcePolicyRest.CATEGORY + "/" + ResourcePolicyRest.PLURAL_NAME + "/search",
+                      Link.of("/api/" + ResourcePolicyRest.CATEGORY + "/" + ResourcePolicyRest.PLURAL_NAME + "/search",
                                          ResourcePolicyRest.PLURAL_NAME + "-search")));
     }
 }

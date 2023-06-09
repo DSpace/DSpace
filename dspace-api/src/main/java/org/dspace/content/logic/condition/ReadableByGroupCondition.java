@@ -10,7 +10,8 @@ package org.dspace.content.logic.condition;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -24,10 +25,9 @@ import org.dspace.core.Context;
  * can perform the action on a given item
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class ReadableByGroupCondition extends AbstractCondition {
-    private static Logger log = Logger.getLogger(ReadableByGroupCondition.class);
+    private final static Logger log = LogManager.getLogger();
 
     // Authorize service
     AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();

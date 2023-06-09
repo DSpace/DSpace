@@ -260,6 +260,19 @@
     <qualifier>other</qualifier>
     <scope_note>A known identifier type common to a local collection.</scope_note>
   </dc-type>
+  
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>doi</qualifier>
+  </dc-type>
+  
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>scopus</qualifier>
+    <scope_note>The scopus identifier</scope_note>
+  </dc-type>
 
   <!-- Used by system: do not remove -->
   <dc-type>
@@ -484,13 +497,6 @@
     <element>rights</element>
     <qualifier>uri</qualifier>
     <scope_note>References terms governing use and reproduction.</scope_note>
-  </dc-type>
-
-  <dc-type>
-    <schema>dc</schema>
-    <element>rights</element>
-    <qualifier>label</qualifier>
-    <scope_note>Rights label should be one of PUB, RES, ACA.</scope_note>
   </dc-type>
 
   <dc-type>

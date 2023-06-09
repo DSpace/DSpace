@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.2.1</version>
+        <version>7.6-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -21,38 +21,6 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>oracle-support</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc6</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>postgres-support</id>
-            <activation>
-                <property>
-                    <name>!db.name</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
     <dependencies>
         <dependency>
@@ -135,7 +103,8 @@
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>fom-impl</artifactId>
-            <version>${axiom.version}</version>
+            <!-- CANNOT UPGRADE WITHOUT BREAKING sword2-server (see above) -->
+            <version>1.2.22</version>
             <exclusions>
                 <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
                      See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->

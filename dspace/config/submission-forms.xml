@@ -51,33 +51,6 @@
         <!-- Form which defines the first page/section of the "traditional" DSpace submission process,
              often used when depositing normal Items (i.e. Items which are not Entities). -->
         <form name="traditionalpageone">
-            <!-- Example row for the complex input type definition.
-                 Uncomment it and the complex input will be showed in the submission UI. -->
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>contact</dc-element>
-                    <dc-qualifier>person</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Contact person</label>
-                    <style>col-sm-5</style>
-                    <input-type complex-definition-ref="contact_person">complex</input-type>
-                    <hint>This is contact person</hint>
-                    <required></required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>sponsor</dc-element>
-                    <repeatable>true</repeatable>
-                    <label>Funding</label>
-                    <style>col-sm-5</style>
-                    <input-type complex-definition-ref="funding">complex</input-type>
-                    <hint>This is funding</hint>
-                    <required></required>
-                </field>
-            </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -85,15 +58,9 @@
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Author</label>
-                    <input-type>clarin-name</input-type>
+                    <input-type>onebox</input-type>
                     <hint>Enter the author's name (Family name, Given names).</hint>
                     <required></required>
-                    <!-- Example ACL field definition.
-                         Uncomment it and the Author input field will be showed only for the admin.
-                     policy=(allow|deny),action=(read|write),grantee-type=(user|group),grantee-id=(<UUID>)
-                    <acl>
-                        policy=deny,action=read,grantee-type=user,grantee-id=*
-                    </acl> -->
                 </field>
             </row>
             <row>
@@ -166,7 +133,6 @@
                     <dc-qualifier>ispartofseries</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Series/Report No.</label>
-                    <type-bind>Technical Report</type-bind>
                     <input-type>series</input-type>
                     <hint>Enter the series and number assigned to this item by your community.</hint>
                     <required></required>
@@ -213,56 +179,6 @@
                         is a dataset or an image) please select 'N/A'.
                     </hint>
                     <required></required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>hasCMDI</dc-element>
-                    <repeatable>true</repeatable>
-                    <label>Has CMDI file</label>
-                    <input-type value-pairs-name="hasCMDI_checkbox">list</input-type>
-                    <hint>Are you going to upload cmdi file?</hint>
-                    <required></required>
-                    <acl>
-                        policy=deny,action=read,grantee-type=user,grantee-id=*
-                    </acl>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>hiddenButHarvestable</dc-element>
-                    <dc-qualifier/>
-                    <repeatable>true</repeatable>
-                    <label>Hidden but harvestable</label>
-                    <style>col-sm-4</style>
-                    <input-type value-pairs-name="hidden_list">list</input-type>
-                    <hint>Should item be harvestable thru OAI-PMH but behave like private?</hint>
-                    <required/>
-                    <acl>
-                        policy=deny,action=read,grantee-type=user,grantee-id=*
-                    </acl>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>bitstream</dc-element>
-                    <dc-qualifier>redirectToURL</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Big file URL</label>
-                    <input-type>onebox</input-type>
-                    <hint>
-                        The actual maximum upload size of the file is 4GB. To upload the file bigger than maximum
-                        upload size type the URL of that big file. Admin must know URL to that bitstream file.
-                        Then click on the 'Save' button and the file will start to upload. The file will be loaded
-                        from the '/temp' folder of the server. Example: /tomcat/temp/bitstream.png
-                    </hint>
-                    <required></required>
-                    <acl>
-                        policy=deny,action=read,grantee-type=user,grantee-id=*
-                    </acl>
                 </field>
             </row>
         </form>
@@ -599,6 +515,37 @@
 <!--                </field>-->
 <!--            </row>-->
             <row>
+                <relation-field>
+                    <relationship-type>isProjectOfPerson</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Investigator</label>
+                    <hint>Enter the investigator's name (Family name, Given names).</hint>
+                    <linked-metadata-field>
+                        <dc-schema>project</dc-schema>
+                        <dc-element>investigator</dc-element>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                </relation-field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isProjectOfOrgUnit</relationship-type>
+                    <search-configuration>orgunit</search-configuration>
+                    <repeatable>false</repeatable>
+                    <label>Organization</label>
+                    <hint>Enter the organization's name</hint>
+                    <linked-metadata-field>
+                        <dc-schema>project</dc-schema>
+                        <dc-element>funder</dc-element>
+                        <dc-qualifier>name</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources/>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
@@ -606,6 +553,39 @@
                     <label>Keywords</label>
                     <input-type>onebox</input-type>
                     <hint>Enter the keywords of the project</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>startDate</dc-element>
+                    <label>Start date</label>
+                    <input-type>date</input-type>
+                    <hint>Enter the start date of the project</hint>
+                </field>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>endDate</dc-element>
+                    <label>End date</label>
+                    <input-type>date</input-type>
+                    <hint>Enter the end date of the project</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <label>Amount</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the amount of the project</hint>
+                </field>
+                <field>
+                    <dc-schema>project</dc-schema>
+                    <dc-element>amount</dc-element>
+                    <dc-qualifier>currency</dc-qualifier>
+                    <label>Amount currency</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the amount currency of the project</hint>
                 </field>
             </row>
             <row>
@@ -930,9 +910,9 @@
             </row>
             <row>
                 <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>dcterms</dc-element>
-                    <dc-qualifier>references</dc-qualifier>
+                    <dc-schema>dcterms</dc-schema>
+                    <dc-element>references</dc-element>
+                    <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Related Dataset</label>
                     <input-type>onebox</input-type>
@@ -1385,12 +1365,6 @@
     <!-- stores the associated stored-values in the database.                  -->
 
     <form-value-pairs>
-        <value-pairs value-pairs-name="hasCMDI_checkbox" dc-term="identifier">
-            <pair>
-                <displayed-value>Yes</displayed-value>
-                <stored-value>yes</stored-value>
-            </pair>
-        </value-pairs>
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
                 <displayed-value>ISSN</displayed-value>
@@ -1415,30 +1389,6 @@
             <pair>
                 <displayed-value>ISBN</displayed-value>
                 <stored-value>isbn</stored-value>
-            </pair>
-        </value-pairs>
-
-        <!-- taken from the metashare standard -->
-        <value-pairs value-pairs-name="metashare_funding" dc-term="">
-            <pair>
-                <displayed-value>N/A</displayed-value>
-                <stored-value>N/A</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>EU</displayed-value>
-                <stored-value>euFunds</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Own funds</displayed-value>
-                <stored-value>ownFunds</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>National</displayed-value>
-                <stored-value>nationalFunds</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>other</displayed-value>
-                <stored-value>Other</stored-value>
             </pair>
         </value-pairs>
 
@@ -2036,31 +1986,6 @@
             </pair>
         </value-pairs>
 
-        <value-pairs value-pairs-name="hidden_list" dc-term="">
-            <pair>
-                <displayed-value>Hidden</displayed-value>
-                <stored-value>hidden</stored-value>
-            </pair>
-        </value-pairs>
-
     </form-value-pairs>
 
-    <!-- Example of the complex input type definition.
-         Uncomment the example row of the complex input type definition to see this input in the submission UI. -->
-    <form-complex-definitions>
-        <definition name="contact_person">
-            <input name="givenname" input-type="text" label="Given name"/>
-            <input name="surname" input-type="text" label="Surname"/>
-            <input name="email" input-type="text" label="Email" regex="[^@]+@[^\.@]+\.[^@]+"/>
-            <input name="affiliation" input-type="text" label="Affiliation"/>
-        </definition>
-
-        <definition name="funding">
-            <input name="type" input-type="dropdown" label="Funding type" value-pairs-name="metashare_funding"/>
-            <input name="code"  input-type="autocomplete" label="Grant no. or funding project code"/>
-            <input name="orgname" input-type="text" label="Funding organization"/>
-            <input name="projname" input-type="autocomplete" label="Funding project name"/>
-            <input name="openaire_id" input-type="text" label="EU Project Identifier (OpenAIRE)" readonly="true" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation"/>
-        </definition>
-    </form-complex-definitions>
 </input-forms>

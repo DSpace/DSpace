@@ -106,6 +106,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
+            c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             workspaceItem = c.reloadEntity(workspaceItem);
@@ -176,12 +177,20 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "subject", null, subject);
     }
 
-    public WorkspaceItemBuilder withAbstract(final String subject) {
-        return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
+    public WorkspaceItemBuilder withIssn(String issn) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(), "identifier", "issn", issn);
     }
 
     public WorkspaceItemBuilder withEntityType(final String entityType) {
         return addMetadataValue("dspace", "entity", "type", entityType);
+    }
+
+    public WorkspaceItemBuilder withAbstract(final String subject) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
+    }
+
+    public WorkspaceItemBuilder withType(final String type) {
+        return addMetadataValue(MetadataSchemaEnum.DC.getName(),"type", null, type);
     }
 
     public WorkspaceItemBuilder grantLicense() {
@@ -209,18 +218,5 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             handleException(e);
         }
         return this;
-    }
-
-    /**
-     * Create workspaceItem with any metadata
-     * @param schema metadataSchema name e.g. `dc`
-     * @param element metadataField name e.g. `contributor`
-     * @param qualifier metadataQualifier e.g. `author` or null
-     * @param value which will be added to this metadata as MetadataValue
-     * @return WorkspaceItemBuilder
-     */
-    public WorkspaceItemBuilder withMetadata(final String schema, final String element, final String qualifier,
-                                    final String value) {
-        return addMetadataValue(schema, element, qualifier, value);
     }
 }

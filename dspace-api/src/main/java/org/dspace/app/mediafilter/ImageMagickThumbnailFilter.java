@@ -14,6 +14,9 @@ import java.io.InputStream;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -113,13 +116,54 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         return f2;
     }
 
-    public File getImageFile(File f, int page, boolean verbose)
+    /**
+     * Return an image from a bitstream with specific processing options for
+     * PDFs. This is only used by ImageMagickPdfThumbnailFilter in order to
+     * generate an intermediate image file for use with getThumbnailFile.
+     */
+    public File getImageFile(File f, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
-        File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
+        // Writing an intermediate file to disk is inefficient, but since we're
+        // doing it anyway, we should use a lossless format. IM's internal MIFF
+        // is lossless like PNG and TIFF, but much faster.
+        File f2 = new File(f.getParentFile(), f.getName() + ".miff");
         f2.deleteOnExit();
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
-        String s = "[" + page + "]";
+
+        // Optionally override ImageMagick's default density of 72 DPI to use a
+        // "supersample" when creating the PDF thumbnail. Note that I prefer to
+        // use the getProperty() method here instead of getIntPropert() because
+        // the latter always returns an integer (0 in the case it's not set). I
+        // would prefer to keep ImageMagick's default to itself rather than for
+        // us to set one. Also note that the density option *must* come before
+        // we open the input file.
+        String density = configurationService.getProperty(PRE + ".density");
+        if (density != null) {
+            op.density(Integer.valueOf(density));
+        }
+
+        // Check the PDF's MediaBox and CropBox to see if they are the same.
+        // If not, then tell ImageMagick to use the CropBox when generating
+        // the thumbnail because the CropBox is generally used to define the
+        // area displayed when a user opens the PDF on a screen, whereas the
+        // MediaBox is used for print. Not all PDFs set these correctly, so
+        // we can use ImageMagick's default behavior unless we see an explit
+        // CropBox. Note: we don't need to do anything special to detect if
+        // the CropBox is missing or empty because pdfbox will set it to the
+        // same size as the MediaBox if it doesn't exist. Also note that we
+        // only need to check the first page, since that's what we use for
+        // generating the thumbnail (PDDocument uses a zero-based index).
+        PDPage pdfPage = PDDocument.load(f).getPage(0);
+        PDRectangle pdfPageMediaBox = pdfPage.getMediaBox();
+        PDRectangle pdfPageCropBox = pdfPage.getCropBox();
+
+        // This option must come *before* we open the input file.
+        if (pdfPageCropBox != pdfPageMediaBox) {
+            op.define("pdf:use-cropbox=true");
+        }
+
+        String s = "[0]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
@@ -172,20 +216,20 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 if (description != null) {
                     if (replaceRegex.matcher(description).matches()) {
                         if (verbose) {
-                            System.out.format("%s %s matches pattern and is replacable.%n",
-                                    description, nsrc);
+                            System.out.format("%s %s matches pattern and is replaceable.%n",
+                                    description, n);
                         }
                         continue;
                     }
                     if (description.equals(getDescription())) {
                         if (verbose) {
                             System.out.format("%s %s is replaceable.%n",
-                                    getDescription(), nsrc);
+                                    getDescription(), n);
                         }
                         continue;
                     }
                 }
-                System.out.format("Custom Thumbnail exists for %s for item %s.  Thumbnail will not be generated.%n",
+                System.out.format("Custom thumbnail exists for %s for item %s. Thumbnail will not be generated.%n",
                         nsrc, item.getHandle());
                 return false;
             }

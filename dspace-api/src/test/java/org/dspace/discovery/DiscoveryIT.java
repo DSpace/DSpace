@@ -7,18 +7,28 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.launcher.ScriptLauncher;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.ClaimedTaskBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
@@ -34,6 +44,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.indexobject.IndexableClaimedTask;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableItem;
@@ -55,6 +67,7 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -64,7 +77,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected SearchService searchService = SearchUtils.getSearchService();
+    protected SearchService searchService;
 
     XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
 
@@ -85,6 +98,14 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
                                                                                       .getMetadataAuthorityService();
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        configurationService.setProperty("solr-database-resync.time-until-reindex", 1);
+        searchService = SearchUtils.getSearchService();
+    }
 
     @Test
     public void solrRecordsAfterDepositOrDeletionOfWorkspaceItemTest() throws Exception {
@@ -371,7 +392,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         collectionService.delete(context, col1);
         context.restoreAuthSystemState();
         assertSearchQuery(IndexableCollection.TYPE, 2);
-        assertSearchQuery(IndexableItem.TYPE, 2);
+        // Deleted item contained within totalFound due to predb status (SolrDatabaseResyncCli takes care of this)
+        assertSearchQuery(IndexableItem.TYPE, 2, 3, 0, -1);
     }
 
     @Test
@@ -453,6 +475,10 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
         // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
         assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
+
+        // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
+        performSolrDatabaseResyncScript();
+
         // check Item type with start=2 and limit=4, we expect: indexableObjects=1, totalFound=3
         assertSearchQuery(IndexableItem.TYPE, 1, 3, 2, 4);
         // check Item type with start=0 and limit=default, we expect: indexableObjects=3, totalFound=3
@@ -639,8 +665,135 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=6 (3 stale objects here)
         assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
-        // as the previous query hit the stale objects running a new query should lead to a clean situation
+
+        // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
+        performSolrDatabaseResyncScript();
+
+        // as SolrDatabaseResyncCli removed the stale objects, running a new query should lead to a clean situation
         assertSearchQuery(IndexableItem.TYPE, 3, 3, 0, -1);
+    }
+
+    @Test
+    public void iteratorSearchServiceTest() throws SearchServiceException {
+        String subject1 = "subject1";
+        String subject2 = "subject2";
+        int numberItemsSubject1 = 30;
+        int numberItemsSubject2 = 2;
+        Item[] itemsSubject1 = new Item[numberItemsSubject1];
+        Item[] itemsSubject2 = new Item[numberItemsSubject2];
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItemsSubject1; i++) {
+            itemsSubject1[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 1 number" + i)
+                .withSubject(subject1)
+                .build();
+        }
+
+        for (int i = 0; i < numberItemsSubject2; i++) {
+            itemsSubject2[i] = ItemBuilder.createItem(context, collection)
+                .withTitle("item subject 2 number " + i)
+                .withSubject(subject2)
+                .build();
+        }
+
+        Collection collection2 = CollectionBuilder.createCollection(context, community).build();
+        ItemBuilder.createItem(context, collection2)
+            .withTitle("item collection2")
+            .withSubject(subject1)
+            .build();
+        context.restoreAuthSystemState();
+
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject1);
+
+        Iterator<Item> itemIterator =
+            searchService.iteratorSearch(context, new IndexableCollection(collection), discoverQuery);
+        int counter = 0;
+        List<Item> foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        for (Item item : itemsSubject1) {
+            assertTrue(foundItems.contains(item));
+        }
+        assertEquals(numberItemsSubject1, counter);
+
+        discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries("subject:" + subject2);
+
+        itemIterator = searchService.iteratorSearch(context, null, discoverQuery);
+        counter = 0;
+        foundItems = new ArrayList<>();
+        while (itemIterator.hasNext()) {
+            foundItems.add(itemIterator.next());
+            counter++;
+        }
+        assertEquals(numberItemsSubject2, counter);
+        for (Item item : itemsSubject2) {
+            assertTrue(foundItems.contains(item));
+        }
+    }
+
+    /**
+     * Test designed to check if default sort option for Discovery is working, using <code>workspace</code>
+     * DiscoveryConfiguration <br/>
+     * <b>Note</b>: this test will be skipped if <code>workspace</code> do not have a default sort option set and of
+     * metadataType <code>dc_date_accessioned</code> or <code>lastModified</code>
+     * @throws SearchServiceException
+     */
+    @Test
+    public void searchWithDefaultSortServiceTest() throws SearchServiceException {
+        DiscoveryConfiguration workspaceConf =
+            SearchUtils.getDiscoveryConfiguration(context, DISCOVER_WORKSPACE_CONFIGURATION_NAME, null);
+        // Skip if no default sort option set for workspaceConf
+        if (workspaceConf.getSearchSortConfiguration().getDefaultSortField() == null) {
+            return;
+        }
+
+        DiscoverySortFieldConfiguration defaultSortField =
+                workspaceConf.getSearchSortConfiguration().getDefaultSortField();
+
+        // Populate the testing objects: create items in eperson's workspace and perform search in it
+        int numberItems = 10;
+        context.turnOffAuthorisationSystem();
+        EPerson submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org").build();
+        context.setCurrentUser(submitter);
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItems; i++) {
+            ItemBuilder.createItem(context, collection)
+                    .withTitle("item " + i)
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Build query with default parameters (except for workspaceConf)
+        DiscoverQuery discoverQuery = SearchUtils.getQueryBuilder()
+                .buildQuery(context, new IndexableCollection(collection), workspaceConf,"",null,"Item",null,null,
+                        null,null);
+
+        DiscoverResult result = searchService.search(context, discoverQuery);
+
+        /*
+        // code example for testing against sort by dc_date_accessioned
+        LinkedList<String> dc_date_accesioneds = result.getIndexableObjects().stream()
+                .map(o -> ((Item) o.getIndexedObject()).getMetadata())
+                .map(l -> l.stream().filter(m -> m.getMetadataField().toString().equals("dc_date_accessioned"))
+                                .map(m -> m.getValue()).findFirst().orElse("")
+                )
+                .collect(Collectors.toCollection(LinkedList::new));
+        }*/
+        LinkedList<String> lastModifieds = result.getIndexableObjects().stream()
+                .map(o -> ((Item) o.getIndexedObject()).getLastModified().toString())
+                .collect(Collectors.toCollection(LinkedList::new));
+        assertFalse(lastModifieds.isEmpty());
+        for (int i = 1; i < lastModifieds.size() - 1; i++) {
+            assertTrue(lastModifieds.get(i).compareTo(lastModifieds.get(i + 1)) >= 0);
+        }
     }
 
     private void assertSearchQuery(String resourceType, int size) throws SearchServiceException {
@@ -648,7 +801,7 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void assertSearchQuery(String resourceType, int size, int totalFound, int start, int limit)
-            throws SearchServiceException {
+        throws SearchServiceException {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setQuery("*:*");
         discoverQuery.setStart(start);
@@ -737,6 +890,13 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         indexer.commit();
         context.setCurrentUser(previousUser);
+    }
+
+    public void performSolrDatabaseResyncScript() throws Exception {
+        String[] args = new String[] {"solr-database-resync"};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+        ScriptLauncher
+                .handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
     }
 
     private void abort(XmlWorkflowItem workflowItem)

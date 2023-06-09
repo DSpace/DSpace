@@ -63,7 +63,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String qualifier,
                                                                             final String value) {
         try {
-            getService().addMetadata(context, dso, schema, element, qualifier, Item.ANY, value);
+            getService().addMetadata(context, dso, schema, element, qualifier, null, value);
         } catch (Exception e) {
             return handleException(e);
         }
@@ -162,8 +162,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
     /**
-     * Support method to grant the {@link Constants#READ} permission over an object only to a specific group. Any other
-     * READ permissions will be removed
+     * Support method to grant the {@link Constants#ADMIN} permission over an object only to a specific eperson.
+     * If another ADMIN policy is in place for an eperson it will be replaced
      *
      * @param dso
      *            the DSpaceObject on which grant the permission

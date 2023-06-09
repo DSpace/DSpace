@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean class="org.dspace.subscriptions.SubscriptionEmailNotificationServiceImpl">
+        <constructor-arg name="subscriptionType2generators">
+            <!-- The keys of the map used by the script "subscription-send"
+             org.dspace.subscriptions.SubscriptionEmailNotification
+             currently we support only 'content' type.   
+              --> 
+            <map>
+                <entry key="content" value-ref="contentNotifyGenerator"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="contentUpdates">
+            <!-- Currently we support subscriptions ONLY for Community & Collection -->
+            <map>
+                <entry key="community" value-ref="communityUpdates"/>
+                <entry key="collection" value-ref="collectionUpdates"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="contentNotifyGenerator" class="org.dspace.subscriptions.ContentGenerator" >
+         <property name="entityType2Disseminator" ref ="entityDissemination"/>
+    </bean>
+
+    <!-- This map allows configuring custom generators for e-mail body by EntityType.
+    currently, we support only 'subscriptionDsoMetadataForEmailCompose' for all EntityType  -->
+    <util:map id="entityDissemination">
+        <entry key="Publication" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Item" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Person" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Project" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="OrgUnit" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="Journal" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="JournalVolume" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+        <entry key="JournalIssue" value-ref="subscriptionDsoMetadataForEmailCompose"/>
+    </util:map>
+
+    <bean id="subscriptionDsoMetadataForEmailCompose" class="org.dspace.content.crosswalk.SubscriptionDsoMetadataForEmailCompose" >
+        <property name="metadata" ref ="generalMetadataEntity"/>
+    </bean>
+
+    <!-- This list includes metadata values we want to include on the e-mail body of the notification -->
+    <util:list id="generalMetadataEntity">
+        <value>dc.title</value>
+    </util:list>
+
+    <bean id="communityUpdates" class="org.dspace.subscriptions.objectupdates.CommunityUpdates" />
+
+    <bean id="collectionUpdates" class="org.dspace.subscriptions.objectupdates.CollectionUpdates" />
+
+</beans>
