@@ -30,7 +30,6 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -47,13 +46,17 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -67,6 +70,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
     protected XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
     protected final WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
             .getWorkspaceItemService();
+    ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
     protected IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
                                                              .getServiceByName(IndexingService.class.getName(),
                                                                  IndexingService.class);
@@ -74,7 +78,8 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+    protected XmlWorkflowItemService workflowItemService =
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
     protected PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
     protected WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory.getInstance().
             getWorkflowRequirementsService();
@@ -218,11 +223,10 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
-     * Test to verify that if a user submits an item into the workflow, a reviewmanager can select a multiple reviewer
-     * epersons
+     * Test to verify that if a step group is removed, the returned WorkflowItem will move forward to the next step
+     * and do not create an unclaimable WorkflowItem
      */
     @Test
-    @Ignore
     public void workflowDeleteGroup_WhileClaimedTasksExist() throws Exception {
         context.turnOffAuthorisationSystem();
         context.setCurrentUser(admin);
@@ -233,10 +237,12 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         Collection colWithWorkflow = CollectionBuilder.createCollection(context, community)
             .withName("Collection WITH workflow")
             .withWorkflowGroup("reviewer", admin)
+            .withWorkflowGroup("editor", admin)
             .withSubmitterGroup(submitter)
             .build();
         context.restoreAuthSystemState();
 
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(colWithWorkflow);
         Context context2 = new Context(Context.Mode.READ_WRITE);
         context2.setCurrentUser(submitter);
 
@@ -249,20 +255,41 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context2, colWithWorkflow, admin)
                 .withTitle("Test workflow item to return to workspace").withIssueDate("2023-06-06").build();
 
-        //collectionService.setWorkflowGroup(context, colWithWorkflow, 1, null);
         WorkflowUtils.deleteRoleGroup(context, colWithWorkflow, "reviewer");
         groupService.delete(context, reviewers);
-        reviewers = xmlWorkflowService.getWorkflowRoleGroup(context2, colWithWorkflow, "reviewer", null);
+        reviewers = xmlWorkflowService.getWorkflowRoleGroup(context, colWithWorkflow, "reviewer", null);
         assertNull(reviewers);
 
         context.restoreAuthSystemState();
 
-        // Return the task ( in this case the item is sent back to submitter)
+        // Return the task ( in this case the item is sent forth to the next step)
         returnClaimedTask(claimedTask);
 
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, claimedTask.getWorkflowItem().getItem());
-        assertNotNull(workspaceItem);
-        assertEquals(claimedTask.getWorkflowItem().getSubmitter(), workspaceItem.getSubmitter());
+        // wfi should be at "editor" step
+        XmlWorkflowItem wfi = workflowItemService.findByItem(context, claimedTask.getWorkflowItem().getItem());
+        claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, wfi, admin);
+        assertEquals("editstep",claimedTask.getStepID());
+        assertEquals(claimedTask.getWorkflowItem(), wfi);
+
+        // Claim and return the new task, we should have a pool task
+        returnClaimedTask(claimedTask);
+
+        wfi = workflowItemService.findByItem(context, claimedTask.getWorkflowItem().getItem());
+        PoolTask poolTask = poolTaskService.findByWorkflowIdAndEPerson(context, wfi, admin);
+        assertNotNull(poolTask);
+    }
+
+    private void claim(Workflow workflow, PoolTask task, EPerson user)
+            throws Exception {
+        final EPerson previousUser = context.getCurrentUser();
+        task = context.reloadEntity(task);
+        context.setCurrentUser(user);
+        Step step = workflow.getStep(task.getStepID());
+        WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
+        xmlWorkflowService.doState(context, user, null, task.getWorkflowItem().getID(), workflow, currentActionConfig);
+        context.commit();
+        indexer.commit();
+        context.setCurrentUser(previousUser);
     }
 
 
@@ -272,7 +299,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         taskToUnclaim = context.reloadEntity(taskToUnclaim);
         context.setCurrentUser(taskToUnclaim.getOwner());
         XmlWorkflowItem workflowItem = taskToUnclaim.getWorkflowItem();
-        workflowService.deleteClaimedTask(context, workflowItem, taskToUnclaim);
+        xmlWorkflowService.deleteClaimedTask(context, workflowItem, taskToUnclaim);
         workflowRequirementsService.removeClaimedUser(context, workflowItem, taskToUnclaim.getOwner(),
                 taskToUnclaim.getStepID());
         context.commit();
@@ -298,6 +325,19 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
         xmlWorkflowService
             .doState(context, task.getOwner(), httpServletRequest, task.getWorkflowItem().getID(), workflow,
                 workflow.getStep(task.getStepID()).getActionConfig(task.getActionID()));
+        context.commit();
+        indexer.commit();
+        context.setCurrentUser(previousUser);
+    }
+
+    private void executeWorkflowAction(HttpServletRequest httpServletRequest, EPerson user,
+                                       Workflow workflow, XmlWorkflowItem workflowItem, String stepId, String actionId)
+        throws Exception {
+        final EPerson previousUser = context.getCurrentUser();
+        context.setCurrentUser(user);
+        xmlWorkflowService
+            .doState(context, user, httpServletRequest, workflowItem.getID(), workflow,
+                workflow.getStep(stepId).getActionConfig(actionId));
         context.commit();
         indexer.commit();
         context.setCurrentUser(previousUser);

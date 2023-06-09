@@ -20,13 +20,17 @@ import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
@@ -41,6 +45,12 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 public class ClaimAction extends UserSelectionAction {
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+
+    private final XmlWorkflowServiceFactory factory = XmlWorkflowServiceFactory.getInstance();
+
+    private final XmlWorkflowService xmlWorkflowService = factory.getXmlWorkflowService();
+    private final XmlWorkflowFactory workflowFactory = factory.getWorkflowFactory();
 
     @Override
     public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
@@ -115,10 +125,22 @@ public class ClaimAction extends UserSelectionAction {
         } else {
             log.info(LogHelper.getHeader(c, "warning while activating claim action",
                                           "No group or person was found for the following roleid: " + getParent()
-                                              .getStep().getId()) + ". The item will be sent back to submitter");
+                                              .getStep().getId()) + ". The item will be sent forward to the next step");
 
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().sendWorkflowItemBackSubmission(
-                    c, wfi, c.getCurrentUser(), this.getProvenanceStartId(), "");
+            try {
+                // Copy of org.dspace.xmlworkflow.XmlWorkflowServiceImpl#processNextStep
+                Workflow wf = workflowFactory.getWorkflow(wfi.getCollection());
+
+                Step nextStep = getParent().getStep().getNextStep(ActionResult.OUTCOME_COMPLETE);
+                WorkflowActionConfig nextActionConfig = nextStep.getUserSelectionMethod();
+                ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, nextStep, null);
+
+                xmlWorkflowService.processOutcome(c, c.getCurrentUser(), wf, nextStep, nextActionConfig,
+                        newOutcome, wfi, false);
+
+            } catch (WorkflowConfigurationException | WorkflowException e) {
+                throw new AuthorizeException(e);
+            }
         }
 
     }
