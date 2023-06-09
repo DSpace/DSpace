@@ -195,6 +195,12 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+
+        // verify Community Admin can't set a primaryBitstream outside their own Community
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -217,6 +223,12 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+
+        // verify Collection Admin can't set a primaryBitstream outside their own Collection
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -238,6 +250,12 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
+
+        // verify Item Admin can't set a primaryBitstream outside their own Item
+        getClient(token).perform(post(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -353,6 +371,13 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+
+        bundle.setPrimaryBitstreamID(bitstream);
+        // verify Community Admin can't update a primaryBitstream outside their own Community
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -377,6 +402,13 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+
+        bundle.setPrimaryBitstreamID(bitstream);
+        // verify Collection Admin can't update a primaryBitstream outside their own Collection
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -400,6 +432,13 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
+
+        bundle.setPrimaryBitstreamID(bitstream);
+        // verify Item Admin can't update a primaryBitstream outside their own Item
+        getClient(token).perform(put(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -482,6 +521,13 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify bitstream itself still exists
         Assert.assertEquals(1, bundle2.getBitstreams().size());
         Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+
+        bundle.setPrimaryBitstreamID(bitstream);
+        // verify Community Admin can't delete a primaryBitstream outside their own Community
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -504,6 +550,13 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify bitstream itself still exists
         Assert.assertEquals(1, bundle2.getBitstreams().size());
         Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+
+        bundle.setPrimaryBitstreamID(bitstream);
+        // verify Collection Admin can't delete a primaryBitstream outside their own Collection
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
@@ -525,6 +578,13 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
         // verify bitstream itself still exists
         Assert.assertEquals(1, bundle2.getBitstreams().size());
         Assert.assertEquals(bitstream2, bundle2.getBitstreams().get(0));
+
+        bundle.setPrimaryBitstreamID(bitstream);
+        // verify Item Admin can't delete a primaryBitstream outside their own Item
+        getClient(token).perform(delete(getBundlePrimaryBitstreamUrl(bundle.getID()))
+                                     .contentType(textUriContentType)
+                                     .content(getBitstreamUrl(bitstream.getID())))
+                        .andExpect(status().isForbidden());
     }
 
     @Test
