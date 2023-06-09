@@ -9,11 +9,6 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.apache.commons.codec.CharEncoding.UTF_8;
-import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
@@ -38,35 +33,22 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.authorization.Authorization;
-import org.dspace.app.rest.authorization.AuthorizationFeature;
-import org.dspace.app.rest.authorization.AuthorizationFeatureService;
-import org.dspace.app.rest.authorization.impl.DownloadFeature;
-import org.dspace.app.rest.authorization.impl.RequestCopyFeature;
-import org.dspace.app.rest.converter.BitstreamConverter;
-import org.dspace.app.rest.matcher.AuthorizationMatcher;
-import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.ResourcePolicyMatcher;
-import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -74,7 +56,6 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -92,18 +73,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
-
-    @Autowired
-    GroupService groupService;
-
-    @Autowired
-    private BitstreamConverter bitstreamConverter;
-
-    @Autowired
-    private AuthorizationFeatureService authorizationFeatureService;
-
-    @Autowired
-    private Utils utils;
 
     @Test
     public void findAllTest() throws Exception {
@@ -3715,101 +3684,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                              .content("/api/eperson/epersons/" + eperson1.getID() +
                                       "\n/api/eperson/epersons/" + eperson2.getID()))
                              .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test //@Ignore
-    public void allowSubmitterToViewItem() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson1@mail.com")
-                .withPassword(password)
-                .build();
-        context.setCurrentUser(eperson);
-
-        Community community = CommunityBuilder.createCommunity(context).build();
-
-        Collection collection = CollectionBuilder.createCollection(context, community)
-                .withAdminGroup(admin)
-                .build();
-        Item publicItem1 = ItemBuilder.createItem(context, collection)
-                .withTitle("Public item").withSubmitter(eperson)
-                .build();
-        publicItem1 = context.reloadEntity(publicItem1);
-
-        Item publicItem2 = ItemBuilder.createItem(context, collection)
-                .withTitle("Public item 2").withSubmitter(eperson)
-                .build();
-        publicItem2 = context.reloadEntity(publicItem2);
-
-        // Only allow Administrator group to READ
-        ResourcePolicy itemrp = resourcePolicyService.find(context, publicItem1, Constants.READ).get(0);
-        itemrp.setGroup(groupService.findByName(context, Group.ADMIN));
-        resourcePolicyService.update(context, itemrp);
-
-        // Add a bitstream
-        Bitstream bitstream = BitstreamBuilder.createBitstream(context, publicItem1,
-                        toInputStream("TestDummyText", UTF_8))
-                .withName("dummy").withMimeType("text/plain").build();
-
-        // Only allow ANONYMOUS to DEFAULT_BITSTREAM_READ
-        resourcePolicyService.removePolicies(context, bitstream, Constants.READ);
-        resourcePolicyService.removePolicies(context, publicItem1.getBundles("ORIGINAL").get(0), Constants.READ);
-
-        ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(bitstream)
-                .withAction(Constants.DEFAULT_BITSTREAM_READ)
-                .withGroup(groupService.findByName(context, Group.ANONYMOUS))
-                .build();
-
-        context.restoreAuthSystemState();
-
-        String tokenEp = getAuthToken(eperson.getEmail(), password);
-        String tokenEp1 = getAuthToken(eperson1.getEmail(), password);
-        //verify eperson workspace contains publicItem1.
-        getClient(tokenEp).perform(get("/api/discover/search/objects").param("configuration", "workspace"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.searchResult.page.totalElements", is(2)))
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
-                    containsInAnyOrder(
-                        hasJsonPath("$._embedded.indexableObject", ItemMatcher.matchItemProperties(publicItem1)),
-                        hasJsonPath("$._embedded.indexableObject", ItemMatcher.matchItemProperties(publicItem2))
-                    )
-                ));
-
-        //verify eperson1 cannot access
-        getClient(tokenEp1).perform(get("/api/core/items/" + publicItem1.getID()))
-                .andExpect(status().isForbidden());
-
-        //verify eperson can get metadata (used to load item page)
-        //we also check if eperson have permission to see bundle and bitstream metadata in item
-        getClient(tokenEp).perform(get("/api/core/items/" + publicItem1.getID())
-                        .param("embed", "bundles"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.bundles._embedded.bundles").isEmpty());
-        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstream, Projection.DEFAULT);
-        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
-        AuthorizationFeature requestCopyFeature = authorizationFeatureService.find(RequestCopyFeature.NAME);
-        AuthorizationFeature downloadFeature = authorizationFeatureService.find(DownloadFeature.NAME);
-        Authorization authorizationFeature = new Authorization(eperson, requestCopyFeature, bitstreamRest);
-
-        //verify eperson cannot download but can request a copy
-        getClient(tokenEp).perform(get("/api/authz/authorizations/search/object")
-                        .param("uri", bitstreamUri)
-                        .param("feature", downloadFeature.getName()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", is(0)))
-                .andExpect(jsonPath("$._embedded").doesNotExist());
-
-        getClient(tokenEp).perform(get("/api/authz/authorizations/search/object")
-                        .param("uri", bitstreamUri)
-                        .param("feature", requestCopyFeature.getName()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
-                .andExpect(jsonPath("$._embedded.authorizations", contains(
-                        Matchers.is(AuthorizationMatcher.matchAuthorization(authorizationFeature))))
-                );
-
     }
 
 }

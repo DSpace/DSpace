@@ -23,14 +23,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
-import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
-import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -366,16 +364,9 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
 
         context.turnOffAuthorisationSystem();
         authorizeService.removeAllPolicies(context, itemAA1);
-        EPerson ep2 = EPersonBuilder.createEPerson(context)
-                .withEmail("test2@example.com").withPassword(password).build();
         context.restoreAuthSystemState();
-
-        // submitter has access, other normal users have none
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA1.getID() + "/owningCollection"))
-                   .andExpect(status().isOk());
-        String token2 = getAuthToken(ep2.getEmail(), password);
-        getClient(token2).perform(get("/api/core/items/" + itemAA1.getID() + "/owningCollection"))
                    .andExpect(status().isForbidden());
 
     }

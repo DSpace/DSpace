@@ -1954,7 +1954,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Donald")
                 .withReaderGroup(restrictGroup)
                 .build();
-        itemRestrictedByGroup.setSubmitter(admin);
 
         context.restoreAuthSystemState();
 
@@ -4073,7 +4072,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col1)
                                .withTitle("Public item 1")
                                .withIssueDate("2017-10-17")
-                               .withSubmitter(admin)
                                .withAuthor("Doe, John")
                                .withSubject("ExtraEntry")
                                .build();

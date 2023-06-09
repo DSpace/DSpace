@@ -364,11 +364,6 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setAdminPermission(item, ePerson, null);
     }
 
-    public ItemBuilder withSubmitter(EPerson submitter) {
-        item.setSubmitter(submitter);
-        return this;
-    }
-
     public ItemBuilder withPersonEmail(String email) {
         return addMetadataValue(item, "person", "email", null, email);
     }

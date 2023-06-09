@@ -58,7 +58,6 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         //2. Three public items that are readable by Anonymous with different subjects
         Item privateItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
-                                      .withSubmitter(admin)
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
@@ -77,7 +76,7 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
                               .withName("testname")
                               .withBitstream(bitstream)
                               .build();
-        context.restoreAuthSystemState();
+
 
         authorizeService.removeAllPolicies(context, privateItem1);
 
