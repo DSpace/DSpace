@@ -121,6 +121,8 @@
 
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
+    <bean class="org.dspace.util.FrontendUrlService"/>
+
     <!-- Configurable workflow services -->
     <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
