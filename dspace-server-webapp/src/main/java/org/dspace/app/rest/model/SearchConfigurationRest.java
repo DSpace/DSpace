@@ -31,6 +31,8 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
     private List<Filter> filters = new LinkedList<>();
     private List<SortOption> sortOptions = new LinkedList<>();
 
+    private SortOption defaultSortOption;
+
     public String getCategory() {
         return CATEGORY;
     }
@@ -73,6 +75,14 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public List<SortOption> getSortOptions() {
         return sortOptions;
+    }
+
+    public SortOption getDefaultSortOption() {
+        return defaultSortOption;
+    }
+
+    public void setDefaultSortOption(SortOption defaultSortOption) {
+        this.defaultSortOption = defaultSortOption;
     }
 
     @Override

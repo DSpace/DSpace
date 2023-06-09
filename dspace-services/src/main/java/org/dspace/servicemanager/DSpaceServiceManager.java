@@ -7,6 +7,8 @@
  */
 package org.dspace.servicemanager;
 
+import static org.apache.logging.log4j.Level.DEBUG;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.kernel.Activator;
 import org.dspace.kernel.config.SpringLoader;
 import org.dspace.kernel.mixins.ConfigChangeListener;
@@ -28,8 +32,7 @@ import org.dspace.kernel.mixins.ServiceChangeListener;
 import org.dspace.kernel.mixins.ServiceManagerReadyAware;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.DSpaceBeanFactoryPostProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.dspace.utils.CallStackUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -44,7 +47,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public final class DSpaceServiceManager implements ServiceManagerSystem {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceServiceManager.class);
+    private static Logger log = LogManager.getLogger();
 
     public static final String CONFIG_PATH = "spring/spring-dspace-applicationContext.xml";
     public static final String CORE_RESOURCE_PATH = "classpath*:spring/spring-dspace-core-services.xml";
@@ -426,9 +429,10 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     service = (T) applicationContext.getBean(name, type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.warn(
+                    log.debug(
                         "Unable to locate bean by name or id={}."
-                                + " Will try to look up bean by type next.", name, e);
+                                + " Will try to look up bean by type next.", name);
+                    CallStackUtils.logCaller(log, DEBUG);
                     service = null;
                 }
             } else {
@@ -437,8 +441,9 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
                     service = (T) applicationContext.getBean(type.getName(), type);
                 } catch (BeansException e) {
                     // no luck, try the fall back option
-                    log.warn("Unable to locate bean by name or id={}."
-                            + " Will try to look up bean by type next.", type.getName(), e);
+                    log.debug("Unable to locate bean by name or id={}."
+                            + " Will try to look up bean by type next.", type::getName);
+                    CallStackUtils.logCaller(log, DEBUG);
                     service = null;
                 }
             }

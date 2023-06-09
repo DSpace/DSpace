@@ -120,7 +120,7 @@ public class ItemTemplateRestController {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'WRITE')")
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request, @PathVariable UUID uuid,
                                                         @RequestBody(required = true) JsonNode jsonNode)
@@ -153,7 +153,7 @@ public class ItemTemplateRestController {
      * @throws AuthorizeException
      * @throws IOException
      */
-    @PreAuthorize("hasPermission(#uuid, 'ITEM', 'DELETE')")
+    @PreAuthorize("hasPermission(#uuid, 'ITEMTEMPLATE', 'DELETE')")
     @RequestMapping(method = RequestMethod.DELETE)
     public ResponseEntity<RepresentationModel<?>> deleteTemplateItem(HttpServletRequest request,
                                                                      @PathVariable UUID uuid)

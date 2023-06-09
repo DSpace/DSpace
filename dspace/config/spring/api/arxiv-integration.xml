@@ -56,10 +56,12 @@
         <constructor-arg value="dc.description.abstract"/>
     </bean>
 
-    <bean id="arxivPublishedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+    <bean id="arxivPublishedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathDateFormatMetadataContributor">
         <property name="field" ref="arxiv.published"/>
         <property name="query" value="ns:published"/>
         <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
+        <property name="dateFormatFrom" value="yyyy-MM-dd'T'HH:mm:ss'Z'"/>
+        <property name="dateFormatTo" value="yyyy-MM-dd"></property>
     </bean>
     <bean id="arxiv.published" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.date.issued"/>

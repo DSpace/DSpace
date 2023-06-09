@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -65,7 +64,9 @@ import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
+import org.dspace.identifier.DOI;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidQueue;
@@ -123,6 +124,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected CollectionService collectionService;
     @Autowired(required = true)
     protected IdentifierService identifierService;
+    @Autowired(required = true)
+    protected DOIService doiService;
     @Autowired(required = true)
     protected VersioningService versioningService;
     @Autowired(required = true)
@@ -288,9 +291,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return itemDAO.findAll(context, true, true);
     }
 
+    @Override
     public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
         return itemDAO.findAllRegularItems(context);
-    };
+    }
 
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
@@ -786,6 +790,16 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Remove any Handle
         handleService.unbindHandle(context, item);
 
+        // Delete a DOI if linked to the item.
+        // If no DOI consumer or provider is configured, but a DOI remains linked to this item's uuid,
+        // hibernate will throw a foreign constraint exception.
+        // Here we use the DOI service directly as it is able to manage DOIs even without any configured
+        // consumer or provider.
+        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        if (doi != null) {
+            doi.setDSpaceObject(null);
+        }
+
         // remove version attached to the item
         removeVersion(context, item);
 
@@ -1054,7 +1068,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         List<Collection> linkedCollections = item.getCollections();
         List<Collection> notLinkedCollections = new ArrayList<>(allCollections.size() - linkedCollections.size());
 
-        if ((allCollections.size() - linkedCollections.size()) == 0) {
+        if (allCollections.size() - linkedCollections.size() == 0) {
             return notLinkedCollections;
         }
         for (Collection collection : allCollections) {
@@ -1149,6 +1163,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
+    @Override
     public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
         return workspaceItemService.findByItem(context, item) != null
             || workflowItemService.findByItem(context, item) != null;
@@ -1179,8 +1194,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (!authorizeService
                 .isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ,
                     defaultPolicy.getID()) &&
-                   ((!appendMode && this.isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso)) ||
-                    (appendMode && this.shouldBeAppended(context, dso, defaultPolicy)))) {
+                   (!appendMode && this.isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso) ||
+                    appendMode && this.shouldBeAppended(context, dso, defaultPolicy))) {
                 ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
                 newPolicy.setdSpaceObject(dso);
                 newPolicy.setAction(Constants.READ);
@@ -1222,7 +1237,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      * Check if the provided default policy should be appended or not to the final
      * item. If an item has at least one custom READ policy any anonymous READ
      * policy with empty start/end date should be skipped
-     * 
+     *
      * @param context       DSpace context
      * @param dso           DSpace object to check for custom read RP
      * @param defaultPolicy The policy to check
@@ -1611,7 +1626,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
 
-            item.setCachedMetadata(sortMetadataValueList(fullMetadataValueList));
+            item.setCachedMetadata(MetadataValueComparators.sort(fullMetadataValueList));
         }
 
         log.debug("Called getMetadata for " + item.getID() + " based on cache");
@@ -1651,28 +1666,6 @@ prevent the generation of resource policy entry values with null dspace_object a
             //just move the metadata
             rr.setPlace(place);
         }
-    }
-
-    /**
-     * This method will sort the List of MetadataValue objects based on the MetadataSchema, MetadataField Element,
-     * MetadataField Qualifier and MetadataField Place in that order.
-     * @param listToReturn  The list to be sorted
-     * @return The list sorted on those criteria
-     */
-    private List<MetadataValue> sortMetadataValueList(List<MetadataValue> listToReturn) {
-        Comparator<MetadataValue> comparator = Comparator.comparing(
-            metadataValue -> metadataValue.getMetadataField().getMetadataSchema().getName(),
-            Comparator.nullsFirst(Comparator.naturalOrder()));
-        comparator = comparator.thenComparing(metadataValue -> metadataValue.getMetadataField().getElement(),
-                                              Comparator.nullsFirst(Comparator.naturalOrder()));
-        comparator = comparator.thenComparing(metadataValue -> metadataValue.getMetadataField().getQualifier(),
-                                              Comparator.nullsFirst(Comparator.naturalOrder()));
-        comparator = comparator.thenComparing(metadataValue -> metadataValue.getPlace(),
-                                              Comparator.nullsFirst(Comparator.naturalOrder()));
-
-        Stream<MetadataValue> metadataValueStream = listToReturn.stream().sorted(comparator);
-        listToReturn = metadataValueStream.collect(Collectors.toList());
-        return listToReturn;
     }
 
     @Override

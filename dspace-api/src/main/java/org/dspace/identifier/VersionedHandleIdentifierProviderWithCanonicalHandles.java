@@ -30,6 +30,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,8 @@ import org.springframework.stereotype.Component;
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Component
-public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider {
+public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider
+    implements InitializingBean {
     /**
      * log4j category
      */
@@ -64,6 +66,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
 
     @Autowired(required = true)
     private ItemService itemService;
+
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedHandleIdentifierProviderWithCanonicalHandles.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
 
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
@@ -306,6 +321,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
         } catch (IllegalStateException | SQLException e) {
             log.error(LogHelper.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
@@ -424,6 +440,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             if (handleService.resolveToObject(context, identifierPreviousItem) == null) {
                 handleService.createHandle(context, previous.getItem(), identifierPreviousItem, true);
             }
+        }
+
+        DSpaceObject itemWithCanonicalHandle = handleService.resolveToObject(context, canonical);
+        if (itemWithCanonicalHandle != null) {
+            if (itemWithCanonicalHandle.getID() != previous.getItem().getID()) {
+                log.warn("The previous version's item (" + previous.getItem().getID() +
+                        ") does not match with the item containing handle " + canonical +
+                        " (" + itemWithCanonicalHandle.getID() + ")");
+            }
+            // Move the original handle from whatever item it's on to the newest version
+            handleService.modifyHandleDSpaceObject(context, canonical, dso);
+        } else {
+            handleService.createHandle(context, dso, canonical);
         }
 
         // add a new Identifier for this item: 12345/100.x

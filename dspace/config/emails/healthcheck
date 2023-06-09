@@ -3,7 +3,7 @@
 ## Parameters: {0} is the output of healthcheck command
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = 'Repository healthcheck')
+#set($subject = "${config.get('dspace.name')}: Repository healthcheck")
 The healthcheck finished with the following output:
 
 ${params[0]}

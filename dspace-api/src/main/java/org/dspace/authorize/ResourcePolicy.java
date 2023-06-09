@@ -100,7 +100,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     private String rptype;
 
     @Lob
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "rpdescription")
     private String rpdescription;
 
