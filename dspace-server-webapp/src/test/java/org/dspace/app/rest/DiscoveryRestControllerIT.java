@@ -61,7 +61,9 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.utils.DiscoverQueryBuilder;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -2553,6 +2555,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
+        // Change config to test DS-8723
+        String oldMaxResults = configurationService.getProperty("rest.search.max.results");
+        configurationService.setProperty("rest.search.max.results", 2);
+        DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
+        queryBuilder.afterPropertiesSet();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -2587,6 +2594,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        Item publicItem4 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 4")
+                .withIssueDate("2010-02-13")
+                .build();
+
+        Item publicItem5 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 5")
+                .withIssueDate("2010-02-13")
+                .build();
+
         context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
@@ -2594,7 +2611,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //An anonymous user browses this endpoint to find the the objects in the system
         //With the scope given
         getClient().perform(get("/api/discover/search/objects")
-                .param("scope", String.valueOf(scope)))
+                .param("configuration", "default")
+                .param("scope", String.valueOf(scope))
+                .param("size", "5"))
                 //** THEN **
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
@@ -2603,9 +2622,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The type has to be 'discover'
                 .andExpect(jsonPath("$.type", is("discover")))
                 //The page object needs to look like this
-                .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntry(0, 20)
-                )))
+                //DS-8723: also verify the value of 'totalElements' is not equal to 'rest.search.max.results'
+                .andExpect(jsonPath("$._embedded.searchResult.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 5,
+                        1, 4)))
                 //The search results have to contain the items belonging to the scope specified
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
@@ -2621,9 +2640,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
-        ;
+                //DS-8576: Also check for present "configuration" and "scope"
+                .andExpect(jsonPath("$._links.self.href", allOf(
+                    containsString("/api/discover/search/objects"),
+                    containsString("configuration=default"),
+                    containsString("scope="+scope))
+                ));
 
+        //revert to default
+        configurationService.setProperty("rest.search.max.results", oldMaxResults);
+        queryBuilder.afterPropertiesSet();
     }
 
     @Test
@@ -5677,63 +5703,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         )
                 ))
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
-    }
-
-    /**
-     * This test is intended to verify that the value of <code>totalElements</code> returned from
-     * /api/discover/search/objects endpoint matches the value of <code>discoverMaxResults</code> that were used to
-     * create the same amount of collections for testing
-     * @throws Exception
-     */
-    @Test
-    public void discoverSearchObjectsTestForPageSizeEqualsTotalElements() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity = CommunityBuilder
-                .createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder
-                .createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-
-        // Note: this value should be relative with solr's max results per page, to verify the
-        var discoverMaxResults = 110;
-        for (int i = 0; i < discoverMaxResults; i++) {
-            Collection col1 = CollectionBuilder
-                    .createCollection(context, child1)
-                    .withName(String.format("Collection %03d", i))
-                    .build();
-        }
-
-        context.restoreAuthSystemState();
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
-
-        getClient(adminToken)
-                .perform(get("/api/discover/search/objects")
-                        .param("configuration", "default")
-                        .param("query", "")
-                        .param("scope", child1.getID().toString())
-                        .param("sort", "dc.title,ASC")
-                        .param("size", "150")
-                )
-
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type", is("discover")))
-                // verify totalElements == discoverMaxResults
-                .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 150, 1, discoverMaxResults)
-                )))
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
-                        Matchers.containsInRelativeOrder(
-                                SearchResultMatcher.matchOnItemName("collection", "collections", "Collection 050")
-                        )
-                ))
-                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
-
     }
 
     @Test
