@@ -55,6 +55,7 @@ import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
+import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -329,8 +330,61 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         assertDeletionOfEperson(submitter);
 
         getClient(token).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isNotFound()); //DS-XXXX
 
+    }
+
+    /**
+     * Test whether a bunch of workflow items with no submitter info will be collected and removed if found
+     * @throws Exception
+     */
+    @Test
+    public void testGhostWorkflowItemsDelete() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community parent = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, parent)
+                                                 .withWorkflowGroup(1, workflowUser)
+                                                 .build();
+
+        List<Integer> wfi_IDS = new ArrayList<>();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // TEST CASE:
+        // 1. Create a bunch of WfItems with submitter as null, then verify.
+        for (int i = 1; i < 5; i++) {
+            XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                    .withSubmitter(submitter)
+                    .withTitle("Test Item " + i)
+                    .withIssueDate("2019-03-06")
+                    .withSubject("ExtraEntry")
+                    .build();
+            workflowItem.getItem().setSubmitter(null);
+            xmlWorkflowItemService.update(context, workflowItem);
+            assertNull(workflowItem.getSubmitter());
+            wfi_IDS.add(workflowItem.getID());
+            getClient(token).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
+                            .andExpect(status().isOk());
+
+        }
+        context.commit();
+        // 2. Remove user, verify WfItems still exist
+        assertDeletionOfEperson(submitter);
+        for (int id : wfi_IDS) {
+            getClient(token).perform(get("/api/workflow/workflowitems/" + id))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$._embedded.submitter").value(IsNull.nullValue()));
+        }
+
+        // 3. Remove WfItems using service, then verify wfi_IDS no longer exists
+        xmlWorkflowItemService.deleteWFItemWithoutSubmitter(context);
+        context.commit();
+        for (int id : wfi_IDS) {
+            getClient(token).perform(get("/api/workflow/workflowitems/" + id))
+                    .andExpect(status().isNotFound());
+        }
+        context.restoreAuthSystemState();
     }
 
 

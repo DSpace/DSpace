@@ -54,6 +54,8 @@ import org.dspace.versioning.dao.VersionDAO;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -326,7 +328,17 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                                 item.setSubmitter(null);
                                 itemService.update(context, item);
                             }
+
+                            WorkflowItemService wfis = WorkflowServiceFactory.getInstance()
+                                    .getWorkflowItemService();
+                            WorkflowItem wfi = wfis.findByItem(context, item);
+                            if (null != wfi) {
+                                wfis.delete(context, wfi);
+                            }
                         }
+                        // WorkflowServiceFactory.getInstance().getWorkflowItemService()
+                        //         .deleteBySubmitter(context, ePerson);
+
                     } else if (StringUtils.equals(tableName, "cwf_claimtask")) {
                          // Unclaim all XmlWorkflow tasks
                         ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory

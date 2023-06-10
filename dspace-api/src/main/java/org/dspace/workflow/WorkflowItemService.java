@@ -105,6 +105,18 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
         throws SQLException, IOException, AuthorizeException;
 
     /**
+     * Delete all workflow items submitted by by a particular e-person.
+     * FIXME: Where to trigger?
+     * @param context    The relevant DSpace Context.
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     */
+    public void deleteWFItemWithoutSubmitter(Context context)
+        throws SQLException, IOException, AuthorizeException;
+
+    /**
      * Delete the specified workflow item.
      *
      * @param context      The relevant DSpace Context.

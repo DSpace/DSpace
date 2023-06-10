@@ -42,6 +42,7 @@ import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -514,6 +515,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
                                                 .withIssueDate("2019-03-06")
                                                 .withSubject("ExtraEntry")
                                                 .build();
+        context.restoreAuthSystemState();
 
         Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
 
@@ -521,9 +523,18 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
+        context.turnOffAuthorisationSystem();
         assertDeletionOfEperson(workflowUserA, true);
+        context.restoreAuthSystemState();
 
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, CLAIM_ACTION);
+        //Updated delete eperson means there is no more item if submitter is removed
+        XmlWorkflowItemService xfis = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowItemService();
+        workflowItem = xfis.find(context, workflowItem.getID());
+        assertNull(workflowItem);
+
+        //FIXME: these are removed for now since the changes to delete EPerson means workflowItem no longer exist.
+        // However impact of this change should be analyzed to entire workflow process as it were here.
+        /*executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
 
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
@@ -533,7 +544,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
                               FINAL_EDIT_ACTION);
 
-        assertTrue(workflowItem.getItem().isArchived());
+        assertTrue(workflowItem.getItem().isArchived());*/
 
     }
 
