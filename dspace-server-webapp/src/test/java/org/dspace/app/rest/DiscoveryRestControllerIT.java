@@ -2596,12 +2596,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         Item publicItem4 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 4")
-                .withIssueDate("2010-02-13")
+                .withIssueDate("2023-06-01")
                 .build();
 
         Item publicItem5 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 5")
-                .withIssueDate("2010-02-13")
+                .withIssueDate("2023-06-02")
                 .build();
 
         context.restoreAuthSystemState();
@@ -2610,46 +2610,49 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With the scope given
-        getClient().perform(get("/api/discover/search/objects")
-                .param("configuration", "default")
-                .param("scope", String.valueOf(scope))
-                .param("size", "5"))
-                //** THEN **
-                //The status has to be 200 OK
-                .andExpect(status().isOk())
-                //The scope has to be equal to the one given in the parameters
-                .andExpect(jsonPath("$.scope", is(String.valueOf(scope))))
-                //The type has to be 'discover'
-                .andExpect(jsonPath("$.type", is("discover")))
-                //The page object needs to look like this
-                //DS-8723: also verify the value of 'totalElements' is not equal to 'rest.search.max.results'
-                .andExpect(jsonPath("$._embedded.searchResult.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 5,
-                        1, 4)))
-                //The search results have to contain the items belonging to the scope specified
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
-                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
-                )))
-                //These facets have to show up in the embedded.facets section as well with the given hasMore
-                // property because we don't exceed their default limit for a hasMore true (the default is 10)
-                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.authorFacet(false),
-                        FacetEntryMatcher.entityTypeFacet(false),
-                        FacetEntryMatcher.subjectFacet(false),
-                        FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
-                )))
-                //There always needs to be a self link available
-                //DS-8576: Also check for present "configuration" and "scope"
-                .andExpect(jsonPath("$._links.self.href", allOf(
-                    containsString("/api/discover/search/objects"),
-                    containsString("configuration=default"),
-                    containsString("scope="+scope))
-                ));
-
-        //revert to default
-        configurationService.setProperty("rest.search.max.results", oldMaxResults);
-        queryBuilder.afterPropertiesSet();
+        try {
+            getClient().perform(get("/api/discover/search/objects")
+                            .param("configuration", "default")
+                            .param("scope", String.valueOf(scope))
+                            .param("sort", "dc.date.issued,ASC")
+                            .param("size", "5"))
+                    //** THEN **
+                    //The status has to be 200 OK
+                    .andExpect(status().isOk())
+                    //The scope has to be equal to the one given in the parameters
+                    .andExpect(jsonPath("$.scope", is(String.valueOf(scope))))
+                    //The type has to be 'discover'
+                    .andExpect(jsonPath("$.type", is("discover")))
+                    //The page object needs to look like this
+                    //DS-8723: also verify the value of 'totalElements' is not equal to 'rest.search.max.results'
+                    .andExpect(jsonPath("$._embedded.searchResult.page",
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 5, 1, 4)))
+                    //The search results have to contain the items belonging to the scope specified
+                    .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                            SearchResultMatcher.matchOnItemName("item", "items", "Test 2"),
+                            SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                    )))
+                    //These facets have to show up in the embedded.facets section as well with the given hasMore
+                    // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                    .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                            FacetEntryMatcher.authorFacet(false),
+                            FacetEntryMatcher.entityTypeFacet(false),
+                            FacetEntryMatcher.subjectFacet(false),
+                            FacetEntryMatcher.dateIssuedFacet(false),
+                            FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                    )))
+                    //There always needs to be a self link available
+                    //DS-8576: Also check for present "configuration" and "scope"
+                    .andExpect(jsonPath("$._links.self.href", allOf(
+                            containsString("/api/discover/search/objects"),
+                            containsString("configuration=default"),
+                            containsString("scope=" + scope))
+                    ));
+        } finally {
+            //revert to default
+            configurationService.setProperty("rest.search.max.results", oldMaxResults);
+            queryBuilder.afterPropertiesSet();
+        }
     }
 
     @Test
