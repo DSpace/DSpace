@@ -75,6 +75,12 @@ public class UtilsTest extends AbstractUnitTest {
         assertEquals("Test keep other prefixes", "demo.dspace.org",
                      Utils.getHostName("https://demo.dspace.org"));
 
+        assertEquals("Test with parameter", "demo.dspace.org",
+                     Utils.getHostName("https://demo.dspace.org/search?query=test"));
+
+        assertEquals("Test with parameter with space", "demo.dspace.org",
+                     Utils.getHostName("https://demo.dspace.org/search?query=test turbine"));
+
         // This uses a bunch of reserved URI characters
         assertNull("Test invalid URI returns null", Utils.getHostName("&+,?/@="));
     }
