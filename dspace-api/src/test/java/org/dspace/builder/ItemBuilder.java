@@ -282,8 +282,8 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Withdrawn the item under build. Please note that an user need to be loggedin the context to avoid NPE during the
-     * creation of the provenance metadata
+     * Withdraw the item under build. Please note that the Context must be
+     * logged in to avoid NPE during the creation of the provenance metadata.
      *
      * @return the ItemBuilder
      */
@@ -292,6 +292,12 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return this;
     }
 
+    /**
+     * Set an embargo to end after some time from "now".
+     *
+     * @param embargoPeriod embargo starting "now", for this long.
+     * @return the ItemBuilder.
+     */
     public ItemBuilder withEmbargoPeriod(Period embargoPeriod) {
         return setEmbargo(embargoPeriod, item);
     }
