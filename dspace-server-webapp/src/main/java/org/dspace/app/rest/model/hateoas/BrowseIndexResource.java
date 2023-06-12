@@ -34,17 +34,6 @@ public class BrowseIndexResource extends DSpaceResource<BrowseIndexRest> {
 
     public BrowseIndexResource(BrowseIndexRest bix, Utils utils) {
         super(bix, utils);
-        // TODO: the following code will force the embedding of items and
-        // entries in the browseIndex we need to find a way to populate the rels
-        // array from the request/projection right now it is always null
-        // super(bix, utils, "items", "entries");
-        if (bix.getBrowseType().equals(BrowseIndexRest.BROWSE_TYPE_VALUE_LIST)) {
-            add(utils.linkToSubResource(bix, BrowseIndexRest.LINK_ENTRIES));
-            add(utils.linkToSubResource(bix, BrowseIndexRest.LINK_ITEMS));
-        }
-        if (bix.getBrowseType().equals(BrowseIndexRest.BROWSE_TYPE_FLAT)) {
-            add(utils.linkToSubResource(bix, BrowseIndexRest.LINK_ITEMS));
-        }
         if (bix.getBrowseType().equals(BrowseIndexRest.BROWSE_TYPE_HIERARCHICAL)) {
             ChoiceAuthorityService choiceAuthorityService =
                     ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();

@@ -56,4 +56,14 @@ public abstract class RestAddressableModel implements RestModel {
     public String getUniqueType() {
         return getCategory() + "." + getType();
     }
+
+    /**
+     * Check if the <pre>link</pre> is allowed. This is intended to be overridden by subclasses that this feature is
+     * relevant
+     * @param link the link to be allowed
+     * @return
+     */
+    public boolean isLinkAllowed(LinkRest link) {
+        return true;
+    }
 }

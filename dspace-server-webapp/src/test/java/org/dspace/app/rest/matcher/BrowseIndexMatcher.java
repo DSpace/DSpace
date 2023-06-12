@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_FLAT;
 import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_HIERARCHICAL;
 import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
@@ -53,6 +54,7 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
             hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/title")),
+            hasNoJsonPath("$._links.entries"),
             hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/title/items"))
         );
     }
@@ -80,6 +82,7 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.order", equalToIgnoringCase(order)),
             hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
             hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/dateissued")),
+            hasNoJsonPath("$._links.entries"),
             hasJsonPath("$._links.items.href", is(REST_SERVER_URL + "discover/browses/dateissued/items"))
         );
     }
@@ -93,10 +96,8 @@ public class BrowseIndexMatcher {
             hasJsonPath("$.vocabulary", equalToIgnoringCase(vocabulary)),
             hasJsonPath("$._links.vocabulary.href",
                         is(REST_SERVER_URL + String.format("submission/vocabularies/%s/", vocabulary))),
-            hasJsonPath("$._links.items.href",
-                        is(REST_SERVER_URL + String.format("discover/browses/%s/items", vocabulary))),
-            hasJsonPath("$._links.entries.href",
-                        is(REST_SERVER_URL + String.format("discover/browses/%s/entries", vocabulary))),
+            hasNoJsonPath("$._links.entries"),
+            hasNoJsonPath("$._links.items.href"),
             hasJsonPath("$._links.self.href",
                         is(REST_SERVER_URL + String.format("discover/browses/%s", vocabulary)))
         );

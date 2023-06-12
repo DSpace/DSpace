@@ -165,4 +165,11 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
             return metadata;
         }
     }
+
+    @Override
+    public boolean isLinkAllowed(LinkRest link) {
+        return !( ( browseType.equals(BROWSE_TYPE_FLAT) && link.name().equals(LINK_ENTRIES)) ||
+                  ( browseType.equals(BROWSE_TYPE_HIERARCHICAL) &&
+                          (link.name().equals(LINK_ITEMS) || link.name().equals(LINK_ENTRIES)) ) );
+    }
 }
