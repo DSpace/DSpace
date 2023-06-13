@@ -301,5 +301,5 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * @return                total community archived items
      * @throws ItemCountException
      */
-    int getArchivedItems(Community community) throws ItemCountException;
+    int countArchivedItems(Community community) throws ItemCountException;
 }

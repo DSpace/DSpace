@@ -26,7 +26,8 @@ public class CommunityConverter
 
     public CommunityRest convert(Community community, Projection projection) {
         CommunityRest resource = super.convert(community, projection);
-        resource.setArchivedItemsCount(community.countArchivedItem());
+        resource.setArchivedItemsCount(community.countArchivedItems());
+
         return resource;
     }
 

@@ -1077,7 +1077,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * @throws ItemCountException
      */
     @Override
-    public int countArchivedItem(Collection collection) throws ItemCountException {
+    public int countArchivedItems(Collection collection) throws ItemCountException {
         return ItemCounter.getInstance().getCount(collection);
     }
 }

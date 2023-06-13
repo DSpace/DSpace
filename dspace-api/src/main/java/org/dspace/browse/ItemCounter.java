@@ -75,7 +75,7 @@ public class ItemCounter {
         this.dao = ItemCountDAOFactory.getInstance(this.context);
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        this.showStrengths = configurationService.getBooleanProperty("webui.strengths.show", true);
+        this.showStrengths = configurationService.getBooleanProperty("webui.strengths.show", false);
         this.useCache = configurationService.getBooleanProperty("webui.strengths.cache", true);
     }
 
@@ -96,7 +96,9 @@ public class ItemCounter {
     /**
      * Get the count of the items in the given container. If the configuration
      * value webui.strengths.show is equal to 'true' this method will return all
-     * archived items. If the configuration value webui.strengths.cache
+     * archived items. If the configuration value webui.strengths.show is equal to
+     * 'false' this method will return -1.
+     * If the configuration value webui.strengths.cache
      * is equal to 'true' this will return the cached value if it exists.
      * If it is equal to 'false' it will count the number of items
      * in the container in real time.
@@ -107,7 +109,7 @@ public class ItemCounter {
      */
     public int getCount(DSpaceObject dso) throws ItemCountException {
         if (!showStrengths) {
-            return 0;
+            return -1;
         }
 
         if (useCache) {

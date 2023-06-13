@@ -719,7 +719,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
      * @throws ItemCountException
      */
     @Override
-    public int getArchivedItems(Community community) throws ItemCountException {
+    public int countArchivedItems(Community community) throws ItemCountException {
         return ItemCounter.getInstance().getCount(community);
     }
 }

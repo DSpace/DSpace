@@ -478,5 +478,5 @@ public interface CollectionService
      * @return                 total collection archived items
      * @throws ItemCountException
      */
-    int countArchivedItem(Collection collection) throws ItemCountException;
+    int countArchivedItems(Collection collection) throws ItemCountException;
 }

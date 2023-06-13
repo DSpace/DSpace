@@ -342,9 +342,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      *
      * @return int
      */
-    public int countArchivedItem() {
+    public int countArchivedItems() {
         try {
-            return collectionService.countArchivedItem(this);
+            return collectionService.countArchivedItems(this);
         } catch (ItemCountException e) {
             throw new RuntimeException(e);
         }
