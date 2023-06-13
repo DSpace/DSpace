@@ -102,19 +102,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneItemGenericLinksets() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection)
-                .withTitle("Item Test")
-                .withMetadata("dc", "identifier", "doi", doi)
-                .build();
-        context.restoreAuthSystemState();
-
-        getClient().perform(get("/signposting/linksets/" + item.getID()))
-                .andExpect(status().isMethodNotAllowed());
-    }
-
-    @Test
     public void findOneItemJsonLinksets() throws Exception {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
@@ -152,12 +139,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
-                .andExpect(jsonPath("$.linkset[0].type[0].type",
-                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].type[1].href",
-                        Matchers.hasToString(articleUri)))
-                .andExpect(jsonPath("$.linkset[0].type[1].type",
-                        Matchers.hasToString("text/html")));
+                        Matchers.hasToString(articleUri)));
     }
 
     @Test
@@ -176,13 +159,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
-                .andExpect(jsonPath("$.linkset[0].type[0].type",
-                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].license[0].href",
-                        Matchers.hasToString(licenceUrl)))
-                .andExpect(jsonPath("$.linkset[0].license[0].type",
-                        Matchers.hasToString("text/html")));
-
+                        Matchers.hasToString(licenceUrl)));
     }
 
     @Test
@@ -216,8 +194,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
                         Matchers.hasSize(1)))
@@ -329,22 +306,19 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/linksets/" + bitstream.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + bitstream.getID() + "/json"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneCollectionJsonLinksets() throws Exception {
-        getClient().perform(get("/signposting/linksets/" + collection.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + collection.getID() + "/json"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneCommunityJsonLinksets() throws Exception {
-        getClient().perform(get("/signposting/linksets/" + parentCommunity.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + parentCommunity.getID() + "/json"))
                 .andExpect(status().isNotFound());
     }
 
@@ -374,12 +348,10 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String itemRelation = "<" + url + "/bitstreams/" + bitstream1.getID() +
                 "/download> ; rel=\"item\" ; " + "type=\"text/plain\" ; anchor=\"" + url + "/entities/publication/" +
                 item.getID() + "\" ,";
-        String typeRelation = "<https://schema.org/AboutPage> ; rel=\"type\" ; type=\"text/html\" ; anchor=\"" +
-                url + "/entities/publication/" +
-                item.getID() + "\" ,";
+        String typeRelation = "<https://schema.org/AboutPage> ; rel=\"type\" ; anchor=\"" +
+                url + "/entities/publication/" + item.getID() + "\" ,";
 
-        getClient().perform(get("/signposting/linksets/" + item.getID())
-                        .header("Accept", "application/linkset"))
+        getClient().perform(get("/signposting/linksets/" + item.getID()))
                 .andExpect(content().string(Matchers.containsString(siteAsRelation)))
                 .andExpect(content().string(Matchers.containsString(itemRelation)))
                 .andExpect(content().string(Matchers.containsString(typeRelation)));
@@ -393,8 +365,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/linksets/" + item.getID())
-                        .header("Accept", "application/linkset"))
+        getClient().perform(get("/signposting/linksets/" + item.getID()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -454,8 +425,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$",
                         Matchers.hasSize(5)))
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(orcidPattern, orcidValue) + "' " +
-                        "&& @.rel == 'author' " +
-                        "&& @.type == 'text/html')]").exists())
+                        "&& @.rel == 'author')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(doiPattern, doi) + "' " +
                         "&& @.rel == 'cite-as')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + dcIdentifierUriMetadataValue + "' " +
@@ -464,8 +434,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         "&& @.rel == 'item' " +
                         "&& @.type == 'text/plain')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/AboutPage' " +
-                        "&& @.rel == 'type' " +
-                        "&& @.type == 'text/html')]").exists());
+                        "&& @.rel == 'type')]").exists());
     }
 
     @Test
@@ -549,8 +518,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         "' && @.rel == 'linkset' " +
                         "&& @.type == 'application/linkset+json')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/ScholarlyArticle' " +
-                        "&& @.rel == 'type' " +
-                        "&& @.type == 'text/html')]").exists());
+                        "&& @.rel == 'type')]").exists());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();

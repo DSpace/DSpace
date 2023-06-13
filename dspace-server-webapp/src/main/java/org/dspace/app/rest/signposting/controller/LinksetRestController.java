@@ -72,15 +72,9 @@ public class LinksetRestController {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
     }
 
-    @PreAuthorize("permitAll()")
-    @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
-    public ResponseEntity getOne() {
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
-    }
-
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
     @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/json",
-            method = RequestMethod.GET, produces = "application/linkset+json")
+            method = RequestMethod.GET)
     public LinksetRest getJson(HttpServletRequest request, @PathVariable UUID uuid) {
         try {
             Context context = ContextUtil.obtainContext(request);
