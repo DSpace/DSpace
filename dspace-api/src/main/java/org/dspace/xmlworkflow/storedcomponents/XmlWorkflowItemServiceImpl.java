@@ -152,18 +152,6 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public void deleteWFItemWithoutSubmitter(Context context)
-            throws SQLException, IOException, AuthorizeException {
-        List<XmlWorkflowItem> xmlWorkflowItems = findBySubmitter(context, null);
-        Iterator<XmlWorkflowItem> iterator = xmlWorkflowItems.iterator();
-        while (iterator.hasNext()) {
-            XmlWorkflowItem workflowItem = iterator.next();
-            iterator.remove();
-            delete(context, workflowItem);
-        }
-    }
-
-    @Override
     public void delete(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException, IOException {
         Item item = workflowItem.getItem();
