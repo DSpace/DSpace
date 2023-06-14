@@ -135,6 +135,7 @@ public class ClarinBitstreamImportController {
             }
             bitstream.setFormat(context, bitstreamFormat);
             String deletedString = request.getParameter("deleted");
+            Boolean deleted = Boolean.parseBoolean(deletedString);
             //set size bytes
             bitstream.setSizeBytes(bitstreamRest.getSizeBytes());
             //set checksum
@@ -142,11 +143,16 @@ public class ClarinBitstreamImportController {
             //set checksum algorithm
             bitstream.setChecksumAlgorithm(bitstreamRest.getCheckSum().getCheckSumAlgorithm());
             //do validation between input fields and calculated fields based on file from assetstore
-            if (!clarinBitstreamService.validation(context, bitstream)) {
-                log.info("Validation failed - return null. Bitstream UUID: " + bitstream.getID());
-                return null;
+            //we do validation only if the bitstream is not deleted
+            if (deleted) {
+                log.info("Validation is not checked for deleted bitstream id: " + bitstream.getID() +
+                        ", because it may not exist in assetstore.");
+            } else {
+                if (!clarinBitstreamService.validation(context, bitstream)) {
+                    log.info("Validation failed - return null. Bitstream UUID: " + bitstream.getID());
+                    return null;
+                }
             }
-
             if (bitstreamRest.getMetadata().getMap().size() > 0) {
                 metadataConverter.setMetadata(context, bitstream, bitstreamRest.getMetadata());
             }
@@ -170,7 +176,7 @@ public class ClarinBitstreamImportController {
             bitstreamService.update(context, bitstream);
 
             // If bitstream is deleted make it deleted
-            if (Boolean.parseBoolean(deletedString)) {
+            if (deleted) {
                 bitstreamService.delete(context, bitstream);
                 log.info("Bitstream with id: " + bitstream.getID() + " is deleted!");
             }
