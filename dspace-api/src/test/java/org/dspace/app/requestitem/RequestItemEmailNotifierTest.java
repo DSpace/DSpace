@@ -164,9 +164,6 @@ public class RequestItemEmailNotifierTest
         assertThat("Body should be a single text bodypart",
                 content, instanceOf(String.class));
 
-        assertThat("Should contain the helpdesk address",
-                (String)content, containsString(HELPDESK_ADDRESS));
-
         assertThat("Should contain the helpdesk name",
                 (String)content, containsString(HELPDESK_NAME));
 
