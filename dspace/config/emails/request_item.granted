@@ -1,0 +1,26 @@
+## Sent to the person requesting a copy of a restricted document when the
+## request is granted.
+##
+## Parameters:
+##  {0} name of the requestor
+##  {1} Handle URL of the requested Item
+##  {2} title of the requested Item
+##  {3} name of the grantor
+##  {4} email address of the grantor (unused)
+##  {5} custom message sent by the grantor.
+#set($subject = 'Request for Copy of Restricted Document is Granted')
+Dear ${params[0]}:
+
+Your request for a copy of the file(s) from the below document has been approved by ${params[3]}.  You may find the requested file(s) attached.
+
+    ${params[2]}
+    ${params[1]} 
+#if( $params[5] )
+
+An additional message from ${params[3]} follows:
+
+${params[5]}
+#end
+
+Best regards,
+The ${config.get('dspace.name')} Team
