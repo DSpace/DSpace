@@ -30,6 +30,8 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
         eperson.setRequireCertificate(obj.getRequireCertificate());
         eperson.setSelfRegistered(obj.getSelfRegistered());
         eperson.setEmail(obj.getEmail());
+        eperson.setWelcomeInfo(obj.getWelcomeInfo());
+        eperson.setCanEditSubmissionMetadata(obj.getCanEditSubmissionMetadata());
 
         return eperson;
     }

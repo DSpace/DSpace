@@ -484,3 +484,7 @@ ALTER TABLE eperson
 ALTER TABLE metadatafieldregistry
 
 ALTER COLUMN element TYPE character varying(128);
+
+ALTER TABLE eperson ADD welcome_info varchar(30);
+
+ALTER TABLE eperson ADD can_edit_submission_metadata BOOL;

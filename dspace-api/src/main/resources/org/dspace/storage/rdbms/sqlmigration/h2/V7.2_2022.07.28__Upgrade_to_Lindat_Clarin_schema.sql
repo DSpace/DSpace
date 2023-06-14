@@ -407,3 +407,7 @@ ALTER TABLE metadatafieldregistry
 
 ALTER TABLE handle
     ALTER COLUMN url TYPE character varying(8192);
+
+ALTER TABLE eperson ADD welcome_info varchar(30);
+
+ALTER TABLE eperson ADD can_edit_submission_metadata BOOL;

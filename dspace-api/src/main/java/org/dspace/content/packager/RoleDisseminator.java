@@ -17,6 +17,7 @@ import java.io.PipedOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -78,6 +79,8 @@ public class RoleDisseminator implements PackageDisseminator {
     public static final String CAN_LOGIN = "CanLogin";
     public static final String REQUIRE_CERTIFICATE = "RequireCertificate";
     public static final String SELF_REGISTERED = "SelfRegistered";
+    public static final String WELCOME_INFO = "welcomeInfo";
+    public static final String CAN_EDIT_SUBMISSION_METADATA = "canEditSubmissionMetadata";
 
     // Valid type values for Groups (only used when Group is associated with a Community or Collection)
     public static final String GROUP_TYPE_ADMIN = "ADMIN";
@@ -461,6 +464,13 @@ public class RoleDisseminator implements PackageDisseminator {
             writer.writeEmptyElement(SELF_REGISTERED);
         }
 
+        if (Objects.nonNull(eperson.getWelcomeInfo())) {
+            writer.writeEmptyElement(WELCOME_INFO);
+        }
+
+        if (Objects.nonNull(eperson.getCanEditSubmissionMetadata())) {
+            writer.writeEmptyElement(CAN_EDIT_SUBMISSION_METADATA);
+        }
         writer.writeEndElement();
     }
 
