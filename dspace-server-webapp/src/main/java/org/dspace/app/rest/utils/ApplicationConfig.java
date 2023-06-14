@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 // bean which is in the scope of both will be duplicated.  dspace-services makes
 // its context the parent of this one.  If a bean is explicitly configured in
 // the parent, it won't be so configured in this context and you may have
-// trouble.  IOW be careful what you add here.
+// trouble.  Be careful what you add here.
 @ComponentScan( {
     "org.dspace.app.rest.converter",
     "org.dspace.app.rest.repository",
