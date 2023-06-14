@@ -31,6 +31,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
@@ -1067,4 +1069,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return collectionList;
     }
 
+    /**
+     * Returns total collection archived items
+     *
+     * @param collection       Collection
+     * @return                 total collection archived items
+     * @throws ItemCountException
+     */
+    @Override
+    public int countArchivedItems(Collection collection) throws ItemCountException {
+        return ItemCounter.getInstance().getCount(collection);
+    }
 }
