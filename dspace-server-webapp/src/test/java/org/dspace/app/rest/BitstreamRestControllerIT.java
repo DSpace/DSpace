@@ -972,6 +972,12 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void checkContentDispositionOfFormats() throws Exception {
+        configurationService.setProperty("webui.content_disposition_format", new String[] {
+            "text/richtext",
+            "text/xml",
+            "txt"
+        });
+
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
