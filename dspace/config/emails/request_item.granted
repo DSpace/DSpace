@@ -3,10 +3,10 @@
 ##
 ## Parameters:
 ##  {0} name of the requestor
-##  {1} unique ID of the requested Item
+##  {1} Handle URL of the requested Item
 ##  {2} title of the requested Item
 ##  {3} name of the grantor
-##  {4} email address of the grantor
+##  {4} email address of the grantor (unused)
 ##  {5} custom message sent by the grantor.
 #set($subject = 'Request for Copy of Restricted Document is Granted')
 Dear ${params[0]}:
