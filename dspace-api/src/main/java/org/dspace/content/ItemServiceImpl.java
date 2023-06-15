@@ -945,8 +945,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Remove bundles
         List<Bundle> bunds = item.getBundles();
         for (Bundle mybundle : bunds) {
-
             // if come from InstallItem: remove all submission/workflow policies
+            authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_CUSTOM);
+            authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_INHERITED);
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_WORKFLOW);
             addCustomPoliciesNotInPlace(context, mybundle, defaultItemPolicies);
@@ -954,6 +955,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
             for (Bitstream bitstream : mybundle.getBitstreams()) {
                 // if come from InstallItem: remove all submission/workflow policies
+                authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
+                authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_INHERITED);
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_SUBMISSION);
                 authorizeService.removeAllPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_WORKFLOW);
                 addCustomPoliciesNotInPlace(context, bitstream, defaultItemPolicies);
@@ -981,6 +984,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             context.turnOffAuthorisationSystem();
 
             // if come from InstallItem: remove all submission/workflow policies
+            authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_CUSTOM);
+            authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_INHERITED);
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, item, ResourcePolicy.TYPE_WORKFLOW);
 
