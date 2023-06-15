@@ -18,6 +18,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.web.ContextUtil;
 
 /**
  * This class provides a standard interface to all item counting
@@ -49,8 +50,19 @@ public class ItemCounter {
      */
     private Context context;
 
+    /**
+     * This field is used to hold singular instance of a class.
+     * Singleton pattern is used but this class should be
+     * refactored to modern DSpace approach (injectible service).
+     */
+
+    private static ItemCounter instance;
+
     protected ItemService itemService;
     protected ConfigurationService configurationService;
+
+    private boolean showStrengths;
+    private boolean useCache;
 
     /**
      * Construct a new item counter which will use the given DSpace Context
@@ -63,21 +75,42 @@ public class ItemCounter {
         this.dao = ItemCountDAOFactory.getInstance(this.context);
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        this.showStrengths = configurationService.getBooleanProperty("webui.strengths.show", false);
+        this.useCache = configurationService.getBooleanProperty("webui.strengths.cache", true);
     }
 
     /**
-     * Get the count of the items in the given container.  If the configuration
-     * value webui.strengths.cache is equal to 'true' this will return the
-     * cached value if it exists.  If it is equal to 'false' it will count
-     * the number of items in the container in real time.
+     * Get the singular instance of a class.
+     * It creates a new instance at the first usage of this method.
+     *
+     * @return instance af a class
+     * @throws ItemCountException when error occurs
+     */
+    public static ItemCounter getInstance() throws ItemCountException {
+        if (instance == null) {
+            instance = new ItemCounter(ContextUtil.obtainCurrentRequestContext());
+        }
+        return instance;
+    }
+
+    /**
+     * Get the count of the items in the given container. If the configuration
+     * value webui.strengths.show is equal to 'true' this method will return all
+     * archived items. If the configuration value webui.strengths.show is equal to
+     * 'false' this method will return -1.
+     * If the configuration value webui.strengths.cache
+     * is equal to 'true' this will return the cached value if it exists.
+     * If it is equal to 'false' it will count the number of items
+     * in the container in real time.
      *
      * @param dso DSpaceObject
      * @return count
      * @throws ItemCountException when error occurs
      */
     public int getCount(DSpaceObject dso) throws ItemCountException {
-        boolean useCache = configurationService.getBooleanProperty(
-            "webui.strengths.cache", true);
+        if (!showStrengths) {
+            return -1;
+        }
 
         if (useCache) {
             return dao.getCount(dso);
