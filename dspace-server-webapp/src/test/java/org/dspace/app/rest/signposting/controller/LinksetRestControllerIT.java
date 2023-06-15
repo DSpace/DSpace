@@ -103,6 +103,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneItemJsonLinksets() throws Exception {
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
@@ -115,11 +117,23 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset",
                         Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
+                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+        ;
     }
 
     @Test
     public void findOneItemJsonLinksetsWithType() throws Exception {
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         String articleUri = mapConverterDSpaceToSchemaOrgUri.getValue("Article");
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
@@ -140,12 +154,23 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
                 .andExpect(jsonPath("$.linkset[0].type[1].href",
-                        Matchers.hasToString(articleUri)));
+                        Matchers.hasToString(articleUri)))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")));
     }
 
     @Test
     public void findOneItemJsonLinksetsWithLicence() throws Exception {
         String licenceUrl = "https://exmple.com/licence";
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
@@ -160,7 +185,16 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
                 .andExpect(jsonPath("$.linkset[0].license[0].href",
-                        Matchers.hasToString(licenceUrl)));
+                        Matchers.hasToString(licenceUrl)))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")));
     }
 
     @Test
@@ -194,6 +228,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
@@ -209,7 +244,16 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[0].item[1].type",
                         Matchers.hasToString(bitstream2MimeType)))
                 .andExpect(jsonPath("$.linkset[0].anchor",
-                        Matchers.hasToString(url + "/entities/publication/" + item.getID())));
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")));
     }
 
     @Test
@@ -343,6 +387,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         String siteAsRelation = "<" + MessageFormat.format(doiPattern, doi) + "> ; rel=\"cite-as\" ; anchor=\"" +
                 url + "/entities/publication/" + item.getID() + "\" ,";
         String itemRelation = "<" + url + "/bitstreams/" + bitstream1.getID() +
@@ -350,11 +395,19 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 item.getID() + "\" ,";
         String typeRelation = "<https://schema.org/AboutPage> ; rel=\"type\" ; anchor=\"" +
                 url + "/entities/publication/" + item.getID() + "\" ,";
+        String linksetRelation = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                "> ; rel=\"linkset\" ; type=\"application/linkset\" ;" +
+                " anchor=\"" + url + "/entities/publication/" + item.getID() + "\" ,";
+        String jsonLinksetRelation = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                "/json> ; rel=\"linkset\" ; type=\"application/linkset+json\" ;" +
+                " anchor=\"" + url + "/entities/publication/" + item.getID() + "\" ,";
 
         getClient().perform(get("/signposting/linksets/" + item.getID()))
                 .andExpect(content().string(Matchers.containsString(siteAsRelation)))
                 .andExpect(content().string(Matchers.containsString(itemRelation)))
-                .andExpect(content().string(Matchers.containsString(typeRelation)));
+                .andExpect(content().string(Matchers.containsString(typeRelation)))
+                .andExpect(content().string(Matchers.containsString(linksetRelation)))
+                .andExpect(content().string(Matchers.containsString(jsonLinksetRelation)));
     }
 
     @Test
@@ -416,6 +469,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         String dcIdentifierUriMetadataValue = itemService
                 .getMetadataFirstValue(publication, "dc", "identifier", "uri", Item.ANY);
 
@@ -423,7 +477,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         .header("Accept", "application/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.hasSize(5)))
+                        Matchers.hasSize(7)))
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(orcidPattern, orcidValue) + "' " +
                         "&& @.rel == 'author')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(doiPattern, doi) + "' " +
@@ -434,7 +488,15 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         "&& @.rel == 'item' " +
                         "&& @.type == 'text/plain')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/AboutPage' " +
-                        "&& @.rel == 'type')]").exists());
+                        "&& @.rel == 'type')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/linksets/" +
+                        publication.getID().toString() + "' " +
+                        "&& @.rel == 'linkset' " +
+                        "&& @.type == 'application/linkset')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/linksets/" +
+                        publication.getID().toString() + "/json' " +
+                        "&& @.rel == 'linkset' " +
+                        "&& @.type == 'application/linkset+json')]").exists());
     }
 
     @Test

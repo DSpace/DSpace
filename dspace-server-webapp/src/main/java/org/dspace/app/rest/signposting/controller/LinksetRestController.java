@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.signposting.converter.LinksetRestMessageConverter;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRest;
 import org.dspace.app.rest.signposting.model.TypedLinkRest;
@@ -100,9 +101,8 @@ public class LinksetRestController {
     }
 
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID,
-            method = RequestMethod.GET, produces = "application/linkset")
-    public LinksetRest getLset(HttpServletRequest request, @PathVariable UUID uuid) {
+    @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
+    public String getLset(HttpServletRequest request, @PathVariable UUID uuid) {
         try {
             Context context = ContextUtil.obtainContext(request);
 
@@ -127,7 +127,7 @@ public class LinksetRestController {
                     linksetRest.getLinksetNodes().add(linksetNode);
                 }
             }
-            return linksetRest;
+            return LinksetRestMessageConverter.convert(linksetRest);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
