@@ -930,16 +930,23 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
-        List<ResourcePolicy> defaultCollectionPolicies = authorizeService
+        // Bundles should inherit from DEFAULT_ITEM_READ so that if the item is readable, the files
+        // can be listed (even if they are themselves not readable as per DEFAULT_BITSTREAM_READ or other
+        // policies or embargos applied
+        List<ResourcePolicy> defaultCollectionBundlePolicies = authorizeService
+                .getPoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
+        // Bitstreams should inherit from DEFAULT_BITSTREAM_READ
+        List<ResourcePolicy> defaultCollectionBitstreamPolicies = authorizeService
             .getPoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 
         List<ResourcePolicy> defaultItemPolicies = authorizeService.findPoliciesByDSOAndType(context, item,
                 ResourcePolicy.TYPE_CUSTOM);
-        if (defaultCollectionPolicies.size() < 1) {
+        if (defaultCollectionBitstreamPolicies.size() < 1) {
             throw new SQLException("Collection " + collection.getID()
                                        + " (" + collection.getHandle() + ")"
                                        + " has no default bitstream READ policies");
         }
+        // TODO: should we also throw an exception if no DEFAULT_ITEM_READ?
 
         // remove all policies from bundles, add new ones
         // Remove bundles
@@ -950,11 +957,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_SUBMISSION);
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_WORKFLOW);
             addCustomPoliciesNotInPlace(context, mybundle, defaultItemPolicies);
-            addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionPolicies);
+            addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionBundlePolicies);
 
             for (Bitstream bitstream : mybundle.getBitstreams()) {
                 // if come from InstallItem: remove all submission/workflow policies
-                removeAllPoliciesAndAddDefault(context, bitstream, defaultItemPolicies, defaultCollectionPolicies);
+                removeAllPoliciesAndAddDefault(context, bitstream, defaultItemPolicies,
+                                               defaultCollectionBitstreamPolicies);
             }
         }
     }
