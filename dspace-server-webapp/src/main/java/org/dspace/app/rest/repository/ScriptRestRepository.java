@@ -110,7 +110,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
                         + " and the specified parameters " + StringUtils.join(dSpaceCommandLineParameters, ", "));
             }
         } catch (IllegalArgumentException e) {
-            throw new DSpaceBadRequestException("missed handle");
+            throw new DSpaceBadRequestException("Illegal argoument " + e.getMessage(), e);
         }
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptToExecute.getName(), dSpaceCommandLineParameters,
