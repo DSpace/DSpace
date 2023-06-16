@@ -176,7 +176,7 @@ public class RequestItemEmailNotifier {
 
         // Build an email back to the requester.
         Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
-                "request_item.granted"));
+                ri.isAccept_request() ? "request_item.granted" : "request_item.rejected"));
         email.addArgument(ri.getReqName()); // {0} requestor's name
         email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {1} URL of the requested Item
         email.addArgument(ri.getItem().getName()); // {2} title of the requested Item
