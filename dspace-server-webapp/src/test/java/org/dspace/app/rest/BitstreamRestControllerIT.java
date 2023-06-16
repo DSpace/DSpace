@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -1235,4 +1236,57 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Mockito.verify(inputStreamSpy, times(1)).close();
     }
 
+
+    @Test
+    public void checkContentDispositionOfFormats() throws Exception {
+        configurationService.setProperty("webui.content_disposition_format", new String[] {
+            "text/richtext",
+            "text/xml",
+            "txt"
+        });
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String content = "Test Content";
+        Bitstream rtf;
+        Bitstream xml;
+        Bitstream txt;
+        Bitstream html;
+        try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
+            rtf = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/richtext").build();
+            xml = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/xml").build();
+            txt = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/plain").build();
+            html = BitstreamBuilder.createBitstream(context, item, is)
+                                   .withMimeType("text/html").build();
+        }
+        context.restoreAuthSystemState();
+
+        // these formats are configured and files should be downloaded
+        verifyBitstreamDownload(rtf, "text/richtext;charset=UTF-8", true);
+        verifyBitstreamDownload(xml, "text/xml;charset=UTF-8", true);
+        verifyBitstreamDownload(txt, "text/plain;charset=UTF-8", true);
+        // this format is not configured and should open inline
+        verifyBitstreamDownload(html, "text/html;charset=UTF-8", false);
+    }
+
+    private void verifyBitstreamDownload(Bitstream file, String contentType, boolean shouldDownload) throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        String header = getClient(token).perform(get("/api/core/bitstreams/" + file.getID() + "/content")
+                                                     .header("Accept", contentType))
+                                         .andExpect(status().isOk())
+                                         .andExpect(content().contentType(contentType))
+                                         .andReturn().getResponse().getHeader("content-disposition");
+        if (shouldDownload) {
+            assertTrue(header.contains("attachment"));
+            assertFalse(header.contains("inline"));
+        } else {
+            assertTrue(header.contains("inline"));
+            assertFalse(header.contains("attachment"));
+        }
+    }
 }

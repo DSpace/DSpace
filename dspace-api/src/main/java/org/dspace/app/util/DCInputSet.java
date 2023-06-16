@@ -10,6 +10,7 @@ package org.dspace.app.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Utils;
@@ -118,9 +119,12 @@ public class DCInputSet {
                             return true;
                         }
                     }
+                } else if (field.isRelationshipField() &&
+                    ("relation." + field.getRelationshipType()).equals(fieldName)) {
+                    return true;
                 } else {
                     String fullName = field.getFieldName();
-                    if (fullName.equals(fieldName)) {
+                    if (Objects.equals(fullName, fieldName)) {
                         return true;
                     }
                 }
