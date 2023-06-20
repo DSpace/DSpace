@@ -213,6 +213,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
                          EPerson currentUser) {
+        postView(dspaceObject, request, currentUser, null);
+    }
+
+    @Override
+    public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
+                         EPerson currentUser, String referrer) {
         if (solr == null) {
             return;
         }
@@ -220,7 +226,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
 
         try {
-            SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, request, currentUser);
+            SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, request, currentUser, referrer);
             if (doc1 == null) {
                 return;
             }
@@ -254,6 +260,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject,
                          String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
+        postView(dspaceObject, ip, userAgent, xforwardedfor, currentUser, null);
+    }
+
+    @Override
+    public void postView(DSpaceObject dspaceObject,
+                         String ip, String userAgent, String xforwardedfor, EPerson currentUser, String referrer) {
         if (solr == null) {
             return;
         }
@@ -261,7 +273,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         try {
             SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwardedfor,
-                                                      currentUser);
+                                                      currentUser, referrer);
             if (doc1 == null) {
                 return;
             }
@@ -302,6 +314,22 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      */
     protected SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, HttpServletRequest request,
                                                  EPerson currentUser) throws SQLException {
+        return getCommonSolrDoc(dspaceObject, request, currentUser, null);
+    }
+
+    /**
+     * Returns a solr input document containing common information about the statistics
+     * regardless if we are logging a search or a view of a DSpace object
+     *
+     * @param dspaceObject the object used.
+     * @param request      the current request context.
+     * @param currentUser  the current session's user.
+     * @param referrer     the optional referrer.
+     * @return a solr input document
+     * @throws SQLException in case of a database exception
+     */
+    protected SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, HttpServletRequest request,
+                                                 EPerson currentUser, String referrer) throws SQLException {
         boolean isSpiderBot = request != null && SpiderDetector.isSpider(request);
         if (isSpiderBot &&
             !configurationService.getBooleanProperty("usage-statistics.logBots", true)) {
@@ -324,7 +352,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
 
             //Also store the referrer
-            if (request.getHeader("referer") != null) {
+            if (referrer != null) {
+                doc1.addField("referrer", referrer);
+            } else if (request.getHeader("referer") != null) {
                 doc1.addField("referrer", request.getHeader("referer"));
             }
 
@@ -393,7 +423,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     protected SolrInputDocument getCommonSolrDoc(DSpaceObject dspaceObject, String ip, String userAgent,
-                                                 String xforwardedfor, EPerson currentUser) throws SQLException {
+                                                 String xforwardedfor, EPerson currentUser,
+                                                 String referrer) throws SQLException {
         boolean isSpiderBot = SpiderDetector.isSpider(ip);
         if (isSpiderBot &&
             !configurationService.getBooleanProperty("usage-statistics.logBots", true)) {
@@ -412,6 +443,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
         } else {
             doc1.addField("ip", ip);
+        }
+
+        // Add the referrer, if present
+        if (referrer != null) {
+            doc1.addField("referrer", referrer);
         }
 
         InetAddress ipAddress = null;
