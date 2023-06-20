@@ -351,6 +351,11 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private List<Element> splitToRecords(String recordsSrc) {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
+            // Disallow external entities & entity expansion to protect against XXE attacks
+            // (NOTE: We receive errors if we disable all DTDs for PubMed, so this is the best we can do)
+            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            saxBuilder.setExpandEntities(false);
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
 
