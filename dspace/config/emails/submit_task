@@ -6,7 +6,7 @@
 ## {3}  Description of task
 ## {4}  link to 'my DSpace' page
 ##
-#set($subject = 'DSpace: You have a new task')
+#set($subject = "${config.get('dspace.name')}: You have a new task")
 
 A new item has been submitted:
 
@@ -16,9 +16,9 @@ Submitted by: ${params[2]}
 
 ${params[3]}
 
-To claim this task, please visit your "My DSpace"
+To claim this task, please visit your "My${config.get('dspace.shortname')}"
 page:  ${params[4]}
 
 Many thanks!
 
-DSpace
+The ${config.get('dspace.name')} Team

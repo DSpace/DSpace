@@ -9,6 +9,7 @@ package org.dspace.storage.bitstore;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.dspace.content.Bitstream;
@@ -62,13 +63,13 @@ public interface BitStoreService {
      * Obtain technical metadata about an asset in the asset store.
      *
      * @param bitstream The bitstream to describe
-     * @param attrs     A Map whose keys consist of desired metadata fields
+     * @param attrs     A List of desired metadata fields
      * @return attrs
      * A Map with key/value pairs of desired metadata
      * If file not found, then return null
      * @throws java.io.IOException If a problem occurs while obtaining metadata
      */
-    public Map about(Bitstream bitstream, Map attrs) throws IOException;
+    public Map<String, Object> about(Bitstream bitstream, List<String> attrs) throws IOException;
 
     /**
      * Remove an asset from the asset store.

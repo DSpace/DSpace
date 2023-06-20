@@ -436,6 +436,35 @@ it, please enter the types and the actual numbers or codes.</hint>
         </field>
      </row>
   </form>
+
+   <form name="test-outside-workflow-hidden">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <required>Field required</required>
+       </field>
+     </row>
+   </form>
+
+   <form name="test-outside-submission-hidden">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Type</label>
+         <input-type>onebox</input-type>
+         <required>Field required</required>
+       </field>
+     </row>
+   </form>
+
  </form-definitions>
 
 

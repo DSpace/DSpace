@@ -27,13 +27,14 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Marsa Haoua
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
-public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
+public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implements InitializingBean {
     /**
      * log4j category
      */
@@ -48,6 +49,19 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
     protected VersioningService versioningService;
     @Autowired(required = true)
     protected VersionHistoryService versionHistoryService;
+
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedDOIIdentifierProvider.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
 
     @Override
     public String mint(Context context, DSpaceObject dso) throws IdentifierException {
