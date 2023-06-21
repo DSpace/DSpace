@@ -8,16 +8,13 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.ClarinUserMetadataRest;
 import org.dspace.app.rest.model.ClarinUserRegistrationRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.clarin.ClarinUserRegistrationService;
 import org.dspace.core.Context;
@@ -47,12 +44,6 @@ public class ClarinUserRegistrationUserMetadataLinkRepository extends AbstractDS
                     " couldn't be found");
         }
 
-        List<ClarinUserMetadata> clarinUserMetadata = clarinUserRegistration.getUserMetadata();
-        if (CollectionUtils.isEmpty(clarinUserMetadata)) {
-            throw new ResourceNotFoundException("The ClarinUserMetadata for ClarinLicenseResourceUserAllowance " +
-                    "with id: " + userRegistrationID + "doesn't exists.");
-        }
-
-        return converter.toRestPage(clarinUserMetadata, optionalPageable, projection);
+        return converter.toRestPage(clarinUserRegistration.getUserMetadata(), optionalPageable, projection);
     }
 }

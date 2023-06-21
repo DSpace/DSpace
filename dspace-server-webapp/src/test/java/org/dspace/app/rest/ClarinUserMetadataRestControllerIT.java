@@ -64,7 +64,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
     Bitstream bitstream;
 
     // Attach ClarinLicense to the Bitstream
-    private void prepareEnvironment(String requiredInfo) throws Exception {
+    private void prepareEnvironment(String requiredInfo, Integer confirmation) throws Exception {
         // 1. Create Workspace Item with uploaded file
         // 2. Create Clarin License
         // 3. Send request to add Clarin License to the Workspace Item
@@ -79,7 +79,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
         String clarinLicenseName = "Test Clarin License";
 
         // 2. Create clarin license with clarin license label
-        clarinLicense = createClarinLicense(clarinLicenseName, "Test Def", requiredInfo, 0);
+        clarinLicense = createClarinLicense(clarinLicenseName, "Test Def", requiredInfo, confirmation);
 
         // creating replace operation
         Map<String, String> licenseReplaceOpValue = new HashMap<String, String>();
@@ -110,7 +110,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
 
     @Test
     public void notAuthorizedUser_shouldReturnToken() throws Exception {
-        this.prepareEnvironment("NAME");
+        this.prepareEnvironment("NAME", 0);
         ObjectMapper mapper = new ObjectMapper();
         ClarinUserMetadataRest clarinUserMetadata1 = new ClarinUserMetadataRest();
         clarinUserMetadata1.setMetadataKey("NAME");
@@ -142,7 +142,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
 
     @Test
     public void notAuthorizedUser_shouldSendEmail() throws Exception {
-        this.prepareEnvironment("SEND_TOKEN");
+        this.prepareEnvironment("SEND_TOKEN", 0);
         ObjectMapper mapper = new ObjectMapper();
         ClarinUserMetadataRest clarinUserMetadata1 = new ClarinUserMetadataRest();
         clarinUserMetadata1.setMetadataKey("NAME");
@@ -179,7 +179,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
 
     @Test
     public void authorizedUserWithoutMetadata_shouldReturnToken() throws Exception {
-        this.prepareEnvironment("NAME");
+        this.prepareEnvironment("NAME", 0);
         context.turnOffAuthorisationSystem();
         ClarinUserRegistration clarinUserRegistration = ClarinUserRegistrationBuilder
                 .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
@@ -224,7 +224,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
 
     @Test
     public void authorizedUserWithoutMetadata_shouldSendEmail() throws Exception {
-        this.prepareEnvironment("SEND_TOKEN");
+        this.prepareEnvironment("SEND_TOKEN", 0);
         context.turnOffAuthorisationSystem();
         ClarinUserRegistration clarinUserRegistration = ClarinUserRegistrationBuilder
                 .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
@@ -274,7 +274,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
 
     @Test
     public void authorizedUserWithMetadata_shouldSendToken() throws Exception {
-        this.prepareEnvironment("NAME,ADDRESS");
+        this.prepareEnvironment("NAME,ADDRESS", 0);
         context.turnOffAuthorisationSystem();
         ClarinUserRegistration clarinUserRegistration = ClarinUserRegistrationBuilder
                 .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
@@ -323,7 +323,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
 
     @Test
     public void authorizedUserWithMetadata_shouldSendEmail() throws Exception {
-        this.prepareEnvironment("SEND_TOKEN,NAME,ADDRESS");
+        this.prepareEnvironment("SEND_TOKEN,NAME,ADDRESS", 0);
         context.turnOffAuthorisationSystem();
         ClarinUserRegistration clarinUserRegistration = ClarinUserRegistrationBuilder
                 .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
@@ -375,6 +375,39 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
         ClarinUserMetadataBuilder.deleteClarinUserMetadata(clarinUserRegistration.getID());
     }
 
+    // Confirmation = 1
+    @Test
+    public void authorizedUserWithoutMetadata_shouldDownloadToken() throws Exception {
+        this.prepareEnvironment(null, 1);
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration clarinUserRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // There should exist record in the UserRegistration table
+        getClient(adminToken).perform(get("/api/core/clarinuserregistrations")
+                        .contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Manage UserMetadata and get token
+        getClient(adminToken).perform(post("/api/core/clarinusermetadata/manage?bitstreamUUID=" + bitstream.getID())
+                        .content(mapper.writeValueAsBytes(new ArrayList<ClarinUserMetadataRest>(0)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$", not(CHECK_EMAIL_RESPONSE_CONTENT)));
+
+        // Get created CLRUA
+        getClient(adminToken).perform(get("/api/core/clarinlruallowances")
+                        .contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
     private WorkspaceItem createWorkspaceItemWithFile() {
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -413,6 +446,7 @@ public class ClarinUserMetadataRestControllerIT extends AbstractControllerIntegr
         clarinLicenseLabelService.update(context, clarinLicenseLabel);
         return clarinLicenseLabel;
     }
+
 
     /**
      * Create ClarinLicense object with ClarinLicenseLabel object for testing purposes.
