@@ -43,6 +43,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleClarinService;
+import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.workflow.WorkflowException;
@@ -81,7 +84,11 @@ public class ClarinItemImportController {
     @Autowired
     private Utils utils;
     @Autowired
-    private HandleClarinService handleService;
+    private HandleClarinService handleClarinService;
+    @Autowired
+    private HandleService handleService;
+    @Autowired
+    private IdentifierService identifierService;
     @Autowired
     XmlWorkflowService workflowService;
     @Autowired(required = true)
@@ -101,15 +108,15 @@ public class ClarinItemImportController {
      * https://<dspace.server.url>/api/clarin/import/workspaceitem
      * }
      * </pre>
-     * @param request
-     * @return
-     * @throws AuthorizeException
-     * @throws SQLException
+     * @param request request
+     * @return workspaceitem converted to rest
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException       if database error
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(method = RequestMethod.POST, value = "/workspaceitem")
     public WorkspaceItemRest importWorkspaceItem(HttpServletRequest request)
-            throws AuthorizeException, SQLException {
+            throws AuthorizeException, SQLException, IdentifierException {
         Context context = obtainContext(request);
         if (Objects.isNull(context)) {
             throw new RuntimeException("Context is null!");
@@ -178,7 +185,8 @@ public class ClarinItemImportController {
         item.setLastModified(itemRest.getLastModified());
         metadataConverter.setMetadata(context, item, itemRest.getMetadata());
         if (!Objects.isNull(itemRest.getHandle())) {
-            item.addHandle(handleService.findByHandle(context, itemRest.getHandle()));
+            //create handle
+            identifierService.register(context, item, itemRest.getHandle());
         }
 
         // save changes
@@ -267,7 +275,7 @@ public class ClarinItemImportController {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(method = RequestMethod.POST, value = "/item")
-    public ItemRest importItem(HttpServletRequest request) throws SQLException, AuthorizeException {
+    public ItemRest importItem(HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
         Context context = obtainContext(request);
         if (Objects.isNull(context)) {
             throw new RuntimeException("Context is null!");
@@ -319,10 +327,6 @@ public class ClarinItemImportController {
         item.setDiscoverable(itemRest.getDiscoverable());
         item.setLastModified(itemRest.getLastModified());
         metadataConverter.setMetadata(context, item, itemRest.getMetadata());
-        if (!Objects.isNull(itemRest.getHandle())) {
-            item.addHandle(handleService.findByHandle(context, itemRest.getHandle()));
-        }
-
         // store metadata values which should not be updated by the import e.g., `dc.description.provenance`,
         // `dc.date.available`, etc..
         // Load these metadata fields from the `clarin-dspace.cfg`
@@ -336,7 +340,7 @@ public class ClarinItemImportController {
         }
 
         //remove workspaceitem and create collection2item
-        Item itemToReturn = installItemService.installItem(context, workspaceItem);
+        Item itemToReturn = installItemService.installItem(context, workspaceItem, itemRest.getHandle());
         //set isArchived back to false
         itemToReturn.setArchived(itemRest.getInArchive());
 

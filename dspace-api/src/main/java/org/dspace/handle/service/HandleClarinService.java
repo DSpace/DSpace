@@ -215,4 +215,15 @@ public interface HandleClarinService {
      * @throws SQLException if database error
      */
     public String getDeadSince(Context context, String handle) throws SQLException;
+
+    /**
+     * Create handle without dspace object.
+     * This method is created for migration purposes.
+     * @param context  context
+     * @param handle   handle of Handle object
+     * @return created Handle
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    public Handle createHandle(Context context, String handle) throws SQLException, AuthorizeException;
 }

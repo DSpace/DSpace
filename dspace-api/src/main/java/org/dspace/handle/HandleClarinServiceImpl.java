@@ -430,6 +430,32 @@ public class HandleClarinServiceImpl implements HandleClarinService {
                 format(timestamptz) : null;
     }
 
+    @Override
+    public Handle createHandle(Context context, String handleStr) throws SQLException, AuthorizeException {
+        // Check authorisation: Only admins may create DC types
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                    "Only administrators may modify the handle registry");
+        }
+
+        String handleId;
+        // Do we want to generate the new handleId or use entered handleStr?
+        if (StringUtils.isNotBlank(handleStr)) {
+            // We use handleStr entered by use
+            handleId = handleStr;
+        } else {
+            // We generate new handleId
+            handleId = createId(context);
+        }
+
+        Handle handle = handleDAO.create(context, new Handle());
+        // Set handleId
+        handle.setHandle(handleId);
+        this.save(context, handle);
+        log.debug("Created new Handle with handle " + handleId);
+        return handle;
+    }
+
     /**
      * Strips the part identifier from the handle
      *

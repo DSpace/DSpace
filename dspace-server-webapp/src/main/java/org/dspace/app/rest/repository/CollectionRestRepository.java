@@ -335,7 +335,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 throw new UnprocessableEntityException("Parent community for id: "
                     + id + " not found");
             }
-            collection = cs.create(context, parent);
+            collection = cs.create(context, parent, collectionRest.getHandle());
             cs.update(context, collection);
             metadataConverter.mergeMetadata(context, collection, collectionRest.getMetadata());
         } catch (SQLException e) {
