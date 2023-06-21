@@ -19,15 +19,22 @@
 
     <bean id="itemIdentifierSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.item.ItemIdentifierProcessor">
-        <property name="metadataConfigurations" ref="itemIdentifierSignpostingProcessorMetadataConfiguration"/>
+        <property name="metadataField" value="dc.identifier.uri"/>
     </bean>
-    <util:list id="itemIdentifierSignpostingProcessorMetadataConfiguration">
+
+    <bean id="itemDescribedbyProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemDescribedbyProcessor">
+        <property name="metadataConfigurations" ref="itemDescribedbyProcessorMetadataConfiguration"/>
+    </bean>
+    <util:list id="itemDescribedbyProcessorMetadataConfiguration">
         <bean class="org.dspace.app.rest.signposting.model.MetadataConfiguration">
             <property name="metadataField" value="dc.identifier.doi"/>
             <property name="pattern" value="https://doi.org/{0}"/>
+            <property name="mimeType" value="application/vnd.datacite.datacite+json"/>
         </bean>
         <bean class="org.dspace.app.rest.signposting.model.MetadataConfiguration">
             <property name="metadataField" value="dc.identifier.uri"/>
+            <property name="mimeType" value="text/html"/>
         </bean>
     </util:list>
 
@@ -52,4 +59,14 @@
     <bean id="bitstreamTypeSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamTypeProcessor"/>
 
+    <bean id="uriDescribesMetadataSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.metadata.MetadataDescribesSignpostingProcessor">
+        <property name="metadataField" value="dc.identifier.uri"/>
+    </bean>
+
+    <bean id="doiDescribesMetadataSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.metadata.MetadataDescribesSignpostingProcessor">
+        <property name="metadataField" value="dc.identifier.doi"/>
+        <property name="pattern" value="https://doi.org/{0}"/>
+    </bean>
 </beans>

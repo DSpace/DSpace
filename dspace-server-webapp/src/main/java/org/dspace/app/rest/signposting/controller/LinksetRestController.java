@@ -12,18 +12,23 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.security.BitstreamMetadataReadPermissionEvaluatorPlugin;
 import org.dspace.app.rest.signposting.converter.LinksetRestMessageConverter;
+import org.dspace.app.rest.signposting.model.Linkset;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRest;
 import org.dspace.app.rest.signposting.model.TypedLinkRest;
 import org.dspace.app.rest.signposting.processor.bitstream.BitstreamSignpostingProcessor;
 import org.dspace.app.rest.signposting.processor.item.ItemSignpostingProcessor;
+import org.dspace.app.rest.signposting.processor.metadata.MetadataSignpostingProcessor;
 import org.dspace.app.rest.signposting.utils.LinksetMapper;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -58,6 +63,8 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty("signposting.enabled")
 public class LinksetRestController {
 
+    private static final Logger log = Logger.getLogger(LinksetRestController.class);
+
     @Autowired
     private Utils utils;
     @Autowired
@@ -66,6 +73,14 @@ public class LinksetRestController {
     private ItemService itemService;
     @Autowired
     private ConverterService converter;
+    @Autowired
+    private BitstreamMetadataReadPermissionEvaluatorPlugin bitstreamMetadataReadPermissionEvaluatorPlugin;
+    private List<BitstreamSignpostingProcessor> bitstreamProcessors = new DSpace().getServiceManager()
+            .getServicesByType(BitstreamSignpostingProcessor.class);
+    private List<ItemSignpostingProcessor> itemProcessors = new DSpace().getServiceManager()
+            .getServicesByType(ItemSignpostingProcessor.class);
+    private List<MetadataSignpostingProcessor> metadataProcessors = new DSpace().getServiceManager()
+            .getServicesByType(MetadataSignpostingProcessor.class);
 
     @PreAuthorize("permitAll()")
     @RequestMapping(method = RequestMethod.GET)
@@ -85,16 +100,9 @@ public class LinksetRestController {
                 throw new ResourceNotFoundException("No such Item: " + uuid);
             }
             verifyItemIsDiscoverable(item);
-
-            List<LinksetNode> linksetNodes = new ArrayList<>();
-            if (item.getType() == Constants.ITEM) {
-                List<ItemSignpostingProcessor> ispp = new DSpace().getServiceManager()
-                        .getServicesByType(ItemSignpostingProcessor.class);
-                for (ItemSignpostingProcessor sp : ispp) {
-                    sp.addLinkSetNodes(context, request, item, linksetNodes);
-                }
-            }
-            return converter.toRest(LinksetMapper.map(linksetNodes), utils.obtainProjection());
+            List<List<LinksetNode>> linksetNodes = createLinksetNodes(request, context, item);
+            List<Linkset> linksets = linksetNodes.stream().map(LinksetMapper::map).collect(Collectors.toList());
+            return converter.toRest(linksets, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -111,23 +119,8 @@ public class LinksetRestController {
                 throw new ResourceNotFoundException("No such Item: " + uuid);
             }
             verifyItemIsDiscoverable(item);
-
-            List<LinksetNode> linksetNodes = new ArrayList<>();
-            List<ItemSignpostingProcessor> ispp = new DSpace().getServiceManager()
-                    .getServicesByType(ItemSignpostingProcessor.class);
-            for (ItemSignpostingProcessor sp : ispp) {
-                sp.addLinkSetNodes(context, request, item, linksetNodes);
-            }
-
-            LinksetRest linksetRest = null;
-            for (LinksetNode linksetNode : linksetNodes) {
-                if (linksetRest == null) {
-                    linksetRest = converter.toRest(linksetNode, utils.obtainProjection());
-                } else {
-                    linksetRest.getLinksetNodes().add(linksetNode);
-                }
-            }
-            return LinksetRestMessageConverter.convert(linksetRest);
+            List<List<LinksetNode>> linksetNodes = createLinksetNodes(request, context, item);
+            return LinksetRestMessageConverter.convert(linksetNodes);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -154,25 +147,89 @@ public class LinksetRestController {
             List<LinksetNode> linksetNodes = new ArrayList<>();
             if (dso.getType() == Constants.ITEM) {
                 verifyItemIsDiscoverable((Item) dso);
-                List<ItemSignpostingProcessor> ispp = new DSpace().getServiceManager()
-                        .getServicesByType(ItemSignpostingProcessor.class);
-                for (ItemSignpostingProcessor sp : ispp) {
-                    sp.addLinkSetNodes(context, request, (Item) dso, linksetNodes);
+                for (ItemSignpostingProcessor processor : itemProcessors) {
+                    processor.addLinkSetNodes(context, request, (Item) dso, linksetNodes);
                 }
             } else {
-                List<BitstreamSignpostingProcessor> bspp = new DSpace().getServiceManager()
-                        .getServicesByType(BitstreamSignpostingProcessor.class);
-                for (BitstreamSignpostingProcessor sp : bspp) {
-                    sp.addLinkSetNodes(context, request, (Bitstream) dso, linksetNodes);
+                for (BitstreamSignpostingProcessor processor : bitstreamProcessors) {
+                    processor.addLinkSetNodes(context, request, (Bitstream) dso, linksetNodes);
                 }
             }
 
             return linksetNodes.stream()
-                    .map(node -> new TypedLinkRest(node.getLink(), node.getRelation(), node.getType()))
+                    .map(node ->
+                            new TypedLinkRest(node.getLink(), node.getRelation(), node.getType(), node.getAnchor()))
                     .collect(Collectors.toList());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<List<LinksetNode>> createLinksetNodes(
+            HttpServletRequest request,
+            Context context, Item item
+    ) throws SQLException {
+        ArrayList<List<LinksetNode>> linksets = new ArrayList<>();
+        addItemLinksets(request, context, item, linksets);
+        addBitstreamLinksets(request, context, item, linksets);
+        addMetadataLinksets(request, context, item, linksets);
+        return linksets;
+    }
+
+    private void addMetadataLinksets(
+            HttpServletRequest request,
+            Context context,
+            Item item,
+            ArrayList<List<LinksetNode>> linksets
+    ) {
+        for (MetadataSignpostingProcessor processor : metadataProcessors) {
+            List<LinksetNode> metadataLinkset = new ArrayList<>();
+            processor.addLinkSetNodes(context, request, item, metadataLinkset);
+            if (!metadataLinkset.isEmpty()) {
+                linksets.add(metadataLinkset);
+            }
+        }
+    }
+
+    private void addBitstreamLinksets(
+            HttpServletRequest request,
+            Context context,
+            Item item,
+            ArrayList<List<LinksetNode>> linksets
+    ) throws SQLException {
+        Iterator<Bitstream> bitstreamsIterator = bitstreamService.getItemBitstreams(context, item);
+        bitstreamsIterator.forEachRemaining(bitstream -> {
+            try {
+                boolean isAuthorized = bitstreamMetadataReadPermissionEvaluatorPlugin
+                        .metadataReadPermissionOnBitstream(context, bitstream);
+                if (isAuthorized) {
+                    List<LinksetNode> bitstreamLinkset = new ArrayList<>();
+                    for (BitstreamSignpostingProcessor processor : bitstreamProcessors) {
+                        processor.addLinkSetNodes(context, request, bitstream, bitstreamLinkset);
+                    }
+                    if (!bitstreamLinkset.isEmpty()) {
+                        linksets.add(bitstreamLinkset);
+                    }
+                }
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+            }
+        });
+    }
+
+    private void addItemLinksets(
+            HttpServletRequest request,
+            Context context,
+            Item item,
+            List<List<LinksetNode>> linksets
+    ) {
+        List<LinksetNode> linksetNodes = new ArrayList<>();
+        if (item.getType() == Constants.ITEM) {
+            for (ItemSignpostingProcessor sp : itemProcessors) {
+                sp.addLinkSetNodes(context, request, item, linksetNodes);
+            }
+        }
+        linksets.add(linksetNodes);
     }
 
     private static void verifyItemIsDiscoverable(Item item) {

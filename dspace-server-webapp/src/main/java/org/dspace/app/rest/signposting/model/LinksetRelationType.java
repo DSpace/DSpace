@@ -20,7 +20,9 @@ public enum LinksetRelationType {
     TYPE("type"),
     LICENSE("license"),
     COLLECTION("collection"),
-    LINKSET("linkset");
+    LINKSET("linkset"),
+    DESCRIBES("describes"),
+    DESCRIBED_BY("describedby");
 
     private final String name;
 

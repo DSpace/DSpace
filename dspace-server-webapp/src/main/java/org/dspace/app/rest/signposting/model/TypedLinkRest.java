@@ -28,13 +28,16 @@ public class TypedLinkRest extends RestAddressableModel {
 
     private String type;
 
+    private String anchor;
+
     public TypedLinkRest() {
     }
 
-    public TypedLinkRest(String href, LinksetRelationType rel, String type) {
+    public TypedLinkRest(String href, LinksetRelationType rel, String type, String anchor) {
         this.href = href;
         this.rel = rel;
         this.type = type;
+        this.anchor = anchor;
     }
 
     public String getHref() {
@@ -55,6 +58,14 @@ public class TypedLinkRest extends RestAddressableModel {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getAnchor() {
+        return anchor;
+    }
+
+    public void setAnchor(String anchor) {
+        this.anchor = anchor;
     }
 
     @Override

@@ -115,9 +115,17 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(3)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
                         Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString("application/vnd.datacite.datacite+json")))
+                .andExpect(jsonPath("$.linkset[0].describedby[1].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[1].type",
+                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].linkset[0].href",
                         Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
                 .andExpect(jsonPath("$.linkset[0].linkset[0].type",
@@ -127,6 +135,18 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                                 "/json")))
                 .andExpect(jsonPath("$.linkset[0].linkset[1].type",
                         Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString("http://localhost:4000/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[2].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[2].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[2].anchor",
+                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
         ;
     }
 
@@ -146,9 +166,17 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(3)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
                         Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString("application/vnd.datacite.datacite+json")))
+                .andExpect(jsonPath("$.linkset[0].describedby[1].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[1].type",
+                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].type",
                         Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
@@ -163,7 +191,19 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
                                 "/json")))
                 .andExpect(jsonPath("$.linkset[0].linkset[1].type",
-                        Matchers.hasToString("application/linkset+json")));
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString("http://localhost:4000/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[2].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[2].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[2].anchor",
+                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
     }
 
     @Test
@@ -181,7 +221,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
                 .andExpect(jsonPath("$.linkset[0].license[0].href",
@@ -194,7 +234,13 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
                                 "/json")))
                 .andExpect(jsonPath("$.linkset[0].linkset[1].type",
-                        Matchers.hasToString("application/linkset+json")));
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString("http://localhost:4000/handle/" + item.getHandle())));
     }
 
     @Test
@@ -232,9 +278,17 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(5)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
                         Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString("application/vnd.datacite.datacite+json")))
+                .andExpect(jsonPath("$.linkset[0].describedby[1].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[1].type",
+                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].item[0].href",
                         Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
                 .andExpect(jsonPath("$.linkset[0].item[0].type",
@@ -253,7 +307,49 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
                                 "/json")))
                 .andExpect(jsonPath("$.linkset[0].linkset[1].type",
-                        Matchers.hasToString("application/linkset+json")));
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].collection[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].collection[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[2].collection[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[2].collection[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[2].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[2].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[2].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[2].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[2].anchor",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream2.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[3].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[3].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[3].anchor",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[4].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[4].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[4].anchor",
+                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
     }
 
     @Test
@@ -374,7 +470,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
-                .withMetadata("dc", "identifier", "doi", doi)
                 .build();
         Bitstream bitstream1 = null;
         try (InputStream is = IOUtils.toInputStream(bitstream1Content, CharEncoding.UTF_8)) {
@@ -388,7 +483,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
-        String siteAsRelation = "<" + MessageFormat.format(doiPattern, doi) + "> ; rel=\"cite-as\" ; anchor=\"" +
+        String siteAsRelation = "<" + url + "/handle/" + item.getHandle() + "> ; rel=\"cite-as\" ; anchor=\"" +
                 url + "/entities/publication/" + item.getID() + "\" ,";
         String itemRelation = "<" + url + "/bitstreams/" + bitstream1.getID() +
                 "/download> ; rel=\"item\" ; " + "type=\"text/plain\" ; anchor=\"" + url + "/entities/publication/" +
@@ -401,13 +496,34 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String jsonLinksetRelation = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
                 "/json> ; rel=\"linkset\" ; type=\"application/linkset+json\" ;" +
                 " anchor=\"" + url + "/entities/publication/" + item.getID() + "\" ,";
+        String describedByRelation = "<" + url + "/handle/" + item.getHandle() + "> ; rel=\"describedby\" ;" +
+                " type=\"text/html\" ; anchor=\"" + url + "/entities/publication/" + item.getID() + "\" ,";
+
+        String bitstreamCollectionLink = "<" + url + "/entities/publication/" + item.getID() + "> ;" +
+                " rel=\"collection\" ; type=\"text/html\" ; anchor=\"" + url + "/bitstreams/"
+                + bitstream1.getID() + "/download\"";
+        String bitstreamLinksetLink = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID() + "> ; " +
+                "rel=\"linkset\" ; type=\"application/linkset\" ; " +
+                "anchor=\"" + url + "/bitstreams/" + bitstream1.getID() + "/download\"";
+        String bitstreamLinksetJsonLink = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID() + "/json> ; " +
+                "rel=\"linkset\" ; type=\"application/linkset+json\" ; " +
+                "anchor=\"" + url + "/bitstreams/" + bitstream1.getID() + "/download\"";
+
+        String describesMetadataLink = "<" + url + "/entities/publication/" + item.getID() + "> ; " +
+                "rel=\"describes\" ; type=\"text/html\" ; " +
+                "anchor=\"" + url + "/handle/" + item.getHandle() + "\"";
 
         getClient().perform(get("/signposting/linksets/" + item.getID()))
                 .andExpect(content().string(Matchers.containsString(siteAsRelation)))
                 .andExpect(content().string(Matchers.containsString(itemRelation)))
                 .andExpect(content().string(Matchers.containsString(typeRelation)))
                 .andExpect(content().string(Matchers.containsString(linksetRelation)))
-                .andExpect(content().string(Matchers.containsString(jsonLinksetRelation)));
+                .andExpect(content().string(Matchers.containsString(jsonLinksetRelation)))
+                .andExpect(content().string(Matchers.containsString(describedByRelation)))
+                .andExpect(content().string(Matchers.containsString(bitstreamCollectionLink)))
+                .andExpect(content().string(Matchers.containsString(bitstreamLinksetLink)))
+                .andExpect(content().string(Matchers.containsString(bitstreamLinksetJsonLink)))
+                .andExpect(content().string(Matchers.containsString(describesMetadataLink)));
     }
 
     @Test
@@ -472,31 +588,42 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String signpostingUrl = configurationService.getProperty("signposting.path");
         String dcIdentifierUriMetadataValue = itemService
                 .getMetadataFirstValue(publication, "dc", "identifier", "uri", Item.ANY);
+        String anchor = url + "/entities/publication/" + publication.getID();
 
         getClient().perform(get("/signposting/links/" + publication.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.hasSize(7)))
+                        Matchers.hasSize(8)))
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(orcidPattern, orcidValue) + "' " +
-                        "&& @.rel == 'author')]").exists())
+                        "&& @.rel == 'author' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(doiPattern, doi) + "' " +
-                        "&& @.rel == 'cite-as')]").exists())
+                        "&& @.rel == 'describedby' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + dcIdentifierUriMetadataValue + "' " +
-                        "&& @.rel == 'cite-as')]").exists())
+                        "&& @.rel == 'describedby' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + dcIdentifierUriMetadataValue + "' " +
+                        "&& @.rel == 'cite-as' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + url + "/bitstreams/" + bitstream.getID() + "/download' " +
                         "&& @.rel == 'item' " +
-                        "&& @.type == 'text/plain')]").exists())
+                        "&& @.type == 'text/plain' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/AboutPage' " +
-                        "&& @.rel == 'type')]").exists())
+                        "&& @.rel == 'type' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/linksets/" +
                         publication.getID().toString() + "' " +
                         "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset')]").exists())
+                        "&& @.type == 'application/linkset' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/linksets/" +
                         publication.getID().toString() + "/json' " +
                         "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset+json')]").exists());
+                        "&& @.type == 'application/linkset+json' " +
+                        "&& @.anchor == '" + anchor + "')]").exists());
     }
 
     @Test
@@ -521,6 +648,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
+        String anchor = uiUrl + "/bitstreams/" + bitstream.getID() + "/download";
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isOk())
@@ -528,13 +656,16 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasSize(3)))
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/entities/publication/" + item.getID() + "' " +
                         "&& @.rel == 'collection' " +
-                        "&& @.type == 'text/html')]").exists())
+                        "&& @.type == 'text/html' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "' " +
                         "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset')]").exists())
+                        "&& @.type == 'application/linkset' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "/json" +
                         "' && @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset+json')]").exists());
+                        "&& @.type == 'application/linkset+json' " +
+                        "&& @.anchor == '" + anchor + "')]").exists());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();
@@ -565,6 +696,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
+        String anchor = uiUrl + "/bitstreams/" + bitstream.getID() + "/download";
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isOk())
@@ -572,15 +704,19 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         Matchers.hasSize(4)))
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/entities/publication/" + item.getID() + "' " +
                         "&& @.rel == 'collection' " +
-                        "&& @.type == 'text/html')]").exists())
+                        "&& @.type == 'text/html' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "' " +
                         "&& @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset')]").exists())
+                        "&& @.type == 'application/linkset' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "/json" +
                         "' && @.rel == 'linkset' " +
-                        "&& @.type == 'application/linkset+json')]").exists())
+                        "&& @.type == 'application/linkset+json' " +
+                        "&& @.anchor == '" + anchor + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/ScholarlyArticle' " +
-                        "&& @.rel == 'type')]").exists());
+                        "&& @.rel == 'type' " +
+                        "&& @.anchor == '" + anchor + "')]").exists());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();
@@ -612,7 +748,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isUnauthorized());
@@ -645,7 +780,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isUnauthorized());
@@ -677,7 +811,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
         getClient().perform(get("/signposting/links/" + bitstream.getID())
                         .header("Accept", "application/json"))
                 .andExpect(status().isUnauthorized());

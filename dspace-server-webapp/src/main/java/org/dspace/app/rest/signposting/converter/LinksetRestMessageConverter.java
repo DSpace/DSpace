@@ -11,10 +11,12 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-import org.dspace.app.rest.signposting.model.LinksetRest;
+import java.util.List;
+
+import org.dspace.app.rest.signposting.model.LinksetNode;
 
 /**
- * Converter for converting LinksetRest message into application/linkset format.
+ * Converter for converting list of linkset nodes into application/linkset format.
  */
 public class LinksetRestMessageConverter {
 
@@ -22,25 +24,25 @@ public class LinksetRestMessageConverter {
     }
 
     /**
-     * Converts LinksetRest object into string of application/linkset format.
+     * Converts list of linkset nodes into string of application/linkset format.
      *
-     * @param linksetRest linkset rest object
+     * @param linksetNodes link of linkset nodes
      * @return string of application/linkset format.
      */
-    public static String convert(LinksetRest linksetRest) {
+    public static String convert(List<List<LinksetNode>> linksetNodes) {
         StringBuilder responseBody = new StringBuilder();
-        linksetRest.getLinksetNodes().forEach(linksetNodes -> {
-            if (isNotBlank(linksetNodes.getLink())) {
-                responseBody.append(format("<%s> ", linksetNodes.getLink()));
+        linksetNodes.stream().flatMap(List::stream).forEach(linksetNode -> {
+            if (isNotBlank(linksetNode.getLink())) {
+                responseBody.append(format("<%s> ", linksetNode.getLink()));
             }
-            if (nonNull(linksetNodes.getRelation())) {
-                responseBody.append(format("; rel=\"%s\" ", linksetNodes.getRelation().getName()));
+            if (nonNull(linksetNode.getRelation())) {
+                responseBody.append(format("; rel=\"%s\" ", linksetNode.getRelation().getName()));
             }
-            if (isNotBlank(linksetNodes.getType())) {
-                responseBody.append(format("; type=\"%s\" ", linksetNodes.getType()));
+            if (isNotBlank(linksetNode.getType())) {
+                responseBody.append(format("; type=\"%s\" ", linksetNode.getType()));
             }
-            if (isNotBlank(linksetNodes.getAnchor())) {
-                responseBody.append(format("; anchor=\"%s\" ", linksetNodes.getAnchor()));
+            if (isNotBlank(linksetNode.getAnchor())) {
+                responseBody.append(format("; anchor=\"%s\" ", linksetNode.getAnchor()));
             }
             responseBody.append(", ");
         });

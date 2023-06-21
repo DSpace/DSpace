@@ -16,6 +16,8 @@ public class MetadataConfiguration {
 
     private String pattern;
 
+    private String mimeType;
+
     public MetadataConfiguration() {
     }
 
@@ -38,5 +40,13 @@ public class MetadataConfiguration {
 
     public void setPattern(String pattern) {
         this.pattern = pattern;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }
