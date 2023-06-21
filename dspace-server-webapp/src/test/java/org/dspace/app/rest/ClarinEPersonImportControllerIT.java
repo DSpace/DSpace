@@ -18,11 +18,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.model.ClarinUserRegistrationRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Integration test to test the /api/clarin/import/eperson/* endpoints
+ * Integration test to test the /api/clarin/import/* endpoints
  *
  * @author Michaela Paurikova (michaela.paurikova at dataquest.sk)
  */
@@ -50,7 +50,7 @@ public class ClarinEPersonImportControllerIT  extends AbstractControllerIntegrat
     private ClarinUserRegistrationService clarinUserRegistrationService;
 
     @Test
-    public void createEpersonWithUserRegistrationTest() throws Exception {
+    public void createEpersonTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -74,10 +74,7 @@ public class ClarinEPersonImportControllerIT  extends AbstractControllerIntegrat
                             .contentType(contentType)
                             .param("projection", "full")
                             .param("selfRegistered", "true")
-                            .param("lastActive", "2018-02-10T13:21:29.733")
-                            .param("userRegistration", "true")
-                            .param("organization", "https://test.com")
-                            .param("confirmation", "false"))
+                            .param("lastActive", "2018-02-10T13:21:29.733"))
                     .andExpect(status().isOk())
                     .andDo(result -> idRef
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
@@ -92,23 +89,13 @@ public class ClarinEPersonImportControllerIT  extends AbstractControllerIntegrat
             assertEquals(createdEperson.getFirstName(), "John");
             assertEquals(createdEperson.getLastName(), "Doe");
 
-            //control the creation of the user registration
-            List<ClarinUserRegistration> userRegistrations = clarinUserRegistrationService.findByEPersonUUID(
-                    context, idRef.get());
-            assertEquals(userRegistrations.size(), 1);
-            ClarinUserRegistration userRegistration = userRegistrations.get(0);
-            assertEquals(userRegistration.getEmail(), "createtest@example.com");
-            assertEquals(userRegistration.getOrganization(), "https://test.com");
-            assertFalse(userRegistration.isConfirmation());
-            //clean all
-            ClarinUserRegistrationBuilder.deleteClarinUserRegistration(userRegistration.getID());
         } finally {
             EPersonBuilder.deleteEPerson(idRef.get());
         }
     }
 
     @Test
-    public void createEpersonWithoutUserRegistrationTest() throws Exception {
+    public void createEpersonDifferentLastActiveFormatTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -132,54 +119,7 @@ public class ClarinEPersonImportControllerIT  extends AbstractControllerIntegrat
                             .contentType(contentType)
                             .param("projection", "full")
                             .param("selfRegistered", "true")
-                            .param("lastActive", "2018-02-10T13:21:29.733")
-                            .param("userRegistration", "false"))
-                    .andExpect(status().isOk())
-                    .andDo(result -> idRef
-                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
-
-            EPerson createdEperson = ePersonService.find(context, idRef.get());
-            assertEquals(getStringFromDate(createdEperson.getLastActive()), "2018-02-10T13:21:29.733");
-            assertTrue(createdEperson.getSelfRegistered());
-
-            //control the creation of the user registration
-            List<ClarinUserRegistration> userRegistrations = clarinUserRegistrationService.findByEPersonUUID(context,
-                    idRef.get());
-            assertEquals(userRegistrations.size(), 0);
-        } finally {
-            EPersonBuilder.deleteEPerson(idRef.get());
-        }
-    }
-
-    @Test
-    public void createEpersonWithUserRegistrationDifferentLastActiveFormatTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        EPersonRest data = new EPersonRest();
-        MetadataRest metadataRest = new MetadataRest();
-        data.setEmail("createtest@example.com");
-        data.setCanLogIn(true);
-        MetadataValueRest surname = new MetadataValueRest();
-        surname.setValue("Doe");
-        metadataRest.put("eperson.lastname", surname);
-        MetadataValueRest firstname = new MetadataValueRest();
-        firstname.setValue("John");
-        metadataRest.put("eperson.firstname", firstname);
-        data.setMetadata(metadataRest);
-
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
-
-        String authToken = getAuthToken(admin.getEmail(), password);
-
-        try {
-            getClient(authToken).perform(post("/api/clarin/import/eperson")
-                            .content(mapper.writeValueAsBytes(data))
-                            .contentType(contentType)
-                            .param("projection", "full")
-                            .param("selfRegistered", "true")
-                            .param("lastActive", "2018-02-10T13:21:29.733")
-                            .param("userRegistration", "true")
-                            .param("organization", "https://test.com")
-                            .param("confirmation", "false"))
+                            .param("lastActive", "2018-02-10T13:21:29.733"))
                     .andExpect(status().isOk())
                     .andDo(result -> idRef
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
@@ -194,18 +134,45 @@ public class ClarinEPersonImportControllerIT  extends AbstractControllerIntegrat
             assertEquals(createdEperson.getFirstName(), "John");
             assertEquals(createdEperson.getLastName(), "Doe");
 
-            //control the creation of the user registration
-            List<ClarinUserRegistration> userRegistrations = clarinUserRegistrationService.findByEPersonUUID(context,
-                    idRef.get());
-            assertEquals(userRegistrations.size(), 1);
-            ClarinUserRegistration userRegistration = userRegistrations.get(0);
-            assertEquals(userRegistration.getEmail(), "createtest@example.com");
-            assertEquals(userRegistration.getOrganization(), "https://test.com");
-            assertFalse(userRegistration.isConfirmation());
-            //clean all
-            ClarinUserRegistrationBuilder.deleteClarinUserRegistration(userRegistration.getID());
         } finally {
             EPersonBuilder.deleteEPerson(idRef.get());
+        }
+    }
+
+    @Test
+    public void createUserRegistrationTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson3@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        context.restoreAuthSystemState();
+        ClarinUserRegistrationRest userRegistrationRest = new ClarinUserRegistrationRest();
+        userRegistrationRest.setConfirmation(true);
+        userRegistrationRest.setEmail("test@test.edu");
+        userRegistrationRest.setePersonID(ePerson.getID());
+        userRegistrationRest.setOrganization("Test");
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        try {
+            getClient(authToken).perform(post("/api/clarin/import/userregistration")
+                            .content(mapper.writeValueAsBytes(userRegistrationRest))
+                            .contentType(contentType))
+                    .andExpect(status().isOk())
+                    .andDo(result -> idRef
+                            .set(read(result.getResponse().getContentAsString(), "$.id")));
+            //control
+            ClarinUserRegistration clarinUserRegistration = clarinUserRegistrationService.find(context, idRef.get());
+            assertTrue(clarinUserRegistration.isConfirmation());
+            assertEquals(clarinUserRegistration.getEmail(), "test@test.edu");
+            assertEquals(clarinUserRegistration.getPersonID(), ePerson.getID());
+            assertEquals(clarinUserRegistration.getOrganization(), "Test");
+        } finally {
+            ClarinUserRegistrationBuilder.deleteClarinUserRegistration(idRef.get());
         }
     }
 

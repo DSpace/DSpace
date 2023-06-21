@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,10 +17,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.ClarinUserRegistrationRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -35,12 +40,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Specialized controller created for Clarin-Dspace eperson import.
+ * Specialized controller created for Clarin-Dspace eperson and user registration import.
  *
  * @author Michaela Paurikova (michaela.paurikova at dataquest.sk)
  */
 @RestController
-@RequestMapping("/api/clarin/import/" + EPersonRest.EPERSON)
+@RequestMapping("/api/clarin/import")
 public class ClarinEPersonImportController {
     @Autowired
     private EPersonRestRepository ePersonRestRepository;
@@ -54,7 +59,7 @@ public class ClarinEPersonImportController {
     private Utils utils;
 
     /**
-     * Endpoint for import eperson. Create user registration if it exists.
+     * Endpoint for import eperson.
      * The mapping for requested endpoint, for example
      * <pre>
      * {@code
@@ -67,7 +72,7 @@ public class ClarinEPersonImportController {
      * @throws SQLException       if database error
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/eperson")
     public EPersonRest importEPerson(HttpServletRequest request)
             throws AuthorizeException, SQLException {
         Context context = obtainContext(request);
@@ -92,27 +97,54 @@ public class ClarinEPersonImportController {
         eperson.setLastActive(lastActive);
         ePersonService.update(context, eperson);
 
-        String hasUserRegistrationString = request.getParameter("userRegistration");
-        boolean userRegistration = getBooleanFromString(hasUserRegistrationString);
-
-        //create user registration if exists
-        if (userRegistration) {
-            String organization = request.getParameter("organization");
-            String confirmationString = request.getParameter("confirmation");
-            boolean confirmation = getBooleanFromString(confirmationString);
-
-            ClarinUserRegistration clarinUserRegistration = new ClarinUserRegistration();
-            clarinUserRegistration.setOrganization(organization);
-            clarinUserRegistration.setConfirmation(confirmation);
-            clarinUserRegistration.setEmail(eperson.getEmail());
-            clarinUserRegistration.setPersonID(eperson.getID());
-            clarinUserRegistrationService.create(context, clarinUserRegistration);
-        }
         epersonRest = converter.toRest(eperson, utils.obtainProjection());
         context.complete();
 
         return epersonRest;
     }
+
+    /**
+     * Endpoint for import clarin user registration.
+     * The mapping for requested endpoint, for example
+     * <pre>
+     * {@code
+     * https://<dspace.server.url>/api/clarin/import/userregistration
+     * }
+     * </pre>
+     * @param request request
+     * @return created clarin user registration converted to rest
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException       if database error
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(method = RequestMethod.POST, value = "/userregistration")
+    public ClarinUserRegistrationRest importUserRegistration(HttpServletRequest request)
+            throws SQLException, AuthorizeException {
+        Context context = obtainContext(request);
+        if (Objects.isNull(context)) {
+            throw new RuntimeException("Context is null!");
+        }
+        //get user registration from request
+        ObjectMapper mapper = new ObjectMapper();
+        ClarinUserRegistrationRest userRegistrationRest = null;
+        try {
+            ServletInputStream input = request.getInputStream();
+            userRegistrationRest = mapper.readValue(input, ClarinUserRegistrationRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body", e1);
+        }
+        //create user registration
+        ClarinUserRegistration clarinUserRegistration = new ClarinUserRegistration();
+        clarinUserRegistration.setOrganization(userRegistrationRest.getOrganization());
+        clarinUserRegistration.setConfirmation(userRegistrationRest.isConfirmation());
+        clarinUserRegistration.setEmail(userRegistrationRest.getEmail());
+        clarinUserRegistration.setPersonID(userRegistrationRest.getePersonID());
+        clarinUserRegistration = clarinUserRegistrationService.create(context, clarinUserRegistration);
+        userRegistrationRest = converter.toRest(clarinUserRegistration, utils.obtainProjection());
+        context.commit();
+        return userRegistrationRest;
+    }
+
 
     /**
      * Convert String value to boolean.
