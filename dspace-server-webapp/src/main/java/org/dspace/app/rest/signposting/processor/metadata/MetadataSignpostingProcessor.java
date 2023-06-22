@@ -7,18 +7,11 @@
  */
 package org.dspace.app.rest.signposting.processor.metadata;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.dspace.content.Item.ANY;
-
-import java.text.MessageFormat;
-
-import org.apache.logging.log4j.util.Strings;
-import org.dspace.app.rest.signposting.model.MetadataConfiguration;
 import org.dspace.app.rest.signposting.processor.AbstractSignPostingProcessor;
 import org.dspace.app.rest.signposting.processor.SignPostingProcessor;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataFieldName;
-import org.dspace.content.service.ItemService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * An abstract class represents {@link SignPostingProcessor } for a metadata.
@@ -26,20 +19,12 @@ import org.dspace.content.service.ItemService;
 public abstract class MetadataSignpostingProcessor extends AbstractSignPostingProcessor
         implements SignPostingProcessor<Item> {
 
-    protected final ItemService itemService;
+    private final ConfigurationService configurationService =
+            DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    public MetadataSignpostingProcessor(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
-    public String buildAnchor(MetadataConfiguration metadataConfiguration, Item item) {
-        String metadataValue = itemService
-                .getMetadataFirstValue(item, new MetadataFieldName(metadataConfiguration.getMetadataField()), ANY);
-        if (isNotBlank(metadataValue)) {
-            return isNotBlank(metadataConfiguration.getPattern())
-                    ? MessageFormat.format(metadataConfiguration.getPattern(), metadataValue)
-                    : metadataValue;
-        }
-        return Strings.EMPTY;
+    public String buildAnchor(Item item) {
+        String baseUrl = configurationService.getProperty("dspace.ui.url");
+        String signpostingPath = configurationService.getProperty("signposting.path");
+        return baseUrl + "/" + signpostingPath + "/describedby/" + item.getID();
     }
 }
