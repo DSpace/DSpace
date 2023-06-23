@@ -45,6 +45,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -328,6 +329,105 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[3].describes[0].type",
                         Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[3].anchor",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
+    }
+
+    @Test
+    public void findOneItemJsonLinksetsWithBitstreamsFromDifferentBundles() throws Exception {
+        String bitstream1Content = "ThisIsSomeDummyText";
+        String bitstream1MimeType = "text/plain";
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Item Test")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .build();
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstream1Content, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, Constants.DEFAULT_BUNDLE_NAME)
+                    .withName("Bitstream 1")
+                    .withDescription("description")
+                    .withMimeType(bitstream1MimeType)
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
+            Bitstream bitstream2 = BitstreamBuilder.createBitstream(context, item, is, "TEXT")
+                    .withName("Bitstream 2")
+                    .withDescription("description")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
+            Bitstream bitstream3 = BitstreamBuilder.createBitstream(context, item, is, "THUMBNAIL")
+                    .withName("Bitstream 3")
+                    .withDescription("description")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
+            Bitstream bitstream4 = BitstreamBuilder.createBitstream(context, item, is, "LICENSE")
+                    .withName("Bitstream 4")
+                    .withDescription("description")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
+        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.linkset",
+                        Matchers.hasSize(3)))
+                .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString(mimeType)))
+                .andExpect(jsonPath("$.linkset[0].item",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.linkset[0].item[0].href",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[0].item[0].type",
+                        Matchers.hasToString(bitstream1MimeType)))
+                .andExpect(jsonPath("$.linkset[0].anchor",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].collection[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].collection[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[2].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[2].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[2].anchor",
                         Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
                 .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }

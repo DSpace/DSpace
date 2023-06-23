@@ -21,9 +21,10 @@ import org.dspace.app.rest.signposting.processor.item.ItemSignpostingProcessor;
 import org.dspace.app.rest.signposting.processor.metadata.MetadataSignpostingProcessor;
 import org.dspace.app.rest.signposting.service.LinksetService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
@@ -39,7 +40,7 @@ public class LinksetServiceImpl implements LinksetService {
     private static final Logger log = Logger.getLogger(LinksetServiceImpl.class);
 
     @Autowired
-    private BitstreamService bitstreamService;
+    protected ItemService itemService;
 
     @Autowired
     private BitstreamMetadataReadPermissionEvaluatorPlugin bitstreamMetadataReadPermissionEvaluatorPlugin;
@@ -143,7 +144,8 @@ public class LinksetServiceImpl implements LinksetService {
 
     private Iterator<Bitstream> getItemBitstreams(Context context, Item item) {
         try {
-            return bitstreamService.getItemBitstreams(context, item);
+            List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
+            return bundles.stream().flatMap(bundle -> bundle.getBitstreams().stream()).iterator();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
