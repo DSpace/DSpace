@@ -195,7 +195,7 @@ public class AccessConditionOption {
      *              configured maximum.
      * @throws ParseException passed through.
      */
-    private void validateResourcePolicy(Context context, String name, Date startDate, Date endDate)
+    public void validateResourcePolicy(Context context, String name, Date startDate, Date endDate)
            throws IllegalStateException, ParseException {
         LOG.debug("Validate policy dates:  name '{}', startDate {}, endDate {}",
                 name, startDate, endDate);
