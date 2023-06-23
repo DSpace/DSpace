@@ -88,8 +88,11 @@ public class LinksetRestController {
     }
 
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/json",
-            method = RequestMethod.GET)
+    @RequestMapping(
+            value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/json",
+            method = RequestMethod.GET,
+            produces = "application/linkset+json"
+    )
     public LinksetRest getJson(HttpServletRequest request, @PathVariable UUID uuid) {
         try {
             Context context = ContextUtil.obtainContext(request);
@@ -109,7 +112,11 @@ public class LinksetRestController {
     }
 
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    @RequestMapping(value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, method = RequestMethod.GET)
+    @RequestMapping(
+            value = "/linksets" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID,
+            method = RequestMethod.GET,
+            produces = "application/linkset"
+    )
     public String getLset(HttpServletRequest request, @PathVariable UUID uuid) {
         try {
             Context context = ContextUtil.obtainContext(request);

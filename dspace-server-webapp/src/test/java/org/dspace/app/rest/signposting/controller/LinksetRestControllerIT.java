@@ -10,6 +10,7 @@ package org.dspace.app.rest.signposting.controller;
 import static org.dspace.content.MetadataSchemaEnum.PERSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,7 +53,6 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -141,7 +141,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[1].describes[0].type",
                         Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[1].anchor",
-                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())));
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
@@ -188,7 +189,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[1].describes[0].type",
                         Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[1].anchor",
-                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())));
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
@@ -225,7 +227,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[1].describes[0].type",
                         Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[1].anchor",
-                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())));
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
@@ -325,7 +328,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[3].describes[0].type",
                         Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[3].anchor",
-                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())));
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
@@ -501,7 +505,8 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(content().string(Matchers.containsString(bitstreamCollectionLink)))
                 .andExpect(content().string(Matchers.containsString(bitstreamLinksetLink)))
                 .andExpect(content().string(Matchers.containsString(bitstreamLinksetJsonLink)))
-                .andExpect(content().string(Matchers.containsString(describesMetadataLink)));
+                .andExpect(content().string(Matchers.containsString(describesMetadataLink)))
+                .andExpect(header().stringValues("Content-Type", "application/linkset;charset=UTF-8"));
     }
 
     @Test
@@ -568,8 +573,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String dcIdentifierUriMetadataValue = itemService
                 .getMetadataFirstValue(publication, "dc", "identifier", "uri", Item.ANY);
 
-        getClient().perform(get("/signposting/links/" + publication.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + publication.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.hasSize(7)))
@@ -618,8 +622,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.hasSize(3)))
@@ -662,8 +665,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.hasSize(4)))
@@ -709,8 +711,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -741,8 +742,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -772,8 +772,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -789,8 +788,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/links/" + item.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + item.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -811,13 +809,10 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         String responseMimeType = "application/vnd.datacite.datacite+xml";
         context.restoreAuthSystemState();
 
-        String titleXml = "<title xmlns=\"http://datacite.org/schema/kernel-3\">" + title + "</title>";
-
         getClient().perform(get("/signposting/describedby/" + item.getID()))
                 .andExpect(status().isOk())
-                .andExpect(content().string(Matchers.containsString(titleXml)))
-                .andExpect(MockMvcResultMatchers.header()
-                        .stringValues("Content-Type", responseMimeType + ";charset=UTF-8"));
+                .andExpect(content().string(Matchers.containsString(title)))
+                .andExpect(header().stringValues("Content-Type", responseMimeType + ";charset=UTF-8"));
     }
 
     @Test
