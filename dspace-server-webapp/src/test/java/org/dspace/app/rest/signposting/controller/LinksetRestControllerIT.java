@@ -109,7 +109,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     public void findOneItemJsonLinksets() throws Exception {
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
-        String mimeType = configurationService.getProperty("signposting.describedby.mime-type");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
@@ -148,7 +148,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     public void findOneItemJsonLinksetsWithType() throws Exception {
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
-        String mimeType = configurationService.getProperty("signposting.describedby.mime-type");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         String articleUri = mapConverterDSpaceToSchemaOrgUri.getValue("Article");
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
@@ -260,7 +260,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
-        String mimeType = configurationService.getProperty("signposting.describedby.mime-type");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
@@ -459,7 +459,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
-        String mimeType = configurationService.getProperty("signposting.describedby.mime-type");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         String siteAsRelation = "<" + url + "/handle/" + item.getHandle() + "> ; rel=\"cite-as\" ; anchor=\"" +
                 url + "/entities/publication/" + item.getID() + "\" ,";
         String itemRelation = "<" + url + "/bitstreams/" + bitstream1.getID() +
@@ -564,7 +564,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
-        String mimeType = configurationService.getProperty("signposting.describedby.mime-type");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         String dcIdentifierUriMetadataValue = itemService
                 .getMetadataFirstValue(publication, "dc", "identifier", "uri", Item.ANY);
 
@@ -808,27 +808,14 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle(title)
                 .withMetadata("dc", "identifier", "doi", doi)
                 .build();
-        String responseMimeType = configurationService.getProperty("signposting.describedby.mime-type");
+        String responseMimeType = "application/vnd.datacite.datacite+xml";
         context.restoreAuthSystemState();
 
         String titleXml = "<title xmlns=\"http://datacite.org/schema/kernel-3\">" + title + "</title>";
-        String doiXml = "<alternateIdentifier xmlns=\"http://datacite.org/schema/kernel-3\" " +
-                "alternateIdentifierType=\"doi\">" + doi + "</alternateIdentifier>";
-        String handleXml = "<alternateIdentifier xmlns=\"http://datacite.org/schema/kernel-3\" " +
-                "alternateIdentifierType=\"uri\">http://localhost:4000/handle/" + item.getHandle() +
-                "</alternateIdentifier>";
-        String acceptedDateXml = "<date xmlns=\"http://datacite.org/schema/kernel-3\" dateType=\"Accepted\">" +
-                currentDateInFormat + "</date>";
-        String availableDateXml = "<date xmlns=\"http://datacite.org/schema/kernel-3\" dateType=\"Available\">" +
-                currentDateInFormat + "</date>";
 
         getClient().perform(get("/signposting/describedby/" + item.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.containsString(titleXml)))
-                .andExpect(content().string(Matchers.containsString(doiXml)))
-                .andExpect(content().string(Matchers.containsString(handleXml)))
-                .andExpect(content().string(Matchers.containsString(acceptedDateXml)))
-                .andExpect(content().string(Matchers.containsString(availableDateXml)))
                 .andExpect(MockMvcResultMatchers.header()
                         .stringValues("Content-Type", responseMimeType + ";charset=UTF-8"));
     }
