@@ -10,11 +10,15 @@ package org.dspace.app.rest.signposting.controller;
 import static org.dspace.content.MetadataSchemaEnum.PERSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -41,6 +45,7 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -102,20 +107,10 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneItemGenericLinksets() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Item item = ItemBuilder.createItem(context, collection)
-                .withTitle("Item Test")
-                .withMetadata("dc", "identifier", "doi", doi)
-                .build();
-        context.restoreAuthSystemState();
-
-        getClient().perform(get("/signposting/linksets/" + item.getID()))
-                .andExpect(status().isMethodNotAllowed());
-    }
-
-    @Test
     public void findOneItemJsonLinksets() throws Exception {
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
@@ -126,13 +121,36 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))));
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString(mimeType)))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
     public void findOneItemJsonLinksetsWithType() throws Exception {
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         String articleUri = mapConverterDSpaceToSchemaOrgUri.getValue("Article");
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
@@ -145,24 +163,42 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString(mimeType)))
                 .andExpect(jsonPath("$.linkset[0].type",
                         Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
-                .andExpect(jsonPath("$.linkset[0].type[0].type",
-                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].type[1].href",
                         Matchers.hasToString(articleUri)))
-                .andExpect(jsonPath("$.linkset[0].type[1].type",
-                        Matchers.hasToString("text/html")));
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
     public void findOneItemJsonLinksetsWithLicence() throws Exception {
         String licenceUrl = "https://exmple.com/licence";
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
@@ -173,16 +209,27 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.linkset[0].type[0].href",
                         Matchers.hasToString("https://schema.org/AboutPage")))
-                .andExpect(jsonPath("$.linkset[0].type[0].type",
-                        Matchers.hasToString("text/html")))
                 .andExpect(jsonPath("$.linkset[0].license[0].href",
                         Matchers.hasToString(licenceUrl)))
-                .andExpect(jsonPath("$.linkset[0].license[0].type",
-                        Matchers.hasToString("text/html")));
-
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
@@ -216,13 +263,18 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
+        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.linkset",
-                        Matchers.hasSize(1)))
+                        Matchers.hasSize(4)))
                 .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
-                        Matchers.hasToString(MessageFormat.format(doiPattern, doi))))
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString(mimeType)))
                 .andExpect(jsonPath("$.linkset[0].item[0].href",
                         Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
                 .andExpect(jsonPath("$.linkset[0].item[0].type",
@@ -232,7 +284,152 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.linkset[0].item[1].type",
                         Matchers.hasToString(bitstream2MimeType)))
                 .andExpect(jsonPath("$.linkset[0].anchor",
-                        Matchers.hasToString(url + "/entities/publication/" + item.getID())));
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].collection[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].collection[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[2].collection[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[2].collection[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[2].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[2].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[2].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[2].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[2].anchor",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream2.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[3].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[3].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[3].anchor",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
+    }
+
+    @Test
+    public void findOneItemJsonLinksetsWithBitstreamsFromDifferentBundles() throws Exception {
+        String bitstream1Content = "ThisIsSomeDummyText";
+        String bitstream1MimeType = "text/plain";
+
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Item Test")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .build();
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstream1Content, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is, Constants.DEFAULT_BUNDLE_NAME)
+                    .withName("Bitstream 1")
+                    .withDescription("description")
+                    .withMimeType(bitstream1MimeType)
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
+            Bitstream bitstream2 = BitstreamBuilder.createBitstream(context, item, is, "TEXT")
+                    .withName("Bitstream 2")
+                    .withDescription("description")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
+            Bitstream bitstream3 = BitstreamBuilder.createBitstream(context, item, is, "THUMBNAIL")
+                    .withName("Bitstream 3")
+                    .withDescription("description")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+
+        try (InputStream is = IOUtils.toInputStream("test", CharEncoding.UTF_8)) {
+            Bitstream bitstream4 = BitstreamBuilder.createBitstream(context, item, is, "LICENSE")
+                    .withName("Bitstream 4")
+                    .withDescription("description")
+                    .withMimeType("application/pdf")
+                    .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
+        getClient().perform(get("/signposting/linksets/" + item.getID() + "/json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.linkset",
+                        Matchers.hasSize(3)))
+                .andExpect(jsonPath("$.linkset[0].cite-as[0].href",
+                        Matchers.hasToString(url + "/handle/" + item.getHandle())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].describedby[0].type",
+                        Matchers.hasToString(mimeType)))
+                .andExpect(jsonPath("$.linkset[0].item",
+                        Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.linkset[0].item[0].href",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[0].item[0].type",
+                        Matchers.hasToString(bitstream1MimeType)))
+                .andExpect(jsonPath("$.linkset[0].anchor",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[0].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[0].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].collection[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[1].collection[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString())))
+                .andExpect(jsonPath("$.linkset[1].linkset[0].type",
+                        Matchers.hasToString("application/linkset")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].href",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                                "/json")))
+                .andExpect(jsonPath("$.linkset[1].linkset[1].type",
+                        Matchers.hasToString("application/linkset+json")))
+                .andExpect(jsonPath("$.linkset[1].anchor",
+                        Matchers.hasToString(url + "/bitstreams/" + bitstream1.getID() + "/download")))
+                .andExpect(jsonPath("$.linkset[2].describes[0].href",
+                        Matchers.hasToString(url + "/entities/publication/" + item.getID())))
+                .andExpect(jsonPath("$.linkset[2].describes[0].type",
+                        Matchers.hasToString("text/html")))
+                .andExpect(jsonPath("$.linkset[2].anchor",
+                        Matchers.hasToString(url + "/" + signpostingUrl + "/describedby/" + item.getID())))
+                .andExpect(header().stringValues("Content-Type", "application/linkset+json;charset=UTF-8"));
     }
 
     @Test
@@ -329,22 +526,19 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/linksets/" + bitstream.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + bitstream.getID() + "/json"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneCollectionJsonLinksets() throws Exception {
-        getClient().perform(get("/signposting/linksets/" + collection.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + collection.getID() + "/json"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void findOneCommunityJsonLinksets() throws Exception {
-        getClient().perform(get("/signposting/linksets/" + parentCommunity.getID() + "/json")
-                        .header("Accept", "application/linkset+json"))
+        getClient().perform(get("/signposting/linksets/" + parentCommunity.getID() + "/json"))
                 .andExpect(status().isNotFound());
     }
 
@@ -356,7 +550,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Item item = ItemBuilder.createItem(context, collection)
                 .withTitle("Item Test")
-                .withMetadata("dc", "identifier", "doi", doi)
                 .build();
         Bitstream bitstream1 = null;
         try (InputStream is = IOUtils.toInputStream(bitstream1Content, CharEncoding.UTF_8)) {
@@ -369,20 +562,51 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
-        String siteAsRelation = "<" + MessageFormat.format(doiPattern, doi) + "> ; rel=\"cite-as\" ; anchor=\"" +
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
+        String siteAsRelation = "<" + url + "/handle/" + item.getHandle() + "> ; rel=\"cite-as\" ; anchor=\"" +
                 url + "/entities/publication/" + item.getID() + "\" ,";
         String itemRelation = "<" + url + "/bitstreams/" + bitstream1.getID() +
                 "/download> ; rel=\"item\" ; " + "type=\"text/plain\" ; anchor=\"" + url + "/entities/publication/" +
                 item.getID() + "\" ,";
-        String typeRelation = "<https://schema.org/AboutPage> ; rel=\"type\" ; type=\"text/html\" ; anchor=\"" +
-                url + "/entities/publication/" +
-                item.getID() + "\" ,";
+        String typeRelation = "<https://schema.org/AboutPage> ; rel=\"type\" ; anchor=\"" +
+                url + "/entities/publication/" + item.getID() + "\" ,";
+        String linksetRelation = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                "> ; rel=\"linkset\" ; type=\"application/linkset\" ;" +
+                " anchor=\"" + url + "/entities/publication/" + item.getID() + "\" ,";
+        String jsonLinksetRelation = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID().toString() +
+                "/json> ; rel=\"linkset\" ; type=\"application/linkset+json\" ;" +
+                " anchor=\"" + url + "/entities/publication/" + item.getID() + "\" ,";
+        String describedByRelation = "<" + url + "/" + signpostingUrl + "/describedby/" + item.getID() +
+                "> ; rel=\"describedby\" ;" + " type=\"" + mimeType + "\" ; anchor=\"" + url +
+                "/entities/publication/" + item.getID() + "\" ,";
 
-        getClient().perform(get("/signposting/linksets/" + item.getID())
-                        .header("Accept", "application/linkset"))
+        String bitstreamCollectionLink = "<" + url + "/entities/publication/" + item.getID() + "> ;" +
+                " rel=\"collection\" ; type=\"text/html\" ; anchor=\"" + url + "/bitstreams/"
+                + bitstream1.getID() + "/download\"";
+        String bitstreamLinksetLink = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID() + "> ; " +
+                "rel=\"linkset\" ; type=\"application/linkset\" ; " +
+                "anchor=\"" + url + "/bitstreams/" + bitstream1.getID() + "/download\"";
+        String bitstreamLinksetJsonLink = "<" + url + "/" + signpostingUrl + "/linksets/" + item.getID() + "/json> ; " +
+                "rel=\"linkset\" ; type=\"application/linkset+json\" ; " +
+                "anchor=\"" + url + "/bitstreams/" + bitstream1.getID() + "/download\"";
+
+        String describesMetadataLink = "<" + url + "/entities/publication/" + item.getID() + "> ; " +
+                "rel=\"describes\" ; type=\"text/html\" ; " +
+                "anchor=\"" + url + "/" + signpostingUrl + "/describedby/" + item.getID() + "\"";
+
+        getClient().perform(get("/signposting/linksets/" + item.getID()))
                 .andExpect(content().string(Matchers.containsString(siteAsRelation)))
                 .andExpect(content().string(Matchers.containsString(itemRelation)))
-                .andExpect(content().string(Matchers.containsString(typeRelation)));
+                .andExpect(content().string(Matchers.containsString(typeRelation)))
+                .andExpect(content().string(Matchers.containsString(linksetRelation)))
+                .andExpect(content().string(Matchers.containsString(jsonLinksetRelation)))
+                .andExpect(content().string(Matchers.containsString(describedByRelation)))
+                .andExpect(content().string(Matchers.containsString(bitstreamCollectionLink)))
+                .andExpect(content().string(Matchers.containsString(bitstreamLinksetLink)))
+                .andExpect(content().string(Matchers.containsString(bitstreamLinksetJsonLink)))
+                .andExpect(content().string(Matchers.containsString(describesMetadataLink)))
+                .andExpect(header().stringValues("Content-Type", "application/linkset;charset=UTF-8"));
     }
 
     @Test
@@ -393,8 +617,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/linksets/" + item.getID())
-                        .header("Accept", "application/linkset"))
+        getClient().perform(get("/signposting/linksets/" + item.getID()))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -445,27 +668,36 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String url = configurationService.getProperty("dspace.ui.url");
+        String signpostingUrl = configurationService.getProperty("signposting.path");
+        String mimeType = "application/vnd.datacite.datacite+xml";
         String dcIdentifierUriMetadataValue = itemService
                 .getMetadataFirstValue(publication, "dc", "identifier", "uri", Item.ANY);
 
-        getClient().perform(get("/signposting/links/" + publication.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + publication.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.hasSize(5)))
+                        Matchers.hasSize(7)))
                 .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(orcidPattern, orcidValue) + "' " +
-                        "&& @.rel == 'author' " +
-                        "&& @.type == 'text/html')]").exists())
-                .andExpect(jsonPath("$[?(@.href == '" + MessageFormat.format(doiPattern, doi) + "' " +
-                        "&& @.rel == 'cite-as')]").exists())
+                        "&& @.rel == 'author')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/describedby/"
+                        + publication.getID() + "' " +
+                        "&& @.rel == 'describedby' " +
+                        "&& @.type == '" + mimeType + "')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + dcIdentifierUriMetadataValue + "' " +
                         "&& @.rel == 'cite-as')]").exists())
                 .andExpect(jsonPath("$[?(@.href == '" + url + "/bitstreams/" + bitstream.getID() + "/download' " +
                         "&& @.rel == 'item' " +
                         "&& @.type == 'text/plain')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/AboutPage' " +
-                        "&& @.rel == 'type' " +
-                        "&& @.type == 'text/html')]").exists());
+                        "&& @.rel == 'type')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/linksets/" +
+                        publication.getID().toString() + "' " +
+                        "&& @.rel == 'linkset' " +
+                        "&& @.type == 'application/linkset')]").exists())
+                .andExpect(jsonPath("$[?(@.href == '" + url + "/" + signpostingUrl + "/linksets/" +
+                        publication.getID().toString() + "/json' " +
+                        "&& @.rel == 'linkset' " +
+                        "&& @.type == 'application/linkset+json')]").exists());
     }
 
     @Test
@@ -490,8 +722,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.hasSize(3)))
@@ -534,8 +765,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
                         Matchers.hasSize(4)))
@@ -549,8 +779,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         "' && @.rel == 'linkset' " +
                         "&& @.type == 'application/linkset+json')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/ScholarlyArticle' " +
-                        "&& @.rel == 'type' " +
-                        "&& @.type == 'text/html')]").exists());
+                        "&& @.rel == 'type')]").exists());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
         metadataAuthorityService.clearCache();
@@ -582,9 +811,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -615,9 +842,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -647,9 +872,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
 
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
-        getClient().perform(get("/signposting/links/" + bitstream.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -665,8 +888,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .build();
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/signposting/links/" + item.getID())
-                        .header("Accept", "application/json"))
+        getClient().perform(get("/signposting/links/" + item.getID()))
                 .andExpect(status().isUnauthorized());
 
         DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
@@ -674,4 +896,95 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
         choiceAuthorityService.clearCache();
     }
 
+    @Test
+    public void getDescribedBy() throws Exception {
+        context.turnOffAuthorisationSystem();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDateInFormat = dateFormat.format(new Date());
+        String title = "Item Test";
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withMetadata("dc", "identifier", "doi", doi)
+                .build();
+        String responseMimeType = "application/vnd.datacite.datacite+xml";
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/describedby/" + item.getID()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.containsString(title)))
+                .andExpect(header().stringValues("Content-Type", responseMimeType + ";charset=UTF-8"));
+    }
+
+    @Test
+    public void getDescribedByItemThatIsInWorkspace() throws Exception {
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                .withTitle("Workspace Item")
+                .build();
+        itemService.addMetadata(context, workspaceItem.getItem(), "dc", "identifier", "doi", Item.ANY, doi);
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/describedby/" + workspaceItem.getItem().getID()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getDescribedByWithdrawnItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Withdrawn Item")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .withdrawn()
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/describedby/" + item.getID()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getDescribedByEmbargoItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Withdrawn Item")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .withIssueDate("2017-11-18")
+                .withEmbargoPeriod("2 week")
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/describedby/" + item.getID()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getDescribedByRestrictedItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group internalGroup = GroupBuilder.createGroup(context)
+                .withName("Internal Group")
+                .build();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Withdrawn Item")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .withReaderGroup(internalGroup)
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/describedby/" + item.getID()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getDescribedByUnDiscoverableItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection)
+                .withTitle("Withdrawn Item")
+                .withMetadata("dc", "identifier", "doi", doi)
+                .makeUnDiscoverable()
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/signposting/describedby/" + item.getID()))
+                .andExpect(status().isUnauthorized());
+    }
 }

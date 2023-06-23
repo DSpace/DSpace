@@ -41,7 +41,7 @@ public class ItemLicenseProcessor extends ItemSignpostingProcessor {
         try {
             String licenseUrl = creativeCommonsService.getLicenseURL(context, item);
             if (StringUtils.isNotBlank(licenseUrl)) {
-                linksetNodes.add(new LinksetNode(licenseUrl, getRelation(), "text/html", buildAnchor(context, item)));
+                linksetNodes.add(new LinksetNode(licenseUrl, getRelation(), buildAnchor(context, item)));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

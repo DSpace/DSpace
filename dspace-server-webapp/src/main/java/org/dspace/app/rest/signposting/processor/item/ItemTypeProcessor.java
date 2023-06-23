@@ -45,12 +45,12 @@ public class ItemTypeProcessor extends ItemSignpostingProcessor {
     public void addLinkSetNodes(Context context, HttpServletRequest request,
                                 Item item, List<LinksetNode> linksetNodes) {
         try {
-            linksetNodes.add(new LinksetNode(ABOUT_PAGE_URI, getRelation(), "text/html", buildAnchor(context, item)));
+            linksetNodes.add(new LinksetNode(ABOUT_PAGE_URI, getRelation(), buildAnchor(context, item)));
             String type = itemService.getMetadataFirstValue(item, "dc", "type", null, Item.ANY);
             if (StringUtils.isNotBlank(type)) {
                 String typeSchemeUri = mapConverterDSpaceToSchemaOrgUri.getValue(type);
                 linksetNodes.add(
-                        new LinksetNode(typeSchemeUri, getRelation(), "text/html", buildAnchor(context, item))
+                        new LinksetNode(typeSchemeUri, getRelation(), buildAnchor(context, item))
                 );
             }
         } catch (Exception e) {
