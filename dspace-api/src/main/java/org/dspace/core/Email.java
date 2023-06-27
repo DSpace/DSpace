@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import javax.activation.DataHandler;
@@ -41,7 +40,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.ParseException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
@@ -140,7 +138,6 @@ public class Email {
     /**
      * The content of the message
      */
-    private String content;
     private String contentName;
 
     /**
@@ -201,7 +198,6 @@ public class Email {
         moreAttachments = new ArrayList<>(10);
         subject = "";
         template = null;
-        content = "";
         replyTo = null;
         charset = null;
     }
@@ -221,12 +217,20 @@ public class Email {
      * "Subject:" line must be stripped.
      *
      * @param name a name for this message body
-     * @param cnt the content of the message
+     * @param content the content of the message
      */
-    public void setContent(String name, String cnt) {
-        content = cnt;
+    public void setContent(String name, String content) {
         contentName = name;
         arguments.clear();
+
+        VelocityEngine templateEngine = new VelocityEngine();
+        templateEngine.init(VELOCITY_PROPERTIES);
+
+        StringResourceRepository repo = (StringResourceRepository)
+                templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
+        repo.putStringResource(contentName, content);
+        // Turn content into a template.
+        template = templateEngine.getTemplate(contentName);
     }
 
     /**
@@ -328,15 +332,20 @@ public class Email {
      * {@code mail.message.headers} then that name and its value will be added
      * to the message's headers.
      *
-     * <p>"subject" is treated specially:  if {@link setSubject()} has not been called,
-     * the value of any "subject" property will be used as if setSubject had
-     * been called with that value.  Thus a template may define its subject, but
-     * the caller may override it.
+     * <p>"subject" is treated specially:  if {@link setSubject()} has not been
+     * called, the value of any "subject" property will be used as if setSubject
+     * had been called with that value.  Thus a template may define its subject,
+     * but the caller may override it.
      *
      * @throws MessagingException if there was a problem sending the mail.
      * @throws IOException        if IO error
      */
     public void send() throws MessagingException, IOException {
+        if (null == template) {
+            // No template -- no content -- PANIC!!!
+            throw new MessagingException("Email has no body");
+        }
+
         ConfigurationService config
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -356,35 +365,17 @@ public class Email {
         MimeMessage message = new MimeMessage(session);
 
         // Set the recipients of the message
-        Iterator<String> i = recipients.iterator();
-
-        while (i.hasNext()) {
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                i.next()));
+        for (String recipient : recipients) {
+            message.addRecipient(Message.RecipientType.TO,
+                    new InternetAddress(recipient));
         }
         // Get headers defined by the template.
         String[] templateHeaders = config.getArrayProperty("mail.message.headers");
 
         // Format the mail message body
-        VelocityEngine templateEngine = new VelocityEngine();
-        templateEngine.init(VELOCITY_PROPERTIES);
-
         VelocityContext vctx = new VelocityContext();
         vctx.put("config", new UnmodifiableConfigurationService(config));
         vctx.put("params", Collections.unmodifiableList(arguments));
-
-        if (null == template) {
-            if (StringUtils.isBlank(content)) {
-                // No template and no content -- PANIC!!!
-                throw new MessagingException("Email has no body");
-            }
-            // No existing template, so use a String of content.
-            StringResourceRepository repo = (StringResourceRepository)
-                    templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
-            repo.putStringResource(contentName, content);
-            // Turn content into a template.
-            template = templateEngine.getTemplate(contentName);
-        }
 
         StringWriter writer = new StringWriter();
         try {
@@ -452,7 +443,8 @@ public class Email {
                 // add the stream
                 messageBodyPart = new MimeBodyPart();
                 messageBodyPart.setDataHandler(new DataHandler(
-                        new InputStreamDataSource(attachment.name,attachment.mimetype,attachment.is)));
+                        new InputStreamDataSource(attachment.name,
+                                attachment.mimetype, attachment.is)));
                 messageBodyPart.setFileName(attachment.name);
                 multipart.addBodyPart(messageBodyPart);
             }
