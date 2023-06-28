@@ -167,10 +167,17 @@ public class ItemUtils {
         return bundles;
     }
 
-    private static void addEmbargoField(Context context, Bitstream bit, Element bitstream) throws SQLException {
+    /**
+     * This method will add embargo metadata for all bitstreams with an active embargo
+     * @param context
+     * @param bitstream the bitstream object
+     * @param bitstreamEl the bitstream metadata object to add embargo value to
+     * @throws SQLException
+     */
+    private static void addEmbargoField(Context context, Bitstream bitstream, Element bitstreamEl) throws SQLException {
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-        List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, bit, ResourcePolicy.TYPE_CUSTOM);
+        List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
 
         for (ResourcePolicy policy : policies) {
             if (policy.getGroup() == anonymousGroup && policy.getAction() == Constants.READ) {
@@ -178,7 +185,7 @@ public class ItemUtils {
 
                 if (startDate != null && startDate.after(new Date())) {
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                    bitstream.getField().add(
+                    bitstreamEl.getField().add(
                             createValue("embargo", formatter.format(startDate)));
                 }
             }
