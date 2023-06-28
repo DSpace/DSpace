@@ -123,6 +123,11 @@
                     <xsl:for-each select="doc:element[@name='bitstreams']/doc:element">
                         <dc:identifier xsi:type="dcterms:URI"><xsl:value-of select="doc:field[@name='url']/text()" /></dc:identifier>
                         <uketdterms:checksum xsi:type="uketdterms:MD5"><xsl:value-of select="doc:field[@name='checksum']/text()" /></uketdterms:checksum>
+                        <!-- Add embargo information -->
+                        <xsl:if test="ancestor::*/doc:field[@name='name']/text() = 'ORIGINAL'
+                        and doc:field[@name='embargo']/text()">
+                            <uketdterms:embargodate><xsl:value-of select="doc:field[@name='embargo']/text()" /></uketdterms:embargodate>
+                        </xsl:if>
                     </xsl:for-each>
                 </xsl:if>
 
