@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
@@ -168,7 +170,8 @@ public class ItemUtils {
     }
 
     /**
-     * This method will add embargo metadata for all bitstreams with an active embargo
+     * This method will add embargo metadata for a give bitstream with an active embargo.
+     * It will parse of relevant policies and select the longest active embargo
      * @param context
      * @param bitstream the bitstream object
      * @param bitstreamEl the bitstream metadata object to add embargo value to
@@ -179,16 +182,22 @@ public class ItemUtils {
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
         List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, bitstream, ResourcePolicy.TYPE_CUSTOM);
 
+        List<Date> embargoDates = new ArrayList<>();
+        // Account for cases where there could be more than one embargo policy
         for (ResourcePolicy policy : policies) {
             if (policy.getGroup() == anonymousGroup && policy.getAction() == Constants.READ) {
-                Date startDate = policies.get(0).getStartDate();
-
+                Date startDate = policy.getStartDate();
                 if (startDate != null && startDate.after(new Date())) {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                    bitstreamEl.getField().add(
-                            createValue("embargo", formatter.format(startDate)));
+                    embargoDates.add(startDate);
                 }
             }
+        }
+        if (embargoDates.size() >= 1) {
+            // Sort array of dates to extract the longest embargo
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            Collections.sort(embargoDates, Date::compareTo);
+            bitstreamEl.getField().add(
+                    createValue("embargo", formatter.format(embargoDates.get(embargoDates.size() - 1))));
         }
     }
 
