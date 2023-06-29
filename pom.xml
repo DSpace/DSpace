@@ -1100,7 +1100,7 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>handle</artifactId>
-                <version>6.2</version>
+                <version>6.2.5_03</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
