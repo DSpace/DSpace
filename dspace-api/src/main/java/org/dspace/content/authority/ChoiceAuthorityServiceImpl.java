@@ -585,6 +585,12 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                         break;
                     }
                 }
+
+                // If there is no matching facet, return null to ignore this vocabulary index
+                if (matchingFacet == null) {
+                    return null;
+                }
+
                 DSpaceControlledVocabularyIndex vocabularyIndex =
                         new DSpaceControlledVocabularyIndex((DSpaceControlledVocabulary) source, metadataFields,
                                 matchingFacet);
