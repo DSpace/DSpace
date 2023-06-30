@@ -20,8 +20,8 @@
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
         <spring.version>5.3.27</spring.version>
-        <spring-boot.version>2.7.12</spring-boot.version>
-        <spring-security.version>5.7.8</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring-boot.version>2.7.13</spring-boot.version>
+        <spring-security.version>5.7.9</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.15.Final</hibernate.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
         <postgresql.driver.version>42.6.0</postgresql.driver.version>
