@@ -1927,7 +1927,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>HEAD</tag>
+        <tag>dspace-7_x</tag>
     </scm>
 
 
