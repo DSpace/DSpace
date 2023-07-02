@@ -17,10 +17,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.HarvestedItem_;
 import org.dspace.harvest.dao.HarvestedItemDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the HarvestedItem object.
@@ -35,19 +35,19 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
     }
 
     @Override
-    public HarvestedItem findByItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public HarvestedItem findByItem(Session session, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedItem.class);
         Root<HarvestedItem> harvestedItemRoot = criteriaQuery.from(HarvestedItem.class);
         criteriaQuery.select(harvestedItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(harvestedItemRoot.get(HarvestedItem_.item), item));
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public HarvestedItem findByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
+    public HarvestedItem findByOAIId(Session session, String itemOaiID, Collection collection) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedItem.class);
         Root<HarvestedItem> harvestedItemRoot = criteriaQuery.from(HarvestedItem.class);
         Join<HarvestedItem, Item> join = harvestedItemRoot.join("item");
@@ -57,7 +57,6 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
                                        criteriaBuilder.equal(join.get(Item_.owningCollection), collection)
                    )
         );
-        return singleResult(context, criteriaQuery);
-
+        return singleResult(session, criteriaQuery);
     }
 }

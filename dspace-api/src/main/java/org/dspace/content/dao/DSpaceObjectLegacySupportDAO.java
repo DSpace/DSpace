@@ -10,7 +10,7 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface interface class that adds support to retrieve DSpaceObject by the old integer
@@ -22,5 +22,5 @@ import org.dspace.core.Context;
  */
 public interface DSpaceObjectLegacySupportDAO<T extends DSpaceObject> extends DSpaceObjectDAO<T> {
 
-    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException;
+    public T findByLegacyId(Session session, int legacyId, Class<T> clazz) throws SQLException;
 }

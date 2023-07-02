@@ -58,7 +58,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     public void findByTokenTestExistingUserTest() throws Exception {
         String email = eperson.getEmail();
         createTokenForEmail(email);
-        RegistrationData registrationData = registrationDataDAO.findByEmail(context, email);
+        RegistrationData registrationData = registrationDataDAO.findByEmail(context.getSession(), email);
 
         try {
             getClient().perform(get("/api/eperson/registrations/search/findByToken")
@@ -67,11 +67,11 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(
                            jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, eperson.getID()))));
 
-            registrationDataDAO.delete(context, registrationData);
+            registrationDataDAO.delete(context.getSession(), registrationData);
 
             email = "newUser@testnewuser.com";
             createTokenForEmail(email);
-            registrationData = registrationDataDAO.findByEmail(context, email);
+            registrationData = registrationDataDAO.findByEmail(context.getSession(), email);
 
             getClient().perform(get("/api/eperson/registrations/search/findByToken")
                                     .param("token", registrationData.getToken()))
@@ -79,7 +79,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(
                            jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, null))));
         } finally {
-            registrationDataDAO.delete(context, registrationData);
+            registrationDataDAO.delete(context.getSession(), registrationData);
         }
 
 
@@ -89,7 +89,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     public void findByTokenTestNewUserTest() throws Exception {
         String email = "newUser@testnewuser.com";
         createTokenForEmail(email);
-        RegistrationData registrationData = registrationDataDAO.findByEmail(context, email);
+        RegistrationData registrationData
+                = registrationDataDAO.findByEmail(context.getSession(), email);
 
         try {
             getClient().perform(get("/api/eperson/registrations/search/findByToken")
@@ -98,7 +99,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .andExpect(
                            jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, null))));
         } finally {
-            registrationDataDAO.delete(context, registrationData);
+            registrationDataDAO.delete(context.getSession(), registrationData);
         }
 
     }
@@ -123,7 +124,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Test
     public void registrationFlowTest() throws Exception {
-        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        List<RegistrationData> registrationDataList
+                = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
         assertEquals(0, registrationDataList.size());
 
         ObjectMapper mapper = new ObjectMapper();
@@ -136,7 +138,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertEquals(1, registrationDataList.size());
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
@@ -147,7 +149,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertTrue(registrationDataList.size() == 2);
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
                            StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
@@ -168,14 +170,15 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
-                registrationDataDAO.delete(context, registrationData);
+                registrationDataDAO.delete(context.getSession(), registrationData);
             }
         }
     }
 
     @Test
     public void testRegisterDomainRegistered() throws Exception {
-        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        List<RegistrationData> registrationDataList
+                = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
         try {
             configurationService.setProperty("authentication-password.domain.valid", "test.com");
             RegistrationRest registrationRest = new RegistrationRest();
@@ -188,14 +191,14 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertEquals(1, registrationDataList.size());
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
-                registrationDataDAO.delete(context, registrationData);
+                registrationDataDAO.delete(context.getSession(), registrationData);
             }
         }
     }
@@ -216,18 +219,19 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .contentType(contentType))
                        .andExpect(status().isUnprocessableEntity());
         } finally {
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
-                registrationDataDAO.delete(context, registrationData);
+                registrationDataDAO.delete(context.getSession(), registrationData);
             }
         }
     }
 
     @Test
     public void testRegisterMailAddressRegistered() throws Exception {
-        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        List<RegistrationData> registrationDataList
+                = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
         try {
             context.turnOffAuthorisationSystem();
             String email = "test@gmail.com";
@@ -246,14 +250,14 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertEquals(1, registrationDataList.size());
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
-                registrationDataDAO.delete(context, registrationData);
+                registrationDataDAO.delete(context.getSession(), registrationData);
             }
         }
     }
@@ -262,7 +266,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     public void forgotPasswordTest() throws Exception {
         configurationService.setProperty("user.registration", false);
 
-        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        List<RegistrationData> registrationDataList
+                = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
         try {
             assertEquals(0, registrationDataList.size());
 
@@ -274,14 +279,14 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
                        .andExpect(status().isCreated());
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertEquals(1, registrationDataList.size());
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
-                registrationDataDAO.delete(context, registrationData);
+                registrationDataDAO.delete(context.getSession(), registrationData);
             }
         }
     }
@@ -349,7 +354,8 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
         doNothing().when(captchaServiceMock).processResponse(eq(captchaToken), eq("register_email"));
 
-        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        List<RegistrationData> registrationDataList
+                = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
         assertEquals(0, registrationDataList.size());
 
         ObjectMapper mapper = new ObjectMapper();
@@ -371,7 +377,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .contentType(contentType))
                        .andExpect(status().isCreated());
 
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertEquals(1, registrationDataList.size());
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
@@ -384,7 +390,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                        .contentType(contentType))
                        .andExpect(status().isCreated());
 
-            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            registrationDataList = registrationDataDAO.findAll(context.getSession(), RegistrationData.class);
             assertTrue(registrationDataList.size() == 2);
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
                        StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
@@ -408,7 +414,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
                 RegistrationData registrationData = iterator.next();
-                registrationDataDAO.delete(context, registrationData);
+                registrationDataDAO.delete(context.getSession(), registrationData);
             }
             reloadCaptchaProperties(originVerification, originSecret, originVresion);
         }

@@ -28,9 +28,9 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -48,19 +48,19 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
      * Get all collections in the system. These are alphabetically sorted by
      * collection name.
      *
-     * @param context
-     *            DSpace context object
+     * @param session
+     *            The current request's database context.
      * @param order order by MetadataField
      * @return the collections in the system
      * @throws SQLException if database error
      */
     @Override
-    public List<Collection> findAll(Context context, MetadataField order) throws SQLException {
-        return findAll(context, order, null, null);
+    public List<Collection> findAll(Session session, MetadataField order) throws SQLException {
+        return findAll(session, order, null, null);
     }
 
     @Override
-    public List<Collection> findAll(Context context, MetadataField order, Integer limit, Integer offset)
+    public List<Collection> findAll(Session session, MetadataField order, Integer limit, Integer offset)
         throws SQLException {
         StringBuilder query = new StringBuilder();
 
@@ -77,7 +77,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
                                 "where internal.metadataField = :sortField and" +
                                 " internal.dSpaceObject = c.id)" +
                                 " ORDER BY LOWER(title.value)");
-        Query hibernateQuery = createQuery(context, query.toString());
+        Query hibernateQuery = createQuery(session, query.toString());
         if (offset != null) {
             hibernateQuery.setFirstResult(offset);
         }
@@ -89,18 +89,18 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     }
 
     @Override
-    public Collection findByTemplateItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public Collection findByTemplateItem(Session session, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
         criteriaQuery.select(collectionRoot);
         criteriaQuery.where(criteriaBuilder.equal(collectionRoot.get(Collection_.template), item));
-        return uniqueResult(context, criteriaQuery, false, Collection.class);
+        return uniqueResult(session, criteriaQuery, false, Collection.class);
     }
 
     @Override
-    public Collection findByGroup(Context context, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public Collection findByGroup(Session session, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
         criteriaQuery.select(collectionRoot);
@@ -109,13 +109,13 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
                                       criteriaBuilder.equal(collectionRoot.get(Collection_.admins), group)
                    )
         );
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions)
+    public List<Collection> findAuthorized(Session session, EPerson ePerson, List<Integer> actions)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
         Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
         Join<Collection, ResourcePolicy> join = collectionRoot.join("resourcePolicies");
@@ -129,11 +129,11 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
             criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION),
                                 criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
                                 orPredicate));
-        return list(context, criteriaQuery, true, Collection.class, -1, -1);
+        return list(session, criteriaQuery, true, Collection.class, -1, -1);
     }
 
     @Override
-    public List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions)
+    public List<Collection> findAuthorizedByGroup(Session session, EPerson ePerson, List<Integer> actions)
         throws SQLException {
         StringBuilder query = new StringBuilder();
         query.append("select c from Collection c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
@@ -148,7 +148,7 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         query.append(
             " AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in " +
                 "elements(epeople))");
-        Query persistenceQuery = createQuery(context, query.toString());
+        Query persistenceQuery = createQuery(session, query.toString());
         persistenceQuery.setParameter("eperson_id", ePerson.getID());
         persistenceQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
@@ -158,22 +158,22 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
     }
 
     @Override
-    public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT DISTINCT col FROM Subscription s join  s.collection col"));
+    public List<Collection> findCollectionsWithSubscribers(Session session) throws SQLException {
+        return list(createQuery(session, "SELECT DISTINCT col FROM Subscription s join  s.collection col"));
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Collection"));
+    public int countRows(Session session) throws SQLException {
+        return count(createQuery(session, "SELECT count(*) FROM Collection"));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context)
+    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Session session)
         throws SQLException {
         String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col " +
             "join i.bundles bun join bun.bitstreams bit group by col";
-        Query query = createQuery(context, q);
+        Query query = createQuery(session, q);
 
         List<Object[]> list = query.getResultList();
         List<Map.Entry<Collection, Long>> returnList = new ArrayList<>(list.size());

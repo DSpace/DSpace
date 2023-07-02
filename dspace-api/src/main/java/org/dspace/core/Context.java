@@ -33,6 +33,7 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
+import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -193,6 +194,17 @@ public class Context implements AutoCloseable {
             setMode(this.mode);
         }
 
+    }
+
+    /**
+     * Get the database context for this DSpace context.
+     *
+     * @return the database context.
+     * @throws SQLException
+     */
+    public Session getSession()
+            throws SQLException {
+        return (Session) dbConnection.getSession();
     }
 
     /**
@@ -947,6 +959,7 @@ public class Context implements AutoCloseable {
 
     /**
      * Check if the user of the context is switched.
+     * @return true if the user of the context is switched.
      */
     public boolean isContextUserSwitched() {
         return currentUserPreviousState != null;

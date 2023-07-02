@@ -95,7 +95,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -207,7 +207,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Item find(Context context, UUID id) throws SQLException {
-        Item item = itemDAO.findByID(context, Item.class, id);
+        Item item = itemDAO.findByID(context.getSession(), Item.class, id);
         if (item == null) {
             if (log.isDebugEnabled()) {
                 log.debug(LogHelper.getHeader(context, "find_item",
@@ -278,33 +278,33 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Iterator<Item> findAll(Context context) throws SQLException {
-        return itemDAO.findAll(context, true);
+        return itemDAO.findAll(context.getSession(), true);
     }
 
     @Override
     public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return itemDAO.findAll(context, true, limit, offset);
+        return itemDAO.findAll(context.getSession(), true, limit, offset);
     }
 
     @Override
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
-        return itemDAO.findAll(context, true, true);
+        return itemDAO.findAll(context.getSession(), true, true);
     }
 
     @Override
     public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
-        return itemDAO.findAllRegularItems(context);
+        return itemDAO.findAllRegularItems(context.getSession());
     }
 
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
-        return itemDAO.findBySubmitter(context, eperson);
+        return itemDAO.findBySubmitter(context.getSession(), eperson);
     }
 
     @Override
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
         throws SQLException {
-        return itemDAO.findBySubmitter(context, eperson, retrieveAllItems);
+        return itemDAO.findBySubmitter(context.getSession(), eperson, retrieveAllItems);
     }
 
     @Override
@@ -318,7 +318,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
-        return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
+        return itemDAO.findBySubmitter(context.getSession(), eperson, metadataField, limit);
     }
 
     @Override
@@ -329,41 +329,41 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findArchivedByCollection(context, collection, limit, offset);
+        return itemDAO.findArchivedByCollection(context.getSession(), collection, limit, offset);
     }
 
     @Override
     public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findArchivedByCollectionExcludingOwning(context, collection, limit, offset);
+        return itemDAO.findArchivedByCollectionExcludingOwning(context.getSession(), collection, limit, offset);
     }
 
     @Override
     public int countByCollectionMapping(Context context, Collection collection) throws SQLException {
-        return itemDAO.countArchivedByCollectionExcludingOwning(context, collection);
+        return itemDAO.countArchivedByCollectionExcludingOwning(context.getSession(), collection);
     }
 
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
-        return itemDAO.findAllByCollection(context, collection);
+        return itemDAO.findAllByCollection(context.getSession(), collection);
     }
 
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findAllByCollection(context, collection, limit, offset);
+        return itemDAO.findAllByCollection(context.getSession(), collection, limit, offset);
     }
 
     @Override
     public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
         throws SQLException {
-        return itemDAO.findAll(context, true, true, true, since);
+        return itemDAO.findAll(context.getSession(), true, true, true, since);
     }
 
     @Override
     public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
         throws SQLException {
-        return itemDAO.findAll(context, true, true, false, since);
+        return itemDAO.findAll(context.getSession(), true, true, false, since);
     }
 
     @Override
@@ -490,9 +490,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected Item createItem(Context context, UUID uuid) throws SQLException, AuthorizeException {
         Item item;
         if (uuid != null) {
-            item = itemDAO.create(context, new Item(uuid));
+            item = itemDAO.create(context.getSession(), new Item(uuid));
         } else {
-            item = itemDAO.create(context, new Item());
+            item = itemDAO.create(context.getSession(), new Item());
         }
         // set discoverable to true (default)
         item.setDiscoverable(true);
@@ -512,7 +512,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     protected Item createItem(Context context) throws SQLException, AuthorizeException {
-        Item item = itemDAO.create(context, new Item());
+        Item item = itemDAO.create(context.getSession(), new Item());
         // set discoverable to true (default)
         item.setDiscoverable(true);
 
@@ -623,7 +623,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // Set the last modified date
             item.setLastModified(new Date());
 
-            itemDAO.save(context, item);
+            itemDAO.save(context.getSession(), item);
 
             if (item.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, item.getType(), item.getID(), item.getDetails(),
@@ -742,11 +742,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         // check if the item was withdrawn before the fix DS-3097
-        if (authorizeService.getPoliciesActionFilter(context, item, Constants.WITHDRAWN_READ).size() != 0) {
+        if (!authorizeService.getPoliciesActionFilter(context, item, Constants.WITHDRAWN_READ).isEmpty()) {
             authorizeService.switchPoliciesAction(context, item, Constants.WITHDRAWN_READ, Constants.READ);
         } else {
             // authorization policies
-            if (colls.size() > 0) {
+            if (!colls.isEmpty()) {
                 // remove the item's policies and replace them with
                 // the defaults from the collection
                 adjustItemPolicies(context, item, item.getOwningCollection());
@@ -824,7 +824,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.setOwningCollection(null);
 
         // Finally remove item row
-        itemDAO.delete(context, item);
+        itemDAO.delete(context.getSession(), item);
     }
 
     protected void removeRequest(Context context, Item item) throws SQLException {
@@ -1240,8 +1240,8 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     private void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> customPolicies)
             throws SQLException, AuthorizeException {
-        boolean customPoliciesAlreadyInPlace = authorizeService
-                .findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM).size() > 0;
+        boolean customPoliciesAlreadyInPlace = !authorizeService
+                .findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM).isEmpty();
         if (!customPoliciesAlreadyInPlace) {
             authorizeService.addPolicies(context, customPolicies, dso);
         }
@@ -1326,9 +1326,9 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context, mdf, null, true);
+            return itemDAO.findByMetadataField(context.getSession(), mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(context, mdf, value, true);
+            return itemDAO.findByMetadataField(context.getSession(), mdf, value, true);
         }
     }
 
@@ -1372,9 +1372,9 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context, mdf, null, true);
+            return itemDAO.findByMetadataField(context.getSession(), mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(context, mdf, value, true);
+            return itemDAO.findByMetadataField(context.getSession(), mdf, value, true);
         }
     }
 
@@ -1384,8 +1384,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                                               String regexClause, int offset, int limit)
         throws SQLException, AuthorizeException, IOException {
         return itemDAO
-            .findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset,
-                                 limit);
+            .findByMetadataQuery(context.getSession(), listFieldList, query_op,
+                    query_val, collectionUuids, regexClause, offset, limit);
     }
 
     @Override
@@ -1480,7 +1480,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
-        return itemDAO.findByAuthorityValue(context, mdf, value, true);
+        return itemDAO.findByAuthorityValue(context.getSession(), mdf, value, true);
     }
 
     @Override
@@ -1523,13 +1523,13 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public int countItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false);
+        return itemDAO.countItems(context.getSession(), collection, true, false);
     }
 
     @Override
     public int countAllItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false) + itemDAO.countItems(context, collection,
-                                                                                         false, true);
+        return itemDAO.countItems(context.getSession(), collection, true, false)
+                + itemDAO.countItems(context.getSession(), collection, false, true);
     }
 
     @Override
@@ -1538,7 +1538,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false);
+        return itemDAO.countItems(context.getSession(), collections, true, false);
     }
 
     @Override
@@ -1547,8 +1547,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false) + itemDAO.countItems(context, collections,
-                                                                                          false, true);
+        return itemDAO.countItems(context.getSession(), collections, true, false)
+                + itemDAO.countItems(context.getSession(), collections, false, true);
     }
 
     @Override
@@ -1570,36 +1570,36 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public Item findByLegacyId(Context context, int id) throws SQLException {
-        return itemDAO.findByLegacyId(context, id, Item.class);
+        return itemDAO.findByLegacyId(context.getSession(), id, Item.class);
     }
 
     @Override
     public Iterator<Item> findByLastModifiedSince(Context context, Date last)
         throws SQLException {
-        return itemDAO.findByLastModifiedSince(context, last);
+        return itemDAO.findByLastModifiedSince(context.getSession(), last);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return itemDAO.countRows(context);
+        return itemDAO.countRows(context.getSession());
     }
 
     @Override
     public int countNotArchivedItems(Context context) throws SQLException {
         // return count of items not in archive and also not withdrawn
-        return itemDAO.countItems(context, false, false);
+        return itemDAO.countItems(context.getSession(), false, false);
     }
 
     @Override
     public int countArchivedItems(Context context) throws SQLException {
         // return count of items in archive and also not withdrawn
-        return itemDAO.countItems(context, true, false);
+        return itemDAO.countItems(context.getSession(), true, false);
     }
 
     @Override
     public int countWithdrawnItems(Context context) throws SQLException {
         // return count of items that are not in archive and withdrawn
-        return itemDAO.countItems(context, false, true);
+        return itemDAO.countItems(context.getSession(), false, true);
     }
 
     @Override

@@ -15,9 +15,9 @@ import java.util.Set;
 import org.dspace.content.MetadataField;
 import org.dspace.content.dao.DSpaceObjectDAO;
 import org.dspace.content.dao.DSpaceObjectLegacySupportDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the EPerson object.
@@ -29,25 +29,25 @@ import org.dspace.eperson.Group;
  */
 public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacySupportDAO<EPerson> {
 
-    public EPerson findByEmail(Context context, String email) throws SQLException;
+    public EPerson findByEmail(Session session, String email) throws SQLException;
 
-    public EPerson findByNetid(Context context, String netid) throws SQLException;
+    public EPerson findByNetid(Session session, String netid) throws SQLException;
 
-    public List<EPerson> search(Context context, String query, List<MetadataField> queryFields,
+    public List<EPerson> search(Session session, String query, List<MetadataField> queryFields,
                                 List<MetadataField> sortFields, int offset, int limit) throws SQLException;
 
-    public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
+    public int searchResultCount(Session session, String query, List<MetadataField> queryFields) throws SQLException;
 
-    public List<EPerson> findByGroups(Context context, Set<Group> groups) throws SQLException;
+    public List<EPerson> findByGroups(Session session, Set<Group> groups) throws SQLException;
 
-    public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Context context) throws SQLException;
+    public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Session session) throws SQLException;
 
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException;
+    public List<EPerson> findNotActiveSince(Session session, Date date) throws SQLException;
 
-    public List<EPerson> findAll(Context context, MetadataField metadataFieldSort, String sortColumn, int pageSize,
+    public List<EPerson> findAll(Session session, MetadataField metadataFieldSort, String sortColumn, int pageSize,
                                  int offset) throws SQLException;
 
-    public List<EPerson> findAllSubscribers(Context context) throws SQLException;
+    public List<EPerson> findAllSubscribers(Session session) throws SQLException;
 
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 }

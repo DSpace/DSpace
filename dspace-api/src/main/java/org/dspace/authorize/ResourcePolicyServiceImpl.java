@@ -17,7 +17,6 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
@@ -37,11 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public class ResourcePolicyServiceImpl implements ResourcePolicyService {
-    /**
-     * log4j logger
-     */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ResourcePolicyServiceImpl.class);
-
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
 
@@ -64,7 +58,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
      */
     @Override
     public ResourcePolicy find(Context context, int id) throws SQLException {
-        return resourcePolicyDAO.findByID(context, ResourcePolicy.class, id);
+        return resourcePolicyDAO.findByID(context.getSession(), ResourcePolicy.class, id);
     }
 
     /**
@@ -78,52 +72,54 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     public ResourcePolicy create(Context context) throws SQLException {
         // FIXME: Check authorisation
         // Create a table row
-        ResourcePolicy resourcePolicy = resourcePolicyDAO.create(context, new ResourcePolicy());
+        ResourcePolicy resourcePolicy
+                = resourcePolicyDAO.create(context.getSession(), new ResourcePolicy());
         return resourcePolicy;
     }
 
     @Override
     public List<ResourcePolicy> find(Context c, DSpaceObject o) throws SQLException {
-        return resourcePolicyDAO.findByDso(c, o);
+        return resourcePolicyDAO.findByDso(c.getSession(), o);
     }
 
 
     @Override
     public List<ResourcePolicy> find(Context c, DSpaceObject o, String type) throws SQLException {
-        return resourcePolicyDAO.findByDsoAndType(c, o, type);
+        return resourcePolicyDAO.findByDsoAndType(c.getSession(), o, type);
     }
 
     @Override
     public List<ResourcePolicy> find(Context context, Group group) throws SQLException {
-        return resourcePolicyDAO.findByGroup(context, group);
+        return resourcePolicyDAO.findByGroup(context.getSession(), group);
     }
 
     @Override
     public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId) throws SQLException {
-        return resourcePolicyDAO.findByDSoAndAction(c, o, actionId);
+        return resourcePolicyDAO.findByDSoAndAction(c.getSession(), o, actionId);
     }
 
     @Override
     public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action) throws SQLException {
-        return resourcePolicyDAO.findByTypeGroupAction(c, dso, group, action);
+        return resourcePolicyDAO.findByTypeGroupAction(c.getSession(), dso, group, action);
     }
 
     @Override
     public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
         throws SQLException {
-        return resourcePolicyDAO.findByEPersonGroupTypeIdAction(c, e, groups, action, type_id);
+        return resourcePolicyDAO.findByEPersonGroupTypeIdAction(c.getSession(), e, groups, action, type_id);
     }
 
     @Override
     public List<ResourcePolicy> find(Context context, EPerson ePerson) throws SQLException {
-        return resourcePolicyDAO.findByEPerson(context, ePerson);
+        return resourcePolicyDAO.findByEPerson(context.getSession(), ePerson);
     }
 
     @Override
     public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group,
                                                               int action, int notPolicyID)
         throws SQLException {
-        return resourcePolicyDAO.findByTypeGroupActionExceptId(context, dso, group, action, notPolicyID);
+        return resourcePolicyDAO.findByTypeGroupActionExceptId(context.getSession(),
+                dso, group, action, notPolicyID);
     }
 
 
@@ -139,7 +135,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     public void delete(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException {
         // FIXME: authorizations
         // Remove ourself
-        resourcePolicyDAO.delete(context, resourcePolicy);
+        resourcePolicyDAO.delete(context.getSession(), resourcePolicy);
 
         context.turnOffAuthorisationSystem();
         if (resourcePolicy.getdSpaceObject() != null) {
@@ -218,7 +214,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByDso(c, o);
+        resourcePolicyDAO.deleteByDso(c.getSession(), o);
         c.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         c.restoreAuthSystemState();
@@ -226,7 +222,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public void removePolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByDsoAndType(c, o, type);
+        resourcePolicyDAO.deleteByDsoAndType(c.getSession(), o, type);
         c.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         c.restoreAuthSystemState();
@@ -235,7 +231,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public void removePolicies(Context c, DSpaceObject o, String type, int action)
         throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByDsoAndTypeAndAction(c, o, type, action);
+        resourcePolicyDAO.deleteByDsoAndTypeAndAction(c.getSession(), o, type, action);
         c.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         c.restoreAuthSystemState();
@@ -244,7 +240,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public void removeDsoGroupPolicies(Context context, DSpaceObject dso, Group group)
         throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByDsoGroupPolicies(context, dso, group);
+        resourcePolicyDAO.deleteByDsoGroupPolicies(context.getSession(), dso, group);
         context.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
         context.restoreAuthSystemState();
@@ -253,7 +249,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public void removeDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson)
         throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByDsoEPersonPolicies(context, dso, ePerson);
+        resourcePolicyDAO.deleteByDsoEPersonPolicies(context.getSession(), dso, ePerson);
         context.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
         context.restoreAuthSystemState();
@@ -262,12 +258,12 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public void removeAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByEPerson(context, ePerson);
+        resourcePolicyDAO.deleteByEPerson(context.getSession(), ePerson);
     }
 
     @Override
     public void removeGroupPolicies(Context c, Group group) throws SQLException {
-        resourcePolicyDAO.deleteByGroup(c, group);
+        resourcePolicyDAO.deleteByGroup(c.getSession(), group);
     }
 
     @Override
@@ -275,7 +271,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         if (actionId == -1) {
             removeAllPolicies(c, o);
         } else {
-            resourcePolicyDAO.deleteByDsoAndAction(c, o, actionId);
+            resourcePolicyDAO.deleteByDsoAndAction(c.getSession(), o, actionId);
             c.turnOffAuthorisationSystem();
             contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
             c.restoreAuthSystemState();
@@ -285,7 +281,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public void removeDsoAndTypeNotEqualsToPolicies(Context c, DSpaceObject o, String type)
         throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteByDsoAndTypeNotEqualsTo(c, o, type);
+        resourcePolicyDAO.deleteByDsoAndTypeNotEqualsTo(c.getSession(), o, type);
         c.turnOffAuthorisationSystem();
         contentServiceFactory.getDSpaceObjectService(o).updateLastModified(c, o);
         c.restoreAuthSystemState();
@@ -319,7 +315,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
                 }
 
                 // FIXME: Check authorisation
-                resourcePolicyDAO.save(context, resourcePolicy);
+                resourcePolicyDAO.save(context.getSession(), resourcePolicy);
             }
 
             //Update the last modified timestamp of all related DSpace Objects
@@ -335,80 +331,82 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     @Override
     public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
         throws SQLException {
-        return resourcePolicyDAO.findByDSoAndActionExceptRpType(c, o, actionID, rpType);
+        return resourcePolicyDAO.findByDSoAndActionExceptRpType(c.getSession(), o, actionID, rpType);
     }
 
     @Override
     public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit)
         throws SQLException {
-        return resourcePolicyDAO.findByEPerson(context, ePerson, offset, limit);
+        return resourcePolicyDAO.findByEPerson(context.getSession(), ePerson, offset, limit);
     }
 
     @Override
     public int countByEPerson(Context context, EPerson eperson) throws SQLException {
-        return resourcePolicyDAO.countByEPerson(context, eperson);
+        return resourcePolicyDAO.countByEPerson(context.getSession(), eperson);
     }
 
     @Override
     public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid,
         int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByEPersonAndResourceUuid(context, eperson, resourceUuid, offset, limit);
+        return resourcePolicyDAO.findByEPersonAndResourceUuid(context.getSession(),
+                eperson, resourceUuid, offset, limit);
     }
 
     @Override
     public int countResourcePoliciesByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid)
         throws SQLException {
-        return resourcePolicyDAO.countByEPersonAndResourceUuid(context, eperson, resourceUuid);
+        return resourcePolicyDAO.countByEPersonAndResourceUuid(context.getSession(), eperson, resourceUuid);
     }
 
     @Override
     public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
         int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByResouceUuidAndActionId(context, resourceUuid, actionId, offset, limit);
+        return resourcePolicyDAO.findByResouceUuidAndActionId(context.getSession(),
+                resourceUuid, actionId, offset, limit);
     }
 
     @Override
     public int countByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId) throws SQLException {
-        return resourcePolicyDAO.countByResouceUuidAndActionId(context, resourceUuid, actionId);
+        return resourcePolicyDAO.countByResouceUuidAndActionId(context.getSession(), resourceUuid, actionId);
     }
 
     @Override
     public List<ResourcePolicy> findByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
         throws SQLException {
-        return resourcePolicyDAO.findByResouceUuid(context, resourceUuid, offset, limit);
+        return resourcePolicyDAO.findByResouceUuid(context.getSession(), resourceUuid, offset, limit);
     }
 
     @Override
     public int countByResourceUuid(Context context, UUID resourceUuid) throws SQLException {
-        return resourcePolicyDAO.countByResourceUuid(context, resourceUuid);
+        return resourcePolicyDAO.countByResourceUuid(context.getSession(), resourceUuid);
     }
 
     @Override
     public List<ResourcePolicy> findByGroup(Context context, Group group, int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByGroup(context, group, offset, limit);
+        return resourcePolicyDAO.findByGroup(context.getSession(), group, offset, limit);
     }
 
     @Override
     public int countResourcePolicyByGroup(Context context, Group group) throws SQLException {
-        return resourcePolicyDAO.countResourcePolicyByGroup(context, group);
+        return resourcePolicyDAO.countResourcePolicyByGroup(context.getSession(), group);
     }
 
     @Override
     public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
         int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByGroupAndResourceUuid(context, group, resourceUuid, offset, limit);
+        return resourcePolicyDAO.findByGroupAndResourceUuid(context.getSession(), group, resourceUuid, offset, limit);
     }
 
     @Override
     public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
-        return resourcePolicyDAO.countByGroupAndResourceUuid(context, group, resourceUuid);
+        return resourcePolicyDAO.countByGroupAndResourceUuid(context.getSession(), group, resourceUuid);
     }
 
     @Override
     public boolean isMyResourcePolicy(Context context, EPerson eperson, Integer id) throws SQLException {
         boolean isMy = false;
 
-        ResourcePolicy resourcePolicy = resourcePolicyDAO.findOneById(context, id);
+        ResourcePolicy resourcePolicy = resourcePolicyDAO.findOneById(context.getSession(), id);
         Group group = resourcePolicy.getGroup();
 
         if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID() == eperson.getID()) {

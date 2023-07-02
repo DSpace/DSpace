@@ -71,7 +71,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the Collection object.
- * This class is responsible for all business logic calls for the Collection object and is autowired by spring.
+ * This class is responsible for all business logic calls for the Collection
+ * object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -81,7 +82,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected CollectionDAO collectionDAO;
@@ -146,9 +147,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         Collection newCollection;
         if (uuid != null) {
-            newCollection = collectionDAO.create(context, new Collection(uuid));
+            newCollection = collectionDAO.create(context.getSession(), new Collection(uuid));
         }  else {
-            newCollection = collectionDAO.create(context, new Collection());
+            newCollection = collectionDAO.create(context.getSession(), new Collection());
         }
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
@@ -166,7 +167,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 .createResourcePolicy(context, newCollection, anonymousGroup, null,
                         Constants.DEFAULT_BITSTREAM_READ, null);
 
-        collectionDAO.save(context, newCollection);
+        collectionDAO.save(context.getSession(), newCollection);
 
         //Update our collection so we have a collection identifier
         try {
@@ -199,7 +200,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return collectionDAO.findAll(context, nameField);
+        return collectionDAO.findAll(context.getSession(), nameField);
     }
 
     @Override
@@ -211,7 +212,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return collectionDAO.findAll(context, nameField, limit, offset);
+        return collectionDAO.findAll(context.getSession(), nameField, limit, offset);
     }
 
     @Override
@@ -280,7 +281,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public List<Collection> findDirectMapped(Context context, int actionID) throws SQLException {
         return collectionDAO
-            .findAuthorized(context, context.getCurrentUser(), Arrays.asList(Constants.ADD, Constants.ADMIN));
+            .findAuthorized(context.getSession(), context.getCurrentUser(),
+                    Arrays.asList(Constants.ADD, Constants.ADMIN));
     }
 
     @Override
@@ -297,7 +299,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public List<Collection> findGroup2GroupMapped(Context context, int actionID) throws SQLException {
         return collectionDAO
-            .findAuthorizedByGroup(context, context.getCurrentUser(), Collections.singletonList(actionID));
+            .findAuthorizedByGroup(context.getSession(), context.getCurrentUser(), Collections.singletonList(actionID));
     }
 
     @Override
@@ -313,7 +315,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection find(Context context, UUID id) throws SQLException {
-        return collectionDAO.findByID(context, Collection.class, id);
+        return collectionDAO.findByID(context.getSession(), Collection.class, id);
     }
 
     @Override
@@ -669,7 +671,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                       "collection_id=" + collection.getID()));
 
         super.update(context, collection);
-        collectionDAO.save(context, collection);
+        collectionDAO.save(context.getSession(), collection);
 
         if (collection.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COLLECTION,
@@ -806,7 +808,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             owningCommunity.removeCollection(collection);
         }
 
-        collectionDAO.delete(context, collection);
+        collectionDAO.delete(context.getSession(), collection);
     }
 
     @Override
@@ -838,12 +840,12 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection findByGroup(Context context, Group group) throws SQLException {
-        return collectionDAO.findByGroup(context, group);
+        return collectionDAO.findByGroup(context.getSession(), group);
     }
 
     @Override
     public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
-        return collectionDAO.findCollectionsWithSubscribers(context);
+        return collectionDAO.findCollectionsWithSubscribers(context.getSession());
     }
 
     @Override
@@ -904,18 +906,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection findByLegacyId(Context context, int id) throws SQLException {
-        return collectionDAO.findByLegacyId(context, id, Collection.class);
+        return collectionDAO.findByLegacyId(context.getSession(), id, Collection.class);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return collectionDAO.countRows(context);
+        return collectionDAO.countRows(context.getSession());
     }
 
     @Override
     public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context)
         throws SQLException {
-        return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
+        return collectionDAO.getCollectionsWithBitstreamSizesTotal(context.getSession());
     }
 
     @Override

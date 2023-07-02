@@ -10,11 +10,11 @@ package org.dspace.xmlworkflow.storedcomponents.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the ClaimedTask object.
@@ -29,36 +29,36 @@ public interface ClaimedTaskDAO extends GenericDAO<ClaimedTask> {
     /**
      * Find all claimed tasks for a given workflow item.
      *
-     * @param context current DSpace session.
+     * @param session current DSpace session.
      * @param workflowItem the interesting workflow item.
      * @return all claimed tasks for that item.
      * @throws SQLException passed through.
      */
-    public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public List<ClaimedTask> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 
     /**
      * Find the single task for a given workflow item which is claimed by a given EPerson.
      *
-     * @param context
+     * @param session
      * @param workflowItem find task for this item.
      * @param ePerson find task claimed by this EPerson.
      * @return the matching task, or null if none.
      * @throws SQLException if query cannot be created or fails.
      */
-    public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public ClaimedTask findByWorkflowItemAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
-    public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;
+    public List<ClaimedTask> findByEperson(Session session, EPerson ePerson) throws SQLException;
 
-    public List<ClaimedTask> findByWorkflowItemAndStepId(Context context, XmlWorkflowItem workflowItem, String stepID)
+    public List<ClaimedTask> findByWorkflowItemAndStepId(Session session, XmlWorkflowItem workflowItem, String stepID)
         throws SQLException;
 
-    public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Context context, EPerson ePerson,
+    public ClaimedTask findByEPersonAndWorkflowItemAndStepIdAndActionId(Session session, EPerson ePerson,
                                                                         XmlWorkflowItem workflowItem, String stepID,
                                                                         String actionID) throws SQLException;
 
-    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Context c, XmlWorkflowItem workflowItem,
+    public List<ClaimedTask> findByWorkflowItemAndStepIdAndActionId(Session session, XmlWorkflowItem workflowItem,
                                                                     String stepID, String actionID) throws SQLException;
 
-    public List<ClaimedTask> findByStep(Context context, String stepID) throws SQLException;
+    public List<ClaimedTask> findByStep(Session session, String stepID) throws SQLException;
 }

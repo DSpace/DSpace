@@ -56,7 +56,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunityServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected CommunityDAO communityDAO;
@@ -104,9 +104,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         Community newCommunity;
         if (uuid != null) {
-            newCommunity = communityDAO.create(context, new Community(uuid));
+            newCommunity = communityDAO.create(context.getSession(), new Community(uuid));
         } else {
-            newCommunity = communityDAO.create(context, new Community());
+            newCommunity = communityDAO.create(context.getSession(), new Community());
         }
 
         if (parent != null) {
@@ -121,7 +121,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         authorizeService.createResourcePolicy(context, newCommunity, anonymousGroup, null, Constants.READ, null);
 
-        communityDAO.save(context, newCommunity);
+        communityDAO.save(context.getSession(), newCommunity);
 
         try {
             if (handle == null) {
@@ -152,7 +152,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community find(Context context, UUID id) throws SQLException {
-        return communityDAO.findByID(context, Community.class, id);
+        return communityDAO.findByID(context.getSession(), Community.class, id);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return communityDAO.findAll(context, sortField);
+        return communityDAO.findAll(context.getSession(), sortField);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return communityDAO.findAll(context, nameField, limit, offset);
+        return communityDAO.findAll(context.getSession(), nameField, limit, offset);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return communityDAO.findAllNoParent(context, sortField);
+        return communityDAO.findAllNoParent(context.getSession(), sortField);
     }
 
     @Override
@@ -267,7 +267,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         super.update(context, community);
 
-        communityDAO.save(context, community);
+        communityDAO.save(context.getSession(), community);
         if (community.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.COMMUNITY, community.getID(), null,
                                        getIdentifiers(context, community)));
@@ -588,7 +588,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         Group g = community.getAdministrators();
 
         // Delete community row
-        communityDAO.delete(context, community);
+        communityDAO.delete(context.getSession(), community);
 
         // Remove administrators group - must happen after deleting community
 
@@ -629,17 +629,17 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community findByAdminGroup(Context context, Group group) throws SQLException {
-        return communityDAO.findByAdminGroup(context, group);
+        return communityDAO.findByAdminGroup(context.getSession(), group);
     }
 
     @Override
     public List<Community> findAuthorized(Context context, List<Integer> actions) throws SQLException {
-        return communityDAO.findAuthorized(context, context.getCurrentUser(), actions);
+        return communityDAO.findAuthorized(context.getSession(), context.getCurrentUser(), actions);
     }
 
     @Override
     public List<Community> findAuthorizedGroupMapped(Context context, List<Integer> actions) throws SQLException {
-        return communityDAO.findAuthorizedByGroup(context, context.getCurrentUser(), actions);
+        return communityDAO.findAuthorizedByGroup(context.getSession(), context.getCurrentUser(), actions);
     }
 
     @Override
@@ -703,12 +703,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community findByLegacyId(Context context, int id) throws SQLException {
-        return communityDAO.findByLegacyId(context, id, Community.class);
+        return communityDAO.findByLegacyId(context.getSession(), id, Community.class);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return communityDAO.countRows(context);
+        return communityDAO.countRows(context.getSession());
     }
 
     /**

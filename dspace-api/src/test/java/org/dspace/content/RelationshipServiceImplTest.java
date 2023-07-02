@@ -85,7 +85,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindAll() throws Exception {
         // Mock DAO to return our mocked relationshipsList
-        when(relationshipDAO.findAll(context, Relationship.class, -1, -1)).thenReturn(relationshipsList);
+        when(relationshipDAO.findAll(context.getSession(), Relationship.class, -1, -1)).thenReturn(relationshipsList);
         // The reported Relationship(s) should match our relationshipsList
         assertEquals("TestFindAll 0", relationshipsList, relationshipService.findAll(context));
     }
@@ -157,7 +157,8 @@ public class RelationshipServiceImplTest {
         relationship.setId(1337);
 
         // Mock DAO to return our mocked relationship
-        when(relationshipDAO.findByID(context, Relationship.class, relationship.getID())).thenReturn(relationship);
+        when(relationshipDAO.findByID(context.getSession(), Relationship.class, relationship.getID()))
+                .thenReturn(relationship);
 
         // The reported Relationship should match our mocked relationship
         assertEquals("TestFind 0", relationship, relationshipService.find(context, relationship.getID()));
@@ -169,7 +170,7 @@ public class RelationshipServiceImplTest {
         when(authorizeService.isAdmin(context)).thenReturn(true);
 
         // Declare objects utilized in unit test
-        Relationship relationship = relationshipDAO.create(context,new Relationship());
+        Relationship relationship = relationshipDAO.create(context.getSession(),new Relationship());
         context.turnOffAuthorisationSystem();
         assertEquals("TestCreate 0", relationship, relationshipService.create(context));
         MetadataValue metVal = mock(MetadataValue.class);
@@ -255,7 +256,7 @@ public class RelationshipServiceImplTest {
         relationshipService.delete(context, relationship);
 
         // Verify RelationshipService.delete() ran once to confirm proper invocation of delete()
-        Mockito.verify(relationshipDAO).delete(context, relationship);
+        Mockito.verify(relationshipDAO).delete(context.getSession(), relationship);
     }
 
     @Test
@@ -290,12 +291,12 @@ public class RelationshipServiceImplTest {
         relationshipService.update(context, relationship);
 
         // Verify RelationshipDAO.delete() ran once to confirm proper invocation of update()
-        Mockito.verify(relationshipDAO).save(context, relationship);
+        Mockito.verify(relationshipDAO).save(context.getSession(), relationship);
     }
 
     @Test
     public void testCountTotal() throws Exception {
-        when(relationshipDAO.countRows(context)).thenReturn(0);
+        when(relationshipDAO.countRows(context.getSession())).thenReturn(0);
         assertEquals("TestCountTotal 1", 0, relationshipService.countTotal(context));
     }
 

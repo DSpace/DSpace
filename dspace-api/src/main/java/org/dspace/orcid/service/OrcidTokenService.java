@@ -7,6 +7,8 @@
  */
 package org.dspace.orcid.service;
 
+import java.sql.SQLException;
+
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -47,8 +49,10 @@ public interface OrcidTokenService {
      * @param  context the DSpace context
      * @param  ePerson the ePerson to search for
      * @return         the Orcid token, if any
+     * @throws SQLException passed through.
      */
-    public OrcidToken findByEPerson(Context context, EPerson ePerson);
+    public OrcidToken findByEPerson(Context context, EPerson ePerson)
+            throws SQLException;
 
     /**
      * Find an OrcidToken by profileItem.
@@ -56,8 +60,10 @@ public interface OrcidTokenService {
      * @param  context     the DSpace context
      * @param  profileItem the profile item to search for
      * @return             the Orcid token, if any
+     * @throws SQLException passed through.
      */
-    public OrcidToken findByProfileItem(Context context, Item profileItem);
+    public OrcidToken findByProfileItem(Context context, Item profileItem)
+            throws SQLException;
 
     /**
      * Delete the given ORCID token entity.
@@ -79,14 +85,16 @@ public interface OrcidTokenService {
      *
      * @param context the DSpace context
      * @param ePerson the ePerson for the deletion
+     * @throws java.sql.SQLException
      */
-    public void deleteByEPerson(Context context, EPerson ePerson);
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException;
 
     /**
      * Deletes the ORCID token entity related to the given profile item.
      *
      * @param context     the DSpace context
      * @param profileItem the item for the deletion
+     * @throws java.sql.SQLException
      */
-    public void deleteByProfileItem(Context context, Item profileItem);
+    public void deleteByProfileItem(Context context, Item profileItem) throws SQLException;
 }

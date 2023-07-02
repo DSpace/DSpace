@@ -17,7 +17,7 @@ import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.ChecksumResult_;
 import org.dspace.checker.dao.ChecksumResultDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ChecksumResult object.
@@ -33,12 +33,12 @@ public class ChecksumResultDAOImpl extends AbstractHibernateDAO<ChecksumResult> 
     }
 
     @Override
-    public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public ChecksumResult findByCode(Session session, ChecksumResultCode code) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ChecksumResult.class);
         Root<ChecksumResult> checksumResultRoot = criteriaQuery.from(ChecksumResult.class);
         criteriaQuery.select(checksumResultRoot);
         criteriaQuery.where(criteriaBuilder.equal(checksumResultRoot.get(ChecksumResult_.resultCode), code));
-        return uniqueResult(context, criteriaQuery, false, ChecksumResult.class);
+        return uniqueResult(session, criteriaQuery, false, ChecksumResult.class);
     }
 }

@@ -45,23 +45,23 @@ public class WebAppServiceImpl implements WebAppService {
 
     @Override
     public WebApp create(Context context, String appName, String url, Date started, int isUI) throws SQLException {
-        WebApp webApp = webAppDAO.create(context, new WebApp());
+        WebApp webApp = webAppDAO.create(context.getSession(), new WebApp());
         webApp.setAppName(appName);
         webApp.setUrl(url);
         webApp.setStarted(started);
         webApp.setIsui(isUI);
-        webAppDAO.save(context, webApp);
+        webAppDAO.save(context.getSession(), webApp);
         return webApp;
     }
 
     @Override
     public void delete(Context context, WebApp webApp) throws SQLException {
-        webAppDAO.delete(context, webApp);
+        webAppDAO.delete(context.getSession(), webApp);
     }
 
     @Override
     public List<WebApp> findAll(Context context) throws SQLException {
-        return webAppDAO.findAll(context, WebApp.class);
+        return webAppDAO.findAll(context.getSession(), WebApp.class);
     }
 
     @Override

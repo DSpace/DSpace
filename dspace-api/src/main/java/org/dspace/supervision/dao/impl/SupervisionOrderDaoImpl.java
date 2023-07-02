@@ -15,11 +15,11 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.SupervisionOrder_;
 import org.dspace.supervision.dao.SupervisionOrderDao;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the SupervisionOrder object.
@@ -31,20 +31,20 @@ import org.dspace.supervision.dao.SupervisionOrderDao;
 public class SupervisionOrderDaoImpl extends AbstractHibernateDAO<SupervisionOrder> implements SupervisionOrderDao {
 
     @Override
-    public List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<SupervisionOrder> findByItem(Session session, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, SupervisionOrder.class);
 
         Root<SupervisionOrder> supervisionOrderRoot = criteriaQuery.from(SupervisionOrder.class);
         criteriaQuery.select(supervisionOrderRoot);
         criteriaQuery.where(criteriaBuilder.equal(supervisionOrderRoot.get(SupervisionOrder_.item), item));
 
-        return list(context, criteriaQuery, false, SupervisionOrder.class, -1, -1);
+        return list(session, criteriaQuery, false, SupervisionOrder.class, -1, -1);
     }
 
     @Override
-    public SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public SupervisionOrder findByItemAndGroup(Session session, Item item, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, SupervisionOrder.class);
 
         Root<SupervisionOrder> supervisionOrderRoot = criteriaQuery.from(SupervisionOrder.class);
@@ -54,6 +54,6 @@ public class SupervisionOrderDaoImpl extends AbstractHibernateDAO<SupervisionOrd
             criteriaBuilder.equal(supervisionOrderRoot.get(SupervisionOrder_.group), group)
         ));
 
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 }

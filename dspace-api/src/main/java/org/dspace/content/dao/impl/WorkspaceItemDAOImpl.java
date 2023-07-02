@@ -23,8 +23,8 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.WorkspaceItem_;
 import org.dspace.content.dao.WorkspaceItemDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the WorkspaceItem object.
@@ -40,8 +40,8 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
 
     @Override
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException {
-        Query query = createQuery(context,
+    public List<WorkspaceItem> findByEPerson(Session session, EPerson ep) throws SQLException {
+        Query query = createQuery(session,
                                   "from WorkspaceItem ws where ws.item.submitter = :submitter order by " +
                                       "workspaceItemId");
         query.setParameter("submitter", ep);
@@ -49,41 +49,54 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+    public List<WorkspaceItem> findByEPerson(Session session, EPerson ep, Integer limit, Integer offset)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(workspaceItemRoot.get(WorkspaceItem_.item).get("submitter"), ep));
         criteriaQuery.orderBy(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
-        return list(context, criteriaQuery, false, WorkspaceItem.class, limit, offset);
+        return list(session, criteriaQuery, false, WorkspaceItem.class, limit, offset);
     }
 
     @Override
-    public List<WorkspaceItem> findByCollection(Context context, Collection c) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<WorkspaceItem> findByCollection(Session session, Collection c) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(workspaceItemRoot.get(WorkspaceItem_.collection), c));
         criteriaQuery.orderBy(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
-        return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
+        return list(session, criteriaQuery, false, WorkspaceItem.class, -1, -1);
     }
 
     @Override
-    public WorkspaceItem findByItem(Context context, Item i) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public WorkspaceItem findByItem(Session session, Item i) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(workspaceItemRoot.get(WorkspaceItem_.item), i));
-        return uniqueResult(context, criteriaQuery, false, WorkspaceItem.class);
+        return uniqueResult(session, criteriaQuery, false, WorkspaceItem.class);
     }
 
     @Override
-    public List<WorkspaceItem> findAll(Context context) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<WorkspaceItem> findAll(Session session) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
+        Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
+        criteriaQuery.select(workspaceItemRoot);
+
+        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
+        criteriaQuery.orderBy(orderList);
+        return list(session, criteriaQuery, false, WorkspaceItem.class, -1, -1);
+    }
+
+    @Override
+    public List<WorkspaceItem> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
         Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
         criteriaQuery.select(workspaceItemRoot);
@@ -93,32 +106,17 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
         criteriaQuery.orderBy(orderList);
 
 
-        return list(context, criteriaQuery, false, WorkspaceItem.class, -1, -1);
+        return list(session, criteriaQuery, false, WorkspaceItem.class, limit, offset);
     }
 
     @Override
-    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);
-        Root<WorkspaceItem> workspaceItemRoot = criteriaQuery.from(WorkspaceItem.class);
-        criteriaQuery.select(workspaceItemRoot);
-
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(workspaceItemRoot.get(WorkspaceItem_.workspaceItemId)));
-        criteriaQuery.orderBy(orderList);
-
-
-        return list(context, criteriaQuery, false, WorkspaceItem.class, limit, offset);
+    public int countRows(Session session) throws SQLException {
+        return count(createQuery(session, "SELECT count(*) from WorkspaceItem"));
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) from WorkspaceItem"));
-    }
-
-    @Override
-    public int countRows(Context context, EPerson ep) throws SQLException {
-        Query query = createQuery(context,
+    public int countRows(Session session, EPerson ep) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT count(*) from WorkspaceItem ws where ws.item.submitter = :submitter");
         query.setParameter("submitter", ep);
         return count(query);
@@ -126,8 +124,8 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
-        Query query = createQuery(context,
+    public List<Map.Entry<Integer, Long>> getStageReachedCounts(Session session) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT wi.stageReached as stage_reached, count(*) as cnt from WorkspaceItem wi" +
                                       " group by wi.stageReached order by wi.stageReached");
 

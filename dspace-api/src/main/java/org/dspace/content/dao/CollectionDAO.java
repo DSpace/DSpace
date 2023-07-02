@@ -14,9 +14,9 @@ import java.util.Map;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Collection object.
@@ -28,29 +28,30 @@ import org.dspace.eperson.Group;
  */
 public interface CollectionDAO extends DSpaceObjectLegacySupportDAO<Collection> {
 
-    public List<Collection> findAll(Context context, MetadataField order) throws SQLException;
+    public List<Collection> findAll(Session session, MetadataField order) throws SQLException;
 
-    public List<Collection> findAll(Context context, MetadataField order, Integer limit, Integer offset)
+    public List<Collection> findAll(Session session, MetadataField order, Integer limit, Integer offset)
         throws SQLException;
 
-    public Collection findByTemplateItem(Context context, Item item) throws SQLException;
+    public Collection findByTemplateItem(Session session, Item item) throws SQLException;
 
     /**
-     * 
-     * @param context DSpace Context
+     * Find a Collection having a given submitter or administrator group.
+     *
+     * @param session current request's database context.
      * @param group EPerson Group
      * @return the collection, if any, that has the specified group as administrators or submitters
      * @throws SQLException
      */
-    public Collection findByGroup(Context context, Group group) throws SQLException;
+    public Collection findByGroup(Session session, Group group) throws SQLException;
 
-    public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
+    public List<Collection> findAuthorized(Session session, EPerson ePerson, List<Integer> actions) throws SQLException;
 
-    List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
+    List<Collection> findAuthorizedByGroup(Session session, EPerson ePerson, List<Integer> actions) throws SQLException;
 
-    List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException;
+    List<Collection> findCollectionsWithSubscribers(Session session) throws SQLException;
 
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 
-    List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+    List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Session session) throws SQLException;
 }

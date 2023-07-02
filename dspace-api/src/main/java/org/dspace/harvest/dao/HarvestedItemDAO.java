@@ -11,9 +11,9 @@ import java.sql.SQLException;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.harvest.HarvestedItem;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the HarvestedItem object.
@@ -25,7 +25,7 @@ import org.dspace.harvest.HarvestedItem;
  */
 public interface HarvestedItemDAO extends GenericDAO<HarvestedItem> {
 
-    public HarvestedItem findByItem(Context context, Item item) throws SQLException;
+    public HarvestedItem findByItem(Session session, Item item) throws SQLException;
 
-    public HarvestedItem findByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException;
+    public HarvestedItem findByOAIId(Session session, String itemOaiID, Collection collection) throws SQLException;
 }

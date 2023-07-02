@@ -57,12 +57,13 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public HarvestedCollection find(Context context, Collection collection) throws SQLException {
-        return harvestedCollectionDAO.findByCollection(context, collection);
+        return harvestedCollectionDAO.findByCollection(context.getSession(), collection);
     }
 
     @Override
     public HarvestedCollection create(Context context, Collection collection) throws SQLException {
-        HarvestedCollection harvestedCollection = harvestedCollectionDAO.create(context, new HarvestedCollection());
+        HarvestedCollection harvestedCollection
+                = harvestedCollectionDAO.create(context.getSession(), new HarvestedCollection());
         harvestedCollection.setCollection(collection);
         harvestedCollection.setHarvestType(HarvestedCollection.TYPE_NONE);
         update(context, harvestedCollection);
@@ -109,7 +110,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public List<HarvestedCollection> findAll(Context context) throws SQLException {
-        return harvestedCollectionDAO.findAll(context, HarvestedCollection.class);
+        return harvestedCollectionDAO.findAll(context.getSession(), HarvestedCollection.class);
     }
 
     @Override
@@ -140,7 +141,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
         int[] statuses = new int[] {HarvestedCollection.STATUS_READY, HarvestedCollection.STATUS_OAI_ERROR};
         return harvestedCollectionDAO
-            .findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(context, startTime,
+            .findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(context.getSession(), startTime,
                                                                                HarvestedCollection.TYPE_NONE, statuses,
                                                                                HarvestedCollection.STATUS_BUSY,
                                                                                expirationTime);
@@ -148,36 +149,36 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException {
-        return harvestedCollectionDAO.findByStatus(context, status);
+        return harvestedCollectionDAO.findByStatus(context.getSession(), status);
     }
 
     @Override
     public HarvestedCollection findOldestHarvest(Context context) throws SQLException {
         return harvestedCollectionDAO
-            .findByStatusAndMinimalTypeOrderByLastHarvestedAsc(context, HarvestedCollection.STATUS_READY,
+            .findByStatusAndMinimalTypeOrderByLastHarvestedAsc(context.getSession(), HarvestedCollection.STATUS_READY,
                                                                HarvestedCollection.TYPE_NONE, 1);
     }
 
     @Override
     public HarvestedCollection findNewestHarvest(Context context) throws SQLException {
         return harvestedCollectionDAO
-            .findByStatusAndMinimalTypeOrderByLastHarvestedDesc(context, HarvestedCollection.STATUS_READY,
+            .findByStatusAndMinimalTypeOrderByLastHarvestedDesc(context.getSession(), HarvestedCollection.STATUS_READY,
                                                                 HarvestedCollection.TYPE_NONE, 1);
     }
 
     @Override
     public void delete(Context context, HarvestedCollection harvestedCollection) throws SQLException {
-        harvestedCollectionDAO.delete(context, harvestedCollection);
+        harvestedCollectionDAO.delete(context.getSession(), harvestedCollection);
     }
 
     @Override
     public void update(Context context, HarvestedCollection harvestedCollection) throws SQLException {
-        harvestedCollectionDAO.save(context, harvestedCollection);
+        harvestedCollectionDAO.save(context.getSession(), harvestedCollection);
     }
 
     @Override
     public boolean exists(Context context) throws SQLException {
-        return 0 < harvestedCollectionDAO.count(context);
+        return 0 < harvestedCollectionDAO.count(context.getSession());
     }
 
     /**
@@ -253,7 +254,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
                     Document reply = db.build(ls.getDocument());
                     Element root = reply.getRootElement();
                     //Check if we can find items, if so this indicates that we have children and our sets exist
-                    foundSet = 0 < root.getChild("ListIdentifiers", OAI_NS).getChildren().size();
+                    foundSet = !root.getChild("ListIdentifiers", OAI_NS).getChildren().isEmpty();
 
                     if (!foundSet) {
                         errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");

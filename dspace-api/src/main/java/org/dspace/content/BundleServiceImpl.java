@@ -51,7 +51,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Bundle.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected BundleDAO bundleDAO;
@@ -72,7 +72,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Override
     public Bundle find(Context context, UUID id) throws SQLException {
         // First check the cache
-        Bundle bundle = bundleDAO.findByID(context, Bundle.class, id);
+        Bundle bundle = bundleDAO.findByID(context.getSession(), Bundle.class, id);
         if (bundle == null) {
             if (log.isDebugEnabled()) {
                 log.debug(LogHelper.getHeader(context, "find_bundle",
@@ -99,7 +99,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
 
         // Create a table row
-        Bundle bundle = bundleDAO.create(context, new Bundle());
+        Bundle bundle = bundleDAO.create(context.getSession(), new Bundle());
         bundle.setName(context, name);
         itemService.addBundle(context, item, bundle);
         if (!bundle.getItems().contains(item)) {
@@ -268,7 +268,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                     + " has no default bitstream READ policies");
         }
 
-        List<ResourcePolicy> newPolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> newPolicies = new ArrayList<>();
         while (i.hasNext()) {
             ResourcePolicy rp = resourcePolicyService.clone(context, i.next());
             rp.setAction(Constants.READ);
@@ -296,7 +296,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
     @Override
     public List<ResourcePolicy> getBitstreamPolicies(Context context, Bundle bundle) throws SQLException {
-        List<ResourcePolicy> list = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> list = new ArrayList<>();
         List<Bitstream> bitstreams = bundle.getBitstreams();
         if (CollectionUtils.isNotEmpty(bitstreams)) {
             for (Bitstream bs : bitstreams) {
@@ -391,7 +391,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         authorizeService.authorizeAction(context, bundle, Constants.WRITE);
 
         List<Bitstream> currentBitstreams = bundle.getBitstreams();
-        List<Bitstream> updatedBitstreams = new ArrayList<Bitstream>();
+        List<Bitstream> updatedBitstreams = new ArrayList<>();
 
         // Loop through and ensure these Bitstream IDs are all valid. Add them to list of updatedBitstreams.
         for (int i = 0; i < bitstreamIds.length; i++) {
@@ -514,7 +514,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 + bundle.getID()));
 
         super.update(context, bundle);
-        bundleDAO.save(context, bundle);
+        bundleDAO.save(context.getSession(), bundle);
 
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
@@ -552,7 +552,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         }
 
         // Remove ourself
-        bundleDAO.delete(context, bundle);
+        bundleDAO.delete(context.getSession(), bundle);
     }
 
     @Override
@@ -571,11 +571,11 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
     @Override
     public Bundle findByLegacyId(Context context, int id) throws SQLException {
-        return bundleDAO.findByLegacyId(context, id, Bundle.class);
+        return bundleDAO.findByLegacyId(context.getSession(), id, Bundle.class);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return bundleDAO.countRows(context);
+        return bundleDAO.countRows(context.getSession());
     }
 }

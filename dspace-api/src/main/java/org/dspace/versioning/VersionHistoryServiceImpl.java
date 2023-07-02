@@ -50,12 +50,12 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public VersionHistory create(Context context) throws SQLException {
-        return versionHistoryDAO.create(context, new VersionHistory());
+        return versionHistoryDAO.create(context.getSession(), new VersionHistory());
     }
 
     @Override
     public VersionHistory find(Context context, int id) throws SQLException {
-        return versionHistoryDAO.findByID(context, VersionHistory.class, id);
+        return versionHistoryDAO.findByID(context.getSession(), VersionHistory.class, id);
     }
 
     @Override
@@ -67,14 +67,14 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     public void update(Context context, List<VersionHistory> versionHistories) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(versionHistories)) {
             for (VersionHistory versionHistory : versionHistories) {
-                versionHistoryDAO.save(context, versionHistory);
+                versionHistoryDAO.save(context.getSession(), versionHistory);
             }
         }
     }
 
     @Override
     public void delete(Context context, VersionHistory versionHistory) throws SQLException, AuthorizeException {
-        versionHistoryDAO.delete(context, new VersionHistory());
+        versionHistoryDAO.delete(context.getSession(), new VersionHistory());
     }
 
     // LIST order: descending
@@ -217,7 +217,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public VersionHistory findByItem(Context context, Item item) throws SQLException {
-        return versionHistoryDAO.findByItem(context, item);
+        return versionHistoryDAO.findByItem(context.getSession(), item);
     }
 
     @Override

@@ -10,11 +10,11 @@ package org.dspace.xmlworkflow.storedcomponents.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the InProgressUser object.
@@ -26,14 +26,14 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface InProgressUserDAO extends GenericDAO<InProgressUser> {
 
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public InProgressUser findByWorkflowItemAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
-    public List<InProgressUser> findByEperson(Context context, EPerson ePerson) throws SQLException;
+    public List<InProgressUser> findByEperson(Session session, EPerson ePerson) throws SQLException;
 
-    public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public List<InProgressUser> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public int countInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public int countInProgressUsers(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public int countFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public int countFinishedUsers(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 }

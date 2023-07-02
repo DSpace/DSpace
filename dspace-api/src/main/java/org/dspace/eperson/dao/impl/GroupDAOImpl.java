@@ -17,10 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
 import org.dspace.core.AbstractHibernateDSODAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group object.
@@ -35,7 +35,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField)
+    public List<Group> findByMetadataField(Session session, String searchValue, MetadataField metadataField)
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
@@ -44,7 +44,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         addMetadataLeftJoin(queryBuilder, groupTableName, Collections.singletonList(metadataField));
         addMetadataValueWhereQuery(queryBuilder, Collections.singletonList(metadataField), "=", null);
 
-        Query query = createQuery(context, queryBuilder.toString());
+        Query query = createQuery(session, queryBuilder.toString());
         query.setParameter(metadataField.toString(), metadataField.getID());
         query.setParameter("queryParam", searchValue);
 
@@ -52,7 +52,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields, int pageSize, int offset)
+    public List<Group> findAll(Session session, List<MetadataField> sortMetadataFields, int pageSize, int offset)
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
@@ -61,7 +61,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         addMetadataLeftJoin(queryBuilder, groupTableName, sortMetadataFields);
         addMetadataSortQuery(queryBuilder, sortMetadataFields, null);
 
-        Query query = createQuery(context, queryBuilder.toString());
+        Query query = createQuery(session, queryBuilder.toString());
         if (pageSize > 0) {
             query.setMaxResults(pageSize);
         }
@@ -75,8 +75,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findAll(Context context, int pageSize, int offset) throws SQLException {
-        Query query = createQuery(context,
+    public List<Group> findAll(Session session, int pageSize, int offset) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT g FROM Group g ORDER BY g.name ASC");
         if (pageSize > 0) {
             query.setMaxResults(pageSize);
@@ -90,8 +90,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        Query query = createQuery(context,
+    public List<Group> findByEPerson(Session session, EPerson ePerson) throws SQLException {
+        Query query = createQuery(session,
                                   "from Group where (from EPerson e where e.id = :eperson_id) in elements(epeople)");
         query.setParameter("eperson_id", ePerson.getID());
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
@@ -100,8 +100,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public Group findByName(final Context context, final String name) throws SQLException {
-        Query query = createQuery(context,
+    public Group findByName(final Session session, final String name) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT g from Group g " +
                                       "where g.name = :name ");
 
@@ -112,11 +112,11 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException {
+    public Group findByIdAndMembership(Session session, UUID id, EPerson ePerson) throws SQLException {
         if (id == null || ePerson == null) {
             return null;
         } else {
-            Query query = createQuery(context,
+            Query query = createQuery(session,
                                       "SELECT DISTINCT g FROM Group g " +
                                           "LEFT JOIN g.epeople p " +
                                           "WHERE g.id = :id AND " +
@@ -139,9 +139,9 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findByNameLike(final Context context, final String groupName, final int offset, final int limit)
+    public List<Group> findByNameLike(final Session session, final String groupName, final int offset, final int limit)
         throws SQLException {
-        Query query = createQuery(context,
+        Query query = createQuery(session,
                                   "SELECT g FROM Group g WHERE lower(g.name) LIKE lower(:name)");
         query.setParameter("name", "%" + StringUtils.trimToEmpty(groupName) + "%");
 
@@ -156,8 +156,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public int countByNameLike(final Context context, final String groupName) throws SQLException {
-        Query query = createQuery(context,
+    public int countByNameLike(final Session session, final String groupName) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT count(*) FROM Group g WHERE lower(g.name) LIKE lower(:name)");
         query.setParameter("name", "%" + groupName + "%");
 
@@ -165,19 +165,19 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public void delete(Context context, Group group) throws SQLException {
-        Query query = getHibernateSession(context)
+    public void delete(Session session, Group group) throws SQLException {
+        Query query = session
             .createNativeQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
         query.setParameter("groupId", group.getID());
         query.executeUpdate();
-        super.delete(context, group);
+        super.delete(session, group);
     }
 
 
     @Override
-    public List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException {
+    public List<Pair<UUID, UUID>> getGroup2GroupResults(Session session, boolean flushQueries) throws SQLException {
 
-        Query query = createQuery(context, "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.id, c.id) " +
+        Query query = createQuery(session, "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.id, c.id) " +
             "FROM Group g " +
             "JOIN g.groups c ");
 
@@ -187,13 +187,13 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> getEmptyGroups(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT g from Group g where g.epeople is EMPTY"));
+    public List<Group> getEmptyGroups(Session session) throws SQLException {
+        return list(createQuery(session, "SELECT g from Group g where g.epeople is EMPTY"));
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Group"));
+    public int countRows(Session session) throws SQLException {
+        return count(createQuery(session, "SELECT count(*) FROM Group"));
     }
 
 }

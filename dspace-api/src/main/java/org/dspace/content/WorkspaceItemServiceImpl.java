@@ -54,7 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(WorkspaceItemServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected WorkspaceItemDAO workspaceItemDAO;
@@ -77,7 +77,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public WorkspaceItem find(Context context, int id) throws SQLException {
-        WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
+        WorkspaceItem workspaceItem
+                = workspaceItemDAO.findByID(context.getSession(), WorkspaceItem.class, id);
 
         if (workspaceItem == null) {
             if (log.isDebugEnabled()) {
@@ -105,7 +106,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
 
-        WorkspaceItem workspaceItem = workspaceItemDAO.create(context, new WorkspaceItem());
+        WorkspaceItem workspaceItem = workspaceItemDAO.create(context.getSession(), new WorkspaceItem());
         workspaceItem.setCollection(collection);
 
 
@@ -215,7 +216,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public WorkspaceItem create(Context c, WorkflowItem workflowItem) throws SQLException, AuthorizeException {
-        WorkspaceItem workspaceItem = workspaceItemDAO.create(c, new WorkspaceItem());
+        WorkspaceItem workspaceItem = workspaceItemDAO.create(c.getSession(), new WorkspaceItem());
         workspaceItem.setItem(workflowItem.getItem());
         workspaceItem.setCollection(workflowItem.getCollection());
         update(c, workspaceItem);
@@ -224,33 +225,33 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException {
-        return workspaceItemDAO.findByEPerson(context, ep);
+        return workspaceItemDAO.findByEPerson(context.getSession(), ep);
     }
 
     @Override
     public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
         throws SQLException {
-        return workspaceItemDAO.findByEPerson(context, ep, limit, offset);
+        return workspaceItemDAO.findByEPerson(context.getSession(), ep, limit, offset);
     }
 
     @Override
     public List<WorkspaceItem> findByCollection(Context context, Collection collection) throws SQLException {
-        return workspaceItemDAO.findByCollection(context, collection);
+        return workspaceItemDAO.findByCollection(context.getSession(), collection);
     }
 
     @Override
     public WorkspaceItem findByItem(Context context, Item item) throws SQLException {
-        return workspaceItemDAO.findByItem(context, item);
+        return workspaceItemDAO.findByItem(context.getSession(), item);
     }
 
     @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
-        return workspaceItemDAO.findAll(context);
+        return workspaceItemDAO.findAll(context.getSession());
     }
 
     @Override
     public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return workspaceItemDAO.findAll(context, limit, offset);
+        return workspaceItemDAO.findAll(context.getSession(), limit, offset);
     }
 
     @Override
@@ -264,7 +265,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         itemService.update(context, workspaceItem.getItem());
 
         // Update ourselves
-        workspaceItemDAO.save(context, workspaceItem);
+        workspaceItemDAO.save(context.getSession(), workspaceItem);
     }
 
     @Override
@@ -291,7 +292,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
-        workspaceItemDAO.delete(context, workspaceItem);
+        workspaceItemDAO.delete(context.getSession(), workspaceItem);
 
         // Delete item
         itemService.delete(context, item);
@@ -299,17 +300,17 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return workspaceItemDAO.countRows(context);
+        return workspaceItemDAO.countRows(context.getSession());
     }
 
     @Override
     public int countByEPerson(Context context, EPerson ep) throws SQLException {
-        return workspaceItemDAO.countRows(context, ep);
+        return workspaceItemDAO.countRows(context.getSession(), ep);
     }
 
     @Override
     public List<Map.Entry<Integer, Long>> getStageReachedCounts(Context context) throws SQLException {
-        return workspaceItemDAO.getStageReachedCounts(context);
+        return workspaceItemDAO.getStageReachedCounts(context.getSession());
     }
 
     @Override
@@ -324,7 +325,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         //        deleteSubmitPermissions();
 
-        workspaceItemDAO.delete(context, workspaceItem);
+        workspaceItemDAO.delete(context.getSession(), workspaceItem);
 
     }
 

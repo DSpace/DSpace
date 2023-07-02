@@ -10,7 +10,7 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 
 import org.dspace.content.Site;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Site object.
@@ -21,5 +21,5 @@ import org.dspace.core.Context;
  */
 public interface SiteDAO extends DSpaceObjectDAO<Site> {
 
-    public Site findSite(Context context) throws SQLException;
+    public Site findSite(Session session) throws SQLException;
 }

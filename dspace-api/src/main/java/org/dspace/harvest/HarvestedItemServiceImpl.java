@@ -34,12 +34,13 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
 
     @Override
     public HarvestedItem find(Context context, Item item) throws SQLException {
-        return harvestedItemDAO.findByItem(context, item);
+        return harvestedItemDAO.findByItem(context.getSession(), item);
     }
 
     @Override
     public Item getItemByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
-        HarvestedItem harvestedItem = harvestedItemDAO.findByOAIId(context, itemOaiID, collection);
+        HarvestedItem harvestedItem
+                = harvestedItemDAO.findByOAIId(context.getSession(), itemOaiID, collection);
         if (harvestedItem != null) {
             return harvestedItem.getItem();
         } else {
@@ -49,7 +50,7 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
 
     @Override
     public HarvestedItem create(Context context, Item item, String itemOAIid) throws SQLException {
-        HarvestedItem harvestedItem = harvestedItemDAO.create(context, new HarvestedItem());
+        HarvestedItem harvestedItem = harvestedItemDAO.create(context.getSession(), new HarvestedItem());
         harvestedItem.setItem(item);
         harvestedItem.setOaiId(itemOAIid);
         update(context, harvestedItem);
@@ -58,12 +59,12 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
 
     @Override
     public void update(Context context, HarvestedItem harvestedItem) throws SQLException {
-        harvestedItemDAO.save(context, harvestedItem);
+        harvestedItemDAO.save(context.getSession(), harvestedItem);
     }
 
     @Override
     public void delete(Context context, HarvestedItem harvestedItem) throws SQLException {
-        harvestedItemDAO.delete(context, harvestedItem);
+        harvestedItemDAO.delete(context.getSession(), harvestedItem);
     }
 
 
