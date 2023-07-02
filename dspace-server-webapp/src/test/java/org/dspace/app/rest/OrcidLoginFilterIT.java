@@ -85,7 +85,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
     private OrcidClient originalOrcidClient;
 
-    private OrcidClient orcidClientMock = mock(OrcidClient.class);
+    private final OrcidClient orcidClientMock = mock(OrcidClient.class);
 
     private EPerson createdEperson;
 
@@ -557,12 +557,14 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         return JsonPath.read(result.getResponse().getContentAsString(), "$.id");
     }
 
-    private String getOrcidAccessToken(EPerson ePerson) {
+    private String getOrcidAccessToken(EPerson ePerson)
+            throws SQLException {
         OrcidToken orcidToken = orcidTokenService.findByEPerson(context, ePerson);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 
-    private String getOrcidAccessToken(Item item) {
+    private String getOrcidAccessToken(Item item)
+            throws SQLException {
         OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
