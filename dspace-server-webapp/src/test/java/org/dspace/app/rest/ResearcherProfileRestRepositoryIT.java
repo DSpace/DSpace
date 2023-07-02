@@ -114,7 +114,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Autowired
     private OrcidClient orcidClient;
 
-    private OrcidClient orcidClientMock = mock(OrcidClient.class);
+    private final OrcidClient orcidClientMock = mock(OrcidClient.class);
 
     private EPerson user;
 
@@ -1336,7 +1336,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(post("/api/eperson/profiles/")
                                          .contentType(MediaType.APPLICATION_JSON_VALUE))
                             .andExpect(status().isCreated())
-                            .andExpect(jsonPath("$.id", is(ePersonId.toString())))
+                            .andExpect(jsonPath("$.id", is(ePersonId)))
                             .andExpect(jsonPath("$.visible", is(false)))
                             .andExpect(jsonPath("$.type", is("profile")));
 
@@ -2527,8 +2527,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
 
-        AtomicReference<UUID> ePersonIdRef = new AtomicReference<UUID>();
-        AtomicReference<UUID> itemIdRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> ePersonIdRef = new AtomicReference<>();
+        AtomicReference<UUID> itemIdRef = new AtomicReference<>();
 
         getClient(authToken).perform(post("/api/eperson/profiles/")
                                          .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -2553,7 +2553,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         return readAttributeFromResponse(result, "$.id");
     }
 
-    private String getOrcidAccessToken(Item item) {
+    private String getOrcidAccessToken(Item item)
+            throws SQLException {
         OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }

@@ -326,8 +326,13 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private Optional<String> getAccessToken(Context context, Item item) {
-        return ofNullable(orcidTokenService.findByProfileItem(context, item))
-            .map(orcidToken -> orcidToken.getAccessToken());
+        try {
+            return ofNullable(orcidTokenService.findByProfileItem(context, item))
+                    .map(orcidToken -> orcidToken.getAccessToken());
+        } catch (SQLException ex) {
+            LOGGER.error("Unable to get ORCiD access token for Item {}", item::getID, () -> ex);
+            return Optional.ofNullable(null);
+        }
     }
 
     private boolean isProfileSectionType(OrcidQueue orcidQueue) {

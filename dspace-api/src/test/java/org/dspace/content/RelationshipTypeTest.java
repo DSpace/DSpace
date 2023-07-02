@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.dspace.AbstractUnitTest;
 import org.dspace.content.dao.RelationshipTypeDAO;
-import org.dspace.core.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RelationshipTypeTest {
+public class RelationshipTypeTest
+        extends AbstractUnitTest {
     @InjectMocks
     private RelationshipTypeServiceImpl relationshipTypeService;
 
@@ -38,10 +39,8 @@ public class RelationshipTypeTest {
     private RelationshipType firstRelationshipType;
     private RelationshipType secondRelationshipType;
 
-    private Context context;
-
     @Before
-    public void init() {
+    public void myinit() {
         // Default state of firstRelationshipType
         firstRelationshipType = mock(RelationshipType.class);
         firstRelationshipType.setId(1);
@@ -66,7 +65,6 @@ public class RelationshipTypeTest {
         secondRelationshipType.setRightMinCardinality(0);
         secondRelationshipType.setRightMinCardinality(null);
     }
-
 
     @Test
     public void testRelationshipTypeFind() throws Exception {

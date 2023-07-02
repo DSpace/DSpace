@@ -18,6 +18,7 @@ import static org.orcid.jaxb.model.common.CitationType.FORMATTED_UNSPECIFIED;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -28,6 +29,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
@@ -63,13 +66,11 @@ import org.orcid.jaxb.model.v3.release.record.WorkTitle;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkGroup;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ExternalDataProvider} that search for all the works
- * of the profile with the given orcid id that hava a source other than DSpace.
+ * of the profile with the given orcid id that have a source other than DSpace.
  * The id of the external data objects returned by the methods of this class is
  * the concatenation of the orcid id and the put code associated with the
  * publication, separated by :: (example 0000-0000-0123-4567::123456)
@@ -79,7 +80,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrcidPublicationDataProvider.class);
+    private final static Logger LOGGER = LogManager.getLogger();
 
     /**
      * Examples of valid ORCID IDs:
@@ -268,8 +269,13 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
     }
 
     private Optional<String> getAccessToken(Item item) {
-        return ofNullable(orcidTokenService.findByProfileItem(getContext(), item))
-            .map(OrcidToken::getAccessToken);
+        try {
+            return ofNullable(orcidTokenService.findByProfileItem(getContext(), item))
+                    .map(OrcidToken::getAccessToken);
+        } catch (SQLException ex) {
+            LOGGER.error("Could not fetch access token for Item {}", item::getID, () -> ex);
+            return Optional.ofNullable(null);
+        }
     }
 
     private String getReadPublicAccessToken() {
