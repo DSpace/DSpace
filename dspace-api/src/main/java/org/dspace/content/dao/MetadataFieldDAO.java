@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the MetadataField object.
@@ -25,21 +25,21 @@ import org.dspace.core.GenericDAO;
  */
 public interface MetadataFieldDAO extends GenericDAO<MetadataField> {
 
-    public MetadataField find(Context context, int metadataFieldId, MetadataSchema metadataSchema, String element,
+    public MetadataField find(Session session, int metadataFieldId, MetadataSchema metadataSchema, String element,
                               String qualifier)
         throws SQLException;
 
-    public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
+    public MetadataField findByElement(Session session, MetadataSchema metadataSchema, String element, String qualifier)
         throws SQLException;
 
-    public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier)
+    public MetadataField findByElement(Session session, String metadataSchema, String element, String qualifier)
         throws SQLException;
 
-    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema,
+    public List<MetadataField> findFieldsByElementNameUnqualified(Session session, String metadataSchema,
                                                                   String element)
         throws SQLException;
 
-    public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema)
+    public List<MetadataField> findAllInSchema(Session session, MetadataSchema metadataSchema)
         throws SQLException;
 
 }

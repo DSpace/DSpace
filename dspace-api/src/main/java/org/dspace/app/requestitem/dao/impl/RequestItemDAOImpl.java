@@ -19,7 +19,7 @@ import org.dspace.app.requestitem.RequestItem_;
 import org.dspace.app.requestitem.dao.RequestItemDAO;
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RequestItem object.
@@ -34,17 +34,17 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
     }
 
     @Override
-    public RequestItem findByToken(Context context, String token) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public RequestItem findByToken(Session session, String token) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
         Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
         criteriaQuery.select(requestItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.token), token));
-        return uniqueResult(context, criteriaQuery, false, RequestItem.class);
+        return uniqueResult(session, criteriaQuery, false, RequestItem.class);
     }
     @Override
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM RequestItem WHERE item_id= :uuid");
+    public Iterator<RequestItem> findByItem(Session session, Item item) throws SQLException {
+        Query query = createQuery(session, "FROM RequestItem WHERE item_id= :uuid");
         query.setParameter("uuid", item.getID());
         return iterate(query);
     }

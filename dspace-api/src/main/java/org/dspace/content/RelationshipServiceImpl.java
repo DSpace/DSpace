@@ -74,7 +74,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             throw new AuthorizeException(
                 "Only administrators can modify relationship");
         }
-        return relationshipDAO.create(context, new Relationship());
+        return relationshipDAO.create(context.getSession(), new Relationship());
     }
 
     @Override
@@ -120,7 +120,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                 // This order of execution should be handled in the creation (create, updateplace, update relationship)
                 // for a proper place allocation
-                Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
+                Relationship relationshipToReturn = relationshipDAO.create(context.getSession(), relationship);
                 updatePlaceInRelationship(context, relationshipToReturn, null, null, true, true);
                 update(context, relationshipToReturn);
                 updateItemsInRelationship(context, relationship);
@@ -603,7 +603,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public Relationship find(Context context, int id) throws SQLException {
-        Relationship relationship = relationshipDAO.findByID(context, Relationship.class, id);
+        Relationship relationship = relationshipDAO.findByID(context.getSession(), Relationship.class, id);
         return relationship;
     }
 
@@ -624,7 +624,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         Context context, Item item, Integer limit, Integer offset, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
         List<Relationship> list =
-            relationshipDAO.findByItem(context, item, limit, offset, excludeTilted, excludeNonLatest);
+            relationshipDAO.findByItem(context.getSession(), item, limit, offset, excludeTilted, excludeNonLatest);
 
         list.sort((o1, o2) -> {
             int relationshipType = o1.getRelationshipType().getLeftwardType()
@@ -649,7 +649,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public List<Relationship> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return relationshipDAO.findAll(context, Relationship.class, limit, offset);
+        return relationshipDAO.findAll(context.getSession(), Relationship.class, limit, offset);
     }
 
     @Override
@@ -665,7 +665,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
                     authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                     if (isRelationshipValidToCreate(context, relationship)) {
-                        relationshipDAO.save(context, relationship);
+                        relationshipDAO.save(context.getSession(), relationship);
                     }
                 } else {
                     throw new AuthorizeException("You do not have write rights on this relationship's items");
@@ -718,7 +718,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         copyMetadataValues(context, relationship, copyToLeftItem, copyToRightItem);
         if (authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE) ||
             authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
-            relationshipDAO.delete(context, relationship);
+            relationshipDAO.delete(context.getSession(), relationship);
             updatePlaceInRelationship(context, relationship, null, null, false, false);
             updateItemsInRelationship(context, relationship);
         } else {
@@ -847,7 +847,7 @@ public class RelationshipServiceImpl implements RelationshipService {
      */
     private boolean containsVirtualMetadata(String typeToSearchInVirtualMetadata) {
         return virtualMetadataPopulator.getMap().containsKey(typeToSearchInVirtualMetadata)
-                && virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).size() > 0;
+                && !virtualMetadataPopulator.getMap().get(typeToSearchInVirtualMetadata).isEmpty();
     }
 
     /**
@@ -1005,7 +1005,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         Context context, Item item, RelationshipType relationshipType, int limit, int offset, boolean excludeNonLatest
     ) throws SQLException {
         return relationshipDAO
-            .findByItemAndRelationshipType(context, item, relationshipType, limit, offset, excludeNonLatest);
+            .findByItemAndRelationshipType(context.getSession(), item,
+                    relationshipType, limit, offset, excludeNonLatest);
     }
 
     @Override
@@ -1021,7 +1022,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         boolean excludeNonLatest
     ) throws SQLException {
         return relationshipDAO
-            .findByItemAndRelationshipType(context, item, relationshipType, isLeft, limit, offset, excludeNonLatest);
+            .findByItemAndRelationshipType(context.getSession(), item,
+                    relationshipType, isLeft, limit, offset, excludeNonLatest);
     }
 
     @Override
@@ -1029,7 +1031,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
     ) throws SQLException {
         return relationshipDAO
-            .findByLatestItemAndRelationshipType(context, latestItem, relationshipType, isLeft);
+            .findByLatestItemAndRelationshipType(context.getSession(), latestItem, relationshipType, isLeft);
     }
 
     @Override
@@ -1043,7 +1045,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType, Integer limit,
                                                      Integer offset)
         throws SQLException {
-        return relationshipDAO.findByRelationshipType(context, relationshipType, limit, offset);
+        return relationshipDAO.findByRelationshipType(context.getSession(), relationshipType, limit, offset);
     }
 
     @Override
@@ -1055,13 +1057,13 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Override
     public List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
             throws SQLException {
-        return relationshipDAO.findByTypeName(context, typeName, limit, offset);
+        return relationshipDAO.findByTypeName(context.getSession(), typeName, limit, offset);
     }
 
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return relationshipDAO.countRows(context);
+        return relationshipDAO.countRows(context.getSession());
     }
 
     @Override
@@ -1073,12 +1075,12 @@ public class RelationshipServiceImpl implements RelationshipService {
     public int countByItem(
         Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
-        return relationshipDAO.countByItem(context, item, excludeTilted, excludeNonLatest);
+        return relationshipDAO.countByItem(context.getSession(), item, excludeTilted, excludeNonLatest);
     }
 
     @Override
     public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
-        return relationshipDAO.countByRelationshipType(context, relationshipType);
+        return relationshipDAO.countByRelationshipType(context.getSession(), relationshipType);
     }
 
     @Override
@@ -1093,13 +1095,13 @@ public class RelationshipServiceImpl implements RelationshipService {
         Context context, Item item, RelationshipType relationshipType, boolean isLeft, boolean excludeNonLatest
     ) throws SQLException {
         return relationshipDAO
-            .countByItemAndRelationshipType(context, item, relationshipType, isLeft, excludeNonLatest);
+            .countByItemAndRelationshipType(context.getSession(), item, relationshipType, isLeft, excludeNonLatest);
     }
 
     @Override
     public int countByTypeName(Context context, String typeName)
             throws SQLException {
-        return relationshipDAO.countByTypeName(context, typeName);
+        return relationshipDAO.countByTypeName(context.getSession(), typeName);
     }
 
     @Override
@@ -1107,13 +1109,14 @@ public class RelationshipServiceImpl implements RelationshipService {
             RelationshipType relationshipType, List<UUID> items, boolean isLeft,
             int offset, int limit) throws SQLException {
         return relationshipDAO
-               .findByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft, offset,limit);
+               .findByItemAndRelationshipTypeAndList(context.getSession(),
+                       focusUUID, relationshipType, items, isLeft, offset,limit);
     }
 
     @Override
     public int countByItemRelationshipTypeAndRelatedList(Context context, UUID focusUUID,
            RelationshipType relationshipType, List<UUID> items, boolean isLeft) throws SQLException {
         return relationshipDAO
-               .countByItemAndRelationshipTypeAndList(context, focusUUID, relationshipType, items, isLeft);
+               .countByItemAndRelationshipTypeAndList(context.getSession(), focusUUID, relationshipType, items, isLeft);
     }
 }

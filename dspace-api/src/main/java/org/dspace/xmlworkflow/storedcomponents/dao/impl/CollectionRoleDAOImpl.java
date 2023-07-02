@@ -16,11 +16,11 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole_;
 import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the CollectionRole object.
@@ -35,29 +35,29 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
     }
 
     @Override
-    public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<CollectionRole> findByCollection(Session session, Collection collection) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
         criteriaQuery.select(collectionRoleRoot);
         criteriaQuery.where(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.collection), collection));
-        return list(context, criteriaQuery, false, CollectionRole.class, -1, -1);
+        return list(session, criteriaQuery, false, CollectionRole.class, -1, -1);
     }
 
     @Override
-    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<CollectionRole> findByGroup(Session session, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
         criteriaQuery.select(collectionRoleRoot);
         criteriaQuery.where(criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.group), group));
-        return list(context, criteriaQuery, false, CollectionRole.class, -1, -1);
+        return list(session, criteriaQuery, false, CollectionRole.class, -1, -1);
     }
 
     @Override
-    public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role)
+    public CollectionRole findByCollectionAndRole(Session session, Collection collection, String role)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, CollectionRole.class);
         Root<CollectionRole> collectionRoleRoot = criteriaQuery.from(CollectionRole.class);
         criteriaQuery.select(collectionRoleRoot);
@@ -66,14 +66,14 @@ public class CollectionRoleDAOImpl extends AbstractHibernateDAO<CollectionRole> 
                                 criteriaBuilder.equal(collectionRoleRoot.get(CollectionRole_.roleId), role)
             )
         );
-        return uniqueResult(context, criteriaQuery, false, CollectionRole.class);
+        return uniqueResult(session, criteriaQuery, false, CollectionRole.class);
 
     }
 
     @Override
-    public void deleteByCollection(Context context, Collection collection) throws SQLException {
+    public void deleteByCollection(Session session, Collection collection) throws SQLException {
         String hql = "delete from CollectionRole WHERE collection=:collection";
-        Query query = createQuery(context, hql);
+        Query query = createQuery(session, hql);
         query.setParameter("collection", collection);
         query.executeUpdate();
     }

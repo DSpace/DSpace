@@ -17,10 +17,10 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.DOI_;
 import org.dspace.identifier.dao.DOIDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the DOI object.
@@ -35,19 +35,19 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
     }
 
     @Override
-    public DOI findByDoi(Context context, String doi) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public DOI findByDoi(Session session, String doi) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
         criteriaQuery.where(criteriaBuilder.equal(doiRoot.get(DOI_.doi), doi));
-        return uniqueResult(context, criteriaQuery, false, DOI.class);
+        return uniqueResult(session, criteriaQuery, false, DOI.class);
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso, List<Integer> statusToExclude)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
@@ -66,12 +66,12 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
                             )
         );
 
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public List<DOI> findByStatus(Context context, List<Integer> statuses) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<DOI> findByStatus(Session session, List<Integer> statuses) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
@@ -80,14 +80,14 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
             orPredicates.add(criteriaBuilder.equal(doiRoot.get(DOI_.status), status));
         }
         criteriaQuery.where(criteriaBuilder.or(orPredicates.toArray(new Predicate[] {})));
-        return list(context, criteriaQuery, false, DOI.class, -1, -1);
+        return list(session, criteriaQuery, false, DOI.class, -1, -1);
     }
 
     @Override
-    public List<DOI> findSimilarNotInState(Context context, String doi, List<Integer> excludedStatuses,
+    public List<DOI> findSimilarNotInState(Session session, String doi, List<Integer> excludedStatuses,
                                            boolean dsoNotNull)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
@@ -106,16 +106,16 @@ public class DOIDAOImpl extends AbstractHibernateDAO<DOI> implements DOIDAO {
             listToIncludeInAndPredicate.add(criteriaBuilder.isNotNull(doiRoot.get(DOI_.dSpaceObject)));
         }
         criteriaQuery.where(listToIncludeInAndPredicate.toArray(new Predicate[] {}));
-        return list(context, criteriaQuery, false, DOI.class, -1, -1);
+        return list(session, criteriaQuery, false, DOI.class, -1, -1);
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, DOI.class);
         Root<DOI> doiRoot = criteriaQuery.from(DOI.class);
         criteriaQuery.select(doiRoot);
         criteriaQuery.where(criteriaBuilder.equal(doiRoot.get(DOI_.dSpaceObject), dso));
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 }

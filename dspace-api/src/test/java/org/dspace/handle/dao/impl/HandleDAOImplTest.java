@@ -66,7 +66,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
-    private HandleDAO handleDAO = new DSpace().getServiceManager().getServicesByType(HandleDAO.class).get(0);
+    private final HandleDAO handleDAO = new DSpace().getServiceManager().getServicesByType(HandleDAO.class).get(0);
 
     private Community owningCommunity;
 
@@ -143,7 +143,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         String newPrefix = "987654321";
-        handleDAO.updateHandlesWithNewPrefix(context, newPrefix, HANDLE_PREFIX);
+        handleDAO.updateHandlesWithNewPrefix(context.getSession(), newPrefix, HANDLE_PREFIX);
         context.commit();
 
         assertEquals(newPrefix + "/" + SUFFIX_1, itemService.find(context, item1.getID()).getHandle());

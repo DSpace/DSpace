@@ -41,7 +41,7 @@ public class ChecksumResultServiceImpl implements ChecksumResultService {
      */
     @Override
     public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException {
-        return checksumResultDAO.findByCode(context, code);
+        return checksumResultDAO.findByCode(context.getSession(), code);
     }
 
     /**
@@ -53,6 +53,6 @@ public class ChecksumResultServiceImpl implements ChecksumResultService {
      */
     @Override
     public List<ChecksumResult> findAll(Context context) throws SQLException {
-        return checksumResultDAO.findAll(context, ChecksumResult.class);
+        return checksumResultDAO.findAll(context.getSession(), ChecksumResult.class);
     }
 }

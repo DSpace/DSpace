@@ -36,28 +36,28 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
 
     @Override
     public CollectionRole find(Context context, int id) throws SQLException {
-        return collectionRoleDAO.findByID(context, CollectionRole.class, id);
+        return collectionRoleDAO.findByID(context.getSession(), CollectionRole.class, id);
     }
 
     @Override
     public CollectionRole find(Context context, Collection collection, String role) throws SQLException {
-        return collectionRoleDAO.findByCollectionAndRole(context, collection, role);
+        return collectionRoleDAO.findByCollectionAndRole(context.getSession(), collection, role);
     }
 
     @Override
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {
-        return collectionRoleDAO.findByCollection(context, collection);
+        return collectionRoleDAO.findByCollection(context.getSession(), collection);
     }
 
     @Override
     public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException {
-        return collectionRoleDAO.findByGroup(context, group);
+        return collectionRoleDAO.findByGroup(context.getSession(), group);
     }
 
     @Override
     public CollectionRole create(Context context, Collection collection, String roleId, Group group)
         throws SQLException {
-        CollectionRole collectionRole = collectionRoleDAO.create(context, new CollectionRole());
+        CollectionRole collectionRole = collectionRoleDAO.create(context.getSession(), new CollectionRole());
         collectionRole.setCollection(collection);
         collectionRole.setRoleId(roleId);
         collectionRole.setGroup(group);
@@ -67,17 +67,17 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
 
     @Override
     public void update(Context context, CollectionRole collectionRole) throws SQLException {
-        collectionRoleDAO.save(context, collectionRole);
+        collectionRoleDAO.save(context.getSession(), collectionRole);
 
     }
 
     @Override
     public void delete(Context context, CollectionRole collectionRole) throws SQLException {
-        collectionRoleDAO.delete(context, collectionRole);
+        collectionRoleDAO.delete(context.getSession(), collectionRole);
     }
 
     @Override
     public void deleteByCollection(Context context, Collection collection) throws SQLException {
-        collectionRoleDAO.deleteByCollection(context, collection);
+        collectionRoleDAO.deleteByCollection(context.getSession(), collection);
     }
 }

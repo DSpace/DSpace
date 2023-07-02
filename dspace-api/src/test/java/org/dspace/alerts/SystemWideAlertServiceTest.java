@@ -115,7 +115,7 @@ public class SystemWideAlertServiceTest {
         systemWideAlertService.update(context, systemWideAlert);
 
         // Verify systemWideAlertDAO.save was invoked twice to confirm proper invocation of both impls of update()
-        Mockito.verify(systemWideAlertDAO, times(1)).save(context, systemWideAlert);
+        Mockito.verify(systemWideAlertDAO, times(1)).save(context.getSession(), systemWideAlert);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class SystemWideAlertServiceTest {
         systemWideAlertService.delete(context, systemWideAlert);
 
         // Verify systemWideAlertDAO.delete() ran once to confirm proper invocation of delete()
-        Mockito.verify(systemWideAlertDAO, times(1)).delete(context, systemWideAlert);
+        Mockito.verify(systemWideAlertDAO, times(1)).delete(context.getSession(), systemWideAlert);
     }
 
     @Test
@@ -138,7 +138,7 @@ public class SystemWideAlertServiceTest {
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
         systemWideAlertList.add(systemWideAlert);
-        when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
+        when(systemWideAlertDAO.findAllActive(context.getSession(), 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users can log in
         assertTrue("CanNonAdminUserLogin 0", systemWideAlertService.canNonAdminUserLogin(context));
@@ -152,7 +152,7 @@ public class SystemWideAlertServiceTest {
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
         systemWideAlertList.add(systemWideAlert);
-        when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
+        when(systemWideAlertDAO.findAllActive(context.getSession(), 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users can log in
         assertFalse("CanNonAdminUserLogin 1", systemWideAlertService.canNonAdminUserLogin(context));
@@ -174,7 +174,7 @@ public class SystemWideAlertServiceTest {
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
         systemWideAlertList.add(systemWideAlert);
-        when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
+        when(systemWideAlertDAO.findAllActive(context.getSession(), 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users can main session
         assertTrue("CanUserMaintainSession 1", systemWideAlertService.canUserMaintainSession(context, eperson));
@@ -191,7 +191,7 @@ public class SystemWideAlertServiceTest {
         // Mock DAO to return our defined systemWideAlertList
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
         systemWideAlertList.add(systemWideAlert);
-        when(systemWideAlertDAO.findAllActive(context, 1, 0)).thenReturn(systemWideAlertList);
+        when(systemWideAlertDAO.findAllActive(context.getSession(), 1, 0)).thenReturn(systemWideAlertList);
 
         // Assert the non admin users cannot main session
         assertFalse("CanUserMaintainSession 2", systemWideAlertService.canUserMaintainSession(context, eperson));

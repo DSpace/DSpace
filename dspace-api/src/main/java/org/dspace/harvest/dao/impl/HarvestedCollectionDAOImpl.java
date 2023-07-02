@@ -18,10 +18,10 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.HarvestedCollection_;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the HarvestedCollection object.
@@ -38,10 +38,10 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 
 
     @Override
-    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedDesc(Context context, int status, int type,
+    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedDesc(Session session, int status, int type,
                                                                                   int limit) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
@@ -50,13 +50,13 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         orderList.add(criteriaBuilder.desc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedAsc(Context context, int status, int type,
+    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedAsc(Session session, int status, int type,
                                                                                  int limit) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
@@ -65,42 +65,42 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         orderList.add(criteriaBuilder.asc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<HarvestedCollection> findByStatus(Session session, int status) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
         criteriaQuery
             .where(criteriaBuilder.equal(harvestedCollectionRoot.get(HarvestedCollection_.harvestStatus), status));
-        return list(context, criteriaQuery, false, HarvestedCollection.class, -1, -1);
+        return list(session, criteriaQuery, false, HarvestedCollection.class, -1, -1);
     }
 
     @Override
-    public HarvestedCollection findByCollection(Context context, Collection collection) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public HarvestedCollection findByCollection(Session session, Collection collection) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
         criteriaQuery
             .where(criteriaBuilder.equal(harvestedCollectionRoot.get(HarvestedCollection_.collection), collection));
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
 
     }
 
     @Override
     public List<HarvestedCollection>
-        findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(Context context,
+        findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(Session session,
                                                                            Date startTime,
                                                                            int minimalType,
                                                                            int[] statuses,
                                                                            int expirationStatus,
                                                                            Date expirationTime)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
@@ -143,24 +143,24 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         criteriaQuery.orderBy(orderList);
 
 
-        return list(context, criteriaQuery, false, HarvestedCollection.class, -1, -1);
+        return list(session, criteriaQuery, false, HarvestedCollection.class, -1, -1);
 
 
     }
 
     @Override
-    public int count(Context context) throws SQLException {
+    public int count(Session session) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
-        return count(context, criteriaQuery, criteriaBuilder, harvestedCollectionRoot);
+        return count(session, criteriaQuery, criteriaBuilder, harvestedCollectionRoot);
     }
 
-    protected CriteriaQuery getByStatusAndMinimalTypeCriteria(Context context, int status, int type)
+    protected CriteriaQuery getByStatusAndMinimalTypeCriteria(Session session, int status, int type)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, HarvestedCollection.class);
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);

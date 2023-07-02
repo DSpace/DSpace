@@ -22,7 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the MostRecentChecksum object.
- * This class is responsible for all business logic calls for the MostRecentChecksum object and is autowired by spring.
+ * This class is responsible for all business logic calls for the
+ * MostRecentChecksum object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -51,7 +52,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
 
     @Override
     public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException {
-        return mostRecentChecksumDAO.findByBitstream(context, bitstream);
+        return mostRecentChecksumDAO.findByBitstream(context.getSession(), bitstream);
     }
 
     /**
@@ -67,7 +68,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
     @Override
     public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Date startDate, Date endDate)
         throws SQLException {
-        return mostRecentChecksumDAO.findByNotProcessedInDateRange(context, startDate, endDate);
+        return mostRecentChecksumDAO.findByNotProcessedInDateRange(context.getSession(), startDate, endDate);
     }
 
     /**
@@ -84,7 +85,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
     @Override
     public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Date startDate, Date endDate,
                                                                   ChecksumResultCode resultCode) throws SQLException {
-        return mostRecentChecksumDAO.findByResultTypeInDateRange(context, startDate, endDate, resultCode);
+        return mostRecentChecksumDAO.findByResultTypeInDateRange(context.getSession(), startDate, endDate, resultCode);
     }
 
     /**
@@ -142,14 +143,14 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
                 checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
             }
             mostRecentChecksum.setChecksumResult(checksumResult);
-            mostRecentChecksumDAO.create(context, mostRecentChecksum);
-            mostRecentChecksumDAO.save(context, mostRecentChecksum);
+            mostRecentChecksumDAO.create(context.getSession(), mostRecentChecksum);
+            mostRecentChecksumDAO.save(context.getSession(), mostRecentChecksum);
         }
     }
 
     @Override
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException {
-        mostRecentChecksumDAO.deleteByBitstream(context, bitstream);
+        mostRecentChecksumDAO.deleteByBitstream(context.getSession(), bitstream);
     }
 
     /**
@@ -162,7 +163,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
      */
     @Override
     public MostRecentChecksum findOldestRecord(Context context) throws SQLException {
-        return mostRecentChecksumDAO.getOldestRecord(context);
+        return mostRecentChecksumDAO.getOldestRecord(context.getSession());
     }
 
     /**
@@ -176,16 +177,16 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
      */
     @Override
     public MostRecentChecksum findOldestRecord(Context context, Date lessThanDate) throws SQLException {
-        return mostRecentChecksumDAO.getOldestRecord(context, lessThanDate);
+        return mostRecentChecksumDAO.getOldestRecord(context.getSession(), lessThanDate);
     }
 
     @Override
     public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException {
-        return mostRecentChecksumDAO.findNotInHistory(context);
+        return mostRecentChecksumDAO.findNotInHistory(context.getSession());
     }
 
     @Override
     public void update(Context context, MostRecentChecksum mostRecentChecksum) throws SQLException {
-        mostRecentChecksumDAO.save(context, mostRecentChecksum);
+        mostRecentChecksumDAO.save(context.getSession(), mostRecentChecksum);
     }
 }

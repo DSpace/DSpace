@@ -116,7 +116,7 @@ public class ChecksumHistoryDAOImplTest
         // Test!
         ChecksumHistoryDAOImpl instance = new ChecksumHistoryDAOImpl();
         int expResult = 1;
-        int result = instance.deleteByDateAndCode(context, retentionDate,
+        int result = instance.deleteByDateAndCode(context.getSession(), retentionDate,
                                                   resultCode);
         assertEquals(expResult, result);
 

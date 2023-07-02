@@ -49,13 +49,13 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     @Override
     public List<PoolTask> findAll(Context context) throws SQLException {
-        return poolTaskDAO.findAll(context, PoolTask.class);
+        return poolTaskDAO.findAll(context.getSession(), PoolTask.class);
     }
 
     @Override
     public List<PoolTask> findByEperson(Context context, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException {
-        List<PoolTask> result = poolTaskDAO.findByEPerson(context, ePerson);
+        List<PoolTask> result = poolTaskDAO.findByEPerson(context.getSession(), ePerson);
         //Get all PoolTasks for groups of which this eperson is a member
         List<Group> groups = groupService.allMemberGroups(context, ePerson);
         result.addAll(findByGroups(context, ePerson, groups));
@@ -63,9 +63,9 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     protected List<PoolTask> findByGroups(Context context, EPerson ePerson, List<Group> groups) throws SQLException {
-        List<PoolTask> result = new ArrayList<PoolTask>();
+        List<PoolTask> result = new ArrayList<>();
         for (Group group : groups) {
-            List<PoolTask> groupTasks = poolTaskDAO.findByGroup(context, group);
+            List<PoolTask> groupTasks = poolTaskDAO.findByGroup(context.getSession(), group);
             for (PoolTask poolTask : groupTasks) {
                 XmlWorkflowItem workflowItem = poolTask.getWorkflowItem();
                 if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) == null) {
@@ -79,13 +79,13 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     @Override
     public List<PoolTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return poolTaskDAO.findByWorkflowItem(context, workflowItem);
+        return poolTaskDAO.findByWorkflowItem(context.getSession(), workflowItem);
     }
 
     @Override
     public PoolTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException {
-        PoolTask poolTask = poolTaskDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
+        PoolTask poolTask = poolTaskDAO.findByWorkflowItemAndEPerson(context.getSession(), workflowItem, ePerson);
 
         //If there is a pooltask for this eperson, return it
         if (poolTask != null) {
@@ -101,7 +101,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
                 //for this workflow item
                 Set<Group> groups = groupService.allMemberGroupsSet(context, ePerson);
                 for (Group group : groups) {
-                    poolTask = poolTaskDAO.findByWorkflowItemAndGroup(context, group, workflowItem);
+                    poolTask = poolTaskDAO.findByWorkflowItemAndGroup(context.getSession(), group, workflowItem);
                     if (poolTask != null) {
                         return poolTask;
                     }
@@ -140,22 +140,22 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
     @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        return poolTaskDAO.findByEPerson(context, ePerson);
+        return poolTaskDAO.findByEPerson(context.getSession(), ePerson);
     }
 
     @Override
     public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
-        return poolTaskDAO.findByGroup(context, group);
+        return poolTaskDAO.findByGroup(context.getSession(), group);
     }
 
     @Override
     public PoolTask create(Context context) throws SQLException, AuthorizeException {
-        return poolTaskDAO.create(context, new PoolTask());
+        return poolTaskDAO.create(context.getSession(), new PoolTask());
     }
 
     @Override
     public PoolTask find(Context context, int id) throws SQLException {
-        return poolTaskDAO.findByID(context, PoolTask.class, id);
+        return poolTaskDAO.findByID(context.getSession(), PoolTask.class, id);
     }
 
     @Override
@@ -167,13 +167,13 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     public void update(Context context, List<PoolTask> poolTasks) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(poolTasks)) {
             for (PoolTask poolTask : poolTasks) {
-                poolTaskDAO.save(context, poolTask);
+                poolTaskDAO.save(context.getSession(), poolTask);
             }
         }
     }
 
     @Override
     public void delete(Context context, PoolTask poolTask) throws SQLException, AuthorizeException {
-        poolTaskDAO.delete(context, poolTask);
+        poolTaskDAO.delete(context.getSession(), poolTask);
     }
 }

@@ -103,7 +103,7 @@ public class RelationshipTypeTest {
         mockedList.add(secondRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findAll(context, RelationshipType.class, -1, -1)).thenReturn(mockedList);
+        when(relationshipTypeDAO.findAll(context.getSession(), RelationshipType.class, -1, -1)).thenReturn(mockedList);
 
         // Invoke findAll()
         List<RelationshipType> foundRelationshipTypes = relationshipTypeService.findAll(context);
@@ -120,7 +120,8 @@ public class RelationshipTypeTest {
         mockedList.add(firstRelationshipType);
 
         // Mock DAO to return our mockedList
-        when(relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, "mock", -1, -1)).thenReturn(mockedList);
+        when(relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context.getSession(),
+                "mock", -1, -1)).thenReturn(mockedList);
 
         // Invoke findByLeftwardOrRightwardTypeName()
         List<RelationshipType> found = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "mock");

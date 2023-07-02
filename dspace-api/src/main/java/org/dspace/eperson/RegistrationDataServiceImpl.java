@@ -35,29 +35,29 @@ public class RegistrationDataServiceImpl implements RegistrationDataService {
 
     @Override
     public RegistrationData create(Context context) throws SQLException, AuthorizeException {
-        return registrationDataDAO.create(context, new RegistrationData());
+        return registrationDataDAO.create(context.getSession(), new RegistrationData());
     }
 
 
     @Override
     public RegistrationData findByToken(Context context, String token) throws SQLException {
-        return registrationDataDAO.findByToken(context, token);
+        return registrationDataDAO.findByToken(context.getSession(), token);
     }
 
     @Override
     public RegistrationData findByEmail(Context context, String email) throws SQLException {
-        return registrationDataDAO.findByEmail(context, email);
+        return registrationDataDAO.findByEmail(context.getSession(), email);
     }
 
     @Override
     public void deleteByToken(Context context, String token) throws SQLException {
-        registrationDataDAO.deleteByToken(context, token);
+        registrationDataDAO.deleteByToken(context.getSession(), token);
 
     }
 
     @Override
     public RegistrationData find(Context context, int id) throws SQLException {
-        return registrationDataDAO.findByID(context, RegistrationData.class, id);
+        return registrationDataDAO.findByID(context.getSession(), RegistrationData.class, id);
     }
 
     @Override
@@ -70,13 +70,13 @@ public class RegistrationDataServiceImpl implements RegistrationDataService {
         throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(registrationDataRecords)) {
             for (RegistrationData registrationData : registrationDataRecords) {
-                registrationDataDAO.save(context, registrationData);
+                registrationDataDAO.save(context.getSession(), registrationData);
             }
         }
     }
 
     @Override
     public void delete(Context context, RegistrationData registrationData) throws SQLException, AuthorizeException {
-        registrationDataDAO.delete(context, registrationData);
+        registrationDataDAO.delete(context.getSession(), registrationData);
     }
 }

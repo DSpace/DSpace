@@ -138,14 +138,14 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String createHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        Handle handle = handleDAO.create(context, new Handle());
+        Handle handle = handleDAO.create(context.getSession(), new Handle());
         String handleId = createId(context);
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
         dso.addHandle(handle);
         handle.setResourceTypeId(dso.getType());
-        handleDAO.save(context, handle);
+        handleDAO.save(context.getSession(), handle);
 
         log.debug("Created new handle for {} (ID={}) {}",
             () -> Constants.typeText[dso.getType()],
@@ -192,14 +192,14 @@ public class HandleServiceImpl implements HandleService {
         } else if (handle == null) {
             //if handle not found, create it
             //handle not found in DB table -- create a new table entry
-            handle = handleDAO.create(context, new Handle());
+            handle = handleDAO.create(context.getSession(), new Handle());
             handle.setHandle(suppliedHandle);
         }
 
         handle.setResourceTypeId(dso.getType());
         handle.setDSpaceObject(dso);
         dso.addHandle(handle);
-        handleDAO.save(context, handle);
+        handleDAO.save(context.getSession(), handle);
 
         log.debug("Created new handle for {} (ID={}) {}",
             () -> Constants.typeText[dso.getType()],
@@ -224,7 +224,7 @@ public class HandleServiceImpl implements HandleService {
                 handle.setDSpaceObject(null);
 
 
-                handleDAO.save(context, handle);
+                handleDAO.save(context.getSession(), handle);
 
                 log.debug("Unbound Handle {} from object {} id={}",
                     () -> handle.getHandle(),
@@ -279,7 +279,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public List<String> getHandlesForPrefix(Context context, String prefix)
         throws SQLException {
-        List<Handle> handles = handleDAO.findByPrefix(context, prefix);
+        List<Handle> handles = handleDAO.findByPrefix(context.getSession(), prefix);
         List<String> handleStrings = new ArrayList<>(handles.size());
         for (Handle handle : handles) {
             handleStrings.add(handle.getHandle());
@@ -299,12 +299,12 @@ public class HandleServiceImpl implements HandleService {
 
     @Override
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException {
-        return handleDAO.countHandlesByPrefix(context, prefix);
+        return handleDAO.countHandlesByPrefix(context.getSession(), prefix);
     }
 
     @Override
     public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException {
-        return handleDAO.updateHandlesWithNewPrefix(context, newPrefix, oldPrefix);
+        return handleDAO.updateHandlesWithNewPrefix(context.getSession(), newPrefix, oldPrefix);
     }
 
     @Override
@@ -321,7 +321,7 @@ public class HandleServiceImpl implements HandleService {
             dbHandle.setDSpaceObject(newOwner);
             dbHandle.setResourceTypeId(newOwner.getType());
             newOwner.getHandles().add(0, dbHandle);
-            handleDAO.save(context, dbHandle);
+            handleDAO.save(context.getSession(), dbHandle);
         }
 
     }
@@ -343,7 +343,7 @@ public class HandleServiceImpl implements HandleService {
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return handleDAO.findByHandle(context, handle);
+        return handleDAO.findByHandle(context.getSession(), handle);
     }
 
     /**
@@ -358,14 +358,14 @@ public class HandleServiceImpl implements HandleService {
         String handlePrefix = getPrefix();
 
         // Get next available suffix (as a Long, since DSpace uses an incrementing sequence)
-        Long handleSuffix = handleDAO.getNextHandleSuffix(context);
+        Long handleSuffix = handleDAO.getNextHandleSuffix(context.getSession());
 
         return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return handleDAO.countRows(context);
+        return handleDAO.countRows(context.getSession());
     }
 
     @Override

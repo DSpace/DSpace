@@ -46,18 +46,18 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
 
     @Override
     public SupervisionOrder create(Context context) throws SQLException, AuthorizeException {
-        return supervisionDao.create(context, new SupervisionOrder());
+        return supervisionDao.create(context.getSession(), new SupervisionOrder());
     }
 
     @Override
     public SupervisionOrder find(Context context, int id) throws SQLException {
-        return supervisionDao.findByID(context, SupervisionOrder.class, id);
+        return supervisionDao.findByID(context.getSession(), SupervisionOrder.class, id);
     }
 
     @Override
     public void update(Context context, SupervisionOrder supervisionOrder)
         throws SQLException, AuthorizeException {
-        supervisionDao.save(context, supervisionOrder);
+        supervisionDao.save(context.getSession(), supervisionOrder);
     }
 
     @Override
@@ -65,14 +65,14 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
         throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(supervisionOrders)) {
             for (SupervisionOrder supervisionOrder : supervisionOrders) {
-                supervisionDao.save(context, supervisionOrder);
+                supervisionDao.save(context.getSession(), supervisionOrder);
             }
         }
     }
 
     @Override
     public void delete(Context context, SupervisionOrder supervisionOrder) throws SQLException, AuthorizeException {
-        supervisionDao.delete(context, supervisionOrder);
+        supervisionDao.delete(context.getSession(), supervisionOrder);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
         SupervisionOrder supervisionOrder = new SupervisionOrder();
         supervisionOrder.setItem(item);
         supervisionOrder.setGroup(group);
-        SupervisionOrder supOrder = supervisionDao.create(context, supervisionOrder);
+        SupervisionOrder supOrder = supervisionDao.create(context.getSession(), supervisionOrder);
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
             itemService.getIdentifiers(context, item)));
         return supOrder;
@@ -88,17 +88,17 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
 
     @Override
     public List<SupervisionOrder> findAll(Context context) throws SQLException {
-        return supervisionDao.findAll(context, SupervisionOrder.class);
+        return supervisionDao.findAll(context.getSession(), SupervisionOrder.class);
     }
 
     @Override
     public List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException {
-        return supervisionDao.findByItem(context, item);
+        return supervisionDao.findByItem(context.getSession(), item);
     }
 
     @Override
     public SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException {
-        return supervisionDao.findByItemAndGroup(context, item, group);
+        return supervisionDao.findByItemAndGroup(context.getSession(), item, group);
     }
 
     @Override

@@ -20,10 +20,10 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.handle.Handle;
 import org.dspace.handle.Handle_;
 import org.dspace.handle.dao.HandleDAO;
+import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DatabaseMetaDataDialectResolutionInfoAdapter;
@@ -46,11 +46,11 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     }
 
     @Override
-    public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
+    public List<Handle> getHandlesByDSpaceObject(Session session, DSpaceObject dso) throws SQLException {
         if (dso == null) {
             return Collections.emptyList();
         } else {
-            Query query = createQuery(context,
+            Query query = createQuery(session,
                                       "SELECT h " +
                                           "FROM Handle h " +
                                           "LEFT JOIN FETCH h.dso " +
@@ -64,8 +64,8 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     }
 
     @Override
-    public Handle findByHandle(Context context, String handle) throws SQLException {
-        Query query = createQuery(context,
+    public Handle findByHandle(Session session, String handle) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT h " +
                                       "FROM Handle h " +
                                       "LEFT JOIN FETCH h.dso " +
@@ -78,34 +78,34 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     }
 
     @Override
-    public List<Handle> findByPrefix(Context context, String prefix) throws SQLException {
+    public List<Handle> findByPrefix(Session session, String prefix) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Handle.class);
         Root<Handle> handleRoot = criteriaQuery.from(Handle.class);
         criteriaQuery.select(handleRoot);
         criteriaQuery.where(criteriaBuilder.like(handleRoot.get(Handle_.handle), prefix + "%"));
-        return list(context, criteriaQuery, false, Handle.class, -1, -1);
+        return list(session, criteriaQuery, false, Handle.class, -1, -1);
     }
 
     @Override
-    public long countHandlesByPrefix(Context context, String prefix) throws SQLException {
+    public long countHandlesByPrefix(Session session, String prefix) throws SQLException {
 
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<Handle> handleRoot = criteriaQuery.from(Handle.class);
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Handle.class)));
         criteriaQuery.where(criteriaBuilder.like(handleRoot.get(Handle_.handle), prefix + "%"));
-        return countLong(context, criteriaQuery, criteriaBuilder, handleRoot);
+        return countLong(session, criteriaQuery, criteriaBuilder, handleRoot);
     }
 
     @Override
-    public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException {
+    public int updateHandlesWithNewPrefix(Session session, String newPrefix, String oldPrefix) throws SQLException {
         String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, :oldPrefixLength + 2)) " +
             "WHERE handle like concat(:oldPrefix,'%')";
-        Query query = createQuery(context, hql);
+        Query query = createQuery(session, hql);
         query.setParameter("newPrefix", newPrefix);
         query.setParameter("oldPrefixLength", oldPrefix.length());
         query.setParameter("oldPrefix", oldPrefix);
@@ -113,18 +113,18 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Handle"));
+    public int countRows(Session session) throws SQLException {
+        return count(createQuery(session, "SELECT count(*) FROM Handle"));
     }
 
     /**
      * Return next available value of Handle suffix (based on DB sequence).
-     * @param context Current DSpace Context
+     * @param session the current request's database context.
      * @return next available Handle suffix (as a Long)
      * @throws SQLException if database error or sequence doesn't exist
      */
     @Override
-    public Long getNextHandleSuffix(Context context) throws SQLException {
+    public Long getNextHandleSuffix(Session session) throws SQLException {
         // Create a new Hibernate ReturningWork, which will return the
         // result of the next value in the Handle Sequence.
         ReturningWork<Long> nextValReturningWork = new ReturningWork<Long>() {
@@ -153,6 +153,6 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
         };
 
         // Run our work, returning the next value in the sequence (see 'nextValReturningWork' above)
-        return getHibernateSession(context).doReturningWork(nextValReturningWork);
+        return session.doReturningWork(nextValReturningWork);
     }
 }

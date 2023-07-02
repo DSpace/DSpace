@@ -23,7 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the BitstreamFormat object.
- * This class is responsible for all business logic calls for the BitstreamFormat object and is autowired by spring.
+ * This class is responsible for all business logic calls for the
+ * BitstreamFormat object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -33,7 +34,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormat.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected BitstreamFormatDAO bitstreamFormatDAO;
@@ -64,7 +65,8 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     @Override
     public BitstreamFormat find(Context context, int id)
         throws SQLException {
-        BitstreamFormat bitstreamFormat = bitstreamFormatDAO.findByID(context, BitstreamFormat.class, id);
+        BitstreamFormat bitstreamFormat
+                = bitstreamFormatDAO.findByID(context.getSession(), BitstreamFormat.class, id);
 
         if (bitstreamFormat == null) {
             if (log.isDebugEnabled()) {
@@ -87,12 +89,12 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public BitstreamFormat findByMIMEType(Context context, String mimeType) throws SQLException {
-        return bitstreamFormatDAO.findByMIMEType(context, mimeType, false);
+        return bitstreamFormatDAO.findByMIMEType(context.getSession(), mimeType, false);
     }
 
     @Override
     public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException {
-        return bitstreamFormatDAO.findByShortDescription(context, desc);
+        return bitstreamFormatDAO.findByShortDescription(context.getSession(), desc);
     }
 
     @Override
@@ -109,12 +111,12 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public List<BitstreamFormat> findAll(Context context) throws SQLException {
-        return bitstreamFormatDAO.findAll(context, BitstreamFormat.class);
+        return bitstreamFormatDAO.findAll(context.getSession(), BitstreamFormat.class);
     }
 
     @Override
     public List<BitstreamFormat> findNonInternal(Context context) throws SQLException {
-        return bitstreamFormatDAO.findNonInternal(context);
+        return bitstreamFormatDAO.findNonInternal(context.getSession());
     }
 
     @Override
@@ -126,8 +128,8 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         }
 
         // Create a table row
-        BitstreamFormat bitstreamFormat = bitstreamFormatDAO.create(context, new BitstreamFormat());
-
+        BitstreamFormat bitstreamFormat
+                = bitstreamFormatDAO.create(context.getSession(), new BitstreamFormat());
 
         log.info(LogHelper.getHeader(context, "create_bitstream_format",
                                       "bitstream_format_id="
@@ -192,7 +194,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
                 log.info(LogHelper.getHeader(context, "update_bitstream_format",
                                               "bitstream_format_id=" + bitstreamFormat.getID()));
 
-                bitstreamFormatDAO.save(context, bitstreamFormat);
+                bitstreamFormatDAO.save(context.getSession(), bitstreamFormat);
             }
         }
     }
@@ -213,10 +215,11 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         }
 
         // Set bitstreams with this format to "unknown"
-        int numberChanged = bitstreamFormatDAO.updateRemovedBitstreamFormat(context, bitstreamFormat, unknown);
+        int numberChanged = bitstreamFormatDAO.updateRemovedBitstreamFormat(context.getSession(),
+                bitstreamFormat, unknown);
 
         // Delete this format from database
-        bitstreamFormatDAO.delete(context, bitstreamFormat);
+        bitstreamFormatDAO.delete(context.getSession(), bitstreamFormat);
 
         log.info(LogHelper.getHeader(context, "delete_bitstream_format",
                                       "bitstream_format_id=" + bitstreamFormat.getID() + ",bitstreams_changed="
@@ -263,7 +266,8 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
             return null;
         }
 
-        List<BitstreamFormat> bitstreamFormats = bitstreamFormatDAO.findByFileExtension(context, extension);
+        List<BitstreamFormat> bitstreamFormats
+                = bitstreamFormatDAO.findByFileExtension(context.getSession(), extension);
 
         if (CollectionUtils.isNotEmpty(bitstreamFormats)) {
             return bitstreamFormats.get(0);

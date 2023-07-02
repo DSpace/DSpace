@@ -15,7 +15,7 @@ import javax.persistence.criteria.Root;
 import org.dspace.content.Site;
 import org.dspace.content.dao.SiteDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Site object.
@@ -30,11 +30,11 @@ public class SiteDAOImpl extends AbstractHibernateDAO<Site> implements SiteDAO {
     }
 
     @Override
-    public Site findSite(Context context) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public Site findSite(Session session) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Site.class);
         Root<Site> siteRoot = criteriaQuery.from(Site.class);
         criteriaQuery.select(siteRoot);
-        return uniqueResult(context, criteriaQuery, true, Site.class);
+        return uniqueResult(session, criteriaQuery, true, Site.class);
     }
 }

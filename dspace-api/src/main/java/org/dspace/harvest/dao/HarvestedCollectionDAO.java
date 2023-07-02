@@ -12,9 +12,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.harvest.HarvestedCollection;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the HarvestedCollection object.
@@ -26,17 +26,17 @@ import org.dspace.harvest.HarvestedCollection;
  */
 public interface HarvestedCollectionDAO extends GenericDAO<HarvestedCollection> {
 
-    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedDesc(Context context, int status, int type,
+    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedDesc(Session session, int status, int type,
                                                                                   int limit) throws SQLException;
 
-    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedAsc(Context context, int status, int type,
+    public HarvestedCollection findByStatusAndMinimalTypeOrderByLastHarvestedAsc(Session session, int status, int type,
                                                                                  int limit) throws SQLException;
 
-    public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException;
+    public List<HarvestedCollection> findByStatus(Session session, int status) throws SQLException;
 
-    public HarvestedCollection findByCollection(Context context, Collection collection) throws SQLException;
+    public HarvestedCollection findByCollection(Session session, Collection collection) throws SQLException;
 
-    List<HarvestedCollection> findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(Context context,
+    List<HarvestedCollection> findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(Session session,
                                                                                                 Date startTime,
                                                                                                 int minimalType,
                                                                                                 int[] statuses,
@@ -44,6 +44,6 @@ public interface HarvestedCollectionDAO extends GenericDAO<HarvestedCollection> 
                                                                                                 Date expirationTime)
         throws SQLException;
 
-    public int count(Context context) throws SQLException;
+    public int count(Session session) throws SQLException;
 
 }

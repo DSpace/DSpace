@@ -91,7 +91,7 @@ public class ProcessServiceImpl implements ProcessService {
                 process.setGroups(new ArrayList<>(specialGroupsSet));
             });
 
-        Process createdProcess = processDAO.create(context, process);
+        Process createdProcess = processDAO.create(context.getSession(), process);
         log.info(LogHelper.getHeader(context, "process_create",
                                       "Process has been created for eperson with email " + ePerson.getEmail()
                                           + " with ID " + createdProcess.getID() + " and scriptName " +
@@ -101,22 +101,22 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public Process find(Context context, int processId) throws SQLException {
-        return processDAO.findByID(context, Process.class, processId);
+        return processDAO.findByID(context.getSession(), Process.class, processId);
     }
 
     @Override
     public List<Process> findAll(Context context) throws SQLException {
-        return processDAO.findAll(context, Process.class);
+        return processDAO.findAll(context.getSession(), Process.class);
     }
 
     @Override
     public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
-        return processDAO.findAll(context, limit, offset);
+        return processDAO.findAll(context.getSession(), limit, offset);
     }
 
     @Override
     public List<Process> findAllSortByScript(Context context) throws SQLException {
-        return processDAO.findAllSortByScript(context);
+        return processDAO.findAllSortByScript(context.getSession());
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public List<Process> findByUser(Context context, EPerson eperson, int limit, int offset) throws SQLException {
-        return processDAO.findByUser(context, eperson, limit, offset);
+        return processDAO.findByUser(context.getSession(), eperson, limit, offset);
     }
 
     @Override
@@ -191,14 +191,14 @@ public class ProcessServiceImpl implements ProcessService {
         for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
             bitstreamService.delete(context, bitstream);
         }
-        processDAO.delete(context, process);
+        processDAO.delete(context.getSession(), process);
         log.info(LogHelper.getHeader(context, "process_delete", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has been deleted"));
     }
 
     @Override
     public void update(Context context, Process process) throws SQLException {
-        processDAO.save(context, process);
+        processDAO.save(context.getSession(), process);
     }
 
     @Override
@@ -252,8 +252,9 @@ public class ProcessServiceImpl implements ProcessService {
         return process.getBitstreams();
     }
 
+    @Override
     public int countTotal(Context context) throws SQLException {
-        return processDAO.countRows(context);
+        return processDAO.countRows(context.getSession());
     }
 
     @Override
@@ -273,13 +274,13 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer,
                                 int limit, int offset) throws SQLException {
-        return processDAO.search(context, processQueryParameterContainer, limit, offset);
+        return processDAO.search(context.getSession(), processQueryParameterContainer, limit, offset);
     }
 
     @Override
     public int countSearch(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
         throws SQLException {
-        return processDAO.countTotalWithParameters(context, processQueryParameterContainer);
+        return processDAO.countTotalWithParameters(context.getSession(), processQueryParameterContainer);
     }
 
 
@@ -313,12 +314,12 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
         Date date) throws SQLException {
-        return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
+        return this.processDAO.findByStatusAndCreationTimeOlderThan(context.getSession(), statuses, date);
     }
 
     @Override
     public int countByUser(Context context, EPerson user) throws SQLException {
-        return processDAO.countByUser(context, user);
+        return processDAO.countByUser(context.getSession(), user);
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {

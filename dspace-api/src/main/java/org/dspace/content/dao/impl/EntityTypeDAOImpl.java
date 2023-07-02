@@ -19,7 +19,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.EntityType_;
 import org.dspace.content.dao.EntityTypeDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for
@@ -33,37 +33,36 @@ import org.dspace.core.Context;
 public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implements EntityTypeDAO {
 
     @Override
-    public EntityType findByEntityType(Context context, String entityType) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public EntityType findByEntityType(Session session, String entityType) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
         Root<EntityType> entityTypeRoot = criteriaQuery.from(EntityType.class);
         criteriaQuery.select(entityTypeRoot);
         criteriaQuery.where(criteriaBuilder.equal(criteriaBuilder.upper(entityTypeRoot.get(EntityType_.label)),
                                                   entityType.toUpperCase()));
-        return uniqueResult(context, criteriaQuery, true, EntityType.class);
+        return uniqueResult(session, criteriaQuery, true, EntityType.class);
     }
 
     @Override
-    public List<EntityType> getEntityTypesByNames(Context context, List<String> names, Integer limit, Integer offset)
+    public List<EntityType> getEntityTypesByNames(Session session, List<String> names, Integer limit, Integer offset)
             throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
         Root<EntityType> entityTypeRoot = criteriaQuery.from(EntityType.class);
         List<Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(entityTypeRoot.get(EntityType_.label)));
         criteriaQuery.select(entityTypeRoot).orderBy(orderList);
         criteriaQuery.where(entityTypeRoot.get(EntityType_.LABEL).in(names));
-        return list(context, criteriaQuery, false, EntityType.class, limit, offset);
+        return list(session, criteriaQuery, false, EntityType.class, limit, offset);
     }
 
     @Override
-    public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public int countEntityTypesByNames(Session session, List<String> names) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
         Root<EntityType> entityTypeRoot = criteriaQuery.from(EntityType.class);
         criteriaQuery.select(entityTypeRoot);
         criteriaQuery.where(entityTypeRoot.get(EntityType_.LABEL).in(names));
-        return count(context, criteriaQuery, criteriaBuilder, entityTypeRoot);
+        return count(session, criteriaQuery, criteriaBuilder, entityTypeRoot);
     }
-
 }

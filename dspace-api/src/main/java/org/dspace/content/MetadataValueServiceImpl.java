@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MetadataValueServiceImpl implements MetadataValueService {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataValueServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -54,7 +54,7 @@ public class MetadataValueServiceImpl implements MetadataValueService {
         dso.addMetadata(metadataValue);
 //An update here isn't needed, this is persited upon the merge of the owning object
 //        metadataValueDAO.save(context, metadataValue);
-        metadataValue = metadataValueDAO.create(context, metadataValue);
+        metadataValue = metadataValueDAO.create(context.getSession(), metadataValue);
         log.info(LogHelper.getHeader(context, "add_metadatavalue",
                                      "metadata_value_id=" + metadataValue.getID()));
 
@@ -64,24 +64,24 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     @Override
     public MetadataValue find(Context context, int valueId) throws IOException, SQLException {
         // Grab row from DB
-        return metadataValueDAO.findByID(context, MetadataValue.class, valueId);
+        return metadataValueDAO.findByID(context.getSession(), MetadataValue.class, valueId);
     }
 
     @Override
     public List<MetadataValue> findByField(Context context, MetadataField metadataField)
         throws IOException, SQLException {
-        return metadataValueDAO.findByField(context, metadataField);
+        return metadataValueDAO.findByField(context.getSession(), metadataField);
     }
 
     @Override
     public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
             throws SQLException {
-        return metadataValueDAO.findItemValuesByFieldAndValue(context, metadataField, value);
+        return metadataValueDAO.findItemValuesByFieldAndValue(context.getSession(), metadataField, value);
     }
 
     @Override
     public void update(Context context, MetadataValue metadataValue) throws SQLException {
-        metadataValueDAO.save(context, metadataValue);
+        metadataValueDAO.save(context.getSession(), metadataValue);
         log.info(LogHelper.getHeader(context, "update_metadatavalue",
                                       "metadata_value_id=" + metadataValue.getID()));
 
@@ -106,28 +106,28 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     public void delete(Context context, MetadataValue metadataValue) throws SQLException {
         log.info(LogHelper.getHeader(context, "delete_metadata_value",
                                       " metadata_value_id=" + metadataValue.getID()));
-        metadataValueDAO.delete(context, metadataValue);
+        metadataValueDAO.delete(context.getSession(), metadataValue);
     }
 
     @Override
     public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
-        return metadataValueDAO.findByValueLike(context, value);
+        return metadataValueDAO.findByValueLike(context.getSession(), value);
     }
 
     @Override
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException {
-        metadataValueDAO.deleteByMetadataField(context, metadataField);
+        metadataValueDAO.deleteByMetadataField(context.getSession(), metadataField);
     }
 
     @Override
     public MetadataValue getMinimum(Context context, int metadataFieldId)
         throws SQLException {
-        return metadataValueDAO.getMinimum(context,
+        return metadataValueDAO.getMinimum(context.getSession(),
                                            metadataFieldId);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return metadataValueDAO.countRows(context);
+        return metadataValueDAO.countRows(context.getSession());
     }
 }

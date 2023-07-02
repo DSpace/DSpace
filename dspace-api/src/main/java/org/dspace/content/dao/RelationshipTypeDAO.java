@@ -12,8 +12,8 @@ import java.util.List;
 
 import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.hibernate.Session;
 
 /**
  * Database Access Object Interface class for the RelationshipType object
@@ -26,7 +26,7 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
     /**
      * This method is used to retrieve the RelationshipType object that has the same
      * leftType, rightType, leftwardType and rightwardType as given in the parameters
-     * @param context           The relevant DSpace context
+     * @param session           The current request's database context.
      * @param leftType          The leftType EntityType object to be matched in the query
      * @param rightType         The rightType EntityType object to be matched in the query
      * @param leftwardType     The leftwardType String to be matched in the query
@@ -34,7 +34,7 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      * @return                  The RelationshipType object that matches all the given parameters
      * @throws SQLException If something goes wrong
      */
-    RelationshipType findbyTypesAndTypeName(Context context, EntityType leftType,EntityType rightType,
+    RelationshipType findbyTypesAndTypeName(Session session, EntityType leftType,EntityType rightType,
                                                                               String leftwardType,
                                                                               String rightwardType)
                                                                                     throws SQLException;
@@ -42,43 +42,43 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
     /**
      * This method will return a list of RelationshipType objects for which the given label is equal to
      * either the leftwardType or rightwardType.
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @param type     The label that will be used to check on
      * @return A list of RelationshipType objects that have the given label as either the leftwardType
      *         or rightwardType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Session session, String type) throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given label is equal to
      * either the leftLabel or rightLabel.
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @param type     The label that will be used to check on
      * @param limit     paging limit
      * @param offset    paging offset
      * @return A list of RelationshipType objects that have the given label as either the leftLabel or rightLabel
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String type, Integer limit,
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Session session, String type, Integer limit,
                                                              Integer offset)
             throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal
      * to the leftType or rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object that will be used to check on
      * @return  The list of RelationshipType objects that have the given EntityType object
      *          as either a leftType or rightType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType) throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal
      * to the leftType or rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object that will be used to check on
      * @param limit         paging limit
      * @param offset        paging offset
@@ -86,13 +86,13 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      *          as either a leftType or rightType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType, Integer limit, Integer offset)
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType, Integer limit, Integer offset)
             throws SQLException;
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal
      * to the leftType or rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object that will be used to check on
      * @param isLeft        Boolean value used to filter by left_type or right_type. If true left_type results only
      *                      else right_type results.
@@ -100,14 +100,14 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      *          as either a leftType or rightType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context,  EntityType entityType, Boolean isLeft)
+    List<RelationshipType> findByEntityType(Session session,  EntityType entityType, Boolean isLeft)
             throws SQLException;
 
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal
      * to the leftType or rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object that will be used to check on
      * @param isLeft        Boolean value used to filter by left_type or right_type. If true left_type results only
      *                      else right_type results.
@@ -117,19 +117,19 @@ public interface RelationshipTypeDAO extends GenericDAO<RelationshipType> {
      *          as either a leftType or rightType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType, Boolean isLeft,
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType, Boolean isLeft,
                                             Integer limit, Integer offset)
             throws SQLException;
 
     /**
      * Count all RelationshipType objects for which the given EntityType
      * is equal to either the leftType or the rightType
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        DSpace context object
      * @param entityType     The EntityType object used to check the leftType and rightType properties
      * @return               Total RelationshipType objects
      * @throws SQLException  If database error
      */
-    public int countByEntityType(Context context, EntityType entityType) throws SQLException;
+    public int countByEntityType(Session session, EntityType entityType) throws SQLException;
 
 }

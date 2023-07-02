@@ -10,12 +10,12 @@ package org.dspace.xmlworkflow.storedcomponents.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the PoolTask object.
@@ -27,15 +27,15 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface PoolTaskDAO extends GenericDAO<PoolTask> {
 
-    public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException;
+    public List<PoolTask> findByEPerson(Session session, EPerson ePerson) throws SQLException;
 
-    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException;
+    public List<PoolTask> findByGroup(Session session, Group group) throws SQLException;
 
-    public List<PoolTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public List<PoolTask> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public PoolTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public PoolTask findByWorkflowItemAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
-    public PoolTask findByWorkflowItemAndGroup(Context context, Group group, XmlWorkflowItem workflowItem)
+    public PoolTask findByWorkflowItemAndGroup(Session session, Group group, XmlWorkflowItem workflowItem)
         throws SQLException;
 }

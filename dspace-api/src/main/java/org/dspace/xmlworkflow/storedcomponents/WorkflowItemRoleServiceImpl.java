@@ -38,13 +38,13 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
 
     @Override
     public List<WorkflowItemRole> find(Context context, XmlWorkflowItem workflowItem, String role) throws SQLException {
-        return workflowItemRoleDAO.findByWorkflowItemAndRole(context, workflowItem, role);
+        return workflowItemRoleDAO.findByWorkflowItemAndRole(context.getSession(), workflowItem, role);
     }
 
     @Override
     public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException {
-        return workflowItemRoleDAO.findByWorkflowItem(context, xmlWorkflowItem);
+        return workflowItemRoleDAO.findByWorkflowItem(context.getSession(), xmlWorkflowItem);
     }
 
     @Override
@@ -70,17 +70,17 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
 
     @Override
     public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        return workflowItemRoleDAO.findByEPerson(context, ePerson);
+        return workflowItemRoleDAO.findByEPerson(context.getSession(), ePerson);
     }
 
     @Override
     public WorkflowItemRole create(Context context) throws SQLException, AuthorizeException {
-        return workflowItemRoleDAO.create(context, new WorkflowItemRole());
+        return workflowItemRoleDAO.create(context.getSession(), new WorkflowItemRole());
     }
 
     @Override
     public WorkflowItemRole find(Context context, int id) throws SQLException {
-        return workflowItemRoleDAO.findByID(context, WorkflowItemRole.class, id);
+        return workflowItemRoleDAO.findByID(context.getSession(), WorkflowItemRole.class, id);
     }
 
     @Override
@@ -93,13 +93,13 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
         throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(workflowItemRoles)) {
             for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
-                workflowItemRoleDAO.save(context, workflowItemRole);
+                workflowItemRoleDAO.save(context.getSession(), workflowItemRole);
             }
         }
     }
 
     @Override
     public void delete(Context context, WorkflowItemRole workflowItemRole) throws SQLException, AuthorizeException {
-        workflowItemRoleDAO.delete(context, workflowItemRole);
+        workflowItemRoleDAO.delete(context.getSession(), workflowItemRole);
     }
 }

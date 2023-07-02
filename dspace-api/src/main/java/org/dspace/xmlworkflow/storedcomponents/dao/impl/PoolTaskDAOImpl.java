@@ -14,13 +14,13 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask_;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.PoolTaskDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the PoolTask object.
@@ -35,40 +35,39 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
     }
 
     @Override
-    public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<PoolTask> findByEPerson(Session session, EPerson ePerson) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
         criteriaQuery.select(poolTaskRoot);
         criteriaQuery.where(criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.ePerson), ePerson));
-        return list(context, criteriaQuery, false, PoolTask.class, -1, -1);
-
+        return list(session, criteriaQuery, false, PoolTask.class, -1, -1);
     }
 
     @Override
-    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<PoolTask> findByGroup(Session session, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
         criteriaQuery.select(poolTaskRoot);
         criteriaQuery.where(criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.group), group));
-        return list(context, criteriaQuery, false, PoolTask.class, -1, -1);
+        return list(session, criteriaQuery, false, PoolTask.class, -1, -1);
     }
 
     @Override
-    public List<PoolTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<PoolTask> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
         criteriaQuery.select(poolTaskRoot);
         criteriaQuery.where(criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.workflowItem), workflowItem));
-        return list(context, criteriaQuery, false, PoolTask.class, -1, -1);
+        return list(session, criteriaQuery, false, PoolTask.class, -1, -1);
     }
 
     @Override
-    public PoolTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public PoolTask findByWorkflowItemAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
         criteriaQuery.select(poolTaskRoot);
@@ -77,13 +76,13 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
                                        criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.ePerson), ePerson)
                    )
         );
-        return uniqueResult(context, criteriaQuery, false, PoolTask.class);
+        return uniqueResult(session, criteriaQuery, false, PoolTask.class);
     }
 
     @Override
-    public PoolTask findByWorkflowItemAndGroup(Context context, Group group, XmlWorkflowItem workflowItem)
+    public PoolTask findByWorkflowItemAndGroup(Session session, Group group, XmlWorkflowItem workflowItem)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, PoolTask.class);
         Root<PoolTask> poolTaskRoot = criteriaQuery.from(PoolTask.class);
         criteriaQuery.select(poolTaskRoot);
@@ -92,6 +91,6 @@ public class PoolTaskDAOImpl extends AbstractHibernateDAO<PoolTask> implements P
                                        criteriaBuilder.equal(poolTaskRoot.get(PoolTask_.group), group)
                    )
         );
-        return uniqueResult(context, criteriaQuery, false, PoolTask.class);
+        return uniqueResult(session, criteriaQuery, false, PoolTask.class);
     }
 }

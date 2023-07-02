@@ -29,7 +29,7 @@ import org.dspace.checker.MostRecentChecksum_;
 import org.dspace.checker.dao.MostRecentChecksumDAO;
 import org.dspace.content.Bitstream;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MostRecentChecksum object.
@@ -44,12 +44,11 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         super();
     }
 
-
     @Override
-    public List<MostRecentChecksum> findByNotProcessedInDateRange(Context context, Date startDate, Date endDate)
+    public List<MostRecentChecksum> findByNotProcessedInDateRange(Session session, Date startDate, Date endDate)
         throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
         criteriaQuery.select(mostRecentChecksumRoot);
@@ -63,26 +62,24 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         List<Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
         criteriaQuery.orderBy(orderList);
-        return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
+        return list(session, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
     }
 
-
     @Override
-    public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public MostRecentChecksum findByBitstream(Session session, Bitstream bitstream) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
         criteriaQuery.select(mostRecentChecksumRoot);
         criteriaQuery
             .where(criteriaBuilder.equal(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream), bitstream));
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
-
     @Override
-    public List<MostRecentChecksum> findByResultTypeInDateRange(Context context, Date startDate, Date endDate,
+    public List<MostRecentChecksum> findByResultTypeInDateRange(Session session, Date startDate, Date endDate,
                                                                 ChecksumResultCode resultCode) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
         Join<MostRecentChecksum, ChecksumResult> mostRecentResult =
@@ -99,21 +96,21 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         List<Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
         criteriaQuery.orderBy(orderList);
-        return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
+        return list(session, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
 
     }
 
     @Override
-    public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException {
+    public void deleteByBitstream(Session session, Bitstream bitstream) throws SQLException {
         String hql = "delete from MostRecentChecksum WHERE bitstream=:bitstream";
-        Query query = createQuery(context, hql);
+        Query query = createQuery(session, hql);
         query.setParameter("bitstream", bitstream);
         query.executeUpdate();
     }
 
     @Override
-    public MostRecentChecksum getOldestRecord(Context context) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public MostRecentChecksum getOldestRecord(Session session) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
         criteriaQuery.select(mostRecentChecksumRoot);
@@ -122,12 +119,12 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.processEndDate)));
         orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
         criteriaQuery.orderBy(orderList);
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public MostRecentChecksum getOldestRecord(Context context, Date lessThanDate) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public MostRecentChecksum getOldestRecord(Session session, Date lessThanDate) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> mostRecentChecksumRoot = criteriaQuery.from(MostRecentChecksum.class);
         criteriaQuery.select(mostRecentChecksumRoot);
@@ -142,13 +139,13 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         orderList.add(criteriaBuilder.asc(mostRecentChecksumRoot.get(MostRecentChecksum_.bitstream)));
         criteriaQuery.orderBy(orderList);
 
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException {
+    public List<MostRecentChecksum> findNotInHistory(Session session) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<MostRecentChecksum> criteriaQuery = getCriteriaQuery(criteriaBuilder, MostRecentChecksum.class);
         Root<MostRecentChecksum> checksumRoot = criteriaQuery.from(MostRecentChecksum.class);
 
@@ -159,6 +156,6 @@ public class MostRecentChecksumDAOImpl extends AbstractHibernateDAO<MostRecentCh
         criteriaQuery.where(
             criteriaBuilder.not(checksumRoot.get(MostRecentChecksum_.bitstream).in(subQuery)));
 
-        return list(context, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
+        return list(session, criteriaQuery, false, MostRecentChecksum.class, -1, -1);
     }
 }

@@ -15,7 +15,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Bitstream object.
@@ -27,29 +27,29 @@ import org.dspace.core.Context;
  */
 public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
 
-    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
+    public Iterator<Bitstream> findAll(Session session, int limit, int offset) throws SQLException;
 
-    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException;
+    public List<Bitstream> findDeletedBitstreams(Session session, int limit, int offset) throws SQLException;
 
-    public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException;
+    public List<Bitstream> findDuplicateInternalIdentifier(Session session, Bitstream bitstream) throws SQLException;
 
-    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException;
+    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Session session) throws SQLException;
 
-    public Iterator<Bitstream> findByCommunity(Context context, Community community) throws SQLException;
+    public Iterator<Bitstream> findByCommunity(Session session, Community community) throws SQLException;
 
-    public Iterator<Bitstream> findByCollection(Context context, Collection collection) throws SQLException;
+    public Iterator<Bitstream> findByCollection(Session session, Collection collection) throws SQLException;
 
-    public Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException;
+    public Iterator<Bitstream> findByItem(Session session, Item item) throws SQLException;
 
-    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+    public Iterator<Bitstream> findByStoreNumber(Session session, Integer storeNumber) throws SQLException;
 
-    public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+    public Long countByStoreNumber(Session session, Integer storeNumber) throws SQLException;
 
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 
-    int countDeleted(Context context) throws SQLException;
+    int countDeleted(Session session) throws SQLException;
 
-    int countWithNoPolicy(Context context) throws SQLException;
+    int countWithNoPolicy(Session session) throws SQLException;
 
-    List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
+    List<Bitstream> getNotReferencedBitstreams(Session session) throws SQLException;
 }

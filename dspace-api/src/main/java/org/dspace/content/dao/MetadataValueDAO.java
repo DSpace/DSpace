@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the MetadataValue object.
@@ -26,19 +26,19 @@ import org.dspace.core.GenericDAO;
  */
 public interface MetadataValueDAO extends GenericDAO<MetadataValue> {
 
-    public List<MetadataValue> findByField(Context context, MetadataField fieldId) throws SQLException;
+    public List<MetadataValue> findByField(Session session, MetadataField fieldId) throws SQLException;
 
-    public Iterator<MetadataValue> findItemValuesByFieldAndValue(Context context,
+    public Iterator<MetadataValue> findItemValuesByFieldAndValue(Session session,
                                                                  MetadataField metadataField, String value)
             throws SQLException;
 
-    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
+    public Iterator<MetadataValue> findByValueLike(Session session, String value) throws SQLException;
 
-    public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;
+    public void deleteByMetadataField(Session session, MetadataField metadataField) throws SQLException;
 
-    public MetadataValue getMinimum(Context context, int metadataFieldId)
+    public MetadataValue getMinimum(Session session, int metadataFieldId)
         throws SQLException;
 
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 
 }

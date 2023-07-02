@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.orcid.OrcidHistory;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the OrcidHistory object. The
@@ -30,47 +30,47 @@ public interface OrcidHistoryDAO extends GenericDAO<OrcidHistory> {
     /**
      * Find all the ORCID history records by the given profileItem and entity uuids.
      *
-     * @param  context       the DSpace context
+     * @param  session       the DSpace context
      * @param  profileItemId the profileItem item uuid
      * @param  entityId      the entity item uuid
      * @return               the records list
      * @throws SQLException  if an SQL error occurs
      */
-    List<OrcidHistory> findByProfileItemAndEntity(Context context, UUID profileItemId, UUID entityId)
+    List<OrcidHistory> findByProfileItemAndEntity(Session session, UUID profileItemId, UUID entityId)
         throws SQLException;
 
     /**
      * Get the OrcidHistory records where the given item is the profileItem or the
      * entity
      *
-     * @param  context      DSpace context object
+     * @param  session      The current request's database context.
      * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidHistory> findByProfileItemOrEntity(Session session, Item item) throws SQLException;
 
     /**
      * Find the OrcidHistory records related to the given entity item.
      *
-     * @param  context      DSpace context object
+     * @param  session      The current request's database context.
      * @param  entity       the entity item
      * @return              the found put codes
      * @throws SQLException if database error
      */
-    List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException;
+    List<OrcidHistory> findByEntity(Session session, Item entity) throws SQLException;
 
     /**
      * Find all the successfully Orcid history records with the given record type
      * related to the given entity. An history record is considered successful if
      * the status is between 200 and 300.
      *
-     * @param  context      DSpace context object
+     * @param  session      The current request's database context.
      * @param  entity       the entity item
      * @param  recordType   the record type
      * @return              the found orcid history records
      * @throws SQLException if database error
      */
-    List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context, Item entity,
+    List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Session session, Item entity,
         String recordType) throws SQLException;
 }

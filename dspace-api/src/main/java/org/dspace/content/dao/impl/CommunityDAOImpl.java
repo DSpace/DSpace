@@ -25,9 +25,9 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Community object.
@@ -45,19 +45,19 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
      * Get a list of all communities in the system. These are alphabetically
      * sorted by community name.
      *
-     * @param context DSpace context object
+     * @param session current request's database context
      * @param sortField sort field
      *
      * @return the communities in the system
      * @throws SQLException if database error
      */
     @Override
-    public List<Community> findAll(Context context, MetadataField sortField) throws SQLException {
-        return findAll(context, sortField, null, null);
+    public List<Community> findAll(Session session, MetadataField sortField) throws SQLException {
+        return findAll(session, sortField, null, null);
     }
 
     @Override
-    public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset)
+    public List<Community> findAll(Session session, MetadataField sortField, Integer limit, Integer offset)
         throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
 
@@ -74,7 +74,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                                 "where internal.metadataField = :sortField and" +
                                                     " internal.dSpaceObject = c.id)" +
                                 " ORDER BY LOWER(title.value)");
-        Query query = createQuery(context, queryBuilder.toString());
+        Query query = createQuery(session, queryBuilder.toString());
         if (offset != null) {
             query.setFirstResult(offset);
         }
@@ -87,17 +87,17 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     }
 
     @Override
-    public Community findByAdminGroup(Context context, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public Community findByAdminGroup(Session session, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Community.class);
         Root<Community> communityRoot = criteriaQuery.from(Community.class);
         criteriaQuery.select(communityRoot);
         criteriaQuery.where(criteriaBuilder.equal(communityRoot.get(Community_.admins), group));
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     @Override
-    public List<Community> findAllNoParent(Context context, MetadataField sortField) throws SQLException {
+    public List<Community> findAllNoParent(Session session, MetadataField sortField) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
 
         // The query has to be rather complex because we want to sort the retrieval of Communities based on the title
@@ -115,15 +115,15 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                                         " internal.dSpaceObject = c.id)" +
                                 " WHERE c.parentCommunities IS EMPTY " +
                                 " ORDER BY LOWER(title.value)");
-        Query query = createQuery(context, queryBuilder.toString());
+        Query query = createQuery(session, queryBuilder.toString());
         query.setParameter("sortField", sortField);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-        return findMany(context, query);
+        return findMany(session, query);
     }
 
     @Override
-    public List<Community> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
+    public List<Community> findAuthorized(Session session, EPerson ePerson, List<Integer> actions) throws SQLException {
 
         /*TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT \n" +
@@ -145,11 +145,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                         .getID());
         */
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Community.class);
         Root<Community> communityRoot = criteriaQuery.from(Community.class);
         Join<Community, ResourcePolicy> join = communityRoot.join("resourcePolicies");
-        List<Predicate> orPredicates = new LinkedList<Predicate>();
+        List<Predicate> orPredicates = new LinkedList<>();
         for (Integer action : actions) {
             orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
@@ -161,11 +161,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                 orPredicate
             )
         );
-        return list(context, criteriaQuery, true, Community.class, -1, -1);
+        return list(session, criteriaQuery, true, Community.class, -1, -1);
     }
 
     @Override
-    public List<Community> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions)
+    public List<Community> findAuthorizedByGroup(Session session, EPerson ePerson, List<Integer> actions)
         throws SQLException {
         StringBuilder query = new StringBuilder();
         query.append("select c from Community c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
@@ -180,7 +180,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         query.append(
             " AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in " +
                 "elements(epeople))");
-        Query persistenceQuery = createQuery(context, query.toString());
+        Query persistenceQuery = createQuery(session, query.toString());
         persistenceQuery.setParameter("eperson_id", ePerson.getID());
 
         persistenceQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
@@ -189,7 +189,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Community"));
+    public int countRows(Session session) throws SQLException {
+        return count(createQuery(session, "SELECT count(*) FROM Community"));
     }
 }

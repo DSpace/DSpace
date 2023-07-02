@@ -110,7 +110,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public EPerson find(Context context, UUID id) throws SQLException {
-        return ePersonDAO.findByID(context, EPerson.class, id);
+        return ePersonDAO.findByID(context.getSession(), EPerson.class, id);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public EPerson findByLegacyId(Context context, int legacyId) throws SQLException {
-        return ePersonDAO.findByLegacyId(context, legacyId, EPerson.class);
+        return ePersonDAO.findByLegacyId(context.getSession(), legacyId, EPerson.class);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         }
 
         // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
-        return ePersonDAO.findByEmail(context, email);
+        return ePersonDAO.findByEmail(context.getSession(), email);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             return null;
         }
 
-        return ePersonDAO.findByNetid(context, netId);
+        return ePersonDAO.findByNetid(context.getSession(), netId);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             if (StringUtils.isBlank(query)) {
                 query = null;
             }
-            return ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField),
+            return ePersonDAO.search(context.getSession(), query, Arrays.asList(firstNameField, lastNameField),
                     Arrays.asList(firstNameField, lastNameField), offset, limit);
         }
     }
@@ -182,7 +182,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         if (StringUtils.isBlank(query)) {
             query = null;
         }
-        return ePersonDAO.searchResultCount(context, query, Arrays.asList(firstNameField, lastNameField));
+        return ePersonDAO.searchResultCount(context.getSession(), query, Arrays.asList(firstNameField, lastNameField));
     }
 
     @Override
@@ -213,7 +213,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             default:
                 metadataFieldSort = metadataFieldService.findByElement(context, "eperson", "lastname", null);
         }
-        return ePersonDAO.findAll(context, metadataFieldSort, sortColumn, pageSize, offset);
+        return ePersonDAO.findAll(context.getSession(), metadataFieldSort, sortColumn, pageSize, offset);
     }
 
     @Override
@@ -225,7 +225,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         }
 
         // Create a table row
-        EPerson e = ePersonDAO.create(context, new EPerson());
+        EPerson e = ePersonDAO.create(context.getSession(), new EPerson());
 
         log.info(LogHelper.getHeader(context, "create_eperson", "eperson_id="
                 + e.getID()));
@@ -288,7 +288,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // check for presence of eperson in tables that
         // have constraints on eperson_id
         List<String> constraintList = getDeleteConstraints(context, ePerson);
-        if (constraintList.size() > 0) {
+        if (!constraintList.isEmpty()) {
             // Check if the constraints we found should be deleted
             if (cascade) {
                 Iterator<String> constraintsIterator = constraintList.iterator();
@@ -310,7 +310,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                                 for (Version version : versioningService.getVersionsByHistory(context,
                                                                                               versionHistory)) {
                                     version.setePerson(null);
-                                    versionDAO.save(context, version);
+                                    versionDAO.save(context.getSession(), version);
                                 }
                             }
                             WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
@@ -392,7 +392,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         subscribeService.deleteByEPerson(context, ePerson);
 
         // Remove ourself
-        ePersonDAO.delete(context, ePerson);
+        ePersonDAO.delete(context.getSession(), ePerson);
 
         log.info(LogHelper.getHeader(context, "delete_eperson",
                 "eperson_id=" + ePerson.getID()));
@@ -493,7 +493,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         super.update(context, ePerson);
 
-        ePersonDAO.save(context, ePerson);
+        ePersonDAO.save(context.getSession(), ePerson);
 
         log.info(LogHelper.getHeader(context, "update_eperson",
                 "eperson_id=" + ePerson.getID()));
@@ -520,12 +520,12 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
         List<WorkspaceItem> workspaceBySubmitter = workspaceItemService.findByEPerson(context, ePerson);
-        if (workspaceBySubmitter.size() > 0) {
+        if (!workspaceBySubmitter.isEmpty()) {
             tableList.add("workspaceitem");
         }
 
         ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-        if (resourcePolicyService.find(context, ePerson).size() > 0) {
+        if (!resourcePolicyService.find(context, ePerson).isEmpty()) {
             tableList.add("resourcepolicy");
         }
 
@@ -542,7 +542,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
         //Make sure we at least have one group, if not don't even bother searching.
         if (CollectionUtils.isNotEmpty(groups)) {
-            return ePersonDAO.findByGroups(c, groups);
+            return ePersonDAO.findByGroups(c.getSession(), groups);
         } else {
             return new ArrayList<>();
         }
@@ -550,7 +550,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException {
-        return ePersonDAO.findAllSubscribers(context);
+        return ePersonDAO.findAllSubscribers(context.getSession());
     }
 
     @Override
@@ -566,17 +566,17 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findUnsalted(Context context) throws SQLException {
-        return ePersonDAO.findWithPasswordWithoutDigestAlgorithm(context);
+        return ePersonDAO.findWithPasswordWithoutDigestAlgorithm(context.getSession());
     }
 
     @Override
     public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException {
-        return ePersonDAO.findNotActiveSince(context, date);
+        return ePersonDAO.findNotActiveSince(context.getSession(), date);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return ePersonDAO.countRows(context);
+        return ePersonDAO.countRows(context.getSession());
     }
 
     @Override

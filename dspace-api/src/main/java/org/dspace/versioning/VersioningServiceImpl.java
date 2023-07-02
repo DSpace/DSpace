@@ -75,7 +75,7 @@ public class VersioningServiceImpl implements VersioningService {
                 // get dc:date.accessioned to be set as first version date...
                 List<MetadataValue> values = itemService.getMetadata(item, "dc", "date", "accessioned", Item.ANY);
                 Date versionDate = new Date();
-                if (values != null && values.size() > 0) {
+                if (values != null && !values.isEmpty()) {
                     String date = values.get(0).getValue();
                     versionDate = new DCDate(date).toDate();
                 }
@@ -116,7 +116,7 @@ public class VersioningServiceImpl implements VersioningService {
             version.setSummary(null);
             version.setVersionDate(null);
             version.setePerson(null);
-            versionDAO.save(c, version);
+            versionDAO.save(c.getSession(), version);
 
             // if all versions of a version history were deleted,
             // we delete the version history.
@@ -124,7 +124,7 @@ public class VersioningServiceImpl implements VersioningService {
                 || this.getVersionsByHistory(c, history).isEmpty()) {
                 // hard delete the previously soft deleted versions
                 for (Version v : history.getVersions()) {
-                    versionDAO.delete(c, v);
+                    versionDAO.delete(c.getSession(), v);
                 }
                 // delete the version history
                 versionHistoryService.delete(c, history);
@@ -157,7 +157,7 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public void removeVersion(Context c, Item item) throws SQLException {
-        Version version = versionDAO.findByItem(c, item);
+        Version version = versionDAO.findByItem(c.getSession(), item);
         if (version != null) {
             delete(c, version);
         }
@@ -165,7 +165,7 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public Version getVersion(Context c, int versionID) throws SQLException {
-        return versionDAO.findByID(c, Version.class, versionID);
+        return versionDAO.findByID(c.getSession(), Version.class, versionID);
     }
 
 
@@ -181,22 +181,22 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public Version updateVersion(Context c, Item item, String summary) throws SQLException {
-        Version version = versionDAO.findByItem(c, item);
+        Version version = versionDAO.findByItem(c.getSession(), item);
         version.setSummary(summary);
-        versionDAO.save(c, version);
+        versionDAO.save(c.getSession(), version);
         return version;
     }
 
     @Override
     public Version getVersion(Context c, Item item) throws SQLException {
-        return versionDAO.findByItem(c, item);
+        return versionDAO.findByItem(c.getSession(), item);
     }
 
     @Override
     public Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date,
                                     int versionNumber) {
         try {
-            Version version = versionDAO.create(context, new Version());
+            Version version = versionDAO.create(context.getSession(), new Version());
             if (versionNumber > 0 && !isVersionExist(context, item, versionNumber)) {
                 version.setVersionNumber(versionNumber);
             } else {
@@ -207,7 +207,7 @@ public class VersioningServiceImpl implements VersioningService {
             version.setItem(item);
             version.setSummary(summary);
             version.setVersionHistory(history);
-            versionDAO.save(context, version);
+            versionDAO.save(context.getSession(), version);
             versionHistoryService.add(context, history, version);
             return version;
         } catch (SQLException e) {
@@ -227,14 +227,14 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException {
-        List<Version> versions = versionDAO.findVersionsWithItems(c, vh, -1, -1);
+        List<Version> versions = versionDAO.findVersionsWithItems(c.getSession(), vh, -1, -1);
         return versions;
     }
 
     @Override
     public List<Version> getVersionsByHistoryWithItems(Context c, VersionHistory vh, int offset, int limit)
            throws SQLException {
-        return versionDAO.findVersionsWithItems(c, vh, offset, limit);
+        return versionDAO.findVersionsWithItems(c.getSession(), vh, offset, limit);
     }
 
 // **** PROTECTED METHODS!!
@@ -245,7 +245,7 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     protected int getNextVersionNumer(Context c, VersionHistory vh) throws SQLException {
-        int next = versionDAO.getNextVersionNumber(c, vh);
+        int next = versionDAO.getNextVersionNumber(c.getSession(), vh);
 
         // check if we have uncommited versions in DSpace's cache
         if (versionHistoryService.getLatestVersion(c, vh) != null
@@ -258,12 +258,12 @@ public class VersioningServiceImpl implements VersioningService {
 
     @Override
     public void update(Context context, Version version) throws SQLException {
-        versionDAO.save(context, version);
+        versionDAO.save(context.getSession(), version);
     }
 
     @Override
     public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException {
-        return versionDAO.countVersionsByHistoryWithItem(context, versionHistory);
+        return versionDAO.countVersionsByHistoryWithItem(context.getSession(), versionHistory);
     }
 
 }

@@ -33,7 +33,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
             throw new AuthorizeException(
                 "Only administrators can modify relationshipType");
         }
-        return relationshipTypeDAO.create(context, new RelationshipType());
+        return relationshipTypeDAO.create(context.getSession(), new RelationshipType());
     }
 
     @Override
@@ -43,13 +43,15 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
             throw new AuthorizeException(
                 "Only administrators can modify relationshipType");
         }
-        return relationshipTypeDAO.create(context, relationshipType);
+        return relationshipTypeDAO.create(context.getSession(), relationshipType);
     }
 
     @Override
-    public RelationshipType findbyTypesAndTypeName(Context context,EntityType leftType,EntityType rightType,
-                                                 String leftwardType,String rightwardType) throws SQLException {
-        return relationshipTypeDAO.findbyTypesAndTypeName(context, leftType, rightType, leftwardType, rightwardType);
+    public RelationshipType findbyTypesAndTypeName(Context context,
+            EntityType leftType, EntityType rightType,
+            String leftwardType,String rightwardType) throws SQLException {
+        return relationshipTypeDAO.findbyTypesAndTypeName(context.getSession(),
+                leftType, rightType, leftwardType, rightwardType);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     @Override
     public List<RelationshipType> findAll(Context context, Integer limit, Integer offset) throws SQLException {
 
-        return relationshipTypeDAO.findAll(context, RelationshipType.class, limit, offset);
+        return relationshipTypeDAO.findAll(context.getSession(), RelationshipType.class, limit, offset);
     }
 
     @Override
@@ -73,7 +75,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName, Integer limit,
                                                                     Integer offset)
             throws SQLException {
-        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context, typeName, limit, offset);
+        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context.getSession(), typeName, limit, offset);
     }
 
     @Override
@@ -84,7 +86,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType,
                                                    Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeDAO.findByEntityType(context, entityType, limit, offset);
+        return relationshipTypeDAO.findByEntityType(context.getSession(), entityType, limit, offset);
     }
 
     @Override
@@ -96,7 +98,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     @Override
     public List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft,
                                                    Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeDAO.findByEntityType(context, entityType, isLeft, limit, offset);
+        return relationshipTypeDAO.findByEntityType(context.getSession(), entityType, isLeft, limit, offset);
     }
 
     @Override
@@ -141,7 +143,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
 
     @Override
     public RelationshipType find(Context context,int id) throws SQLException {
-        return relationshipTypeDAO.findByID(context, RelationshipType.class, id);
+        return relationshipTypeDAO.findByID(context.getSession(), RelationshipType.class, id);
     }
 
     @Override
@@ -160,7 +162,7 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
             }
 
             for (RelationshipType relationshipType : relationshipTypes) {
-                relationshipTypeDAO.save(context, relationshipType);
+                relationshipTypeDAO.save(context.getSession(), relationshipType);
             }
         }
 
@@ -172,11 +174,11 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
             throw new AuthorizeException(
                 "Only administrators can delete entityType");
         }
-        relationshipTypeDAO.delete(context, relationshipType);
+        relationshipTypeDAO.delete(context.getSession(), relationshipType);
     }
 
     @Override
     public int countByEntityType(Context context, EntityType entityType) throws SQLException {
-        return relationshipTypeDAO.countByEntityType(context, entityType);
+        return relationshipTypeDAO.countByEntityType(context.getSession(), entityType);
     }
 }

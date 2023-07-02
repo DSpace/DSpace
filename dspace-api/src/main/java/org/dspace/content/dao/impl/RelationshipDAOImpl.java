@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.persistence.Query;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -26,26 +27,27 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.RelationshipType_;
 import org.dspace.content.Relationship_;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.content.dao.pojo.ItemUuidAndRelationshipId;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> implements RelationshipDAO {
+    @Inject
+    RelationshipTypeDAO rtdao;
 
     @Override
     public List<Relationship> findByItem(
-        Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
+        Session session, Item item, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
-        return findByItem(context, item, -1, -1, excludeTilted, excludeNonLatest);
+        return findByItem(session, item, -1, -1, excludeTilted, excludeNonLatest);
     }
 
     @Override
     public List<Relationship> findByItem(
-        Context context, Item item, Integer limit, Integer offset, boolean excludeTilted, boolean excludeNonLatest
+        Session session, Item item, Integer limit, Integer offset, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Relationship> criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
@@ -57,7 +59,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             )
         );
 
-        return list(context, criteriaQuery, false, Relationship.class, limit, offset);
+        return list(session, criteriaQuery, false, Relationship.class, limit, offset);
     }
 
     /**
@@ -164,9 +166,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
 
     @Override
     public int countByItem(
-        Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
+        Session session, Item item, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
@@ -178,35 +180,35 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             )
         );
 
-        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+        return count(session, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
     @Override
-    public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType)
+    public List<Relationship> findByRelationshipType(Session session, RelationshipType relationshipType)
         throws SQLException {
 
-        return findByRelationshipType(context, relationshipType, -1, -1);
+        return findByRelationshipType(session, relationshipType, -1, -1);
     }
 
     @Override
-    public List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType,
+    public List<Relationship> findByRelationshipType(Session session, RelationshipType relationshipType,
                                                      Integer limit, Integer offset) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
         criteriaQuery
             .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType));
-        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+        return list(session, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
     @Override
     public List<Relationship> findByItemAndRelationshipType(
-        Context context, Item item, RelationshipType relationshipType, Integer limit, Integer offset,
+        Session session, Item item, RelationshipType relationshipType, Integer limit, Integer offset,
         boolean excludeNonLatest
     ) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
@@ -219,15 +221,15 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             )
         );
 
-        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+        return list(session, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
     @Override
     public List<Relationship> findByItemAndRelationshipType(
-        Context context, Item item, RelationshipType relationshipType, boolean isLeft, Integer limit, Integer offset,
+        Session session, Item item, RelationshipType relationshipType, boolean isLeft, Integer limit, Integer offset,
         boolean excludeNonLatest
     ) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
@@ -246,17 +248,17 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             criteriaQuery.orderBy(criteriaBuilder.asc(relationshipRoot.get(Relationship_.rightPlace)));
         }
 
-        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+        return list(session, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
     @Override
     public List<ItemUuidAndRelationshipId> findByLatestItemAndRelationshipType(
-        Context context, Item latestItem, RelationshipType relationshipType, boolean isLeft
+        Session session, Item latestItem, RelationshipType relationshipType, boolean isLeft
     ) throws SQLException {
         final String relationshipIdAlias = "relationshipId";
         final String itemUuidAlias = "itemUuid";
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Tuple> criteriaQuery = criteriaBuilder.createTupleQuery();
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
 
@@ -314,7 +316,7 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         criteriaQuery.distinct(true);
 
         // execute query
-        Query query = this.getHibernateSession(context).createQuery(criteriaQuery);
+        Query query = session.createQuery(criteriaQuery);
         query.setHint("org.hibernate.cacheable", true);
         List<?> resultList = query.getResultList();
 
@@ -329,54 +331,52 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public List<Relationship> findByTypeName(Context context, String typeName)
+    public List<Relationship> findByTypeName(Session session, String typeName)
             throws SQLException {
-        return this.findByTypeName(context, typeName, -1, -1);
+        return this.findByTypeName(session, typeName, -1, -1);
     }
 
     @Override
-    public List<Relationship> findByTypeName(Context context, String typeName, Integer limit, Integer offset)
+    public List<Relationship> findByTypeName(Session session, String typeName, Integer limit, Integer offset)
             throws SQLException {
-        RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
-                .getRelationshipTypeService();
-        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, typeName);
+        List<RelationshipType> relTypes = rtdao.findByLeftwardOrRightwardTypeName(session, typeName);
         List<Integer> ids = new ArrayList<>();
         for ( RelationshipType relationshipType : relTypes) {
             ids.add(relationshipType.getID());
         }
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
-        return list(context, criteriaQuery, true, Relationship.class, limit, offset);
+        return list(session, criteriaQuery, true, Relationship.class, limit, offset);
     }
 
     @Override
-    public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
+    public int countByRelationshipType(Session session, RelationshipType relationshipType) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
         criteriaQuery
                 .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType));
-        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+        return count(session, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public int countRows(Session session) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
-        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+        return count(session, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
     @Override
     public int countByItemAndRelationshipType(
-        Context context, Item item, RelationshipType relationshipType, boolean isLeft, boolean excludeNonLatest
+        Session session, Item item, RelationshipType relationshipType, boolean isLeft, boolean excludeNonLatest
     ) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.select(relationshipRoot);
@@ -393,33 +393,31 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             );
         }
 
-        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+        return count(session, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
     @Override
-    public int countByTypeName(Context context, String typeName)
+    public int countByTypeName(Session session, String typeName)
             throws SQLException {
-        RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
-                .getRelationshipTypeService();
-        List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, typeName);
+        List<RelationshipType> relTypes = rtdao.findByLeftwardOrRightwardTypeName(session, typeName);
         List<Integer> ids = new ArrayList<>();
         for ( RelationshipType relationshipType : relTypes) {
             ids.add(relationshipType.getID());
         }
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
         criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
-        return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
+        return count(session, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
     @Override
-    public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
+    public List<Relationship> findByItemAndRelationshipTypeAndList(Session session, UUID focusUUID,
             RelationshipType relationshipType, List<UUID> items, boolean isLeft,
             int offset, int limit) throws SQLException {
         String side = isLeft ? "left_id" : "right_id";
         String otherSide = !isLeft ? "left_id" : "right_id";
-        Query query = createQuery(context, "FROM " + Relationship.class.getSimpleName() +
+        Query query = createQuery(session, "FROM " + Relationship.class.getSimpleName() +
                                           " WHERE type_id = (:typeId) " +
                                            "AND " + side + " = (:focusUUID) " +
                                            "AND " + otherSide + " in (:list) " +
@@ -431,11 +429,11 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     }
 
     @Override
-    public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
+    public int countByItemAndRelationshipTypeAndList(Session session, UUID focusUUID, RelationshipType relationshipType,
             List<UUID> items, boolean isLeft) throws SQLException {
         String side = isLeft ? "left_id" : "right_id";
         String otherSide = !isLeft ? "left_id" : "right_id";
-        Query query = createQuery(context, "SELECT count(*) " +
+        Query query = createQuery(session, "SELECT count(*) " +
                                            "FROM " + Relationship.class.getSimpleName() +
                                           " WHERE type_id = (:typeId) " +
                                            "AND " + side + " = (:focusUUID) " +

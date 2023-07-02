@@ -50,7 +50,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
 
     @Override
     public EntityType findByEntityType(Context context, String entityType) throws SQLException {
-        return entityTypeDAO.findByEntityType(context, entityType);
+        return entityTypeDAO.findByEntityType(context.getSession(), entityType);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Override
     public List<EntityType> findAll(Context context, Integer limit, Integer offset) throws SQLException {
 
-        return entityTypeDAO.findAll(context, EntityType.class, limit, offset);
+        return entityTypeDAO.findAll(context.getSession(), EntityType.class, limit, offset);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             throw new AuthorizeException(
                 "Only administrators can modify entityType");
         }
-        return entityTypeDAO.create(context, new EntityType());
+        return entityTypeDAO.create(context.getSession(), new EntityType());
     }
 
     @Override
@@ -82,12 +82,12 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         }
         EntityType entityType = new EntityType();
         entityType.setLabel(entityTypeString);
-        return entityTypeDAO.create(context, entityType);
+        return entityTypeDAO.create(context.getSession(), entityType);
     }
 
     @Override
     public EntityType find(Context context,int id) throws SQLException {
-        EntityType entityType = entityTypeDAO.findByID(context, EntityType.class, id);
+        EntityType entityType = entityTypeDAO.findByID(context.getSession(), EntityType.class, id);
         return entityType;
     }
 
@@ -106,7 +106,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             }
 
             for (EntityType entityType : entityTypes) {
-                entityTypeDAO.save(context, entityType);
+                entityTypeDAO.save(context.getSession(), entityType);
             }
         }
     }
@@ -117,7 +117,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             throw new AuthorizeException(
                 "Only administrators can delete entityType");
         }
-        entityTypeDAO.delete(context, entityType);
+        entityTypeDAO.delete(context.getSession(), entityType);
     }
 
     @Override
@@ -161,12 +161,12 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Override
     public List<EntityType> getEntityTypesByNames(Context context, List<String> names, Integer limit, Integer offset)
             throws SQLException {
-        return entityTypeDAO.getEntityTypesByNames(context, names, limit, offset);
+        return entityTypeDAO.getEntityTypesByNames(context.getSession(), names, limit, offset);
     }
 
     @Override
     public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
-        return entityTypeDAO.countEntityTypesByNames(context, names);
+        return entityTypeDAO.countEntityTypesByNames(context.getSession(), names);
     }
 
     @Override

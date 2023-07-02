@@ -31,7 +31,7 @@ public class FailedOpenURLTrackerServiceImpl implements FailedOpenURLTrackerServ
      */
     @Override
     public void remove(Context context, OpenURLTracker openURLTracker) throws SQLException {
-        openURLTrackerDAO.delete(context, openURLTracker);
+        openURLTrackerDAO.delete(context.getSession(), openURLTracker);
     }
 
     /**
@@ -42,18 +42,18 @@ public class FailedOpenURLTrackerServiceImpl implements FailedOpenURLTrackerServ
      */
     @Override
     public List<OpenURLTracker> findAll(Context context) throws SQLException {
-        return openURLTrackerDAO.findAll(context, OpenURLTracker.class);
+        return openURLTrackerDAO.findAll(context.getSession(), OpenURLTracker.class);
     }
 
     /**
      * Creates a new OpenURLTracker
      * @param context
-     * @return the creatred OpenURLTracker
+     * @return the created OpenURLTracker
      * @throws SQLException
      */
     @Override
     public OpenURLTracker create(Context context) throws SQLException {
-        OpenURLTracker openURLTracker = openURLTrackerDAO.create(context, new OpenURLTracker());
+        OpenURLTracker openURLTracker = openURLTrackerDAO.create(context.getSession(), new OpenURLTracker());
         return openURLTracker;
     }
 }

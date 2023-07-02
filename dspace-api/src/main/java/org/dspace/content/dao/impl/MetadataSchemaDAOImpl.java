@@ -19,7 +19,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchema_;
 import org.dspace.content.dao.MetadataSchemaDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataSchema object.
@@ -36,15 +36,15 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     /**
      * Get the schema object corresponding to this namespace URI.
      *
-     * @param context DSpace context
+     * @param session The current request's database context.
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
      * @throws SQLException if database error
      */
     @Override
-    public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException {
+    public MetadataSchema findByNamespace(Session session, String namespace) throws SQLException {
         // Grab rows from DB
-        Query query = createQuery(context,
+        Query query = createQuery(session,
                                   "SELECT ms FROM MetadataSchema ms " +
                                       "WHERE ms.namespace = :namespace ");
 
@@ -55,10 +55,10 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     }
 
     @Override
-    public List<MetadataSchema> findAll(Context context, Class clazz) throws SQLException {
+    public List<MetadataSchema> findAll(Session session, Class clazz) throws SQLException {
         // Get all the metadataschema rows
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataSchema.class);
         Root<MetadataSchema> metadataSchemaRoot = criteriaQuery.from(MetadataSchema.class);
         criteriaQuery.select(metadataSchemaRoot);
@@ -67,22 +67,22 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
         orderList.add(criteriaBuilder.asc(metadataSchemaRoot.get(MetadataSchema_.id)));
         criteriaQuery.orderBy(orderList);
 
-        return list(context, criteriaQuery, true, MetadataSchema.class, -1, -1);
+        return list(session, criteriaQuery, true, MetadataSchema.class, -1, -1);
     }
 
     /**
      * Return true if and only if the passed name appears within the allowed
      * number of times in the current schema.
      *
-     * @param context DSpace context
+     * @param session The current request's database context.
      * @param metadataSchemaId schema id
      * @param namespace namespace URI to match
      * @return true of false
      * @throws SQLException if database error
      */
     @Override
-    public boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace) throws SQLException {
-        Query query = createQuery(context,
+    public boolean uniqueNamespace(Session session, int metadataSchemaId, String namespace) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT ms FROM MetadataSchema ms " +
                                       "WHERE ms.namespace = :namespace and ms.id != :id");
 
@@ -96,15 +96,15 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     /**
      * Return true if and only if the passed name is unique.
      *
-     * @param context DSpace context
+     * @param session The current request's database context.
      * @param metadataSchemaId schema id
      * @param name  short name of schema
      * @return true of false
      * @throws SQLException if database error
      */
     @Override
-    public boolean uniqueShortName(Context context, int metadataSchemaId, String name) throws SQLException {
-        Query query = createQuery(context,
+    public boolean uniqueShortName(Session session, int metadataSchemaId, String name) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT ms FROM MetadataSchema ms " +
                                       "WHERE ms.name = :name and ms.id != :id");
 
@@ -118,7 +118,7 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
     /**
      * Get the schema corresponding with this short name.
      *
-     * @param context
+     * @param session
      *            context, in case we need to read it in from DB
      * @param shortName
      *            the short name for the schema
@@ -126,8 +126,8 @@ public class MetadataSchemaDAOImpl extends AbstractHibernateDAO<MetadataSchema> 
      * @throws SQLException if database error
      */
     @Override
-    public MetadataSchema find(Context context, String shortName) throws SQLException {
-        Query query = createQuery(context,
+    public MetadataSchema find(Session session, String shortName) throws SQLException {
+        Query query = createQuery(session,
                                   "SELECT ms FROM MetadataSchema ms " +
                                       "WHERE ms.name = :name");
 
