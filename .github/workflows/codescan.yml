@@ -5,12 +5,16 @@
 # because CodeQL requires a fresh build with all tests *disabled*.
 name: "Code Scanning"
 
-# Run this code scan for all pushes / PRs to main branch. Also run once a week.
+# Run this code scan for all pushes / PRs to main or maintenance branches. Also run once a week.
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'dspace-**'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - 'dspace-**'
     # Don't run if PR is only updating static documentation
     paths-ignore:
       - '**/*.md'
