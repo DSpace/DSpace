@@ -459,7 +459,7 @@ public class ScriptLauncher {
     }
 
     private static boolean isSaveEnabled() {
-       return configurationService.getBooleanProperty("process.save");
+       return configurationService.getBooleanProperty("process.save-enable", false);
     }
     private static EPerson getEpersonProcess(Context context) throws Exception {
         UUID epersonUUID = UUID.fromString(configurationService.getProperty("process.eperson"));
