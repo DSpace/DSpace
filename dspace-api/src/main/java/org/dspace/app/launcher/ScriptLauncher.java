@@ -7,31 +7,43 @@
  */
 package org.dspace.app.launcher;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.scripts.service.ProcessService;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.UUID;
+
 
 /**
  * A DSpace script launcher.
@@ -47,6 +59,10 @@ public class ScriptLauncher {
      * The service manager kernel
      */
     private static transient DSpaceKernelImpl kernelImpl;
+
+    private static ProcessService processService;
+    private static EPersonService ePersonService;
+    private static ConfigurationService configurationService;
 
     /**
      * Default constructor
@@ -69,6 +85,10 @@ public class ScriptLauncher {
             if (!kernelImpl.isRunning()) {
                 kernelImpl.start();
             }
+            processService = ScriptServiceFactory.getInstance().getProcessService();
+            ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+            configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
         } catch (Exception e) {
             // Failed to start so destroy it and log and throw an exception
             try {
@@ -132,11 +152,12 @@ public class ScriptLauncher {
         } else {
             status = runOneCommand(commandConfigs, args, kernelImpl);
         }
+
         return status;
     }
 
     /**
-     * This method will simply execute the script
+     * This method will execute the script and save it in database
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
@@ -144,8 +165,26 @@ public class ScriptLauncher {
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                                      DSpaceRunnable script) {
+
+
         try {
             script.initialize(args, dSpaceRunnableHandler, null);
+            if (isSaveEnabled()) {
+                Context context = new Context();
+                try {
+                    EPerson ePerson = getEpersonProcess(context);
+                    List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = processParametersToDSpaceCommandLineParameters(Arrays.copyOfRange(args, 1, args.length));
+                    processService.create(context, ePerson, args[0], dSpaceCommandLineParameters, new HashSet<>(context.getSpecialGroups()));
+                    context.complete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return 1;
+                } finally {
+                    if (context.isValid()) {
+                        context.abort();
+                    }
+                }
+            }
             script.run();
             return 0;
         } catch (ParseException e) {
@@ -153,6 +192,7 @@ public class ScriptLauncher {
             e.printStackTrace();
             return 1;
         }
+
     }
 
     protected static int runOneCommand(Document commandConfigs, String[] args) {
@@ -408,4 +448,25 @@ public class ScriptLauncher {
         return scriptConfigurations;
     }
 
+
+    private static List<DSpaceCommandLineParameter> processParametersToDSpaceCommandLineParameters(String... parameters) {
+        List<DSpaceCommandLineParameter> dSpaceCommandLineParameterList = new ArrayList<>();
+        for (String parameter : parameters) {
+            DSpaceCommandLineParameter dSpaceCommandLineParameter = new DSpaceCommandLineParameter(parameter, "true");
+            dSpaceCommandLineParameterList.add(dSpaceCommandLineParameter);
+        }
+        return dSpaceCommandLineParameterList;
+    }
+
+    private static boolean isSaveEnabled() {
+       return configurationService.getBooleanProperty("process.save");
+    }
+    private static EPerson getEpersonProcess(Context context) throws Exception {
+        UUID epersonUUID = UUID.fromString(configurationService.getProperty("process.eperson"));
+        EPerson ePerson = ePersonService.find(context, epersonUUID);
+        if (ePerson == null) {
+            throw new Exception("EPerson UUID not valid, no result found.");
+        }
+        return ePerson;
+    }
 }
