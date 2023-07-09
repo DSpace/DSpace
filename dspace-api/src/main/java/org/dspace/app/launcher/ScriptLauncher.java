@@ -7,30 +7,6 @@
  */
 package org.dspace.app.launcher;
 
-import org.apache.commons.cli.ParseException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
-import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.dspace.scripts.factory.ScriptServiceFactory;
-import org.dspace.scripts.handler.DSpaceRunnableHandler;
-import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
-import org.dspace.scripts.service.ProcessService;
-import org.dspace.scripts.service.ScriptService;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.RequestService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -39,10 +15,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.UUID;
+
+import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.core.Context;
+import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.dspace.scripts.factory.ScriptServiceFactory;
+import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.scripts.service.ScriptService;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
+import org.dspace.services.RequestService;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 
 
 /**
@@ -106,8 +98,10 @@ public class ScriptLauncher {
         }
 
         // Look up command in the configuration, and execute.
-        List<DSpaceCommandLineParameter> commandLineParameters = processParametersToDSpaceCommandLineParameters(Arrays.copyOfRange(args, 1, args.length));
-        CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler(args[0], commandLineParameters);
+        List<DSpaceCommandLineParameter> commandLineParameters =
+            processParametersToDSpaceCommandLineParameters(Arrays.copyOfRange(args, 1, args.length));
+        CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler =
+            new CommandLineDSpaceRunnableHandler(args[0], commandLineParameters);
         int status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
 
         // Destroy the service kernel if it is still alive
@@ -124,6 +118,7 @@ public class ScriptLauncher {
      * This method will take the arguments from a commandline input and it'll find the script that the first argument
      * refers to and it'll execute this script.
      * It can return a 1 or a 0 depending on whether the script failed or passed respectively
+     *
      * @param args                  The arguments for the script and the script as first one in the array
      * @param commandConfigs        The Document
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler for this execution
@@ -151,6 +146,7 @@ public class ScriptLauncher {
 
     /**
      * This method will execute the script and save it in database
+     *
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
      * @param script                The script to be executed
@@ -179,8 +175,8 @@ public class ScriptLauncher {
     /**
      * Recognize and execute a single command.
      *
-     * @param commandConfigs  Document
-     * @param args the command line arguments given
+     * @param commandConfigs Document
+     * @param args           the command line arguments given
      */
     protected static int runOneCommand(Document commandConfigs, String[] args, DSpaceKernelImpl kernelImpl) {
         String request = args[0];
@@ -220,8 +216,8 @@ public class ScriptLauncher {
             }
             try {
                 target = Class.forName(className,
-                                       true,
-                                       Thread.currentThread().getContextClassLoader());
+                    true,
+                    Thread.currentThread().getContextClassLoader());
             } catch (ClassNotFoundException e) {
                 System.err.println("Error in launcher.xml: Invalid class name: " + className);
                 return 1;
@@ -340,6 +336,7 @@ public class ScriptLauncher {
 
     /**
      * Display the commands that are defined in launcher.xml and/or the script service.
+     *
      * @param commandConfigs configs as Document
      */
     private static void display(Document commandConfigs) {
@@ -373,7 +370,8 @@ public class ScriptLauncher {
 
     /**
      * Display a single command using a fixed format. Used by {@link #display}.
-     * @param name the name that can be used to invoke the command
+     *
+     * @param name        the name that can be used to invoke the command
      * @param description the description of the command
      */
     private static void displayCommand(String name, String description) {
@@ -382,6 +380,7 @@ public class ScriptLauncher {
 
     /**
      * Get a sorted collection of the commands that are specified in launcher.xml. Used by {@link #display}.
+     *
      * @param commandConfigs the contexts of launcher.xml
      * @return sorted collection of commands
      */
@@ -402,6 +401,7 @@ public class ScriptLauncher {
 
     /**
      * Get a sorted collection of the commands that are defined as beans. Used by {@link #display}.
+     *
      * @return sorted collection of commands
      */
     private static Collection<ScriptConfiguration> getServiceCommands() {
@@ -425,13 +425,23 @@ public class ScriptLauncher {
         return scriptConfigurations;
     }
 
-
-    private static List<DSpaceCommandLineParameter> processParametersToDSpaceCommandLineParameters(String... parameters) {
+    /**
+     * Transform the parameters to a list of DSpaceCommandLineParameters
+     *
+     * @param parameters the script parameters
+     * @return a list of DSpaceCommandLineParameters
+     */
+    private static List<DSpaceCommandLineParameter> processParametersToDSpaceCommandLineParameters(
+        String[] parameters) {
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameterList = new ArrayList<>();
-        for (String parameter : parameters) {
-            DSpaceCommandLineParameter dSpaceCommandLineParameter = new DSpaceCommandLineParameter(parameter, "true");
-            dSpaceCommandLineParameterList.add(dSpaceCommandLineParameter);
+        StringBuilder builder = new StringBuilder();
+        for (String value : parameters) {
+            builder.append(value);
         }
+        String parameterString = builder.toString();
+        DSpaceCommandLineParameter dSpaceCommandLineParameter =
+            new DSpaceCommandLineParameter(parameterString, "");
+        dSpaceCommandLineParameterList.add(dSpaceCommandLineParameter);
         return dSpaceCommandLineParameterList;
     }
 

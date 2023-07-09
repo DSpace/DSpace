@@ -7,6 +7,16 @@
  */
 package org.dspace.scripts.handler.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
@@ -23,23 +33,13 @@ import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 /**
  * This is an implementation for the CommandLineDSpaceRunnables which means that these implementations
  * are used by DSpaceRunnables which are called from the CommandLine
  */
 public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(CommandLineDSpaceRunnableHandler.class);
+        .getLogger(CommandLineDSpaceRunnableHandler.class);
 
     private ProcessService processService;
     private EPersonService ePersonService;
@@ -49,7 +49,10 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     Integer processId;
     UUID ePersonUUID;
-    public CommandLineDSpaceRunnableHandler(){}
+
+    public CommandLineDSpaceRunnableHandler() {
+    }
+
     public CommandLineDSpaceRunnableHandler(String scriptName, List<DSpaceCommandLineParameter> parameters) {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         if (isSaveEnabled()) {
@@ -59,13 +62,15 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
             try {
                 EPerson ePerson = getEpersonProcess(context);
                 this.ePersonUUID = ePerson.getID();
-                Process process = processService.create(context, ePerson, scriptName, parameters, new HashSet<>(context.getSpecialGroups()));
+                Process process = processService.create(context, ePerson, scriptName, parameters,
+                    new HashSet<>(context.getSpecialGroups()));
                 processId = process.getID();
                 this.scriptName = process.getName();
                 context.complete();
             } catch (Exception e) {
-                logError("CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " + scriptName +
-                        " and parameters: " + parameters + " could not be created", e);
+                logError("CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " +
+                    scriptName +
+                    " and parameters: " + parameters + " could not be created", e);
             } finally {
                 if (context.isValid()) {
                     context.abort();
@@ -205,7 +210,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
-            throws IOException {
+        throws IOException {
         File file = new File(fileName);
         FileUtils.copyInputStreamToFile(inputStream, file);
     }
@@ -217,6 +222,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     /**
      * Check if the save option is enabled in the configuration
+     *
      * @return true if the save option is enabled, false otherwise
      */
     private boolean isSaveEnabled() {
@@ -225,6 +231,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     /**
      * Get the EPerson that is used to create the process
+     *
      * @param context context
      * @return the EPerson that is used to create the process
      * @throws Exception if the EPerson UUID is not valid
