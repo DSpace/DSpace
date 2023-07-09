@@ -11,7 +11,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -65,9 +64,8 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 this.scriptName = process.getName();
                 context.complete();
             } catch (Exception e) {
-                System.out.println("CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " + scriptName +
-                        " and parameters: " + parameters + " could not be created");
-                e.printStackTrace();
+                logError("CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " + scriptName +
+                        " and parameters: " + parameters + " could not be created", e);
             } finally {
                 if (context.isValid()) {
                     context.abort();
@@ -87,8 +85,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 processService.start(context, process);
                 context.complete();
             } catch (SQLException e) {
-                System.out.println("RestDSpaceRunnableHandler with process: " + processId + " could not be started");
-                e.printStackTrace();
+                logError("CommandLineDSpaceRunnableHandler with process: " + processId + " could not be started", e);
             } finally {
                 if (context.isValid()) {
                     context.abort();
@@ -105,18 +102,11 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
             try {
                 Process process = processService.find(context, processId);
                 processService.complete(context, process);
-                addLogBitstreamToProcess(context);
                 context.complete();
             } catch (SQLException e) {
-                System.out.println("CommandLineDSpaceRunnableHandler with process: " + processId + " could not be completed");
-                e.printStackTrace();
-            } catch (IOException | AuthorizeException e) {
-                System.out.println("CommandLineDSpaceRunnableHandler with process: " + processId + " could not be completed due to an " +
-                        "error with the logging bitstream");
-                e.printStackTrace();
+                logError("CommandLineDSpaceRunnableHandler with process: " + processId + " could not be completed", e);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-                e.printStackTrace();
+                logError(e.getMessage(), e);
             } finally {
                 if (context.isValid()) {
                     context.abort();
@@ -152,18 +142,11 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 Process process = processService.find(context, processId);
                 processService.fail(context, process);
 
-                addLogBitstreamToProcess(context);
                 context.complete();
             } catch (SQLException sqlException) {
-                System.out.println("SQL exception while handling another exception");
-                sqlException.printStackTrace();
-            } catch (IOException | AuthorizeException ioException) {
-                System.out.println("RestDSpaceRunnableHandler with process: " + processId + " could not be completed due to an " +
-                        "error with the logging bitstream");
-                ioException.printStackTrace();
+                logError("SQL exception while handling another exception", e);
             } catch (Exception exception) {
-                System.out.println(exception.getMessage());
-                exception.printStackTrace();
+                logError(exception.getMessage(), exception);
             } finally {
                 if (context.isValid()) {
                     context.abort();
@@ -232,10 +215,20 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
         return Collections.emptyList();
     }
 
+    /**
+     * Check if the save option is enabled in the configuration
+     * @return true if the save option is enabled, false otherwise
+     */
     private boolean isSaveEnabled() {
         return configurationService.getBooleanProperty("process.save-enable", false);
     }
 
+    /**
+     * Get the EPerson that is used to create the process
+     * @param context
+     * @return the EPerson that is used to create the process
+     * @throws Exception if the EPerson UUID is not valid
+     */
     private EPerson getEpersonProcess(Context context) throws Exception {
         UUID epersonUUID = UUID.fromString(configurationService.getProperty("process.eperson"));
         EPerson ePerson = ePersonService.find(context, epersonUUID);
@@ -245,15 +238,4 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
         return ePerson;
     }
 
-    private void addLogBitstreamToProcess(Context context) throws SQLException, IOException, AuthorizeException {
-        try {
-            EPerson ePerson = ePersonService.find(context, ePersonUUID);
-            Process process = processService.find(context, processId);
-
-            context.setCurrentUser(ePerson);
-            processService.createLogBitstream(context, process);
-        } catch (SQLException | IOException | AuthorizeException e) {
-            System.out.println("CommandLineDspaceRunnableHandler with process: " + processId + " could not write log to process" + e.getMessage());
-        }
-    }
 }
