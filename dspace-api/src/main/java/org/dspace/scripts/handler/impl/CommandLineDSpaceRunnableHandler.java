@@ -41,9 +41,11 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(CommandLineDSpaceRunnableHandler.class);
 
-    private ProcessService processService;
-    private EPersonService ePersonService;
-    private ConfigurationService configurationService;
+    private final ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
+
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+    private final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     String scriptName;
 
@@ -54,11 +56,8 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     public CommandLineDSpaceRunnableHandler(String scriptName, List<DSpaceCommandLineParameter> parameters) {
-        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         if (isSaveEnabled()) {
             Context context = new Context();
-            processService = ScriptServiceFactory.getInstance().getProcessService();
-            ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
             try {
                 EPerson ePerson = getEpersonProcess(context);
                 this.ePersonUUID = ePerson.getID();
