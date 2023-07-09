@@ -45,7 +45,8 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-    private final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
 
     String scriptName;
 
