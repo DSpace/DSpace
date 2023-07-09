@@ -81,7 +81,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void start() {
-        logInfo("The script has started");
+        System.out.println("The script has started");
         if (isSaveEnabled()) {
             Context context = new Context();
             try {
@@ -100,7 +100,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void handleCompletion() {
-        logInfo("The script has completed");
+        System.out.println("The script has completed");
         if (isSaveEnabled()) {
             Context context = new Context();
             try {
