@@ -225,7 +225,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     /**
      * Get the EPerson that is used to create the process
-     * @param context
+     * @param context context
      * @return the EPerson that is used to create the process
      * @throws Exception if the EPerson UUID is not valid
      */
