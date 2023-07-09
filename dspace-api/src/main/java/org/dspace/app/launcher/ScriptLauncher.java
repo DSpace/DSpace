@@ -60,10 +60,6 @@ public class ScriptLauncher {
      */
     private static transient DSpaceKernelImpl kernelImpl;
 
-    private static ProcessService processService;
-    private static EPersonService ePersonService;
-    private static ConfigurationService configurationService;
-
     /**
      * Default constructor
      */
@@ -85,9 +81,6 @@ public class ScriptLauncher {
             if (!kernelImpl.isRunning()) {
                 kernelImpl.start();
             }
-            processService = ScriptServiceFactory.getInstance().getProcessService();
-            ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-            configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         } catch (Exception e) {
             // Failed to start so destroy it and log and throw an exception
@@ -113,8 +106,8 @@ public class ScriptLauncher {
         }
 
         // Look up command in the configuration, and execute.
-
-        CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler();
+        List<DSpaceCommandLineParameter> commandLineParameters = processParametersToDSpaceCommandLineParameters(Arrays.copyOfRange(args, 1, args.length));
+        CommandLineDSpaceRunnableHandler commandLineDSpaceRunnableHandler = new CommandLineDSpaceRunnableHandler(args[0], commandLineParameters);
         int status = handleScript(args, commandConfigs, commandLineDSpaceRunnableHandler, kernelImpl);
 
         // Destroy the service kernel if it is still alive
@@ -169,22 +162,6 @@ public class ScriptLauncher {
 
         try {
             script.initialize(args, dSpaceRunnableHandler, null);
-            if (isSaveEnabled()) {
-                Context context = new Context();
-                try {
-                    EPerson ePerson = getEpersonProcess(context);
-                    List<DSpaceCommandLineParameter> dSpaceCommandLineParameters = processParametersToDSpaceCommandLineParameters(Arrays.copyOfRange(args, 1, args.length));
-                    processService.create(context, ePerson, args[0], dSpaceCommandLineParameters, new HashSet<>(context.getSpecialGroups()));
-                    context.complete();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return 1;
-                } finally {
-                    if (context.isValid()) {
-                        context.abort();
-                    }
-                }
-            }
             script.run();
             return 0;
         } catch (ParseException e) {
@@ -458,15 +435,4 @@ public class ScriptLauncher {
         return dSpaceCommandLineParameterList;
     }
 
-    private static boolean isSaveEnabled() {
-       return configurationService.getBooleanProperty("process.save-enable", false);
-    }
-    private static EPerson getEpersonProcess(Context context) throws Exception {
-        UUID epersonUUID = UUID.fromString(configurationService.getProperty("process.eperson"));
-        EPerson ePerson = ePersonService.find(context, epersonUUID);
-        if (ePerson == null) {
-            throw new Exception("EPerson UUID not valid, no result found.");
-        }
-        return ePerson;
-    }
 }
