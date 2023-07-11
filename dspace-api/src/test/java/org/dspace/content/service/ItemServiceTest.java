@@ -9,9 +9,13 @@ package org.dspace.content.service;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
@@ -19,13 +23,20 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.app.requestitem.RequestItem;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
+import org.dspace.builder.RequestItemBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -35,6 +46,8 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Constants;
+import org.dspace.eperson.Group;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
@@ -98,6 +111,177 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
+    }
+
+    @Test
+    public void preserveMetadataOrder() throws Exception {
+        context.turnOffAuthorisationSystem();
+        itemService
+            .addMetadata(
+                context, item, dcSchema, contributorElement, authorQualifier, null, "test, one", null, 0, 2
+            );
+        MetadataValue placeZero =
+            itemService
+                .addMetadata(
+                    context, item, dcSchema, contributorElement, authorQualifier, null, "test, two", null, 0, 0
+                );
+        itemService
+            .addMetadata(
+                context, item, dcSchema, contributorElement, authorQualifier, null, "test, three", null, 0, 1
+            );
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        // check the correct order using default method `getMetadata`
+        List<MetadataValue> defaultMetadata =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+
+        assertThat(defaultMetadata,hasSize(3));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, two", null, 0, defaultMetadata.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, defaultMetadata.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, defaultMetadata.get(2)
+        );
+
+        // check the correct order using the method `getMetadata` without virtual fields
+        List<MetadataValue> nonVirtualMetadatas =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+
+        // if we don't reload the item the place order is not applied correctly
+        // item = context.reloadEntity(item);
+
+        assertThat(nonVirtualMetadatas,hasSize(3));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, two", null, 0, nonVirtualMetadatas.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, nonVirtualMetadatas.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, nonVirtualMetadatas.get(2)
+        );
+
+        context.turnOffAuthorisationSystem();
+
+        item = context.reloadEntity(item);
+
+        // now just add one metadata to be the last
+        this.itemService.addMetadata(
+            context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, latest", null, 0
+        );
+        // now just remove first metadata
+        this.itemService.removeMetadataValues(context, item, List.of(placeZero));
+        // now just add one metadata to place 0
+        this.itemService.addAndShiftRightMetadata(
+            context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, new", null, 0, 0
+        );
+
+        // check the metadata using method `getMetadata`
+        defaultMetadata =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+
+        // check correct places
+        assertThat(defaultMetadata,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, defaultMetadata.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, defaultMetadata.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, defaultMetadata.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, defaultMetadata.get(3)
+        );
+
+        // check metadata using nonVirtualMethod
+        nonVirtualMetadatas =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+
+        // check correct places
+        assertThat(nonVirtualMetadatas,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, nonVirtualMetadatas.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, nonVirtualMetadatas.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, nonVirtualMetadatas.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, nonVirtualMetadatas.get(3)
+        );
+
+        // check both lists
+        assertThat(defaultMetadata.size(), equalTo(nonVirtualMetadatas.size()));
+        assertThat(defaultMetadata.get(0), equalTo(nonVirtualMetadatas.get(0)));
+        assertThat(defaultMetadata.get(1), equalTo(nonVirtualMetadatas.get(1)));
+        assertThat(defaultMetadata.get(2), equalTo(nonVirtualMetadatas.get(2)));
+        assertThat(defaultMetadata.get(3), equalTo(nonVirtualMetadatas.get(3)));
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        item = context.reloadEntity(item);
+
+        // check after commit
+        defaultMetadata =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+
+        // check correct places
+        assertThat(defaultMetadata,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, defaultMetadata.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, defaultMetadata.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, defaultMetadata.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, defaultMetadata.get(3)
+        );
+
+        // check metadata using nonVirtualMethod
+        nonVirtualMetadatas =
+            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+
+        // check correct places
+        assertThat(nonVirtualMetadatas,hasSize(4));
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, new", null, 0, nonVirtualMetadatas.get(0)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, three", null, 1, nonVirtualMetadatas.get(1)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 2, nonVirtualMetadatas.get(2)
+        );
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, latest", null, 3, nonVirtualMetadatas.get(3)
+        );
+
+        // check both lists
+        assertThat(defaultMetadata.size(), equalTo(nonVirtualMetadatas.size()));
+        assertThat(defaultMetadata.get(0), equalTo(nonVirtualMetadatas.get(0)));
+        assertThat(defaultMetadata.get(1), equalTo(nonVirtualMetadatas.get(1)));
+        assertThat(defaultMetadata.get(2), equalTo(nonVirtualMetadatas.get(2)));
+        assertThat(defaultMetadata.get(3), equalTo(nonVirtualMetadatas.get(3)));
+
     }
 
     @Test
@@ -473,6 +657,101 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
     }
 
+    @Test
+    public void testFindItemsWithEditNoRights() throws Exception {
+        context.setCurrentUser(eperson);
+        List<Item> result = itemService.findItemsWithEdit(context, 0, 10);
+        int count = itemService.countItemsWithEdit(context);
+        assertThat(result.size(), equalTo(0));
+        assertThat(count, equalTo(0));
+    }
+
+    @Test
+    public void testFindAndCountItemsWithEditEPerson() throws Exception {
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withUser(eperson)
+            .withDspaceObject(item)
+            .withAction(Constants.WRITE)
+            .build();
+        context.setCurrentUser(eperson);
+        List<Item> result = itemService.findItemsWithEdit(context, 0, 10);
+        int count = itemService.countItemsWithEdit(context);
+        assertThat(result.size(), equalTo(1));
+        assertThat(count, equalTo(1));
+    }
+
+    @Test
+    public void testFindAndCountItemsWithAdminEPerson() throws Exception {
+         ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withUser(eperson)
+            .withDspaceObject(item)
+            .withAction(Constants.ADMIN)
+            .build();
+        context.setCurrentUser(eperson);
+        List<Item> result = itemService.findItemsWithEdit(context, 0, 10);
+        int count = itemService.countItemsWithEdit(context);
+        assertThat(result.size(), equalTo(1));
+        assertThat(count, equalTo(1));
+    }
+
+    @Test
+    public void testFindAndCountItemsWithEditGroup() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+            .addMember(eperson)
+            .build();
+        context.restoreAuthSystemState();
+
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withGroup(group)
+            .withDspaceObject(item)
+            .withAction(Constants.WRITE)
+            .build();
+        context.setCurrentUser(eperson);
+        List<Item> result = itemService.findItemsWithEdit(context, 0, 10);
+        int count = itemService.countItemsWithEdit(context);
+        assertThat(result.size(), equalTo(1));
+        assertThat(count, equalTo(1));
+    }
+
+    @Test
+    public void testFindAndCountItemsWithAdminGroup() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+            .addMember(eperson)
+            .build();
+        context.restoreAuthSystemState();
+
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
+            .withGroup(group)
+            .withDspaceObject(item)
+            .withAction(Constants.ADMIN)
+            .build();
+        context.setCurrentUser(eperson);
+        List<Item> result = itemService.findItemsWithEdit(context, 0, 10);
+        int count = itemService.countItemsWithEdit(context);
+        assertThat(result.size(), equalTo(1));
+        assertThat(count, equalTo(1));
+    }
+
+    @Test
+    public void testRemoveItemThatHasRequests() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = ItemBuilder.createItem(context, collection1)
+            .withTitle("Test")
+            .build();
+        InputStream is = new ByteArrayInputStream(new byte[0]);
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                                              .build();
+        RequestItem requestItem = RequestItemBuilder.createRequestItem(context, item, bitstream)
+                                                    .build();
+
+        itemService.delete(context, item);
+        context.dispatchEvents();
+        context.restoreAuthSystemState();
+
+        assertNull(itemService.find(context, item.getID()));
+    }
     private void assertMetadataValue(String authorQualifier, String contributorElement, String dcSchema, String value,
                                      String authority, int place, MetadataValue metadataValue) {
         assertThat(metadataValue.getValue(), equalTo(value));

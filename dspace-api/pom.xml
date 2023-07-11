@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.4</version>
+        <version>7.6.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -589,13 +589,6 @@
             <artifactId>solr-core</artifactId>
             <scope>test</scope>
             <version>${solr.client.version}</version>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -783,7 +776,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>20230227</version>
         </dependency>
 
         <!-- Useful for testing command-line tools -->
@@ -813,10 +806,11 @@
             <scope>test</scope>
         </dependency>
 
-       <dependency>
+        <dependency>
             <groupId>org.apache.bcel</groupId>
             <artifactId>bcel</artifactId>
-            <version>6.4.0</version>
+            <version>6.6.0</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- required for openaire api integration -->
@@ -839,42 +833,60 @@
             	</exclusion>
             </exclusions>
         </dependency>
+        
+        <dependency>
+            <groupId>io.findify</groupId>
+            <artifactId>s3mock_2.13</artifactId>
+            <version>0.2.6</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.amazonawsl</groupId>
+                    <artifactId>aws-java-sdk-s3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.amazonaws</groupId>
+                    <artifactId>aws-java-sdk-s3</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
           <!-- for mockserver -->
-          <!-- Solve dependency convergence issues related to
+          <!-- Solve dependency convergence issues related to Solr and
                'mockserver-junit-rule' by selecting the versions we want to use. -->
-          <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.9</version>
-          </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.68.Final</version>
+            <version>4.1.94.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport</artifactId>
-            <version>4.1.68.Final</version>
+            <version>4.1.94.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-unix-common</artifactId>
+            <version>4.1.94.Final</version>
+           </dependency>
+          <dependency>
+            <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.1.68.Final</version>
+            <version>4.1.94.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
-            <version>4.1.68.Final</version>
+            <version>4.1.94.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec</artifactId>
-            <version>4.1.68.Final</version>
+            <version>4.1.94.Final</version>
           </dependency>
           <dependency>
             <groupId>org.apache.velocity</groupId>
@@ -906,6 +918,12 @@
             <groupId>io.swagger</groupId>
             <artifactId>swagger-core</artifactId>
             <version>1.6.2</version>
+          </dependency>
+          <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.13.9</version>
+            <scope>test</scope>
           </dependency>
         </dependencies>
     </dependencyManagement>

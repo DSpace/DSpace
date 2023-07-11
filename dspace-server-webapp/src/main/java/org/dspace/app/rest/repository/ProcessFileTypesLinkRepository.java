@@ -47,7 +47,7 @@ public class ProcessFileTypesLinkRepository extends AbstractDSpaceRestRepository
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
     public ProcessFileTypesRest getFileTypesFromProcess(@Nullable HttpServletRequest request,
                                                         Integer processId,
                                                         @Nullable Pageable optionalPageable,

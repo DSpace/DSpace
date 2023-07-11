@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.4</version>
+    <version>7.6.1-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -19,30 +19,30 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.3.20</spring.version>
-        <spring-boot.version>2.6.8</spring-boot.version>
-        <spring-security.version>5.6.5</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.6.5.Final</hibernate.version>
-        <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.4.1</postgresql.driver.version>
-        <solr.client.version>8.11.1</solr.client.version>
+        <spring.version>5.3.27</spring.version>
+        <spring-boot.version>2.7.12</spring-boot.version>
+        <spring-security.version>5.7.8</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>5.6.15.Final</hibernate.version>
+        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.6.0</postgresql.driver.version>
+        <solr.client.version>8.11.2</solr.client.version>
 
         <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
-        <jackson.version>2.12.6</jackson.version>
-        <jackson-databind.version>2.12.6.1</jackson-databind.version>
+        <jackson.version>2.13.4</jackson.version>
+        <jackson-databind.version>2.13.4.2</jackson-databind.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.48.v20220622</jetty.version>
-        <log4j.version>2.17.1</log4j.version>
-        <pdfbox-version>2.0.24</pdfbox-version>
-        <rome.version>1.18.0</rome.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <tika.version>2.3.0</tika.version>
+        <jetty.version>9.4.51.v20230217</jetty.version>
+        <log4j.version>2.20.0</log4j.version>
+        <pdfbox-version>2.0.28</pdfbox-version>
+        <rome.version>1.19.0</rome.version>
+        <slf4j.version>1.7.36</slf4j.version>
+        <tika.version>2.5.0</tika.version>
         <!-- Sync with whatever version Tika uses -->
         <bouncycastle.version>1.70</bouncycastle.version>
 
@@ -872,14 +872,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.4</version>
+                       <version>7.6.1-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.4</version>
+                       <version>7.6.1-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1030,69 +1030,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.4</version>
+                <version>7.6.1-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1479,12 +1479,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-dbcp2</artifactId>
-                <version>2.8.0</version>
+                <version>2.9.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
-                <version>1.3.3</version>
+                <version>1.5</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -1506,7 +1506,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
-                <version>2.9.0</version>
+                <version>2.11.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-validator</groupId>
@@ -1611,11 +1616,6 @@
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
                 <version>62.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>11.2.0.4.0</version>
             </dependency>
             <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
@@ -1772,7 +1772,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>31.0.1-jre</version>
+                <version>32.0.0-jre</version>
                 <exclusions>
                     <!-- Use version provided by Solr / Postgres -->
                     <exclusion>
@@ -1927,7 +1927,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>dspace-7.4</tag>
+        <tag>dspace-7_x</tag>
     </scm>
 
 

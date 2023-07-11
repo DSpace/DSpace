@@ -40,6 +40,7 @@ import org.dspace.app.rest.exception.GroupNameNotProvidedException;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -56,6 +57,8 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -556,6 +559,68 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$", Matchers.is(
                         GroupMatcher.matchGroupEntry(group.getID(), "new name"))
                 ));
+    }
+
+    @Test
+    public void patchReplaceMultipleDescriptionGroupName() throws Exception {
+        context.turnOffAuthorisationSystem();
+        List<String> groupDescription = List.of(
+            "FIRST",
+            "SECOND",
+            "THIRD"
+        );
+
+        Group group =
+            GroupBuilder.createGroup(context)
+                .build();
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        groupService
+            .addMetadata(
+                context, group, MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY, groupDescription
+            );
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+        .perform(get("/api/eperson/groups/" + group.getID()))
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$.metadata",
+                Matchers.allOf(
+                    MetadataMatcher.matchMetadata("dc.description", groupDescription.get(0), 0),
+                    MetadataMatcher.matchMetadata("dc.description", groupDescription.get(1), 1),
+                    MetadataMatcher.matchMetadata("dc.description", groupDescription.get(2), 2)
+                )
+            )
+        );
+
+        List<Operation> ops = List.of(
+            new ReplaceOperation("/metadata/dc.description/0", groupDescription.get(2)),
+            new ReplaceOperation("/metadata/dc.description/1", groupDescription.get(0)),
+            new ReplaceOperation("/metadata/dc.description/2", groupDescription.get(1))
+        );
+        String requestBody = getPatchContent(ops);
+
+        getClient(token)
+        .perform(
+            patch("/api/eperson/groups/" + group.getID())
+            .content(requestBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+        )
+        .andExpect(status().isOk());
+
+        getClient(token)
+            .perform(get("/api/eperson/groups/" + group.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", groupDescription.get(2), 0),
+                        MetadataMatcher.matchMetadata("dc.description", groupDescription.get(0), 1),
+                        MetadataMatcher.matchMetadata("dc.description", groupDescription.get(1), 2)
+                    )
+                )
+            );
     }
 
     @Test

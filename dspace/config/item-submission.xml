@@ -47,6 +47,26 @@
         <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
         <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
         -->
+        <!-- These configurations enable default submission forms per Entity type 
+            
+            The  collection-entity-type will be the entity-type attribute associated with a collection,
+            typically the entity name that is associated with a collection if any created or loaded 
+            (that is usually specified in relationship-types.xml).
+            - - - - - -
+            PLEASE NOTICE THAT YOU WILL HAVE TO RESTART DSPACE
+            - - - - - -
+            Uncomment if you intend to use them
+        -->  
+        <!-- 
+        <name-map collection-entity-type="Publication" submission-name="Publication"/>
+        <name-map collection-entity-type="Person" submission-name="Person"/>
+        <name-map collection-entity-type="Project" submission-name="Project"/>
+        <name-map collection-entity-type="OrgUnit" submission-name="OrgUnit"/>
+        <name-map collection-entity-type="Journal" submission-name="Journal"/>
+        <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
+        <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
+         -->
+
     </submission-map>
 
 
@@ -79,7 +99,6 @@
             <heading></heading>
             <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
             <type>collection</type>
-            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
         <!-- The following set of DescribeStep <step-definition>s all point to forms (of the same name) which are
@@ -209,6 +228,13 @@
             <processing-class>org.dspace.app.rest.submit.step.SherpaPolicyStep</processing-class>
             <type>sherpaPolicy</type>
         </step-definition>
+
+        <!-- New step for show / mint identifiers -->
+        <step-definition id="identifiers">
+            <heading>submit.progressbar.identifiers</heading>
+            <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
+            <type>identifiers</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -233,7 +259,9 @@
             <!--<step id="sample"/> -->
 
             <step id="collection"/>
-
+            <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
+                 that identifiers.cfg and identifier-service.xml are properly configured. -->
+            <!--<step id="identifiers"/>-->
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>

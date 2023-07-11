@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.4</version>
+      <version>7.6.1-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -61,22 +61,6 @@
    </build>
 
    <profiles>
-      <profile>
-         <id>oracle-support</id>
-         <activation>
-            <property>
-               <name>db.name</name>
-               <value>oracle</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc6</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
-
       <!-- Setup the Unit Test Environment (when -DskipUnitTests=false) -->
       <profile>
          <id>unit-test-environment</id>
@@ -266,13 +250,6 @@
          <artifactId>solr-core</artifactId>
          <version>${solr.client.version}</version>
          <scope>test</scope>
-         <exclusions>
-            <!-- Newer version brought in by opencsv -->
-            <exclusion>
-               <groupId>org.apache.commons</groupId>
-               <artifactId>commons-text</artifactId>
-            </exclusion>
-         </exclusions>
       </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>

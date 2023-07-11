@@ -18,6 +18,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.logic.Filter;
 import org.dspace.core.Context;
 import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
@@ -26,13 +27,14 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Marsa Haoua
  * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
-public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
+public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implements InitializingBean {
     /**
      * log4j category
      */
@@ -48,8 +50,26 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
     @Autowired(required = true)
     protected VersionHistoryService versionHistoryService;
 
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
     @Override
-    public String mint(Context context, DSpaceObject dso)
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedDOIIdentifierProvider.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
+
+    @Override
+    public String mint(Context context, DSpaceObject dso) throws IdentifierException {
+        return mint(context, dso, this.filter);
+    }
+
+    @Override
+    public String mint(Context context, DSpaceObject dso, Filter filter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             throw new IdentifierException("Currently only Items are supported for DOIs.");
@@ -60,7 +80,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         try {
             history = versionHistoryService.findByItem(context, item);
         } catch (SQLException ex) {
-            throw new RuntimeException("A problem occured while accessing the database.", ex);
+            throw new RuntimeException("A problem occurred while accessing the database.", ex);
         }
 
         String doi = null;
@@ -70,7 +90,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                 return doi;
             }
         } catch (SQLException ex) {
-            log.error("Error while attemping to retrieve information about a DOI for "
+            log.error("Error while attempting to retrieve information about a DOI for "
                           + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                           + " with ID " + dso.getID() + ".", ex);
             throw new RuntimeException("Error while attempting to retrieve "
@@ -78,6 +98,9 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                                            + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                                            + " with ID " + dso.getID() + ".", ex);
         }
+
+        // Make a call to the filter here to throw an exception instead of carrying on with removal + creation
+        checkMintable(context, filter, dso);
 
         // check whether we have a DOI in the metadata and if we have to remove it
         String metadataDOI = getDOIOutOfObject(dso);
@@ -111,7 +134,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                 // ensure DOI exists in our database as well and return.
                 // this also checks that the doi is not assigned to another dso already.
                 try {
-                    loadOrCreateDOI(context, dso, versionedDOI);
+                    loadOrCreateDOI(context, dso, versionedDOI, filter);
                 } catch (SQLException ex) {
                     log.error(
                         "A problem with the database connection occurd while processing DOI " + versionedDOI + ".", ex);
@@ -125,9 +148,9 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
             if (history != null) {
                 // versioning is currently supported for items only
                 // if we have a history, we have a item
-                doi = makeIdentifierBasedOnHistory(context, dso, history);
+                doi = makeIdentifierBasedOnHistory(context, dso, history, filter);
             } else {
-                doi = loadOrCreateDOI(context, dso, null).getDoi();
+                doi = loadOrCreateDOI(context, dso, null, filter).getDoi();
             }
         } catch (SQLException ex) {
             log.error("SQLException while creating a new DOI: ", ex);
@@ -136,11 +159,31 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
             log.error("AuthorizationException while creating a new DOI: ", ex);
             throw new IdentifierException(ex);
         }
+        return doi.startsWith(DOI.SCHEME) ? doi : DOI.SCHEME + doi;
+    }
+
+    @Override
+    public void register(Context context, DSpaceObject dso, String identifier) throws IdentifierException {
+        register(context, dso, identifier, this.filter);
+    }
+
+    @Override
+    public String register(Context context, DSpaceObject dso, Filter filter)
+            throws IdentifierException {
+        if (!(dso instanceof Item)) {
+            // DOIs are currently assigned only to Items
+            return null;
+        }
+
+        String doi = mint(context, dso, filter);
+
+        register(context, dso, doi, filter);
+
         return doi;
     }
 
     @Override
-    public void register(Context context, DSpaceObject dso, String identifier)
+    public void register(Context context, DSpaceObject dso, String identifier, Filter filter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             throw new IdentifierException("Currently only Items are supported for DOIs.");
@@ -148,7 +191,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         Item item = (Item) dso;
 
         if (StringUtils.isEmpty(identifier)) {
-            identifier = mint(context, dso);
+            identifier = mint(context, dso, filter);
         }
         String doiIdentifier = doiService.formatIdentifier(identifier);
 
@@ -156,10 +199,10 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
 
         // search DOI in our db
         try {
-            doi = loadOrCreateDOI(context, dso, doiIdentifier);
+            doi = loadOrCreateDOI(context, dso, doiIdentifier, filter);
         } catch (SQLException ex) {
-            log.error("Error in databse connection: " + ex.getMessage(), ex);
-            throw new RuntimeException("Error in database conncetion.", ex);
+            log.error("Error in database connection: " + ex.getMessage(), ex);
+            throw new RuntimeException("Error in database connection.", ex);
         }
 
         if (DELETED.equals(doi.getStatus()) ||
@@ -220,8 +263,14 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         return doiPostfix;
     }
 
-    // Should never return null!
     protected String makeIdentifierBasedOnHistory(Context context, DSpaceObject dso, VersionHistory history)
+            throws AuthorizeException, SQLException, DOIIdentifierException, IdentifierNotApplicableException {
+        return makeIdentifierBasedOnHistory(context, dso, history, this.filter);
+    }
+
+    // Should never return null!
+    protected String makeIdentifierBasedOnHistory(Context context, DSpaceObject dso, VersionHistory history,
+                                                  Filter filter)
         throws AuthorizeException, SQLException, DOIIdentifierException, IdentifierNotApplicableException {
         // Mint foreach new version an identifier like: 12345/100.versionNumber
         // use the bare handle (g.e. 12345/100) for the first version.
@@ -244,6 +293,9 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
         }
 
         if (previousVersionDOI == null) {
+            // Before continuing with any new DOI creation, apply the filter
+            checkMintable(context, filter, dso);
+
             // We need to generate a new DOI.
             DOI doi = doiService.create(context);
 
@@ -269,7 +321,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider {
                 String.valueOf(versionHistoryService.getVersion(context, history, item).getVersionNumber()));
         }
 
-        loadOrCreateDOI(context, dso, identifier);
+        loadOrCreateDOI(context, dso, identifier, filter);
         return identifier;
     }
 

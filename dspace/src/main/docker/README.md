@@ -1,4 +1,4 @@
-# Docker images supporting DSpace
+# Docker images supporting DSpace Backend
 
 ***
 :warning: **THESE IMAGES ARE NOT PRODUCTION READY**  The below Docker Compose images/resources were built for development/testing only.  Therefore, they may not be fully secured or up-to-date, and should not be used in production.
@@ -6,9 +6,15 @@
 If you wish to run DSpace on Docker in production, we recommend building your own Docker images. You are welcome to borrow ideas/concepts from the below images in doing so. But, the below images should not be used "as is" in any production scenario.
 ***
 
-## Dockerfile.dependencies
+## Overview
+The Dockerfiles in this directory (and subdirectories) are used by our [Docker Compose scripts](../docker-compose/README.md).
+
+## Dockerfile.dependencies (in root folder)
 
 This Dockerfile is used to pre-cache Maven dependency downloads that will be used in subsequent DSpace docker builds.
+Caching these Maven dependencies provides a speed increase to all later builds by ensuring the dependencies
+are only downloaded once.
+
 ```
 docker build -t dspace/dspace-dependencies:dspace-7_x -f Dockerfile.dependencies .
 ```
@@ -22,12 +28,13 @@ Admins to our DockerHub repo can manually publish with the following command.
 docker push dspace/dspace-dependencies:dspace-7_x
 ```
 
-## Dockerfile.test
+## Dockerfile.test (in root folder)
 
-This Dockerfile builds a DSpace 7 Tomcat image (for testing/development).
-This image deploys two DSpace webapps:
+This Dockerfile builds a DSpace 7 backend image (for testing/development).
+This image deploys two DSpace webapps to Tomcat running in Docker:
 1. The DSpace 7 REST API (at `http://localhost:8080/server`)
-2. The legacy (v6) REST API (at `http://localhost:8080//rest`), deployed without requiring HTTPS access.
+2. The legacy (v6) REST API (at `http://localhost:8080/rest`), deployed without requiring HTTPS access.
+This image also sets up debugging in Tomcat for development.
 
 ```
 docker build -t dspace/dspace:dspace-7_x-test -f Dockerfile.test .
@@ -42,12 +49,12 @@ Admins to our DockerHub repo can manually publish with the following command.
 docker push dspace/dspace:dspace-7_x-test
 ```
 
-## Dockerfile
+## Dockerfile (in root folder)
 
-This Dockerfile builds a DSpace 7 tomcat image.
-This image deploys two DSpace webapps:
+This Dockerfile builds a DSpace 7 backend image.
+This image deploys one DSpace webapp to Tomcat running in Docker:
 1. The DSpace 7 REST API (at `http://localhost:8080/server`)
-2. The legacy (v6) REST API (at `http://localhost:8080//rest`), deployed *requiring* HTTPS access.
+
 ```
 docker build -t dspace/dspace:dspace-7_x -f Dockerfile .
 ```
@@ -61,9 +68,9 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace:dspace-7_x
 ```
 
-## Dockefile.cli
+## Dockerfile.cli (in root folder)
 
-This Dockerfile builds a DSpace 7 CLI image, which can be used to run commandline tools via Docker.
+This Dockerfile builds a DSpace 7 CLI (command line interface) image, which can be used to run DSpace's commandline tools via Docker.
 ```
 docker build -t dspace/dspace-cli:dspace-7_x -f Dockerfile.cli .
 ```
@@ -77,46 +84,60 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace-cli:dspace-7_x
 ```
 
-## dspace/src/main/docker/dspace-postgres-pgcrypto/Dockerfile
+## ./dspace-postgres-pgcrypto/Dockerfile
 
 This is a PostgreSQL Docker image containing the `pgcrypto` extension required by DSpace 6+.
+This image is built *automatically* after each commit is made to the `main` branch.
+
+How to build manually:
 ```
 cd dspace/src/main/docker/dspace-postgres-pgcrypto
-docker build -t dspace/dspace-postgres-pgcrypto .
+docker build -t dspace/dspace-postgres-pgcrypto:dspace-7_x .
 ```
 
-**This image is built manually.**  It should be rebuilt as needed.
+It is also possible to change the version of PostgreSQL or the PostgreSQL user's password during the build:
+```
+cd dspace/src/main/docker/dspace-postgres-pgcrypto
+docker build -t dspace/dspace-postgres-pgcrypto:dspace-7_x --build-arg POSTGRES_VERSION=11 --build-arg POSTGRES_PASSWORD=mypass .
+```
 
 A copy of this file exists in the DSpace 6 branch.  A specialized version of this file exists for DSpace 4 in DSpace-Docker-Images.
 
-Admins to our DockerHub repo can publish with the following command.
+Admins to our DockerHub repo can (manually) publish with the following command.
 ```
-docker push dspace/dspace-postgres-pgcrypto
+docker push dspace/dspace-postgres-pgcrypto:dspace-7_x
 ```
 
-## dspace/src/main/docker/dspace-postgres-pgcrypto-curl/Dockerfile
+## ./dspace-postgres-pgcrypto-curl/Dockerfile
 
 This is a PostgreSQL Docker image containing the `pgcrypto` extension required by DSpace 6+.
 This image also contains `curl`.  The image is pre-configured to load a Postgres database dump on initialization.
+
+This image is built *automatically* after each commit is made to the `main` branch.
+
+How to build manually:
 ```
 cd dspace/src/main/docker/dspace-postgres-pgcrypto-curl
-docker build -t dspace/dspace-postgres-pgcrypto:loadsql .
+docker build -t dspace/dspace-postgres-pgcrypto:dspace-7_x-loadsql .
 ```
 
-**This image is built manually.**   It should be rebuilt as needed.
+Similar to `dspace-postgres-pgcrypto` above, you can also modify the version of PostgreSQL or the PostgreSQL user's password.
+See examples above.
 
 A copy of this file exists in the DSpace 6 branch.
 
-Admins to our DockerHub repo can publish with the following command.
+Admins to our DockerHub repo can (manually) publish with the following command.
 ```
-docker push dspace/dspace-postgres-pgcrypto:loadsql
+docker push dspace/dspace-postgres-pgcrypto:dspace-7_x-loadsql
 ```
 
-## dspace/src/main/docker/dspace-shibboleth/Dockerfile
+## ./dspace-shibboleth/Dockerfile
 
 This is a test / demo image which provides an Apache HTTPD proxy (in front of Tomcat)
-with mod_shib & Shibboleth installed.  It is primarily for usage for
-testing DSpace's Shibboleth integration. It uses https://samltest.id/ as the Shibboleth IDP
+with `mod_shib` & Shibboleth installed based on the
+[DSpace Shibboleth configuration instructions](https://wiki.lyrasis.org/display/DSDOC7x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication).
+It is primarily for usage for testing DSpace's Shibboleth integration.
+It uses https://samltest.id/ as the Shibboleth IDP
 
 **This image is built manually.**   It should be rebuilt as needed.
 
@@ -130,10 +151,28 @@ docker run -i -t -d -p 80:80 -p 443:443 dspace/dspace-shibboleth
 
 This image can also be rebuilt using the `../docker-compose/docker-compose-shibboleth.yml` script.
 
+## ./dspace-solr/Dockerfile
 
-## test/ folder
+This Dockerfile builds a Solr image with DSpace Solr configsets included. It
+can be pulled / built following the [docker compose resources](../docker-compose/README.md)
+documentation. Or, to just build and/or run Solr:
+
+```bash
+docker-compose build dspacesolr
+docker-compose -p d7 up -d dspacesolr
+```
+
+If you're making iterative changes to the DSpace Solr configsets you'll need to rebuild /
+restart the `dspacesolr` container for the changes to be deployed. From DSpace root:
+
+```bash
+docker-compose -p d7 up --detach --build dspacesolr
+```
+
+## ./test/ folder
 
 These resources are bundled into the `dspace/dspace:dspace-*-test` image at build time.
+See the `Dockerfile.test` section above for more information about the test image.
 
 
 ## Debugging Docker builds

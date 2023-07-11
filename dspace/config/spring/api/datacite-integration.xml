@@ -1,0 +1,62 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="dataciteMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="datacite.title" value-ref="dataciteTitleContrib"/>
+        <entry key-ref="datacite.id" value-ref="dataciteIDContrib"/>
+        <entry key-ref="datacite.author" value-ref="dataciteAuthorContrib"/>
+        <!-- TODO: Further Mappings here! querys are applied among the data.attributes object containing the informations -->
+    </util:map>
+
+    <bean id="dataciteAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/creators"/>
+                <property name="elementAttribute" value="/name"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.author"/>
+    </bean>
+    <bean id="datacite.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="dataciteTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/titles"/>
+                <property name="elementAttribute" value="/title"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.title"/>
+    </bean>
+    <bean id="datacite.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+
+    <!-- must be present to be imported, since it's used as the recordId-->
+    <bean id="dataciteIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="datacite.id"/>
+        <property name="query" value="/doi"/>
+    </bean>
+    <bean id="datacite.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.doi"/>
+    </bean>
+
+</beans>

@@ -15,8 +15,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.DCDate;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
@@ -107,26 +107,30 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
             LinkedList<MetadatumDTO> dayList = (LinkedList<MetadatumDTO>) day.contributeMetadata(t);
 
             for (int i = 0; i < yearList.size(); i++) {
-                DCDate dcDate = null;
+                String resultDateString = "";
                 String dateString = "";
 
+                SimpleDateFormat resultFormatter = null;
                 if (monthList.size() > i && dayList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue() +
                         "-" + dayList.get(i).getValue();
+                    resultFormatter = new SimpleDateFormat("yyyy-MM-dd");
                 } else if (monthList.size() > i) {
                     dateString = yearList.get(i).getValue() + "-" + monthList.get(i).getValue();
+                    resultFormatter = new SimpleDateFormat("yyyy-MM");
                 } else {
                     dateString = yearList.get(i).getValue();
+                    resultFormatter = new SimpleDateFormat("yyyy");
                 }
 
                 int j = 0;
                 // Use the first dcDate that has been formatted (Config should go from most specific to most lenient)
-                while (j < dateFormatsToAttempt.size() && dcDate == null) {
+                while (j < dateFormatsToAttempt.size() && StringUtils.isBlank(resultDateString)) {
                     String dateFormat = dateFormatsToAttempt.get(j);
                     try {
                         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
                         Date date = formatter.parse(dateString);
-                        dcDate = new DCDate(date);
+                        resultDateString = resultFormatter.format(date);
                     } catch (ParseException e) {
                         // Multiple dateformats can be configured, we don't want to print the entire stacktrace every
                         // time one of those formats fails.
@@ -136,8 +140,8 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
                     }
                     j++;
                 }
-                if (dcDate != null) {
-                    values.add(metadataFieldMapping.toDCValue(field, dcDate.toString()));
+                if (StringUtils.isNotBlank(resultDateString)) {
+                    values.add(metadataFieldMapping.toDCValue(field, resultDateString));
                 } else {
                     log.info(
                             "Failed parsing " + dateString + ", check " +
