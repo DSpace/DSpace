@@ -172,13 +172,6 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             addNamedResourceTypeIndex(doc, acvalue);
         }
 
-        // write the index and close the inputstreamreaders
-        try {
-            log.info("Wrote Item: " + item.getID() + " to Index");
-        } catch (RuntimeException e) {
-            log.error("Error while writing item to discovery index: " + item.getID() + " message:"
-                    + e.getMessage(), e);
-        }
         return doc;
     }
 
