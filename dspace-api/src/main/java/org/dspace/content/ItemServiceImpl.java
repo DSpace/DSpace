@@ -81,6 +81,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -282,6 +283,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findAll(Session session) throws SQLException {
+        return itemDAO.findAll(session, true);
+    }
+
+    @Override
     public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
         return itemDAO.findAll(context.getSession(), true, limit, offset);
     }
@@ -346,6 +352,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
         return itemDAO.findAllByCollection(context.getSession(), collection);
+    }
+
+    @Override
+    public Iterator<Item> findAllByCollection(Session session, Collection collection)
+            throws SQLException {
+        return itemDAO.findAllByCollection(session, collection);
     }
 
     @Override

@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.persistence.FlushModeType;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
@@ -205,6 +206,26 @@ public class Context implements AutoCloseable {
     public Session getSession()
             throws SQLException {
         return (Session) dbConnection.getSession();
+    }
+
+    /**
+     * Get an additional JPA {@link Session} from a DSpace {@link Context},
+     * set default-read-only.
+     * Be sure to {@code close()} the Session when finished -- Context does not
+     * track it.
+     *
+     * @return a new read-only JPA {@link Session}.
+     * @throws SQLException passed through.
+     */
+    public Session getReadOnlySession()
+            throws SQLException {
+        DBConnection<Session> connection = dbConnection;
+        Session newSession = connection.getSession()
+                .getSessionFactory()
+                .openSession();
+        newSession.setDefaultReadOnly(true);
+        newSession.setFlushMode(FlushModeType.COMMIT);
+        return newSession;
     }
 
     /**
