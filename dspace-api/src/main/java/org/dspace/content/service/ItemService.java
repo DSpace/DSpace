@@ -31,6 +31,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Item object.
@@ -92,6 +93,17 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findAll(Context context) throws SQLException;
+
+    /**
+     * Get all the items in the archive. Only items with the "in archive" flag
+     * set are included. The order of the list is indeterminate.
+     *
+     * @param session current request's database context.
+     * @return an iterator over the items in the archive.
+     * @throws SQLException if database error
+     */
+
+    public Iterator<Item> findAll(Session session) throws SQLException;
 
     /**
      * Get all the items in the archive. Only items with the "in archive" flag
@@ -215,19 +227,6 @@ public interface ItemService
     public int countByCollectionMapping(Context context, Collection collection) throws SQLException;
 
     /**
-     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
-     *
-     * @param context DSpace context object
-     * @param collection Collection (parent)
-     * @return an iterator over the items in the collection.
-     * @param limit limited number of items
-     * @param offset offset value
-     * @throws SQLException if database error
-     */
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
-        throws SQLException;
-
-    /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
      *
      * @param context DSpace context object
@@ -257,6 +256,30 @@ public interface ItemService
      * @throws SQLException if database error
      */
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
+
+    /**
+     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
+     *
+     * @param session    current request's database session.
+     * @param collection Collection (parent)
+     * @return an iterator over the items in the collection.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findAllByCollection(Session session, Collection collection)
+            throws SQLException;
+
+    /**
+     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
+     *
+     * @param context DSpace context object
+     * @param collection Collection (parent)
+     * @return an iterator over the items in the collection.
+     * @param limit limited number of items
+     * @param offset offset value
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
+        throws SQLException;
 
     /**
      * See whether this Item is contained by a given Collection.
@@ -497,7 +520,7 @@ public interface ItemService
      * already applied to the bundle/bitstream. Collection's policies are inherited
      * if there are no other policies defined or if the append mode is defined by
      * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
-     * 
+     *
      * @param context             DSpace context object
      * @param item                Item to adjust policies on
      * @param collection          Collection
@@ -535,7 +558,7 @@ public interface ItemService
      * inherited as appropriate. Collection's policies are inherited if there are no
      * other policies defined or if the append mode is defined by the configuration
      * via the core.authorization.installitem.inheritance-read.append-mode property
-     * 
+     *
      * @param context              DSpace context object
      * @param item                 Item to adjust policies on
      * @param collection           Collection
@@ -681,7 +704,6 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     public Iterator<Item> findByAuthorityValue(Context context,
                                                String schema, String element, String qualifier, String value)
@@ -883,6 +905,7 @@ public interface ItemService
      * @param context the DSpace context.
      * @param item the item.
      * @return the entity type of the given item, or null if not found.
+     * @throws java.sql.SQLException passed through.
      */
     public EntityType getEntityType(Context context, Item item) throws SQLException;
 
