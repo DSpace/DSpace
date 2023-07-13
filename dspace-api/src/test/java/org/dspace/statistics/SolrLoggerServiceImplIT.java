@@ -36,6 +36,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -130,14 +131,16 @@ public class SolrLoggerServiceImplIT
         System.out.println("markRobots");
 
         EmbeddedSolrClientFactory clientFactory = new EmbeddedSolrClientFactory();
+        ContentServiceFactory csf = ContentServiceFactory.getInstance();
+        DSpace dspace = new DSpace();
 
         SolrLoggerServiceImpl instance = new SolrLoggerServiceImpl();
-        ContentServiceFactory csf = ContentServiceFactory.getInstance();
         instance.bitstreamService = csf.getBitstreamService();
         instance.contentServiceFactory = csf;
         instance.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         instance.clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
-        instance.solrClientFactory = clientFactory;
+        instance.geoIpService = dspace.getSingletonService(GeoIpService.class);
+        instance.solrStatisticsCore = dspace.getSingletonService(SolrStatisticsCore.class);
         instance.afterPropertiesSet();
 
         // Create objects to view.
@@ -226,14 +229,16 @@ public class SolrLoggerServiceImplIT
         System.out.println("deleteRobots");
 
         EmbeddedSolrClientFactory clientFactory = new EmbeddedSolrClientFactory();
+        ContentServiceFactory csf = ContentServiceFactory.getInstance();
+        DSpace dspace = new DSpace();
 
         SolrLoggerServiceImpl instance = new SolrLoggerServiceImpl();
-        ContentServiceFactory csf = ContentServiceFactory.getInstance();
         instance.bitstreamService = csf.getBitstreamService();
         instance.contentServiceFactory = csf;
-        instance.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        instance.configurationService = cfg;
         instance.clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
-        instance.solrClientFactory = clientFactory;
+        instance.geoIpService = dspace.getSingletonService(GeoIpService.class);
+        instance.solrStatisticsCore = dspace.getSingletonService(SolrStatisticsCore.class);
         instance.afterPropertiesSet();
 
         // Create objects to view.
