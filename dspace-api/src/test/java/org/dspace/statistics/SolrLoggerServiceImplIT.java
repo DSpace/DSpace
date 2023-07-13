@@ -131,18 +131,16 @@ public class SolrLoggerServiceImplIT
         System.out.println("markRobots");
 
         EmbeddedSolrClientFactory clientFactory = new EmbeddedSolrClientFactory();
+        ContentServiceFactory csf = ContentServiceFactory.getInstance();
         DSpace dspace = new DSpace();
 
         SolrLoggerServiceImpl instance = new SolrLoggerServiceImpl();
-
-        ContentServiceFactory csf = ContentServiceFactory.getInstance();
         instance.bitstreamService = csf.getBitstreamService();
         instance.contentServiceFactory = csf;
         instance.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         instance.clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
         instance.geoIpService = dspace.getSingletonService(GeoIpService.class);
         instance.solrStatisticsCore = dspace.getSingletonService(SolrStatisticsCore.class);
-        instance.solrClientFactory = clientFactory;
         instance.afterPropertiesSet();
 
         // Create objects to view.
