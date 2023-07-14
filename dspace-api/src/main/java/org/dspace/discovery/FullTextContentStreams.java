@@ -76,7 +76,6 @@ public class FullTextContentStreams extends ContentStreamBase {
             if (StringUtils.equals(FULLTEXT_BUNDLE, myBundle.getName())) {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
-
                 log.debug("Processing full-text bitstreams. Item handle: " + sourceInfo);
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
@@ -164,16 +163,16 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
 
         public String getContentType(final Context context) throws SQLException {
-            BitstreamFormat format = bitstream.getFormat(context);
+            BitstreamFormat format = bitstream != null ? bitstream.getFormat(context) : null;
             return format == null ? null : StringUtils.trimToEmpty(format.getMIMEType());
         }
 
         public String getFileName() {
-            return StringUtils.trimToEmpty(bitstream.getName());
+            return bitstream != null ? StringUtils.trimToEmpty(bitstream.getName()) : null;
         }
 
         public long getSize() {
-            return bitstream.getSizeBytes();
+            return bitstream != null ? bitstream.getSizeBytes() : -1;
         }
 
         public InputStream getInputStream() throws SQLException, IOException, AuthorizeException {
