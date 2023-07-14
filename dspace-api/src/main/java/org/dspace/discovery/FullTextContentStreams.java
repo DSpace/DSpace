@@ -77,13 +77,19 @@ public class FullTextContentStreams extends ContentStreamBase {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
+                log.debug("Processing full-text bitstreams. Item handle: " + sourceInfo);
+
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
                     fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
 
-                    log.debug("Added BitStream: "
-                                  + fulltextBitstream.getStoreNumber() + " "
-                                  + fulltextBitstream.getSequenceID() + " "
-                                  + fulltextBitstream.getName());
+                    if (fulltextBitstream != null) {
+                        log.debug("Added BitStream: "
+                                + fulltextBitstream.getStoreNumber() + " "
+                                + fulltextBitstream.getSequenceID() + " "
+                                + fulltextBitstream.getName());
+                    } else {
+                        log.error("Found a NULL bitstream when processing full-text files: item handle:" + sourceInfo);
+                    }
                 }
             }
         }
