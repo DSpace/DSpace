@@ -173,6 +173,9 @@ public class LicenseServiceImpl implements LicenseService {
         }
     }
 
+    /**
+     * Obtaining current request context
+     */
     private Context obtainContext() {
         Request currentRequest = DSpaceServicesFactory.getInstance().getRequestService().getCurrentRequest();
         if (currentRequest != null) {
