@@ -172,7 +172,7 @@ jobs:
           labels: ${{ steps.meta_build_cli.outputs.labels }}
           
       - name: redeploy
-        if: '!cancelled()'
+        if: 'false'
         run: |
           curl -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Authorization: token ${{ secrets.DEPLOY_DEV5_GH_ACTION_DISPATCH }}" \
