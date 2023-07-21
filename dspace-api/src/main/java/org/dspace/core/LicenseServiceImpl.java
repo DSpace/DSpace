@@ -17,9 +17,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.core.service.LicenseService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.services.model.Request;
+import org.dspace.web.ContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,13 +104,14 @@ public class LicenseServiceImpl implements LicenseService {
     /**
      * Get the site-wide default license that submitters need to grant
      *
+     * Localized license requires: default_{{locale}}.license file.
+     * Locale also must be listed in webui.supported.locales setting.
+     *
      * @return the default license
      */
     @Override
     public String getDefaultSubmissionLicense() {
-        if (null == license) {
-            init();
-        }
+        init();
         return license;
     }
 
@@ -115,9 +119,8 @@ public class LicenseServiceImpl implements LicenseService {
      * Load in the default license.
      */
     protected void init() {
-        File licenseFile = new File(
-            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
-                + File.separator + "config" + File.separator + "default.license");
+        Context context = obtainContext();
+        File licenseFile = new File(I18nUtil.getDefaultLicense(context));
 
         FileInputStream fir = null;
         InputStreamReader ir = null;
@@ -167,6 +170,16 @@ public class LicenseServiceImpl implements LicenseService {
                     // ignore
                 }
             }
+        }
+    }
+
+    private Context obtainContext() {
+        Request currentRequest = DSpaceServicesFactory.getInstance().getRequestService().getCurrentRequest();
+        if (currentRequest != null) {
+            HttpServletRequest request = currentRequest.getHttpServletRequest();
+            return ContextUtil.obtainContext(request);
+        } else {
+            return  new Context();
         }
     }
 }
