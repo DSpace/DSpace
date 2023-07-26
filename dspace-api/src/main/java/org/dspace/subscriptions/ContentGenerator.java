@@ -56,8 +56,16 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 Locale supportedLocale = I18nUtil.getEPersonLocale(ePerson);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscriptions_content"));
                 email.addRecipient(ePerson.getEmail());
-                email.addArgument(generateBodyMail(context, indexableComm));
-                email.addArgument(generateBodyMail(context, indexableColl));
+
+                String bodyCommunitites = generateBodyMail(context, indexableComm);
+                String bodyCollections = generateBodyMail(context, indexableColl);
+                if (bodyCommunitites.equals(EMPTY) && bodyCollections.equals(EMPTY)) {
+                    log.debug("subscription(s) of eperson {} do(es) not match any new items: nothing to send - exit silently", ePerson::getID);
+                    return;
+                }
+                email.addArgument(bodyCommunitites);
+                email.addArgument(bodyCollections);
+                
                 email.send();
             }
         } catch (Exception e) {
@@ -70,7 +78,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write("\n".getBytes(UTF_8));
-            if (indexableObjects.size() > 0) {
+            if (indexableObjects != null && !indexableObjects.isEmpty()) {
                 for (IndexableObject indexableObject : indexableObjects) {
                     out.write("\n".getBytes(UTF_8));
                     Item item = (Item) indexableObject.getIndexedObject();
@@ -80,10 +88,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                             .disseminate(context, item, out);
                 }
                 return out.toString();
-            } else {
-                out.write("No items".getBytes(UTF_8));
             }
-            return out.toString();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
