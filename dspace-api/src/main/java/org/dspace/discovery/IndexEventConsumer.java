@@ -205,6 +205,10 @@ public class IndexEventConsumer implements Consumer {
     @Override
     public void end(Context ctx) throws Exception {
 
+        // Change the mode to readonly to improve the performance
+        Context.Mode originalMode = ctx.getCurrentMode();
+        ctx.setMode(Context.Mode.READ_ONLY);
+
         try {
             for (String uid : uniqueIdsToDelete) {
                 try {
@@ -235,6 +239,8 @@ public class IndexEventConsumer implements Consumer {
                 createdItemsToUpdate.clear();
             }
         }
+
+        ctx.setMode(originalMode);
     }
 
     private void indexObject(Context ctx, IndexableObject iu, boolean preDb) throws SQLException {
