@@ -23,7 +23,7 @@ services:
       DSPACE_REST_HOST: localhost
       DSPACE_REST_PORT: 8080
       DSPACE_REST_NAMESPACE: /server
-    image: dspace/dspace-angular:dspace-7_x
+    image: dspace/dspace-angular:${DSPACE_VER:-latest}
     networks:
       dspacenet:
     ports:
