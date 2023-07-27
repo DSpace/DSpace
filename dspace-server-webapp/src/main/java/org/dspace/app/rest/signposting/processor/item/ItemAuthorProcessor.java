@@ -74,9 +74,7 @@ public class ItemAuthorProcessor extends ItemSignpostingProcessor {
                         String authorLink = isBlank(getPattern())
                                 ? authorOrcid
                                 : MessageFormat.format(getPattern(), authorOrcid);
-                        linksetNodes.add(
-                                new LinksetNode(authorLink, getRelation(), "text/html", buildAnchor(context, item))
-                        );
+                        linksetNodes.add(new LinksetNode(authorLink, getRelation(), buildAnchor(context, item)));
                     }
                 }
             }

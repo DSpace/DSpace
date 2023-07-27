@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
-
-    <bean class="org.dspace.app.rest.signposting.converter.LinksetHttpMessageConverter"/>
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean name="mapConverterDSpaceToSchemaOrgUri" class="org.dspace.util.SimpleMapConverter" init-method="init">
         <property name="converterNameFile" value="signposting/mapConverter-dspace-to-schema-org-uri.properties"/>
@@ -21,17 +18,11 @@
 
     <bean id="itemIdentifierSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.item.ItemIdentifierProcessor">
-        <property name="metadataConfigurations" ref="itemIdentifierSignpostingProcessorMetadataConfiguration"/>
+        <property name="metadataField" value="dc.identifier.uri"/>
     </bean>
-    <util:list id="itemIdentifierSignpostingProcessorMetadataConfiguration">
-        <bean class="org.dspace.app.rest.signposting.model.MetadataConfiguration">
-            <property name="metadataField" value="dc.identifier.doi"/>
-            <property name="pattern" value="https://doi.org/{0}"/>
-        </bean>
-        <bean class="org.dspace.app.rest.signposting.model.MetadataConfiguration">
-            <property name="metadataField" value="dc.identifier.uri"/>
-        </bean>
-    </util:list>
+
+    <bean id="itemDescribedbyProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemDescribedbyProcessor"/>
 
     <bean id="itemContentBitstreamsSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.item.ItemContentBitstreamsProcessor"/>
@@ -40,6 +31,9 @@
 
     <bean id="itemLicenseTypeSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.item.ItemLicenseProcessor"/>
+
+    <bean id="itemLinksetProcessorSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.item.ItemLinksetProcessor"/>
 
     <bean id="bitstreamParentItemSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamParentItemProcessor"/>
@@ -51,4 +45,6 @@
     <bean id="bitstreamTypeSignpostingProcessor"
           class="org.dspace.app.rest.signposting.processor.bitstream.BitstreamTypeProcessor"/>
 
+    <bean id="metadataDescribesSignpostingProcessor"
+          class="org.dspace.app.rest.signposting.processor.metadata.MetadataDescribesSignpostingProcessor"/>
 </beans>

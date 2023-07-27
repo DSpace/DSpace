@@ -1,0 +1,24 @@
+# This workflow runs whenever a new pull request is created
+name: Pull Request opened
+
+# Only run for newly opened PRs against the "main" or maintenance branches
+# We allow this to run for `pull_request_target` so that github secrets are available
+# (This is required to assign a PR back to the creator when the PR comes from a forked repo)
+on:
+  pull_request_target:
+    types: [ opened ]
+    branches:
+      - main
+      - 'dspace-**'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  automation:
+    runs-on: ubuntu-latest
+    steps:
+    # Assign the PR to whomever created it. This is useful for visualizing assignments on project boards
+    # See https://github.com/toshimaru/auto-author-assign
+    - name: Assign PR to creator
+      uses: toshimaru/auto-author-assign@v1.6.2

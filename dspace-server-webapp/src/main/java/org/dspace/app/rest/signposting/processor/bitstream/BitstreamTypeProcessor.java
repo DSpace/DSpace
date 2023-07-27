@@ -48,9 +48,7 @@ public class BitstreamTypeProcessor extends BitstreamSignpostingProcessor {
             String type = bitstreamService.getMetadataFirstValue(bitstream, "dc", "type", null, Item.ANY);
             if (StringUtils.isNotBlank(type)) {
                 String typeSchemeUri = mapConverterDSpaceToSchemaOrgUri.getValue(type);
-                linksetNodes.add(
-                        new LinksetNode(typeSchemeUri, getRelation(), "text/html", buildAnchor(bitstream))
-                );
+                linksetNodes.add(new LinksetNode(typeSchemeUri, getRelation(), buildAnchor(bitstream)));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

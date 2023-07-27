@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.signposting.converter;
 
+import java.util.List;
+
 import org.dspace.app.rest.converter.DSpaceConverter;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.signposting.model.Linkset;
@@ -20,18 +22,18 @@ import org.springframework.stereotype.Component;
  * @author Francesco Pio Scognamiglio (francescopio.scognamiglio at 4science.com)
  */
 @Component
-public class LinksetConverter implements DSpaceConverter<Linkset, LinksetRest> {
+public class LinksetConverter implements DSpaceConverter<List<Linkset>, LinksetRest> {
 
     @Override
-    public LinksetRest convert(Linkset linkset, Projection projection) {
+    public LinksetRest convert(List<Linkset> linksets, Projection projection) {
         LinksetRest linksetRest = new LinksetRest();
         linksetRest.setProjection(projection);
-        linksetRest.getLinkset().add(linkset);
+        linksetRest.setLinkset(linksets);
         return linksetRest;
     }
 
     @Override
-    public Class<Linkset> getModelClass() {
-        return Linkset.class;
+    public Class<List<Linkset>> getModelClass() {
+        return (Class<List<Linkset>>) ((Class) List.class);
     }
 }

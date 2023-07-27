@@ -33,6 +33,10 @@ public class Linkset {
     private List<LinksetRelation> license;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<LinksetRelation> linkset;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<LinksetRelation> describes;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<LinksetRelation> describedby;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String anchor;
 
@@ -104,6 +108,26 @@ public class Linkset {
     }
     public void setLinkset(List<LinksetRelation> linkset) {
         this.linkset = linkset;
+    }
+
+    public List<LinksetRelation> getDescribes() {
+        if (describes == null) {
+            describes = new ArrayList<>();
+        }
+        return describes;
+    }
+    public void setDescribes(List<LinksetRelation> describes) {
+        this.describes = describes;
+    }
+
+    public List<LinksetRelation> getDescribedby() {
+        if (describedby == null) {
+            describes = new ArrayList<>();
+        }
+        return describedby;
+    }
+    public void setDescribedby(List<LinksetRelation> describedby) {
+        this.describedby = describedby;
     }
 
     public String getAnchor() {

@@ -26,7 +26,7 @@ public class LinksetMapper {
     /**
      * Converts list of linkset nodes into linkset.
      *
-     * @param linksetNodes
+     * @param linksetNodes list of linkset nodes
      * @return linkset
      */
     public static Linkset map(List<LinksetNode> linksetNodes) {
@@ -38,6 +38,8 @@ public class LinksetMapper {
         linkset.setCollection(getLinksetRelationsByType(linksetNodes, LinksetRelationType.COLLECTION));
         linkset.setLicense(getLinksetRelationsByType(linksetNodes, LinksetRelationType.LICENSE));
         linkset.setCiteAs(getLinksetRelationsByType(linksetNodes, LinksetRelationType.CITE_AS));
+        linkset.setDescribes(getLinksetRelationsByType(linksetNodes, LinksetRelationType.DESCRIBES));
+        linkset.setDescribedby(getLinksetRelationsByType(linksetNodes, LinksetRelationType.DESCRIBED_BY));
         if (!linksetNodes.isEmpty()) {
             linkset.setAnchor(linksetNodes.get(0).getAnchor());
         }
