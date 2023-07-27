@@ -60,12 +60,12 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 String bodyCommunitites = generateBodyMail(context, indexableComm);
                 String bodyCollections = generateBodyMail(context, indexableColl);
                 if (bodyCommunitites.equals(EMPTY) && bodyCollections.equals(EMPTY)) {
-                    log.debug("subscription(s) of eperson {} do(es) not match any new items: nothing to send - exit silently", ePerson::getID);
+                    log.debug("subscription(s) of eperson {} do(es) not match any new items: nothing to send" +
+                            " - exit silently", ePerson::getID);
                     return;
                 }
                 email.addArgument(bodyCommunitites);
                 email.addArgument(bodyCollections);
-                
                 email.send();
             }
         } catch (Exception e) {
