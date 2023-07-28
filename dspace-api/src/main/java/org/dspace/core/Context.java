@@ -880,6 +880,16 @@ public class Context implements AutoCloseable {
         dbConnection.uncacheEntity(entity);
     }
 
+    /**
+     * Flush the current Session to synchronizes the in-memory state of the Session
+     * with the database (write changes to the database)
+     *
+     * @throws SQLException passed through.
+     */
+    public void flushDBChanges() throws SQLException {
+        dbConnection.flushSession();
+    }
+
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
         if (isReadOnly()) {
             return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson);
