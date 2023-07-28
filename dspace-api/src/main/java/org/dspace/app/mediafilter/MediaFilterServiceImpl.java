@@ -40,6 +40,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ThrowableUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -240,8 +241,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     sb.append("\tFile Size: ").append(size);
                     sb.append("\tChecksum: ").append(checksum);
                     sb.append("\tAsset Store: ").append(assetstore);
+                    sb.append("\tInternal ID: ").append(myBitstream.getInternalId());
                     logError(sb.toString());
-                    logError(e.getMessage(), e);
+                    logError(ThrowableUtils.formatCauseChain(e));
                 }
             } else if (filterClass instanceof SelfRegisterInputFormats) {
                 // Filter implements self registration, so check to see if it should be applied
@@ -319,10 +321,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
         // check if destination bitstream exists
         Bundle existingBundle = null;
-        List<Bitstream> existingBitstreams = new ArrayList<Bitstream>();
+        List<Bitstream> existingBitstreams = new ArrayList<>();
         List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
 
-        if (bundles.size() > 0) {
+        if (!bundles.isEmpty()) {
             // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
             for (Bundle bundle : bundles) {
                 List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -337,7 +339,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
 
         // if exists and overwrite = false, exit
-        if (!overWrite && (existingBitstreams.size() > 0)) {
+        if (!overWrite && (!existingBitstreams.isEmpty())) {
             if (!isQuiet) {
                 logInfo("SKIPPED: bitstream " + source.getID()
                                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
@@ -370,7 +372,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
 
             Bundle targetBundle; // bundle we're modifying
-            if (bundles.size() < 1) {
+            if (bundles.isEmpty()) {
                 // create new bundle if needed
                 targetBundle = bundleService.create(context, item, formatFilter.getBundleName());
             } else {
