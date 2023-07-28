@@ -707,8 +707,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             dcvalues = line.get(md).toArray(new String[line.get(md).size()]);
         }
 
-
-        // Compare from current->csv
+        // Register adds
         for (int v = 0; v < fromCSV.length; v++) {
             String value = fromCSV[v];
             BulkEditMetadataValue dcv = getBulkEditValueFromCSV(c, language, schema, element, qualifier, value,
@@ -719,7 +718,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 fromCSV[v] = value;
             }
 
-            if ((value != null) && (!"".equals(value)) && (!contains(value, dcvalues))) {
+            if ((value != null) && (!"".equals(value))) {
                 changes.registerAdd(dcv);
             } else {
                 // Keep it
@@ -727,7 +726,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             }
         }
 
-        // Compare from csv->current
+        // Register removes
         for (String value : dcvalues) {
             // Look to see if it should be removed
             BulkEditMetadataValue dcv = new BulkEditMetadataValue();
@@ -748,7 +747,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             // can only be used to add metadata, not to change or remove them
             // because e.g. an author that is not in the column "ORCID:dc.contributor.author" could still be in the
             // column "dc.contributor.author" so don't remove it
-            if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)) && fromAuthority == null) {
+            if ((value != null) && (!"".equals(value)) && fromAuthority == null) {
                 // Remove it
                 log.debug(LogHelper.getHeader(c, "metadata_import",
                                                "item_id=" + item.getID() + ",fromCSV=" + all +
