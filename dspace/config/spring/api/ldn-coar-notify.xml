@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The contents of this file are subject to the license and copyright detailed 
+    in the LICENSE and NOTICE files at the root of the source tree and available 
+    online at http://www.dspace.org/license/ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+    default-autowire-candidates="*">
+
+    <context:annotation-config />
+    <!-- allows us to use spring annotations in beans -->
+
+    <bean class="org.dspace.app.ldn.LDNBusinessDelegate"></bean>
+
+    <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
+        <property name="processors">
+            <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceEndorsementAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Reject</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:ReleaseAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceReleaseAction" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="announceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="changes">
+            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>requestreview</value>
+                            <value>examination</value>
+                            <value>refused</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                            <value>$notification.inReplyTo</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
+                    <property name="qualifier" value="review" />
+                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo||$notification.object.id" />
+                </bean>
+            </list>
+        </property>
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="changes">
+            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>requestendorsement</value>
+                            <value>examination</value>
+                            <value>refused</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                            <value>$notification.inReplyTo</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
+                    <property name="qualifier" value="endorsement" />
+                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo||$notification.object.id" />
+                </bean>
+            </list>
+        </property>
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_endorsed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="acceptReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="changes">
+            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>requestreview</value>
+                            <value>refused</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>refused</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                            <value>$notification.inReplyTo</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
+                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
+                    <property name="qualifier" value="examination" />
+                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
+                </bean>
+            </list>
+        </property>
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_accepted" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="rejectReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="changes">
+            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>examination</value>
+                            <value>requestreview</value>
+                            <value>requestendorsement</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
+                            <value>$notification.inReplyTo</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
+                    <property name="qualifier" value="refused" />
+                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
+                </bean>
+            </list>
+        </property>
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_rejected" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceReleaseAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="repeater">
+            <bean class="org.dspace.app.ldn.processor.LDNContextRepeater">
+                <property name="repeatOver" value="IsSupplementTo" />
+            </bean>
+        </property>
+        <property name="changes">
+            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
+                    <property name="qualifiers">
+                        <list value-type="java.lang.String">
+                            <value>release</value>
+                        </list>
+                    </property>
+                    <property name="valueTemplates">
+                        <list value-type="java.lang.String">
+                            <value>$notification.object.ietfCiteAs</value>
+                            <value>$LDNUtils.removedProtocol($notification.object.id)</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
+                    <property name="qualifier" value="release" />
+                    <property name="valueTemplate" value="$timestamp||$notification.object.ietfCiteAs||$LDNUtils.removedProtocol($notification.object.id)" />
+                </bean>
+            </list>
+        </property>
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_released" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>
