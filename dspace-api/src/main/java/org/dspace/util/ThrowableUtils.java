@@ -33,7 +33,9 @@ public class ThrowableUtils {
         trace.append(throwable.getMessage());
         Throwable cause = throwable.getCause();
         while (null != cause) {
-            trace.append("\nCaused by:  ").append(cause.getMessage());
+            trace.append("\nCaused by:  ")
+                    .append(cause.getClass().getCanonicalName()).append(' ')
+                    .append(cause.getMessage());
             cause = cause.getCause();
         }
         return trace.toString();
