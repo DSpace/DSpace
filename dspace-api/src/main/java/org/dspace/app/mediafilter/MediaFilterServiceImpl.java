@@ -10,6 +10,7 @@ package org.dspace.app.mediafilter;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -226,23 +227,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                         filtered = true;
                     }
                 } catch (Exception e) {
-                    String handle = myItem.getHandle();
-                    List<Bundle> bundles = myBitstream.getBundles();
-                    long size = myBitstream.getSizeBytes();
-                    String checksum = myBitstream.getChecksum() + " (" + myBitstream.getChecksumAlgorithm() + ")";
-                    int assetstore = myBitstream.getStoreNumber();
-
                     // Printout helpful information to find the errored bitstream.
-                    StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
-                    sb.append("\tItem Handle: ").append(handle);
-                    for (Bundle bundle : bundles) {
-                        sb.append("\tBundle Name: ").append(bundle.getName());
-                    }
-                    sb.append("\tFile Size: ").append(size);
-                    sb.append("\tChecksum: ").append(checksum);
-                    sb.append("\tAsset Store: ").append(assetstore);
-                    sb.append("\tInternal ID: ").append(myBitstream.getInternalId());
-                    logError(sb.toString());
+                    logError(formatBitstreamDetails(myItem.getHandle(), myBitstream));
                     logError(ThrowableUtils.formatCauseChain(e));
                 }
             } else if (filterClass instanceof SelfRegisterInputFormats) {
@@ -401,6 +387,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
         } catch (OutOfMemoryError oome) {
             logError("!!! OutOfMemoryError !!!");
+            logError(formatBitstreamDetails(item.getHandle(), source));
         }
 
         // we are overwriting, so remove old bitstream
@@ -496,6 +483,37 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         } else {
             return false;
         }
+    }
+
+    /**
+     * Describe a Bitstream in detail.  Format a single line of text with
+     * information such as Bitstore index, backing file ID, size, checksum,
+     * enclosing Item and Bundles.
+     *
+     * @param itemHandle Handle of the Item by which we found the Bitstream.
+     * @param bitstream the Bitstream to be described.
+     * @return Bitstream details.
+     */
+    private String formatBitstreamDetails(String itemHandle,
+            Bitstream bitstream) {
+        List<Bundle> bundles;
+        try {
+            bundles = bitstream.getBundles();
+        } catch (SQLException ex) {
+            logError("Unexpected error fetching Bundles", ex);
+            bundles = Collections.EMPTY_LIST;
+        }
+        StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
+        sb.append("\tItem Handle: ").append(itemHandle);
+        for (Bundle bundle : bundles) {
+            sb.append("\tBundle Name: ").append(bundle.getName());
+        }
+        sb.append("\tFile Size: ").append(bitstream.getSizeBytes());
+        sb.append("\tChecksum: ").append(bitstream.getChecksum())
+                .append(" (").append(bitstream.getChecksumAlgorithm()).append(')');
+        sb.append("\tAsset Store: ").append(bitstream.getStoreNumber());
+        sb.append("\tInternal ID: ").append(bitstream.getInternalId());
+        return sb.toString();
     }
 
     private void logInfo(String message) {
