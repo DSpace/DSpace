@@ -158,6 +158,18 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
         throws SQLException;
 
     /**
+     * Try very hard to find an administrator's account.  Might return a member
+     * of the Administrators group, or an account with a configured email
+     * address.
+     *
+     * @param context current DSpace session.
+     * @return a presumed administrator account, or null if none could be found.
+     * @throws SQLException
+     */
+    public EPerson findAnAdministrator(Context context)
+            throws SQLException;
+
+    /**
      * Create a new eperson
      *
      * @param context The relevant DSpace Context.
