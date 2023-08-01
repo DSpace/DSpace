@@ -28,6 +28,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -506,6 +507,26 @@ public interface ItemService
     public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException;
 
+    /**
+     * Adjust the Bitstream policies to reflect what have been defined
+     * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
+     * policies are removed and the policies defined at the item and collection
+     * level are copied and inherited as appropriate. Custom selected Item policies
+     * are copied to the bitstream only if no explicit custom policies were
+     * already applied to the bitstream. Collection's policies are inherited
+     * if there are no other policies defined or if the append mode is defined by
+     * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
+     *
+     * @param context             DSpace context object
+     * @param item                Item to adjust policies on
+     * @param collection          Collection
+     * @param bitstream           Bitstream to adjust policies on
+     * @throws SQLException       If database error
+     * @throws AuthorizeException If authorization error
+     */
+    public void adjustBitstreamPolicies(Context context, Item item, Collection collection, Bitstream bitstream)
+        throws SQLException, AuthorizeException;
+
 
     /**
      * Adjust the Item's policies to reflect what have been defined during the
@@ -767,6 +788,27 @@ public interface ItemService
      * @throws SQLException if database error
      */
     int countWithdrawnItems(Context context) throws SQLException;
+
+    /**
+     * finds all items for which the current user has editing rights
+     * @param context DSpace context object
+     * @param offset page offset
+     * @param limit  page size limit
+     * @return list of items for which the current user has editing rights
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
+    public List<Item> findItemsWithEdit(Context context, int offset, int limit)
+        throws SQLException, SearchServiceException;
+
+    /**
+     * counts all items for which the current user has editing rights
+     * @param context DSpace context object
+     * @return list of items for which the current user has editing rights
+     * @throws SQLException
+     * @throws SearchServiceException
+     */
+    public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException;
 
     /**
      * Check if the supplied item is an inprogress submission

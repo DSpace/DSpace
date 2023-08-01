@@ -94,6 +94,22 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         }
     }
 
+    @SearchRestMethod(name = "own")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<ProcessRest> findByCurrentUser(Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            long total = processService.countByUser(context, context.getCurrentUser());
+            List<Process> processes = processService.findByUser(context, context.getCurrentUser(),
+                                                                pageable.getPageSize(),
+                                                                Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(processes, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     /**
      * Calls on the getBitstreams method to retrieve all the Bitstreams of this process
      * @param processId The processId of the Process to retrieve the Bitstreams for

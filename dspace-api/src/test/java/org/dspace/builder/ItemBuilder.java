@@ -353,9 +353,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Create an admin group for the collection with the specified members
+     * Assign the admin permission to the specified eperson
      *
-     * @param ePerson epersons to add to the admin group
+     * @param ePerson the eperson that will get the ADMIN permission on the item
      * @return this builder
      * @throws SQLException
      * @throws AuthorizeException
@@ -397,12 +397,17 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
        try (Context c = new Context()) {
             c.setDispatcher("noindex");
             c.turnOffAuthorisationSystem();
+            // If the workspaceItem used to create this item still exists, delete it
+            workspaceItem = c.reloadEntity(workspaceItem);
+            if (workspaceItem != null) {
+                workspaceItemService.deleteAll(c, workspaceItem);
+            }
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             item = c.reloadEntity(item);
             if (item != null) {
                  delete(c, item);
-                 c.complete();
             }
+            c.complete();
        }
     }
 

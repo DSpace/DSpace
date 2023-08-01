@@ -41,6 +41,9 @@ public class Role implements BeanNameAware {
     @Autowired
     private WorkflowItemRoleService workflowItemRoleService;
 
+    // Whether or not to delete temporary group made attached to the WorkflowItemRole for this role in AutoAssignAction
+    private boolean deleteTemporaryGroup = false;
+
     private String id;
     private String name;
     private String description;
@@ -152,5 +155,18 @@ public class Role implements BeanNameAware {
      */
     public void setInternal(boolean internal) {
         isInternal = internal;
+    }
+
+    public boolean isDeleteTemporaryGroup() {
+        return deleteTemporaryGroup;
+    }
+
+    /**
+     * Setter for config that indicated whether or not to delete temporary group made attached to the
+     * WorkflowItemRole for this role in AutoAssignAction
+     * @param deleteTemporaryGroup
+     */
+    public void setDeleteTemporaryGroup(boolean deleteTemporaryGroup) {
+        this.deleteTemporaryGroup = deleteTemporaryGroup;
     }
 }

@@ -25,7 +25,6 @@ import org.dspace.core.Context;
  * can perform the action on a given item
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class ReadableByGroupCondition extends AbstractCondition {
     private final static Logger log = LogManager.getLogger();

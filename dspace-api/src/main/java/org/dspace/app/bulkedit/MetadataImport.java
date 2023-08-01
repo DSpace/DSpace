@@ -598,18 +598,19 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 changes.add(whatHasChanged);
             }
 
-            if (change) {
-                //only clear cache if changes have been made.
-                c.uncacheEntity(wsItem);
-                c.uncacheEntity(wfItem);
-                c.uncacheEntity(item);
+            if (change && (rowCount % configurationService.getIntProperty("bulkedit.change.commit.count", 100) == 0)) {
+                c.commit();
+                handler.logInfo(LogHelper.getHeader(c, "metadata_import_commit", "lineNumber=" + rowCount));
             }
             populateRefAndRowMap(line, item == null ? null : item.getID());
             // keep track of current rows processed
             rowCount++;
         }
+        if (change) {
+            c.commit();
+        }
 
-        c.setMode(originalMode);
+        c.setMode(Context.Mode.READ_ONLY);
 
 
         // Return the changes

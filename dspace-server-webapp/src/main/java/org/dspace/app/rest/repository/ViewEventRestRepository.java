@@ -64,7 +64,8 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
             throw new UnprocessableEntityException(
                 "The given targetId does not resolve to a DSpaceObject: " + viewEventRest.getTargetId());
         }
-        UsageEvent usageEvent = new UsageEvent(UsageEvent.Action.VIEW, req, context, dSpaceObject);
+        UsageEvent usageEvent = new UsageEvent(UsageEvent.Action.VIEW, req, context, dSpaceObject,
+                viewEventRest.getReferrer());
         eventService.fireEvent(usageEvent);
         return viewEventRest;
     }

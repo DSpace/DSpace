@@ -33,7 +33,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * A command-line runner used for testing a logical filter against an item, or all items
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class TestLogicRunner {
 
