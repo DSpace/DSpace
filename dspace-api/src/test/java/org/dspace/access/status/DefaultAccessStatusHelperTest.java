@@ -8,6 +8,7 @@
 package org.dspace.access.status;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -273,6 +274,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithEmbargo, threshold);
         assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo);
+        assertThat("testWithEmbargo 1", embargoDate, equalTo(policy.getStartDate().toString()));
     }
 
     /**
@@ -390,6 +393,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithPrimaryAndMultipleBitstreams);
+        assertThat("testWithPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(policy.getStartDate().toString()));
     }
 
     /**
@@ -419,5 +424,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(null));
     }
 }

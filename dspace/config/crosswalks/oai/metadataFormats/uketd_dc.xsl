@@ -115,6 +115,12 @@
                 <!-- <dc:identifier xsi:type="dcterms:URI"><xsl:value-of select="." /></dc:identifier> -->
             </xsl:for-each>
 
+            <!-- ******* Check access-status embargo information for embargoed content associated with this item ******* -->
+            <xsl:for-each select="doc:metadata/doc:element[@name='others']/doc:element[@name='access-status']/doc:field[@name='embargo']/text()">
+                <!-- Add embargo information -->
+                <uketdterms:embargodate><xsl:value-of select="." /></uketdterms:embargodate>
+            </xsl:for-each>
+
             <!-- ******* URLs for digital object(s) (obtained from file 'bundles') ******* -->
             <xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']">
 
@@ -123,11 +129,6 @@
                     <xsl:for-each select="doc:element[@name='bitstreams']/doc:element">
                         <dc:identifier xsi:type="dcterms:URI"><xsl:value-of select="doc:field[@name='url']/text()" /></dc:identifier>
                         <uketdterms:checksum xsi:type="uketdterms:MD5"><xsl:value-of select="doc:field[@name='checksum']/text()" /></uketdterms:checksum>
-                        <!-- Add embargo information -->
-                        <xsl:if test="ancestor::*/doc:field[@name='name']/text() = 'ORIGINAL'
-                        and doc:field[@name='embargo']/text()">
-                            <uketdterms:embargodate><xsl:value-of select="doc:field[@name='embargo']/text()" /></uketdterms:embargodate>
-                        </xsl:if>
                     </xsl:for-each>
                 </xsl:if>
 
