@@ -102,10 +102,15 @@ public class XmlWorkflowCuratorServiceImpl
         Curator curator = new Curator();
         curator.setReporter(reporter);
         c.turnOffAuthorisationSystem();
+        boolean wasAnonymous = false;
         if (null == c.getCurrentUser()) { // We need someone to email
-            c.setCurrentUser(ePersonService.findAnAdministrator(c));
+            wasAnonymous = true;
+            c.setCurrentUser(ePersonService.getSystemEPerson(c));
         }
         boolean failedP = curate(curator, c, wfi);
+        if (wasAnonymous) {
+            c.setCurrentUser(null);
+        }
         c.restoreAuthSystemState();
         return failedP;
     }

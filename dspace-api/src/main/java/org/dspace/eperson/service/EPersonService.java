@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -158,15 +159,16 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
         throws SQLException;
 
     /**
-     * Try very hard to find an administrator's account.  Might return a member
-     * of the Administrators group, or an account with a configured email
-     * address.
+     * The "System EPerson" is a fake account that exists only to receive email.
+     * It has an email address that should be presumed usable.  It does not
+     * exist in the database and is not complete.
      *
      * @param context current DSpace session.
-     * @return a presumed administrator account, or null if none could be found.
+     * @return an EPerson that can presumably receive email.
      * @throws SQLException
      */
-    public EPerson findAnAdministrator(Context context)
+    @NotNull
+    public EPerson getSystemEPerson(Context context)
             throws SQLException;
 
     /**

@@ -116,19 +116,28 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         return ePersonDAO.findByID(context, EPerson.class, id);
     }
 
+    /**
+     * Create a fake EPerson which can receive email.  Its address will be the
+     * value of "mail.admin", or "postmaster" if all else fails.
+     * @param c
+     * @return
+     * @throws SQLException
+     */
     @Override
-    public EPerson findAnAdministrator(Context c)
+    public EPerson getSystemEPerson(Context c)
             throws SQLException {
-        List<EPerson> contacts = groupService.findByName(c, Group.ADMIN).getMembers();
-        EPerson currentUser;
-        if (contacts.isEmpty()) {
-            log.warn("Administrators group is empty");
-            currentUser = findByEmail(c, configurationService.getProperty("mail.admin"));
-            // Null if no such EPerson
-        } else {
-            currentUser = contacts.get(0);
+        String adminEmail = configurationService.getProperty("mail.admin");
+        if (null == adminEmail) {
+            adminEmail = "postmaster"; // Last-ditch attempt to send *somewhere*
         }
-        return currentUser;
+        EPerson systemEPerson = findByEmail(c, adminEmail);
+
+        if (null == systemEPerson) {
+            systemEPerson = new EPerson();
+            systemEPerson.setEmail(adminEmail);
+        }
+
+        return systemEPerson;
     }
 
     @Override
