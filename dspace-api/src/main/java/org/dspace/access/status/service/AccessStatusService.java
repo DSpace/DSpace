@@ -8,7 +8,6 @@
 package org.dspace.access.status.service;
 
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
