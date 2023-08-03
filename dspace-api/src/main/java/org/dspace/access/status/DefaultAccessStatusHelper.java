@@ -198,6 +198,10 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                     .orElse(null);
         }
 
+        if (bitstream == null) {
+            return null;
+        }
+
         embargoDate = this.retrieveLongestEmbargo(context, bitstream);
 
         return embargoDate != null ? embargoDate.toString() : null;
