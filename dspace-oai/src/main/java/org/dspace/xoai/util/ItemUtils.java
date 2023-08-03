@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -184,22 +182,28 @@ public class ItemUtils {
                 bitstream,
                 ResourcePolicy.TYPE_CUSTOM);
 
-        List<Date> embargoDates = new ArrayList<>();
+        Date embargoDate = null;
+
         // Account for cases where there could be more than one embargo policy
         for (ResourcePolicy policy : policies) {
             if (policy.getGroup() == anonymousGroup && policy.getAction() == Constants.READ) {
                 Date startDate = policy.getStartDate();
                 if (startDate != null && startDate.after(new Date())) {
-                    embargoDates.add(startDate);
+                    // There is an active embargo: aim to take the longest embargo
+                    if (embargoDate == null) {
+                        embargoDate = startDate;
+                    } else {
+                        embargoDate = startDate.after(embargoDate) ? startDate : embargoDate;
+                    }
                 }
             }
         }
-        if (embargoDates.size() >= 1) {
+
+        if (embargoDate != null) {
             // Sort array of dates to extract the longest embargo
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Collections.sort(embargoDates, Date::compareTo);
             bitstreamEl.getField().add(
-                    createValue("embargo", formatter.format(embargoDates.get(embargoDates.size() - 1))));
+                    createValue("embargo", formatter.format(embargoDate)));
         }
     }
 
