@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.util.Util;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.core.I18nUtil;
@@ -31,6 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ClarinShibbolethAuthAssing2GroupsIT extends AbstractControllerIntegrationTest {
 
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.clarin.ClarinShibAuthentication"};
+    private static final String NET_ID_TEST_EPERSON = "123456789";
+    private static final String IDP_TEST_EPERSON = "Test Idp";
+
 
     private EPerson clarinEperson;
 
@@ -54,7 +58,7 @@ public class ClarinShibbolethAuthAssing2GroupsIT extends AbstractControllerInteg
                 .withEmail("clarin@email.com")
                 .withNameInMetadata("first", "last")
                 .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .withNetId("123456789")
+                .withNetId(Util.formatNetId(NET_ID_TEST_EPERSON, IDP_TEST_EPERSON))
                 .build();
         context.turnOffAuthorisationSystem();
     }
@@ -74,8 +78,8 @@ public class ClarinShibbolethAuthAssing2GroupsIT extends AbstractControllerInteg
 
         String token = getClient().perform(get("/api/authn/shibboleth")
                         .header("SHIB-MAIL", clarinEperson.getEmail())
-                        .header("Shib-Identity-Provider", "Test idp")
-                        .header("SHIB-NETID", clarinEperson.getNetid()))
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-NETID", NET_ID_TEST_EPERSON))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost:4000"))
                 .andReturn().getResponse().getHeader("Authorization");
@@ -117,8 +121,8 @@ public class ClarinShibbolethAuthAssing2GroupsIT extends AbstractControllerInteg
         // The user will be added to the AUTHENTICATED and UFAL group
         String token = getClient().perform(get("/api/authn/shibboleth")
                         .header("SHIB-MAIL", clarinEperson.getEmail())
-                        .header("Shib-Identity-Provider", "Test idp")
-                        .header("SHIB-NETID", clarinEperson.getNetid())
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-NETID", NET_ID_TEST_EPERSON)
                         .header("entitlement", "ufal.mff.cuni.cz"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost:4000"))
@@ -170,8 +174,8 @@ public class ClarinShibbolethAuthAssing2GroupsIT extends AbstractControllerInteg
         // The user will be added to the AUTHENTICATED and UFAL group
         String token = getClient().perform(get("/api/authn/shibboleth")
                         .header("SHIB-MAIL", clarinEperson.getEmail())
-                        .header("Shib-Identity-Provider", "Test idp")
-                        .header("SHIB-NETID", clarinEperson.getNetid())
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-NETID", NET_ID_TEST_EPERSON)
                         .header("entitlement", "staff@org1297.mff.cuni.cz"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost:4000"))

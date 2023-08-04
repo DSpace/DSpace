@@ -4,10 +4,10 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.2.1</version>
+    <version>7.5</version>
     <name>DSpace Parent Project</name>
     <description>
-   	DSpace open source software is a turnkey institutional repository application.
+        DSpace open source software is a turnkey institutional repository application.
     </description>
     <url>https://github.com/dspace/DSpace</url>
 
@@ -19,15 +19,15 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.2.20.RELEASE</spring.version>
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-security.version>5.2.2.RELEASE</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.4.10.Final</hibernate.version>
-        <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.2.25</postgresql.driver.version>
-        <solr.client.version>8.8.1</solr.client.version>
+        <spring.version>5.3.20</spring.version>
+        <spring-boot.version>2.6.8</spring-boot.version>
+        <spring-security.version>5.6.5</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>5.6.5.Final</hibernate.version>
+        <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.4.3</postgresql.driver.version>
+        <solr.client.version>8.11.1</solr.client.version>
 
-        <axiom.version>1.2.22</axiom.version>
+        <ehcache.version>3.4.0</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.13.4</jackson.version>
@@ -37,12 +37,12 @@
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <jcache-version>1.1.0</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.53.v20231009</jetty.version>
-        <log4j.version>2.20.0</log4j.version>
-        <pdfbox-version>2.0.28</pdfbox-version>
-        <rome.version>1.19.0</rome.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <tika.version>2.5.0</tika.version>
+        <jetty.version>9.4.48.v20220622</jetty.version>
+        <log4j.version>2.17.1</log4j.version>
+        <pdfbox-version>2.0.27</pdfbox-version>
+        <rome.version>1.18.0</rome.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <tika.version>2.3.0</tika.version>
         <!-- Sync with whatever version Tika uses -->
         <bouncycastle.version>1.70</bouncycastle.version>
 
@@ -236,7 +236,7 @@
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
-                         <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
+                        <!-- Detailed logs in failsafe-reports/testName-output.txt instead of stdout -->
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
@@ -524,7 +524,7 @@
                 </property>
             </activation>
             <properties>
-                <test.argLine>-Xmx1024m</test.argLine>
+                <test.argLine>-Xmx1024m -Dfile.encoding=UTF-8</test.argLine>
             </properties>
         </profile>
 
@@ -853,38 +853,38 @@
             </modules>
         </profile>
 
-       <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
-       <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
-       <profile>
-           <id>dspace-rest</id>
-           <activation>
-               <activeByDefault>false</activeByDefault>
-               <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
-               <property>
-                   <name>release</name>
-               </property>
-           </activation>
-           <modules>
-               <module>dspace-rest</module>
-           </modules>
-           <dependencyManagement>
-               <dependencies>
-                   <dependency>
-                       <groupId>org.dspace</groupId>
-                       <artifactId>dspace-rest</artifactId>
-                       <version>7.2.1</version>
-                       <type>jar</type>
-                       <classifier>classes</classifier>
-                   </dependency>
-                   <dependency>
-                       <groupId>org.dspace</groupId>
-                       <artifactId>dspace-rest</artifactId>
-                       <version>7.2.1</version>
-                       <type>war</type>
-                   </dependency>
-               </dependencies>
-           </dependencyManagement>
-       </profile>
+        <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
+        <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
+        <profile>
+            <id>dspace-rest</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
+            <modules>
+                <module>dspace-rest</module>
+            </modules>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.dspace</groupId>
+                        <artifactId>dspace-rest</artifactId>
+                        <version>7.5</version>
+                        <type>jar</type>
+                        <classifier>classes</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.dspace</groupId>
+                        <artifactId>dspace-rest</artifactId>
+                        <version>7.5</version>
+                        <type>war</type>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
 
 
         <!--
@@ -921,7 +921,7 @@
         <!--
            Builds Server API webapp for DSpace
         -->
-		<profile>
+        <profile>
             <id>dspace-server-webapp</id>
             <activation>
                 <file>
@@ -1030,69 +1030,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.2.1</version>
+                <version>7.5</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.2.1</version>
+                <version>7.5</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.2.1</version>
+                <version>7.5</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1207,7 +1207,7 @@
             </dependency>
 
             <dependency>
-		    <artifactId>spring-jdbc</artifactId>
+                <artifactId>spring-jdbc</artifactId>
                 <groupId>org.springframework</groupId>
                 <version>${spring.version}</version>
             </dependency>
@@ -1227,12 +1227,6 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
                 <version>${spring.version}</version>
             </dependency>
 
@@ -1365,7 +1359,7 @@
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.0</version>
-		<exclusions>
+                <exclusions>
                     <!-- A later version is brought in by google-oauth-client -->
                     <exclusion>
                         <groupId>com.google.code.gson</groupId>
@@ -1604,45 +1598,7 @@
                 <artifactId>fontbox</artifactId>
                 <version>${pdfbox-version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${poi-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version brought in by solr-cell -->
-                    <exclusion>
-                        <groupId>com.github.virtuald</groupId>
-                        <artifactId>curvesapi</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-schemas</artifactId>
-                <version>${poi-version}</version>
-                <exclusions>
-                    <!-- Newer version pulled in below -->
-                    <exclusion>
-                        <groupId>org.apache.xmlbeans</groupId>
-                        <artifactId>xmlbeans</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.xmlbeans</groupId>
-                <artifactId>xmlbeans</artifactId>
-                <version>3.1.0</version>
-            </dependency>
+            <!-- Tika and Jena disagree on version of Xerces to use. Select latest -->
             <dependency>
                 <groupId>xerces</groupId>
                 <artifactId>xercesImpl</artifactId>
@@ -1666,18 +1622,11 @@
                 <artifactId>ojdbc6</artifactId>
                 <version>11.2.0.4.0</version>
             </dependency>
-            <!-- Codebase at https://github.com/OCLC-Research/oaiharvester2/ -->
+            <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>oclc-harvester2</artifactId>
                 <version>1.0.0</version>
-            </dependency>
-            <!-- Xalan is REQUIRED by 'oclc-harvester2' listed above (OAI harvesting fails without it).
-                 Please do NOT use Xalan in DSpace codebase as it is not well maintained. -->
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -1690,9 +1639,9 @@
                 <version>4.5.13</version>
             </dependency>
             <dependency>
-              <groupId>org.apache.httpcomponents</groupId>
-              <artifactId>httpmime</artifactId>
-              <version>4.5.13</version>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.13</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -1750,7 +1699,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>2.2.220</version>
+                <version>2.1.210</version>
                 <scope>test</scope>
             </dependency>
             <!-- Google Analytics -->
@@ -1828,7 +1777,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>32.0.0-jre</version>
+                <version>31.0.1-jre</version>
                 <exclusions>
                     <!-- Use version provided by Solr / Postgres -->
                     <exclusion>
@@ -1890,7 +1839,7 @@
             <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
-               A BSD 3-Clause license for the DSpace codebase.
+                A BSD 3-Clause license for the DSpace codebase.
             </comments>
         </license>
     </licenses>
@@ -1904,75 +1853,75 @@
         <mailingList>
             <name>DSpace Technical Users List</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-tech
+                https://groups.google.com/d/forum/dspace-tech
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-tech
+                https://groups.google.com/d/forum/dspace-tech
             </unsubscribe>
             <post>dspace-tech AT googlegroups.com</post>
             <archive>
-               https://groups.google.com/d/forum/dspace-tech
+                https://groups.google.com/d/forum/dspace-tech
             </archive>
         </mailingList>
         <mailingList>
             <name>DSpace Developers List</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-devel
+                https://groups.google.com/d/forum/dspace-devel
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-devel
+                https://groups.google.com/d/forum/dspace-devel
             </unsubscribe>
             <post>dspace-devel AT googlegroups.com</post>
             <archive>
-               https://groups.google.com/d/forum/dspace-devel
+                https://groups.google.com/d/forum/dspace-devel
             </archive>
         </mailingList>
         <mailingList>
             <name>DSpace Community List</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-community
+                https://groups.google.com/d/forum/dspace-community
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-community
+                https://groups.google.com/d/forum/dspace-community
             </unsubscribe>
             <post>dspace-community AT googlegroups.com</post>
             <archive>
-               https://groups.google.com/d/forum/dspace-community
+                https://groups.google.com/d/forum/dspace-community
             </archive>
         </mailingList>
         <mailingList>
             <name>DSpace Commit Change-Log</name>
             <subscribe>
-               https://groups.google.com/d/forum/dspace-changelog
+                https://groups.google.com/d/forum/dspace-changelog
             </subscribe>
             <unsubscribe>
-               https://groups.google.com/d/forum/dspace-changelog
+                https://groups.google.com/d/forum/dspace-changelog
             </unsubscribe>
             <archive>
-               https://groups.google.com/d/forum/dspace-changelog
+                https://groups.google.com/d/forum/dspace-changelog
             </archive>
         </mailingList>
     </mailingLists>
 
     <developers>
         <developer>
-           <name>DSpace Committers</name>
-           <email>dspace-devel@googlegroups.com</email>
-           <url>https://wiki.lyrasis.org/display/DSPACE/DSpace+Committers</url>
-           <roles>
-             <role>committer</role>
-           </roles>
+            <name>DSpace Committers</name>
+            <email>dspace-devel@googlegroups.com</email>
+            <url>https://wiki.lyrasis.org/display/DSPACE/DSpace+Committers</url>
+            <roles>
+                <role>committer</role>
+            </roles>
         </developer>
     </developers>
 
     <contributors>
         <contributor>
-           <name>DSpace Contributors</name>
-           <email>dspace-tech@googlegroups.com</email>
-           <url>https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors</url>
-           <roles>
-             <role>developer</role>
-           </roles>
+            <name>DSpace Contributors</name>
+            <email>dspace-tech@googlegroups.com</email>
+            <url>https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors</url>
+            <roles>
+                <role>developer</role>
+            </roles>
         </contributor>
     </contributors>
 
@@ -1983,7 +1932,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>dspace-7.2.1</tag>
+        <tag>dspace-7.5</tag>
     </scm>
 
 

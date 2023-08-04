@@ -5,21 +5,32 @@ name: Check for merge conflicts
 # NOTE: This means merge conflicts are only checked for when a PR is merged to main.
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  # So that the `conflict_label_name` is removed if conflicts are resolved,
+  # we allow this to run for `pull_request_target` so that github secrets are available.
+  pull_request_target:
+    types: [ synchronize ]
+
+permissions: {}
 
 jobs:
   triage:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
-      # See: https://github.com/mschilde/auto-label-merge-conflicts/
+      # See: https://github.com/prince-chrismc/label-merge-conflicts-action
       - name: Auto-label PRs with merge conflicts
-        uses: mschilde/auto-label-merge-conflicts@v2.0
+        uses: prince-chrismc/label-merge-conflicts-action@v2
         # Add "merge conflict" label if a merge conflict is detected. Remove it when resolved.
         # Note, the authentication token is created automatically
         # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token
         with:
-          CONFLICT_LABEL_NAME: 'merge conflict'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Ignore errors
-        continue-on-error: true
+          conflict_label_name: 'merge conflict'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          conflict_comment: |
+            Hi @${author},
+            Conflicts have been detected against the base branch.
+            Please [resolve these conflicts](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/about-merge-conflicts) as soon as you can. Thanks!

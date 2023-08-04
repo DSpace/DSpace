@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeException;
@@ -81,6 +82,9 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
      * log4j category
      */
     private static final Logger log = LogManager.getLogger(ClarinShibAuthentication.class);
+
+    // If the user which are in the login process has email already associated with a different users email.
+    private boolean isDuplicateUser = false;
 
     /**
      * Additional metadata mappings
@@ -249,7 +253,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
             EPerson eperson = findEPerson(context, request);
 
             // Step 2: Register New User, if necessary
-            if (eperson == null && autoRegister) {
+            if (eperson == null && autoRegister && !isDuplicateUser) {
                 eperson = registerNewEPerson(context, request);
             }
 
@@ -550,7 +554,8 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
 
         // 1) First, look for a netid header.
         if (netidHeader != null) {
-            String netid = findSingleAttribute(request, netidHeader);
+            String org = shibheaders.get_idp();
+            String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), org);
             if (StringUtils.isEmpty(netid)) {
                 netid = shibheaders.get_single(netidHeader);
             }
@@ -605,6 +610,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
                                     "'. This might be a possible hacking attempt to steal another users " +
                                     "credentials. If the user's netid has changed you will need to manually " +
                                     "change it to the correct value or unset it in the database.");
+                    this.isDuplicateUser = true;
                     eperson = null;
                 }
             }
@@ -687,7 +693,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
         // CLARIN
 
         // Header values
-        String netid = findSingleAttribute(request, netidHeader);
+        String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), org);
         String email = findSingleAttribute(request, emailHeader);
         String fname = findSingleAttribute(request, fnameHeader);
         String lname = findSingleAttribute(request, lnameHeader);
@@ -706,7 +712,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
             lname = shibheaders.get_single(lnameHeader);
         }
 
-        if ( email == null && netid == null) {
+        if ( email == null ) {
             // We require that there be an email, first name, and last name. If we
             // don't have at least these three pieces of information then we fail.
             String message = "Unable to register new eperson because we are unable to find an email address along " +
@@ -809,7 +815,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
         String fnameHeader = configurationService.getProperty("authentication-shibboleth.firstname-header");
         String lnameHeader = configurationService.getProperty("authentication-shibboleth.lastname-header");
 
-        String netid = findSingleAttribute(request, netidHeader);
+        String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), shibheaders.get_idp());
         String email = findSingleAttribute(request, emailHeader);
         String fname = findSingleAttribute(request, fnameHeader);
         String lname = findSingleAttribute(request, lnameHeader);
@@ -1306,6 +1312,11 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
                 request.getSession().getAttribute("shib.authenticated") != null) {
             return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
         return false;
     }
 }

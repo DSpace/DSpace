@@ -88,7 +88,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
         http.requestMatchers()
-            .antMatchers("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
+            .antMatchers("/api/**", "/iiif/**", actuatorBasePath + "/**")
             .and()
             // Enable Spring Security authorization on these paths
             .authorizeRequests()

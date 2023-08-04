@@ -76,11 +76,6 @@ public class SearchUtils {
         searchService = null;
     }
 
-    /**
-     * Retrieves the Discovery Configuration for a null context, prefix and DSpace object.
-     * This will result in returning the default configuration
-     * @return the default configuration
-     */
     public static DiscoveryConfiguration getDiscoveryConfiguration() {
         return getDiscoveryConfiguration(null, null, null);
     }

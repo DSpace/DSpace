@@ -368,7 +368,9 @@ public class DatabaseUtils {
                             .println("\nWARNING: ALL DATA AND TABLES IN YOUR DATABASE WILL BE PERMANENTLY DELETED.\n");
                         System.out.println("There is NO turning back from this action. Backup your DB before " +
                                                "continuing.");
-                        if (dbType.equals(DBMS_POSTGRES)) {
+                        if (dbType.equals(DBMS_ORACLE)) {
+                            System.out.println("\nORACLE WARNING: your RECYCLEBIN will also be PURGED.\n");
+                        } else if (dbType.equals(DBMS_POSTGRES)) {
                             System.out.println(
                                 "\nPOSTGRES WARNING: the '" + PostgresUtils.PGCRYPTO + "' extension will be dropped " +
                                 "if it is in the same schema as the DSpace database.\n");
@@ -464,10 +466,11 @@ public class DatabaseUtils {
         DatabaseMetaData meta = connection.getMetaData();
         String dbType = getDbType(connection);
         System.out.println("\nDatabase Type: " + dbType);
-        if (!dbType.equals(DBMS_POSTGRES) && !dbType.equals(DBMS_H2)) {
-            System.err.println("====================================");
-            System.err.println("ERROR: Database type " + dbType + " is UNSUPPORTED!");
-            System.err.println("=====================================");
+        if (dbType.equals(DBMS_ORACLE)) {
+            System.out.println("====================================");
+            System.out.println("WARNING: Oracle support is deprecated!");
+            System.out.println("See https://github.com/DSpace/DSpace/issues/8214");
+            System.out.println("=====================================");
         }
         System.out.println("Database URL: " + meta.getURL());
         System.out.println("Database Schema: " + getSchemaName(connection));
@@ -601,6 +604,10 @@ public class DatabaseUtils {
             // Migration scripts are based on DBMS Keyword (see full path below)
             String dbType = getDbType(connection);
             connection.close();
+
+            if (dbType.equals(DBMS_ORACLE)) {
+                log.warn("ORACLE SUPPORT IS DEPRECATED! See https://github.com/DSpace/DSpace/issues/8214");
+            }
 
             // Determine location(s) where Flyway will load all DB migrations
             ArrayList<String> scriptLocations = new ArrayList<>();

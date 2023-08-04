@@ -89,24 +89,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     ChoiceAuthorityService choiceAuthorityService;
 
-    /**
-     * This field has been created to easily modify the tests when updating the defaultConfiguration's sidebar facets
-     */
-    List<Matcher<? super Object>> customSidebarFacets = List.of(
-    );
-
-    /**
-     * This field has been created to easily modify the tests when updating the defaultConfiguration's search filters
-     */
-    List<Matcher<? super Object>> customSearchFilters = List.of(
-    );
-
-    /**
-     * This field has been created to easily modify the tests when updating the defaultConfiguration's sort fields
-     */
-    List<Matcher<? super Object>> customSortFields = List.of(
-    );
-
     @Test
     public void rootDiscoverTest() throws Exception {
 
@@ -6754,7 +6736,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.facetType", equalTo("authority")))
                    //There always needs to be a self link available
                    .andExpect(jsonPath("$._links.self.href",
-                       containsString("api/discover/facets/supervisedBy?prefix=group%20B&configuration=supervision")))
+                       containsString("api/discover/facets/supervisedBy?prefix=group%2520B&configuration=supervision")))
                    //This is how the page object must look like because it's the default with size 20
                    .andExpect(jsonPath("$.page",
                        is(PageMatcher.pageEntry(0, 20))))
@@ -6867,7 +6849,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("ExtraEntry")
                                       .build();
 
-        //3. three in progress submission from a normal user (2 ws, 1 wf that will produce also a pooltask)
+        //3. three inprogress submission from a normal user (2 ws, 1 wf that will produce also a pooltask)
         context.setCurrentUser(eperson);
         WorkspaceItem wsItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                     .withTitle("Workspace Item 1")
@@ -6897,7 +6879,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                               .withIssueDate("2010-11-03")
                                               .build();
 
-        // 5. other in progress submissions made by the administrator
+        // 5. other inprogress submissions made by the administrator
         context.setCurrentUser(admin);
         WorkspaceItem wsItem1Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                          .withIssueDate("2010-07-23")

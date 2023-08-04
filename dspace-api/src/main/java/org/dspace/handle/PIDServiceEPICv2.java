@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.handle.service.HandleClarinService;
 
@@ -40,7 +40,7 @@ import org.dspace.handle.service.HandleClarinService;
  * @author Michaela Paurikova (michaela.paurikova at dataquest.sk)
  */
 public class PIDServiceEPICv2 extends AbstractPIDService {
-    private static final Logger log = Logger.getLogger(PIDServiceEPICv2.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(PIDServiceEPICv2.class);
     private static final Type handleListType = new TypeToken<List<Handle>>() {}.getType();
 
     private HandleClarinService handleClarinService = ContentServiceFactory.getInstance().getHandleClarinService();

@@ -26,6 +26,8 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.statistics.clarin.ClarinMatomoBitstreamTracker;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -145,6 +147,29 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
+
+    @Autowired(required = true)
+    private EntityTypeService entityTypeService;
+
+    @Autowired
+    private OrcidTokenService orcidTokenService;
+
+    @Autowired(required = true)
+    private OrcidHistoryService orcidHistoryService;
+
+    @Autowired(required = true)
+    private OrcidQueueService orcidQueueService;
+
+    @Autowired(required = true)
+    private OrcidSynchronizationService orcidSynchronizationService;
+
+    @Autowired(required = true)
+    private ResearcherProfileService researcherProfileService;
+    @Autowired(required = true)
+    private RequestItemService requestItemService;
+
+    @Autowired(required = true)
+    protected SubscribeService subscribeService;
 
     @Autowired(required = true)
     ClarinMatomoBitstreamTracker matomoBitstreamTracker;
@@ -269,6 +294,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
         return itemDAO.findAll(context, true, true);
     }
+
+    public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
+        return itemDAO.findAllRegularItems(context);
+    };
 
     @Override
     public Iterator<Item> findAllRegularItems(Context context) throws SQLException {

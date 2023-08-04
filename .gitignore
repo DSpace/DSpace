@@ -50,5 +50,6 @@ rebel.xml
 
 ## local config for build scripts
 /scripts/envs/__basic.bat
+/scripts/envs/__dspace.parent.basic.bat
 /scripts/TEST_*
 /scripts/tests.yaml

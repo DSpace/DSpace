@@ -81,7 +81,7 @@ public class ExternalHandleRestRepositoryIT extends AbstractControllerIntegratio
 
         getClient().perform(get("/api/services/handles/magic"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.valueOf("application/json;charset=UTF-8")))
                 .andExpect(jsonPath("$", ExternalHandleMatcher.matchListOfExternalHandles(
                         expectedExternalHandles
                 )))

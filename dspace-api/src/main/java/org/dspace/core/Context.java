@@ -965,15 +965,4 @@ public class Context implements AutoCloseable {
     public boolean isContextUserSwitched() {
         return currentUserPreviousState != null;
     }
-
-    /**
-     * Returns the default "Administrator" group for DSpace administrators.
-     * The result is cached in the 'adminGroup' field, so it is only looked up once.
-     * This is done to improve performance, as this method is called quite often.
-     */
-    public Group getAdminGroup() throws SQLException {
-        return (adminGroup == null) ? EPersonServiceFactory.getInstance()
-                                                           .getGroupService()
-                                                           .findByName(this, Group.ADMIN) : adminGroup;
-    }
 }

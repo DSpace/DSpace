@@ -36,7 +36,6 @@ import org.dspace.content.ProcessStatus;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.hibernate.annotations.Type;
 
 /**
  * This class is the DB Entity representation of the Process object to be stored in the Database

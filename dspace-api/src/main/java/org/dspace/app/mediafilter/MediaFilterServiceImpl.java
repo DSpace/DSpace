@@ -380,7 +380,18 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             bitstreamService.update(context, b);
 
             //Set permissions on the derivative bitstream
-            updatePoliciesOfDerivativeBitstream(context, b, formatFilter, source);
+            //- First remove any existing policies
+            authorizeService.removeAllPolicies(context, b);
+
+            //- Determine if this is a public-derivative format
+            if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
+                //- Set derivative bitstream to be publicly accessible
+                Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
+                authorizeService.addPolicy(context, b, Constants.READ, anonymous);
+            } else {
+                //- replace the policies using the same in the source bitstream
+                authorizeService.replaceAllPolicies(context, source, b);
+            }
 
             //do post-processing of the generated bitstream
             formatFilter.postProcessBitstream(context, item, b);

@@ -19,14 +19,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ReloadableEntity;
 
 @Entity
 @Table(name = "user_metadata")
 public class ClarinUserMetadata implements ReloadableEntity<Integer> {
 
-    private static Logger log = Logger.getLogger(ClarinUserMetadata.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinUserMetadata.class);
     @Id
     @Column(name = "user_metadata_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_metadata_user_metadata_id_seq")

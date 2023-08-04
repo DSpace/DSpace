@@ -85,11 +85,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findAll method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
 
@@ -111,11 +111,11 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findAll method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        Date countdownDate = new Date();
+        Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
-                                                                 .withCountdownDate(countdownDate)
+                                                                 .withCountdownDate(dateToNearestSecond)
                                                                  .isActive(true)
                                                                  .build();
 
@@ -153,7 +153,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                  .build();
         context.restoreAuthSystemState();
 
-
         String authToken = getAuthToken(admin.getEmail(), password);
 
         // When the alert is active and the user is not an admin, the user will be able to see the alert
@@ -165,8 +164,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlert1.getAllowSessions().getValue())),
-                                             hasJsonPath("$.countdownTo",
-                                                         dateMatcher(dateToNearestSecond)),
+                                             hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                              )
                                     ));
@@ -204,8 +202,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlert1.getAllowSessions().getValue())),
-                                             hasJsonPath("$.countdownTo",
-                                                         dateMatcher(dateToNearestSecond)),
+                                             hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                              )
                                     ));
@@ -240,7 +237,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-
         getClient(authToken).perform(get("/api/system/systemwidealerts/" + systemWideAlert1.getID()))
                             .andExpect(status().isOk())
                             .andExpect(
@@ -249,8 +245,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlert1.getAllowSessions().getValue())),
-                                             hasJsonPath("$.countdownTo",
-                                                         dateMatcher(dateToNearestSecond)),
+                                             hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                              )
                                     ));
@@ -297,8 +292,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                     hasJsonPath("$.alertId", is(systemWideAlert1.getID())),
                                     hasJsonPath("$.message", is(systemWideAlert1.getMessage())),
                                     hasJsonPath("$.allowSessions", is(systemWideAlert1.getAllowSessions().getValue())),
-                                    hasJsonPath("$.countdownTo",
-                                                dateMatcher(dateToNearestSecond)),
+                                    hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                     hasJsonPath("$.active", is(systemWideAlert1.isActive()))
                                     ),
                                     allOf(
@@ -355,7 +349,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                             hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
                                             hasJsonPath("$.allowSessions", is(systemWideAlertRest.getAllowSessions())),
                                             hasJsonPath("$.countdownTo",
-                                                        dateMatcher(dateToNearestSecond)),
+                                                    dateMatcher(dateToNearestSecond)),
                                             hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                     )
                            ));
@@ -441,7 +435,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                 .isActive(false)
                                                                 .build();
         context.restoreAuthSystemState();
-
         Date dateToNearestSecond = DateUtils.round(new Date(), Calendar.SECOND);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
@@ -455,7 +448,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-
         getClient(authToken).perform(put("/api/system/systemwidealerts/" + systemWideAlert.getID())
                                              .content(mapper.writeValueAsBytes(systemWideAlertRest))
                                              .contentType(contentType))
@@ -466,8 +458,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                              hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
                                              hasJsonPath("$.allowSessions",
                                                          is(systemWideAlertRest.getAllowSessions())),
-                                             hasJsonPath("$.countdownTo",
-                                                         dateMatcher(dateToNearestSecond)),
+                                             hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                              hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                              )
                                     ));
@@ -479,8 +470,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                             hasJsonPath("$.alertId", is(systemWideAlert.getID())),
                                             hasJsonPath("$.message", is(systemWideAlertRest.getMessage())),
                                             hasJsonPath("$.allowSessions", is(systemWideAlertRest.getAllowSessions())),
-                                            hasJsonPath("$.countdownTo",
-                                                        dateMatcher(dateToNearestSecond)),
+                                            hasJsonPath("$.countdownTo", dateMatcher(dateToNearestSecond)),
                                             hasJsonPath("$.active", is(systemWideAlertRest.isActive()))
                                     )
                            ));

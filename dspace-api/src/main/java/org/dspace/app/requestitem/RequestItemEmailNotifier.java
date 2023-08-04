@@ -58,7 +58,11 @@ public class RequestItemEmailNotifier {
     @Inject
     protected RequestItemService requestItemService;
 
-    protected final RequestItemAuthorExtractor requestItemAuthorExtractor;
+    private static final RequestItemAuthorExtractor requestItemAuthorExtractor
+            = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("requestItemAuthorExtractor",
+                            RequestItemAuthorExtractor.class);
 
     @Inject
     public RequestItemEmailNotifier(RequestItemAuthorExtractor requestItemAuthorExtractor) {

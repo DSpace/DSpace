@@ -79,9 +79,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     private ValidatePasswordService validatePasswordService;
 
     @Autowired
-    private RegistrationDataService registrationDataService;
-
-    @Autowired
     private GroupService groupService;
 
     private final EPersonService es;

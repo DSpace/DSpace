@@ -238,8 +238,6 @@ public class IndexEventConsumer implements Consumer {
                 uniqueIdsToDelete.clear();
                 createdItemsToUpdate.clear();
             }
-
-            ctx.setMode(originalMode);
         }
     }
 

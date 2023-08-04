@@ -48,8 +48,8 @@ import org.xml.sax.InputSource;
 public class SpecialItemService {
     private SpecialItemService() {}
     /** log4j logger */
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger
-            .getLogger(SpecialItemService.class);
+    private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j
+            .LogManager.getLogger(SpecialItemService.class);
 
     /**
      * Returns cmdi metadata of item, if uploaded and marked as local.hasCMDI = true.

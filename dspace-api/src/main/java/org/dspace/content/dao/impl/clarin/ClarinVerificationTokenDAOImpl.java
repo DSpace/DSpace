@@ -9,8 +9,12 @@ package org.dspace.content.dao.impl.clarin;
 
 import java.sql.SQLException;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.dspace.content.clarin.ClarinVerificationToken;
+import org.dspace.content.clarin.ClarinVerificationToken_;
 import org.dspace.content.dao.clarin.ClarinVerificationTokenDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -39,13 +43,14 @@ public class ClarinVerificationTokenDAOImpl extends AbstractHibernateDAO<ClarinV
 
     @Override
     public ClarinVerificationToken findByNetID(Context context, String netID) throws SQLException {
-        Query query = createQuery(context, "SELECT cvt " +
-                "FROM ClarinVerificationToken cvt " +
-                "WHERE cvt.ePersonNetID = :netID");
-
-        query.setParameter("netID", netID);
-        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
-
-        return singleResult(query);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClarinVerificationToken.class);
+        Root<ClarinVerificationToken> clarinVerificationTokenRoot = criteriaQuery.from(ClarinVerificationToken.class);
+        criteriaQuery.select(clarinVerificationTokenRoot);
+        criteriaQuery.where(criteriaBuilder.like(clarinVerificationTokenRoot.get(ClarinVerificationToken_.ePersonNetID),
+                "%" + netID + "%"));
+        criteriaQuery.orderBy(criteriaBuilder.asc(clarinVerificationTokenRoot.
+                get(ClarinVerificationToken_.ePersonNetID)));
+        return singleResult(context, criteriaQuery);
     }
 }

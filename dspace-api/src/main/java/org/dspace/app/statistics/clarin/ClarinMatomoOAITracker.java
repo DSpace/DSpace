@@ -10,7 +10,7 @@ package org.dspace.app.statistics.clarin;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -27,7 +27,7 @@ import org.matomo.java.tracking.MatomoRequest;
  */
 public class ClarinMatomoOAITracker extends ClarinMatomoTracker {
     /** log4j category */
-    private static Logger log = Logger.getLogger(ClarinMatomoOAITracker.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinMatomoOAITracker.class);
 
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();

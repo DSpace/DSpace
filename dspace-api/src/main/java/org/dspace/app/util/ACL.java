@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -34,7 +34,7 @@ import org.dspace.eperson.service.GroupService;
 public class ACL {
 
     /** Logger */
-    private static final Logger log = Logger.getLogger(ACL.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ACL.class);
     public static final int ACTION_READ = ACE.ACTION_READ;
     public static final int ACTION_WRITE = ACE.ACTION_WRITE;
     /**

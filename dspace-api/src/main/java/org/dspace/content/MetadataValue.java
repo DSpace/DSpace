@@ -60,7 +60,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      * The value of the field
      */
     @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "text_value")
     private String value;
 

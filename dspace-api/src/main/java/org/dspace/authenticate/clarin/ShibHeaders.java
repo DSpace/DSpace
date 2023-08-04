@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.Util;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Shibboleth authentication header abstraction for DSpace
@@ -29,6 +32,8 @@ public class ShibHeaders {
     // constants
     //
     private static final String header_separator_ = ";";
+    private String netIdHeader = "";
+    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // variables
     //
@@ -58,10 +63,12 @@ public class ShibHeaders {
 
     public void initialise(HttpServletRequest request, List<String> interesting) {
         headers_ = new Headers(request, header_separator_, interesting);
+        this.initializeNetIdHeader();
     }
 
     public void initialise(String shibHeaders) {
         headers_ = new Headers(shibHeaders, header_separator_);
+        this.initializeNetIdHeader();
     }
 
     //
@@ -97,6 +104,10 @@ public class ShibHeaders {
     public String get_single(String name) {
         List<String> values = get(name);
         if (values != null && !values.isEmpty()) {
+            // Format netId
+            if (StringUtils.equals(name, this.netIdHeader)) {
+                return Util.formatNetId(values.get(0), this.get_idp());
+            }
             return values.get(0);
         }
         return null;
@@ -136,5 +147,9 @@ public class ShibHeaders {
             log.debug(String.format("header:%s=%s",
                     i.getKey(), StringUtils.join(i.getValue().toArray(), ",") ));
         }
+    }
+
+    private void initializeNetIdHeader() {
+        this.netIdHeader = configurationService.getProperty("authentication-shibboleth.netid-header");
     }
 }

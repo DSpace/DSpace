@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,9 @@ public class ClarinDiscoJuiceFeedsUpdateScheduler implements InitializingBean {
     @Autowired
     ClarinDiscoJuiceFeedsDownloadService clarinDiscoJuiceFeedsDownloadService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     /**
      * Instead of static {} method.
      */
@@ -45,7 +49,12 @@ public class ClarinDiscoJuiceFeedsUpdateScheduler implements InitializingBean {
      */
     @Scheduled(cron = "${discojuice.refresh:-}")
     public void cronJobSch() {
-        log.info("CRON Job - going to download the discojuice feeds.");
+        boolean isAllowed = configurationService.getBooleanProperty("shibboleth.discofeed.allowed", true);
+        if (!isAllowed) {
+            return;
+        }
+
+        log.debug("CRON Job - going to download the discojuice feeds.");
         String newFeedsContent = clarinDiscoJuiceFeedsDownloadService.createFeedsContent();
         if (isNotBlank(newFeedsContent)) {
             feedsContent = newFeedsContent;

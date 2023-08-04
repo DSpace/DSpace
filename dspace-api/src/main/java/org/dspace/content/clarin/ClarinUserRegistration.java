@@ -21,14 +21,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ReloadableEntity;
 
 @Entity
 @Table(name = "user_registration")
 public class ClarinUserRegistration implements ReloadableEntity<Integer> {
 
-    private static Logger log = Logger.getLogger(ClarinUserRegistration.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinUserRegistration.class);
 
     @Id
     @Column(name = "user_registration_id")

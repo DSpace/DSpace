@@ -71,15 +71,23 @@ dspace.name = DSpace at My University
 ##########################
 # DATABASE CONFIGURATION #
 ##########################
-# DSpace ONLY supports PostgreSQL at this time.
+# DSpace only supports two database types: PostgreSQL or Oracle
+# PostgreSQL is highly recommended.
+# Oracle support is DEPRECATED. See https://github.com/DSpace/DSpace/issues/8214
 
 # URL for connecting to database
+#    * Postgres template: jdbc:postgresql://localhost:5432/dspace
+#    * Oracle template (DEPRECATED): jdbc:oracle:thin:@//localhost:1521/xe
 db.url = jdbc:postgresql://localhost:5432/dspace
 
-# JDBC Driver for PostgreSQL
+# JDBC Driver
+#    * For Postgres: org.postgresql.Driver
+#    * For Oracle (DEPRECATED):   oracle.jdbc.OracleDriver
 db.driver = org.postgresql.Driver
 
-# PostgreSQL Database Dialect (for Hibernate)
+# Database Dialect (for Hibernate)
+#    * For Postgres: org.hibernate.dialect.PostgreSQL94Dialect
+#    * For Oracle (DEPRECATED):   org.hibernate.dialect.Oracle10gDialect
 db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
 
 # Database username and password
@@ -87,7 +95,9 @@ db.username = dspace
 db.password = dspace
 
 # Database Schema name
-# For PostgreSQL, this is often "public" (default schema)
+#    * For Postgres, this is often "public" (default schema)
+#    * For Oracle (DEPRECATED), schema is equivalent to the username of your database account,
+#      so this may be set to ${db.username} in most scenarios.
 db.schema = public
 
 ## Connection pool parameters

@@ -9,7 +9,7 @@ package org.dspace.app.util;
 
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class that represents single Access Control Entry
@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 public class ACE {
 
     /** Logger */
-    private static final Logger log = Logger.getLogger(ACE.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ACE.class);
     private static final String POLICY_KEYWORD = "policy";
     private static final String POLICY_DENY_KEYWORD = "deny";
     private static final String POLICY_ALLOW_KEYWORD = "allow";

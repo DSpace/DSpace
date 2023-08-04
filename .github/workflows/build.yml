@@ -4,7 +4,7 @@
 name: Build
 
 # Run this Build for pushes to our main and all PRs
-on: 
+on:
   push:
     branches:
       - dtq-dev
@@ -112,6 +112,6 @@ jobs:
       # Retry action: https://github.com/marketplace/actions/retry-action
       # Codecov action: https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos

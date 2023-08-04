@@ -98,9 +98,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     private EPersonService ePersonService;
 
     @Autowired
-    private GroupService groupService;
-
-    @Autowired
     private ConfigurationService configurationService;
 
     @Test

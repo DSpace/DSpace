@@ -464,7 +464,8 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     public void setCanEditSubmissionMetadata(Boolean canEditSubmissionMetadata) {
         this.canEditSubmissionMetadata = canEditSubmissionMetadata;
     }
-
-
+    public boolean hasPasswordSet() {
+        return StringUtils.isNotBlank(getPassword());
+    }
 
 }

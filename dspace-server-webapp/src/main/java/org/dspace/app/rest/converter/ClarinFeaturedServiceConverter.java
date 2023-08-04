@@ -15,6 +15,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.clarin.ClarinFeaturedService;
 import org.dspace.content.clarin.ClarinFeaturedServiceLink;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Component;
 public class ClarinFeaturedServiceConverter implements DSpaceConverter<ClarinFeaturedService,
         ClarinFeaturedServiceRest> {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
     @Autowired
     private ConverterService converter;
 

@@ -34,6 +34,4 @@
     
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
 
-    <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
-
 </beans>

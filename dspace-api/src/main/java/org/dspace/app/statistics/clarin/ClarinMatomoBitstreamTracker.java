@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ClarinMatomoBitstreamTracker extends ClarinMatomoTracker {
     /** log4j category */
-    private static Logger log = Logger.getLogger(ClarinMatomoBitstreamTracker.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinMatomoBitstreamTracker.class);
 
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();

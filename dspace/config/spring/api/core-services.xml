@@ -114,7 +114,7 @@
     <bean class="org.dspace.eperson.GroupServiceImpl"/>
     <bean class="org.dspace.eperson.RegistrationDataServiceImpl"/>
     <bean class="org.dspace.eperson.SubscribeServiceImpl"/>
-    <bean class="org.dspace.eperson.SupervisorServiceImpl"/>
+    <bean class="org.dspace.eperson.CaptchaServiceImpl"/>
 
     <bean class="org.dspace.authorize.AuthorizationBitstreamUtils"/>
 
@@ -162,6 +162,11 @@
     <!-- OIDC Authentication -->
     <bean class="org.dspace.authenticate.OidcAuthenticationBean" id="oidcAuthentication"/>
     <bean class="org.dspace.authenticate.oidc.impl.OidcClientImpl" />
+
+    <bean class="org.dspace.authorize.ValidatePasswordServiceImpl"/>
+    <bean class="org.dspace.authorize.RegexPasswordValidator" />
+
+    <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
     <!-- Matomo statistics -->
     <bean class="org.matomo.java.tracking.MatomoTracker">

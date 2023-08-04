@@ -8,6 +8,7 @@
 package org.dspace.app.solrdatabaseresync;
 
 import org.apache.commons.cli.Options;
+import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
@@ -24,6 +25,11 @@ public class SolrDatabaseResyncCliScriptConfiguration extends ScriptConfiguratio
     @Override
     public void setDspaceRunnableClass(Class<SolrDatabaseResyncCli> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
+    }
+
+    @Override
+    public boolean isAllowedToExecute(Context context) {
+        return true;
     }
 
     @Override

@@ -35,8 +35,8 @@ public class LicenseUtil {
     }
 
     /** log4j logger */
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger
-            .getLogger(LicenseUtil.class);
+    private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j
+            .LogManager.getLogger(LicenseUtil.class);
 
     /*
      * values:

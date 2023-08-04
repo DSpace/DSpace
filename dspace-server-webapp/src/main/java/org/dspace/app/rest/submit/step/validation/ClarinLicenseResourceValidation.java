@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.step.validation;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,15 +44,16 @@ public class ClarinLicenseResourceValidation extends AbstractValidation {
         List<MetadataValue> licenseName = itemService.getMetadataByMetadataString(item, "dc.rights");
         List<MetadataValue> licenseLabel = itemService.getMetadataByMetadataString(item, "dc.rights.label");
 
+        List<ErrorRest> errors = new ArrayList<>();
         if (CollectionUtils.isEmpty(licenseDefinition) || CollectionUtils.isEmpty(licenseName) ||
             CollectionUtils.isEmpty(licenseLabel)) {
-            addError(ERROR_VALIDATION_CLARIN_LICENSE_GRANTED,
+            addError(errors, ERROR_VALIDATION_CLARIN_LICENSE_GRANTED,
                     "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
                             + config.getId());
         }
 
 
-        return getErrors();
+        return errors;
     }
 
     public ItemService getItemService() {

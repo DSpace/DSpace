@@ -48,6 +48,8 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     @Autowired(required = true)
     protected IdentifierService identifierService;
     @Autowired(required = true)
+    protected RelationshipService relationshipService;
+    @Autowired(required = true)
     protected HandleService handleService;
 
     @Override
@@ -132,6 +134,51 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
+    /**
+     * Copy all relationships of the old item to the new item.
+     * At this point in the lifecycle of the item-version (before archival), only the opposite item receives
+     * "latest" status. On item archival of the item-version, the "latest" status of the relevant relationships
+     * will be updated.
+     * @param context the DSpace context.
+     * @param newItem the new version of the item.
+     * @param oldItem the old version of the item.
+     */
+    protected void copyRelationships(
+        Context context, Item newItem, Item oldItem
+    ) throws SQLException, AuthorizeException {
+        List<Relationship> oldRelationships = relationshipService.findByItem(context, oldItem, -1, -1, false, true);
+        for (Relationship oldRelationship : oldRelationships) {
+            if (oldRelationship.getLeftItem().equals(oldItem)) {
+                // current item is on left side of this relationship
+                relationshipService.create(
+                    context,
+                    newItem,  // new item
+                    oldRelationship.getRightItem(),
+                    oldRelationship.getRelationshipType(),
+                    oldRelationship.getLeftPlace(),
+                    oldRelationship.getRightPlace(),
+                    oldRelationship.getLeftwardValue(),
+                    oldRelationship.getRightwardValue(),
+                    Relationship.LatestVersionStatus.RIGHT_ONLY // only mark the opposite side as "latest" for now
+                );
+            } else if (oldRelationship.getRightItem().equals(oldItem)) {
+                // current item is on right side of this relationship
+                relationshipService.create(
+                    context,
+                    oldRelationship.getLeftItem(),
+                    newItem, // new item
+                    oldRelationship.getRelationshipType(),
+                    oldRelationship.getLeftPlace(),
+                    oldRelationship.getRightPlace(),
+                    oldRelationship.getLeftwardValue(),
+                    oldRelationship.getRightwardValue(),
+                    Relationship.LatestVersionStatus.LEFT_ONLY // only mark the opposite side as "latest" for now
+                );
+            }
+        }
+    }
+
 
     /**
      * Add metadata `dc.relation.replaces` to the new item.

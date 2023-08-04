@@ -12,6 +12,7 @@ import static org.dspace.app.rest.security.WebSecurityConfiguration.AUTHENTICATE
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -68,6 +69,16 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired(required = false)
+    private List<PostLoggedInAction> postLoggedInActions;
+
+    @PostConstruct
+    public void postConstruct() {
+        if (postLoggedInActions == null) {
+            postLoggedInActions = Collections.emptyList();
+        }
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

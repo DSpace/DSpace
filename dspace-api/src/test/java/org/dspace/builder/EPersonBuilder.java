@@ -133,6 +133,16 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         return this;
     }
 
+    public EPersonBuilder withOrcid(final String orcid) {
+        setMetadataSingleValue(ePerson, "eperson", "orcid", null, orcid);
+        return this;
+    }
+
+    public EPersonBuilder withOrcidScope(final String scope) {
+        addMetadataValue(ePerson, "eperson", "orcid", "scope", scope);
+        return this;
+    }
+
     private static void deleteUserRegistration(Context context, EPerson eperson)
             throws SQLException, AuthorizeException {
         if (Objects.isNull(eperson)) {

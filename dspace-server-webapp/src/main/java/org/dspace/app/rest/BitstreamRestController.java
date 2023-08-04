@@ -159,7 +159,6 @@ public class BitstreamRestController {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
-
             org.dspace.app.rest.utils.BitstreamResource bitstreamResource =
                 new org.dspace.app.rest.utils.BitstreamResource(name, uuid,
                     currentUser != null ? currentUser.getID() : null,

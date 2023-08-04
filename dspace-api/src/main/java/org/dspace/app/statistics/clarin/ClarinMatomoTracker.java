@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ClarinServiceFactory;
 import org.dspace.core.Context;
@@ -35,7 +35,7 @@ public class ClarinMatomoTracker {
     }
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(ClarinMatomoTracker.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinMatomoTracker.class);
 
     private final ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();

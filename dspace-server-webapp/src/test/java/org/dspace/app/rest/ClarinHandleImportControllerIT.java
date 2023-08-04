@@ -35,9 +35,11 @@ public class ClarinHandleImportControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void createHandleWithoutDSpaceObjectTest() throws Exception {
+        String uniqueHandle = "123456789/135479";
+
         ObjectMapper mapper = new ObjectMapper();
         HandleRest handleRest = new HandleRest();
-        handleRest.setHandle("123456789/1");
+        handleRest.setHandle(uniqueHandle);
         handleRest.setResourceTypeID(2);
         Integer handleId = null;
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -53,7 +55,7 @@ public class ClarinHandleImportControllerIT extends AbstractControllerIntegratio
         //find created handle
         Handle handle = handleService.findByID(context, handleId);
         //control
-        assertEquals(handle.getHandle(), "123456789/1");
+        assertEquals(handle.getHandle(), uniqueHandle);
         assertEquals(handle.getResourceTypeId(), (Integer)2);
         assertNull(handle.getUrl());
         assertNull(handle.getDSpaceObject());

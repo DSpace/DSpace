@@ -146,16 +146,11 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         try {
             metadataSchemaRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataSchemaRest.class);
         } catch (JsonProcessingException e) {
-            throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
+            throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
         }
 
-        MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
-        if (metadataSchema == null) {
-            throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
-        }
-
-        if (!Objects.equals(metadataSchemaRest.getPrefix(), metadataSchema.getName())) {
-            throw new UnprocessableEntityException("Metadata schema name cannot be updated.");
+        if (metadataSchemaRest == null || isBlank(metadataSchemaRest.getPrefix())) {
+            throw new UnprocessableEntityException("metadata schema name cannot be blank");
         }
         if (isBlank(metadataSchemaRest.getNamespace())) {
             throw new UnprocessableEntityException("metadata schema namespace cannot be blank");

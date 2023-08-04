@@ -29,7 +29,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.ReloadableEntity;
 
@@ -47,7 +47,7 @@ import org.dspace.core.ReloadableEntity;
 @Table(name = "license_definition")
 public class ClarinLicense implements ReloadableEntity<Integer> {
 
-    private static Logger log = Logger.getLogger(ClarinLicense.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinLicense.class);
 
     /**
      * Required info key word.

@@ -135,6 +135,7 @@ public class ClarinBitstreamImportController {
             }
             bitstream.setFormat(context, bitstreamFormat);
             String deletedString = request.getParameter("deleted");
+
             Boolean deleted = Boolean.parseBoolean(deletedString);
             //set size bytes
             bitstream.setSizeBytes(bitstreamRest.getSizeBytes());
@@ -143,6 +144,7 @@ public class ClarinBitstreamImportController {
             //set checksum algorithm
             bitstream.setChecksumAlgorithm(bitstreamRest.getCheckSum().getCheckSumAlgorithm());
             //do validation between input fields and calculated fields based on file from assetstore
+
             //we do validation only if the bitstream is not deleted
             if (deleted) {
                 log.info("Validation is not checked for deleted bitstream id: " + bitstream.getID() +

@@ -78,11 +78,11 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
                 service = new DatabaseReader.Builder(
                         new BufferedInputStream(Files.newInputStream(Paths.get(dbfile)))).build();
             } catch (IOException e) {
-                log.error("Unable to load GeoLite Database file (" + dbfile + ")! " +
+                log.debug("ERROR: Unable to load GeoLite Database file (" + dbfile + ")! " +
                         "You may need to reinstall it. See the DSpace installation instructions for more details.", e);
             }
         } else {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+            log.debug("ERROR: The required 'dbfile' configuration is missing in solr-statistics.cfg!");
         }
         locationService = service;
 
@@ -100,7 +100,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
     }
 
     public String createFeedsContent() {
-        log.info("Going to create feeds content.");
+        log.debug("Going to create feeds content.");
         String[] feedsConfig = configurationService.getArrayProperty("discojuice.feeds");
         String shibbolethDiscoFeedUrl = configurationService.getProperty("shibboleth.discofeed.url");
 

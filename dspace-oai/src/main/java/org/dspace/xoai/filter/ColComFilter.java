@@ -13,8 +13,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -36,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * /dspace-oai/src/main/java/cz/cuni/mff/ufal/dspace/xoai/filter/ColComFilter.java
  */
 public class ColComFilter extends DSpaceFilter {
-    private static Logger log = LogManager.getLogger(ColComFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ColComFilter.class);
 
     private DSpaceObject dso = null;
 

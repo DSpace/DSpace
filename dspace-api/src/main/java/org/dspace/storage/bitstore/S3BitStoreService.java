@@ -19,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Supplier;
 import javax.validation.constraints.NotNull;
 
@@ -27,14 +26,16 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.transfer.Download;
+import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -44,7 +45,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
@@ -97,10 +98,27 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     private boolean enabled = false;
 
+    // These settings control the way an identifier is hashed into
+    // directory and file names
+    //
+    // With digitsPerLevel 2 and directoryLevels 3, an identifier
+    // like 12345678901234567890 turns into the relative name
+    // /12/34/56/12345678901234567890.
+    //
+    // You should not change these settings if you have data in the
+    // asset store, as the BitstreamStorageManager will be unable
+    // to find your existing data.
+    protected static final int digitsPerLevel = 2;
+    protected static final int directoryLevels = 3;
+
+    private boolean enabled = false;
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
     private boolean useRelativePath;
+
+    private String endpoint;
+    private boolean pathStyleAccessEnabled;
 
     /**
      * container for all the assets
@@ -127,7 +145,7 @@ public class S3BitStoreService extends BaseBitStoreService {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
-     * Utility method for generate AmazonS3 builder
+     * Utility method for generate AmazonS3 builder with specific region
      *
      * @param regions wanted regions in client
      * @param awsCredentials credentials of the client
@@ -143,15 +161,35 @@ public class S3BitStoreService extends BaseBitStoreService {
                 .build();
     }
 
+    /**
+     * Utility method for generate AmazonS3 builder with specific endpoint
+     *
+     * @param endpointConfiguration configuration of endpoint
+     * @param awsCredentials credentials of the client
+     * @param pathStyleAccessEnabled enable path style access to S3 service
+     * @return builder with the specified parameters
+     */
+    protected static Supplier<AmazonS3> amazonClientBuilderBy(
+            @NotNull AwsClientBuilder.EndpointConfiguration endpointConfiguration,
+            @NotNull AWSCredentials awsCredentials,
+            @NotNull boolean pathStyleAccessEnabled
+    ) {
+        return () -> AmazonS3ClientBuilder.standard()
+                .withPathStyleAccessEnabled( pathStyleAccessEnabled)
+                .withEndpointConfiguration(endpointConfiguration)
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials)).build();
+    }
     public S3BitStoreService() {}
 
     /**
      * This constructor is used for test purpose.
+     * In this way is possible to use a mocked instance of AmazonS3
      *
-     * @param s3Service AmazonS3 service
+     * @param s3Service mocked AmazonS3 service
      */
-    protected S3BitStoreService(AmazonS3 s3Service) {
+    protected S3BitStoreService(AmazonS3 s3Service, TransferManager tm) {
         this.s3Service = s3Service;
+        this.tm = tm;
     }
 
     @Override
@@ -174,7 +212,16 @@ public class S3BitStoreService extends BaseBitStoreService {
         }
 
         try {
-            if (StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
+            if (StringUtils.isNotBlank(getEndpoint())) {
+                log.info("Creating s3service from different endpoint than amazon: " + getEndpoint());
+                BasicAWSCredentials credentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
+                AwsClientBuilder.EndpointConfiguration ec =
+                        new AwsClientBuilder.EndpointConfiguration(getEndpoint(), "");
+                s3Service = FunctionalUtils.getDefaultOrBuild(
+                        this.s3Service,
+                        amazonClientBuilderBy(ec, credentials, getPathStyleAccessEnabled())
+                );
+            } else if (StringUtils.isNotBlank(getAwsAccessKey()) && StringUtils.isNotBlank(getAwsSecretKey())) {
                 log.warn("Use local defined S3 credentials");
                 // region
                 Regions regions = Regions.DEFAULT_REGION;
@@ -290,22 +337,19 @@ public class S3BitStoreService extends BaseBitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
-        try (
-                FileOutputStream fos = new FileOutputStream(scratchFile);
-                // Read through a digest input stream that will work out the MD5
-                DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
-        ) {
-            Utils.bufferedCopy(dis, fos);
-            in.close();
+        try {
+            FileUtils.copyInputStreamToFile(in, scratchFile);
+            long contentLength = scratchFile.length();
+            // The ETag may or may not be and MD5 digest of the object data.
+            // Therefore, we precalculate before uploading
+            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
 
             Upload upload = tm.upload(bucketName, key, scratchFile);
 
             upload.waitForUploadResult();
 
-            bitstream.setSizeBytes(scratchFile.length());
-            // we cannot use the S3 ETAG here as it could be not a MD5 in case of multipart upload (large files) or if
-            // the bucket is encrypted
-            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
+            bitstream.setSizeBytes(contentLength);
+            bitstream.setChecksum(localChecksum);
             bitstream.setChecksumAlgorithm(CSA);
 
         } catch (AmazonClientException | IOException | InterruptedException e) {
@@ -342,30 +386,10 @@ public class S3BitStoreService extends BaseBitStoreService {
         if (isRegisteredBitstream(key)) {
             key = key.substring(REGISTERED_FLAG.length());
         }
-
-        Map<String, Object> metadata = new HashMap<>();
-
         try {
-
             ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
             if (objectMetadata != null) {
-                putValueIfExistsKey(attrs, metadata, "size_bytes", objectMetadata.getContentLength());
-                putValueIfExistsKey(attrs, metadata, "modified", valueOf(objectMetadata.getLastModified().getTime()));
-            }
-
-            putValueIfExistsKey(attrs, metadata, "checksum_algorithm", CSA);
-
-            if (attrs.contains("checksum")) {
-                try (InputStream in = get(bitstream);
-                     DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA))
-                ) {
-                    Utils.copy(dis, NullOutputStream.NULL_OUTPUT_STREAM);
-                    byte[] md5Digest = dis.getMessageDigest().digest();
-                    metadata.put("checksum", Utils.toHex(md5Digest));
-                } catch (NoSuchAlgorithmException nsae) {
-                    // Should never happen
-                    log.warn("Caught NoSuchAlgorithmException", nsae);
-                }
+                return this.about(objectMetadata, attrs);
             }
 
             return metadata;
@@ -378,6 +402,34 @@ public class S3BitStoreService extends BaseBitStoreService {
             throw new IOException(e);
         }
         return metadata;
+    }
+
+    /**
+     * Populates map values by checking key existence
+     * <br>
+     * Adds technical metadata about an asset in the asset store, like:
+     * <ul>
+     *  <li>size_bytes</li>
+     *  <li>checksum</li>
+     *  <li>checksum_algorithm</li>
+     *  <li>modified</li>
+     * </ul>
+     *
+     * @param objectMetadata containing technical data
+     * @param attrs map with keys populated
+     * @return Map of enriched attrs with values
+     */
+    public Map about(ObjectMetadata objectMetadata, Map attrs) {
+        if (objectMetadata != null) {
+            this.putValueIfExistsKey(attrs, SIZE_BYTES, objectMetadata.getContentLength());
+
+            // put CHECKSUM_ALGORITHM if exists CHECKSUM
+            this.putValueIfExistsKey(attrs, CHECKSUM, objectMetadata.getETag());
+            this.putEntryIfExistsKey(attrs, CHECKSUM, Map.entry(CHECKSUM_ALGORITHM, CSA));
+
+            this.putValueIfExistsKey(attrs, MODIFIED, String.valueOf(objectMetadata.getLastModified().getTime()));
+        }
+        return attrs;
     }
 
     /**
@@ -462,6 +514,22 @@ public class S3BitStoreService extends BaseBitStoreService {
         this.awsAccessKey = awsAccessKey;
     }
 
+    @Autowired(required = true)
+    public void setPathStyleAccessEnabled(boolean pathStyleAccessEnabled) {
+        this.pathStyleAccessEnabled = pathStyleAccessEnabled;
+    }
+
+    public boolean getPathStyleAccessEnabled() {
+        return this.pathStyleAccessEnabled;
+    }
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public String getEndpoint() {
+        return this.endpoint;
+    }
+
     public String getAwsSecretKey() {
         return awsSecretKey;
     }
@@ -541,6 +609,7 @@ public class S3BitStoreService extends BaseBitStoreService {
 
         String accessKey = command.getOptionValue("a");
         String secretKey = command.getOptionValue("s");
+        String assetFile = command.getOptionValue("f");
 
         S3BitStoreService store = new S3BitStoreService();
 

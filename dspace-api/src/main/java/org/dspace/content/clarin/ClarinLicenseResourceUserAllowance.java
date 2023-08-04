@@ -23,14 +23,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.ReloadableEntity;
 
 @Entity
 @Table(name = "license_resource_user_allowance")
 public class ClarinLicenseResourceUserAllowance implements ReloadableEntity<Integer> {
 
-    private static Logger log = Logger.getLogger(ClarinLicenseResourceUserAllowance.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinLicenseResourceUserAllowance.class);
 
     @Id
     @Column(name = "transaction_id")

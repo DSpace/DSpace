@@ -27,8 +27,8 @@ import java.util.Set;
 public class XslLogUtil {
 
     /** log4j logger */
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger
-            .getLogger("Missed");
+    private static org.apache.logging.log4j.Logger log = org.apache.logging.log4j
+            .LogManager.getLogger("Missed");
 
     private XslLogUtil() {}
 

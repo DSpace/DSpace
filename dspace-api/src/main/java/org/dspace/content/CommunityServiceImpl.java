@@ -78,7 +78,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected SubscribeService subscribeService;
-
     protected CommunityServiceImpl() {
         super();
     }
@@ -119,8 +118,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         // of 'anonymous' READ
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
 
-        authorizeService.createResourcePolicy(context, newCommunity, anonymousGroup,null,
-                Constants.READ, null);
+        authorizeService.createResourcePolicy(context, newCommunity, anonymousGroup, null, Constants.READ, null);
 
         communityDAO.save(context, newCommunity);
 

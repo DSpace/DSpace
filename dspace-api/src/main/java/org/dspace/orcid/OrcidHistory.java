@@ -79,8 +79,6 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     /**
      * A description of the synchronized resource.
      */
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "description")
     private String description;
 
@@ -89,7 +87,7 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
      * the owner itself.
      */
     @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "metadata")
     private String metadata;
 
@@ -104,7 +102,7 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
      * The response message incoming from ORCID.
      */
     @Lob
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
     @Column(name = "response_message")
     private String responseMessage;
 

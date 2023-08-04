@@ -226,7 +226,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
-    public void testRegisterMailAddressRegistered() throws Exception {
+    public void testRegisterDomainNotRegisteredMailAddressRegistred() throws Exception {
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
         try {
             context.turnOffAuthorisationSystem();
@@ -236,7 +236,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                           .withCanLogin(true)
                           .build();
             context.restoreAuthSystemState();
-
+            configurationService.setProperty("authentication-password.domain.valid", "test.com");
             RegistrationRest registrationRest = new RegistrationRest();
             registrationRest.setEmail(email);
 
@@ -245,10 +245,9 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
                                     .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                                     .content(mapper.writeValueAsBytes(registrationRest))
                                     .contentType(contentType))
-                       .andExpect(status().isCreated());
+                       .andExpect(status().isUnprocessableEntity());
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-            assertEquals(1, registrationDataList.size());
-            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), email));
+            assertEquals(0, registrationDataList.size());
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {
@@ -299,7 +298,6 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
 
         // when reCAPTCHA enabled and request doesn't contain "X-Recaptcha-Token” header
         getClient().perform(post("/api/eperson/registrations")
-                            .param(TYPE_QUERY_PARAM, TYPE_REGISTER)
                    .content(mapper.writeValueAsBytes(registrationRest))
                    .contentType(contentType))
                    .andExpect(status().isForbidden());

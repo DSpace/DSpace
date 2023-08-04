@@ -355,7 +355,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     /**
      * Assign the admin permission to the specified eperson
      *
-     * @param ePerson the eperson that will get the ADMIN permission on the item
+     * @param ePerson epersons to add to the admin group
      * @return this builder
      * @throws SQLException
      * @throws AuthorizeException
@@ -364,6 +364,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setAdminPermission(item, ePerson, null);
     }
 
+    public ItemBuilder withPersonEmail(String email) {
+        return addMetadataValue(item, "person", "email", null, email);
+    }
     public ItemBuilder withCCLicense(String uri) throws SQLException, AuthorizeException {
         creativeCommonsService.updateLicense(context, uri, item);
         return this;

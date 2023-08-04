@@ -34,6 +34,7 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.app.util.Util;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -54,6 +55,8 @@ public class ClarinAuthenticationRestControllerIT extends AbstractControllerInte
     private final String feature = CanChangePasswordFeature.NAME;
     private Authorization authorization;
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
+    private static final String NET_ID_TEST_EPERSON = "123456789";
+    private static final String IDP_TEST_EPERSON = "Test Idp";
 
     @Autowired
     ConfigurationService configurationService;
@@ -88,7 +91,7 @@ public class ClarinAuthenticationRestControllerIT extends AbstractControllerInte
                 .withEmail("clarin@email.com")
                 .withNameInMetadata("first", "last")
                 .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
-                .withNetId("123456789")
+                .withNetId(Util.formatNetId(NET_ID_TEST_EPERSON, IDP_TEST_EPERSON))
                 .build();
         context.restoreAuthSystemState();
 
@@ -112,8 +115,8 @@ public class ClarinAuthenticationRestControllerIT extends AbstractControllerInte
                         .header("Referer", "https://myshib.example.com")
                         .param("redirectUrl", uiURL)
                         .header("SHIB-MAIL", clarinEperson.getEmail())
-                        .header("Shib-Identity-Provider", "Test idp")
-                        .header("SHIB-NETID", clarinEperson.getNetid())
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-NETID", NET_ID_TEST_EPERSON)
                         .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(uiURL))

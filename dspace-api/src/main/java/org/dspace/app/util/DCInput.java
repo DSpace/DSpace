@@ -144,6 +144,11 @@ public class DCInput {
     private String regex = null;
 
     /**
+     * the computed pattern, null if nothing
+     */
+    private Pattern pattern = null;
+
+    /**
      * Access Control List - is user allowed for particular ACL action on this input field in given
      */
     private ACL acl = null;
@@ -235,7 +240,7 @@ public class DCInput {
         visibility = fieldMap.get("visibility");
         readOnly = fieldMap.get("readonly");
         vocabulary = fieldMap.get("vocabulary");
-        regex = fieldMap.get("regex");
+        this.initRegex(fieldMap.get("regex"));
         acl = ACL.fromString(fieldMap.get("acl"));
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
@@ -656,9 +661,11 @@ public class DCInput {
     }
 
     /**
-     * Verify whether the current field contains an entity relationship
-     * This also implies a relationship type is defined for this field
-     * The field can contain both an entity relationship and a metadata field simultaneously
+     * Verify whether the current field contains an entity relationship.
+     * This also implies a relationship type is defined for this field.
+     * The field can contain both an entity relationship and a metadata field
+     * simultaneously.
+     * @return true if the field contains a relationship.
      */
     public boolean isRelationshipField() {
         return isRelationshipField;

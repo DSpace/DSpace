@@ -13,32 +13,30 @@ on:
 permissions:
   contents: read  #  to fetch code (actions/checkout)
 
-# Define shared environment variables for all jobs below
-env:
-  # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
-  # For a new commit on default branch (main), use the literal tag 'latest' on Docker image.
-  # For a new commit on other branches, use the branch name as the tag for Docker image.
-  # For a new tag, copy that tag name as the tag for Docker image.
-  IMAGE_TAGS: |
-    type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-    type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
-    type=ref,event=tag
-  # Define default tag "flavor" for docker/metadata-action per
-  # https://github.com/docker/metadata-action#flavor-input
-  # We manage the 'latest' tag ourselves to the 'main' branch (see settings above)
-  TAGS_FLAVOR: |
-    latest=false
-  # Architectures / Platforms for which we will build Docker images
-  # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
-  # If this is NOT a PR (e.g. a tag or merge commit), also build for ARM64. NOTE: The ARM64 build takes MUCH
-  # longer (around 45mins or so) which is why we only run it when pushing a new Docker image.
-  PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
-
 jobs:
   docker:
     # Ensure this job never runs on forked repos. It's only executed for our repo
     if: github.repository == 'dataquest-dev/dspace'
     runs-on: ubuntu-latest
+    env:
+      # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
+      # For a new commit on default branch (main), use the literal tag 'dspace-7_x' on Docker image.
+      # For a new commit on other branches, use the branch name as the tag for Docker image.
+      # For a new tag, copy that tag name as the tag for Docker image.
+      IMAGE_TAGS: |
+        type=raw,value=dspace-7_x,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+        type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
+        type=ref,event=tag
+      # Define default tag "flavor" for docker/metadata-action per
+      # https://github.com/docker/metadata-action#flavor-input
+      # We turn off 'latest' tag by default.
+      TAGS_FLAVOR: |
+        latest=false
+      # Architectures / Platforms for which we will build Docker images
+      # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
+      # If this is NOT a PR (e.g. a tag or merge commit), also build for ARM64. NOTE: The ARM64 build takes MUCH
+      # longer (around 45mins or so) which is why we only run it when pushing a new Docker image.
+      PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
 
     steps:
       # https://github.com/actions/checkout
@@ -78,7 +76,7 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: Build and push 'dspace-dependencies' image
         id: docker_build_deps
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.dependencies
@@ -104,7 +102,7 @@ jobs:
 
       - name: Build and push 'dspace' image
         id: docker_build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile
@@ -133,7 +131,7 @@ jobs:
 
       - name: Build and push 'dspace-test' image
         id: docker_build_test
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.test
@@ -159,7 +157,7 @@ jobs:
 
       - name: Build and push 'dspace-cli' image
         id: docker_build_cli
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./Dockerfile.cli
@@ -170,7 +168,7 @@ jobs:
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build_cli.outputs.tags }}
           labels: ${{ steps.meta_build_cli.outputs.labels }}
-          
+
       - name: redeploy
         if: 'false'
         run: |
@@ -179,4 +177,4 @@ jobs:
           --request POST \
           https://api.github.com/repos/dataquest-dev/\
           dspace-angular/actions/workflows/deploy.yml/dispatches \
-          --data "{\"ref\":\"refs/heads/dtq-dev\"}"
+          --data "{\"ref\":\"refs/heads/dtq-dev-7.5\"}"

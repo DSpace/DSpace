@@ -34,6 +34,10 @@
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
+
+<!--        Endpoint for other S3 providers than amazon AWS-->
+        <property name="endpoint" value="${assetstore.s3.endpoint}"/>
+        <property name="pathStyleAccessEnabled" value="${assetstore.s3.pathStyleAccessEnabled}"/>
     </bean>
 
     <!-- <bean name="localStore2 ... -->

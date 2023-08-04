@@ -169,33 +169,6 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         return list(context, criteriaQuery, false, Process.class, -1, -1);
     }
 
-    @Override
-    public List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
-
-        Root<Process> processRoot = criteriaQuery.from(Process.class);
-        criteriaQuery.select(processRoot);
-        criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
-
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.desc(processRoot.get(Process_.PROCESS_ID)));
-        criteriaQuery.orderBy(orderList);
-
-        return list(context, criteriaQuery, false, Process.class, limit, offset);
-    }
-
-    @Override
-    public int countByUser(Context context, EPerson user) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
-
-        Root<Process> processRoot = criteriaQuery.from(Process.class);
-        criteriaQuery.select(processRoot);
-        criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
-        return count(context, criteriaQuery, criteriaBuilder, processRoot);
-    }
-
 }
 
 

@@ -21,11 +21,11 @@ DSpace uses GitHub to track issues:
 - Language is not properly showed in the Item View, it is `ces, zxx` instead of `Czech, Nolinguistic content`. Issue: https://github.com/dataquest-dev/DSpace/issues/253
 
 ### Tables which are not migrated yet:
-- resurcepolicy, 
-- schema_version, 
+- resurcepolicy - automatically filled, 
+- schema_version - automatically filled, 
 - subscription, 
 - tasklistitem, 
-- webapp, 
+- webapp - automatically filled, 
 - license_ressource_user_allowance, 
 - user_metadata, 
 - verification_token

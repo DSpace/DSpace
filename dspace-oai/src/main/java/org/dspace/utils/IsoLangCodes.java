@@ -45,8 +45,8 @@ public class IsoLangCodes {
     }
 
     /** log4j logger */
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger
-            .getLogger(IsoLangCodes.class);
+    private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j
+            .LogManager.getLogger(IsoLangCodes.class);
 
     private static Map<String, String> isoLanguagesMap = null;
 
