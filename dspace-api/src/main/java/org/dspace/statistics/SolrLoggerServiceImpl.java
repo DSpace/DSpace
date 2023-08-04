@@ -1699,11 +1699,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 //Also add the core containing the current year, if it hasn't been added already
                 statisticYearCores.add(baseCore);
             }
-            //Also add the core containing the current year !
-            statisticYearCores.add(((HttpSolrClient) solr)
-                    .getBaseURL()
-                    .replace("http://", "")
-                    .replace("https://", ""));
         } catch (IOException | SolrServerException e) {
             log.error(e.getMessage(), e);
         }
