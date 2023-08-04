@@ -93,7 +93,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         // As this is a BRAND NEW item, as a final step we need to remove the
         // submitter item policies created during deposit and replace them with
         // the default policies from the collection.
-        itemService.inheritCollectionDefaultPolicies(c, item, collection);
+        itemService.inheritCollectionDefaultPolicies(c, item, collection, false);
 
         return item;
     }

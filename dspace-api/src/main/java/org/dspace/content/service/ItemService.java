@@ -473,7 +473,7 @@ public interface ItemService
     public void removeGroupPolicies(Context context, Item item, Group group) throws SQLException, AuthorizeException;
 
     /**
-     * remove all policies on an item and its contents, and replace them with
+     * Remove all policies on an item and its contents, and replace them with
      * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
      * the collection.
      *
@@ -486,6 +486,26 @@ public interface ItemService
      * @throws AuthorizeException if authorization error
      */
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
+        throws java.sql.SQLException, AuthorizeException;
+
+    /**
+     * Remove all submission and workflow policies on an item and its contents, and add
+     * default collection policies which are not yet already in place.
+     * If overrideItemReadPolicies is true, then all read policies on the item are replaced (but only if the
+     * collection has a default read policy).
+     *
+     * @param context                   DSpace context object
+     * @param item                      item to reset policies on
+     * @param collection                Collection
+     * @param overrideItemReadPolicies  if true, all read policies on the item are replaced (but only if the
+     *                                  collection has a default read policy)
+     * @throws SQLException       if database error
+     *                            if an SQL error or if no default policies found. It's a bit
+     *                            draconian, but default policies must be enforced.
+     * @throws AuthorizeException if authorization error
+     */
+    public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection,
+                                                 boolean overrideItemReadPolicies)
         throws java.sql.SQLException, AuthorizeException;
 
     /**
