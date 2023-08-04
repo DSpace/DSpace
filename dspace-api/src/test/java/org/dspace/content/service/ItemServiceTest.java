@@ -39,6 +39,7 @@ import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.RequestItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -786,20 +787,45 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
             .createItem(context, permissive)
             .build();
 
-        // Verify that the item has exactly one READ policy, for the anonymous group.
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, InputStream.nullInputStream())
+            .build();
+
+        Bundle bundle = item.getBundles("ORIGINAL").get(0);
+
+        // Verify that the item, bundle and bitstream each have exactly one READ policy, for the anonymous group.
         assertEquals(
             List.of(anonymous),
             authorizeService.getPoliciesActionFilter(context, item, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, bundle, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ)
                 .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
         );
 
         // Move the item to the restrictive collection, making sure to inherit default policies.
         itemService.move(context, item, permissive, restrictive, true);
 
-        // Verify that the item has exactly one READ policy, but now for the admin group.
+        // Verify that the item, bundle and bitstream each have exactly one READ policy, but now for the admin group.
         assertEquals(
             List.of(admin),
             authorizeService.getPoliciesActionFilter(context, item, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, bundle, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ)
                 .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
         );
 
