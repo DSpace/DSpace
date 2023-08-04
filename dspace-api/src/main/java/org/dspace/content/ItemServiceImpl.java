@@ -920,6 +920,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
+
+        // If collection has READ policies, remove the item's READ policies.
+        List<ResourcePolicy> defaultCollectionPolicies = authorizeService
+            .getPoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
+        if (!defaultCollectionPolicies.isEmpty()) {
+            authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
+        }
+
         adjustItemPolicies(context, item, collection);
         adjustBundleBitstreamPolicies(context, item, collection);
 
