@@ -702,9 +702,10 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
                 script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
             }
             if (script != null) {
-            	if (DSpaceRunnable.StepResult.Continue.equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
-            		script.run();	
-            	} 
+                if (DSpaceRunnable.StepResult.Continue
+                        .equals(script.initialize(args, testDSpaceRunnableHandler, null))) {
+                    script.run();
+                }
             }
             if (testDSpaceRunnableHandler.getException() != null) {
                 throw testDSpaceRunnableHandler.getException();

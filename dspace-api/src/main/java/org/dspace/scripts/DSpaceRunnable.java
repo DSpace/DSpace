@@ -35,7 +35,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * The CommandLine object for the script that'll hold the information
      */
     protected CommandLine commandLine;
-    
+
     /**
      * The minimal CommandLine object for the script that'll hold help information
      */
@@ -69,8 +69,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * @param args                  The arguments given to the script
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler object that defines from where the script was ran
      * @param currentUser
-     * @return the result of this step; StepResult.Continue: continue the normal process, initialize is successful; 
-     *         otherwise exit the process (the help or version is shown)
+     * @return the result of this step; StepResult.Continue: continue the normal process,
+     * initialize is successful; otherwise exit the process (the help or version is shown)
      * @throws ParseException       If something goes wrong
      */
     public StepResult initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
@@ -79,35 +79,38 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
             this.setEpersonIdentifier(currentUser.getID());
         }
         this.setHandler(dSpaceRunnableHandler);
-        
-        // parse the command line in a first step for the help options 
+
+        // parse the command line in a first step for the help options
         // --> no other option is required
         StepResult result = this.parseForHelp(args);
         switch (result) {
-		case Exit:
-			// arguments of the command line matches the help options, handle this
-			handleHelpCommandLine();			
-			break;
-			
-		case Continue:
-			// arguments of the command line matches NOT the help options, parse the args for the normal options
-			result = this.parse(args);
-			break;
-		}        
-        
+            case Exit:
+                // arguments of the command line matches the help options, handle this
+                handleHelpCommandLine();
+                break;
+
+            case Continue:
+                // arguments of the command line matches NOT the help options, parse the args for the normal options
+                result = this.parse(args);
+                break;
+            default:
+                break;
+        }
+
         return result;
     }
 
 
-	/** This method handle the help command line. In this easy implementation only the help is printed.
-	 *  For more complexity override this method. 
-	 */
-	private void handleHelpCommandLine() {
-		printHelp();		
-	}
+    /**
+     * This method handle the help command line. In this easy implementation only the help is printed. For more
+     * complexity override this method.
+     */
+    private void handleHelpCommandLine() {
+        printHelp();
+    }
 
 
-	/**
+    /**
      * This method will take the primitive array of String objects that represent the parameters given to the String
      * and it'll parse these into a CommandLine object that can be used by the script to retrieve the data
      * @param args              The primitive array of Strings representing the parameters
@@ -118,15 +121,15 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
         setup();
         return StepResult.Continue;
     }
-    
+
     private StepResult parseForHelp(String[] args) throws ParseException {
-    	helpCommandLine = new DefaultParser().parse(getScriptConfiguration().getHelpOptions(), args);
-		if (helpCommandLine.getOptions() != null && helpCommandLine.getOptions().length > 0) {
-			return StepResult.Exit;
-		}
-		
-		return StepResult.Continue;
-	}
+        helpCommandLine = new DefaultParser().parse(getScriptConfiguration().getHelpOptions(), args);
+        if (helpCommandLine.getOptions() != null && helpCommandLine.getOptions().length > 0) {
+            return StepResult.Exit;
+        }
+
+        return StepResult.Continue;
+    }
 
     /**
      * This method has to be included in every script and handles the setup of the script by parsing the CommandLine
@@ -200,9 +203,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     public void setEpersonIdentifier(UUID epersonIdentifier) {
         this.epersonIdentifier = epersonIdentifier;
     }
-    
+
     public enum StepResult {
-    	Continue,
-    	Exit;
+        Continue, Exit;
     }
 }
