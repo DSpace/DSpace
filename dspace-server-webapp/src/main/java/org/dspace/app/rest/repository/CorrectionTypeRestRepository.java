@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CorrectionTypeRest;
 import org.dspace.authorize.AuthorizeException;
@@ -46,7 +45,11 @@ public class CorrectionTypeRestRepository extends DSpaceRestRepository<Correctio
     @PreAuthorize("permitAll()")
     @Override
     public CorrectionTypeRest findOne(Context context, String id) {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+        CorrectionType correctionType = correctionTypeService.findOne(id);
+        if (null == correctionType) {
+            return null;
+        }
+        return converter.toRest(correctionType, utils.obtainProjection());
     }
 
     @PreAuthorize("permitAll()")

@@ -79,8 +79,18 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
 
     @Test
     public void findOneTest() throws Exception {
+        getClient().perform(get("/api/config/correctiontypes/addpersonalpath"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.id", equalTo("addpersonalpath")))
+                   .andExpect(jsonPath("$.topic", equalTo("/DSPACEUSERS/RELATIONADD/dc.relation.personalpath")))
+                   .andExpect(jsonPath("$.discoveryConfiguration", equalTo("RELATION.PersonPath.Items")))
+                   .andExpect(jsonPath("$.creationForm", equalTo("manageRelation")));
+    }
+
+    @Test
+    public void findOneNotFoundTest() throws Exception {
         getClient().perform(get("/api/config/correctiontypes/test"))
-                   .andExpect(status().isMethodNotAllowed());
+                   .andExpect(status().isNotFound());
     }
 
     @Test
