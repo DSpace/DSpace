@@ -123,7 +123,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     }
 
     private StepResult parseForHelp(String[] args) throws ParseException {
-        helpCommandLine = new DefaultParser().parse(getScriptConfiguration().getHelpOptions(), args);
+        helpCommandLine = new DefaultParser().parse(getScriptConfiguration().getHelpOptions(), args, true);
         if (helpCommandLine.getOptions() != null && helpCommandLine.getOptions().length > 0) {
             return StepResult.Exit;
         }
