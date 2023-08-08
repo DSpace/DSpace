@@ -177,4 +177,4 @@ jobs:
           --request POST \
           https://api.github.com/repos/dataquest-dev/\
           dspace-angular/actions/workflows/deploy.yml/dispatches \
-          --data "{\"ref\":\"refs/heads/dtq-dev-7.5\"}"
+          --data "{\"ref\":\"refs/heads/dtq-dev\"}"

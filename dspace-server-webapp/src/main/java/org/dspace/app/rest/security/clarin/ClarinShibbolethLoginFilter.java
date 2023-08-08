@@ -78,7 +78,8 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
 
     public static final String VERIFICATION_TOKEN_HEADER = "Verification-Token";
 
-    private static final Logger log = LogManager.getLogger(org.dspace.app.rest.security.ShibbolethLoginFilter.class);
+    private static final Logger log = LogManager.getLogger(org.dspace.app.rest.security.clarin.
+            ClarinShibbolethLoginFilter.class);
 
     /**
      * Property which handles information if the IdP send required information.
@@ -175,6 +176,11 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
                 //
             }
         }
+
+        // logging
+        log.info("Shib-Identity-Provider: " + idp);
+        log.info("authentication-shibboleth.netid-header: " + netidHeader + " with value: " + netid);
+        log.info("authentication-shibboleth.email-header: " + emailHeader + " with value: " + email);
 
         try {
             if (StringUtils.isEmpty(netid) || StringUtils.isEmpty(idp)) {

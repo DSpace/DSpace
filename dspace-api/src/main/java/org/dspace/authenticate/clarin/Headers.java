@@ -8,12 +8,16 @@
 /* Created for LINDAT/CLARIN */
 package org.dspace.authenticate.clarin;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Helper class for request headers.
@@ -22,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class Headers {
 
+    private static final Logger log = LogManager.getLogger(org.dspace.authenticate.clarin.Headers.class);
     // variables
     //
 
@@ -56,7 +61,7 @@ public class Headers {
             List<String> vals = new ArrayList<String>();
             Enumeration e_vals = request.getHeaders(key);
             while (e_vals.hasMoreElements()) {
-                String values = (String)e_vals.nextElement();
+                String values = updateValueByCharset((String) e_vals.nextElement());
                 vals.addAll( header2values(values) );
             }
 
@@ -148,5 +153,21 @@ public class Headers {
         }
 
         return values;
+    }
+
+
+    /**
+     * Convert ISO header value to UTF-8
+     * @param value ISO header value String
+     * @return
+     */
+    private String updateValueByCharset(String value) {
+        try {
+            return new String(value.getBytes("ISO-8859-1"), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            log.warn("Failed to reconvert shibboleth attribute with value ("
+                    + value + ").", ex);
+        }
+        return value;
     }
 }

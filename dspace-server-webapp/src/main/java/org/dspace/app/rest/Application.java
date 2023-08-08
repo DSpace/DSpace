@@ -12,6 +12,7 @@ import static org.dspace.app.rest.security.clarin.ClarinShibbolethLoginFilter.VE
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Predicate;
 import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
@@ -39,6 +40,8 @@ import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -165,6 +168,23 @@ public class Application extends SpringBootServletInitializer {
     @Bean
     protected LinkRelationProvider dspaceLinkRelationProvider() {
         return new DSpaceLinkRelationProvider();
+    }
+
+    /**
+     * StrictHttpFirewall doesn't allow ISO header values by default. It could throw an error during Shibboleth
+     * authentication if the user has UTF-8 characters in the name.
+     * Updated allowedHeaderValues without any regex - it allows every character.
+     * @return
+     */
+    @Bean
+    public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        Predicate<String> test = (s) -> {
+            return true;
+        };
+
+        firewall.setAllowedHeaderValues(test);
+        return firewall;
     }
 
     @Bean

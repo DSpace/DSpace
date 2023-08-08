@@ -111,8 +111,10 @@ public class ClarinMatomoBitstreamTracker extends ClarinMatomoTracker {
     public void trackBitstreamDownload(Context context, HttpServletRequest request, Bitstream bit) throws SQLException {
         // We only track a download request when serving a request without Range header. Do not track the
         // download if the downloading continues or the tracking is not allowed by the configuration.
-        if (StringUtils.isNotBlank(request.getHeader("Range")) &&
-                BooleanUtils.isFalse(configurationService.getBooleanProperty("matomo.track.enabled"))) {
+        if (StringUtils.isNotBlank(request.getHeader("Range"))) {
+            return;
+        }
+        if (BooleanUtils.isFalse(configurationService.getBooleanProperty("matomo.track.enabled"))) {
             return;
         }
 
