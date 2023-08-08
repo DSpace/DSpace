@@ -761,10 +761,11 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
-    public void testMoveItemToCollectionWithMoreRestrictiveReadPolicy() throws Exception {
-        /* Verify that, if we move an item from a collection with a permissive default READ policy
-         * to a collection with a restrictive default READ policy,
-         * that the item does not retain the original permissive READ policy.
+    public void testMoveItemToCollectionWithMoreRestrictiveItemReadPolicy() throws Exception {
+        /* Verify that, if we move an item from a collection with a permissive default item READ policy
+         * to a collection with a restrictive default item READ policy,
+         * that the item does not retain the original permissive item READ policy.
+         * However, its bundles and bitstreams do.
          */
 
         context.turnOffAuthorisationSystem();
@@ -812,7 +813,7 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         // Move the item to the restrictive collection, making sure to inherit default policies.
         itemService.move(context, item, permissive, restrictive, true);
 
-        // Verify that the item, bundle and bitstream each have exactly one READ policy, but now for the admin group.
+        // Verify that the item's read policy now only allows administrators.
         assertEquals(
             List.of(admin),
             authorizeService.getPoliciesActionFilter(context, item, Constants.READ)
@@ -830,6 +831,80 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         );
 
         context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void testMoveItemToCollectionWithMoreRestrictiveBitstreamReadPolicy() throws Exception {
+        /* Verify that, if we move an item from a collection with a permissive default bitstream READ policy
+         * to a collection with a restrictive default bitstream READ policy,
+         * that the item's bundles and bitstreams do not retain the original permissive READ policy.
+         * However, the item itself does retain the original policy.
+         */
+
+        context.turnOffAuthorisationSystem();
+
+        Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
+        Group admin = groupService.findByName(context, Group.ADMIN);
+
+        // Set up the two different collections: one permissive and one restrictive in its default READ policy.
+        Collection permissive = CollectionBuilder
+            .createCollection(context, community)
+            .build();
+        Collection restrictive = CollectionBuilder
+            .createCollection(context, community)
+            .build();
+        authorizeService.removePoliciesActionFilter(context, restrictive, Constants.DEFAULT_BITSTREAM_READ);
+        authorizeService.addPolicy(context, restrictive, Constants.DEFAULT_BITSTREAM_READ, admin);
+
+        // Add an item to the permissive collection.
+        Item item = ItemBuilder
+            .createItem(context, permissive)
+            .build();
+
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, InputStream.nullInputStream())
+            .build();
+
+        Bundle bundle = item.getBundles("ORIGINAL").get(0);
+
+        // Verify that the item, bundle and bitstream each have exactly one READ policy, for the anonymous group.
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, item, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, bundle, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+
+        // Move the item to the restrictive collection, making sure to inherit default policies.
+        itemService.move(context, item, permissive, restrictive, true);
+
+        // Verify that the bundle and bitstream's read policies now only allows administrators.
+        assertEquals(
+            List.of(anonymous),
+            authorizeService.getPoliciesActionFilter(context, item, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(admin),
+            authorizeService.getPoliciesActionFilter(context, bundle, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+        assertEquals(
+            List.of(admin),
+            authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ)
+                .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
+        );
+
+        context.restoreAuthSystemState();
+
     }
 
     private void assertMetadataValue(String authorQualifier, String contributorElement, String dcSchema, String value,
