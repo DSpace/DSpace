@@ -194,7 +194,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 List<Group> defaultBitstreamReadGroups =
                         authorizeService.getAuthorizedGroups(context, owningCollection,
                                 Constants.DEFAULT_BITSTREAM_READ);
-                log.info(defaultBitstreamReadGroups.size());
                 // If this collection is configured with a DEFAULT_BITSTREAM_READ group, overwrite the READ policy
                 // inherited from the bundle with this policy.
                 if (!defaultBitstreamReadGroups.isEmpty()) {
