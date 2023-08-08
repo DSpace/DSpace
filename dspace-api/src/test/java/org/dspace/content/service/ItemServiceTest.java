@@ -764,8 +764,8 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     public void testMoveItemToCollectionWithMoreRestrictiveItemReadPolicy() throws Exception {
         /* Verify that, if we move an item from a collection with a permissive default item READ policy
          * to a collection with a restrictive default item READ policy,
-         * that the item does not retain the original permissive item READ policy.
-         * However, its bundles and bitstreams do.
+         * that the item and its bundles do not retain the original permissive item READ policy.
+         * However, its bitstreams do.
          */
 
         context.turnOffAuthorisationSystem();
@@ -820,7 +820,7 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
                 .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
         );
         assertEquals(
-            List.of(anonymous),
+            List.of(admin),
             authorizeService.getPoliciesActionFilter(context, bundle, Constants.READ)
                 .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
         );
@@ -837,8 +837,8 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
     public void testMoveItemToCollectionWithMoreRestrictiveBitstreamReadPolicy() throws Exception {
         /* Verify that, if we move an item from a collection with a permissive default bitstream READ policy
          * to a collection with a restrictive default bitstream READ policy,
-         * that the item's bundles and bitstreams do not retain the original permissive READ policy.
-         * However, the item itself does retain the original policy.
+         * that the item's bitstreams do not retain the original permissive READ policy.
+         * However, the item itself and its bundles do retain the original policy.
          */
 
         context.turnOffAuthorisationSystem();
@@ -893,7 +893,7 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
                 .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
         );
         assertEquals(
-            List.of(admin),
+            List.of(anonymous),
             authorizeService.getPoliciesActionFilter(context, bundle, Constants.READ)
                 .stream().map(ResourcePolicy::getGroup).collect(Collectors.toList())
         );
