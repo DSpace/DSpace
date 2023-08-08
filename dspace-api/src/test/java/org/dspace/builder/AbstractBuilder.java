@@ -44,6 +44,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.notifyservices.factory.NotifyServiceFactory;
+import org.dspace.notifyservices.service.NotifyService;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -109,6 +111,7 @@ public abstract class AbstractBuilder<T, S> {
     static SystemWideAlertService systemWideAlertService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
+    static NotifyService notifyService;
 
 
     protected Context context;
@@ -173,6 +176,7 @@ public abstract class AbstractBuilder<T, S> {
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
+        notifyService = NotifyServiceFactory.getInstance().getNotifyService();
     }
 
 
@@ -209,6 +213,7 @@ public abstract class AbstractBuilder<T, S> {
         systemWideAlertService = null;
         subscribeService = null;
         supervisionOrderService = null;
+        notifyService = null;
 
     }
 

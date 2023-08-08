@@ -152,5 +152,11 @@
 
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
+    <bean class="org.dspace.notifyservices.NotifyServiceImpl"/>
+    <bean class="org.dspace.notifyservices.NotifyServiceInboundPatternServiceImpl"/>
+    <bean class="org.dspace.notifyservices.NotifyServiceOutboundPatternServiceImpl"/>
+
+    <bean class="org.dspace.content.ItemFilterServiceImpl"/>
+
 </beans>
 
