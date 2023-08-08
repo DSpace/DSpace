@@ -31,6 +31,7 @@ import org.dspace.workflow.CurationTaskConfig;
 import org.dspace.workflow.FlowStep;
 import org.dspace.workflow.Task;
 import org.dspace.workflow.TaskSet;
+import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -276,12 +277,17 @@ public class XmlWorkflowCuratorServiceImpl
                             String.valueOf(wfi.getID()), e);
                     return epList;
                 }
-                RoleMembers roleMembers = step.getRole().getMembers(c, wfi);
-                for (EPerson ep : roleMembers.getEPersons()) {
-                    epList.add(ep);
-                }
-                for (Group group : roleMembers.getGroups()) {
-                    epList.addAll(group.getMembers());
+                Role role = step.getRole();
+                if (null != role) {
+                    RoleMembers roleMembers = role.getMembers(c, wfi);
+                    for (EPerson ep : roleMembers.getEPersons()) {
+                        epList.add(ep);
+                    }
+                    for (Group group : roleMembers.getGroups()) {
+                        epList.addAll(group.getMembers());
+                    }
+                } else {
+                    epList.add(ePersonService.getSystemEPerson(c));
                 }
             } else if ("$colladmin".equals(contact)) {
                 // special literal for collection administrators
