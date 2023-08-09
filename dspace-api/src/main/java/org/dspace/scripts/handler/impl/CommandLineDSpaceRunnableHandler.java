@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -54,13 +55,26 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     UUID ePersonUUID;
 
     public CommandLineDSpaceRunnableHandler() {
+
     }
 
     public CommandLineDSpaceRunnableHandler(String scriptName, List<DSpaceCommandLineParameter> parameters) {
         if (isSaveEnabled()) {
             Context context = new Context();
             try {
-                EPerson ePerson = getEpersonProcess(context);
+                EPerson ePerson;
+                String parameter = parameters.get(0).getName();
+                if (parameter.contains("-e")) {
+                    String email = Arrays.stream(parameter.split(" "))
+                            .filter(s -> s.contains("@")).findFirst()
+                            .orElseThrow(() -> new Exception("No email found in parameters"));
+                    ePerson = ePersonService.findByEmail(context, email);
+                    if (ePerson == null) {
+                        throw new Exception("No eperson found with email: " + email);
+                    }
+                } else {
+                    ePerson = getEpersonProcess(context);
+                }
                 this.ePersonUUID = ePerson.getID();
                 Process process = processService.create(context, ePerson, scriptName, parameters,
                     new HashSet<>(context.getSpecialGroups()));
@@ -237,10 +251,10 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @throws Exception if the EPerson UUID is not valid
      */
     private EPerson getEpersonProcess(Context context) throws Exception {
-        UUID epersonUUID = UUID.fromString(configurationService.getProperty("process.eperson"));
-        EPerson ePerson = ePersonService.find(context, epersonUUID);
+        String epersonEmail = configurationService.getProperty("process.eperson");
+        EPerson ePerson = ePersonService.findByEmail(context, epersonEmail);
         if (ePerson == null) {
-            throw new Exception("EPerson UUID not valid, no result found.");
+            throw new Exception("EPerson email not valid, no result found.");
         }
         return ePerson;
     }
