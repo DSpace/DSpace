@@ -145,7 +145,7 @@ public class ScriptLauncher {
     }
 
     /**
-     * This method will execute the script and save it in database
+     * This method will execute the script and, if enabled, save it in database
      *
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
@@ -154,8 +154,6 @@ public class ScriptLauncher {
      */
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                                      DSpaceRunnable script) {
-
-
         try {
             script.initialize(args, dSpaceRunnableHandler, null);
             script.run();
@@ -437,6 +435,7 @@ public class ScriptLauncher {
         StringBuilder builder = new StringBuilder();
         for (String value : parameters) {
             builder.append(value);
+            builder.append(" ");
         }
         String parameterString = builder.toString();
         DSpaceCommandLineParameter dSpaceCommandLineParameter =
