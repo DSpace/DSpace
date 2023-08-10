@@ -7,7 +7,7 @@
 #
 
 # This will be deployed as dspace/dspace-postgres-pgcrpyto:latest
-FROM postgres:12
+FROM postgres:12.14
 
 ENV POSTGRES_DB dspace
 ENV POSTGRES_USER dspace
