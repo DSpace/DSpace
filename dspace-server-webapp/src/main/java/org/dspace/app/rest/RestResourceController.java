@@ -1107,13 +1107,6 @@ public class RestResourceController implements InitializingBean {
         return deleteInternal(apiCategory, model, uuid);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
-    public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                         @PathVariable String model, @PathVariable String id)
-        throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, id);
-    }
-
     /**
      * Internal method to delete resource.
      *
@@ -1129,6 +1122,13 @@ public class RestResourceController implements InitializingBean {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         repository.deleteById(id);
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
+    public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
+                                                         @PathVariable String model, @PathVariable String id)
+        throws HttpRequestMethodNotSupportedException {
+        return deleteInternal(apiCategory, model, id);
     }
 
     /**
