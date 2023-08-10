@@ -21,14 +21,7 @@ DSpace uses GitHub to track issues:
 - Language is not properly showed in the Item View, it is `ces, zxx` instead of `Czech, Nolinguistic content`. Issue: https://github.com/dataquest-dev/DSpace/issues/253
 
 ### Tables which are not migrated yet:
-- resurcepolicy - automatically filled, 
-- schema_version - automatically filled, 
-- subscription, 
-- tasklistitem, 
-- webapp - automatically filled, 
-- license_ressource_user_allowance, 
-- user_metadata, 
-- verification_token
+- subscription, - Planned in CLARIN-DSpace7.5.
 
 ### Tables which are missing in the DSpace7.*., but they are in the CLARIN-DSpace5.* (they are not planned to migrate)
 - userconnection, 
