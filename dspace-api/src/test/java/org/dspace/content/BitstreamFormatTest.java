@@ -519,7 +519,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testGetExtensions() {
         assertThat("testGetExtensions 0", bf.getExtensions(), notNullValue());
-        assertTrue("testGetExtensions 1", bf.getExtensions().size() == 1);
+        assertTrue("testGetExtensions 1", bf.getExtensions().size() == 2);
         assertThat("testGetExtensions 2", bf.getExtensions().get(0), equalTo("xml"));
     }
 

@@ -75,6 +75,7 @@
     <support_level>1</support_level>
     <internal>false</internal>
     <extension>xml</extension>
+    <extension>trs</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -800,22 +801,80 @@
         <extension>mp3</extension>
     </bitstream-type>
 
+    <!-- CLARIN UPDATE Start -->
+
     <bitstream-type>
-        <mimetype>image/webp</mimetype>
-        <short_description>WebP</short_description>
-        <description>WebP is a modern image format that provides superior lossless and lossy compression for images on the web.</description>
+        <mimetype>application/x-tar</mimetype>
+        <short_description>tar</short_description>
+        <description>Tape archive</description>
         <support_level>1</support_level>
         <internal>false</internal>
-        <extension>webp</extension>
+        <extension>tar</extension>
     </bitstream-type>
 
     <bitstream-type>
-        <mimetype>image/avif</mimetype>
-        <short_description>AVIF</short_description>
-        <description>AV1 Image File Format (AVIF) is an open, royalty-free image file format specification for storing images or image sequences compressed with AV1 in the HEIF container format.</description>
+        <mimetype>application/x-rar-compressed</mimetype>
+        <short_description>rar</short_description>
+        <description>RAR</description>
         <support_level>1</support_level>
         <internal>false</internal>
-        <extension>avif</extension>
+        <extension>rar</extension>
     </bitstream-type>
 
+    <bitstream-type>
+        <mimetype>application/x-bzip2</mimetype>
+        <short_description>bzip2</short_description>
+        <description>bzip2</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>bz2</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/x-xz</mimetype>
+        <short_description>xz</short_description>
+        <description>xz</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>xz</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/zip</mimetype>
+        <short_description>zip</short_description>
+        <description>ZIP</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>zip</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/x-gtar</mimetype>
+        <short_description>tgz</short_description>
+        <description>tar with gzip</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>tgz</extension>
+        <extension>tar.gz</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/x-bzip</mimetype>
+        <short_description>bz</short_description>
+        <description>BZip archive</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>bz</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>application/gzip</mimetype>
+        <short_description>gz</short_description>
+        <description>GZip Compressed Archive</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>gz</extension>
+    </bitstream-type>
+
+    <!-- CLARIN UPDATE End -->
 </dspace-bitstream-types>
