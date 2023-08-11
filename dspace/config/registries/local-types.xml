@@ -25,7 +25,7 @@
 
   <dc-type>
     <schema>local</schema>
-    <element>hiddenButHarvestable</element>
+    <element>hidden</element>
     <scope_note>Should item be harvestable thru OAI-PMH, but behave like private in frontend?</scope_note>
   </dc-type>
 

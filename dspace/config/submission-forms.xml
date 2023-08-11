@@ -232,7 +232,7 @@
             <row>
                 <field>
                     <dc-schema>local</dc-schema>
-                    <dc-element>hiddenButHarvestable</dc-element>
+                    <dc-element>hidden</dc-element>
                     <dc-qualifier/>
                     <repeatable>true</repeatable>
                     <label>Hidden but harvestable</label>
