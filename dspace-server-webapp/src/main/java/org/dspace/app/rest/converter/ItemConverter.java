@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -54,6 +55,14 @@ public class ItemConverter
             List<MetadataValue> issuedDates =
                     itemService.getMetadata(obj, "dc", "date", "issued", Item.ANY, false);
             issuedDates.forEach(metadataValue -> metadataValue.setValue(approximatedDates.get(0).getValue()));
+
+            // Remove the date from the `dc.date.issued` because it was added into `local.approximateDate.issued`.
+            Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getHttpServletRequest());
+            try {
+                itemService.clearMetadata(context, obj, "dc", "date", "issued", Item.ANY);
+            } catch (SQLException e) {
+                log.error("Cannot remove `dc.date.issued` metadata because: " + e.getMessage());
+            }
         }
 
         ItemRest item = super.convert(obj, projection);
