@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    Ce fichier est inclus dans le fichier item-submissions.xml, comme premier
+    enfant de l'élément <submission-map> (après le "default").
+
+    Il doit donc contenir un ou plusieurs éléments <name-map>. Chacun définit 
+    une correspondance entre une collection et un formulaire.
+
+    ATTENTION: le parseur Maven ne permet pas d'avoir plus d'une racine
+    dans ce fichier. On peut donc mettre seulement un <name-map>. Si on en veut
+    plus d'un, il faudra utiliser plusieurs entités externes dans le XML
+    source.
+
+    Il est préférable de préfixer tout les identifiants par "calypso" pour éviter les
+    collisions avec d'autres éléments définis dans le fichier maître.
+-->
+
+<name-map collection-handle="todo" submission-name="calypso-standard"/>

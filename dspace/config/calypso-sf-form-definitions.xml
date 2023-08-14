@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    Ce fichier est inclus dans le fichier submission-forms.xml, comme premier
+    enfant de l'élément <form-definitions> .
+
+    Il doit donc contenir un ou plusieurs éléments <form>. Chacun définit un
+    formulaire de soumission.
+
+    ATTENTION: le parseur Maven ne permet pas d'avoir plus d'une racine
+    dans ce fichier. On peut donc mettre seulement un <form>. Si on en veut
+    plus d'un, il faudra utiliser plusieurs entités externes dans le XML
+    source.
+
+    Il est préférable de préfixer tout les identifiants par "calypso" pour éviter les
+    collisions avec d'autres éléments définis dans le fichier maître.
+-->
+
+<!-- Ce sont des exemples pour valider que le fichier est valide -->
+<form name="calypso-test">
+    <row>
+        <field>
+            <dc-schema>dc</dc-schema>
+            <dc-element>title</dc-element>
+            <dc-qualifier></dc-qualifier>
+            <repeatable>false</repeatable>
+            <label>Le titre ajouté par Martin</label>
+            <input-type>onebox</input-type>
+            <hint>Enter the name of the file.</hint>
+            <required>You must enter a name for this file</required>
+        </field>
+    </row>
+</form>

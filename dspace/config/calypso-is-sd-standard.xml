@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    Ce fichier est inclus dans le fichier item-submissions.xml, comme premier
+    enfant de l'élément <step-definitions>.
+
+    Il doit donc contenir un ou plusieurs éléments <step-definition>.
+
+    ATTENTION: le parseur Maven ne permet pas d'avoir plus d'une racine
+    dans ce fichier. On peut donc mettre seulement un <step-definition>. Si on en veut
+    plus d'un, il faudra utiliser plusieurs entités externes dans le XML
+    source.
+
+    Il est préférable de préfixer tout les identifiants par "calypso" pour éviter les
+    collisions avec d'autres éléments définis dans le fichier maître.
+-->
+
+<step-definition id="calpyso-test">
+    <heading>Un test</heading>
+    <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
+    <type>collection</type>
+</step-definition>

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE item-submission SYSTEM "item-submission.dtd">
+<!DOCTYPE item-submission SYSTEM "item-submission.dtd"
+    [
+        <!ENTITY calypso-is-name-map SYSTEM "calypso-is-name-map.xml">
+        <!ENTITY calypso-is-sd-standard SYSTEM "calypso-is-sd-standard.xml">
+        <!ENTITY calypso-is-sp-standard SYSTEM "calypso-is-sp-standard.xml">
+    ]
+>
 
 <!-- Configurable Submission configuration file -->
 
@@ -19,7 +25,7 @@
     <submission-map>
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
-
+        &calypso-is-name-map;
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
              This sets up the following Entity-based Collections in that dataset:
@@ -88,6 +94,7 @@
     <!-- Messages.properties -->
     <!-- -->
     <step-definitions>
+        &calypso-is-sd-standard;
         <!-- The "collection" step is a "special step" which is *REQUIRED* -->
         <!-- In DSpace, all submitted items must be immediately assigned -->
         <!-- to a collection. This step ensures that a collection is always selected. -->
@@ -248,6 +255,8 @@
     <!-- -->
     <!-- -->
     <submission-definitions>
+
+        &calypso-is-sp-standard;
 
         <!--This "traditional" process defines the DEFAULT item submission process -->
         <submission-process name="traditional">

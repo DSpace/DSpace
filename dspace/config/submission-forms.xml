@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
-<!DOCTYPE input-forms SYSTEM "submission-forms.dtd">
+<!DOCTYPE input-forms SYSTEM "submission-forms.dtd"
+    [
+        <!ENTITY calypso-sf-form-definitions SYSTEM "calypso-sf-form-definitions.xml">
+        <!ENTITY calypso-sf-form-value-pairs SYSTEM "calypso-sf-form-value-pairs.xml">
+    ]
+>
 
 
 <input-forms>
@@ -21,6 +26,7 @@
     <!-- serves as a 'this field is required' flag.                           -->
 
     <form-definitions>
+        &calypso-sf-form-definitions;
         <!-- Form used for entering in Bitstream/File metadata after uploading a file -->
         <form name="bitstream-metadata">
             <row>
@@ -1365,6 +1371,7 @@
     <!-- stores the associated stored-values in the database.                  -->
 
     <form-value-pairs>
+        &calypso-sf-form-value-pairs;
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
                 <displayed-value>ISSN</displayed-value>

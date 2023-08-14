@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    Ce fichier est inclus dans le fichier submission-forms.xml, comme premier
+    enfant de l'élément <form-value-pairs> .
+
+    Il doit donc contenir un ou plusieurs éléments <value-pairs>. Chacun définit 
+    une liste de valeurs.
+
+    ATTENTION: le parseur Maven ne permet pas d'avoir plus d'une racine
+    dans ce fichier. On peut donc mettre seulement un <value-pairs>. Si on en veut
+    plus d'un, il faudra utiliser plusieurs entités externes dans le XML
+    source.
+
+    Il est préférable de préfixer tout les identifiants par "calypso" pour éviter les
+    collisions avec d'autres éléments définis dans le fichier maître.
+-->
+
+<!-- Ce sont des exemples pour valider que le fichier est valide -->
+<value-pairs value-pairs-name="calypso-langues" dc-term="language_iso">
+    <pair>
+        <displayed-value>Français</displayed-value>
+        <stored-value>fr</stored-value>
+    </pair>
+    <pair>
+        <displayed-value>Anglais</displayed-value>
+        <stored-value>en</stored-value>
+    </pair>
+</value-pairs>
