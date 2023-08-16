@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import java.net.URI;
@@ -5,7 +12,9 @@ import java.net.URI;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNRouter;
 import org.dspace.app.ldn.model.Notification;
-import org.dspace.app.ldn.processor.LDNProcessor;
+import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.core.Context;
+import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
@@ -30,34 +39,30 @@ public class LDNInboxController {
     @Autowired
     private LDNRouter router;
 
+    @Autowired
+    private LDNMessageService ldnMessageService;
+
     /**
      * LDN DSpace inbox.
      *
      * @param notification received notification
-     * @return ResponseEntity 400 not routable, 201 routed
+     * @return ResponseEntity 400 not stored, 201 stored
      * @throws Exception
      */
     @PostMapping(value = "/inbox", consumes = "application/ld+json")
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
+        Context context = ContextUtil.obtainCurrentRequestContext();
 
-        LDNProcessor processor = router.route(notification);
+        ldnMessageService.create(context, notification.getId());
 
-        if (processor == null) {
-            return ResponseEntity.badRequest()
-                .body(String.format("No processor found for type %s", notification.getType()));
-        }
-
-        log.info("Routed notification {} {} to {}",
+        log.info("stored notification {} {}",
                 notification.getId(),
-                notification.getType(),
-                processor.getClass().getSimpleName());
-
-        processor.process(notification);
+                notification.getType());
 
         URI target = new URI(notification.getTarget().getInbox());
 
         return ResponseEntity.created(target)
-            .body(String.format("Successfully routed notification %s %s",
+            .body(String.format("Successfully stored notification %s %s",
                     notification.getId(), notification.getType()));
     }
 

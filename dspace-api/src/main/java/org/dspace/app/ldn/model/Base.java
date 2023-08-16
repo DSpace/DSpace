@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn.model;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,8 +60,12 @@ public class Base {
     /**
      * @param type
      */
-    public void setType(Set<String> type) {
-        this.type = type;
+    public void setType(java.lang.Object type) {
+        if (type instanceof String) {
+            this.type.add((String) type);
+        } else if (type instanceof Collection) {
+            this.type.addAll((Collection) type);
+        }
     }
 
     /**

@@ -152,5 +152,7 @@
 
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
+    <bean class="org.dspace.app.ldn.LDNMessageServiceImpl"/>
+
 </beans>
 
