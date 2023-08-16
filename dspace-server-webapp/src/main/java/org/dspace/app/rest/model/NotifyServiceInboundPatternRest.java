@@ -16,7 +16,7 @@ package org.dspace.app.rest.model;
 public class NotifyServiceInboundPatternRest {
 
     /**
-     * link to the coar notify documentation for pattern
+     * https://notify.coar-repositories.org/patterns/
      */
     private String pattern;
 
