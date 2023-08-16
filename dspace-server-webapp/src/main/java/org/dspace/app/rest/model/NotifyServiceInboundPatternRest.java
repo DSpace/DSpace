@@ -15,10 +15,20 @@ package org.dspace.app.rest.model;
  */
 public class NotifyServiceInboundPatternRest {
 
+    /**
+     * link to the coar notify documentation for pattern
+     */
     private String pattern;
 
+    /**
+     * the id of a bean implementing the ItemFilter
+     */
     private String constraint;
 
+    /**
+     * means that the pattern is triggered automatically
+     * by dspace if the item respect the filter
+     */
     private boolean automatic;
 
     public String getPattern() {

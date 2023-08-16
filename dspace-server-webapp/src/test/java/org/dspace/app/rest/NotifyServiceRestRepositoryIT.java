@@ -31,13 +31,13 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
-import org.dspace.notifyservices.NotifyServiceEntity;
 import org.junit.Test;
 
 /**
@@ -49,7 +49,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void findAllUnAuthorizedTest() throws Exception {
-        getClient().perform(get("/api/core/notifyservices"))
+        getClient().perform(get("/api/ldn/ldnservices"))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -84,9 +84,9 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(get("/api/core/notifyservices"))
+            .perform(get("/api/ldn/ldnservices"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.notifyservices", containsInAnyOrder(
+            .andExpect(jsonPath("$._embedded.ldnservices", containsInAnyOrder(
                 matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
                     "service url one", "service ldn url one"),
                 matchNotifyService(notifyServiceEntityTwo.getID(), "service name two", "service description two",
@@ -98,7 +98,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void findOneUnAuthorizedTest() throws Exception {
-        getClient().perform(get("/api/core/notifyservices/1"))
+        getClient().perform(get("/api/ldn/ldnservices/1"))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -106,7 +106,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void findOneNotFoundTest() throws Exception {
 
         getClient(getAuthToken(eperson.getEmail(), password))
-            .perform(get("/api/core/notifyservices/" + RandomUtils.nextInt()))
+            .perform(get("/api/ldn/ldnservices/" + RandomUtils.nextInt()))
             .andExpect(status().isNotFound());
     }
 
@@ -124,7 +124,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(get("/api/core/notifyservices/" + notifyServiceEntity.getID()))
+            .perform(get("/api/ldn/ldnservices/" + notifyServiceEntity.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$",
                 matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
@@ -143,7 +143,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(post("/api/core/notifyservices")
+        getClient(authToken).perform(post("/api/ldn/ldnservices")
                                 .content(mapper.writeValueAsBytes(notifyServiceRest))
                                 .contentType(contentType))
                             .andExpect(status().isCreated())
@@ -153,7 +153,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 idRef.set((read(result.getResponse().getContentAsString(), "$.id"))));
 
         getClient(authToken)
-            .perform(get("/api/core/notifyservices/" + idRef.get()))
+            .perform(get("/api/ldn/ldnservices/" + idRef.get()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$",
                 matchNotifyService(idRef.get(), "service name", "service description",
@@ -199,7 +199,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(patch("/api/core/notifyservices/" + notifyServiceEntityOne.getID())
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityOne.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
@@ -219,7 +219,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         patchBody = getPatchContent(List.of(ops.get(0)));
         getClient(authToken)
-            .perform(patch("/api/core/notifyservices/" + notifyServiceEntityTwo.getID())
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityTwo.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
@@ -237,7 +237,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void findByLdnUrlUnAuthorizedTest() throws Exception {
-        getClient().perform(get("/api/core/notifyservices/search/byLdnUrl")
+        getClient().perform(get("/api/ldn/ldnservices/search/byLdnUrl")
                        .param("ldnUrl", "test"))
                    .andExpect(status().isUnauthorized());
     }
@@ -245,7 +245,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     @Test
     public void findByLdnUrlBadRequestTest() throws Exception {
         getClient(getAuthToken(eperson.getEmail(), password))
-            .perform(get("/api/core/notifyservices/search/byLdnUrl"))
+            .perform(get("/api/ldn/ldnservices/search/byLdnUrl"))
             .andExpect(status().isBadRequest());
     }
 
@@ -257,7 +257,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withName("service name one")
                                 .withDescription("service description one")
                                 .withUrl("service url one")
-                                .withLdnUrl("service ldn url")
+                                .withLdnUrl("service ldn url one")
                                 .build();
 
       NotifyServiceEntity notifyServiceEntityTwo =
@@ -265,7 +265,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withName("service name two")
                                 .withDescription("service description two")
                                 .withUrl("service url two")
-                                .withLdnUrl("service ldn url")
+                                .withLdnUrl("service ldn url two")
                                 .build();
 
       NotifyServiceBuilder.createNotifyServiceBuilder(context)
@@ -279,20 +279,17 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(get("/api/core/notifyservices/search/byLdnUrl")
+            .perform(get("/api/ldn/ldnservices/search/byLdnUrl")
                 .param("ldnUrl", notifyServiceEntityOne.getLdnUrl()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.notifyservices", containsInAnyOrder(
-                matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
-                    "service url one", "service ldn url"),
-                matchNotifyService(notifyServiceEntityTwo.getID(), "service name two", "service description two",
-                    "service url two", "service ldn url")
-            )));
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntityOne.getID(),
+                "service name one", "service description one",
+                "service url one", "service ldn url one")));
     }
 
     @Test
     public void findByPatternUnAuthorizedTest() throws Exception {
-        getClient().perform(get("/api/core/notifyservices/search/byPattern")
+        getClient().perform(get("/api/ldn/ldnservices/search/byPattern")
                        .param("pattern", "value"))
                    .andExpect(status().isUnauthorized());
     }
@@ -300,7 +297,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     @Test
     public void findByPatternIsBadRequestTest() throws Exception {
         getClient(getAuthToken(eperson.getEmail(), password))
-            .perform(get("/api/core/notifyservices/search/byPattern"))
+            .perform(get("/api/ldn/ldnservices/search/byPattern"))
             .andExpect(status().isBadRequest());
     }
 
@@ -339,7 +336,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(patch("/api/core/notifyservices/" + notifyServiceEntityOne.getID())
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityOne.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
@@ -357,7 +354,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         patchBody = getPatchContent(List.of(inboundReplaceOperationTwo));
 
         getClient(authToken)
-            .perform(patch("/api/core/notifyservices/" + notifyServiceEntityTwo.getID())
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityTwo.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
@@ -373,11 +370,11 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         getClient(authToken)
-            .perform(get("/api/core/notifyservices/search/byPattern")
+            .perform(get("/api/ldn/ldnservices/search/byPattern")
                 .param("pattern", "patternA"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.totalElements", is(1)))
-            .andExpect(jsonPath("$._embedded.notifyservices", hasItem(
+            .andExpect(jsonPath("$._embedded.ldnservices", hasItem(
                 allOf(
                     matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
                         "service url one", "service ldn url one"),
@@ -391,14 +388,14 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void deleteUnAuthorizedTest() throws Exception {
-        getClient().perform(delete("/api/core/notifyservices/" + RandomUtils.nextInt()))
+        getClient().perform(delete("/api/ldn/ldnservices/" + RandomUtils.nextInt()))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void deleteNotFoundTest() throws Exception {
         getClient(getAuthToken(eperson.getEmail(), password))
-            .perform(delete("/api/core/notifyservices/" + RandomUtils.nextInt()))
+            .perform(delete("/api/ldn/ldnservices/" + RandomUtils.nextInt()))
             .andExpect(status().isNotFound());
     }
 
@@ -416,11 +413,11 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(delete("/api/core/notifyservices/" + notifyServiceEntity.getID()))
+            .perform(delete("/api/ldn/ldnservices/" + notifyServiceEntity.getID()))
             .andExpect(status().isNoContent());
 
         getClient(authToken)
-            .perform(get("/api/core/notifyservices/" + notifyServiceEntity.getID()))
+            .perform(get("/api/ldn/ldnservices/" + notifyServiceEntity.getID()))
             .andExpect(status().isNotFound());
     }
 

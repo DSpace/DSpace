@@ -14,8 +14,14 @@ package org.dspace.app.rest.model;
  */
 public class NotifyServiceOutboundPatternRest {
 
+    /**
+     * link to the coar notify documentation for pattern
+     */
     private String pattern;
 
+    /**
+     * the id of a bean implementing the ItemFilter
+     */
     private String constraint;
 
     public String getPattern() {

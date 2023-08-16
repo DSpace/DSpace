@@ -57,6 +57,6 @@
 
     <bean id="supervisionOrderServiceFactory" class="org.dspace.supervision.factory.SupervisionOrderServiceFactoryImpl"/>
 
-    <bean id="notifyServiceFactory" class="org.dspace.notifyservices.factory.NotifyServiceFactoryImpl"/>
+    <bean id="notifyServiceFactory" class="org.dspace.app.ldn.factory.NotifyServiceFactoryImpl"/>
 
 </beans>

@@ -5,13 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.service;
+package org.dspace.app.ldn.service;
 
 import java.sql.SQLException;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.core.Context;
-import org.dspace.notifyservices.NotifyServiceEntity;
-import org.dspace.notifyservices.NotifyServiceOutboundPattern;
 
 /**
  * Service interface class for the {@link NotifyServiceOutboundPattern} object.

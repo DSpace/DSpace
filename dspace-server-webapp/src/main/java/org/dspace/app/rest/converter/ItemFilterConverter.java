@@ -7,9 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.dspace.app.ldn.ItemFilter;
 import org.dspace.app.rest.model.ItemFilterRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.notifyservices.ItemFilter;
 import org.springframework.stereotype.Component;
 
 /**

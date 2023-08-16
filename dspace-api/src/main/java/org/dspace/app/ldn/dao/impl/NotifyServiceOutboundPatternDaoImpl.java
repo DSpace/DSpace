@@ -5,19 +5,19 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.dao.impl;
+package org.dspace.app.ldn.dao.impl;
 
 import java.sql.SQLException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.NotifyServiceOutboundPattern;
+import org.dspace.app.ldn.NotifyServiceOutboundPattern_;
+import org.dspace.app.ldn.dao.NotifyServiceOutboundPatternDao;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.dspace.notifyservices.NotifyServiceEntity;
-import org.dspace.notifyservices.NotifyServiceOutboundPattern;
-import org.dspace.notifyservices.NotifyServiceOutboundPattern_;
-import org.dspace.notifyservices.dao.NotifyServiceOutboundPatternDao;
 
 /**
  * Implementation of {@link NotifyServiceOutboundPatternDao}.

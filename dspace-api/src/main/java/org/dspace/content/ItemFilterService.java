@@ -9,7 +9,7 @@ package org.dspace.content;
 
 import java.util.List;
 
-import org.dspace.notifyservices.ItemFilter;
+import org.dspace.app.ldn.ItemFilter;
 
 /**
  * Service interface class for the Item Filter Object
@@ -17,6 +17,13 @@ import org.dspace.notifyservices.ItemFilter;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 public interface ItemFilterService {
+
+    /**
+     * @param id the bean name of item filter
+     * @return one logical item filter by id
+     * defined in item-filter.xml
+     */
+    public ItemFilter findOne(String id);
 
     /**
      * @return all logical item filters

@@ -5,9 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.factory;
+package org.dspace.app.ldn.factory;
 
-import org.dspace.notifyservices.service.NotifyService;
+import org.dspace.app.ldn.service.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

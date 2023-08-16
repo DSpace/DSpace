@@ -8,13 +8,13 @@
 package org.dspace.content;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.dspace.app.ldn.ItemFilter;
 import org.dspace.content.logic.LogicalStatement;
-import org.dspace.notifyservices.ItemFilter;
+import org.dspace.kernel.ServiceManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Service implementation for {@link ItemFilterService}
@@ -24,17 +24,30 @@ import org.springframework.context.ApplicationContext;
 public class ItemFilterServiceImpl implements ItemFilterService {
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private ServiceManager serviceManager;
+
+    @Override
+    public ItemFilter findOne(String id) {
+        return findAll()
+            .stream()
+            .filter(itemFilter ->
+                itemFilter.getId().equals(id))
+            .findFirst()
+            .orElse(null);
+    }
 
     @Override
     public List<ItemFilter> findAll() {
-        Map<String, LogicalStatement> beans =
-            applicationContext.getBeansOfType(LogicalStatement.class);
+        return serviceManager.getServicesNames()
+                             .stream()
+                             .filter(id -> isLogicalStatement(id))
+                             .map(id -> new ItemFilter(id))
+                             .collect(Collectors.toList());
+    }
 
-        return beans.keySet()
-                    .stream()
-                    .sorted()
-                    .map(id -> new ItemFilter(id))
-                    .collect(Collectors.toList());
+    private boolean isLogicalStatement(String id) {
+        return Objects.nonNull(
+            serviceManager.getServiceByName(id, LogicalStatement.class)
+        );
     }
 }

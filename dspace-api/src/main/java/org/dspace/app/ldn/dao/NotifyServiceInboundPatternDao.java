@@ -5,24 +5,24 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.dao;
+package org.dspace.app.ldn.dao;
 
 import java.sql.SQLException;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
-import org.dspace.notifyservices.NotifyServiceEntity;
-import org.dspace.notifyservices.NotifyServiceOutboundPattern;
 
 /**
- * This is the Data Access Object for the {@link NotifyServiceOutboundPattern} object
+ * This is the Data Access Object for the {@link NotifyServiceInboundPattern} object
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public interface NotifyServiceOutboundPatternDao extends GenericDAO<NotifyServiceOutboundPattern> {
+public interface NotifyServiceInboundPatternDao extends GenericDAO<NotifyServiceInboundPattern> {
 
     /**
-     * find all notifyServiceOutboundPatterns matched with
+     * find all notifyServiceInboundPatterns matched with
      * the provided notifyServiceEntity and pattern
      *
      * @param context the context
@@ -32,7 +32,7 @@ public interface NotifyServiceOutboundPatternDao extends GenericDAO<NotifyServic
      * the provided notifyServiceEntity and pattern
      * @throws SQLException if database error
      */
-    public NotifyServiceOutboundPattern findByServiceAndPattern(Context context,
+    public NotifyServiceInboundPattern findByServiceAndPattern(Context context,
                                                                NotifyServiceEntity notifyServiceEntity,
                                                                String pattern) throws SQLException;
 }

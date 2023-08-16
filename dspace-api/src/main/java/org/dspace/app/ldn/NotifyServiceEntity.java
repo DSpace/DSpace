@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices;
+package org.dspace.app.ldn;
 
 import java.util.List;
 import javax.persistence.Column;

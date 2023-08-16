@@ -13,6 +13,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -21,8 +23,6 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
-import org.dspace.notifyservices.NotifyServiceEntity;
-import org.dspace.notifyservices.service.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -121,11 +121,13 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
 
     @SearchRestMethod(name = "byLdnUrl")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<NotifyServiceRest> findByLdnUrl(@Parameter(value = "ldnUrl", required = true)
-                                                      String ldnUrl, Pageable pageable) {
+    public NotifyServiceRest findByLdnUrl(@Parameter(value = "ldnUrl", required = true) String ldnUrl) {
         try {
-            return converter.toRestPage(notifyService.findByLdnUrl(obtainContext(), ldnUrl),
-                pageable, utils.obtainProjection());
+            NotifyServiceEntity notifyServiceEntity = notifyService.findByLdnUrl(obtainContext(), ldnUrl);
+            if (notifyServiceEntity == null) {
+                return null;
+            }
+            return converter.toRest(notifyServiceEntity, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

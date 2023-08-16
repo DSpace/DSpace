@@ -5,14 +5,14 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.dao;
+package org.dspace.app.ldn.dao;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
-import org.dspace.notifyservices.NotifyServiceEntity;
 
 /**
  * This is the Data Access Object for the {@link NotifyServiceEntity} object
@@ -21,14 +21,14 @@ import org.dspace.notifyservices.NotifyServiceEntity;
  */
 public interface NotifyServiceDao extends GenericDAO<NotifyServiceEntity> {
     /**
-     * find all NotifyServiceEntity matched the provided ldnUrl
+     * find the NotifyServiceEntity matched with the provided ldnUrl
      *
      * @param context the context
      * @param ldnUrl the ldnUrl
-     * @return all NotifyServiceEntity matched the provided ldnUrl
+     * @return the NotifyServiceEntity matched the provided ldnUrl
      * @throws SQLException if database error
      */
-    public List<NotifyServiceEntity> findByLdnUrl(Context context, String ldnUrl) throws SQLException;
+    public NotifyServiceEntity findByLdnUrl(Context context, String ldnUrl) throws SQLException;
 
     /**
      * find all NotifyServiceEntity matched the provided pattern

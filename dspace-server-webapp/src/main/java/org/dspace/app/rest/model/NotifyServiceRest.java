@@ -18,9 +18,9 @@ import org.dspace.app.rest.RestResourceController;
  * @author mohamed eskander (mohamed.eskander at 4science.com)
  */
 public class NotifyServiceRest extends BaseObjectRest<Integer> {
-    public static final String NAME = "notifyservice";
-    public static final String PLURAL_NAME = "notifyservices";
-    public static final String CATEGORY = RestAddressableModel.CORE;
+    public static final String NAME = "ldnservice";
+    public static final String PLURAL_NAME = "ldnservices";
+    public static final String CATEGORY = RestAddressableModel.LDN;
 
     private String name;
     private String description;

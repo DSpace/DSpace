@@ -33,7 +33,7 @@ public class NotifyServiceMatcher {
             hasJsonPath("$.description", is(description)),
             hasJsonPath("$.url", is(url)),
             hasJsonPath("$.ldnUrl", is(ldnUrl)),
-            hasJsonPath("$._links.self.href", containsString("/api/core/notifyservices/"))
+            hasJsonPath("$._links.self.href", containsString("/api/ldn/ldnservices/"))
         );
     }
 
@@ -43,7 +43,7 @@ public class NotifyServiceMatcher {
             hasJsonPath("$.id", is(id)),
             matchNotifyService(name, description, url, ldnUrl),
             hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
-            hasJsonPath("$._links.self.href", endsWith("/api/core/notifyservices/" + id))
+            hasJsonPath("$._links.self.href", endsWith("/api/ldn/ldnservices/" + id))
         );
     }
 

@@ -5,13 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.service;
+package org.dspace.app.ldn.service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.core.Context;
-import org.dspace.notifyservices.NotifyServiceEntity;
 
 /**
  * Service interface class for the {@link NotifyServiceEntity} object.
@@ -67,14 +67,14 @@ public interface NotifyService {
     public void delete(Context context, NotifyServiceEntity notifyServiceEntity) throws SQLException;
 
     /**
-     * find all NotifyServiceEntity matched the provided ldnUrl
+     * find the NotifyServiceEntity matched with the provided ldnUrl
      *
      * @param context the context
      * @param ldnUrl the ldnUrl
-     * @return all NotifyServiceEntity matched the provided ldnUrl
+     * @return the NotifyServiceEntity matched the provided ldnUrl
      * @throws SQLException if database error
      */
-    public List<NotifyServiceEntity> findByLdnUrl(Context context, String ldnUrl) throws SQLException;
+    public NotifyServiceEntity findByLdnUrl(Context context, String ldnUrl) throws SQLException;
 
     /**
      * find all NotifyServiceEntity matched the provided pattern

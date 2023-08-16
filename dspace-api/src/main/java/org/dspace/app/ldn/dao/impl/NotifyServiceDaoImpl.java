@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices.dao.impl;
+package org.dspace.app.ldn.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,13 +14,13 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.NotifyServiceEntity_;
+import org.dspace.app.ldn.NotifyServiceInboundPattern;
+import org.dspace.app.ldn.NotifyServiceInboundPattern_;
+import org.dspace.app.ldn.dao.NotifyServiceDao;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
-import org.dspace.notifyservices.NotifyServiceEntity;
-import org.dspace.notifyservices.NotifyServiceEntity_;
-import org.dspace.notifyservices.NotifyServiceInboundPattern;
-import org.dspace.notifyservices.NotifyServiceInboundPattern_;
-import org.dspace.notifyservices.dao.NotifyServiceDao;
 
 /**
  * Implementation of {@link NotifyServiceDao}.
@@ -30,14 +30,14 @@ import org.dspace.notifyservices.dao.NotifyServiceDao;
 public class NotifyServiceDaoImpl extends AbstractHibernateDAO<NotifyServiceEntity> implements NotifyServiceDao {
 
     @Override
-    public List<NotifyServiceEntity> findByLdnUrl(Context context, String ldnUrl) throws SQLException {
+    public NotifyServiceEntity findByLdnUrl(Context context, String ldnUrl) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, NotifyServiceEntity.class);
         Root<NotifyServiceEntity> notifyServiceEntityRoot = criteriaQuery.from(NotifyServiceEntity.class);
         criteriaQuery.select(notifyServiceEntityRoot);
         criteriaQuery.where(criteriaBuilder.equal(
             notifyServiceEntityRoot.get(NotifyServiceEntity_.ldnUrl), ldnUrl));
-        return list(context, criteriaQuery, false, NotifyServiceEntity.class, -1, -1);
+        return uniqueResult(context, criteriaQuery, false, NotifyServiceEntity.class);
     }
 
     @Override

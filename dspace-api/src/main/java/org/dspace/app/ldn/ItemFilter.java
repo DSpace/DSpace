@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices;
+package org.dspace.app.ldn;
 
 /**
  * model class for the item filters configured into item-filters.xml

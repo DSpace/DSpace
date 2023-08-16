@@ -10,13 +10,13 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.NotifyServiceInboundPattern;
+import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceOutboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.notifyservices.NotifyServiceEntity;
-import org.dspace.notifyservices.NotifyServiceInboundPattern;
-import org.dspace.notifyservices.NotifyServiceOutboundPattern;
 import org.springframework.stereotype.Component;
 
 /**

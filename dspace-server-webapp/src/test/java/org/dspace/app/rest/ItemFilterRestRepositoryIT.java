@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,41 +27,78 @@ import org.junit.Test;
 public class ItemFilterRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
-    public void findOneTest() throws Exception {
-        getClient()
+    public void findOneUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/config/itemfilters/test"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        getClient(getAuthToken(eperson.getEmail(), password))
             .perform(get("/api/config/itemfilters/test"))
-            .andExpect(status().isMethodNotAllowed());
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findOneNotFoundTest() throws Exception {
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(get("/api/config/itemfilters/test"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findOneTest() throws Exception {
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(get("/api/config/itemfilters/always_true_filter"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is("always_true_filter")))
+            .andExpect(jsonPath("$._links.self.href",
+                containsString("/api/config/itemfilters/always_true_filter")));
+    }
+
+    @Test
+    public void findAllUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/config/itemfilters"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findAllForbiddenTest() throws Exception {
+        getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(get("/api/config/itemfilters"))
+            .andExpect(status().isForbidden());
     }
 
     @Test
     public void findAllPaginatedSortedTest() throws Exception {
-        getClient().perform(get("/api/config/itemfilters")
-                       .param("size", "30"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.page.totalElements", is(21)))
-                   .andExpect(jsonPath("$.page.totalPages", is(1)))
-                   .andExpect(jsonPath("$.page.size", is(30)))
-                   .andExpect(jsonPath("$._embedded.itemfilters", contains(
-                       hasJsonPath("$.id", is("a-common-or_statement")),
-                       hasJsonPath("$.id", is("always_true_filter")),
-                       hasJsonPath("$.id", is("dc-identifier-uri-contains-doi_condition")),
-                       hasJsonPath("$.id", is("demo_filter")),
-                       hasJsonPath("$.id", is("doi-filter")),
-                       hasJsonPath("$.id", is("driver-document-type_condition")),
-                       hasJsonPath("$.id", is("example-doi_filter")),
-                       hasJsonPath("$.id", is("has-at-least-one-bitstream_condition")),
-                       hasJsonPath("$.id", is("has-bitstream_filter")),
-                       hasJsonPath("$.id", is("has-one-bitstream_condition")),
-                       hasJsonPath("$.id", is("in-outfit-collection_condition")),
-                       hasJsonPath("$.id", is("is-archived_condition")),
-                       hasJsonPath("$.id", is("is-withdrawn_condition")),
-                       hasJsonPath("$.id", is("item-is-public_condition")),
-                       hasJsonPath("$.id", is("openaire_filter")),
-                       hasJsonPath("$.id", is("simple-demo_filter")),
-                       hasJsonPath("$.id", is("title-contains-demo_condition")),
-                       hasJsonPath("$.id", is("title-starts-with-pattern_condition")),
-                       hasJsonPath("$.id", is("type-equals-dataset_condition")),
-                       hasJsonPath("$.id", is("type-equals-journal-article_condition")),
-                       hasJsonPath("$.id", is("type_filter")))));
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(get("/api/config/itemfilters")
+                .param("size", "30"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(21)))
+            .andExpect(jsonPath("$.page.totalPages", is(1)))
+            .andExpect(jsonPath("$.page.size", is(30)))
+            .andExpect(jsonPath("$._embedded.itemfilters", contains(
+                hasJsonPath("$.id", is("a-common-or_statement")),
+                hasJsonPath("$.id", is("always_true_filter")),
+                hasJsonPath("$.id", is("dc-identifier-uri-contains-doi_condition")),
+                hasJsonPath("$.id", is("demo_filter")),
+                hasJsonPath("$.id", is("doi-filter")),
+                hasJsonPath("$.id", is("driver-document-type_condition")),
+                hasJsonPath("$.id", is("example-doi_filter")),
+                hasJsonPath("$.id", is("has-at-least-one-bitstream_condition")),
+                hasJsonPath("$.id", is("has-bitstream_filter")),
+                hasJsonPath("$.id", is("has-one-bitstream_condition")),
+                hasJsonPath("$.id", is("in-outfit-collection_condition")),
+                hasJsonPath("$.id", is("is-archived_condition")),
+                hasJsonPath("$.id", is("is-withdrawn_condition")),
+                hasJsonPath("$.id", is("item-is-public_condition")),
+                hasJsonPath("$.id", is("openaire_filter")),
+                hasJsonPath("$.id", is("simple-demo_filter")),
+                hasJsonPath("$.id", is("title-contains-demo_condition")),
+                hasJsonPath("$.id", is("title-starts-with-pattern_condition")),
+                hasJsonPath("$.id", is("type-equals-dataset_condition")),
+                hasJsonPath("$.id", is("type-equals-journal-article_condition")),
+                hasJsonPath("$.id", is("type_filter")))));
     }
 }

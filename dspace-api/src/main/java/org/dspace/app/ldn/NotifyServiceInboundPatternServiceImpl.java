@@ -5,13 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.notifyservices;
+package org.dspace.app.ldn;
 
 import java.sql.SQLException;
 
+import org.dspace.app.ldn.dao.NotifyServiceInboundPatternDao;
+import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.core.Context;
-import org.dspace.notifyservices.dao.NotifyServiceInboundPatternDao;
-import org.dspace.notifyservices.service.NotifyServiceInboundPatternService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
