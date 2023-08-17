@@ -16,7 +16,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -285,105 +284,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntityOne.getID(),
                 "service name one", "service description one",
                 "service url one", "service ldn url one")));
-    }
-
-    @Test
-    public void findByPatternUnAuthorizedTest() throws Exception {
-        getClient().perform(get("/api/ldn/ldnservices/search/byPattern")
-                       .param("pattern", "value"))
-                   .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void findByPatternIsBadRequestTest() throws Exception {
-        getClient(getAuthToken(eperson.getEmail(), password))
-            .perform(get("/api/ldn/ldnservices/search/byPattern"))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void findByPatternTest() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-
-        NotifyServiceEntity notifyServiceEntityOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
-                                .withDescription("service description one")
-                                .withUrl("service url one")
-                                .withLdnUrl("service ldn url one")
-                                .build();
-
-        NotifyServiceEntity notifyServiceEntityTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name two")
-                                .withDescription("service description two")
-                                .withUrl("service url two")
-                                .withLdnUrl("service ldn url two")
-                                .build();
-
-        context.restoreAuthSystemState();
-
-        List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperationOne = new ReplaceOperation("notifyservices_inbound_patterns",
-            "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
-
-        ReplaceOperation inboundReplaceOperationTwo = new ReplaceOperation("notifyservices_inbound_patterns",
-            "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"true\"}");
-
-        ops.add(inboundReplaceOperationOne);
-        String patchBody = getPatchContent(ops);
-
-        String authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken)
-            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityOne.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.notifyServiceInboundPatterns", hasSize(1)))
-            .andExpect(jsonPath("$",
-                allOf(
-                    matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
-                        "service url one", "service ldn url one"),
-                    hasJsonPath("$.notifyServiceInboundPatterns", hasItem(
-                        matchNotifyServicePattern("patternA", "itemFilterA", false)
-                    )),
-                    hasJsonPath("$.notifyServiceOutboundPatterns", empty())
-                )));
-
-        patchBody = getPatchContent(List.of(inboundReplaceOperationTwo));
-
-        getClient(authToken)
-            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityTwo.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.notifyServiceInboundPatterns", hasSize(1)))
-            .andExpect(jsonPath("$",
-                allOf(
-                    matchNotifyService(notifyServiceEntityTwo.getID(), "service name two", "service description two",
-                        "service url two", "service ldn url two"),
-                    hasJsonPath("$.notifyServiceInboundPatterns", hasItem(
-                        matchNotifyServicePattern("patternA", "itemFilterA", true)
-                    )),
-                    hasJsonPath("$.notifyServiceOutboundPatterns", empty())
-                )));
-
-        getClient(authToken)
-            .perform(get("/api/ldn/ldnservices/search/byPattern")
-                .param("pattern", "patternA"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(1)))
-            .andExpect(jsonPath("$._embedded.ldnservices", hasItem(
-                allOf(
-                    matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
-                        "service url one", "service ldn url one"),
-                    hasJsonPath("$.notifyServiceInboundPatterns", hasItem(
-                        matchNotifyServicePattern("patternA", "itemFilterA", false)
-                    )),
-                    hasJsonPath("$.notifyServiceOutboundPatterns", empty())
-                )
-            )));
     }
 
     @Test

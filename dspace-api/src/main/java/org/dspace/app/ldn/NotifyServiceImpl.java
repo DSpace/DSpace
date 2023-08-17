@@ -57,8 +57,9 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public List<NotifyServiceEntity> findByPattern(Context context, String pattern) throws SQLException {
-        return notifyServiceDao.findByPattern(context, pattern);
+    public List<NotifyServiceEntity> findManualServicesByInboundPattern(Context context, String pattern)
+        throws SQLException {
+        return notifyServiceDao.findManualServicesByInboundPattern(context, pattern);
     }
 
 }

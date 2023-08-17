@@ -41,7 +41,8 @@ public class NotifyServiceDaoImpl extends AbstractHibernateDAO<NotifyServiceEnti
     }
 
     @Override
-    public List<NotifyServiceEntity> findByPattern(Context context, String pattern) throws SQLException {
+    public List<NotifyServiceEntity> findManualServicesByInboundPattern(Context context, String pattern)
+        throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, NotifyServiceEntity.class);
         Root<NotifyServiceEntity> notifyServiceEntityRoot = criteriaQuery.from(NotifyServiceEntity.class);

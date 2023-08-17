@@ -31,7 +31,7 @@ public interface NotifyServiceDao extends GenericDAO<NotifyServiceEntity> {
     public NotifyServiceEntity findByLdnUrl(Context context, String ldnUrl) throws SQLException;
 
     /**
-     * find all NotifyServiceEntity matched the provided pattern
+     * find all NotifyServiceEntity matched the provided inbound pattern
      * from the related notifyServiceInboundPatterns
      * also with 'automatic' equals to false
      *
@@ -40,5 +40,6 @@ public interface NotifyServiceDao extends GenericDAO<NotifyServiceEntity> {
      * @return all NotifyServiceEntity matched the provided pattern
      * @throws SQLException if database error
      */
-    public List<NotifyServiceEntity> findByPattern(Context context, String pattern) throws SQLException;
+    public List<NotifyServiceEntity> findManualServicesByInboundPattern(Context context, String pattern)
+        throws SQLException;
 }

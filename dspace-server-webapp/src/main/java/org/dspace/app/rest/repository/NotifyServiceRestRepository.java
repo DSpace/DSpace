@@ -133,18 +133,6 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         }
     }
 
-    @SearchRestMethod(name = "byPattern")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<NotifyServiceRest> findByPattern(@Parameter(value = "pattern", required = true)
-                                                       String pattern, Pageable pageable) {
-        try {
-            return converter.toRestPage(notifyService.findByPattern(obtainContext(), pattern),
-                pageable, utils.obtainProjection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     @Override
     public Class<NotifyServiceRest> getDomainClass() {
         return NotifyServiceRest.class;
