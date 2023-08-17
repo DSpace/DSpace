@@ -245,17 +245,12 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void testOnBitstreamContentDownloadExcludeNonContentBitstreams() throws Exception {
-        configurationService.setProperty("google-analytics.exclude-non-content-bitstreams", true);
-
+    public void testOnBitstreamContentDownloadDefaultBundleConfig() throws Exception {
         context.turnOffAuthorisationSystem();
         Bundle licenseBundle = BundleBuilder.createBundle(context, item)
                                             .withName(Constants.LICENSE_BUNDLE_NAME).build();
         Bitstream license = BitstreamBuilder.createBitstream(context, licenseBundle,
                                                              toInputStream("License", defaultCharset())).build();
-        Bundle thumbnailBundle = BundleBuilder.createBundle(context, item).withName("THUMBNAIL").build();
-        Bitstream thumbnail = BitstreamBuilder.createBitstream(context, thumbnailBundle,
-                                                               toInputStream("Thumbnail", defaultCharset())).build();
         context.restoreAuthSystemState();
 
         assertThat(getStoredEventsAsList(), empty());
@@ -264,14 +259,14 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
 
         downloadBitstreamContent("Postman", "123456", "REF");
         downloadContent("Chrome", "ABCDEFG", "REF-1", license);
-        downloadContent("Chrome", "987654", "REF-2", thumbnail);
 
         assertThat(getStoredEventsAsList(), hasSize(1));
 
         List<GoogleAnalyticsEvent> storedEvents = getStoredEventsAsList();
 
         assertThat(storedEvents, contains(
-            event("123456", "127.0.0.1", "Postman", "REF", bitstreamUrl, "Test item")));
+            event("123456", "127.0.0.1", "Postman", "REF", bitstreamUrl, "Test item"))
+        );
 
         googleAsyncEventListener.sendCollectedEvents();
 
@@ -284,14 +279,14 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void testOnBitstreamContentDownloadIncludeNonContentBitstreams() throws Exception {
-        configurationService.setProperty("google-analytics.exclude-non-content-bitstreams", false);
+    public void testOnBitstreamContentDownloadMultipleBundleConfig() throws Exception {
+        configurationService.setProperty("google-analytics.bundles",
+                                         List.of(Constants.DEFAULT_BUNDLE_NAME, "CONTENT"));
 
         context.turnOffAuthorisationSystem();
-        Bundle licenseBundle = BundleBuilder.createBundle(context, item)
-                                            .withName(Constants.LICENSE_BUNDLE_NAME).build();
-        Bitstream license = BitstreamBuilder.createBitstream(context, licenseBundle,
-                                                             toInputStream("License", defaultCharset())).build();
+        Bundle contentBundle = BundleBuilder.createBundle(context, item).withName("CONTENT").build();
+        Bitstream content = BitstreamBuilder.createBitstream(context, contentBundle,
+                                                             toInputStream("Test Content", defaultCharset())).build();
         Bundle thumbnailBundle = BundleBuilder.createBundle(context, item).withName("THUMBNAIL").build();
         Bitstream thumbnail = BitstreamBuilder.createBitstream(context, thumbnailBundle,
                                                                toInputStream("Thumbnail", defaultCharset())).build();
@@ -300,21 +295,20 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
         assertThat(getStoredEventsAsList(), empty());
 
         String bitstreamUrl = "/api/core/bitstreams/" + bitstream.getID() + "/content";
-        String licenseUrl = "/api/core/bitstreams/" + license.getID() + "/content";
-        String thumbnailUrl = "/api/core/bitstreams/" + thumbnail.getID() + "/content";
+        String contentUrl = "/api/core/bitstreams/" + content.getID() + "/content";
 
         downloadBitstreamContent("Postman", "123456", "REF");
-        downloadContent("Chrome", "ABCDEFG", "REF-1", license);
+        downloadContent("Chrome", "ABCDEFG", "REF-1", content);
         downloadContent("Chrome", "987654", "REF-2", thumbnail);
 
-        assertThat(getStoredEventsAsList(), hasSize(3));
+        assertThat(getStoredEventsAsList(), hasSize(2));
 
         List<GoogleAnalyticsEvent> storedEvents = getStoredEventsAsList();
 
         assertThat(storedEvents, contains(
             event("123456", "127.0.0.1", "Postman", "REF", bitstreamUrl, "Test item"),
-            event("ABCDEFG", "127.0.0.1", "Chrome", "REF-1", licenseUrl, "Test item"),
-            event("987654", "127.0.0.1", "Chrome", "REF-2", thumbnailUrl, "Test item")));
+            event("ABCDEFG", "127.0.0.1", "Chrome", "REF-1", contentUrl, "Test item")
+            ));
 
         googleAsyncEventListener.sendCollectedEvents();
 
@@ -324,6 +318,28 @@ public class GoogleAsyncEventListenerIT extends AbstractControllerIntegrationTes
         verify(secondGaClientMock).isAnalyticsKeySupported(ANALYTICS_KEY);
         verify(secondGaClientMock).sendEvents(ANALYTICS_KEY, storedEvents);
         verifyNoMoreInteractions(firstGaClientMock, secondGaClientMock);
+    }
+
+    @Test
+    public void testOnBitstreamContentDownloadNoneBundleConfig() throws Exception {
+        configurationService.setProperty("google-analytics.bundles", "none");
+
+        context.turnOffAuthorisationSystem();
+        Bundle contentBundle = BundleBuilder.createBundle(context, item).withName("CONTENT").build();
+        Bitstream content = BitstreamBuilder.createBitstream(context, contentBundle,
+                                                             toInputStream("Test Content", defaultCharset())).build();
+        Bundle thumbnailBundle = BundleBuilder.createBundle(context, item).withName("THUMBNAIL").build();
+        Bitstream thumbnail = BitstreamBuilder.createBitstream(context, thumbnailBundle,
+                                                               toInputStream("Thumbnail", defaultCharset())).build();
+        context.restoreAuthSystemState();
+
+        assertThat(getStoredEventsAsList(), empty());
+
+        downloadBitstreamContent("Postman", "123456", "REF");
+        downloadContent("Chrome", "ABCDEFG", "REF-1", content);
+        downloadContent("Chrome", "987654", "REF-2", thumbnail);
+
+        assertThat(getStoredEventsAsList(), empty());
     }
 
     @SuppressWarnings("unchecked")
