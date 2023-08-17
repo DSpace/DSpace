@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -176,26 +177,27 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
      * Verifies if the usage event is a content bitstream view event, by checking if:<ul>
      * <li>the usage event is a view event</li>
      * <li>the object of the usage event is a bitstream</li>
-     * <li>the bitstream belongs to the ORIGINAL bundle</li></ul>
-     * This last one can be skipped if 'google-analytics.exclude-non-content-bitstreams' is set to false.
-     * This will make it so the bundle name is completely ignored when sending events.
+     * <li>the bitstream belongs to one of the configured bundles (fallback: ORIGINAL bundle)</li></ul>
      */
     private boolean isContentBitstream(UsageEvent usageEvent) {
         // check if event is a VIEW event and object is a Bitstream
         if (usageEvent.getAction() == UsageEvent.Action.VIEW
             || usageEvent.getObject().getType() == Constants.BITSTREAM) {
-            // check if config is set to true
-            if (configurationService.getBooleanProperty("google-analytics.exclude-non-content-bitstreams")) {
-                try {
-                    // check if bitstream belongs to the ORIGINAL bundle
-                    return ((Bitstream) usageEvent.getObject())
-                        .getBundles().stream()
-                        .anyMatch(bundle -> bundle.getName().equals(Constants.CONTENT_BUNDLE_NAME));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
+            // check if bitstream belongs to a configured bundle
+            List<String> allowedBundles = List.of(configurationService
+                      .getArrayProperty("google-analytics.bundles", new String[]{Constants.CONTENT_BUNDLE_NAME}));
+            if (allowedBundles.contains("none")) {
+                // GA events for bitstream views were turned off in config
+                return false;
             }
-            return true;
+            List<String> bitstreamBundles;
+            try {
+                bitstreamBundles = ((Bitstream) usageEvent.getObject())
+                    .getBundles().stream().map(Bundle::getName).collect(Collectors.toList());
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            return allowedBundles.stream().anyMatch(bitstreamBundles::contains);
         }
         return false;
     }
