@@ -32,7 +32,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.model.NotifyServiceRest;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -157,6 +159,471 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 matchNotifyService(idRef.get(), "service name", "service description",
                     "service url", "service ldn url")));
+    }
+
+    @Test
+    public void notifyServiceDescriptionAddOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/description", "add service description");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceDescriptionAddOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/description", "add service description");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "add service description", "service url", "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceDescriptionReplaceOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/description", "service description replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceDescriptionReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/description", "service description replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description replaced", "service url", "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceDescriptionRemoveOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation operation = new RemoveOperation("/description");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                null, "service url", "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceUrlAddOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/url", "add service url");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceUrlAddOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/url", "add service url");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "add service url", "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceUrlReplaceOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/url", "service url replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceUrlReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/url", "service url replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "service url replaced", "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceUrlRemoveOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation operation = new RemoveOperation("/url");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", null, "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceNameReplaceOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/name", "service name replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceNameReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/name", "service name replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name replaced",
+                "service description", "service url", "service ldn url"))
+            );
+    }
+
+    @Test
+    public void notifyServiceLdnUrlReplaceOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withUrl("service url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/ldnurl", "service ldn url replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceLdnUrlReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/ldnurl", "service ldn url replaced");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "service url", "service ldn url replaced"))
+            );
+    }
+
+    @Test
+    public void notifyServiceNameRemoveOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation operation = new RemoveOperation("/name");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void notifyServiceLdnUrlRemoveOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation operation = new RemoveOperation("/ldnurl");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
