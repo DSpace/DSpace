@@ -54,4 +54,13 @@ public interface NotifyServiceOutboundPatternService {
      * @throws SQLException if database error
      */
     public void update(Context context, NotifyServiceOutboundPattern outboundPattern) throws SQLException;
+
+    /**
+     * delete the provided notifyServiceOutboundPattern
+     *
+     * @param context the context
+     * @param outboundPattern the notifyServiceOutboundPattern
+     * @throws SQLException if database error
+     */
+    public void delete(Context context, NotifyServiceOutboundPattern outboundPattern) throws SQLException;
 }

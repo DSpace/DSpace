@@ -5,69 +5,69 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository.patch.operation;
+package org.dspace.app.rest.repository.patch.operation.ldn;
+
+import static org.dspace.app.rest.repository.patch.operation.ldn.NotifyServicePatchUtils.NOTIFY_SERVICE_OUTBOUND_PATTERNS;
 
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.ldn.service.NotifyServiceOutboundPatternService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.repository.patch.operation.PatchOperation;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for NotifyService Outbound patterns patches.
+ * Implementation for NotifyService Outbound patterns Add patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/ldn/ldnservices/<:id-notifyService> -H "
  * Content-Type: application/json" -d '
  * [{
- *  "op": "replace",
- *  "path": "notifyservices_outbound_patterns",
+ *  "op": "add",
+ *  "path": "notifyservices_outbound_patterns/-",
  *  "value": {"pattern":"patternA","constraint":"itemFilterA"}
  *  }]'
  * </code>
  */
 @Component
-public class NotifyServiceOutboundReplaceOperation<R> extends PatchOperation<R> {
+public class NotifyServiceOutboundPatternsAddOperation extends PatchOperation<NotifyServiceEntity> {
 
     @Autowired
     private NotifyServiceOutboundPatternService outboundPatternService;
 
-    private static final String OPERATION_PATH = "notifyservices_outbound_patterns";
+    @Autowired
+    private NotifyServicePatchUtils notifyServicePatchUtils;
+
+    private static final String OPERATION_PATH = NOTIFY_SERVICE_OUTBOUND_PATTERNS + "/-";
 
     @Override
-    public R perform(Context context, R object, Operation operation) {
+    public NotifyServiceEntity perform(Context context, NotifyServiceEntity notifyServiceEntity, Operation operation) {
         checkOperationValue(operation.getValue());
-        if (supports(object, operation)) {
-            NotifyServiceEntity notifyServiceEntity = (NotifyServiceEntity) object;
-
-            ObjectMapper mapper = new ObjectMapper();
+        if (supports(notifyServiceEntity, operation)) {
             try {
-                NotifyServiceOutboundPattern patchOutboundPattern = mapper.readValue((String) operation.getValue(),
-                    NotifyServiceOutboundPattern.class);
+                NotifyServiceOutboundPattern patchOutboundPattern =
+                    notifyServicePatchUtils.extractNotifyServiceOutboundPatternFromOperation(operation);
 
                 NotifyServiceOutboundPattern persistOutboundPattern = outboundPatternService.findByServiceAndPattern(
                     context, notifyServiceEntity, patchOutboundPattern.getPattern());
 
-                if (persistOutboundPattern == null) {
-                    NotifyServiceOutboundPattern c =
-                        outboundPatternService.create(context, notifyServiceEntity);
-                    c.setPattern(patchOutboundPattern.getPattern());
-                    c.setConstraint(patchOutboundPattern.getConstraint());
-                } else {
-                    persistOutboundPattern.setConstraint(patchOutboundPattern.getConstraint());
-                    outboundPatternService.update(context, persistOutboundPattern);
+                if (persistOutboundPattern != null) {
+                    throw new DSpaceBadRequestException("the provided OutboundPattern is already existed");
                 }
-            } catch (SQLException | JsonProcessingException e) {
+
+                NotifyServiceOutboundPattern outboundPattern =
+                    outboundPatternService.create(context, notifyServiceEntity);
+                outboundPattern.setPattern(patchOutboundPattern.getPattern());
+                outboundPattern.setConstraint(patchOutboundPattern.getConstraint());
+            } catch (SQLException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            return object;
+            return notifyServiceEntity;
         } else {
             throw new DSpaceBadRequestException(
                 "NotifyServiceOutboundReplaceOperation does not support this operation");
@@ -77,7 +77,7 @@ public class NotifyServiceOutboundReplaceOperation<R> extends PatchOperation<R> 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
         return (objectToMatch instanceof NotifyServiceEntity &&
-            operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE) &&
+            operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD) &&
             operation.getPath().trim().equalsIgnoreCase(OPERATION_PATH));
     }
 }

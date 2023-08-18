@@ -43,4 +43,9 @@ public class NotifyServiceInboundPatternServiceImpl implements NotifyServiceInbo
     public void update(Context context, NotifyServiceInboundPattern inboundPattern) throws SQLException {
         inboundPatternDao.save(context, inboundPattern);
     }
+
+    @Override
+    public void delete(Context context, NotifyServiceInboundPattern inboundPattern) throws SQLException {
+        inboundPatternDao.delete(context, inboundPattern);
+    }
 }
