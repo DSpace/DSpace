@@ -72,6 +72,7 @@ Common usage:
     <!-- Load the configurations -->
     <!-- In Ant, properties are immutable, so the first one "wins". In this case,
          we load the local.cfg FIRST, so that its settings are used by default. -->
+    <property file="config/local.local.cfg" /> <!-- Configuration de l'environnement d'exécution-->
     <property file="${local-config}" />
     <property file="${config}" />
     <property file="${irus-config}" />
