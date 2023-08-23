@@ -147,11 +147,11 @@ public class ScriptLauncher {
                                      DSpaceRunnable script) {
         try {
             StepResult result = script.initialize(args, dSpaceRunnableHandler, null);
+            // check the StepResult, only run the script if the result is Continue;
+            // otherwise - for example the script is started with the help as argument, nothing is to do
             if (StepResult.Continue.equals(result)) {
-                // only run the script, if the normal initialize is successful
+                // runs the script, the normal initialization is successful
                 script.run();
-            } else {
-                // otherwise - for example the script is started with the help argument
             }
             return 0;
         } catch (ParseException e) {
