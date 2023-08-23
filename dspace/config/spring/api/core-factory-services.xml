@@ -60,4 +60,6 @@
      <!-- LDN COAR Notify services -->
 	<bean id="ldnBusinessDelegateFactory" class="org.dspace.app.ldn.factory.LDNBusinessDelegateFactoryImpl"/>
 
+    <bean id="notifyServiceFactory" class="org.dspace.app.ldn.factory.NotifyServiceFactoryImpl"/>
+
 </beans>

@@ -14,6 +14,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.service.SystemWideAlertService;
+import org.dspace.app.ldn.factory.NotifyServiceFactory;
+import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
@@ -109,6 +111,7 @@ public abstract class AbstractBuilder<T, S> {
     static SystemWideAlertService systemWideAlertService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
+    static NotifyService notifyService;
 
 
     protected Context context;
@@ -173,6 +176,7 @@ public abstract class AbstractBuilder<T, S> {
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
+        notifyService = NotifyServiceFactory.getInstance().getNotifyService();
     }
 
 
@@ -209,6 +213,7 @@ public abstract class AbstractBuilder<T, S> {
         systemWideAlertService = null;
         subscribeService = null;
         supervisionOrderService = null;
+        notifyService = null;
 
     }
 

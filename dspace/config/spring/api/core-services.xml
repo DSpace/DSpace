@@ -154,5 +154,11 @@
 
     <bean class="org.dspace.app.ldn.LDNMessageServiceImpl"/>
 
+    <bean class="org.dspace.app.ldn.NotifyServiceImpl"/>
+    <bean class="org.dspace.app.ldn.NotifyServiceInboundPatternServiceImpl"/>
+    <bean class="org.dspace.app.ldn.NotifyServiceOutboundPatternServiceImpl"/>
+
+    <bean class="org.dspace.content.ItemFilterServiceImpl"/>
+
 </beans>
 
