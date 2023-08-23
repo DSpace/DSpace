@@ -18,6 +18,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.cli.DSpaceSkipUnknownArgumentsParser;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -123,7 +124,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     }
 
     private StepResult parseForHelp(String[] args) throws ParseException {
-        helpCommandLine = new DefaultParser().parse(getScriptConfiguration().getHelpOptions(), args, true);
+        helpCommandLine = new DSpaceSkipUnknownArgumentsParser().parse(getScriptConfiguration().getHelpOptions(), args);
         if (helpCommandLine.getOptions() != null && helpCommandLine.getOptions().length > 0) {
             return StepResult.Exit;
         }
