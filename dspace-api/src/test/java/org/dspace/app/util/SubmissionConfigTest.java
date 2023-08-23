@@ -66,7 +66,7 @@ public class SubmissionConfigTest extends AbstractUnitTest {
 
         // Get submission configuration
         SubmissionConfig submissionConfig =
-                SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService()
+                SubmissionServiceFactory.getInstance().getSubmissionConfigService()
                     .getSubmissionConfigByCollection(typeBindHandle);
         // Submission name should match name defined in item-submission.xml
         assertEquals(typeBindSubmissionName, submissionConfig.getSubmissionName());

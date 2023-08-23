@@ -35,7 +35,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.factory.SubmissionServiceFactory;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -89,7 +89,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     protected Map<String, DSpaceControlledVocabularyIndex> vocabularyIndexMap = new HashMap<>();
 
     // the item submission reader
-    private SubmissionConfigReaderService itemSubmissionConfigReaderService;
+    private SubmissionConfigService itemSubmissionConfigReaderService;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -136,7 +136,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     private synchronized void init() {
         if (!initialized) {
             try {
-                itemSubmissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+                itemSubmissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
                 throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
@@ -491,9 +491,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         init();
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null && collection != null) {
-            SubmissionConfigReaderService configReaderService;
+            SubmissionConfigService configReaderService;
             try {
-                configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+                configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
                 SubmissionConfig submissionName = configReaderService.getSubmissionConfigByCollection(collection.getHandle());
                 ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {

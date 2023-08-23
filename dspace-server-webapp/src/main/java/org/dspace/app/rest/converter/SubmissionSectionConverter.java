@@ -16,7 +16,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.submit.factory.SubmissionServiceFactory;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +30,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionSectionConverter.class);
 
-    private SubmissionConfigReaderService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigReaderService;
 
     @Override
     public SubmissionSectionRest convert(SubmissionStepConfig step, Projection projection) {
@@ -61,10 +61,10 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         return SubmissionStepConfig.class;
     }
 
-    public SubmissionConfigReaderService getSubmissionConfigReaderService() 
+    public SubmissionConfigService getSubmissionConfigReaderService() 
             throws SubmissionConfigReaderException, SQLException, IllegalStateException {
         if (submissionConfigReaderService == null) {
-            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
         }
         return submissionConfigReaderService;
     }

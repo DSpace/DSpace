@@ -159,7 +159,7 @@ public class DCInputsReader {
         throws DCInputsReaderException {
         SubmissionConfig config;
         try {
-            config = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService()
+            config = SubmissionServiceFactory.getInstance().getSubmissionConfigService()
                         .getSubmissionConfigByCollection(collectionHandle);
             String formName = config.getSubmissionName();
             if (formName == null) {
@@ -182,7 +182,7 @@ public class DCInputsReader {
         throws DCInputsReaderException {
         SubmissionConfig config;
         try {
-            config = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService()
+            config = SubmissionServiceFactory.getInstance().getSubmissionConfigService()
                         .getSubmissionConfigByName(name);
             String formName = config.getSubmissionName();
             if (formName == null) {

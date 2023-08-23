@@ -47,7 +47,7 @@ public class SubmissionConfigConsumer implements Consumer {
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
                 // reload submission configurations
-                SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService().reload();
+                SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
                 break;
         }
         

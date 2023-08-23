@@ -53,7 +53,7 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.factory.SubmissionServiceFactory;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.versioning.factory.VersionServiceFactory;
@@ -110,7 +110,7 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
     static SystemWideAlertService systemWideAlertService;
-    static SubmissionConfigReaderService submissionConfigReaderService;
+    static SubmissionConfigService submissionConfigReaderService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
     
@@ -177,7 +177,7 @@ public abstract class AbstractBuilder<T, S> {
         systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
         try {
-            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
         } catch (SubmissionConfigReaderException e) {
             log.error(e.getMessage(), e);
         }
