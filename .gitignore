@@ -34,9 +34,9 @@ nb-configuration.xml
 
 # Ignore a local.cfg file in root folder, if it exists
 /local.cfg
-# Also ignore it under dspace/config
-/dspace/config/local.cfg
-
+# UdeMChange: we ignore local.local.cfg, but we put local.cfg in the repo
+/dspace/config/local.local.cfg
+ 
 ##Mac noise
 .DS_Store
 
