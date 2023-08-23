@@ -58,7 +58,7 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.factory.SubmissionServiceFactory;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -118,10 +118,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
-    private SubmissionConfigReaderService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigReaderService;
 
     public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")

@@ -8,7 +8,7 @@
 package org.dspace.submit.factory;
 
 import org.dspace.app.util.SubmissionConfigReaderException;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -19,10 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SubmissionServiceFactoryImpl extends SubmissionServiceFactory {
     @Autowired(required = true)
-    private SubmissionConfigReaderService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     @Override
-    public SubmissionConfigReaderService getSubmissionConfigReaderService() throws SubmissionConfigReaderException {
-        return submissionConfigReaderService;
+    public SubmissionConfigService getSubmissionConfigService() throws SubmissionConfigReaderException {
+        return submissionConfigService;
     }
 }

@@ -17,11 +17,16 @@ import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.InitializingBean;
 
-public class SubmissionConfigReaderServiceImpl implements SubmissionConfigReaderService, InitializingBean {
-    
+/**
+ * An implementation for Submission Config service
+ *
+ * @author paulo.graca at fccn.pt
+ */
+public class SubmissionConfigServiceImpl implements SubmissionConfigService, InitializingBean {
+
     protected SubmissionConfigReader submissionConfigReader;
-    
-    public SubmissionConfigReaderServiceImpl () throws SubmissionConfigReaderException {
+
+    public SubmissionConfigServiceImpl () throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
     }
 

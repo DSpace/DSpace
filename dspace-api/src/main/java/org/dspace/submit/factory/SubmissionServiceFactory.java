@@ -9,7 +9,7 @@ package org.dspace.submit.factory;
 
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 
 /**
  * Abstract factory to get services for submission, use SubmissionServiceFactory.getInstance() to retrieve an
@@ -19,7 +19,7 @@ import org.dspace.submit.service.SubmissionConfigReaderService;
  */
 public abstract class SubmissionServiceFactory {
 
-    public abstract SubmissionConfigReaderService getSubmissionConfigReaderService() throws SubmissionConfigReaderException;
+    public abstract SubmissionConfigService getSubmissionConfigService() throws SubmissionConfigReaderException;
 
     public static SubmissionServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()

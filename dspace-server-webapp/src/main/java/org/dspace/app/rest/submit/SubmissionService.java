@@ -59,7 +59,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.submit.factory.SubmissionServiceFactory;
-import org.dspace.submit.service.SubmissionConfigReaderService;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
@@ -102,10 +102,10 @@ public class SubmissionService {
     private ConverterService converter;
     @Autowired
     private org.dspace.app.rest.utils.Utils utils;
-    private SubmissionConfigReaderService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigReaderService;
 
     public SubmissionService() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigReaderService();
+        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     /**
