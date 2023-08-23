@@ -8,20 +8,30 @@
 package org.dspace.discovery.indexobject;
 
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.discovery.IndexableObject;
 
 /**
- * DSpaceObject implementation for the IndexableObject, contains methods used by all DSpaceObject methods
- * All DSpaceObjects that will be indexed in discovery should inherit from this class & have their own implementation
+ * DSpaceObject implementation for the {@link IndexableObject}.
+ * Contains methods used by all {@link DSpaceObject} implementations.
+ * All {@code DSpaceObject} types that will be indexed in Discovery should
+ * inherit from this class & have their own implementations.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
+ * @param <T> type of this {@link DSpaceObject}.
  */
-public abstract class IndexableDSpaceObject<T extends DSpaceObject> extends AbstractIndexableObject<T, UUID> {
+public abstract class IndexableDSpaceObject<T extends DSpaceObject>
+        extends AbstractIndexableObject<T, UUID> {
 
     private T dso;
 
-    public IndexableDSpaceObject(T dso) {
+    public IndexableDSpaceObject(@NotNull T dso) {
+        if (null == dso) {
+            throw new NullPointerException("Null DSO constructing "
+                    + this.getClass().getSimpleName());
+        }
         this.dso = dso;
     }
 
@@ -31,7 +41,11 @@ public abstract class IndexableDSpaceObject<T extends DSpaceObject> extends Abst
     }
 
     @Override
-    public void setIndexedObject(T dso) {
+    public void setIndexedObject(@NotNull T dso) {
+        if (null == dso) {
+            throw new NullPointerException("Null DSO set in "
+                    + this.getClass().getSimpleName());
+        }
         this.dso = dso;
     }
 
@@ -39,6 +53,4 @@ public abstract class IndexableDSpaceObject<T extends DSpaceObject> extends Abst
     public UUID getID() {
         return dso.getID();
     }
-
-
 }
