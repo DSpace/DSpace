@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
 import org.dspace.app.rest.matcher.BrowseIndexMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -1479,6 +1480,131 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                        )))
                    //Verify that the startsWith paramater is included in the links
                     .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=C")));
+
+    };
+
+    /**
+     * This test ensure when we browses by author, our entries and items are sorted as if we configured
+     * `webui.browse.index.2` (or similar config values)
+     * @throws Exception
+     */
+    @Test
+    public void testBrowseAuthorByEntriesSortByDateIssued() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+
+        //0. Try to find the `author` BrowseIndex and replace it with one that sort by `dateissued,DESC`
+        // default config should be `webui.browse.index.2`
+        for (String conf :configurationService.getPropertyKeys("webui.browse.index")) {
+            String property = configurationService.getProperty(conf);
+            if (StringUtils.isNotEmpty(property) && property.startsWith("author")) {
+                configurationService.setProperty(conf,
+                        "author:metadata:dc.contributor.*\\,dc.creator:text:desc:dateissued");
+                System.out.println(conf + "=" + configurationService.getProperty(conf));
+            }
+        }
+
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 5 public items that are readable by Anonymous
+
+        Item item5 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Zeta Reticuli")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-01")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item6 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Moon")
+                                .withAuthor("Universe")
+                                .withIssueDate("2018-01-02")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item7 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Mars")
+                                .withAuthor("Universe2")
+                                .withIssueDate("2018-01-03")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item8 = ItemBuilder.createItem(context, col2)
+                                .withTitle("Jupiter")
+                                .withAuthor("Universe2")
+                                .withIssueDate("2018-01-04")
+                                .withSubject("Astronomy")
+                                .build();
+
+        Item item9 = ItemBuilder.createItem(context, col2)
+                                .withTitle("T-800")
+                                .withAuthor("Cameron, James")
+                                .withIssueDate("2029")
+                                .withSubject("Science Fiction")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        // ---- BROWSES BY ENTRIES ----
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with startsWith set to U
+        getClient().perform(get("/api/discover/browses/author/entries?startsWith=U")
+                                .param("size", "10").param("projection", "full"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //We expect only the "Universe" entry to be present
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
+                   //As entry browsing works as a filter, we expect to be on page 0
+                   .andExpect(jsonPath("$.page.number", is(0)))
+
+                   //Verify that the index filters to the "Universe" entries and Counts 2 Items.
+                   .andExpect(jsonPath("$._embedded.entries",
+                                       containsInAnyOrder(BrowseEntryResourceMatcher.matchBrowseEntry("Universe", 2),
+                                               BrowseEntryResourceMatcher.matchBrowseEntry("Universe2", 2)
+                                       )))
+                   //Verify startsWith parameter is included in the links
+                    .andExpect(jsonPath("$._links.self.href", containsString("?startsWith=U")));
+
+        // ---- BROWSES BY ITEMS ----
+
+        //** WHEN **
+        //An anonymous user browses the entries in the Browse by Author endpoint
+        //with filterValue set to Universe2 & default sort option and direction (by not sending them)
+        getClient().perform(get("/api/discover/browses/author/items?filterValue=Universe2")
+                                .param("size", "10")
+                    .param("projection", "full"))
+
+                    //** THEN **
+                    //The status has to be 200 OK
+                    .andExpect(status().isOk())
+                    //We expect only the "Universe" item to be present
+                    .andExpect(jsonPath("$.page.totalElements", is(2)))
+                    //As entry browsing works as a filter, we expect to be on page 0
+                    .andExpect(jsonPath("$.page.number", is(0)))
+                    //Verify filterValue parameter is included in the links
+                    .andExpect(jsonPath("$._links.self.href", containsString("filterValue=Universe2")))
+                    //Embedded items are sorted by date issued
+                    .andExpect(jsonPath("$._embedded.items",
+                           contains(ItemMatcher.matchItemWithTitleAndDateIssued(item8, "Jupiter", "2018-01-04"),
+                                   ItemMatcher.matchItemWithTitleAndDateIssued(item7, "Mars", "2018-01-03")
+                           )
+                    ));
 
     };
 

@@ -256,7 +256,11 @@ public class BrowseIndex {
      * @return Returns the datatype.
      */
     public String getDataType() {
-        if (sortOption != null) {
+        // Check if sortOption.getType() is not equal to BI's datatype, in which case we return the BI's
+        // else we get error, check https://github.com/DSpace/DSpace/issues/8651 for details
+        if (datatype != null && (sortOption == null || !sortOption.getType().equals(datatype))) {
+            return datatype;
+        } else if (sortOption != null) {
             return sortOption.getType();
         }
 
