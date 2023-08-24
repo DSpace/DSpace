@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
@@ -61,7 +62,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         return SubmissionStepConfig.class;
     }
 
-    public SubmissionConfigService getSubmissionConfigService() 
+    public SubmissionConfigService getSubmissionConfigService()
             throws SubmissionConfigReaderException, SQLException, IllegalStateException {
         if (submissionConfigService == null) {
             submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
