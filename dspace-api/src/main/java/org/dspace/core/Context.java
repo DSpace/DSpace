@@ -46,7 +46,7 @@ import org.springframework.util.CollectionUtils;
  * to commit the changes and free up any resources used by the context. If
  * anything has gone wrong, <code>abort</code> is called to roll back any
  * changes and free up the resources.
- * <P>
+ * <P> 
  * The context object is also used as a cache for CM API objects.
  */
 public class Context implements AutoCloseable {
@@ -148,7 +148,7 @@ public class Context implements AutoCloseable {
     public Context() {
         init();
     }
-
+ 
     /**
      * Construct a new context object with the given mode enabled. A database connection is opened.
      * No user is authenticated.
