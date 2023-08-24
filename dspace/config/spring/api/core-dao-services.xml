@@ -72,5 +72,6 @@
     <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceDaoImpl"/>
     <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceInboundPatternDaoImpl"/>
     <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceOutboundPatternDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.LDNMessageDaoImpl"/>
 
 </beans>

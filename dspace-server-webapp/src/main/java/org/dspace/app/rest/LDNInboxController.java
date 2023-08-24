@@ -7,17 +7,17 @@
  */
 package org.dspace.app.rest;
 
-import java.net.URI;
+import java.util.regex.Pattern;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.ldn.LDNRouter;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.rest.exception.InvalidLDNMessageException;
 import org.dspace.core.Context;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,10 +35,6 @@ public class LDNInboxController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
-    @Lazy
-    @Autowired
-    private LDNRouter router;
-
     @Autowired
     private LDNMessageService ldnMessageService;
 
@@ -46,24 +42,19 @@ public class LDNInboxController {
      * LDN DSpace inbox.
      *
      * @param notification received notification
-     * @return ResponseEntity 400 not stored, 201 stored
+     * @return ResponseEntity 400 not stored, 202 stored
      * @throws Exception
      */
     @PostMapping(value = "/inbox", consumes = "application/ld+json")
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
-
-        ldnMessageService.create(context, notification.getId());
-
-        log.info("stored notification {} {}",
-                notification.getId(),
-                notification.getType());
-
-        URI target = new URI(notification.getTarget().getInbox());
-
-        return ResponseEntity.created(target)
+        validate(notification);
+        ldnMessageService.create(context, notification);
+        log.info("stored notification {} {}", notification.getId(), notification.getType());
+        context.commit();
+        return ResponseEntity.accepted()
             .body(String.format("Successfully stored notification %s %s",
-                    notification.getId(), notification.getType()));
+                notification.getId(), notification.getType()));
     }
 
     /**
@@ -87,6 +78,20 @@ public class LDNInboxController {
     public ResponseEntity<String> handleResponseStatusException(ResponseStatusException e) {
         return ResponseEntity.status(e.getStatus().value())
                 .body(e.getMessage());
+    }
+
+    private void validate(Notification notification) {
+        String id = notification.getId();
+        Pattern URNRegex =
+            Pattern.compile("^urn:uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+
+        if (!URNRegex.matcher(id).matches() && !new UrlValidator().isValid(id)) {
+            throw new InvalidLDNMessageException("Invalid URI format for 'id' field.");
+        }
+
+        if (notification.getOrigin() == null || notification.getTarget() == null || notification.getObject() == null) {
+            throw new InvalidLDNMessageException("Origin or Target or Object is missing");
+        }
     }
 
 }

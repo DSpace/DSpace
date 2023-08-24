@@ -100,5 +100,7 @@
         <mapping class="org.dspace.app.ldn.NotifyServiceInboundPattern"/>
         <mapping class="org.dspace.app.ldn.NotifyServiceOutboundPattern"/>
 
+        <mapping class="org.dspace.app.ldn.LDNMessage"/>
+
     </session-factory>
 </hibernate-configuration>
