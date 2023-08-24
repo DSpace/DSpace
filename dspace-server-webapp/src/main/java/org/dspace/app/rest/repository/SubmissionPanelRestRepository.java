@@ -31,17 +31,17 @@ import org.springframework.stereotype.Component;
 @Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionSectionRest.NAME)
 public class SubmissionPanelRestRepository extends DSpaceRestRepository<SubmissionSectionRest, String> {
 
-    private SubmissionConfigService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     public SubmissionPanelRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionSectionRest findOne(Context context, String id) {
         try {
-            SubmissionStepConfig step = submissionConfigReaderService.getStepConfig(id);
+            SubmissionStepConfig step = submissionConfigService.getStepConfig(id);
             return converter.toRest(step, utils.obtainProjection());
         } catch (SubmissionConfigReaderException e) {
             //TODO wrap with a specific exception
@@ -52,7 +52,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionSectionRest> findAll(Context context, Pageable pageable) {
-        List<SubmissionConfig> subConfs = submissionConfigReaderService.getAllSubmissionConfigs(
+        List<SubmissionConfig> subConfs = submissionConfigService.getAllSubmissionConfigs(
                 pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         long total = 0;
         List<SubmissionStepConfig> stepConfs = new ArrayList<>();

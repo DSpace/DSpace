@@ -54,13 +54,13 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     private SubmissionSectionConverter submissionSectionConverter;
 
-    protected SubmissionConfigService submissionConfigReaderService;
+    protected SubmissionConfigService submissionConfigService;
 
     @Autowired
     SubmissionService submissionService;
 
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     protected void fillFromModel(T obj, R witem, Projection projection) {
@@ -82,7 +82,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
         if (collection != null) {
             SubmissionDefinitionRest def = converter.toRest(
-                    submissionConfigReaderService.getSubmissionConfigByCollection(collection.getHandle()), projection);
+                    submissionConfigService.getSubmissionConfigByCollection(collection.getHandle()), projection);
             witem.setSubmissionDefinition(def);
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);

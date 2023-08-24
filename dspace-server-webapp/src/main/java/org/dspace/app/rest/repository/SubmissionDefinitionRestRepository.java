@@ -34,18 +34,18 @@ import org.springframework.stereotype.Component;
  */
 @Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionDefinitionRest.NAME)
 public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<SubmissionDefinitionRest, String> {
-    private SubmissionConfigService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     public SubmissionDefinitionRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public SubmissionDefinitionRest findOne(Context context, String submitName) {
-        SubmissionConfig subConfig = submissionConfigReaderService.getSubmissionConfigByName(submitName);
+        SubmissionConfig subConfig = submissionConfigService.getSubmissionConfigByName(submitName);
         if (subConfig == null) {
             return null;
         }
@@ -55,8 +55,8 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionDefinitionRest> findAll(Context context, Pageable pageable) {
-        int total = submissionConfigReaderService.countSubmissionConfigs();
-        List<SubmissionConfig> subConfs = submissionConfigReaderService.getAllSubmissionConfigs(
+        int total = submissionConfigService.countSubmissionConfigs();
+        List<SubmissionConfig> subConfs = submissionConfigService.getAllSubmissionConfigs(
                 pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
         return converter.toRestPage(subConfs, pageable, total, utils.obtainProjection());
     }
@@ -70,7 +70,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
             return null;
         }
         SubmissionDefinitionRest def = converter
-            .toRest(submissionConfigReaderService.getSubmissionConfigByCollection(col.getHandle()),
+            .toRest(submissionConfigService.getSubmissionConfigByCollection(col.getHandle()),
                     utils.obtainProjection());
         return def;
     }

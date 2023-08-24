@@ -30,7 +30,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionSectionConverter.class);
 
-    private SubmissionConfigService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     @Override
     public SubmissionSectionRest convert(SubmissionStepConfig step, Projection projection) {
@@ -49,7 +49,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         SubmissionStepConfig step;
 
         try {
-            step = getSubmissionConfigReaderService().getStepConfig(obj.getId());
+            step = getSubmissionConfigService().getStepConfig(obj.getId());
         } catch (SQLException | IllegalStateException | SubmissionConfigReaderException e) {
             throw new RuntimeException(e);
         }
@@ -61,11 +61,11 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         return SubmissionStepConfig.class;
     }
 
-    public SubmissionConfigService getSubmissionConfigReaderService() 
+    public SubmissionConfigService getSubmissionConfigService() 
             throws SubmissionConfigReaderException, SQLException, IllegalStateException {
-        if (submissionConfigReaderService == null) {
-            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        if (submissionConfigService == null) {
+            submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
         }
-        return submissionConfigReaderService;
+        return submissionConfigService;
     }
 }

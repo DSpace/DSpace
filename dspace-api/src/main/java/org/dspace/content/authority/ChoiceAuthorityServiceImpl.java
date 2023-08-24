@@ -24,7 +24,6 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
@@ -89,7 +88,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     protected Map<String, DSpaceControlledVocabularyIndex> vocabularyIndexMap = new HashMap<>();
 
     // the item submission reader
-    private SubmissionConfigService itemSubmissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -136,7 +135,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     private synchronized void init() {
         if (!initialized) {
             try {
-                itemSubmissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+                submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
                 throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
@@ -241,7 +240,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             // there is an authority configured for the metadata valid for some collections,
             // check if it is the requested collection
             Map<String, ChoiceAuthority> controllerFormDef = controllerFormDefinitions.get(fieldKey);
-            SubmissionConfig submissionConfig = itemSubmissionConfigReaderService
+            SubmissionConfig submissionConfig = submissionConfigService
                     .getSubmissionConfigByCollection(collection.getHandle());
             String submissionName = submissionConfig.getSubmissionName();
             // check if the requested collection has a submission definition that use an authority for the metadata
@@ -270,7 +269,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
-        itemSubmissionConfigReaderService.reload();
+        submissionConfigService.reload();
         initialized = false;
     }
 
@@ -320,7 +319,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
      */
     private void autoRegisterChoiceAuthorityFromInputReader() {
         try {
-            List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReaderService
+            List<SubmissionConfig> submissionConfigs = submissionConfigService
                     .getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
             DCInputsReader dcInputsReader = new DCInputsReader();
 
@@ -494,7 +493,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             SubmissionConfigService configReaderService;
             try {
                 configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
-                SubmissionConfig submissionName = configReaderService.getSubmissionConfigByCollection(collection.getHandle());
+                SubmissionConfig submissionName = configReaderService
+                        .getSubmissionConfigByCollection(collection.getHandle());
                 ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid

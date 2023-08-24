@@ -110,10 +110,9 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
     static SystemWideAlertService systemWideAlertService;
-    static SubmissionConfigService submissionConfigReaderService;
+    static SubmissionConfigService submissionConfigService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
-    
 
 
     protected Context context;
@@ -177,7 +176,7 @@ public abstract class AbstractBuilder<T, S> {
         systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
         try {
-            submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+            submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
         } catch (SubmissionConfigReaderException e) {
             log.error(e.getMessage(), e);
         }
@@ -217,7 +216,7 @@ public abstract class AbstractBuilder<T, S> {
         versioningService = null;
         orcidTokenService = null;
         systemWideAlertService = null;
-        submissionConfigReaderService = null;
+        submissionConfigService = null;
         subscribeService = null;
         supervisionOrderService = null;
 
