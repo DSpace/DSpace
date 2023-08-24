@@ -118,10 +118,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
-    private SubmissionConfigService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
@@ -252,7 +252,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
 
         SubmissionConfig submissionConfig =
-            submissionConfigReaderService.getSubmissionConfigByCollection(collection.getHandle());
+            submissionConfigService.getSubmissionConfigByCollection(collection.getHandle());
         List<WorkspaceItem> result = null;
         List<ImportRecord> records = new ArrayList<>();
         try {

@@ -111,10 +111,10 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Autowired
     protected XmlWorkflowFactory workflowFactory;
 
-    private SubmissionConfigService submissionConfigReaderService;
+    private SubmissionConfigService submissionConfigService;
 
     public WorkflowItemRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     @Override

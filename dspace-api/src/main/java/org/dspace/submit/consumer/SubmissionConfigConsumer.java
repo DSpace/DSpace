@@ -24,7 +24,7 @@ public class SubmissionConfigConsumer implements Consumer {
      * log4j logger
      */
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfigConsumer.class);
-    
+
     @Override
     public void initialize() throws Exception {
         // No-op
@@ -39,18 +39,18 @@ public class SubmissionConfigConsumer implements Consumer {
                           + event.toString());
             return;
         }
-                
+
         int et = event.getEventType();
         switch (et) {
             case Event.CREATE:
             case Event.DELETE:
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
+            default:
                 // reload submission configurations
                 SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
                 break;
         }
-        
     }
 
     @Override
