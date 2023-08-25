@@ -113,6 +113,14 @@
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
                 <entry key="eperson_claims" value-ref="eperson_claims"/>
+
+                <!-- Le mapping pour les collections Papyrus -->
+                <!-- TODO: faire au complet pour prod / preprod -->
+                <entry key="1973/578" value-ref="TMEetProdEtudiante" />    <!-- Sc. infirmières, production étudiante -->
+                <entry key="1973/2620" value-ref="TMEetProdEtudiante" />    <!-- Thèses et mémoires UdeM -->
+
+                <entry key="1973/577" value-ref="TravauxPublications" />    <!-- Sciences informières - Travaux et publications -->
+
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
@@ -156,6 +164,422 @@
             </map>
         </property>
     </bean>
+
+    <!-- Configuration Papyrus Thèses et mémoires + Productions étudiantes-->
+    <bean id="TMEetProdEtudiante" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterDegreeDiscipline"/>
+                <ref bean="searchFilterAdvisor"/>
+                <ref bean="searchFilterDegreeLevel"/>
+                <ref bean="searchFilterSubject"/>
+                <ref bean="searchFilterIssued"/>
+                <ref bean="searchFilterAuthor"/>
+                <ref bean="searchFilterType"/>
+                <ref bean="searchFilterLanguage"/>
+            </list>
+        </property>
+        <!-- Set TagCloud configuration per discovery configuration -->
+        <!-- TODO: supporté? utile? peut-on supprimer? -->
+        <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
+        <!-- TODO: à quoi ça sert au juste? -->
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <!-- Les 5 suivants sont des ajouts Papyrus -->
+                <ref bean="searchFilterDegreeDiscipline"/>
+                <ref bean="searchFilterAdvisor"/>
+                <ref bean="searchFilterDegreeLevel"/>
+                <ref bean="searchFilterType"/>
+                <ref bean="searchFilterLanguage"/>
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <!-- Papyrus: plusieurs ont été retirés -->
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <!-- TODO: cette configuration ne semble pas prise en compte dans le frontend -->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitle" />
+                        <!-- Papyrus: on ajoute les tris inverses TODO: vraiment nécessaire? -->
+                        <ref bean="sortTitleDESC" />
+                        <ref bean="sortDateIssued" />
+                        <ref bean="sortDateIssuedASC" />
+                        <!-- Papyrus: on retire le tri par date de dépôt -->
+                        <!-- TODO: si on le retire ici, on ne peut pas
+                                utiliser la liste des plus récentes soumisssions -->
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <!-- Papyrus: on cherche uniquement les items -->
+                <value>(search.resourcetype:Item AND latestVersion:true)</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <!--The configuration for the recent submissions-->
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned" />
+                <property name="type" value="date"/>
+                <property name="max" value="10"/>
+                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+                <!-- Papyrus: on affiche les soumissions récentes -->
+                <property name="useAsHomePage" value="true"/>
+            </bean>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+        <property name="hitHighlightingConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
+                <property name="metadataFields">
+                    <list>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.contributor.author"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dspace.entity.type"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.identifier.jobtitle"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="project.identifier.name"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.description.abstract"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.title"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="organization.legalName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.givenName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.familyName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <!-- Papyrus: ajout du texte intégral dans les snippets -->
+                        <!-- TODO: impact?-->
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="fulltext"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                        <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
+                             may appear in search results when the Item is public. See DS-3498
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="project.identifier.status"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="orgunit.identifier.name"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="orgunit.identifier.description"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        -->
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!-- TODO: impact?-->
+        <property name="moreLikeThisConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
+                <property name="similarityMetadataFields">
+                    <list>
+                        <value>dc.title</value>
+                        <value>dc.contributor.author</value>
+                        <value>dc.creator</value>
+                        <value>dc.subject</value>
+                    </list>
+                </property>
+                <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
+                <property name="minTermFrequency" value="5"/>
+                <!--The maximum number of related items displayed-->
+                <property name="max" value="3"/>
+                <!--The minimum word length below which words will be ignored-->
+                <property name="minWordLength" value="5"/>
+            </bean>
+        </property>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <!-- TODO: impact?-->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+    <!-- Fin de la configuration Papyrus Thèses et mémoire + Productions étudiantes -->
+
+    <!-- Configuration Papyrus Travaux et publications-->
+    <bean id="TravauxPublications" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterAuthor"/>
+                <ref bean="searchFilterAffiliation"/>
+                <ref bean="searchFilterSubject"/>
+                <ref bean="searchFilterIssued"/>
+                <ref bean="searchFilterType"/>
+                <ref bean="searchFilterLanguage"/>
+            </list>
+        </property>
+        <!-- Set TagCloud configuration per discovery configuration -->
+        <!-- TODO: supporté? utile? peut-on supprimer? -->
+        <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
+        <!-- TODO: à quoi ça sert au juste? -->
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterAffiliation" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterType"/>
+                <ref bean="searchFilterLanguage"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <!-- TODO: cette configuration ne semble pas prise en compte dans le frontend -->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortScore" />
+                        <ref bean="sortTitle" />
+                        <!-- Papyrus: on ajoute les tris inverses TODO: vraiment nécessaire? -->
+                        <ref bean="sortTitleDESC" />
+                        <ref bean="sortDateIssued" />
+                        <ref bean="sortDateIssuedASC" />
+                        <!-- Papyrus: on retire le tri par date de dépôt -->
+                        <!-- TODO: si on le retire ici, on ne peut pas
+                                utiliser la liste des plus récentes soumisssions -->
+                        <ref bean="sortDateAccessioned"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find items, communities and collections-->
+                <!-- Papyrus: on cherche uniquement les items -->
+                <value>(search.resourcetype:Item AND latestVersion:true)</value>
+                <value>-withdrawn:true AND -discoverable:false</value>
+            </list>
+        </property>
+        <!--The configuration for the recent submissions-->
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned" />
+                <property name="type" value="date"/>
+                <property name="max" value="10"/>
+                <!-- If enabled the collection home page will not display metadata but show a pageable list of recent submissions -->
+                <!-- Papyrus: on affiche les soumissions récentes -->
+                <property name="useAsHomePage" value="true"/>
+            </bean>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+        <property name="hitHighlightingConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
+                <property name="metadataFields">
+                    <list>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.contributor.author"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dspace.entity.type"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.identifier.jobtitle"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="project.identifier.name"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.description.abstract"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.title"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="organization.legalName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.givenName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="person.familyName"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <!-- Papyrus: ajout du texte intégral dans les snippets -->
+                        <!-- TODO: impact?-->
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="fulltext"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                        <!-- By default, full text snippets are disabled, as snippets of embargoed/restricted bitstreams
+                             may appear in search results when the Item is public. See DS-3498
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="project.identifier.status"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="orgunit.identifier.name"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="orgunit.identifier.description"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        -->
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!-- TODO: impact?-->
+        <property name="moreLikeThisConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration">
+                <property name="similarityMetadataFields">
+                    <list>
+                        <value>dc.title</value>
+                        <value>dc.contributor.author</value>
+                        <value>dc.creator</value>
+                        <value>dc.subject</value>
+                    </list>
+                </property>
+                <!--The minimum number of matching terms across the metadata fields above before an item is found as related -->
+                <property name="minTermFrequency" value="5"/>
+                <!--The maximum number of related items displayed-->
+                <property name="max" value="3"/>
+                <!--The minimum word length below which words will be ignored-->
+                <property name="minWordLength" value="5"/>
+            </bean>
+        </property>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <!-- TODO: impact?-->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+    <!-- Fin de la configuration Papyrus Travaux et publications -->
+
+
+    <!-- Configuration Papyrus des filtres de recherche spécifiques -->
+    <bean id="searchFilterDegreeDiscipline" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="degreeDiscipline"/>
+        <property name="metadataFields">
+            <list>
+                <value>etd.degree.discipline</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterAdvisor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="advisor"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.advisor</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterDegreeLevel" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="degreeLevel"/>
+        <property name="metadataFields">
+            <list>
+                <value>etd.degree.level</value>
+                <value>UdeM.cycle</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterAffiliation" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="affiliation"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.affiliation</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterLanguage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="language"/>
+        <property name="metadataFields">
+            <list>
+                <value>dcterms.language</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <!-- Fin de la configuration Papyrus des filtres de recherche spécifiques -->
+
+    <!-- Configuration Papyrus des options de tri supplémentaires -->
+
+    <bean id="sortTitleDESC" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="dc.title"/>
+        <property name="defaultSortOrder" value="desc"/>
+    </bean>
+
+    <bean id="sortDateIssuedASC" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
+        <property name="metadataField" value="dc.date.issued"/>
+        <property name="type" value="date"/>
+        <property name="defaultSortOrder" value="asc"/>
+    </bean>
+
+    <!-- Fin de la configuration Papyrus des options de tri supplémentaires -->
+
 
     <!--The default configuration settings for discovery-->
     <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
@@ -207,6 +631,9 @@
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find items, communities and collections-->
+                <!-- Papyrus: on cherche uniquement les items -->
+                <!-- TODO: ça brise le choix d'une collection à chercher -->
+                <!-- <value>(search.resourcetype:Item AND latestVersion:true)</value> -->
                 <value>(search.resourcetype:Item AND latestVersion:true) OR search.resourcetype:Collection OR search.resourcetype:Community</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
             </list>
@@ -2296,6 +2723,8 @@
             <list>
                 <value>dc.contributor.author</value>
                 <value>dc.creator</value>
+                <!-- Ajout Papyrus -->
+                <value>dc.contributor</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -2343,6 +2772,7 @@
         </property>
         <property name="type" value="date"/>
         <property name="facetLimit" value="5"/>
+        <!-- TODO: dans Papyrus 5.9, c'est plutôt VALUE qui est utilisé pour le tri -->
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="isOpenByDefault" value="false"/>
@@ -2386,6 +2816,10 @@
                 <value>dc.type</value>
             </list>
         </property>
+        <!-- Ajout Papyrus -->
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
 
     <bean id="searchFilterIdentifier" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
