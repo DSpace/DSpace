@@ -49,8 +49,8 @@ public class LDNContextRepeater {
     }
 
     /**
-     * @param notification
-     * @return Iterator<Notification>
+     * @param  notification
+     * @return              Iterator<Notification>
      */
     public Iterator<Notification> iterator(Notification notification) {
         return new NotificationIterator(notification, repeatOver);

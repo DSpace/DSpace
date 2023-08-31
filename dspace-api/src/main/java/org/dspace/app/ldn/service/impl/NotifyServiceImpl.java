@@ -5,11 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.ldn;
+package org.dspace.app.ldn.service.impl;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.dao.NotifyServiceDao;
 import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.core.Context;
@@ -22,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class NotifyServiceImpl implements NotifyService {
 
-    @Autowired
+    @Autowired(required = true)
     private NotifyServiceDao notifyServiceDao;
 
     @Override

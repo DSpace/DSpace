@@ -21,5 +21,4 @@ public interface LDNProcessor {
      * @throws Exception something went wrong processing the notification
      */
     public void process(Notification notification) throws Exception;
-
 }

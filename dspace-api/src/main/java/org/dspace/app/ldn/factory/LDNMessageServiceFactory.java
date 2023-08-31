@@ -7,7 +7,7 @@
  */
 package org.dspace.app.ldn.factory;
 
-import org.dspace.app.ldn.service.NotifyService;
+import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -16,12 +16,14 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public abstract class NotifyServiceFactory {
+public abstract class LDNMessageServiceFactory {
 
-    public abstract NotifyService getNotifyService();
+    public abstract LDNMessageService getLDNMessageService();
 
-    public static NotifyServiceFactory getInstance() {
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
-            "notifyServiceFactory", NotifyServiceFactory.class);
+    public static LDNMessageServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance()
+                .getServiceManager()
+                .getServiceByName("ldnMessageServiceFactory",
+                    LDNMessageServiceFactory.class);
     }
 }

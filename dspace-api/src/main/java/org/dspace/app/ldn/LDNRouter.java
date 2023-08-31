@@ -8,10 +8,12 @@
 package org.dspace.app.ldn;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.dspace.app.ldn.model.Notification;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.processor.LDNProcessor;
 
 /**
@@ -20,13 +22,33 @@ import org.dspace.app.ldn.processor.LDNProcessor;
 public class LDNRouter {
 
     private Map<Set<String>, LDNProcessor> processors = new HashMap<>();
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LDNRouter.class);
 
     /**
      * Route notification to processor
+     * 
      * @return LDNProcessor processor to process notification, can be null
      */
-    public LDNProcessor route(Notification notification) {
-        return processors.get(notification.getType());
+    public LDNProcessor route(LDNMessageEntity ldnMessage) {
+        if (StringUtils.isEmpty(ldnMessage.getType())) {
+            log.warn("LDNMessage " + ldnMessage + " has no type!");
+            return null;
+        }
+        if (ldnMessage == null) {
+            log.warn("an null LDNMessage " + ldnMessage + "is received for routing!");
+            return null;
+        }
+        String ldnMessageType = ldnMessage.getType();
+        ldnMessageType = ldnMessageType.replace("[", "");
+        ldnMessageType = ldnMessageType.replace("]", "");
+        ldnMessageType = ldnMessageType.replace(" ", "");
+        String[] ldnMsgTypeArray = ldnMessageType.split(",");
+        Set<String> ldnMessageTypeSet = new HashSet<String>();
+        for (int i = 0; i < ldnMsgTypeArray.length; i++) {
+            ldnMessageTypeSet.add(ldnMsgTypeArray[i]);
+        }
+        LDNProcessor processor = processors.get(ldnMessageTypeSet);
+        return processor;
     }
 
     /**

@@ -10,7 +10,7 @@
 -- Table to store LDN messages
 -------------------------------------------------------------------------------
 
-CREATE TABLE ldn_messages
+CREATE TABLE ldn_message
 (
   id VARCHAR(255) PRIMARY KEY,
   object uuid,
@@ -20,9 +20,13 @@ CREATE TABLE ldn_messages
   target INTEGER,
   inReplyTo VARCHAR(255),
   context uuid,
+  queue_status INTEGER DEFAULT NULL,
+  queue_attempts INTEGER DEFAULT 0,
+  queue_last_start_time TIMESTAMP,
+  queue_timeout TIMESTAMP,
   FOREIGN KEY (object) REFERENCES dspaceobject (uuid) ON DELETE SET NULL,
   FOREIGN KEY (context) REFERENCES dspaceobject (uuid) ON DELETE SET NULL,
-  FOREIGN KEY (origin) REFERENCES notifyservices (id) ON DELETE SET NULL,
-  FOREIGN KEY (target) REFERENCES notifyservices (id) ON DELETE SET NULL,
-  FOREIGN KEY (inReplyTo) REFERENCES ldn_messages (id) ON DELETE SET NULL
+  FOREIGN KEY (origin) REFERENCES notifyservice (id) ON DELETE SET NULL,
+  FOREIGN KEY (target) REFERENCES notifyservice (id) ON DELETE SET NULL,
+  FOREIGN KEY (inReplyTo) REFERENCES ldn_message (id) ON DELETE SET NULL
 );

@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.Filter;
 
+import org.dspace.app.ldn.LDNQueueExtractor;
+import org.dspace.app.ldn.LDNQueueTimeoutChecker;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
@@ -46,8 +48,9 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Define the Spring Boot Application settings itself. This class takes the place
- * of a web.xml file, and configures all Filters/Listeners as methods (see below).
+ * Define the Spring Boot Application settings itself. This class takes the
+ * place of a web.xml file, and configures all Filters/Listeners as methods (see
+ * below).
  * <p>
  * NOTE: Requires a Servlet 3.0 container, e.g. Tomcat 7.0 or above.
  * <p>
@@ -76,6 +79,16 @@ public class Application extends SpringBootServletInitializer {
         GenerateSitemaps.generateSitemapsScheduled();
     }
 
+    @Scheduled(cron = "${ldn.queue.extractor.cron:-}")
+    public void ldnExtractFromQueue() throws IOException, SQLException {
+        LDNQueueExtractor.extractMessageFromQueue();
+    }
+
+    @Scheduled(cron = "${ldn.queue.timeout.checker.cron:-}")
+    public void ldnQueueTimeoutCheck() throws IOException, SQLException {
+        LDNQueueTimeoutChecker.checkQueueMessageTimeout();
+    }
+
     @Scheduled(cron = "${solr-database-resync.cron:-}")
     public void solrDatabaseResync() throws Exception {
         SolrDatabaseResyncCli.runScheduled();
@@ -87,28 +100,30 @@ public class Application extends SpringBootServletInitializer {
     }
 
     /**
-     * Override the default SpringBootServletInitializer.configure() method,
-     * passing it this Application class.
+     * Override the default SpringBootServletInitializer.configure() method, passing
+     * it this Application class.
      * <p>
-     * This is necessary to allow us to build a deployable WAR, rather than
-     * always relying on embedded Tomcat.
+     * This is necessary to allow us to build a deployable WAR, rather than always
+     * relying on embedded Tomcat.
      * <p>
-     * See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
+     * See:
+     * http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
      *
-     * @param application
+     * @param  application
      * @return
      */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        // Pass this Application class, and our initializers for DSpace Kernel and Configuration
+        // Pass this Application class, and our initializers for DSpace Kernel and
+        // Configuration
         // NOTE: Kernel must be initialized before Configuration
         return application.sources(Application.class)
-                          .initializers(new DSpaceKernelInitializer(), new DSpaceConfigurationInitializer());
+            .initializers(new DSpaceKernelInitializer(), new DSpaceConfigurationInitializer());
     }
 
     /**
-     * Register the "DSpaceContextListener" so that it is loaded
-     * for this Application.
+     * Register the "DSpaceContextListener" so that it is loaded for this
+     * Application.
      *
      * @return DSpaceContextListener
      */
@@ -120,8 +135,8 @@ public class Application extends SpringBootServletInitializer {
     }
 
     /**
-     * Register the DSpaceWebappServletFilter, which initializes the
-     * DSpace RequestService / SessionService
+     * Register the DSpaceWebappServletFilter, which initializes the DSpace
+     * RequestService / SessionService
      *
      * @return DSpaceWebappServletFilter
      */
@@ -170,59 +185,70 @@ public class Application extends SpringBootServletInitializer {
 
         return new WebMvcConfigurer() {
             /**
-             * Create a custom CORS mapping for the DSpace REST API (/api/ paths), based on configured allowed origins.
+             * Create a custom CORS mapping for the DSpace REST API (/api/ paths), based on
+             * configured allowed origins.
              * @param registry CorsRegistry
              */
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 // Get allowed origins for api and iiif endpoints.
-                // The actuator endpoints are configured using management.endpoints.web.cors.* properties
+                // The actuator endpoints are configured using management.endpoints.web.cors.*
+                // properties
                 String[] corsAllowedOrigins = configuration
-                        .getCorsAllowedOrigins(configuration.getCorsAllowedOriginsConfig());
+                    .getCorsAllowedOrigins(configuration.getCorsAllowedOriginsConfig());
                 String[] iiifAllowedOrigins = configuration
-                        .getCorsAllowedOrigins(configuration.getIiifAllowedOriginsConfig());
+                    .getCorsAllowedOrigins(configuration.getIiifAllowedOriginsConfig());
                 String[] signpostingAllowedOrigins = configuration
-                        .getCorsAllowedOrigins(configuration.getSignpostingAllowedOriginsConfig());
+                    .getCorsAllowedOrigins(configuration.getSignpostingAllowedOriginsConfig());
 
                 boolean corsAllowCredentials = configuration.getCorsAllowCredentials();
                 boolean iiifAllowCredentials = configuration.getIiifAllowCredentials();
                 boolean signpostingAllowCredentials = configuration.getSignpostingAllowCredentials();
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
-                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
-                            // for our Access-Control-Allow-Origin header
-                            // for our Access-Control-Allow-Origin header
-                            .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
-                            // Allow list of request preflight headers allowed to be sent to us from the client
-                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                "x-recaptcha-token")
-                            // Allow list of response headers allowed to be sent by us (the server) to the client
-                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                        // Set Access-Control-Allow-Credentials to "true" and specify which origins are
+                        // valid
+                        // for our Access-Control-Allow-Origin header
+                        // for our Access-Control-Allow-Origin header
+                        .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
+                        // Allow list of request preflight headers allowed to be sent to us from the
+                        // client
+                        .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                            "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+                            "x-recaptcha-token")
+                        // Allow list of response headers allowed to be sent by us (the server) to the
+                        // client
+                        .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
                 if (iiifAllowedOrigins != null) {
                     registry.addMapping("/iiif/**").allowedMethods(CorsConfiguration.ALL)
-                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
-                            // for our Access-Control-Allow-Origin header
-                            .allowCredentials(iiifAllowCredentials).allowedOrigins(iiifAllowedOrigins)
-                            // Allow list of request preflight headers allowed to be sent to us from the client
-                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                "x-recaptcha-token")
-                            // Allow list of response headers allowed to be sent by us (the server) to the client
-                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                        // Set Access-Control-Allow-Credentials to "true" and specify which origins are
+                        // valid
+                        // for our Access-Control-Allow-Origin header
+                        .allowCredentials(iiifAllowCredentials).allowedOrigins(iiifAllowedOrigins)
+                        // Allow list of request preflight headers allowed to be sent to us from the
+                        // client
+                        .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                            "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+                            "x-recaptcha-token")
+                        // Allow list of response headers allowed to be sent by us (the server) to the
+                        // client
+                        .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
                 if (signpostingAllowedOrigins != null) {
                     registry.addMapping("/signposting/**").allowedMethods(CorsConfiguration.ALL)
-                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
-                            // for our Access-Control-Allow-Origin header
-                            .allowCredentials(signpostingAllowCredentials).allowedOrigins(signpostingAllowedOrigins)
-                            // Allow list of request preflight headers allowed to be sent to us from the client
-                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
-                                    "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                    "x-recaptcha-token", "access-control-allow-headers")
-                            // Allow list of response headers allowed to be sent by us (the server) to the client
-                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                        // Set Access-Control-Allow-Credentials to "true" and specify which origins are
+                        // valid
+                        // for our Access-Control-Allow-Origin header
+                        .allowCredentials(signpostingAllowCredentials).allowedOrigins(signpostingAllowedOrigins)
+                        // Allow list of request preflight headers allowed to be sent to us from the
+                        // client
+                        .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                            "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+                            "x-recaptcha-token", "access-control-allow-headers")
+                        // Allow list of response headers allowed to be sent by us (the server) to the
+                        // client
+                        .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
             }
 
@@ -237,14 +263,15 @@ public class Application extends SpringBootServletInitializer {
             }
 
             /**
-             * Add a new ResourceHandler to allow us to use WebJars.org to pull in web dependencies
-             * dynamically for HAL Browser, etc.
+             * Add a new ResourceHandler to allow us to use WebJars.org to pull in web
+             * dependencies dynamically for HAL Browser, etc.
              * @param registry ResourceHandlerRegistry
              */
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 // First, "mount" the Hal Browser resources at the /browser path
-                // NOTE: the hal-browser directory uses the version of the Hal browser, so this needs to be synced
+                // NOTE: the hal-browser directory uses the version of the Hal browser, so this
+                // needs to be synced
                 // with the org.webjars.hal-browser version in the POM
                 registry
                     .addResourceHandler("/browser/**")

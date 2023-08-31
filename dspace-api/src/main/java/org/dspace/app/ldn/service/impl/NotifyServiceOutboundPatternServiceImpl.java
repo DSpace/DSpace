@@ -5,10 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.ldn;
+package org.dspace.app.ldn.service.impl;
 
 import java.sql.SQLException;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.ldn.dao.NotifyServiceOutboundPatternDao;
 import org.dspace.app.ldn.service.NotifyServiceOutboundPatternService;
 import org.dspace.core.Context;

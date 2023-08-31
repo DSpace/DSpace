@@ -7,13 +7,13 @@
 --
 
 -----------------------------------------------------------------------------------
--- CREATE notifyservices table
+-- CREATE notifyservice table
 -----------------------------------------------------------------------------------
 
 
-CREATE SEQUENCE if NOT EXISTS notifyservices_id_seq;
+CREATE SEQUENCE if NOT EXISTS notifyservice_id_seq;
 
-CREATE TABLE notifyservices (
+CREATE TABLE notifyservice (
     id INTEGER PRIMARY KEY,
     name VARCHAR(255),
     description TEXT,
@@ -22,33 +22,33 @@ CREATE TABLE notifyservices (
 );
 
 -----------------------------------------------------------------------------------
--- CREATE notifyservices_inbound_patterns_id_seq table
+-- CREATE notifyservice_inbound_pattern_id_seq table
 -----------------------------------------------------------------------------------
 
-CREATE SEQUENCE if NOT EXISTS notifyservices_inbound_patterns_id_seq;
+CREATE SEQUENCE if NOT EXISTS notifyservice_inbound_pattern_id_seq;
 
-CREATE TABLE notifyservices_inbound_patterns (
+CREATE TABLE notifyservice_inbound_pattern (
     id INTEGER PRIMARY KEY,
-    service_id INTEGER REFERENCES notifyservices(id) ON DELETE CASCADE,
+    service_id INTEGER REFERENCES notifyservice(id) ON DELETE CASCADE,
     pattern VARCHAR(255),
     constrain_name VARCHAR(255),
     automatic BOOLEAN
 );
 
-CREATE INDEX notifyservices_inbound_idx ON notifyservices_inbound_patterns (service_id);
+CREATE INDEX notifyservice_inbound_idx ON notifyservice_inbound_pattern (service_id);
 
 -----------------------------------------------------------------------------------
--- CREATE notifyservices_outbound_patterns table
+-- CREATE notifyservice_outbound_patterns table
 -----------------------------------------------------------------------------------
 
-CREATE SEQUENCE if NOT EXISTS notifyservices_outbound_patterns_id_seq;
+CREATE SEQUENCE if NOT EXISTS notifyservice_outbound_patterns_id_seq;
 
-CREATE TABLE notifyservices_outbound_patterns (
+CREATE TABLE notifyservice_outbound_patterns (
     id INTEGER PRIMARY KEY,
-    service_id INTEGER REFERENCES notifyservices(id) ON DELETE CASCADE,
+    service_id INTEGER REFERENCES notifyservice(id) ON DELETE CASCADE,
     pattern VARCHAR(255),
     constrain_name VARCHAR(255)
 );
 
-CREATE INDEX notifyservices_outbound_idx ON notifyservices_outbound_patterns (service_id);
+CREATE INDEX notifyservice_outbound_idx ON notifyservice_outbound_patterns (service_id);
 

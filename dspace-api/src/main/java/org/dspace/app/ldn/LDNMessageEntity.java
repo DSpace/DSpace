@@ -7,12 +7,15 @@
  */
 package org.dspace.app.ldn;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
@@ -24,7 +27,12 @@ import org.dspace.core.ReloadableEntity;
  */
 @Entity
 @Table(name = "ldn_messages")
-public class LDNMessage implements ReloadableEntity<String> {
+public class LDNMessageEntity implements ReloadableEntity<String> {
+
+    public static final Integer QUEUE_STATUS_QUEUED = 1;
+    public static final Integer QUEUE_STATUS_PROCESSING = 2;
+    public static final Integer QUEUE_STATUS_PROCESSED = 3;
+    public static final Integer QUEUE_STATUS_FAILED = 4;
 
     @Id
     private String id;
@@ -39,6 +47,20 @@ public class LDNMessage implements ReloadableEntity<String> {
     @Column(name = "type")
     private String type;
 
+    @Column(name = "queue_status")
+    private Integer queueStatus;
+
+    @Column(name = "queue_attempts")
+    private Integer queueAttempts = 0;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "queue_last_start_time")
+    private Date queueLastStartTime = null;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "queue_timeout")
+    private Date queueTimeout = null;
+
     @ManyToOne
     @JoinColumn(name = "origin", referencedColumnName = "id")
     private NotifyServiceEntity origin;
@@ -49,17 +71,17 @@ public class LDNMessage implements ReloadableEntity<String> {
 
     @ManyToOne
     @JoinColumn(name = "inReplyTo", referencedColumnName = "id")
-    private LDNMessage inReplyTo;
+    private LDNMessageEntity inReplyTo;
 
     @ManyToOne
     @JoinColumn(name = "context", referencedColumnName = "uuid")
     private DSpaceObject context;
 
-    protected LDNMessage() {
+    protected LDNMessageEntity() {
 
     }
 
-    protected LDNMessage(String id) {
+    public LDNMessageEntity(String id) {
         this.id = id;
     }
 
@@ -112,11 +134,11 @@ public class LDNMessage implements ReloadableEntity<String> {
         this.target = target;
     }
 
-    public LDNMessage getInReplyTo() {
+    public LDNMessageEntity getInReplyTo() {
         return inReplyTo;
     }
 
-    public void setInReplyTo(LDNMessage inReplyTo) {
+    public void setInReplyTo(LDNMessageEntity inReplyTo) {
         this.inReplyTo = inReplyTo;
     }
 
@@ -126,5 +148,42 @@ public class LDNMessage implements ReloadableEntity<String> {
 
     public void setContext(DSpaceObject context) {
         this.context = context;
+    }
+
+    public Integer getQueueStatus() {
+        return queueStatus;
+    }
+
+    public void setQueueStatus(Integer queueStatus) {
+        this.queueStatus = queueStatus;
+    }
+
+    public Integer getQueueAttempts() {
+        return queueAttempts;
+    }
+
+    public void setQueueAttempts(Integer queueAttempts) {
+        this.queueAttempts = queueAttempts;
+    }
+
+    public Date getQueueLastStartTime() {
+        return queueLastStartTime;
+    }
+
+    public void setQueueLastStartTime(Date queueLastStartTime) {
+        this.queueLastStartTime = queueLastStartTime;
+    }
+
+    public Date getQueueTimeout() {
+        return queueTimeout;
+    }
+
+    public void setQueueTimeout(Date queueTimeout) {
+        this.queueTimeout = queueTimeout;
+    }
+
+    @Override
+    public String toString() {
+        return "LDNMessage id:" + this.getID() + " typed:" + this.getType();
     }
 }
