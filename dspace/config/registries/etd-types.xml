@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+  - etd-types.xml
+  -
+  - ETD-MS v1.1: an Interoperability Metadata Standard for Electronic
+  - Theses and Dissertations
+  -
+  - Dans Papyrus, on fait référence à la version 1.0 du standard mais ça
+  - ne semble pas avoir changé pour les 4 métadonnées qui nous concernent.
+  -
+  - Les notes en anglais sont extraites de:
+  -   https://ndltd.org/wp-content/uploads/2021/04/etd-ms-v1.1.html
+  - 
+  -->
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>ETD - Interoperability Metadata Standard for
+                Electronic Theses and Dissertations</title>
+    <description>
+      Voir https://ndltd.org/wp-content/uploads/2021/04/etd-ms-v1.1.html
+    </description>
+  </dspace-header>
+
+  <dc-schema>
+    <name>etd</name>
+    <namespace>http://www.ndltd.org/standards/metadata/etdms/1.0/</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>etd</schema>
+    <element>degree</element>
+    <qualifier>discipline</qualifier>
+    <scope_note>
+      Area of study of the intellectual content of the document.
+      Usually, this will be the name of a program or department.
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>etd</schema>
+    <element>degree</element>
+    <qualifier>grantor</qualifier>
+    <scope_note>
+      Institution granting the degree associated with the work.
+      Like other names and institutions, this field should be
+      entered in free text form as it appears on the title
+      page or equivalent, with a link to to an authority record
+      if available. See "Authority" section for more information.
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>etd</schema>
+    <element>degree</element>
+    <qualifier>level</qualifier>
+    <scope_note>
+      Level of education associated with the document.
+      Three levels are valid:
+          0 Undergraduate (pre-masters)
+          1 Masters (pre-doctoral)
+          2 Doctoral (includes post-doctoral)
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>etd</schema>
+    <element>degree</element>
+    <qualifier>name</qualifier>
+    <scope_note>
+      Name of the degree associated with the work as it appears within the work.
+      (example: Masters in Operations Research)
+    </scope_note>
+  </dc-type>
+
+</dspace-dc-types>

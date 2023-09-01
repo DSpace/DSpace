@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+  - UdeM-types.xml
+  -
+  - Des métdonnées locales pour l'UdeM (Papyrus).
+  - 
+  -->
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>Registre des métadonnées spécifiques à l'UdeM / Papyrus</title>
+    <description>Ces métadonnées sont reprises depuis la base de données
+                  de l'instance 5.9 de Papyrus (elles n'étaient pas en fichiers
+                  de configuration)
+    </description>
+  </dspace-header>
+
+  <dc-schema>
+    <name>UdeM</name>
+    <namespace>http://www.bib.umontreal.ca/</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>NoteInterne</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Notes internes que le déposant peut destiner aux vérificatuers.
+      Utilisé dans la Vitrine interdisciplinaire.
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>ORCIDAuteurThese</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Numero ORCID de l'auteur de la thèse.
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>ReferenceFournieParDeposant</element>
+    <qualifier></qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>TestEmbargoLift</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Test to hold computed "lift date" of embargo.
+      TODO: toujours pertinent?
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>TestEmbargoTerms</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Test to hold the user-supplied embargo terms.
+      TODO: toujours pertinent?
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>VersionRioxx</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Indicate the status in the publication process.
+      Définition directement et exactement tirée de rioxx.
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>cycle</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Cycle (1er ou cycles supérieurs): s'applique aux travaux étudiants
+      et non aux TME.
+    </scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>UdeM</schema>
+    <element>statut</element>
+    <qualifier></qualifier>
+    <scope_note>
+      Statut professeur ou étudiant, vitrine interdisciplinaire.
+    </scope_note>
+  </dc-type>
+
+</dspace-dc-types>

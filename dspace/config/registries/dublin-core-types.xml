@@ -123,6 +123,14 @@
     <scope_note></scope_note>
   </dc-type>
 
+  <!-- Ajout Papyrus -->
+  <dc-type>
+  	<schema>dc</schema>
+    <element>contributor</element>
+    <qualifier>affiliation</qualifier>
+    <scope_note>Affiliation de l'auteur (vitrine disciplinaire)</scope_note>
+  </dc-type>
+
   <dc-type>
 	<schema>dc</schema>
     <element>coverage</element>
