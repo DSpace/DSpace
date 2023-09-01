@@ -23,14 +23,14 @@ import javax.persistence.Table;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 @Entity
-@Table(name = "notifyservices_outbound_patterns")
+@Table(name = "notifyservice_outbound_pattern")
 public class NotifyServiceOutboundPattern {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notifyservices_outbound_patterns_id_seq")
-    @SequenceGenerator(name = "notifyservices_outbound_patterns_id_seq",
-        sequenceName = "notifyservices_outbound_patterns_id_seq",
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notifyservice_outbound_pattern_id_seq")
+    @SequenceGenerator(name = "notifyservice_outbound_pattern_id_seq",
+        sequenceName = "notifyservice_outbound_pattern_id_seq",
         allocationSize = 1)
     private Integer id;
 

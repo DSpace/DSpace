@@ -26,7 +26,7 @@ import org.dspace.core.ReloadableEntity;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 @Entity
-@Table(name = "ldn_messages")
+@Table(name = "ldn_message")
 public class LDNMessageEntity implements ReloadableEntity<String> {
 
     public static final Integer QUEUE_STATUS_QUEUED = 1;

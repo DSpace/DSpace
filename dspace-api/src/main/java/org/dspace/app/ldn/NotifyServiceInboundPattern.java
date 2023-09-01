@@ -25,14 +25,14 @@ import org.dspace.core.ReloadableEntity;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 @Entity
-@Table(name = "notifyservices_inbound_patterns")
+@Table(name = "notifyservice_inbound_pattern")
 public class NotifyServiceInboundPattern implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notifyservices_inbound_patterns_id_seq")
-    @SequenceGenerator(name = "notifyservices_inbound_patterns_id_seq",
-        sequenceName = "notifyservices_inbound_patterns_id_seq",
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notifyservice_inbound_pattern_id_seq")
+    @SequenceGenerator(name = "notifyservice_inbound_pattern_id_seq",
+        sequenceName = "notifyservice_inbound_pattern_id_seq",
         allocationSize = 1)
     private Integer id;
 
