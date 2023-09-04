@@ -8,7 +8,7 @@
 
 package org.dspace.xoai.services.impl.resources.functions;
 
-import org.dspace.utils.IsoLangCodes;
+import org.dspace.discovery.IsoLangCodes;
 
 /**
  * Serves as proxy for call from XSL engine. Calls SpecialItemService.

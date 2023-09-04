@@ -7,7 +7,7 @@
  */
 
 /* Created for LINDAT/CLARIAH-CZ (UFAL) */
-package org.dspace.utils;
+package org.dspace.discovery;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import java.util.Objects;
 /**
  *  Class is copied from the LINDAT/CLARIAH-CZ (https://github.com/ufal/clarin-dspace/blob
  *  /si-master-origin/dspace-api/src/main/java/cz/cuni/mff/ufal/IsoLangCodes.java) and modified by
+ *
  *  @author Marian Berger (marian.berger at dataquest.sk)
  */
 public class IsoLangCodes {

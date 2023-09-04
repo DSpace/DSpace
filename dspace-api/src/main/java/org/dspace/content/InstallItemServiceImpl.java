@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -23,6 +24,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IsoLangCodes;
 import org.dspace.embargo.service.EmbargoService;
 import org.dspace.event.Event;
 import org.dspace.identifier.Identifier;
@@ -200,6 +202,9 @@ public class InstallItemServiceImpl implements InstallItemService {
         // Add provenance description
         itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
                                 "description", "provenance", "en", provDescription);
+
+        // Add language name into metadata. The lang name is fetched from the `lang_codes.txt`.
+        addLanguageNameToMetadata(c, item);
     }
 
     /**
@@ -272,27 +277,31 @@ public class InstallItemServiceImpl implements InstallItemService {
         return myMessage.toString();
     }
 
-    @Override
-    public String getSubmittedByProvenanceMessage(Context context, Item item) throws SQLException {
-        // get date
-        DCDate now = DCDate.getCurrent();
-
-        // Create provenance description
-        StringBuffer provmessage = new StringBuffer();
-
-        if (item.getSubmitter() != null) {
-            provmessage.append("Submitted by ").append(item.getSubmitter().getFullName())
-                .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
-                .append(now.toString());
-        } else {
-            // else, null submitter
-            provmessage.append("Submitted by unknown (probably automated) on")
-                .append(now.toString());
+    /**
+     * Language is stored in the metadatavalue in the ISO format e.g., `fra, cse,..` and not in the human satisfying
+     * format e.g., `France, Czech`. This method converts ISO format into human satisfying format e.g., `cse -> Czech`
+     * and stores it into `local.language.name` metadata field.
+     * @param c
+     * @param item
+     * @throws SQLException
+     */
+    private void addLanguageNameToMetadata(Context c, Item item) throws SQLException {
+        itemService.clearMetadata(c, item, "local", "language", "name", null);
+        List<MetadataValue> languageMetadata = itemService.getMetadataByMetadataString(item, "dc.language.iso");
+        for (MetadataValue mv: languageMetadata) {
+            if (StringUtils.isBlank(mv.getValue())) {
+                log.error("Cannot get name of the iso language (`dc.language.iso`) because the value is blank.");
+                return;
+            }
+            String langName = IsoLangCodes
+                    .getLangForCode(mv.getValue());
+            if (StringUtils.isBlank(langName)) {
+                log.error(String
+                        .format("No language found for iso code %s",
+                                langName));
+                return;
+            }
+            itemService.addMetadata(c, item, "local", "language", "name", null, langName);
         }
-        provmessage.append("\n");
-
-        // add sizes and checksums of bitstreams
-        provmessage.append(getBitstreamProvenanceMessage(context, item));
-        return provmessage.toString();
     }
 }

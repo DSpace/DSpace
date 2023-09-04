@@ -9,6 +9,7 @@ call mvn clean package
 
 rem copy created jar into tomcat/webapps/server
 xcopy /e /h /i /q /y %dspace_source%\dspace-api\target\dspace-api-7.5.jar %tomcat%\webapps\server\WEB-INF\lib\
+xcopy /e /h /i /q /y %dspace_source%\dspace-api\target\dspace-api-7.5.jar %dspace_application%\lib\
 
 cd %dspace_source%\scripts\fast-build\
 

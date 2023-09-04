@@ -1413,6 +1413,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD)) {
             return field;
+        } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_ISO_LANG)) {
+            if (removePostfix) {
+                return field.substring(0, field.lastIndexOf("_filter"));
+            } else {
+                return field + "_filter";
+            }
         } else {
             return field;
         }

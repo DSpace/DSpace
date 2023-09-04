@@ -123,7 +123,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> clarinItemsLanguageFacet(boolean hasNext) {
         return allOf(
                 hasJsonPath("$.name", is("language")),
-                hasJsonPath("$.facetType", is("standard")),
+                hasJsonPath("$.facetType", is("iso_language")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/language")),
                 hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/language"))

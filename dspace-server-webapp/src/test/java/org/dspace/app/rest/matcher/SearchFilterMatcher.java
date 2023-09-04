@@ -170,7 +170,7 @@ public class SearchFilterMatcher {
         return allOf(
                 hasJsonPath("$.filter", is("language")),
                 hasJsonPath("$.hasFacets", is(true)),
-                hasJsonPath("$.type", is("standard")),
+                hasJsonPath("$.type", is("iso_language")),
                 hasJsonPath("$.openByDefault", is(false)),
                 checkOperators()
         );

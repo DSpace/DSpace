@@ -2508,7 +2508,7 @@
         <property name="facetLimit" value="5"/>
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
-        <property name="type" value="standard"/>
+        <property name="type" value="iso_language"/>
     </bean>
 
     <bean id="searchFilterItemsCommunity" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">

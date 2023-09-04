@@ -21,6 +21,8 @@ public class DiscoveryConfigurationParameters {
     public static final String TYPE_AUTHORITY = "authority";
     public static final String TYPE_STANDARD = "standard";
 
+    public static final String TYPE_ISO_LANG = "iso_language";
+
     public static enum SORT { VALUE, COUNT }
 
     /**
