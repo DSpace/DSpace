@@ -26,6 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -138,11 +139,39 @@ public class MetadataConverter implements DSpaceConverter<MetadataValueList, Met
             String element = seq[1];
             String qualifier = seq.length == 3 ? seq[2] : null;
             for (MetadataValueRest mvr: entry.getValue()) {
-                dsoService.addMetadata(context, dso, schema, element, qualifier, mvr.getLanguage(),
-                        mvr.getValue(), mvr.getAuthority(), mvr.getConfidence());
+                addMetadataByService(dsoService, context, dso, schema, element, qualifier, mvr);
             }
         }
         dsoService.update(context, dso);
+    }
+
+    /**
+     * Call `addMetadata` method by arbitrary dso service. ItemService calls `addMetadata` method with more
+     * arguments than other services.
+     *
+     * @param dsoService service with implemented `addMetadata` method
+     * @param context the context to use.
+     * @param dso the DSpace object.
+     * @param schema name of the metadata schema
+     * @param element name of the metadata element
+     * @param qualifier name of the metadata qualifier
+     * @param mvr MetadataValueRest object
+     * @throws SQLException if a database error occurs.
+     */
+    private <T extends DSpaceObject> void addMetadataByService(DSpaceObjectService<T> dsoService, Context context,
+                                                               T dso, String schema, String element, String qualifier,
+                                                      MetadataValueRest mvr) throws SQLException {
+        // Use `place` argument only for ItemService because some services doesn't have implemented
+        // `addMetadata` method with `place` argument.
+        // `place` is important because of importing Items. Without it the Items metadata could be in the
+        // wrong sequence e.g., authors of the item.
+        if (dsoService instanceof ItemService) {
+            dsoService.addMetadata(context, dso, schema, element, qualifier, mvr.getLanguage(),
+                    mvr.getValue(), mvr.getAuthority(), mvr.getConfidence(), mvr.getPlace());
+        } else {
+            dsoService.addMetadata(context, dso, schema, element, qualifier, mvr.getLanguage(),
+                    mvr.getValue(), mvr.getAuthority(), mvr.getConfidence());
+        }
     }
 
 }

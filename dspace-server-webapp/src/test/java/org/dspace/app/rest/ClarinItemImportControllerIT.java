@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
@@ -323,6 +324,88 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
         assertEquals(identifierValue.get(0).getValue(), IDENTIFIER_VALUE);
 
         //clean all
+        context.turnOffAuthorisationSystem();
+        ItemBuilder.deleteItem(uuid);
+        context.restoreAuthSystemState();
+    }
+
+    // Fix of this issue: https://github.com/dataquest-dev/DSpace/issues/409
+    // Authors sequence was changed after a data import.
+    @Test
+    public void importItemWithUnsortedAuthors() throws Exception {
+        String FIRST_AUTHOR_VALUE = "First author";
+        int FIRST_AUTHOR_PLACE = 1;
+        String SECOND_AUTHOR_VALUE = "Second author";
+        int SECOND_AUTHOR_PLACE = 0;
+
+        context.turnOffAuthorisationSystem();
+        ObjectNode node = jsonNodeFactory.objectNode();
+        node.set("withdrawn", jsonNodeFactory.textNode("false"));
+        node.set("inArchive", jsonNodeFactory.textNode("false"));
+        node.set("discoverable", jsonNodeFactory.textNode("false"));
+
+        // Metadata which should be kept after installing the new Item.
+        ObjectNode metadataNode = jsonNodeFactory.objectNode();
+
+        // `dc.contributor.author` metadata added into `metadata` of the ItemRest object
+        ObjectNode firstAuthorMetadataNode = jsonNodeFactory.objectNode();
+        firstAuthorMetadataNode.set("value", jsonNodeFactory.textNode(FIRST_AUTHOR_VALUE));
+        firstAuthorMetadataNode.set("language", jsonNodeFactory.textNode("en_US"));
+        firstAuthorMetadataNode.set("authority", jsonNodeFactory.nullNode());
+        firstAuthorMetadataNode.set("confidence", jsonNodeFactory.numberNode(-1));
+        firstAuthorMetadataNode.set("place", jsonNodeFactory.numberNode(FIRST_AUTHOR_PLACE));
+
+        // `dc.contributor.author` metadata added into `metadata` of the ItemRest object
+        ObjectNode secondAuthorMetadataNode = jsonNodeFactory.objectNode();
+        secondAuthorMetadataNode.set("value", jsonNodeFactory.textNode(SECOND_AUTHOR_VALUE));
+        secondAuthorMetadataNode.set("language", jsonNodeFactory.textNode("en_US"));
+        secondAuthorMetadataNode.set("authority", jsonNodeFactory.nullNode());
+        secondAuthorMetadataNode.set("confidence", jsonNodeFactory.numberNode(-1));
+        secondAuthorMetadataNode.set("place", jsonNodeFactory.numberNode(SECOND_AUTHOR_PLACE));
+        metadataNode.set("dc.contributor.author", jsonNodeFactory.arrayNode()
+                .add(firstAuthorMetadataNode)
+                .add(secondAuthorMetadataNode));
+
+        node.set("metadata", metadataNode);
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        UUID uuid = UUID.fromString(read(getClient(token).perform(post("/api/clarin/import/item")
+                                .content(mapper.writeValueAsBytes(node))
+                                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                .param("owningCollection", col.getID().toString())
+                                .param("epersonUUID", submitter.getID().toString()))
+                        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(),
+                "$.id"));
+
+        // workspaceitem should nt exist
+        List<WorkspaceItem> workflowItems = workspaceItemService.findAll(context);
+        assertEquals(workflowItems.size(), 0);
+        // contoling of the created item
+        Item item = itemService.find(context, uuid);
+        assertFalse(item.isWithdrawn());
+        assertFalse(item.isArchived());
+        assertFalse(item.isDiscoverable());
+        assertEquals(item.getSubmitter().getID(), submitter.getID());
+        assertEquals(item.getOwningCollection().getID(), col.getID());
+
+        // get all `dc.contributor.author`metadata values
+        List<MetadataValue> authorValues =
+                itemService.getMetadata(item, "dc", "contributor", "author", "en_US");
+        assertEquals(authorValues.size(), 2);
+
+        int indexFirstAuthor = Objects.equals(authorValues.get(0).getValue(), FIRST_AUTHOR_VALUE) ? 0 : 1;
+        int indexSecondAuthor = Objects.equals(indexFirstAuthor, 0) ? 1 : 0;
+        // first metadata value should be FIRST_AUTHOR with place 1
+        assertEquals(authorValues.get(indexFirstAuthor).getValue(), FIRST_AUTHOR_VALUE);
+        assertEquals(authorValues.get(indexFirstAuthor).getPlace(), FIRST_AUTHOR_PLACE);
+        // second metadata value should be SECOND_AUTHOR with place 0
+        assertEquals(authorValues.get(indexSecondAuthor).getValue(), SECOND_AUTHOR_VALUE);
+        assertEquals(authorValues.get(indexSecondAuthor).getPlace(), SECOND_AUTHOR_PLACE);
+
+        // clean all
         context.turnOffAuthorisationSystem();
         ItemBuilder.deleteItem(uuid);
         context.restoreAuthSystemState();
