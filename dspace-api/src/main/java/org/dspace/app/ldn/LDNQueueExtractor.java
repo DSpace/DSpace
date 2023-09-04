@@ -36,6 +36,7 @@ public class LDNQueueExtractor {
         } else {
             log.error("Errors happened during the extract operations. Check the log above!");
         }
+        context.complete();
         log.info("END LDNQueueExtractor.extractMessageFromQueue()");
         return processed_messages;
     }

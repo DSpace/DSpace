@@ -20,6 +20,8 @@ CREATE TABLE ldn_message
   target INTEGER,
   inReplyTo VARCHAR(255),
   context uuid,
+  activity_stream_type VARCHAR(255),
+  coar_notify_type VARCHAR(255),
   queue_status INTEGER DEFAULT NULL,
   queue_attempts INTEGER DEFAULT 0,
   queue_last_start_time TIMESTAMP,

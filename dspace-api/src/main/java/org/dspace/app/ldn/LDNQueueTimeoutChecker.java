@@ -38,6 +38,7 @@ public class LDNQueueTimeoutChecker {
             log.error("Errors happened during the check operation. Check the log above!");
         }
         log.info("END LDNQueueTimeoutChecker.checkQueueMessageTimeout()");
+        context.complete();
         return fixed_messages;
     }
 }

@@ -30,23 +30,17 @@ public class LDNRouter {
      * @return LDNProcessor processor to process notification, can be null
      */
     public LDNProcessor route(LDNMessageEntity ldnMessage) {
+        if (ldnMessage == null) {
+            log.warn("an null LDNMessage is received for routing!");
+            return null;
+        }
         if (StringUtils.isEmpty(ldnMessage.getType())) {
             log.warn("LDNMessage " + ldnMessage + " has no type!");
             return null;
         }
-        if (ldnMessage == null) {
-            log.warn("an null LDNMessage " + ldnMessage + "is received for routing!");
-            return null;
-        }
-        String ldnMessageType = ldnMessage.getType();
-        ldnMessageType = ldnMessageType.replace("[", "");
-        ldnMessageType = ldnMessageType.replace("]", "");
-        ldnMessageType = ldnMessageType.replace(" ", "");
-        String[] ldnMsgTypeArray = ldnMessageType.split(",");
         Set<String> ldnMessageTypeSet = new HashSet<String>();
-        for (int i = 0; i < ldnMsgTypeArray.length; i++) {
-            ldnMessageTypeSet.add(ldnMsgTypeArray[i]);
-        }
+        ldnMessageTypeSet.add(ldnMessage.getActivityStreamType());
+        ldnMessageTypeSet.add(ldnMessage.getCoarNotifyType());
         LDNProcessor processor = processors.get(ldnMessageTypeSet);
         return processor;
     }

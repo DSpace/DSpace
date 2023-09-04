@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Factory implementation to get services for the notifyservices package, use
  * NotifyServiceFactory.getInstance() to retrieve an implementation
  *
- * @author Mohamed Eskander (mohamed.eskander at 4science.com)
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.com)
  */
 public class LDNMessageServiceFactoryImpl extends LDNMessageServiceFactory {
 

@@ -29,9 +29,28 @@ import org.dspace.core.ReloadableEntity;
 @Table(name = "ldn_message")
 public class LDNMessageEntity implements ReloadableEntity<String> {
 
+    /**
+     * LDN messages interact with a fictitious queue. Scheduled tasks manage the queue.
+     */
+
+   /**
+    * Message queued, it has to be elaborated.
+    */
     public static final Integer QUEUE_STATUS_QUEUED = 1;
+
+    /**
+     * Message has been taken from the queue and it's elaboration is in progress.
+     */
     public static final Integer QUEUE_STATUS_PROCESSING = 2;
+
+    /**
+     * Message has been correctly elaborated.
+     */
     public static final Integer QUEUE_STATUS_PROCESSED = 3;
+
+    /**
+     * Message has not been correctly elaborated - despite more than "ldn.processor.max.attempts" retryies
+     */
     public static final Integer QUEUE_STATUS_FAILED = 4;
 
     @Id
@@ -77,6 +96,12 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @JoinColumn(name = "context", referencedColumnName = "uuid")
     private DSpaceObject context;
 
+    @Column(name = "activity_stream_type")
+    private String activityStreamType;
+
+    @Column(name = "coar_notify_type")
+    private String coarNotifyType;
+
     protected LDNMessageEntity() {
 
     }
@@ -116,6 +141,22 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getActivityStreamType() {
+        return activityStreamType;
+    }
+
+    public void setActivityStreamType(String activityStreamType) {
+        this.activityStreamType = activityStreamType;
+    }
+
+    public String getCoarNotifyType() {
+        return coarNotifyType;
+    }
+
+    public void setCoarNotifyType(String coarNotifyType) {
+        this.coarNotifyType = coarNotifyType;
     }
 
     public NotifyServiceEntity getOrigin() {

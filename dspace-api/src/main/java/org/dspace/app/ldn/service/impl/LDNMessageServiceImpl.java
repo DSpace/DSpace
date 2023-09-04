@@ -10,8 +10,11 @@ package org.dspace.app.ldn.service.impl;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.time.DateUtils;
@@ -33,7 +36,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 /**
  * Implementation of {@link LDNMessageService}
@@ -81,9 +83,31 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         ldnMessage.setOrigin(findNotifyService(context, notification.getOrigin()));
         ldnMessage.setTarget(findNotifyService(context, notification.getTarget()));
         ldnMessage.setInReplyTo(find(context, notification.getInReplyTo()));
-        ldnMessage.setMessage(new Gson().toJson(notification));
+        ObjectMapper mapper = new ObjectMapper();
+        String message = null;
+        try {
+            message = mapper.writeValueAsString(notification);
+            ldnMessage.setMessage(message);
+        } catch (JsonProcessingException e) {
+            log.error("Notification json can't be correctly processed and stored inside the LDN Message Entity");
+            log.error(e);
+        }
         ldnMessage.setType(StringUtils.joinWith(",", notification.getType()));
-
+        Set<String> notificationType = notification.getType();
+        if (notificationType != null) {
+            String[] notificationTypeArray = (String[]) notificationType.toArray();
+            if (notificationTypeArray.length >= 2) {
+                ldnMessage.setActivityStreamType(notificationTypeArray[0]);
+                ldnMessage.setCoarNotifyType(notificationTypeArray[1]);
+            } else {
+                log.warn("LDN Message from Notification won't be typed because notification has incorrect "
+                    + "Type attribute");
+                log.warn(message);
+            }
+        } else {
+            log.warn("LDN Message from Notification won't be typed because notification has incorrect Type attribute");
+            log.warn(message);
+        }
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         ldnMessage.setQueueTimeout(new Date());
 

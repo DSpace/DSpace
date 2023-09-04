@@ -73,6 +73,9 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
         this.description = description;
     }
 
+    /**
+     * @return URL of an informative website
+     */
     public String getUrl() {
         return url;
     }
@@ -81,6 +84,9 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
         this.url = url;
     }
 
+    /**
+     * @return URL of the LDN InBox
+     */
     public String getLdnUrl() {
         return ldnUrl;
     }
@@ -89,6 +95,9 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
         this.ldnUrl = ldnUrl;
     }
 
+    /**
+     * @return The list of the inbound patterns configuration supported by the service
+     */
     public List<NotifyServiceInboundPattern> getInboundPatterns() {
         return inboundPatterns;
     }

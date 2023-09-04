@@ -14,7 +14,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * Abstract factory to get services for the NotifyService package,
  * use NotifyServiceFactory.getInstance() to retrieve an implementation
  *
- * @author Mohamed Eskander (mohamed.eskander at 4science.com)
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.com)
  */
 public abstract class LDNMessageServiceFactory {
 

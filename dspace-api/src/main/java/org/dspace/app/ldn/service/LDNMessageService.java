@@ -61,22 +61,37 @@ public interface LDNMessageService {
     public void update(Context context, LDNMessageEntity ldnMessage) throws SQLException;
 
     /**
-     * find the oldest queued LDNMessage
+     * Find the oldest queued LDNMessages that still can be elaborated
      *
+     * @return list of LDN messages
      * @param context The DSpace context
      * @throws SQLException If something goes wrong in the database
      */
     public List<LDNMessageEntity> findOldestMessageToProcess(Context context) throws SQLException;
 
     /**
-     * find all messages queue timedout and with queue status Processing
-     *
+     * Find all messages in the queue with the Processing status but timed-out
+     * 
+     * @return all the LDN Messages to be fixed on their queue_ attributes
      * @param context The DSpace context
      * @throws SQLException If something goes wrong in the database
      */
     public List<LDNMessageEntity> findProcessingTimedoutMessages(Context context) throws SQLException;
 
+    /**
+     * Find all messages in the queue with the Processing status but timed-out and modify their queue_status
+     * considering the queue_attempts
+     * 
+     * @return number of messages fixed
+     * @param context The DSpace context
+     */
     public int checkQueueMessageTimeout(Context context);
 
+    /**
+     * Elaborates the oldest enqueued message
+     * 
+     * @return number of messages fixed
+     * @param context The DSpace context
+     */
     public int extractAndProcessMessageFromQueue(Context context) throws SQLException;
 }

@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -45,8 +45,10 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         InputStream offerEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_object.json");
         String offerEndorsementJson = IOUtils.toString(offerEndorsementStream, Charset.defaultCharset());
+        offerEndorsementStream.close();
         String message = offerEndorsementJson.replace("<<object>>", object);
-        Notification notification = new Gson().fromJson(message, Notification.class);
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(post("/ldn/inbox")
@@ -60,7 +62,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
         InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
         String message = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
-        Notification notification = new Gson().fromJson(message, Notification.class);
+        announceEndorsementStream.close();
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(announceEndorsementStream, Notification.class);
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
@@ -71,9 +75,11 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     @Test
     public void ldnInboxEndorsementActionBadRequestTest() throws Exception {
         // id is not an uri
-        InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_badrequest.json");
-        String message = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
-        Notification notification = new Gson().fromJson(message, Notification.class);
+        InputStream offerEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_badrequest.json");
+        String message = IOUtils.toString(offerEndorsementStream, Charset.defaultCharset());
+        offerEndorsementStream.close();
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(offerEndorsementStream, Notification.class);
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
