@@ -111,25 +111,11 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
      */
     @Test
     public void shouldReturnMissingHeadersFromIdpExceptionBecauseOfMissingIdp() throws Exception {
-        // Try to authenticate but the Shibboleth doesn't send the email in the header, so the user won't be registered
-        // but the user will be redirected to the page where he will fill in the user email.
-        getClient().perform(get("/api/authn/shibboleth")
-                        .header("SHIB-NETID", NET_ID_TEST_EPERSON))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl("http://localhost:4000/login/missing-headers"));
-    }
-
-    /**
-     * Test the IdP hasn't sent the `Shib-Identity-Provider` or `SHIB-NETID` header.
-     */
-    @Test
-    public void shouldReturnMissingHeadersFromIdpExceptionBecauseOfMissingNetId() throws Exception {
         String idp = "Test Idp";
 
         // Try to authenticate but the Shibboleth doesn't send the email in the header, so the user won't be registered
         // but the user will be redirected to the page where he will fill in the user email.
-        getClient().perform(get("/api/authn/shibboleth")
-                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON))
+        getClient().perform(get("/api/authn/shibboleth"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("http://localhost:4000/login/missing-headers"));
     }

@@ -183,8 +183,8 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
         log.info("authentication-shibboleth.email-header: " + emailHeader + " with value: " + email);
 
         try {
-            if (StringUtils.isEmpty(netid) || StringUtils.isEmpty(idp)) {
-                log.error("Cannot load the netid or idp from the request headers.");
+            if (StringUtils.isEmpty(idp)) {
+                log.error("Cannot load the idp from the request headers.");
                 this.setMissingHeadersFromIdp(true);
             }
 
