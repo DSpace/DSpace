@@ -258,18 +258,7 @@ public class ClarinShibbolethLoginFilter extends StatelessLoginFilter {
 
         response.setHeader("WWW-Authenticate", authenticateHeaderValue);
 
-        // Get redirect URL from request parameter
-        String redirectUrl = request.getParameter("redirectUrl");
-
-        // If redirectUrl unspecified, default to the configured UI
-        if (StringUtils.isEmpty(redirectUrl)) {
-            redirectUrl = configurationService.getProperty("dspace.ui.url");
-        }
-
-
-        String loginUrl = "/login/";
-        redirectUrl += loginUrl;
-
+        String redirectUrl = configurationService.getProperty("dspace.ui.url") + "/login/";
         String missingHeadersUrl = "missing-headers";
         String userWithoutEmailUrl = "auth-failed";
         String duplicateUser = "duplicate-user";

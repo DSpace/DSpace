@@ -489,4 +489,16 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$.page.totalElements", is(0)))
                 .andExpect(jsonPath("$._embedded").doesNotExist());
     }
+
+    @Test
+    public void testRedirectToMissingHeadersWithRedirectUrlParam() throws Exception {
+        String expectedMissingHeadersUrl = configurationService.getProperty("dspace.ui.url") + "/login/missing-headers";
+
+        getClient().perform(get("/api/authn/shibboleth")
+                        .param("redirectUrl", "http://localhost:8080/server/api/authn/status")
+                        .header("SHIB-MAIL", clarinEperson.getEmail())
+                        .header("SHIB-NETID", NET_ID_TEST_EPERSON))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl(expectedMissingHeadersUrl));
+    }
 }
