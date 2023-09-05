@@ -57,6 +57,7 @@ EXPOSE 8080 8009 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 COPY scripts/restart_debug/* /usr/local/tomcat/bin
+COPY scripts/index-scripts/* /dspace/bin
 # Link the DSpace 'server' webapp into Tomcat's webapps directory.
 # This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
 RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
