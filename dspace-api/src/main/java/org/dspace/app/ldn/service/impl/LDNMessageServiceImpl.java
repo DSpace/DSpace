@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -145,7 +144,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     }
 
     @Override
-    public List<LDNMessageEntity> findOldestMessageToProcess(Context context) throws SQLException {
+    public List<LDNMessageEntity> findOldestMessagesToProcess(Context context) throws SQLException {
         List<LDNMessageEntity> result = null;
         int max_attempts = configurationService.getIntProperty("ldn.processor.max.attempts");
         result = ldnMessageDao.findOldestMessageToProcess(context, max_attempts);
@@ -169,7 +168,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         }
         List<LDNMessageEntity> msgs = null;
         try {
-            msgs = findOldestMessageToProcess(context);
+            msgs = findOldestMessagesToProcess(context);
             if (msgs != null && msgs.size() > 0) {
                 LDNMessageEntity msg = null;
                 LDNProcessor processor = null;
@@ -188,7 +187,8 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                         msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSING);
                         msg.setQueueTimeout(DateUtils.addMinutes(new Date(), timeoutInMinutes));
                         update(context, msg);
-                        Notification notification = new Gson().fromJson(msg.getMessage(), Notification.class);
+                        ObjectMapper mapper = new ObjectMapper();
+                        Notification notification = mapper.readValue(msg.getMessage(), Notification.class);
                         processor.process(notification);
                         msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSED);
                         result = 1;

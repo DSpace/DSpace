@@ -11,8 +11,8 @@ import org.dspace.app.ldn.LDNRouter;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the NotifyService package, use
- * NotifyServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the ldn package, use
+ * LDNRouterFactory.getInstance() to retrieve an implementation
  *
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.com)
  */

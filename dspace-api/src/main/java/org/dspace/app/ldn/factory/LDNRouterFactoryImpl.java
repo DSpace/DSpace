@@ -10,10 +10,10 @@ package org.dspace.app.ldn.factory;
 import org.dspace.app.ldn.LDNRouter;
 import org.springframework.beans.factory.annotation.Autowired;
 /**
- * Factory implementation to get services for the notifyservices package,
- * use NotifyServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the ldn package,
+ * use ldnRouter spring bean instance to retrieve an implementation
  *
- * @author Mohamed Eskander (mohamed.eskander at 4science.com)
+ * @author Francesco Bacchelli (mohamed.eskander at 4science.com)
  */
 public class LDNRouterFactoryImpl extends LDNRouterFactory {
 

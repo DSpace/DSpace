@@ -15,6 +15,11 @@ import org.dspace.app.ldn.factory.LDNMessageServiceFactory;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.core.Context;
 
+/**
+ * LDN Message manager: scheduled task invoking extractAndProcessMessageFromQueue() of {@link LDNMessageService}
+ *
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
+ */
 public class LDNQueueExtractor {
 
     private static final LDNMessageService ldnMessageService = LDNMessageServiceFactory.getInstance()

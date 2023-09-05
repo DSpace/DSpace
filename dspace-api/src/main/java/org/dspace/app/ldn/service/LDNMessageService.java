@@ -67,7 +67,7 @@ public interface LDNMessageService {
      * @param context The DSpace context
      * @throws SQLException If something goes wrong in the database
      */
-    public List<LDNMessageEntity> findOldestMessageToProcess(Context context) throws SQLException;
+    public List<LDNMessageEntity> findOldestMessagesToProcess(Context context) throws SQLException;
 
     /**
      * Find all messages in the queue with the Processing status but timed-out
