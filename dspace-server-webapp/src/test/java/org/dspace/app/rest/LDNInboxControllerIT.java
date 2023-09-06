@@ -64,7 +64,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
         announceEndorsementStream.close();
         ObjectMapper mapper = new ObjectMapper();
-        Notification notification = mapper.readValue(announceEndorsementStream, Notification.class);
+        Notification notification = mapper.readValue(message, Notification.class);
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
@@ -79,7 +79,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String message = IOUtils.toString(offerEndorsementStream, Charset.defaultCharset());
         offerEndorsementStream.close();
         ObjectMapper mapper = new ObjectMapper();
-        Notification notification = mapper.readValue(offerEndorsementStream, Notification.class);
+        Notification notification = mapper.readValue(message, Notification.class);
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
