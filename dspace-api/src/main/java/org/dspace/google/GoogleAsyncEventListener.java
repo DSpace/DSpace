@@ -182,7 +182,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     private boolean isContentBitstream(UsageEvent usageEvent) {
         // check if event is a VIEW event and object is a Bitstream
         if (usageEvent.getAction() == UsageEvent.Action.VIEW
-            || usageEvent.getObject().getType() == Constants.BITSTREAM) {
+            && usageEvent.getObject().getType() == Constants.BITSTREAM) {
             // check if bitstream belongs to a configured bundle
             List<String> allowedBundles = List.of(configurationService
                       .getArrayProperty("google-analytics.bundles", new String[]{Constants.CONTENT_BUNDLE_NAME}));
