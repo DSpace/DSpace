@@ -140,6 +140,9 @@ db.schema = public
 #mail.admin = dspace-help@myu.edu
 
 # Helpdesk E-mail
+# ClARIN update
+# lr.help.mail = some mail
+# ClARIN update
 #mail.helpdesk = ${mail.admin}
 #mail.helpdesk.name = Help Desk
 
