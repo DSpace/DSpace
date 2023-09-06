@@ -174,15 +174,22 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     /**
-     * Obtaining current request context
+     * Obtaining current request context.
+     * Return new context if getting one from current request failed.
+     *
+     * @return DSpace context object
      */
     private Context obtainContext() {
-        Request currentRequest = DSpaceServicesFactory.getInstance().getRequestService().getCurrentRequest();
-        if (currentRequest != null) {
-            HttpServletRequest request = currentRequest.getHttpServletRequest();
-            return ContextUtil.obtainContext(request);
-        } else {
-            return  new Context();
+        try {
+            Request currentRequest = DSpaceServicesFactory.getInstance().getRequestService().getCurrentRequest();
+            if (currentRequest != null) {
+                HttpServletRequest request = currentRequest.getHttpServletRequest();
+                return ContextUtil.obtainContext(request);
+            }
+        } catch (Exception e) {
+            log.error("Can't load current request context.");
         }
+
+        return  new Context();
     }
 }

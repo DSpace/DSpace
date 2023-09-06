@@ -1,14 +1,15 @@
 # This image will be published as dspace/dspace
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x
+# - note: default tag for branch: dspace/dspace: dspace/dspace:latest
 
 # This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
 # To build with JDK17, use "--build-arg JDK_VERSION=17"
 ARG JDK_VERSION=11
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM dspace/dspace-dependencies:${DSPACE_VERSION} as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -50,7 +51,7 @@ RUN ant init_installation update_configs update_code update_webapps
 FROM tomcat:9-jdk${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
-# Copy the /dspace directory from 'ant_build' containger to /dspace in this container
+# Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Expose Tomcat port and AJP port
 EXPOSE 8080 8009
