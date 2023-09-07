@@ -10,6 +10,7 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Period;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
@@ -171,7 +172,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return targetBundle;
     }
 
-    public BitstreamBuilder withEmbargoPeriod(String embargoPeriod) {
+    public BitstreamBuilder withEmbargoPeriod(Period embargoPeriod) {
         return setEmbargo(embargoPeriod, bitstream);
     }
 
