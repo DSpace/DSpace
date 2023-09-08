@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
@@ -557,6 +558,15 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             init();
             ChoiceAuthority source = this.getChoiceAuthorityByAuthorityName(nameVocab);
             if (source != null && source instanceof DSpaceControlledVocabulary) {
+
+                // First, check if this vocabulary index is disabled
+                String[] vocabulariesDisabled = configurationService
+                    .getArrayProperty("webui.browse.vocabularies.disabled");
+                if (vocabulariesDisabled != null && ArrayUtils.contains(vocabulariesDisabled, nameVocab)) {
+                    // Discard this vocabulary browse index
+                    return null;
+                }
+
                 Set<String> metadataFields = new HashSet<>();
                 Map<String, List<String>> formsToFields = this.authoritiesFormDefinitions.get(nameVocab);
                 for (Map.Entry<String, List<String>> formToField : formsToFields.entrySet()) {
