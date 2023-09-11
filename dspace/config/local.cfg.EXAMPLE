@@ -241,3 +241,8 @@ db.schema = public
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
+
+########################
+#  LDN INBOX SETTINGS  #
+########################
+ldn.enabled = true

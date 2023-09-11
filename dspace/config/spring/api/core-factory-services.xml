@@ -56,5 +56,11 @@
     <bean id="orcidServiceFactory" class="org.dspace.orcid.factory.OrcidServiceFactoryImpl"/>
 
     <bean id="supervisionOrderServiceFactory" class="org.dspace.supervision.factory.SupervisionOrderServiceFactoryImpl"/>
+    
+     <!-- LDN COAR Notify services -->
+	<bean id="ldnBusinessDelegateFactory" class="org.dspace.app.ldn.factory.LDNBusinessDelegateFactoryImpl"/>
 
+    <bean id="notifyServiceFactory" class="org.dspace.app.ldn.factory.NotifyServiceFactoryImpl"/>
+    
+    <bean id="ldnMessageServiceFactory" class="org.dspace.app.ldn.factory.LDNMessageServiceFactoryImpl"/>
 </beans>

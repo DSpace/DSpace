@@ -96,5 +96,11 @@
 
         <mapping class="org.dspace.supervision.SupervisionOrder"/>
 
+        <mapping class="org.dspace.app.ldn.NotifyServiceEntity"/>
+        <mapping class="org.dspace.app.ldn.NotifyServiceInboundPattern"/>
+        <mapping class="org.dspace.app.ldn.NotifyServiceOutboundPattern"/>
+
+        <mapping class="org.dspace.app.ldn.LDNMessageEntity"/>
+
     </session-factory>
 </hibernate-configuration>

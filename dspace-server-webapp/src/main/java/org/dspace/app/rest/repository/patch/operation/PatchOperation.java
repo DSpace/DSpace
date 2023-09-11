@@ -59,7 +59,7 @@ public abstract class PatchOperation<M> {
      * @return the original or derived boolean value
      * @throws DSpaceBadRequestException
      */
-    Boolean getBooleanOperationValue(Object value) {
+    protected Boolean getBooleanOperationValue(Object value) {
         Boolean bool;
 
         if (value instanceof String) {
