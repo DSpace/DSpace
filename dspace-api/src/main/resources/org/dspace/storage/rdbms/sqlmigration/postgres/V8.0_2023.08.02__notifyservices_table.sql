@@ -31,7 +31,7 @@ CREATE TABLE notifyservice_inbound_pattern (
     id INTEGER PRIMARY KEY,
     service_id INTEGER REFERENCES notifyservice(id) ON DELETE CASCADE,
     pattern VARCHAR(255),
-    constrain_name VARCHAR(255),
+    constraint_name VARCHAR(255),
     automatic BOOLEAN
 );
 
@@ -47,7 +47,7 @@ CREATE TABLE notifyservice_outbound_pattern (
     id INTEGER PRIMARY KEY,
     service_id INTEGER REFERENCES notifyservice(id) ON DELETE CASCADE,
     pattern VARCHAR(255),
-    constrain_name VARCHAR(255)
+    constraint_name VARCHAR(255)
 );
 
 CREATE INDEX notifyservice_outbound_idx ON notifyservice_outbound_pattern (service_id);

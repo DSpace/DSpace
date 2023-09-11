@@ -20,7 +20,8 @@ import javax.persistence.Table;
 import org.dspace.core.ReloadableEntity;
 
 /**
- * Database object representing notify services inbound patterns
+ * Database object representing notify service inbound patterns. Every {@link org.dspace.app.ldn.NotifyServiceEntity}
+ * may have inbounds and outbounds. Inbounds are to be sent to the external service.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
@@ -43,7 +44,7 @@ public class NotifyServiceInboundPattern implements ReloadableEntity<Integer> {
     @Column(name = "pattern")
     private String pattern;
 
-    @Column(name = "constrain_name")
+    @Column(name = "constraint_name")
     private String constraint;
 
     @Column(name = "automatic")
@@ -66,6 +67,10 @@ public class NotifyServiceInboundPattern implements ReloadableEntity<Integer> {
         this.notifyService = notifyService;
     }
 
+    /**
+     * @see <a href="https://notify.coar-repositories.org/patterns">coar documentation</a>
+     * @return pattern of the inbound notification
+     */
     public String getPattern() {
         return pattern;
     }
@@ -74,6 +79,9 @@ public class NotifyServiceInboundPattern implements ReloadableEntity<Integer> {
         this.pattern = pattern;
     }
 
+    /**
+     * @return the condition checked for automatic evaluation
+     */
     public String getConstraint() {
         return constraint;
     }
@@ -82,6 +90,10 @@ public class NotifyServiceInboundPattern implements ReloadableEntity<Integer> {
         this.constraint = constraint;
     }
 
+    /**
+     * when true - the notification is automatically when constraints are respected.
+     * @return the automatic flag
+     */
     public boolean isAutomatic() {
         return automatic;
     }

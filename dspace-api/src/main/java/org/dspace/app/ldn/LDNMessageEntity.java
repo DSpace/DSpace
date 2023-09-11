@@ -21,7 +21,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
 
 /**
- * Class representing ldnMessages stored in the DSpace system.
+ * Class representing ldnMessages stored in the DSpace system and, when locally resolvable, 
+ * some information are stored as dedicated attributes.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
@@ -119,6 +120,10 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.id = id;
     }
 
+    /**
+     * 
+     * @return the DSpace item related to this message
+     */
     public DSpaceObject getObject() {
         return object;
     }
@@ -159,6 +164,10 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.coarNotifyType = coarNotifyType;
     }
 
+    /**
+     * 
+     * @return The originator of the activity, typically the service responsible for sending the notification
+     */
     public NotifyServiceEntity getOrigin() {
         return origin;
     }
@@ -167,6 +176,10 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.origin = origin;
     }
 
+    /**
+     * 
+     * @return The intended destination of the activity, typically the service which consumes the notification
+     */
     public NotifyServiceEntity getTarget() {
         return target;
     }
@@ -175,6 +188,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.target = target;
     }
 
+    /**
+     * 
+     * @return This property is used when the notification is a direct response to a previous notification; 
+     * contains an {@link org.dspace.app.ldn.LDNMessageEntity#inReplyTo id}
+     */
     public LDNMessageEntity getInReplyTo() {
         return inReplyTo;
     }
@@ -183,6 +201,10 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.inReplyTo = inReplyTo;
     }
 
+    /**
+     * 
+     * @return This identifies another resource which is relevant to understanding the notification
+     */
     public DSpaceObject getContext() {
         return context;
     }

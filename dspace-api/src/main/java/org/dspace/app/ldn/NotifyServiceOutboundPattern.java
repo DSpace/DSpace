@@ -18,7 +18,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 /**
- * Database object representing notify services outbound patterns
+ * Database object representing notify services outbound patterns. Every {@link org.dspace.app.ldn.NotifyServiceEntity}
+ * may have inbounds and outbounds. Outbounds are to be sent to the external service.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
@@ -41,7 +42,7 @@ public class NotifyServiceOutboundPattern {
     @Column(name = "pattern")
     private String pattern;
 
-    @Column(name = "constrain_name")
+    @Column(name = "constraint_name")
     private String constraint;
 
     public Integer getId() {
@@ -60,6 +61,10 @@ public class NotifyServiceOutboundPattern {
         this.notifyService = notifyService;
     }
 
+    /**
+     * https://notify.coar-repositories.org/patterns/
+     * @return pattern of the outbound notification
+     */
     public String getPattern() {
         return pattern;
     }
