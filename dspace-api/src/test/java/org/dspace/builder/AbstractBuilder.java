@@ -18,6 +18,7 @@ import org.dspace.app.ldn.factory.NotifyServiceFactory;
 import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -50,11 +51,13 @@ import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
 import org.dspace.supervision.service.SupervisionOrderService;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -113,6 +116,8 @@ public abstract class AbstractBuilder<T, S> {
     static SupervisionOrderService supervisionOrderService;
     static NotifyService notifyService;
 
+    static QAEventService qaEventService;
+    static SolrSuggestionStorageService solrSuggestionService;
 
     protected Context context;
 
@@ -177,6 +182,8 @@ public abstract class AbstractBuilder<T, S> {
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
         notifyService = NotifyServiceFactory.getInstance().getNotifyService();
+        qaEventService = new DSpace().getSingletonService(QAEventService.class);
+        solrSuggestionService = new DSpace().getSingletonService(SolrSuggestionStorageService.class);
     }
 
 
@@ -214,6 +221,7 @@ public abstract class AbstractBuilder<T, S> {
         subscribeService = null;
         supervisionOrderService = null;
         notifyService = null;
+        qaEventService = null;
 
     }
 
