@@ -70,7 +70,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
     }
 
     @Override
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected NotifyServiceRest createAndReturn(Context context) throws AuthorizeException, SQLException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
@@ -92,7 +92,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         return converter.toRest(notifyServiceEntity, utils.obtainProjection());
     }
     @Override
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                          Patch patch) throws AuthorizeException, SQLException {
         NotifyServiceEntity notifyServiceEntity = notifyService.find(context, id);
@@ -105,7 +105,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
     }
 
     @Override
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, Integer id) throws AuthorizeException {
         try {
             NotifyServiceEntity notifyServiceEntity = notifyService.find(context, id);

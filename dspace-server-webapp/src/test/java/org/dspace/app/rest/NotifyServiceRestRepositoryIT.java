@@ -134,6 +134,17 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void createForbiddenTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(post("/api/ldn/ldnservices")
+                                .content(mapper.writeValueAsBytes(notifyServiceRest))
+                                .contentType(contentType))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void createTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -144,7 +155,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         notifyServiceRest.setLdnUrl("service ldn url");
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/ldn/ldnservices")
                                 .content(mapper.writeValueAsBytes(notifyServiceRest))
                                 .contentType(contentType))
@@ -160,6 +171,34 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 matchNotifyService(idRef.get(), "service name", "service description",
                     "service url", "service ldn url")));
+    }
+
+    @Test
+    public void notifyServicePatchOperationForbiddenTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/description", "add service description");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -182,7 +221,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -209,7 +248,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -239,7 +278,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -267,7 +306,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -298,7 +337,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -329,7 +368,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -356,7 +395,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -386,7 +425,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -414,7 +453,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -445,7 +484,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -475,7 +514,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -503,7 +542,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -532,7 +571,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -560,7 +599,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -591,7 +630,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -619,7 +658,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -686,8 +725,15 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void deleteNotFoundTest() throws Exception {
+    public void deleteForbiddenTest() throws Exception {
         getClient(getAuthToken(eperson.getEmail(), password))
+            .perform(delete("/api/ldn/ldnservices/" + RandomUtils.nextInt()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteNotFoundTest() throws Exception {
+        getClient(getAuthToken(admin.getEmail(), password))
             .perform(delete("/api/ldn/ldnservices/" + RandomUtils.nextInt()))
             .andExpect(status().isNotFound());
     }
@@ -704,7 +750,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .build();
         context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(delete("/api/ldn/ldnservices/" + notifyServiceEntity.getID()))
             .andExpect(status().isNoContent());
@@ -740,7 +786,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -785,7 +831,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -837,7 +883,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -882,7 +928,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -934,7 +980,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -996,7 +1042,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1052,7 +1098,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1114,7 +1160,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1170,7 +1216,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1238,7 +1284,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1296,7 +1342,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1364,7 +1410,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1422,7 +1468,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1485,7 +1531,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1541,7 +1587,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1609,7 +1655,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1667,7 +1713,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1735,7 +1781,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1793,7 +1839,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1856,7 +1902,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperation);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1912,7 +1958,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -1980,7 +2026,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2038,7 +2084,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2106,7 +2152,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2164,7 +2210,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2232,7 +2278,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2290,7 +2336,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2358,7 +2404,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2416,7 +2462,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2484,7 +2530,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2542,7 +2588,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2611,7 +2657,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2670,7 +2716,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2728,7 +2774,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2797,7 +2843,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2856,7 +2902,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2914,7 +2960,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -2972,7 +3018,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -3030,7 +3076,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(inboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -3098,7 +3144,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ops.add(outboundAddOperationTwo);
         String patchBody = getPatchContent(ops);
 
-        String authToken = getAuthToken(eperson.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
