@@ -42,7 +42,7 @@ public class TrueForUsersInGroupTestFeature implements AuthorizationFeature {
         if (context.getCurrentUser() == null) {
             return false;
         }
-        Group testGroup = groupService.findByName(context, GROUP_NAME);
+        Group testGroup = groupService.findByName(context.getSession(), GROUP_NAME);
         if (testGroup != null) {
             return groupService.isMember(context, testGroup);
         } else {

@@ -146,7 +146,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         configurationService.setProperty("request.item.helpdesk.override", "true");
 
         // Test it.
-        Item item = itemService.find(context, installItem.getID());
+        Item item = itemService.find(context.getSession(), installItem.getID());
         List<RequestItemAuthor> requestItemAuthor = requestItemAuthorExtractor.getRequestItemAuthor(context, item);
 
         assertEquals(HELPDESK_NAME, requestItemAuthor.get(0).getFullName());
@@ -350,7 +350,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
             fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() +
                          ": " + ex.getMessage());
         }
-        EPerson ePersonCheck = ePersonService.find(context, ePerson.getID());
+        EPerson ePersonCheck = ePersonService.find(context.getSession(), ePerson.getID());
         assertNull(ePersonCheck);
     }
 
@@ -360,7 +360,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
      */
     private EPerson retrieveItemSubmitter(UUID itemID) throws Exception {
 
-        Item item = itemService.find(context, itemID);
+        Item item = itemService.find(context.getSession(), itemID);
         return item.getSubmitter();
 
     }
@@ -374,7 +374,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
                         .andDo(result -> idRef
                                 .set(read(result.getResponse().getContentAsString(), "$.uuid")));
 
-        return itemService.find(context, UUID.fromString(idRef.get()));
+        return itemService.find(context.getSession(), UUID.fromString(idRef.get()));
     }
 
     private void cleanupVersion(int id) throws SQLException {

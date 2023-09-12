@@ -45,7 +45,7 @@ public class CollectionReplacePatchOperation extends ReplacePatchOperation<Strin
         WorkspaceItem wsi = (WorkspaceItem) source;
         String uuid = (String) value;
         Collection fromCollection = source.getCollection();
-        Collection toCollection = collectionService.find(context, UUIDUtils.fromString(uuid));
+        Collection toCollection = collectionService.find(context.getSession(), UUIDUtils.fromString(uuid));
         workspaceItemService.move(context, wsi, fromCollection, toCollection);
 
     }

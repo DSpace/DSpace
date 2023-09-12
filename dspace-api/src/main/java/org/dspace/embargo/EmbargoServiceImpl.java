@@ -122,7 +122,7 @@ public class EmbargoServiceImpl implements EmbargoService {
         }
 
         result = setter.parseTerms(context, item,
-                                   terms.size() > 0 ? terms.get(0).getValue() : null);
+                                   !terms.isEmpty() ? terms.get(0).getValue() : null);
 
         if (result == null) {
             return null;
@@ -219,8 +219,9 @@ public class EmbargoServiceImpl implements EmbargoService {
     // it was never under embargo, or the lift date has passed.
     protected DCDate recoverEmbargoDate(Item item) {
         DCDate liftDate = null;
-        List<MetadataValue> lift = itemService.getMetadata(item, lift_schema, lift_element, lift_qualifier, Item.ANY);
-        if (lift.size() > 0) {
+        List<MetadataValue> lift = itemService.getMetadata(item,
+                lift_schema, lift_element, lift_qualifier, Item.ANY);
+        if (!lift.isEmpty()) {
             liftDate = new DCDate(lift.get(0).getValue());
             // sanity check: do not allow an embargo lift date in the past.
             if (liftDate.toDate().before(new Date())) {
@@ -243,6 +244,7 @@ public class EmbargoServiceImpl implements EmbargoService {
     @Override
     public Iterator<Item> findItemsByLiftMetadata(Context context)
         throws SQLException, IOException, AuthorizeException {
-        return itemService.findByMetadataField(context, lift_schema, lift_element, lift_qualifier, Item.ANY);
+        return itemService.findByMetadataField(context.getSession(),
+                lift_schema, lift_element, lift_qualifier, Item.ANY);
     }
 }

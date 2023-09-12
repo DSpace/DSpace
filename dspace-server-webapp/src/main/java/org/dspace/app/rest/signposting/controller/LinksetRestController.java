@@ -97,7 +97,7 @@ public class LinksetRestController {
         try {
             Context context = ContextUtil.obtainContext(request);
 
-            Item item = itemService.find(context, uuid);
+            Item item = itemService.find(context.getSession(), uuid);
             if (item == null) {
                 throw new ResourceNotFoundException("No such Item: " + uuid);
             }
@@ -120,7 +120,7 @@ public class LinksetRestController {
     public String getLset(HttpServletRequest request, @PathVariable UUID uuid) {
         try {
             Context context = ContextUtil.obtainContext(request);
-            Item item = itemService.find(context, uuid);
+            Item item = itemService.find(context.getSession(), uuid);
             if (item == null) {
                 throw new ResourceNotFoundException("No such Item: " + uuid);
             }
@@ -170,9 +170,9 @@ public class LinksetRestController {
 
     private DSpaceObject findObject(Context context, UUID uuid) {
         try {
-            DSpaceObject object = itemService.find(context, uuid);
+            DSpaceObject object = itemService.find(context.getSession(), uuid);
             if (isNull(object)) {
-                object = bitstreamService.find(context, uuid);
+                object = bitstreamService.find(context.getSession(), uuid);
                 if (isNull(object)) {
                     throw new ResourceNotFoundException("No such resource: " + uuid);
                 }

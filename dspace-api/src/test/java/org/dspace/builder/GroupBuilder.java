@@ -106,7 +106,7 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
     public static void deleteGroup(UUID uuid) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Group group = groupService.find(c, uuid);
+            Group group = groupService.find(c.getSession(), uuid);
             if (group != null) {
                 try {
                     groupService.delete(c, group);

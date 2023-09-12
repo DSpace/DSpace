@@ -186,7 +186,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                             .resolveToObject(context, collections[i]));
                     } else {
                         // not a handle, try and treat it as an integer collection database ID
-                        collection = collectionService.find(context, UUID.fromString(collections[i]));
+                        collection = collectionService.find(context.getSession(), UUID.fromString(collections[i]));
                     }
                 }
 
@@ -427,7 +427,7 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
      * @throws SQLException
      */
     protected void setEPerson(Context context) throws SQLException {
-        EPerson myEPerson = epersonService.find(context, this.getEpersonIdentifier());
+        EPerson myEPerson = epersonService.find(context.getSession(), this.getEpersonIdentifier());
 
         // check eperson
         if (myEPerson == null) {

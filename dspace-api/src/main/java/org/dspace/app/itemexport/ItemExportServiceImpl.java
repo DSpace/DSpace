@@ -572,7 +572,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 for (Collection collection : collections) {
                     ArrayList<UUID> items = new ArrayList<>();
                     // get all the items in each collection
-                    Iterator<Item> iitems = itemService.findByCollection(context, collection);
+                    Iterator<Item> iitems = itemService.findByCollection(context.getSession(), collection);
                     try {
                         while (iitems.hasNext()) {
                             Item item = iitems.next();
@@ -589,7 +589,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                             items.add(item.getID());
                         }
                     } finally {
-                        if (items.size() > 0) {
+                        if (!items.isEmpty()) {
                             itemsMap.put("collection_" + collection.getID(), items);
                         }
                     }
@@ -599,7 +599,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                 ArrayList<UUID> items = new ArrayList<>();
 
                 // get all the items in the collection
-                Iterator<Item> iitems = itemService.findByCollection(context, collection);
+                Iterator<Item> iitems = itemService.findByCollection(context.getSession(), collection);
                 try {
                     while (iitems.hasNext()) {
                         Item item = iitems.next();
@@ -616,7 +616,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         items.add(item.getID());
                     }
                 } finally {
-                    if (items.size() > 0) {
+                    if (!items.isEmpty()) {
                         itemsMap.put("collection_" + collection.getID(), items);
                     }
                 }
@@ -660,7 +660,7 @@ public class ItemExportServiceImpl implements ItemExportService {
         }
 
         // if we have any items to process then kick off anonymous thread
-        if (itemsMap.size() > 0) {
+        if (!itemsMap.isEmpty()) {
             Thread go = new Thread() {
                 @Override
                 public void run() {
@@ -687,7 +687,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                             List<UUID> uuids = itemsMap.get(keyName);
                             List<Item> items = new ArrayList<>();
                             for (UUID uuid : uuids) {
-                                items.add(itemService.find(context, uuid));
+                                items.add(itemService.find(context.getSession(), uuid));
                             }
                             iitems = items.iterator();
 
@@ -836,9 +836,9 @@ public class ItemExportServiceImpl implements ItemExportService {
         EPerson eperson;
         try {
             UUID ePersonId = UUID.fromString(strID);
-            eperson = ePersonService.find(context, ePersonId);
+            eperson = ePersonService.find(context.getSession(), ePersonId);
         } catch (Exception e) {
-            eperson = ePersonService.findByLegacyId(context, Integer.parseInt(strID));
+            eperson = ePersonService.findByLegacyId(context.getSession(), Integer.parseInt(strID));
         }
         return eperson;
     }
@@ -897,7 +897,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             }
         }
 
-        if (fileNames.size() > 0) {
+        if (!fileNames.isEmpty()) {
             return fileNames;
         }
 

@@ -121,7 +121,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         if (item != null) {
             try {
-                item = itemService.find(context, item.getID());
+                item = itemService.find(context.getSession(), item.getID());
                 itemService.delete(context, item);
             } catch (SQLException | AuthorizeException | IOException ex) {
                 log.error("Error in destroy", ex);
@@ -130,7 +130,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         if (this.collection != null) {
             try {
-                this.collection = collectionService.find(context, this.collection.getID());
+                this.collection = collectionService.find(context.getSession(), this.collection.getID());
                 collectionService.delete(context, this.collection);
             } catch (SQLException | AuthorizeException | IOException ex) {
                 log.error("Error in destroy", ex);
@@ -139,7 +139,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         if (this.community != null) {
             try {
-                this.community = communityService.find(context, this.community.getID());
+                this.community = communityService.find(context.getSession(), this.community.getID());
                 communityService.delete(context, this.community);
             } catch (SQLException | AuthorizeException | IOException ex) {
                 log.error("Error in destroy", ex);
@@ -899,7 +899,7 @@ public class EPersonTest extends AbstractUnitTest {
                      ": " + ex.getMessage());
             }
         }
-        item = itemService.find(context, item.getID());
+        item = itemService.find(context.getSession(), item.getID());
         assertNotNull("Could not load item after cascading deletion of the submitter.", item);
         assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted item null.",
                 item.getSubmitter());
@@ -946,7 +946,7 @@ public class EPersonTest extends AbstractUnitTest {
 
         try {
             WorkspaceItem restoredWsi = workspaceItemService.find(context, wsi.getID());
-            Item restoredItem = itemService.find(context, item.getID());
+            Item restoredItem = itemService.find(context.getSession(), item.getID());
             assertNull("An unsubmited WorkspaceItem wasn't deleted while cascading deleting the submitter.",
                        restoredWsi);
             assertNull("An unsubmited Item wasn't deleted while cascading deleting the submitter.", restoredItem);

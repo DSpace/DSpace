@@ -1541,7 +1541,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
             }
         }
 
-        EPerson ePersonCheck = ePersonService.find(context, ePerson.getID());
+        EPerson ePersonCheck = ePersonService.find(context.getSession(), ePerson.getID());
         if (shouldSucceed) {
             assertTrue(deleteSuccess);
             assertFalse(deleteError);

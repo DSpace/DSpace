@@ -100,7 +100,7 @@ public class CommunityLogoController {
 
         Context context = ContextUtil.obtainContext(request);
 
-        Community community = communityService.find(context, uuid);
+        Community community = communityService.find(context.getSession(), uuid);
         if (community == null) {
             throw new ResourceNotFoundException(
                     "The given uuid did not resolve to a community on the server: " + uuid);

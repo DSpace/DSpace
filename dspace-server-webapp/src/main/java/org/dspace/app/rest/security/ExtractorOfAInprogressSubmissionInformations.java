@@ -64,7 +64,7 @@ public class ExtractorOfAInprogressSubmissionInformations {
      * it searches the latest version and checks if there is
      * a Workspace/Workflow item in progress submission,
      * if yes return the id of this one, otherwise returns null.
-     * 
+     *
      * @param request              The current request
      * @param versionHistoryId     VersionHistoryId
      * @return
@@ -96,7 +96,7 @@ public class ExtractorOfAInprogressSubmissionInformations {
      * This method is used on security checks, given a versionHistory id,
      * it searches the latest version and checks if there is a Workspace/Workflow item in progress submission,
      * if yes return the rest name - 'workspaceitem' or 'workflowitem', otherwise it returns the empty string.
-     * 
+     *
      * @param request             The current request
      * @param versionHistoryId    VersionHistoryId
      * @return
@@ -125,7 +125,7 @@ public class ExtractorOfAInprogressSubmissionInformations {
     /**
      * This method is used on security checks, given an item UUID,
      * it searches the relative version, if version exist return its id, otherwise returns null.
-     * 
+     *
      * @param request     The current request
      * @param uuid        Item uuid
      * @return
@@ -134,7 +134,7 @@ public class ExtractorOfAInprogressSubmissionInformations {
         Context context = getContext(request);
         if (Objects.nonNull(uuid)) {
             try {
-                Item item = itemService.find(context, uuid);
+                Item item = itemService.find(context.getSession(), uuid);
                 if (Objects.nonNull(item)) {
                     Version version = versionService.getVersion(context, item);
                     return Objects.nonNull(version) ? version.getID() : null;

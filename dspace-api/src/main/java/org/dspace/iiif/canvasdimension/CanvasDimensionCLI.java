@@ -188,7 +188,7 @@ public class CanvasDimensionCLI {
             // @ sign, must be an email
             user = epersonService.findByEmail(context, eperson);
         } else {
-            user = epersonService.find(context, UUID.fromString(eperson));
+            user = epersonService.find(context.getSession(), UUID.fromString(eperson));
         }
 
         if (user == null) {

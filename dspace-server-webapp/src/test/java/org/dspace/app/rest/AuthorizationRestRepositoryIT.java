@@ -70,7 +70,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 /**
  * Test suite for the Authorization endpoint
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
@@ -99,37 +99,37 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     private Utils utils;
     private SiteService siteService;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AlwaysTrueFeature}
      */
     private AuthorizationFeature alwaysTrue;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AlwaysFalseFeature}
      */
     private AuthorizationFeature alwaysFalse;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AlwaysThrowExceptionFeature}
      */
     private AuthorizationFeature alwaysException;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForAdminsFeature}
      */
     private AuthorizationFeature trueForAdmins;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForLoggedUsersFeature}
      */
     private AuthorizationFeature trueForLoggedUsers;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForTestFeature}
      */
     private AuthorizationFeature trueForTestUsers;
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link TrueForUsersInGroupTestFeature}
      */
     private AuthorizationFeature trueForUsersInGroupTest;
@@ -171,7 +171,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findOneTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // define three authorizations that we know must exists
@@ -213,7 +213,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findOneUnauthorizedTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // define two authorizations that we know must exists
@@ -237,7 +237,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         EPerson testEPerson = EPersonBuilder.createEPerson(context)
                 .withEmail("test-authorization@example.com")
@@ -273,7 +273,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         EPersonRest epersonRest = ePersonConverter.convert(eperson, DefaultProjection.DEFAULT);
         context.restoreAuthSystemState();
@@ -359,7 +359,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findOneInternalServerErrorTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         // define two authorizations that we know will throw exceptions
         Authorization authAdminSite = new Authorization(admin, alwaysException, siteRest);
@@ -382,11 +382,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * - for an administrator that want to inspect permission of the anonymous users or another user
      * - for a logged-in "normal" user
      * - for anonymous
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -671,7 +671,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Verify that the findByObject return an empty page when the requested object doesn't exist but the uri is
      * potentially valid (i.e. deleted object)
-     * 
+     *
      * @throws Exception
      */
     public void findByNotExistingObjectTest() throws Exception {
@@ -762,7 +762,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     @Test
     /**
      * Verify that the findByObject return the 400 Bad Request response for invalid or missing URI (required parameter)
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectBadRequestTest() throws Exception {
@@ -840,11 +840,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     @Test
     /**
      * Verify that the findByObject return the 401 Unauthorized response when an eperson is involved
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectUnauthorizedTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -880,11 +880,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Verify that the findByObject return the 403 Forbidden response when a non-admin eperson try to search the
      * authorization of another eperson
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectForbiddenTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.turnOffAuthorisationSystem();
@@ -926,7 +926,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findByObjectInternalServerErrorTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -984,7 +984,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * - for an administrator that want to inspect permission of the anonymous users or another user
      * - for a logged-in "normal" user
      * - for anonymous
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectAndFeatureTest() throws Exception {
@@ -1149,11 +1149,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     @Test
     /**
      * Verify that the search by object and feature works return 204 No Content when a feature is not granted
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectAndFeatureNotGrantedTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -1212,12 +1212,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Verify that the findByObject return the 204 No Content code when the requested object doesn't exist but the uri
      * is potentially valid (i.e. deleted object) or the feature doesn't exist
-     * 
+     *
      * @throws Exception
      */
     public void findByNotExistingObjectAndFeatureTest() throws Exception {
         String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -1329,7 +1329,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 "http://localhost/api/wrongcategory/wrongmodel/1",
                 "http://localhost/api/core/sites/this-is-not-an-uuid"
         };
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         // disarm the alwaysThrowExceptionFeature
@@ -1393,11 +1393,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     @Test
     /**
      * Verify that the findByObjectAndFeature return the 401 Unauthorized response when an eperson is involved
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectAndFeatureUnauthorizedTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -1437,11 +1437,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Verify that the findByObjectAndFeature return the 403 Forbidden response when a non-admin eperson try to search
      * the authorization of another eperson
-     * 
+     *
      * @throws Exception
      */
     public void findByObjectAndFeatureForbiddenTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.turnOffAuthorisationSystem();
@@ -1487,7 +1487,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findByObjectAndFeatureInternalServerErrorTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -2200,7 +2200,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByNotExistingMultipleObjectsAndFeatureTest() throws Exception {
         String wrongSiteId = UUID.randomUUID().toString();
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // disarm the alwaysThrowExceptionFeature
@@ -2449,7 +2449,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findByMultipleObjectsAndFeatureUnauthorizedTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         String siteId = site.getID().toString();
 
         // disarm the alwaysThrowExceptionFeature
@@ -2497,7 +2497,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findByMultipleObjectsAndFeatureForbiddenTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         String siteId = site.getID().toString();
 
         context.turnOffAuthorisationSystem();
@@ -2551,7 +2551,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void findByMultipleObjectsAndFeatureInternalServerErrorTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         String siteId = site.getID().toString();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -2601,11 +2601,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * This test will check that special group are correctly used to verify
      * authorization for the current loggedin user but not inherited from the
      * Administrators login when they look to authorization of third users
-     * 
+     *
      * @throws Exception
      */
     public void verifySpecialGroupMembershipTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.turnOffAuthorisationSystem();

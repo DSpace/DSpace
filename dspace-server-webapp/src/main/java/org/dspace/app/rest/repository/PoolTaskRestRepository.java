@@ -105,7 +105,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
                     + " to search for their own pool tasks or the admins");
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
-                EPerson ep = epersonService.find(context, userID);
+                EPerson ep = epersonService.find(context.getSession(), userID);
                 List<PoolTask> tasks = poolTaskService.findByEperson(context, ep);
                 return converter.toRestPage(tasks, pageable, utils.obtainProjection());
             } else {
@@ -142,7 +142,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         List<PoolTask> poolTasks = null;
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemUUID);
+            Item item = itemService.find(context.getSession(), itemUUID);
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
@@ -164,7 +164,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
         PoolTask poolTask = null;
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemUUID);
+            Item item = itemService.find(context.getSession(), itemUUID);
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }

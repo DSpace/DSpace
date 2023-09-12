@@ -406,7 +406,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
             itemTwo = context.reloadEntity(itemTwo);
             itemThree = context.reloadEntity(itemThree);
 
-            Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+            Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
             assertThat(itemOne.getResourcePolicies(), hasSize(1));
             assertThat(itemTwo.getResourcePolicies(), hasSize(1));

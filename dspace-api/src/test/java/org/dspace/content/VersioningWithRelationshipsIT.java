@@ -201,12 +201,13 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
     protected Relationship getRelationship(
         Item leftItem, RelationshipType relationshipType, Item rightItem
     ) throws Exception {
-        List<Relationship> rels = relationshipService.findByRelationshipType(context, relationshipType).stream()
-            .filter(rel -> leftItem.getID().equals(rel.getLeftItem().getID()))
-            .filter(rel -> rightItem.getID().equals(rel.getRightItem().getID()))
-            .collect(Collectors.toList());
+        List<Relationship> rels = relationshipService.findByRelationshipType(context.getSession(), relationshipType)
+                .stream()
+                .filter(rel -> leftItem.getID().equals(rel.getLeftItem().getID()))
+                .filter(rel -> rightItem.getID().equals(rel.getRightItem().getID()))
+                .collect(Collectors.toList());
 
-        if (rels.size() == 0) {
+        if (rels.isEmpty()) {
             return null;
         }
 
@@ -258,7 +259,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         /////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -267,21 +268,21 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
@@ -300,7 +301,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -309,28 +310,28 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(newPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
@@ -343,7 +344,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -352,7 +353,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0)
@@ -360,7 +361,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
                 isRel(newPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0)
@@ -368,7 +369,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0),
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
@@ -376,7 +377,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(newPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
@@ -397,7 +398,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
@@ -406,28 +407,28 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -440,7 +441,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
@@ -449,7 +450,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
@@ -457,7 +458,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
                 isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0)
@@ -465,7 +466,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0),
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
@@ -473,7 +474,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(newPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -486,7 +487,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////
 
         // need to manually delete all relationships to avoid SQL constraint violation exception
-        List<Relationship> relationships = relationshipService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context.getSession());
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
@@ -534,7 +535,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         /////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -543,21 +544,21 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
@@ -587,13 +588,13 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
 
         // on new item, remove relationship with project 1
         List<Relationship> newProjectRels = relationshipService
-            .findByItemAndRelationshipType(context, newPublication, isProjectOfPublication);
+            .findByItemAndRelationshipType(context.getSession(), newPublication, isProjectOfPublication);
         assertEquals(1, newProjectRels.size());
         relationshipService.delete(context, newProjectRels.get(0));
 
         // on new item remove relationship with org unit 1
         List<Relationship> newOrgUnitRels = relationshipService
-            .findByItemAndRelationshipType(context, newPublication, isOrgUnitOfPublication);
+            .findByItemAndRelationshipType(context.getSession(), newPublication, isOrgUnitOfPublication);
         assertEquals(1, newOrgUnitRels.size());
         relationshipService.delete(context, newOrgUnitRels.get(0));
 
@@ -608,7 +609,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -617,14 +618,14 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, person2, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), person2, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
                 isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
@@ -632,21 +633,21 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit2, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit2, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
@@ -654,7 +655,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 // NOTE: BOTH because new relationship
@@ -668,7 +669,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0),
@@ -677,7 +678,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0)
@@ -685,7 +686,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
                 isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
@@ -693,21 +694,21 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 // NOTE: BOTH because new relationship
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
@@ -715,7 +716,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 // NOTE: BOTH because new relationship
@@ -737,7 +738,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
@@ -746,38 +747,38 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, person2, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), person2, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, true),
             empty()
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, true),
             empty()
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit2, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit2, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0),
@@ -790,7 +791,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0),
@@ -799,7 +800,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isAuthorOfPublication, person1, RIGHT_ONLY, 0, 0),
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0)
@@ -807,35 +808,35 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, person2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), person2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isProjectOfPublication, project1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(originalPublication, isOrgUnitOfPublication, orgUnit1, RIGHT_ONLY, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isOrgUnitOfPublication, orgUnit2, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(newPublication, isAuthorOfPublication, person1, BOTH, 0, 0),
                 isRel(newPublication, isAuthorOfPublication, person2, BOTH, 1, 0),
@@ -848,7 +849,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////
 
         // need to manually delete all relationships to avoid SQL constraint violation exception
-        List<Relationship> relationships = relationshipService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context.getSession());
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
@@ -894,7 +895,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         /////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
                 isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
@@ -903,21 +904,21 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, publication1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
@@ -936,7 +937,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPerson, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), originalPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
                 isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
@@ -945,28 +946,28 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, publication1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPerson, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), newPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, newPerson, LEFT_ONLY, 0, 0),
                 isRel(project1, isMemberOfProject, newPerson, LEFT_ONLY, 0, 0),
@@ -979,7 +980,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
                 isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
@@ -988,7 +989,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, publication1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, BOTH, 0, 0),
                 isRel(publication1, isAuthorOfPublication, newPerson, LEFT_ONLY, 0, 0)
@@ -996,7 +997,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(project1, isMemberOfProject, originalPerson, BOTH, 0, 0),
                 isRel(project1, isMemberOfProject, newPerson, LEFT_ONLY, 0, 0)
@@ -1004,7 +1005,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, BOTH, 0, 0),
                 isRel(orgUnit1, isMemberOfOrgUnit, newPerson, LEFT_ONLY, 0, 0)
@@ -1012,7 +1013,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPerson, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), newPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, newPerson, LEFT_ONLY, 0, 0),
                 isRel(project1, isMemberOfProject, newPerson, LEFT_ONLY, 0, 0),
@@ -1033,7 +1034,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPerson, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), originalPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, LEFT_ONLY, 0, 0),
                 isRel(project1, isMemberOfProject, originalPerson, LEFT_ONLY, 0, 0),
@@ -1042,28 +1043,28 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, publication1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(orgUnit1, isMemberOfOrgUnit, newPerson, BOTH, 0, 0)
             ))
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPerson, -1, -1, false, true),
+            relationshipService.findByItem(context.getSession(), newPerson, -1, -1, false, true),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0),
                 isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0),
@@ -1076,7 +1077,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, originalPerson, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), originalPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, LEFT_ONLY, 0, 0),
                 isRel(project1, isMemberOfProject, originalPerson, LEFT_ONLY, 0, 0),
@@ -1085,7 +1086,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, publication1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, originalPerson, LEFT_ONLY, 0, 0),
                 isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0)
@@ -1093,7 +1094,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, project1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), project1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(project1, isMemberOfProject, originalPerson, LEFT_ONLY, 0, 0),
                 isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0)
@@ -1101,7 +1102,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, orgUnit1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), orgUnit1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(orgUnit1, isMemberOfOrgUnit, originalPerson, LEFT_ONLY, 0, 0),
                 isRel(orgUnit1, isMemberOfOrgUnit, newPerson, BOTH, 0, 0)
@@ -1109,7 +1110,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-            relationshipService.findByItem(context, newPerson, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), newPerson, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1, isAuthorOfPublication, newPerson, BOTH, 0, 0),
                 isRel(project1, isMemberOfProject, newPerson, BOTH, 0, 0),
@@ -1122,7 +1123,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////
 
         // need to manually delete all relationships to avoid SQL constraint violation exception
-        List<Relationship> relationships = relationshipService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context.getSession());
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
@@ -1257,7 +1258,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // test relationship isAuthorOfPublication //
         /////////////////////////////////////////////
 
-        List<Relationship> oldRelationships = relationshipService.findByItem(context, originalPublication);
+        List<Relationship> oldRelationships = relationshipService.findByItem(context.getSession(), originalPublication);
         assertEquals(6, oldRelationships.size());
 
         assertEquals(originalPublication, oldRelationships.get(0).getLeftItem());
@@ -1353,7 +1354,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         // test relationship isAuthorOfPublication //
         /////////////////////////////////////////////
 
-        List<Relationship> newRelationships = relationshipService.findByItem(context, newPublication);
+        List<Relationship> newRelationships = relationshipService.findByItem(context.getSession(), newPublication);
         assertEquals(6, newRelationships.size());
 
         assertEquals(newPublication, newRelationships.get(0).getLeftItem());
@@ -1397,7 +1398,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////
 
         // need to manually delete all relationships to avoid SQL constraint violation exception
-        List<Relationship> relationships = relationshipService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context.getSession());
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
@@ -1446,7 +1447,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         /////////////////////////////////////////////////////////////////////
 
         assertThat(
-                relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+                relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, true),
                 containsInAnyOrder(listOriginalPublication)
         );
 
@@ -1455,7 +1456,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////////////////////////////////////////////////////////////
 
         assertThat(
-                relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+                relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
                 containsInAnyOrder(listOriginalPublication)
         );
 
@@ -1523,7 +1524,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////
 
         // need to manually delete all relationships to avoid SQL constraint violation exception
-        List<Relationship> relationships = relationshipService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context.getSession());
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);
         }
@@ -1532,7 +1533,8 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
     protected void removeProject(Item newPublication, int place, List<Item> newProjects)
             throws SQLException, AuthorizeException {
         List<Relationship> projectRels = relationshipService
-                .findByItemAndRelationshipType(context, newProjects.get(place), isProjectOfPublication, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(),
+                        newProjects.get(place), isProjectOfPublication, -1, -1, false)
                 .stream()
                 .filter(
                         relationship -> relationship.getLeftItem().equals(newPublication)
@@ -1547,7 +1549,8 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
             throws SQLException, AuthorizeException {
         Item project = newProjects.get(oldPlace);
         List<Relationship> projectRels = relationshipService
-                .findByItemAndRelationshipType(context, project, isProjectOfPublication, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(), project,
+                        isProjectOfPublication, -1, -1, false)
                 .stream()
                 .filter(
                         relationship -> relationship.getLeftItem().equals(newPublication)
@@ -1592,7 +1595,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-                relationshipService.findByItem(context, originalPublication, -1, -1, false, true),
+                relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, true),
                 containsInAnyOrder(listOriginalPublication)
         );
 
@@ -1602,7 +1605,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         );
 
         assertThat(
-                relationshipService.findByItem(context, newPublication, -1, -1, false, true),
+                relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, true),
                 containsInAnyOrder(listNewPublication)
         );
 
@@ -1611,12 +1614,12 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         //////////////////////////////////////////////////////////////////////
 
         assertThat(
-                relationshipService.findByItem(context, originalPublication, -1, -1, false, false),
+                relationshipService.findByItem(context.getSession(), originalPublication, -1, -1, false, false),
                 containsInAnyOrder(listOriginalPublication)
         );
 
         assertThat(
-                relationshipService.findByItem(context, newPublication, -1, -1, false, false),
+                relationshipService.findByItem(context.getSession(), newPublication, -1, -1, false, false),
                 containsInAnyOrder(listNewPublication)
         );
     }
@@ -1799,7 +1802,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_1, -1, -1, false, false),
                 containsInAnyOrder(List.of(
                     isRel(v1_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
                     isRel(v1_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 0),
@@ -1841,7 +1844,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////
 
         assertThat(
-                relationshipService.findByItem(context, v1_2, -1, -1, false, false),
+                relationshipService.findByItem(context.getSession(), v1_2, -1, -1, false, false),
                 containsInAnyOrder(List.of(
                     isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                     isRel(v1_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 0),
@@ -1903,7 +1906,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_1, -1, -1, false, false),
                 containsInAnyOrder(List.of(
                     isRel(v1_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
                     isRel(v1_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 0),
@@ -1945,7 +1948,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_2, -1, -1, false, false),
                 containsInAnyOrder(List.of(
                     isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                     isRel(v1_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 0),
@@ -2001,7 +2004,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_1, -1, -1, false, false),
                 containsInAnyOrder(List.of(
                     isRel(v1_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
                     isRel(v1_1, isIssueOfJournalVolume, i3_1, RIGHT_ONLY, 2, 0),
@@ -2043,7 +2046,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_2, -1, -1, false, false),
                 containsInAnyOrder(List.of(
                     isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                     isRel(v1_2, isIssueOfJournalVolume, i3_1, LEFT_ONLY, 2, 0),
@@ -2333,7 +2336,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 ////////////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pe3_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pe3_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe3_1, isProjectOfPerson, pr1_1, RIGHT_ONLY, 0, 0),
                         isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
@@ -2375,7 +2378,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr3_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr3_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 0),
                         isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
@@ -2418,7 +2421,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr5_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr5_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe5_1, isProjectOfPerson, pr5_1, BOTH, 1, 1),
                         isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2),
@@ -2448,7 +2451,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 ////////////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pe3_2, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pe3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
                         isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
@@ -2491,7 +2494,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
                         isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 4),
@@ -2553,7 +2556,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 ////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pe3_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pe3_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe3_1, isProjectOfPerson, pr1_1, RIGHT_ONLY, 0, 0),
                         isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
@@ -2595,7 +2598,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr3_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr3_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 0),
                         isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
@@ -2638,7 +2641,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr5_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr5_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe5_1, isProjectOfPerson, pr5_1, BOTH, 1, 1),
                         isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2),
@@ -2669,7 +2672,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 ////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pe3_2, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pe3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
                         isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
@@ -2708,7 +2711,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
                         // NOTE: right place was reduced by one (from 4 to 3)
@@ -2762,7 +2765,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 ////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pe3_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pe3_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe3_1, isProjectOfPerson, pr1_1, RIGHT_ONLY, 0, 0),
                         isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
@@ -2804,7 +2807,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr3_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr3_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_1, LEFT_ONLY, 0, 0),
                         isRel(pe3_1, isProjectOfPerson, pr3_1, RIGHT_ONLY, 2, 2),
@@ -2847,7 +2850,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr5_1, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr5_1, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe5_1, isProjectOfPerson, pr5_1, BOTH, 1, 1),
                         isRel(pe3_1, isProjectOfPerson, pr5_1, RIGHT_ONLY, 4, 2),
@@ -2878,7 +2881,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 ////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pe3_2, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pe3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe3_2, isProjectOfPerson, pr1_1, BOTH, 0, 0),
                         isRel(pe3_2, isProjectOfPerson, pr3_1, LEFT_ONLY, 2, 2),
@@ -2913,7 +2916,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                 /////////////////////////////////////////
 
                 assertThat(
-                    relationshipService.findByItem(context, pr3_2, -1, -1, false, false),
+                    relationshipService.findByItem(context.getSession(), pr3_2, -1, -1, false, false),
                     containsInAnyOrder(List.of(
                         isRel(pe1_1, isProjectOfPerson, pr3_2, BOTH, 0, 0),
                         isRel(pe5_1, isProjectOfPerson, pr3_2, BOTH, 0, 3)
@@ -3073,7 +3076,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
                 isRel(v1_1, isIssueOfJournalVolume, i2_1, RIGHT_ONLY, 1, 0),
@@ -3113,7 +3116,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i2_1, BOTH, 1, 0),
@@ -3176,7 +3179,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
                 isRel(v1_1, isIssueOfJournalVolume, i2_1, RIGHT_ONLY, 1, 0),
@@ -3216,7 +3219,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i2_1, BOTH, 1, 0),
@@ -3283,7 +3286,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_1, isIssueOfJournalVolume, i1_1, RIGHT_ONLY, 0, 0),
                 isRel(v1_1, isIssueOfJournalVolume, i2_1, RIGHT_ONLY, 1, 0),
@@ -3323,7 +3326,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, v1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), v1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(v1_2, isIssueOfJournalVolume, i1_1, BOTH, 0, 0),
                 isRel(v1_2, isIssueOfJournalVolume, i2_1, BOTH, 1, 0),
@@ -3541,7 +3544,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
                 isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
@@ -3604,7 +3607,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V2, isAuthorOfPublication, person1V1, BOTH, 0, 0),
                 isRel(publication1V2, isAuthorOfPublication, person1V2, LEFT_ONLY, 0, 0),
@@ -3706,7 +3709,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
                 isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
@@ -3769,7 +3772,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
                 isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
@@ -3875,7 +3878,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
                 isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
@@ -3938,7 +3941,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
                 isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),
@@ -4048,7 +4051,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V1, isAuthorOfPublication, person1V1, RIGHT_ONLY, 0, 0),
                 isRel(publication1V1, isAuthorOfPublication, person2V1, RIGHT_ONLY, null, "Doe, J.", 1, 0)
@@ -4111,7 +4114,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ///////////////////////////////////////////////////
 
         assertThat(
-            relationshipService.findByItem(context, publication1V2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), publication1V2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(publication1V2, isAuthorOfPublication, person1V1, LEFT_ONLY, 0, 0),
                 isRel(publication1V2, isAuthorOfPublication, person1V2, BOTH, 0, 0),

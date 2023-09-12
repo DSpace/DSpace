@@ -119,7 +119,7 @@ public class SelectReviewerAction extends ProcessingAction {
         }
         List<EPerson> reviewers = new ArrayList<>();
         for (String reviewerId : reviewerIds) {
-            EPerson reviewer = ePersonService.find(c, UUID.fromString(reviewerId));
+            EPerson reviewer = ePersonService.find(c.getSession(), UUID.fromString(reviewerId));
             if (reviewer == null) {
                 log.warn("No EPerson found with uuid {}", reviewerId);
             } else {
@@ -136,7 +136,7 @@ public class SelectReviewerAction extends ProcessingAction {
     }
 
     private boolean checkReviewersValid(Context c, List<EPerson> reviewers) throws SQLException {
-        if (reviewers.size() == 0) {
+        if (reviewers.isEmpty()) {
             return false;
         }
         Group group = this.getGroup(c);
@@ -229,10 +229,10 @@ public class SelectReviewerAction extends ProcessingAction {
             Group group = null;
             try {
                 // try to get group by name
-                group = groupService.findByName(context, groupIdOrName);
+                group = groupService.findByName(context.getSession(), groupIdOrName);
                 if (group == null) {
                     // try to get group by uuid if not a name
-                    group = groupService.find(context, UUID.fromString(groupIdOrName));
+                    group = groupService.find(context.getSession(), UUID.fromString(groupIdOrName));
                 }
             } catch (Exception e) {
                 // There is an issue with the reviewer group that is set; if it is not set then can be chosen

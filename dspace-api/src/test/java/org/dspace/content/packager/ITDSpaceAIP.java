@@ -107,7 +107,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
     private static String testCollectionHandle = null;
     private static String testItemHandle = null;
     private static String testMappedItemHandle = null;
-    private static String submitterEmail = "aip-test@dspace.org";
+    private static final String submitterEmail = "aip-test@dspace.org";
 
     /**
      * Create a global temporary upload folder which will be cleaned up automatically by JUnit.
@@ -196,7 +196,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
             //Make our test ePerson an admin so it can perform deletes and restores
             GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-            Group adminGroup = groupService.findByName(context, Group.ADMIN);
+            Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
             groupService.addMember(context, adminGroup, submitter);
 
             // Create our primary Test Item
@@ -824,7 +824,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         List<ResourcePolicy> policies = new ArrayList<>();
         ResourcePolicy admin_policy = resourcePolicyService.create(context);
         admin_policy.setRpName("Admin Read-Only");
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
         admin_policy.setGroup(adminGroup);
         admin_policy.setAction(Constants.READ);
         policies.add(admin_policy);
@@ -1159,7 +1159,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
                         collectionService.getTypeText(collection) + valueseparator + collection.getName());
 
             // Recursively call method for each Item in Collection
-            Iterator<Item> items = itemService.findByCollection(context, collection);
+            Iterator<Item> items = itemService.findByCollection(context.getSession(), collection);
             while (items.hasNext()) {
                 Item i = items.next();
                 saveObjectInfo(i, infoMap);

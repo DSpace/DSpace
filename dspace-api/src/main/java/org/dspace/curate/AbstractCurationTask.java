@@ -81,11 +81,12 @@ public abstract class AbstractCurationTask implements CurationTask {
             //next, we'll try to distribute to all child objects, based on container type
             int type = dso.getType();
             if (Constants.COLLECTION == type) {
-                Iterator<Item> iter = itemService.findByCollection(Curator.curationContext(), (Collection) dso);
+                Context context = Curator.curationContext();
+                Iterator<Item> iter = itemService.findByCollection(context.getSession(), (Collection) dso);
                 while (iter.hasNext()) {
                     Item item = iter.next();
                     performObject(item);
-                    Curator.curationContext().uncacheEntity(item);
+                    context.uncacheEntity(item);
                 }
             } else if (Constants.COMMUNITY == type) {
                 Community comm = (Community) dso;
@@ -96,7 +97,7 @@ public abstract class AbstractCurationTask implements CurationTask {
                     distribute(coll);
                 }
             } else if (Constants.SITE == type) {
-                List<Community> topComm = communityService.findAllTop(Curator.curationContext());
+                List<Community> topComm = communityService.findAllTop(Curator.curationContext().getSession());
                 for (Community comm : topComm) {
                     distribute(comm);
                 }

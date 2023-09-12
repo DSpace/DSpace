@@ -191,7 +191,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         Context context = obtainContext();
         EPerson ePerson = null;
         if (ePersonUuid != null) {
-            ePerson = epersonService.find(context, ePersonUuid);
+            ePerson = epersonService.find(context.getSession(), ePersonUuid);
             if (ePerson == null) {
                 throw new DSpaceBadRequestException("No EPerson with the given UUID is found");
             }

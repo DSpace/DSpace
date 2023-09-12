@@ -105,7 +105,7 @@ public class ITMetadata extends AbstractIntegrationTest {
         assertThat("testCreateSchema 1", field1.getMetadataSchema(), equalTo(schema));
         assertThat("testCreateSchema 2", field2.getMetadataSchema(), equalTo(schema));
 
-        List<MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
+        List<MetadataField> fields = metadataFieldService.findAllInSchema(context.getSession(), schema);
         assertTrue("testCreateSchema 3", fields.size() == 2);
         boolean exist = true;
         for (MetadataField f : fields) {
@@ -115,15 +115,15 @@ public class ITMetadata extends AbstractIntegrationTest {
         }
         assertTrue("testCreateSchema 4", exist);
 
-        List<MetadataValue> col1 = metadataValueService.findByField(context, field1);
+        List<MetadataValue> col1 = metadataValueService.findByField(context.getSession(), field1);
         assertTrue("testCreateSchema 5", col1.contains(value1));
 
-        List<MetadataValue> col2 = metadataValueService.findByField(context, field2);
+        List<MetadataValue> col2 = metadataValueService.findByField(context.getSession(), field2);
         assertTrue("testCreateSchema 6", col2.contains(value2));
 
         //clean database
         it.removeMetadata(value1);
-        col1 = metadataValueService.findByField(context, field1);
+        col1 = metadataValueService.findByField(context.getSession(), field1);
         assertFalse("testCreateSchema 7", col1.contains(value1));
 
         it.removeMetadata(value2);

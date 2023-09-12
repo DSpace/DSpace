@@ -79,7 +79,7 @@ public class CuratorReportTest
         context.turnOffAuthorisationSystem();
         Site site = ContentServiceFactory.getInstance()
                 .getSiteService()
-                .findSite(context);
+                .findSite(context.getSession());
         Community community = ContentServiceFactory.getInstance()
                 .getCommunityService()
                 .create(null, context);

@@ -319,7 +319,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.name", is(name)));
 
         String itemId = getItemIdByProfileId(authToken, id);
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(get("/api/authz/resourcepolicies/search/resource")
@@ -417,7 +417,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
 
         String itemId = getItemIdByProfileId(authToken, id);
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getOwningCollection(), is(personCollection));
 
@@ -452,7 +452,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
 
         String itemId = getItemIdByProfileId(authToken, id);
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getOwningCollection(), is(personCollection));
 
@@ -1350,7 +1350,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String itemId = getItemIdByProfileId(authToken, ePersonId);
 
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
         assertThat(profileItem, notNullValue());
 
         List<MetadataValue> metadata = profileItem.getMetadata();
@@ -2542,7 +2542,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
                             .andDo(result -> itemIdRef.set(fromString(read(result.getResponse().getContentAsString(),
                                                                            "$.id"))));
 
-        return itemService.find(context, itemIdRef.get());
+        return itemService.find(context.getSession(), itemIdRef.get());
     }
 
     private String getItemIdByProfileId(String token, String id) throws SQLException, Exception {

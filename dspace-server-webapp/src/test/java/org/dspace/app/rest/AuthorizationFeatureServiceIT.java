@@ -126,7 +126,7 @@ public class AuthorizationFeatureServiceIT extends AbstractControllerIntegration
      * @throws Exception
      */
     public void isAuthorizedTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         AuthorizationFeature alwaysTrue = authzFeatureService.find(AlwaysTrueFeature.NAME);

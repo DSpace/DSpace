@@ -176,7 +176,7 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private List<Item> findAllRelatedItems(Context context, Item entity) throws SQLException {
-        return relationshipService.findByItem(context, entity).stream()
+        return relationshipService.findByItem(context.getSession(), entity).stream()
             .map(relationship -> getRelatedItem(entity, relationship))
             .collect(Collectors.toList());
     }

@@ -69,7 +69,7 @@ public class BitstreamResource extends Resource {
                                                                                    .getResourcePolicyService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Return bitstream properties without file data. It can throw
@@ -218,11 +218,11 @@ public class BitstreamResource extends Resource {
 
         log.info("Reading bitstreams.(offset=" + offset + ",limit=" + limit + ")");
         org.dspace.core.Context context = null;
-        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+        List<Bitstream> bitstreams = new ArrayList<>();
 
         try {
             context = createContext();
-            List<org.dspace.content.Bitstream> dspaceBitstreams = bitstreamService.findAll(context);
+            List<org.dspace.content.Bitstream> dspaceBitstreams = bitstreamService.findAll(context.getSession());
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
                 log.warn("Paging was badly set.");
@@ -459,7 +459,7 @@ public class BitstreamResource extends Resource {
             }
             dspaceBitstream.setName(context, bitstream.getName());
             Integer sequenceId = bitstream.getSequenceId();
-            if (sequenceId != null && sequenceId.intValue() != -1) {
+            if (sequenceId != null && sequenceId != -1) {
                 dspaceBitstream.setSequenceID(sequenceId);
             }
 
@@ -731,7 +731,7 @@ public class BitstreamResource extends Resource {
         throws SQLException, AuthorizeException {
         org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
         dspacePolicy.setAction(policy.getActionInt());
-        dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context, policy.getGroupId()));
+        dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context.getSession(), policy.getGroupId()));
         dspacePolicy.setdSpaceObject(dspaceBitstream);
         dspacePolicy.setStartDate(policy.getStartDate());
         dspacePolicy.setEndDate(policy.getEndDate());
@@ -757,7 +757,7 @@ public class BitstreamResource extends Resource {
         throws WebApplicationException {
         org.dspace.content.Bitstream bitstream = null;
         try {
-            bitstream = bitstreamService.findByIdOrLegacyId(context, id);
+            bitstream = bitstreamService.findByIdOrLegacyId(context.getSession(), id);
 
             if ((bitstream == null) || (bitstreamService.getParentObject(context, bitstream) == null)) {
                 context.abort();

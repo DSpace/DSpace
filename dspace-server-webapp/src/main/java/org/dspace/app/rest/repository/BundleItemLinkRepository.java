@@ -45,7 +45,7 @@ public class BundleItemLinkRepository extends AbstractDSpaceRestRepository
                             Projection projection) {
         try {
             Context context = obtainContext();
-            Bundle bundle = bundleService.find(context, bundleId);
+            Bundle bundle = bundleService.find(context.getSession(), bundleId);
             if (bundle == null) {
                 throw new ResourceNotFoundException("No such bundle: " + bundleId);
             }

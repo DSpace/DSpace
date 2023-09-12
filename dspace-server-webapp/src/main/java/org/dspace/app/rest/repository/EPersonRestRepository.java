@@ -217,7 +217,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     public EPersonRest findOne(Context context, UUID id) {
         EPerson eperson = null;
         try {
-            eperson = es.find(context, id);
+            eperson = es.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -317,7 +317,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     protected void delete(Context context, UUID id) throws AuthorizeException {
         EPerson eperson = null;
         try {
-            eperson = es.find(context, id);
+            eperson = es.find(context.getSession(), id);
             es.delete(context, eperson);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);

@@ -535,19 +535,19 @@ public class StatisticsDataVisits extends StatisticsData {
             if (dsoId != null && query.getDsoType() != -1) {
                 switch (query.getDsoType()) {
                     case Constants.BITSTREAM:
-                        Bitstream bit = bitstreamService.findByIdOrLegacyId(context, dsoId);
+                        Bitstream bit = bitstreamService.findByIdOrLegacyId(context.getSession(), dsoId);
                         if (bit == null) {
                             break;
                         }
                         return bit.getName() + legacyNote;
                     case Constants.ITEM:
-                        Item item = itemService.findByIdOrLegacyId(context, dsoId);
+                        Item item = itemService.findByIdOrLegacyId(context.getSession(), dsoId);
                         if (item == null) {
                             break;
                         }
                         String name = "untitled";
                         List<MetadataValue> vals = itemService.getMetadata(item, "dc", "title", null, Item.ANY);
-                        if (vals != null && 0 < vals.size()) {
+                        if (vals != null && !vals.isEmpty()) {
                             name = vals.get(0).getValue();
                         }
                         if (dsoLength != -1 && name.length() > dsoLength) {
@@ -561,7 +561,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         return name + legacyNote;
 
                     case Constants.COLLECTION:
-                        Collection coll = collectionService.findByIdOrLegacyId(context, dsoId);
+                        Collection coll = collectionService.findByIdOrLegacyId(context.getSession(), dsoId);
                         if (coll == null) {
                             break;
                         }
@@ -577,7 +577,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         return name + legacyNote;
 
                     case Constants.COMMUNITY:
-                        Community comm = communityService.findByIdOrLegacyId(context, dsoId);
+                        Community comm = communityService.findByIdOrLegacyId(context.getSession(), dsoId);
                         if (comm == null) {
                             break;
                         }
@@ -627,7 +627,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
             switch (query.dsoType) {
                 case Constants.BITSTREAM:
-                    Bitstream bit = bitstreamService.findByIdOrLegacyId(context, dsoId);
+                    Bitstream bit = bitstreamService.findByIdOrLegacyId(context.getSession(), dsoId);
                     if (bit == null) {
                         break;
                     }
@@ -635,7 +635,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     //Get our owning item
                     Item owningItem = null;
                     List<Bundle> bunds = bit.getBundles();
-                    if (0 < bunds.size() && 0 < bunds.get(0).getItems().size()) {
+                    if (!bunds.isEmpty() && !bunds.get(0).getItems().isEmpty()) {
                         owningItem = bunds.get(0).getItems().get(0);
                     }
 
@@ -673,7 +673,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     break;
 
                 case Constants.ITEM:
-                    Item item = itemService.findByIdOrLegacyId(context, dsoId);
+                    Item item = itemService.findByIdOrLegacyId(context.getSession(), dsoId);
                     if (item == null || item.getHandle() == null) {
                         break;
                     }
@@ -682,7 +682,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     break;
 
                 case Constants.COLLECTION:
-                    Collection coll = collectionService.findByIdOrLegacyId(context, dsoId);
+                    Collection coll = collectionService.findByIdOrLegacyId(context.getSession(), dsoId);
                     if (coll == null || coll.getHandle() == null) {
                         break;
                     }
@@ -691,7 +691,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     break;
 
                 case Constants.COMMUNITY:
-                    Community comm = communityService.findByIdOrLegacyId(context, dsoId);
+                    Community comm = communityService.findByIdOrLegacyId(context.getSession(), dsoId);
                     if (comm == null || comm.getHandle() == null) {
                         break;
                     }

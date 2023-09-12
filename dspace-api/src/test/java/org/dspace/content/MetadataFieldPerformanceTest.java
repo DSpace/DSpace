@@ -37,7 +37,7 @@ public class MetadataFieldPerformanceTest extends AbstractUnitTest {
 
         int amount = 50000;
         for (int i = 0; i < amount; i++) {
-            metadataFieldService.findByElement(context, "dc", "description", null);
+            metadataFieldService.findByElement(context.getSession(), "dc", "description", null);
         }
         long endTime = System.currentTimeMillis();
 

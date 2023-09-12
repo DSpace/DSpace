@@ -94,7 +94,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
     public static void deleteMetadataSchema(Integer id) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            MetadataSchema metadataSchema = metadataSchemaService.find(c, id);
+            MetadataSchema metadataSchema = metadataSchemaService.find(c.getSession(), id);
             if (metadataSchema != null) {
                 try {
                     metadataSchemaService.delete(c, metadataSchema);

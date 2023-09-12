@@ -131,7 +131,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     public CollectionRest findOne(Context context, UUID id) {
         Collection collection = null;
         try {
-            collection = cs.find(context, id);
+            collection = cs.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -146,11 +146,11 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         try {
             if (authorizeService.isAdmin(context)) {
                 long total = cs.countTotal(context);
-                List<Collection> collections = cs.findAll(context, pageable.getPageSize(),
+                List<Collection> collections = cs.findAll(context.getSession(), pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
                 return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
             } else {
-                List<Collection> collections = new LinkedList<Collection>();
+                List<Collection> collections = new LinkedList<>();
                 // search for all the collections and let the SOLR security plugins to limit
                 // what is returned to what the user can see
                 DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -176,7 +176,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         @Parameter(value = "query") String q) {
         try {
             Context context = obtainContext();
-            Community com = communityService.find(context, communityUuid);
+            Community com = communityService.find(context.getSession(), communityUuid);
             if (com == null) {
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
@@ -225,7 +225,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     /**
      * Returns Collections for which the current user has 'submit' privileges.
-     * 
+     *
      * @param query                     The query used in the lookup
      * @param entityTypeLabel           The EntityType label object that will be used to limit the returned collection
      *                                      to those related to given entity type
@@ -257,7 +257,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     /**
      * Returns Collections for which the current user has 'submit' privileges limited by parent community.
-     * 
+     *
      * @param query                 The query used in the lookup
      * @param communityUuid         UUID of the parent community
      * @param entityTypeLabel       The EntityType label object that will be used to limit the returned collection
@@ -277,7 +277,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             if (Objects.isNull(entityType)) {
                 throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
-            Community community = communityService.find(context, communityUuid);
+            Community community = communityService.find(context.getSession(), communityUuid);
             if (Objects.isNull(community)) {
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid + " not found");
@@ -330,7 +330,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
         Collection collection;
         try {
-            Community parent = communityService.find(context, id);
+            Community parent = communityService.find(context.getSession(), id);
             if (parent == null) {
                 throw new UnprocessableEntityException("Parent community for id: "
                     + id + " not found");
@@ -356,7 +356,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }
-        Collection collection = cs.find(context, id);
+        Collection collection = cs.find(context.getSession(), id);
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
@@ -375,7 +375,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @PreAuthorize("hasPermission(#id, 'COLLECTION', 'DELETE')")
     protected void delete(Context context, UUID id) throws AuthorizeException {
         try {
-            Collection collection = cs.find(context, id);
+            Collection collection = cs.find(context.getSession(), id);
             if (collection == null) {
                 throw new ResourceNotFoundException(
                     CollectionRest.CATEGORY + "." + CollectionRest.NAME + " with id: " + id + " not found");
@@ -559,7 +559,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         Group itemReadGroup = itemGroups.get(0);
         groupService.delete(context, itemReadGroup);
         authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,
-                                   groupService.findByName(context, Group.ANONYMOUS));
+                                   groupService.findByName(context.getSession(), Group.ANONYMOUS));
     }
 
     /**
@@ -596,7 +596,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         Group itemReadGroup = itemGroups.get(0);
         groupService.delete(context, itemReadGroup);
         authorizeService.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ,
-                                   groupService.findByName(context, Group.ANONYMOUS));
+                                   groupService.findByName(context.getSession(), Group.ANONYMOUS));
     }
 
 

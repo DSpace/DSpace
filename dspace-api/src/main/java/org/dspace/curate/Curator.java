@@ -96,7 +96,7 @@ public class Curator {
 
     /**
      * constructor that uses an handler for logging
-     * 
+     *
      * @param handler {@code DSpaceRunnableHandler} used to logs infos
      */
     public Curator(DSpaceRunnableHandler handler) {
@@ -461,7 +461,7 @@ public class Curator {
 
             //Then, perform this task for all Top-Level Communities in the Site
             // (this will recursively perform task for all objects in DSpace)
-            for (Community subcomm : communityService.findAllTop(ctx)) {
+            for (Community subcomm : communityService.findAllTop(ctx.getSession())) {
                 if (!doCommunity(tr, subcomm)) {
                     return false;
                 }
@@ -512,7 +512,7 @@ public class Curator {
                 return false;
             }
             Context context = curationContext();
-            Iterator<Item> iter = itemService.findByCollection(context, coll);
+            Iterator<Item> iter = itemService.findByCollection(context.getSession(), coll);
             while (iter.hasNext()) {
                 Item item = iter.next();
                 boolean shouldContinue = tr.run(item);
@@ -620,7 +620,7 @@ public class Curator {
 
         /**
          * Proxy method for logging with INFO level
-         * 
+         *
          * @param message that needs to be logged
          */
         protected void logInfo(String message) {
@@ -635,7 +635,7 @@ public class Curator {
 
     /**
      * Proxt method for logging with WARN level
-     * 
+     *
      * @param message
      */
     protected void logWarning(String message) {
@@ -645,7 +645,7 @@ public class Curator {
     /**
      * Proxy method for logging with WARN level and a {@code Messageformatter}
      * that generates the final log.
-     * 
+     *
      * @param message Target message to format or print
      * @param object  Object to use inside the message, or null
      */

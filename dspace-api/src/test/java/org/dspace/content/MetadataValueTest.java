@@ -62,19 +62,25 @@ public class MetadataValueTest extends AbstractUnitTest {
     /**
      * Element of the metadata element
      */
-    private String element = "contributor";
+    private final String element = "contributor";
 
     /**
      * Qualifier of the metadata element
      */
-    private String qualifier = "author";
+    private final String qualifier = "author";
 
-    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    private final MetadataFieldService metadataFieldService
+            = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private final MetadataValueService metadataValueService
+            = ContentServiceFactory.getInstance().getMetadataValueService();
+    protected CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected WorkspaceItemService workspaceItemService
+            = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected InstallItemService installItemService
+            = ContentServiceFactory.getInstance().getInstallItemService();
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -94,7 +100,7 @@ public class MetadataValueTest extends AbstractUnitTest {
             WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
             this.it = installItemService.installItem(context, workspaceItem);
 
-            this.mf = metadataFieldService.findByElement(context,
+            this.mf = metadataFieldService.findByElement(context.getSession(),
                                                          MetadataSchemaEnum.DC.getName(), element, qualifier);
             this.mv = metadataValueService.create(context, it, mf);
             context.restoreAuthSystemState();
@@ -264,7 +270,7 @@ public class MetadataValueTest extends AbstractUnitTest {
     public void testFind() throws Exception {
         metadataValueService.create(context, it, mf);
         int id = mv.getID();
-        MetadataValue found = metadataValueService.find(context, id);
+        MetadataValue found = metadataValueService.find(context.getSession(), id);
         assertThat("testFind 0", found, notNullValue());
         assertThat("testFind 1", found.getID(), equalTo(id));
     }
@@ -275,7 +281,7 @@ public class MetadataValueTest extends AbstractUnitTest {
     @Test
     public void testFindByField() throws Exception {
         metadataValueService.create(context, it, mf);
-        List<MetadataValue> found = metadataValueService.findByField(context, mf);
+        List<MetadataValue> found = metadataValueService.findByField(context.getSession(), mf);
         assertThat("testFind 0", found, notNullValue());
         assertTrue("testFind 1", found.size() >= 1);
     }

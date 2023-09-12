@@ -175,7 +175,7 @@ public class ProcessServiceImpl implements ProcessService {
         bitstream.setName(context, fileName);
         bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
         MetadataField dspaceProcessFileTypeField = metadataFieldService
-            .findByString(context, Process.BITSTREAM_TYPE_METADATAFIELD, '.');
+            .findByString(context.getSession(), Process.BITSTREAM_TYPE_METADATAFIELD, '.');
         bitstreamService.addMetadata(context, bitstream, dspaceProcessFileTypeField, null, type);
         authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
         authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());

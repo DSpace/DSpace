@@ -88,16 +88,6 @@ public interface ItemService
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
      *
-     * @param context DSpace context object
-     * @return an iterator over the items in the archive.
-     * @throws SQLException if database error
-     */
-    public Iterator<Item> findAll(Context context) throws SQLException;
-
-    /**
-     * Get all the items in the archive. Only items with the "in archive" flag
-     * set are included. The order of the list is indeterminate.
-     *
      * @param session current request's database context.
      * @return an iterator over the items in the archive.
      * @throws SQLException if database error
@@ -109,24 +99,24 @@ public interface ItemService
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param limit   limit
      * @param offset  offset
      * @return an iterator over the items in the archive.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    public Iterator<Item> findAll(Session session, Integer limit, Integer offset) throws SQLException;
 
     /**
      * Get all "final" items in the archive, both archived ("in archive" flag) or
      * withdrawn items are included. The order of the list is indeterminate.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return an iterator over the items in the archive.
      * @throws SQLException if database error
      */
     @Deprecated
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException;
+    public Iterator<Item> findAllUnfiltered(Session session) throws SQLException;
 
     /**
      * Find all items that are:
@@ -135,29 +125,29 @@ public interface ItemService
      * - NOT a template item for e.g. a collection
      *
      * This implies that the result also contains older versions of items and withdrawn items.
-     * @param context the DSpace context.
+     * @param session current request's database context.
      * @return iterator over all regular items.
      * @throws SQLException if database error.
      */
-    public Iterator<Item> findAllRegularItems(Context context) throws SQLException;
+    public Iterator<Item> findAllRegularItems(Session session) throws SQLException;
 
     /**
      * Find all the items in the archive by a given submitter. The order is
      * indeterminate. Only items with the "in archive" flag set are included.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param eperson the submitter
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson)
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson)
         throws SQLException;
 
     /**
      * Find all the items by a given submitter. The order is
      * indeterminate. All items are included.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param eperson the submitter
      * @param retrieveAllItems flag to determine if all items should be returned or only archived items.
      *                         If true, all items (regardless of status) are returned.
@@ -165,55 +155,55 @@ public interface ItemService
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson, boolean retrieveAllItems)
             throws SQLException;
 
     /**
      * Retrieve the list of items submitted by eperson, ordered by recently submitted, optionally limitable
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param eperson the submitter
      * @param limit   a positive integer to limit, -1 or null for unlimited
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */
-    public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit)
+    public Iterator<Item> findBySubmitterDateSorted(Session session, EPerson eperson, Integer limit)
         throws SQLException;
 
     /**
      * Get all the archived items in this collection. The order is indeterminate.
      *
-     * @param context    DSpace context object
+     * @param session    current request's database context.
      * @param collection Collection (parent)
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException;
+    public Iterator<Item> findByCollection(Session session, Collection collection) throws SQLException;
 
     /**
      * Get all the archived items in this collection. The order is indeterminate.
      *
-     * @param context    DSpace context object
+     * @param session    current request's database context.
      * @param collection Collection (parent)
      * @param limit      limited number of items
      * @param offset     offset value
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findByCollection(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException;
 
     /**
      * Get all the archived items mapped to this collection (excludes owning collection). The order is indeterminate.
      *
-     * @param context    DSpace context object
+     * @param session    current request's database context.
      * @param collection Collection (parent)
      * @param limit      limited number of items
      * @param offset     offset value
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findByCollectionMapping(Session session, Collection collection, Integer limit, Integer offset)
             throws SQLException;
 
     /**
@@ -229,33 +219,23 @@ public interface ItemService
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param since   earliest interesting last-modified date, or null for no date test.
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Session session, Date since)
         throws SQLException;
 
     /**
      * Get all Items installed or withdrawn, NON-discoverable, and modified since a Date.
-     * @param context context
+     * @param session current request's database context.
      * @param since earliest interesting last-modified date, or null for no date test.
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
      */
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Session session, Date since)
         throws SQLException;
-
-    /**
-     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
-     *
-     * @param context    DSpace context object
-     * @param collection Collection (parent)
-     * @return an iterator over the items in the collection.
-     * @throws SQLException if database error
-     */
-    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
@@ -271,15 +251,15 @@ public interface ItemService
     /**
      * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
-     * @param context DSpace context object
+     * @param session    current request's database session.
      * @param collection Collection (parent)
+     * @param limit      number of items
+     * @param offset     offset value
      * @return an iterator over the items in the collection.
-     * @param limit limited number of items
-     * @param offset offset value
      * @throws SQLException if database error
      */
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
-        throws SQLException;
+    public Iterator<Item> findAllByCollection(Session session, Collection collection, Integer limit, Integer offset)
+            throws SQLException;
 
     /**
      * See whether this Item is contained by a given Collection.
@@ -642,7 +622,7 @@ public interface ItemService
      * Returns an iterator of in archive items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
-     * @param context   DSpace context object
+     * @param session   current request's database context.
      * @param schema    metadata field schema
      * @param element   metadata field element
      * @param qualifier metadata field qualifier
@@ -651,7 +631,7 @@ public interface ItemService
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public Iterator<Item> findArchivedByMetadataField(Context context, String schema,
+    public Iterator<Item> findArchivedByMetadataField(Session session, String schema,
                                                       String element, String qualifier,
                                                       String value) throws SQLException, AuthorizeException;
 
@@ -659,21 +639,21 @@ public interface ItemService
      * Returns an iterator of in archive items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
-     * @param context   DSpace context object
+     * @param session   current request's database context.
      * @param metadataField    metadata
      * @param value     field value or Item.ANY to match any value
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+    public Iterator<Item> findArchivedByMetadataField(Session session, String metadataField, String value)
             throws SQLException, AuthorizeException;
 
     /**
      * Returns an iterator of Items possessing the passed metadata field, or only
      * those matching the passed value, if value is not Item.ANY
      *
-     * @param context   DSpace context object
+     * @param session   current request's database context.
      * @param schema    metadata field schema
      * @param element   metadata field element
      * @param qualifier metadata field qualifier
@@ -683,11 +663,11 @@ public interface ItemService
      * @throws AuthorizeException if authorization error
      * @throws IOException        if IO error
      */
-    public Iterator<Item> findByMetadataField(Context context,
+    public Iterator<Item> findByMetadataField(Session session,
                                               String schema, String element, String qualifier, String value)
         throws SQLException, AuthorizeException, IOException;
 
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
+    public Iterator<Item> findByMetadataQuery(Session session, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit)
         throws SQLException, AuthorizeException, IOException;
@@ -696,7 +676,7 @@ public interface ItemService
      * Find all the items in the archive with a given authority key value
      * in the indicated metadata field.
      *
-     * @param context   DSpace context object
+     * @param session   current request's database context.
      * @param schema    metadata field schema
      * @param element   metadata field element
      * @param qualifier metadata field qualifier
@@ -705,12 +685,11 @@ public interface ItemService
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public Iterator<Item> findByAuthorityValue(Context context,
+    public Iterator<Item> findByAuthorityValue(Session session,
                                                String schema, String element, String qualifier, String value)
         throws SQLException, AuthorizeException;
 
-
-    public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)
+    public Iterator<Item> findByMetadataFieldAuthority(Session session, String mdString, String authority)
         throws SQLException, AuthorizeException;
 
     /**
@@ -747,12 +726,12 @@ public interface ItemService
     /**
      * Find all Items modified since a Date.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param last    Earliest interesting last-modified date.
      * @return iterator over items
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public Iterator<Item> findByLastModifiedSince(Session session, Date last)
         throws SQLException;
 
     /**
@@ -908,5 +887,4 @@ public interface ItemService
      * @throws java.sql.SQLException passed through.
      */
     public EntityType getEntityType(Context context, Item item) throws SQLException;
-
 }

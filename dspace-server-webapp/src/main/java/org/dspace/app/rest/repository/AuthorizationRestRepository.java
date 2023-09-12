@@ -136,7 +136,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     /**
      * It returns the list of matching available authorizations granted to the specified eperson or to the anonymous
      * user. Only administrators and the user identified by the epersonUuid parameter can access this method
-     * 
+     *
      * @param uri
      *            the uri of the object to check the authorization against
      * @param epersonUuid
@@ -283,7 +283,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
     /**
      * Return the user specified in the request parameter if valid
-     * 
+     *
      * @param context
      * @param epersonUuid
      * @return
@@ -312,7 +312,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                         + " as a non-admin; only system administrators can see the authorization of other users");
             }
 
-            return epersonService.find(context, epersonUuid);
+            return epersonService.find(context.getSession(), epersonUuid);
         }
     }
 

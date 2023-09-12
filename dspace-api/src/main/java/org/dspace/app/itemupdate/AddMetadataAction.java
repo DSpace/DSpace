@@ -69,7 +69,7 @@ public class AddMetadataAction extends UpdateMetadataAction {
                             ItemUpdate.pr("Metadata to add: " + dtom.toString());
                             //validity tests that would occur in actual processing
                             // If we're just test the import, let's check that the actual metadata field exists.
-                            MetadataSchema foundSchema = metadataSchemaService.find(context, dtom.schema);
+                            MetadataSchema foundSchema = metadataSchemaService.find(context.getSession(), dtom.schema);
 
                             if (foundSchema == null) {
                                 ItemUpdate.pr("ERROR: schema '"
@@ -77,7 +77,7 @@ public class AddMetadataAction extends UpdateMetadataAction {
                                                   dirname);
                             } else {
                                 MetadataField foundField = metadataFieldService
-                                    .findByElement(context, foundSchema, dtom.element, dtom.qualifier);
+                                    .findByElement(context.getSession(), foundSchema, dtom.element, dtom.qualifier);
 
                                 if (foundField == null) {
                                     ItemUpdate.pr("ERROR: Metadata field: '" + dtom.schema + "." + dtom.element + "."

@@ -50,7 +50,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     private Item originalItem;
     private Item versionedItem;
-    private String summary = "Unit test version";
+    private final String summary = "Unit test version";
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
@@ -166,7 +166,7 @@ public class VersioningTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         String handle = versionedItem.getHandle();
         versionService.removeVersion(context, versionedItem);
-        assertThat("Test_version_delete", itemService.find(context, versionedItem.getID()), nullValue());
+        assertThat("Test_version_delete", itemService.find(context.getSession(), versionedItem.getID()), nullValue());
         assertThat("Test_version_handle_delete", handleService.resolveToObject(context, handle), nullValue());
         context.restoreAuthSystemState();
     }

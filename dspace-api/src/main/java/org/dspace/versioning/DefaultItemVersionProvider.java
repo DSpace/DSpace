@@ -139,7 +139,8 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     protected void copyRelationships(
         Context context, Item newItem, Item oldItem
     ) throws SQLException, AuthorizeException {
-        List<Relationship> oldRelationships = relationshipService.findByItem(context, oldItem, -1, -1, false, true);
+        List<Relationship> oldRelationships
+                = relationshipService.findByItem(context.getSession(), oldItem, -1, -1, false, true);
         for (Relationship oldRelationship : oldRelationships) {
             if (oldRelationship.getLeftItem().equals(oldItem)) {
                 // current item is on left side of this relationship

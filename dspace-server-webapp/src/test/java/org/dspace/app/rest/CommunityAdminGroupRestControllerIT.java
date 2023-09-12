@@ -160,7 +160,7 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
         );
         // no needs to explicitly cleanup the group created as the community comes
         // from a CommunityBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -191,7 +191,7 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
         );
         // no needs to explicitly cleanup the group created as the community comes
         // from a CommunityBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.metadata", allOf(
@@ -252,7 +252,7 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
         );
         // no needs to explicitly cleanup the group created as the community comes
         // from a CommunityBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())
                         .andExpect(

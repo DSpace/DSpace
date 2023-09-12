@@ -74,11 +74,12 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         this.bundleService = dsoService;
     }
 
+    @Override
     @PreAuthorize("hasPermission(#id, 'BUNDLE', 'READ')")
     public BundleRest findOne(Context context, UUID id) {
         Bundle bundle = null;
         try {
-            bundle = bundleService.find(context, id);
+            bundle = bundleService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -88,6 +89,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         return converter.toRest(bundle, utils.obtainProjection());
     }
 
+    @Override
     public Page<BundleRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException(BundleRest.NAME, "findAll");
     }
@@ -198,6 +200,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         return bitstream;
     }
 
+    @Override
     public Class<BundleRest> getDomainClass() {
         return BundleRest.class;
     }
@@ -214,7 +217,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Bundle bundleToDelete = null;
         try {
-            bundleToDelete = bundleService.find(context, id);
+            bundleToDelete = bundleService.find(context.getSession(), id);
             if (bundleToDelete == null) {
                 throw new ResourceNotFoundException("Bundle with id: " + id + " not found");
             }

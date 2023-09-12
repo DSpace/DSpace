@@ -212,7 +212,7 @@ public class GenerateSitemaps {
 
         Context c = new Context(Context.Mode.READ_ONLY);
 
-        List<Community> comms = communityService.findAll(c);
+        List<Community> comms = communityService.findAll(c.getSession());
 
         for (Community comm : comms) {
             String url = uiURLStem + "communities/" + comm.getID();
@@ -227,7 +227,7 @@ public class GenerateSitemaps {
             c.uncacheEntity(comm);
         }
 
-        List<Collection> colls = collectionService.findAll(c);
+        List<Collection> colls = collectionService.findAll(c.getSession());
 
         for (Collection coll : colls) {
             String url = uiURLStem + "collections/" + coll.getID();
@@ -242,7 +242,7 @@ public class GenerateSitemaps {
             c.uncacheEntity(coll);
         }
 
-        Iterator<Item> allItems = itemService.findAll(c);
+        Iterator<Item> allItems = itemService.findAll(c.getSession());
         int itemCount = 0;
 
         while (allItems.hasNext()) {

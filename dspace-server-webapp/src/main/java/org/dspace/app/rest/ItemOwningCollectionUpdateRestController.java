@@ -148,7 +148,7 @@ public class ItemOwningCollectionUpdateRestController {
                                        boolean inheritPolicies)
             throws SQLException, IOException, AuthorizeException {
 
-        Item item = itemService.find(context, itemUuid);
+        Item item = itemService.find(context.getSession(), itemUuid);
 
         if (item == null) {
             throw new ResourceNotFoundException("Item with id: " + itemUuid + " not found");

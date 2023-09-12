@@ -78,7 +78,7 @@ public class AnnotationListService extends AbstractResourceService {
         // We need the DSpace item to proceed
         Item item;
         try {
-            item = itemService.find(context, id);
+            item = itemService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

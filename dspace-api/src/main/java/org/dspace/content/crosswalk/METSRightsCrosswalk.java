@@ -61,18 +61,18 @@ public class METSRightsCrosswalk
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(METSRightsCrosswalk.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     private static final Namespace METSRights_NS =
         Namespace.getNamespace("rights", "http://cosimo.stanford.edu/sdr/metsrights/");
 
     // XML schemaLocation fragment for this crosswalk, from config.
-    private String schemaLocation =
+    private final String schemaLocation =
         METSRights_NS.getURI() + " http://cosimo.stanford.edu/sdr/metsrights.xsd";
 
     private static final Namespace namespaces[] = {METSRights_NS};
 
-    private static final Map<Integer, String> otherTypesMapping = new HashMap<Integer, String>();
+    private static final Map<Integer, String> otherTypesMapping = new HashMap<>();
 
     static {
         //Mapping of DSpace Policy Actions to METSRights PermissionType values
@@ -282,7 +282,7 @@ public class METSRightsCrosswalk
     public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
         IOException, SQLException, AuthorizeException {
-        List<Element> result = new ArrayList<Element>(1);
+        List<Element> result = new ArrayList<>(1);
         result.add(disseminateElement(context, dso));
         return result;
     }
@@ -461,7 +461,7 @@ public class METSRightsCrosswalk
                     //Check if this permission pertains to Anonymous users
                     if (ANONYMOUS_CONTEXTCLASS.equals(contextClass)) {
                         //get DSpace Anonymous group, ID=0
-                        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+                        Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
                         if (anonGroup == null) {
                             throw new CrosswalkInternalException(
                                 "The DSpace database has not been properly initialized.  The Anonymous Group is " +
@@ -472,7 +472,7 @@ public class METSRightsCrosswalk
                     } else if (ADMIN_CONTEXTCLASS.equals(contextClass)) {
                         // else if this permission declaration pertains to Administrators
                         // get DSpace Administrator group
-                        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+                        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
                         if (adminGroup == null) {
                             throw new CrosswalkInternalException(
                                 "The DSpace database has not been properly initialized.  The Administrator Group is " +
@@ -493,7 +493,7 @@ public class METSRightsCrosswalk
                             groupName = PackageUtils.translateGroupNameForImport(context, groupName);
 
                             //Check if this group exists in DSpace already
-                            Group group = groupService.findByName(context, groupName);
+                            Group group = groupService.findByName(context.getSession(), groupName);
 
                             //if not found, throw an error -- user should restore group from the SITE AIP
                             if (group == null) {

@@ -113,7 +113,7 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
 
         IndexableObject dso = null;
         Context context = new Context();
-        context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
+        context.setCurrentUser(ePersonService.find(context.getSession(), this.getEpersonIdentifier()));
 
         if (hasScope) {
             dso = resolveScope(context, identifier);
@@ -161,9 +161,9 @@ public class MetadataExportSearch extends DSpaceRunnable<MetadataExportSearchScr
 
     public IndexableObject resolveScope(Context context, String id) throws SQLException {
         UUID uuid = UUID.fromString(id);
-        IndexableObject scopeObj = new IndexableCommunity(communityService.find(context, uuid));
+        IndexableObject scopeObj = new IndexableCommunity(communityService.find(context.getSession(), uuid));
         if (scopeObj.getIndexedObject() == null) {
-            scopeObj = new IndexableCollection(collectionService.find(context, uuid));
+            scopeObj = new IndexableCollection(collectionService.find(context.getSession(), uuid));
         }
         return scopeObj;
     }

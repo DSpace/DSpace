@@ -18,6 +18,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EntityServiceImpl implements EntityService {
@@ -35,16 +36,16 @@ public class EntityServiceImpl implements EntityService {
     protected ItemService itemService;
 
     @Override
-    public Entity findByItemId(Context context, UUID itemId) throws SQLException {
+    public Entity findByItemId(Session session, UUID itemId) throws SQLException {
 
-        return findByItemId(context, itemId, -1, -1);
+        return findByItemId(session, itemId, -1, -1);
     }
 
     @Override
-    public Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException {
+    public Entity findByItemId(Session session, UUID itemId, Integer limit, Integer offset) throws SQLException {
 
-        Item item = itemService.find(context, itemId);
-        List<Relationship> relationshipList = relationshipService.findByItem(context, item, limit, offset, true);
+        Item item = itemService.find(session, itemId);
+        List<Relationship> relationshipList = relationshipService.findByItem(session, item, limit, offset, true);
         return new Entity(item, relationshipList);
     }
 
@@ -91,7 +92,7 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<Relationship> getRelationsByTypeName(Context context, String typeName, Integer limit, Integer offset)
             throws SQLException {
-        return relationshipService.findByTypeName(context, typeName, limit, offset);
+        return relationshipService.findByTypeName(context.getSession(), typeName, limit, offset);
     }
 
     @Override

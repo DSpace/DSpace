@@ -993,7 +993,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         bitstreamOne = context.reloadEntity(bitstreamOne);
         bitstreamTwo = context.reloadEntity(bitstreamTwo);
 
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         assertThat(bitstreamOne.getResourcePolicies(), hasSize(1));
         assertThat(bitstreamOne.getResourcePolicies(), hasItem(
@@ -1121,7 +1121,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
         itemThree = context.reloadEntity(itemThree);
         itemFour = context.reloadEntity(itemFour);
 
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         assertThat(itemOne.getResourcePolicies(), hasSize(1));
         assertThat(itemOne.getResourcePolicies(), hasItem(
@@ -1152,7 +1152,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     public void performBulkAccessWithReplaceModeAndEmptyAccessConditionsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         Community parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("parent community")
@@ -1272,7 +1272,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     public void performBulkAccessWithAddModeTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         Community parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("parent community")
@@ -1379,7 +1379,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     public void performBulkAccessWithReplaceModeTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         Community parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("parent community")
@@ -1494,7 +1494,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     public void performBulkAccessAndCheckDerivativeBitstreamsPoliciesTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         Community parentCommunity = CommunityBuilder.createCommunity(context)
                                               .withName("parent community")
@@ -1697,7 +1697,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
 
             item = context.reloadEntity(item);
 
-            Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+            Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
             assertThat(item.getResourcePolicies(), hasSize(2));
             assertThat(item.getResourcePolicies(), containsInAnyOrder(
@@ -1713,7 +1713,7 @@ public class BulkAccessControlIT extends AbstractIntegrationTestWithDatabase {
     public void performBulkAccessWithReplaceModeOnItemsWithMultipleBundlesTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         Community parentCommunity = CommunityBuilder.createCommunity(context)
                                                     .withName("parent community")

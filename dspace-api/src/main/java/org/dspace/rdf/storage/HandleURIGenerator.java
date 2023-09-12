@@ -38,7 +38,7 @@ public class HandleURIGenerator implements URIGenerator {
     public String generateIdentifier(Context context, int type, UUID id,
                                      String handle, List<String> identifiers) throws SQLException {
         if (type == Constants.SITE) {
-            return handleService.getCanonicalForm(siteService.findSite(context).getHandle());
+            return handleService.getCanonicalForm(siteService.findSite(context.getSession()).getHandle());
         }
 
         if (type == Constants.COMMUNITY

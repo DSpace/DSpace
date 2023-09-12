@@ -64,7 +64,8 @@ public class SubscriptionEmailNotification
         context = new Context();
         UUID uuid = getEpersonIdentifier();
         if (Objects.nonNull(uuid)) {
-            EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+            EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService()
+                    .find(context.getSession(), uuid);
             context.setCurrentUser(ePerson);
         }
     }

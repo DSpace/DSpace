@@ -18,6 +18,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -119,7 +120,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
                 "Only administrators may modify the metadata registry");
         }
 
-        for (MetadataField metadataField : metadataFieldService.findAllInSchema(context, metadataSchema)) {
+        for (MetadataField metadataField : metadataFieldService.findAllInSchema(context.getSession(), metadataSchema)) {
             metadataFieldService.delete(context, metadataField);
         }
 
@@ -135,17 +136,17 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     }
 
     @Override
-    public MetadataSchema find(Context context, int id) throws SQLException {
-        return metadataSchemaDAO.findByID(context.getSession(), MetadataSchema.class, id);
+    public MetadataSchema find(Session session, int id) throws SQLException {
+        return metadataSchemaDAO.findByID(session.getSession(), MetadataSchema.class, id);
     }
 
     @Override
-    public MetadataSchema find(Context context, String shortName) throws SQLException {
+    public MetadataSchema find(Session session, String shortName) throws SQLException {
         // If we are not passed a valid schema name then return
         if (shortName == null) {
             return null;
         }
-        return metadataSchemaDAO.find(context.getSession(), shortName);
+        return metadataSchemaDAO.find(session.getSession(), shortName);
     }
 
 

@@ -57,7 +57,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
         Context context = new Context();
         context.turnOffAuthorisationSystem();
         try {
-            context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
+            context.setCurrentUser(ePersonService.find(context.getSession(), this.getEpersonIdentifier()));
         } catch (SQLException e) {
             handler.handleException(e);
         }
@@ -108,7 +108,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
                     dso = dSpaceObjectUtils.findDSpaceObject(context, UUID.fromString(identifier));
                 }
             } else {
-                dso = ContentServiceFactory.getInstance().getSiteService().findSite(context);
+                dso = ContentServiceFactory.getInstance().getSiteService().findSite(context.getSession());
             }
             if (dso == null) {
                 throw new ParseException("An identifier was given that wasn't able to be parsed to a DSpaceObject");

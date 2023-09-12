@@ -61,7 +61,7 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
             addFacetIndex(doc, FIELD_NAME_VARIATIONS, metadataField.getElement(), metadataField.getElement());
         }
         addNamedResourceTypeIndex(doc, indexableObject.getTypeText());
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         // add read permission on doc for anonymous group
         doc.addField("read", "g" + anonymousGroup.getID());
         doc.addField(FIELD_NAME_VARIATIONS + "_sort", fieldName);
@@ -73,7 +73,7 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
 
     @Override
     public Iterator<IndexableMetadataField> findAll(Context context) throws SQLException {
-        final Iterator<MetadataField> metadataFields = metadataFieldService.findAll(context).iterator();
+        final Iterator<MetadataField> metadataFields = metadataFieldService.findAll(context.getSession()).iterator();
         return new Iterator<>() {
             @Override
             public boolean hasNext() {
@@ -94,7 +94,7 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
 
     @Override
     public Optional<IndexableMetadataField> findIndexableObject(Context context, String id) throws SQLException {
-        final MetadataField metadataField = metadataFieldService.find(context, Integer.parseInt(id));
+        final MetadataField metadataField = metadataFieldService.find(context.getSession(), Integer.parseInt(id));
         return metadataField == null ? Optional.empty() : Optional.of(new IndexableMetadataField(metadataField));
     }
 

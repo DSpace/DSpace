@@ -613,7 +613,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
      * @throws SQLException if database error
      */
     protected void setEPerson(Context context) throws SQLException {
-        EPerson myEPerson = epersonService.find(context, this.getEpersonIdentifier());
+        EPerson myEPerson = epersonService.find(context.getSession(), this.getEpersonIdentifier());
 
         if (myEPerson == null) {
             handler.logError("EPerson cannot be found: " + this.getEpersonIdentifier());

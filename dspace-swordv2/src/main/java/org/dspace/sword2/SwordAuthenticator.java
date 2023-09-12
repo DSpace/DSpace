@@ -52,7 +52,7 @@ public class SwordAuthenticator {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SwordAuthenticator.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     protected AuthenticationService authenticationService =
         AuthenticateServiceFactory.getInstance().getAuthenticationService();
@@ -439,8 +439,8 @@ public class SwordAuthenticator {
         try {
             // locate all the top level communities
             Context context = swordContext.getContext();
-            List<Community> allowed = new ArrayList<Community>();
-            List<Community> comms = communityService.findAllTop(context);
+            List<Community> allowed = new ArrayList<>();
+            List<Community> comms = communityService.findAllTop(context.getSession());
             for (Community comm : comms) {
                 boolean authAllowed = false;
                 boolean oboAllowed = false;
@@ -688,7 +688,7 @@ public class SwordAuthenticator {
         try {
             List<Item> allowed = new ArrayList<>();
             Iterator<Item> ii = itemService
-                .findByCollection(swordContext.getContext(), collection);
+                .findByCollection(swordContext.getContext().getSession(), collection);
 
             while (ii.hasNext()) {
                 Item item = ii.next();

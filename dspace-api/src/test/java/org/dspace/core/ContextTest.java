@@ -506,7 +506,7 @@ public class ContextTest extends AbstractUnitTest {
         instance.setSpecialGroup(groupID);
 
         // Also add Administrator group as a special group
-        Group adminGroup = groupService.findByName(instance, Group.ADMIN);
+        Group adminGroup = groupService.findByName(instance.getSession(), Group.ADMIN);
         UUID adminGroupID = adminGroup.getID();
         instance.setSpecialGroup(adminGroupID);
 

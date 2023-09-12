@@ -54,7 +54,7 @@ public class PasswordAuthentication
 
     private static final String PASSWORD_AUTHENTICATED = "password.authenticated";
 
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
 
 
@@ -150,7 +150,7 @@ public class PasswordAuthentication
                                                         .getProperty("authentication-password.login.specialgroup");
                 if ((groupName != null) && !groupName.trim().isEmpty()) {
                     Group specialGroup = EPersonServiceFactory.getInstance().getGroupService()
-                                                              .findByName(context, groupName);
+                                                              .findByName(context.getSession(), groupName);
                     if (specialGroup == null) {
                         // Oops - the group isn't there.
                         log.warn(LogHelper.getHeader(context,

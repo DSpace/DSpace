@@ -19,6 +19,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,7 +46,7 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
 
     @Override
     public Site createSite(Context context) throws SQLException {
-        Site site = findSite(context);
+        Site site = findSite(context.getSession());
         if (site == null) {
             //Only one site can be created at any point in time
             site = siteDAO.create(context.getSession(), new Site());
@@ -55,13 +56,13 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
     }
 
     @Override
-    public Site findSite(Context context) throws SQLException {
-        return siteDAO.findSite(context.getSession());
+    public Site findSite(Session session) throws SQLException {
+        return siteDAO.findSite(session);
     }
 
     @Override
-    public Site find(Context context, UUID id) throws SQLException {
-        return siteDAO.findByID(context.getSession(), Site.class, id);
+    public Site find(Session session, UUID id) throws SQLException {
+        return siteDAO.findByID(session, Site.class, id);
     }
 
     @Override

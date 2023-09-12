@@ -133,9 +133,9 @@ public class RelatedTest {
         when(relationshipType.getLeftwardType()).thenReturn("LeftwardType");
         when(relationshipType.getLeftType()).thenReturn(entityType);
         when(entityService.getAllRelationshipTypes(context, entity)).thenReturn(relationshipTypeList);
-        when(entityService.findByItemId(context, item.getID())).thenReturn(entity);
+        when(entityService.findByItemId(context.getSession(), item.getID())).thenReturn(entity);
         when(entityService.getType(context, entity)).thenReturn(entityType);
-        when(relationshipService.findByItemAndRelationshipType(context, item, relationshipType))
+        when(relationshipService.findByItemAndRelationshipType(context.getSession(), item, relationshipType))
                 .thenReturn(relationshipList);
         when(relationship.getRelationshipType()).thenReturn(relationshipType);
         when(relationship.getLeftPlace()).thenReturn(0);

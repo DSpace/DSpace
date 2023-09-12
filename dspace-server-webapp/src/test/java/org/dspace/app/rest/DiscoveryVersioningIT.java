@@ -184,7 +184,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
                 // assume everything fits on one page
                 PageMatcher.pageEntryWithTotalPagesAndElements(
-                    0, 20, searchResultMatchers.size() == 0 ? 0 : 1, searchResultMatchers.size()
+                    0, 20, searchResultMatchers.isEmpty() ? 0 : 1, searchResultMatchers.size()
                 )
             )))
             .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
@@ -1140,7 +1140,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // init - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, BOTH, 0, 0)
             ))
@@ -1148,7 +1148,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // init - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, BOTH, 0, 0)
             ))
@@ -1219,7 +1219,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pub 1.2 - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
             ))
@@ -1227,7 +1227,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pub 1.2 - test relationships of publication 1.2
         assertThat(
-            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
             ))
@@ -1235,7 +1235,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pub 1.2 - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
@@ -1351,7 +1351,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
             ))
@@ -1359,7 +1359,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of publication 1.2
         assertThat(
-            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_2, LEFT_ONLY, 0, 0)
@@ -1368,7 +1368,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
@@ -1377,7 +1377,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of project 1.2
         assertThat(
-            relationshipService.findByItem(context, pro1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_2, LEFT_ONLY, 0, 0)
             ))
@@ -1527,7 +1527,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
             ))
@@ -1535,7 +1535,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of publication 1.2
         assertThat(
-            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_1, LEFT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_2, BOTH, 0, 0)
@@ -1544,7 +1544,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_1, LEFT_ONLY, 0, 0)
@@ -1553,7 +1553,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of project 1.2
         assertThat(
-            relationshipService.findByItem(context, pro1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_2, BOTH, 0, 0)
             ))
@@ -1727,7 +1727,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // init - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, BOTH, 0, 0)
             ))
@@ -1735,7 +1735,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // init - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, BOTH, 0, 0)
             ))
@@ -1806,7 +1806,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pub 1.2 - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
             ))
@@ -1814,7 +1814,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pub 1.2 - test relationships of publication 1.2
         assertThat(
-            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
             ))
@@ -1822,7 +1822,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pub 1.2 - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
@@ -1945,7 +1945,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
             ))
@@ -1953,7 +1953,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of publication 1.2
         assertThat(
-            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_2, LEFT_ONLY, 0, 0)
@@ -1962,7 +1962,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_1, BOTH, 0, 0)
@@ -1971,7 +1971,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after create pro 1.2 - test relationships of project 1.2
         assertThat(
-            relationshipService.findByItem(context, pro1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_2, LEFT_ONLY, 0, 0)
             ))
@@ -2121,7 +2121,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of publication 1.1
         assertThat(
-            relationshipService.findByItem(context, pub1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0)
             ))
@@ -2129,7 +2129,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of publication 1.2
         assertThat(
-            relationshipService.findByItem(context, pub1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pub1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_1, LEFT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_2, BOTH, 0, 0)
@@ -2138,7 +2138,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of project 1.1
         assertThat(
-            relationshipService.findByItem(context, pro1_1, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_1, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_1, isProjectOfPublication, pro1_1, RIGHT_ONLY, 0, 0),
                 isRel(pub1_2, isProjectOfPublication, pro1_1, LEFT_ONLY, 0, 0)
@@ -2147,7 +2147,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // after archive pro 1.2 - test relationships of project 1.2
         assertThat(
-            relationshipService.findByItem(context, pro1_2, -1, -1, false, false),
+            relationshipService.findByItem(context.getSession(), pro1_2, -1, -1, false, false),
             containsInAnyOrder(List.of(
                 isRel(pub1_2, isProjectOfPublication, pro1_2, BOTH, 0, 0)
             ))

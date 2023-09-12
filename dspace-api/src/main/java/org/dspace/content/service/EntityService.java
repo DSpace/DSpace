@@ -16,6 +16,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * This Service provides us with a few methods to return objects based on the Entity object.
@@ -29,25 +30,25 @@ public interface EntityService {
      * This will construct an Entity object that will be returned with the Item that matches the ItemID that was
      * passed along
      * as well as a list of relationships for that Item.
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @param itemId    The ItemID for the Item that is to be used in the Entity object
      * @return The constructed Entity object with the Item and the list of relationships
      * @throws SQLException If something goes wrong
      */
-    Entity findByItemId(Context context, UUID itemId) throws SQLException;
+    Entity findByItemId(Session session, UUID itemId) throws SQLException;
 
     /**
      * This will construct an Entity object that will be returned with the Item that matches the ItemID that was
      * passed along
      * as well as a list of relationships for that Item.
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @param itemId    The ItemID for the Item that is to be used in the Entity object
      * @param limit     paging limit
      * @param offset    paging offset
      * @return The constructed Entity object with the Item and the list of relationships
      * @throws SQLException If something goes wrong
      */
-    Entity findByItemId(Context context, UUID itemId, Integer limit, Integer offset) throws SQLException;
+    Entity findByItemId(Session session, UUID itemId, Integer limit, Integer offset) throws SQLException;
 
     /**
      * Returns the EntityType for the Item that is attached to the Entity that is passed along to this method.

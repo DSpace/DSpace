@@ -102,7 +102,7 @@ public class SHERPASubmitServiceTest extends AbstractUnitTest {
 
         // Set up ISSN metadatavalue
         MetadataField issnField = metadataFieldService.
-            findByString(context, "dc.identifier.issn", '.');
+            findByString(context.getSession(), "dc.identifier.issn", '.');
         MetadataValue metadataValue = metadataValueService.create(context, testItem, issnField);
         metadataValue.setValue(validISSN);
 

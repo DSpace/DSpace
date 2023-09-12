@@ -151,7 +151,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
         Context context = obtainContext();
         List<IdentifierRest> results = new ArrayList<>();
         try {
-            DSpaceObject dso = itemService.find(context, UUID.fromString(uuid));
+            DSpaceObject dso = itemService.find(context.getSession(), UUID.fromString(uuid));
             String handle = dso.getHandle();
             DOI doi = doiService.findDOIByDSpaceObject(context, dso);
             if (doi != null) {

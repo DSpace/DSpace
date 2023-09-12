@@ -106,7 +106,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
 
             // first get the ones out of the archive
             Iterator<Item> items = itemService
-                .findBySubmitter(sc.getContext(), person);
+                .findBySubmitter(sc.getContext().getSession(), person);
             while (items.hasNext()) {
                 Item item = items.next();
                 List<Collection> cols = item.getCollections();

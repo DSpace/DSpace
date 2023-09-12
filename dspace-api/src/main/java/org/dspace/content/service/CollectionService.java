@@ -23,6 +23,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Collection object.
@@ -85,22 +86,22 @@ public interface CollectionService
      * Get all collections in the system. These are alphabetically sorted by
      * collection name.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return the collections in the system
      * @throws SQLException if database error
      */
-    public List<Collection> findAll(Context context) throws SQLException;
+    public List<Collection> findAll(Session session) throws SQLException;
 
     /**
      * Get all collections in the system. Adds support for limit and offset.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param limit   paging limit
      * @param offset  paging offset
      * @return List of Collections
      * @throws SQLException if database error
      */
-    public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    public List<Collection> findAll(Session session, Integer limit, Integer offset) throws SQLException;
 
     public List<Collection> findAuthorizedOptimized(Context context, int actionID) throws java.sql.SQLException;
 
@@ -337,14 +338,14 @@ public interface CollectionService
      */
     public Collection findByGroup(Context context, Group group) throws SQLException;
 
-    List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException;
+    List<Collection> findCollectionsWithSubscribers(Session session) throws SQLException;
 
     int countTotal(Context context) throws SQLException;
 
     /**
      * The map entry returned contains a collection as a key and sum of bitstream sizes in bytes as a value
      *
-     * @param context DSpace Context
+     * @param context current DSpace session.
      * @return List of Collections and bitstream sizes map
      * @throws SQLException if database error
      */
@@ -380,7 +381,7 @@ public interface CollectionService
      * NOTE: for better performance, this method retrieves its results from an
      *       index (cache) and does not query the database directly.
      *       This means that results may be stale or outdated until https://github.com/DSpace/DSpace/issues/2853 is resolved"
-     * 
+     *
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name
@@ -402,7 +403,7 @@ public interface CollectionService
      *       index (cache) and does not query the database directly.
      *       This means that results may be stale or outdated until
      *       https://github.com/DSpace/DSpace/issues/2853 is resolved"
-     * 
+     *
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name
@@ -423,7 +424,7 @@ public interface CollectionService
      *       and does not query the database directly.
      *       This means that results may be stale or outdated until
      *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
-     * 
+     *
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name
@@ -442,7 +443,7 @@ public interface CollectionService
      *       and does not query the database directly.
      *       This means that results may be stale or outdated until
      *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
-     * 
+     *
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
      *                         an autosuggest feature over the collection name

@@ -90,7 +90,7 @@ public class ViewWorkflowStatisticsFeatureIT extends AbstractControllerIntegrati
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        site = siteService.findSite(context);
+        site = siteService.findSite(context.getSession());
         communityA = CommunityBuilder.createCommunity(context)
             .withName("communityA")
             .build();

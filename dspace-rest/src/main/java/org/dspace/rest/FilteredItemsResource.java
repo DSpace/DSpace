@@ -58,7 +58,7 @@ public class FilteredItemsResource extends Resource {
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredItemsResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Return instance of collection with passed id. You can add more properties
@@ -128,7 +128,7 @@ public class FilteredItemsResource extends Resource {
             context = createContext();
 
             int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
-            List<ItemFilterQuery> itemFilterQueries = new ArrayList<ItemFilterQuery>();
+            List<ItemFilterQuery> itemFilterQueries = new ArrayList<>();
             for (int i = 0; i < index; i++) {
                 itemFilterQueries.add(new ItemFilterQuery(query_field.get(i), query_op.get(i), query_val.get(i)));
             }
@@ -142,10 +142,10 @@ public class FilteredItemsResource extends Resource {
             List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);
 
             Iterator<org.dspace.content.Item> childItems = itemService
-                .findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
+                .findByMetadataQuery(context.getSession(), listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
 
             int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
-            writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
+            writeStats(siteService.findSite(context.getSession()), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                        headers, request, context);
             result.annotateQuery(query_field, query_op, query_val);
             result.setUnfilteredItemCount(count);
@@ -166,9 +166,9 @@ public class FilteredItemsResource extends Resource {
 
     private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field)
         throws SQLException {
-        List<List<MetadataField>> listFieldList = new ArrayList<List<MetadataField>>();
+        List<List<MetadataField>> listFieldList = new ArrayList<>();
         for (String s : query_field) {
-            ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
+            ArrayList<MetadataField> fields = new ArrayList<>();
             listFieldList.add(fields);
             if (s.equals("*")) {
                 continue;
@@ -189,11 +189,12 @@ public class FilteredItemsResource extends Resource {
 
             if (Item.ANY.equals(qualifier)) {
                 for (MetadataField mf : metadataFieldService
-                    .findFieldsByElementNameUnqualified(context, schema, element)) {
+                    .findFieldsByElementNameUnqualified(context.getSession(), schema, element)) {
                     fields.add(mf);
                 }
             } else {
-                MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
+                MetadataField mf = metadataFieldService.findByElement(context.getSession(),
+                        schema, element, qualifier);
                 if (mf != null) {
                     fields.add(mf);
                 }
@@ -203,7 +204,7 @@ public class FilteredItemsResource extends Resource {
     }
 
     private List<UUID> getUuidsFromStrings(List<String> collSel) {
-        List<UUID> uuids = new ArrayList<UUID>();
+        List<UUID> uuids = new ArrayList<>();
         for (String s : collSel) {
             try {
                 uuids.add(UUID.fromString(s));

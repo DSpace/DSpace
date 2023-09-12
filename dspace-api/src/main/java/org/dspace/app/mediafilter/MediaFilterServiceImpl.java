@@ -116,18 +116,19 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         if (skipList != null) {
             //if a skip-list exists, we need to filter community-by-community
             //so we can respect what is in the skip-list
-            List<Community> topLevelCommunities = communityService.findAllTop(context);
+            List<Community> topLevelCommunities = communityService.findAllTop(context.getSession());
 
             for (Community topLevelCommunity : topLevelCommunities) {
                 applyFiltersCommunity(context, topLevelCommunity);
             }
         } else {
             //otherwise, just find every item and process
-            try (Session session = context.getReadOnlySession()) {
-                Iterator<Item> itemIterator = itemService.findAll(session);
+            try (Session roSession = context.getReadOnlySession()) {
+                Iterator<Item> itemIterator = itemService.findAll(roSession);
                 while (itemIterator.hasNext() && processed < max2Process) {
+                    Session rwSession = context.getSession();
                     Item roItem = itemIterator.next();
-                    Item rwItem = itemService.find(context, roItem.getID());
+                    Item rwItem = itemService.find(rwSession, roItem.getID());
                     applyFiltersItem(context, rwItem);
                     context.commit();
                 }
@@ -160,8 +161,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 Iterator<Item> itemIterator
                         = itemService.findAllByCollection(driverSession, collection);
                 while (itemIterator.hasNext() && processed < max2Process) {
+                    Session rwSession = context.getSession();
                     Item roItem = itemIterator.next();
-                    Item rwItem = itemService.find(context, roItem.getID());
+                    Item rwItem = itemService.find(rwSession, roItem.getID());
                     applyFiltersItem(context, rwItem);
                     context.commit();
                 }
@@ -465,7 +467,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         authorizeService.removeAllPolicies(context, bitstream);
 
         if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
-            Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
+            Group anonymous = groupService.findByName(context.getSession(), Group.ANONYMOUS);
             authorizeService.addPolicy(context, bitstream, Constants.READ, anonymous);
         } else {
             authorizeService.replaceAllPolicies(context, source, bitstream);

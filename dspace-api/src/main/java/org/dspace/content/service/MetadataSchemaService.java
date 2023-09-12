@@ -14,6 +14,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the MetadataSchema object.
@@ -85,20 +86,20 @@ public interface MetadataSchemaService {
      * Get the schema corresponding with this numeric ID.
      * The ID is a database key internal to DSpace.
      *
-     * @param context context, in case we need to read it in from DB
+     * @param session current request's database context.
      * @param id      the schema ID
      * @return the metadata schema object
      * @throws SQLException if database error
      */
-    public MetadataSchema find(Context context, int id) throws SQLException;
+    public MetadataSchema find(Session session, int id) throws SQLException;
 
     /**
      * Get the schema corresponding with this short name.
      *
-     * @param context   context, in case we need to read it in from DB
+     * @param session   current request's database session.
      * @param shortName the short name for the schema
      * @return the metadata schema object
      * @throws SQLException if database error
      */
-    public MetadataSchema find(Context context, String shortName) throws SQLException;
+    public MetadataSchema find(Session session, String shortName) throws SQLException;
 }

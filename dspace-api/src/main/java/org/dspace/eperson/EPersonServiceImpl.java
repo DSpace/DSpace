@@ -66,6 +66,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -109,22 +110,22 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public EPerson find(Context context, UUID id) throws SQLException {
-        return ePersonDAO.findByID(context.getSession(), EPerson.class, id);
+    public EPerson find(Session session, UUID id) throws SQLException {
+        return ePersonDAO.findByID(session, EPerson.class, id);
     }
 
     @Override
-    public EPerson findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public EPerson findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUID.fromString(id));
+            return find(session, UUID.fromString(id));
         }
     }
 
     @Override
-    public EPerson findByLegacyId(Context context, int legacyId) throws SQLException {
-        return ePersonDAO.findByLegacyId(context.getSession(), legacyId, EPerson.class);
+    public EPerson findByLegacyId(Session session, int legacyId) throws SQLException {
+        return ePersonDAO.findByLegacyId(session, legacyId, EPerson.class);
     }
 
     @Override
@@ -159,14 +160,16 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     public List<EPerson> search(Context context, String query, int offset, int limit) throws SQLException {
         try {
             List<EPerson> ePerson = new ArrayList<>();
-            EPerson person = find(context, UUID.fromString(query));
+            EPerson person = find(context.getSession(), UUID.fromString(query));
             if (person != null) {
                 ePerson.add(person);
             }
             return ePerson;
         } catch (IllegalArgumentException e) {
-            MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
-            MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+            MetadataField firstNameField = metadataFieldService.findByElement(context.getSession(),
+                    "eperson", "firstname", null);
+            MetadataField lastNameField = metadataFieldService.findByElement(context.getSession(),
+                    "eperson", "lastname", null);
             if (StringUtils.isBlank(query)) {
                 query = null;
             }
@@ -177,8 +180,10 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public int searchResultCount(Context context, String query) throws SQLException {
-        MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
-        MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+        MetadataField firstNameField = metadataFieldService.findByElement(context.getSession(),
+                "eperson", "firstname", null);
+        MetadataField lastNameField = metadataFieldService.findByElement(context.getSession(),
+                "eperson", "lastname", null);
         if (StringUtils.isBlank(query)) {
             query = null;
         }
@@ -204,14 +209,16 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 break;
 
             case EPerson.LANGUAGE:
-                metadataFieldSort = metadataFieldService.findByElement(context, "eperson", "language", null);
+                metadataFieldSort = metadataFieldService.findByElement(context.getSession(),
+                        "eperson", "language", null);
                 break;
             case EPerson.NETID:
                 sortColumn = "netid";
                 break;
 
             default:
-                metadataFieldSort = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+                metadataFieldSort = metadataFieldService.findByElement(context.getSession(),
+                        "eperson", "lastname", null);
         }
         return ePersonDAO.findAll(context.getSession(), metadataFieldSort, sortColumn, pageSize, offset);
     }
@@ -296,7 +303,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 while (constraintsIterator.hasNext()) {
                     String tableName = constraintsIterator.next();
                     if (StringUtils.equals(tableName, "item") || StringUtils.equals(tableName, "workspaceitem")) {
-                        Iterator<Item> itemIterator = itemService.findBySubmitter(context, ePerson, true);
+                        Iterator<Item> itemIterator = itemService.findBySubmitter(context.getSession(), ePerson, true);
 
                         VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance()
                                                                       .getVersionHistoryService();
@@ -513,7 +520,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         List<String> tableList = new ArrayList<>();
 
         // check for eperson in item table
-        Iterator<Item> itemsBySubmitter = itemService.findBySubmitter(context, ePerson, true);
+        Iterator<Item> itemsBySubmitter = itemService.findBySubmitter(context.getSession(), ePerson, true);
         if (itemsBySubmitter.hasNext()) {
             tableList.add("item");
         }
@@ -585,7 +592,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         if (CollectionUtils.isEmpty(owners)) {
             return null;
         }
-        return find(context, UUIDUtils.fromString(owners.get(0).getAuthority()));
+        return find(context.getSession(), UUIDUtils.fromString(owners.get(0).getAuthority()));
     }
 
     @Override

@@ -156,7 +156,7 @@ public class CollectionItemTemplateController {
     }
 
     private Collection getCollection(Context context, UUID uuid) throws SQLException {
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException(
                 "The given uuid did not resolve to a collection on the server: " + uuid);

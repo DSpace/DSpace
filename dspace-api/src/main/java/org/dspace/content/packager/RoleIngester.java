@@ -226,7 +226,7 @@ public class RoleIngester implements PackageIngester {
             log.debug("Translated group name:  {}", name);
 
             Group groupObj = null; // The group to restore
-            Group collider = groupService.findByName(context, name); // Existing group?
+            Group collider = groupService.findByName(context.getSession(), name); // Existing group?
             if (null != collider) { // Group already exists, so empty it
 
                 if (params.replaceModeEnabled()) { // -r -f
@@ -248,7 +248,7 @@ public class RoleIngester implements PackageIngester {
                         // Remove all group members *EXCEPT* we don't ever want
                         // to remove the current user from the list of Administrators
                         // (otherwise remainder of ingest will fail)
-                        if (!(collider.equals(groupService.findByName(context, Group.ADMIN)) &&
+                        if (!(collider.equals(groupService.findByName(context.getSession(), Group.ADMIN)) &&
                             member.equals(context.getCurrentUser()))) {
                             groupService.removeMember(context, collider, member);
                         }
@@ -350,7 +350,7 @@ public class RoleIngester implements PackageIngester {
             }
 
             // Find previously created group
-            Group groupObj = groupService.findByName(context, name);
+            Group groupObj = groupService.findByName(context.getSession(), name);
             log.debug("Looked up the group and found {}", groupObj);
             NodeList members = group
                 .getElementsByTagName(RoleDisseminator.MEMBER_GROUP);
@@ -360,7 +360,7 @@ public class RoleIngester implements PackageIngester {
                 //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
                 memberName = PackageUtils.translateGroupNameForImport(context, memberName);
                 // Find previously created group
-                Group memberGroup = groupService.findByName(context, memberName);
+                Group memberGroup = groupService.findByName(context.getSession(), memberName);
                 groupService.addMember(context, groupObj, memberGroup);
             }
             // Actually update Group info in DB

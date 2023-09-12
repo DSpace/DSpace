@@ -344,7 +344,7 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkCollectionMigration() throws Exception {
-        assertNotNull(collectionService.find(context, collection.getID()));
+        assertNotNull(collectionService.find(context.getSession(), collection.getID()));
     }
 
     /**
@@ -353,7 +353,7 @@ public class ItemExportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkItemMigration(Item item) throws Exception {
-        assertNotNull(itemService.find(context, item.getID()));
+        assertNotNull(itemService.find(context.getSession(), item.getID()));
     }
 
     private void perfomExportScript(String[] args)

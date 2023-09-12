@@ -485,7 +485,8 @@ public class Utils {
             String uuid = string.substring(string.lastIndexOf('/') + 1);
             try {
                 for (DSpaceObjectService dSpaceObjectService : dSpaceObjectServices) {
-                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, UUIDUtils.fromString(uuid));
+                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context.getSession(),
+                            UUIDUtils.fromString(uuid));
                     if (dSpaceObject != null) {
                         dSpaceObjects.add(dSpaceObject);
                         break;

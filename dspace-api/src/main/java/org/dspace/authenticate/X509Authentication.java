@@ -105,7 +105,7 @@ public class X509Authentication implements AuthenticationMethod {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(X509Authentication.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * public key of CA to check client certs against.
@@ -388,7 +388,7 @@ public class X509Authentication implements AuthenticationMethod {
      * @return List<String> of special groups configured for this authenticator
      */
     private List<String> getX509Groups() {
-        List<String> groupNames = new ArrayList<String>();
+        List<String> groupNames = new ArrayList<>();
 
         String[] groups = configurationService
             .getArrayProperty("authentication-x509.groups");
@@ -459,7 +459,7 @@ public class X509Authentication implements AuthenticationMethod {
             if (groupNames != null) {
                 for (String groupName : groupNames) {
                     if (groupName != null) {
-                        Group group = groupService.findByName(context, groupName);
+                        Group group = groupService.findByName(context.getSession(), groupName);
                         if (group != null) {
                             groups.add(group);
                         } else {

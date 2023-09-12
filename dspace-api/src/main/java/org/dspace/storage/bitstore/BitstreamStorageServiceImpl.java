@@ -231,7 +231,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
             while (cleanedBitstreamCount < deletedBitstreamCount) {
 
-                List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context, limit, offset);
+                List<Bitstream> storage = bitstreamService.findDeletedBitstreams(context.getSession(), limit, offset);
 
                 if (CollectionUtils.isEmpty(storage)) {
                     break;
@@ -291,7 +291,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
                     // Since versioning allows for multiple bitstreams, check if the internal
                     // identifier isn't used on
                     // another place
-                    if (bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty()) {
+                    if (bitstreamService.findDuplicateInternalIdentifier(context.getSession(), bitstream).isEmpty()) {
                         this.getStore(bitstream.getStoreNumber()).remove(bitstream);
 
                         String message = ("Deleted bitstreamID " + bid + ", internalID " + bitstream.getInternalId());
@@ -397,7 +397,8 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld,
                         Integer batchCommitSize) throws IOException, SQLException, AuthorizeException {
         //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old
-        Iterator<Bitstream> allBitstreamsInSource = bitstreamService.findByStoreNumber(context, assetstoreSource);
+        Iterator<Bitstream> allBitstreamsInSource
+                = bitstreamService.findByStoreNumber(context.getSession(), assetstoreSource);
         int processedCounter = 0;
 
         while (allBitstreamsInSource.hasNext()) {

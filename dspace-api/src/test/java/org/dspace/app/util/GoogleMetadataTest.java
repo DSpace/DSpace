@@ -369,7 +369,7 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         Date embargoDate = Date.from(ZonedDateTime.now(ZoneOffset.UTC)
                 .plus(period)
                 .toInstant());
-        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         authorizeService.removeAllPolicies(context, b);
         resourcePolicyService.removeAllPolicies(context, b);
         ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, anonGroup,

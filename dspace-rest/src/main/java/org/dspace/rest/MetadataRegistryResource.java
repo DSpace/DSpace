@@ -70,7 +70,7 @@ public class MetadataRegistryResource extends Resource {
     protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
                                                                                  .getMetadataSchemaService();
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataRegistryResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Return all metadata registry items in DSpace.
@@ -108,7 +108,7 @@ public class MetadataRegistryResource extends Resource {
             context = createContext();
 
             List<org.dspace.content.MetadataSchema> schemas = metadataSchemaService.findAll(context);
-            metadataSchemas = new ArrayList<MetadataSchema>();
+            metadataSchemas = new ArrayList<>();
             for (org.dspace.content.MetadataSchema schema : schemas) {
                 metadataSchemas.add(new MetadataSchema(schema, expand, context));
             }
@@ -165,7 +165,8 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
+            org.dspace.content.MetadataSchema schema
+                    = metadataSchemaService.find(context.getSession(), schemaPrefix);
             metadataSchema = new MetadataSchema(schema, expand, context);
             if (schema == null) {
                 processException(String.format("Schema not found for index %s", schemaPrefix), context);
@@ -264,7 +265,8 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
+            org.dspace.content.MetadataSchema schema
+                    = metadataSchemaService.find(context.getSession(), schemaPrefix);
 
             if (schema == null) {
                 log.error(String.format("Schema not found for prefix %s", schemaPrefix));
@@ -272,7 +274,7 @@ public class MetadataRegistryResource extends Resource {
             }
 
             org.dspace.content.MetadataField field = metadataFieldService
-                .findByElement(context, schema, element, qualifier);
+                .findByElement(context.getSession(), schema, element, qualifier);
             if (field == null) {
                 log.error(String.format("Field %s.%s.%s not found", schemaPrefix, element, qualifier));
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -331,7 +333,8 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.MetadataField field = metadataFieldService.find(context, fieldId);
+            org.dspace.content.MetadataField field
+                    = metadataFieldService.find(context.getSession(), fieldId);
             if (field == null) {
                 log.error(String.format("Metadata Field %d not found", fieldId));
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -411,8 +414,9 @@ public class MetadataRegistryResource extends Resource {
             log.debug("Creating return object.");
             retSchema = new MetadataSchema(dspaceSchema, "", context);
 
-            writeStats(siteService.findSite(context), UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
-                       headers, request, context);
+            writeStats(siteService.findSite(context.getSession()),
+                    UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
 
             context.complete();
             log.info("Schema created" + retSchema.getPrefix());
@@ -489,15 +493,17 @@ public class MetadataRegistryResource extends Resource {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
-            org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
+            org.dspace.content.MetadataSchema schema
+                    = metadataSchemaService.find(context.getSession(), schemaPrefix);
             if (schema == null) {
                 log.error(String.format("Schema not found for prefix %s", schemaPrefix));
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
             org.dspace.content.MetadataField dspaceField = metadataFieldService
                 .create(context, schema, field.getElement(), field.getQualifier(), field.getDescription());
-            writeStats(siteService.findSite(context), UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
-                       headers, request, context);
+            writeStats(siteService.findSite(context.getSession()),
+                    UsageEvent.Action.CREATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
 
             retField = new MetadataField(schema, dspaceField, "", context);
             context.complete();
@@ -564,14 +570,16 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.MetadataField dspaceField = metadataFieldService.find(context, fieldId);
+            org.dspace.content.MetadataField dspaceField
+                    = metadataFieldService.find(context.getSession(), fieldId);
             if (field == null) {
                 log.error(String.format("Metadata Field %d not found", fieldId));
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
 
-            writeStats(siteService.findSite(context), UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
-                       headers, request, context);
+            writeStats(siteService.findSite(context.getSession()),
+                    UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
 
             dspaceField.setElement(field.getElement());
             dspaceField.setQualifier(field.getQualifier());
@@ -638,14 +646,15 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.MetadataField dspaceField = metadataFieldService.find(context, fieldId);
+            org.dspace.content.MetadataField dspaceField
+                    = metadataFieldService.find(context.getSession(), fieldId);
             if (dspaceField == null) {
                 log.error(String.format("Metadata Field %d not found", fieldId));
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            writeStats(siteService.findSite(context), UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor,
-                       headers,
-                       request, context);
+            writeStats(siteService.findSite(context.getSession()),
+                    UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
 
             metadataFieldService.delete(context, dspaceField);
             context.complete();
@@ -704,14 +713,15 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.find(context, schemaId);
+            org.dspace.content.MetadataSchema dspaceSchema
+                    = metadataSchemaService.find(context.getSession(), schemaId);
             if (dspaceSchema == null) {
                 log.error(String.format("Metadata Schema %d not found", schemaId));
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-            writeStats(siteService.findSite(context), UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor,
-                       headers,
-                       request, context);
+            writeStats(siteService.findSite(context.getSession()),
+                    UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
 
             metadataSchemaService.delete(context, dspaceSchema);
             context.complete();

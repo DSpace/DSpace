@@ -49,14 +49,14 @@ public class CollectionMappedItemLinkRepository extends AbstractDSpaceRestReposi
                                          Projection projection) {
         try {
             Context context = obtainContext();
-            Collection collection = collectionService.find(context, collectionId);
+            Collection collection = collectionService.find(context.getSession(), collectionId);
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
             int total = itemService.countByCollectionMapping(context, collection);
             Pageable pageable = utils.getPageable(optionalPageable);
             List<Item> items = new ArrayList<>();
-            itemService.findByCollectionMapping(context, collection, pageable.getPageSize(),
+            itemService.findByCollectionMapping(context.getSession(), collection, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset())).forEachRemaining(items::add);
             return converter.toRestPage(items, pageable, total, projection);
         } catch (SQLException e) {

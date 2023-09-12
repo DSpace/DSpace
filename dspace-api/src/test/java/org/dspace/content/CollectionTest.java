@@ -149,7 +149,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCollectionFind() throws Exception {
         UUID id = collection.getID();
-        Collection found = collectionService.find(context, id);
+        Collection found = collectionService.find(context.getSession(), id);
         assertThat("testCollectionFind 0", found, notNullValue());
         assertThat("testCollectionFind 1", found.getID(), equalTo(id));
         //the community created by default has no name
@@ -223,7 +223,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        List<Collection> all = collectionService.findAll(context);
+        List<Collection> all = collectionService.findAll(context.getSession());
         assertThat("testFindAll 0", all, notNullValue());
         assertTrue("testFindAll 1", all.size() >= 1);
 
@@ -241,7 +241,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetItems() throws Exception {
-        Iterator<Item> items = itemService.findByCollection(context, collection);
+        Iterator<Item> items = itemService.findByCollection(context.getSession(), collection);
         assertThat("testGetItems 0", items, notNullValue());
         //by default is empty
         assertFalse("testGetItems 1", items.hasNext());
@@ -252,7 +252,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetAllItems() throws Exception {
-        Iterator<Item> items = itemService.findByCollection(context, collection);
+        Iterator<Item> items = itemService.findByCollection(context.getSession(), collection);
         assertThat("testGetAllItems 0", items, notNullValue());
         //by default is empty
         assertFalse("testGetAllItems 1", items.hasNext());
@@ -685,7 +685,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         collectionService.addItem(context, collection, item);
         boolean added = false;
-        Iterator<Item> ii = itemService.findByCollection(context, collection);
+        Iterator<Item> ii = itemService.findByCollection(context.getSession(), collection);
         while (ii.hasNext()) {
             if (ii.next().equals(item)) {
                 added = true;
@@ -735,7 +735,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         collectionService.removeItem(context, collection, item);
         boolean isthere = false;
-        Iterator<Item> ii = itemService.findByCollection(context, collection);
+        Iterator<Item> ii = itemService.findByCollection(context.getSession(), collection);
         while (ii.hasNext()) {
             if (ii.next().equals(item)) {
                 isthere = true;
@@ -996,7 +996,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         UUID id = collection.getID();
         collectionService.delete(context, collection);
-        collection = collectionService.find(context, id);
+        collection = collectionService.find(context.getSession(), id);
         assertThat("testDelete 0", collection, nullValue());
     }
 

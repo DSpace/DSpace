@@ -41,13 +41,13 @@ import org.swordapp.server.UriRegistry;
 
 public class MediaResourceManagerDSpace extends DSpaceSwordAPI
     implements MediaResourceManager {
-    private static Logger log = org.apache.logging.log4j.LogManager
+    private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(MediaResourceManagerDSpace.class);
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory
         .getInstance().getAuthorizeService();
 
-    private VerboseDescription verboseDescription = new VerboseDescription();
+    private final VerboseDescription verboseDescription = new VerboseDescription();
 
     private boolean isAccessible(Context context, Bitstream bitstream)
         throws DSpaceSwordException {
@@ -113,8 +113,8 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
         } else {
             // we just want to ask for the atom version, so we bypass the main content
             // negotiation place
-            Map<Float, List<String>> analysed = new HashMap<Float, List<String>>();
-            List<String> list = new ArrayList<String>();
+            Map<Float, List<String>> analysed = new HashMap<>();
+            List<String> list = new ArrayList<>();
             list.add("application/atom+xml");
             analysed.put((float) 1.0, list);
             disseminator = SwordDisseminatorFactory
@@ -128,6 +128,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                                  disseminator.getPackaging());
     }
 
+    @Override
     public MediaResource getMediaResourceRepresentation(String uri,
                                                         Map<String, String> accept, AuthCredentials authCredentials,
                                                         SwordConfiguration swordConfig)
@@ -166,7 +167,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
                     ctx = sc.getContext();
 
                     // re-retrieve the bitstream using the new context
-                    bitstream = bitstreamService.find(ctx, bitstream.getID());
+                    bitstream = bitstreamService.find(ctx.getSession(), bitstream.getID());
 
                     // and re-verify its accessibility
                     accessible = this.isAccessible(ctx, bitstream);
@@ -249,6 +250,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
         return lm;
     }
 
+    @Override
     public DepositReceipt replaceMediaResource(String emUri, Deposit deposit,
                                                AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
@@ -417,6 +419,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
         }
     }
 
+    @Override
     public void deleteMediaResource(String emUri,
                                     AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
@@ -547,6 +550,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
         }
     }
 
+    @Override
     public DepositReceipt addResource(String emUri, Deposit deposit,
                                       AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {

@@ -363,6 +363,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Removes all documents from the Lucene index
      */
+    @Override
     public void deleteIndex() {
         try {
             final List<IndexFactory> indexableObjectServices = indexObjectServiceFactory.
@@ -610,7 +611,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             for (ResourcePolicy rp : collectionsPolicies) {
                 Collection collection = ContentServiceFactory.getInstance().getCollectionService()
-                                                             .find(context, rp.getdSpaceObject().getID());
+                                                             .find(context.getSession(), rp.getdSpaceObject().getID());
                 allCollections.add(collection);
             }
 
@@ -619,8 +620,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 for (int i = 0; i < communitiesPolicies.size(); i++) {
                     ResourcePolicy rp = communitiesPolicies.get(i);
-                    Community community = ContentServiceFactory.getInstance().getCommunityService()
-                                                               .find(context, rp.getdSpaceObject().getID());
+                    Community community = ContentServiceFactory.getInstance()
+                            .getCommunityService()
+                            .find(context.getSession(), rp.getdSpaceObject().getID());
 
                     locationQuery.append("m").append(community.getID());
 
@@ -633,7 +635,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 Iterator<Collection> collIter = allCollections.iterator();
 
-                if (communitiesPolicies.size() > 0 && allCollections.size() > 0) {
+                if (!communitiesPolicies.isEmpty() && !allCollections.isEmpty()) {
                     locationQuery.append(" OR ");
                 }
 
@@ -725,7 +727,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             int type = ("location.comm").equals(field) ? Constants.COMMUNITY : Constants.COLLECTION;
             DSpaceObject commColl = null;
             if (StringUtils.isNotBlank(value)) {
-                commColl = contentServiceFactory.getDSpaceObjectService(type).find(context, UUID.fromString(value));
+                commColl = contentServiceFactory.getDSpaceObjectService(type)
+                        .find(context.getSession(), UUID.fromString(value));
             }
             if (commColl != null) {
                 return commColl.getName();

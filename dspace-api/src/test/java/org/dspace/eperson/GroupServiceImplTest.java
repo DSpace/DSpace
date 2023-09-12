@@ -93,6 +93,7 @@ public class GroupServiceImplTest
 
     /**
      * Test of setName method applied to a 'permanent' Group.
+     * @throws java.lang.Exception passed through.
      */
     @Test(expected = SQLException.class)
     public void testSetName_permanent()
@@ -100,7 +101,7 @@ public class GroupServiceImplTest
         System.out.println("setName on a 'permanent' Group");
         String name = "NOTANONYMOUS";
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         groupService.setName(group, name);
     }
 
@@ -400,13 +401,14 @@ public class GroupServiceImplTest
 
     /**
      * Test of delete method applied to a 'permanent' Group.
+     * @throws java.lang.Exception passed through.
      */
     @Test(expected = SQLException.class)
     public void testDelete_permanent()
         throws Exception {
         System.out.println("delete on a 'permanent' Group");
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         groupService.delete(context, group);
     }
 

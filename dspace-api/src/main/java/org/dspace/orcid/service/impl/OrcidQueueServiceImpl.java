@@ -228,7 +228,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
     private List<Relationship> findRelationshipsByItem(Context context, Item item) {
         try {
-            return relationshipService.findByItem(context, item);
+            return relationshipService.findByItem(context.getSession(), item);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

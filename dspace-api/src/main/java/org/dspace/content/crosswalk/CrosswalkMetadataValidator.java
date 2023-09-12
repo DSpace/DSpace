@@ -75,7 +75,7 @@ public class CrosswalkMetadataValidator {
         throws SQLException, AuthorizeException, CrosswalkException {
         if (!validatedBefore(schema, element, qualifier)) {
             // Verify that the schema exists
-            MetadataSchema mdSchema = metadataSchemaService.find(context, schema);
+            MetadataSchema mdSchema = metadataSchemaService.find(context.getSession(), schema);
             MetadataField mdField = null;
 
             if (mdSchema == null) {
@@ -97,7 +97,7 @@ public class CrosswalkMetadataValidator {
 
             if (mdSchema != null) {
                 // Verify that the element exists; this part is reachable only if the metadata schema is valid
-                mdField = metadataFieldService.findByElement(context, mdSchema, element, qualifier);
+                mdField = metadataFieldService.findByElement(context.getSession(), mdSchema, element, qualifier);
                 if (mdField == null) {
                     if (forceCreate && fieldChoice.equals("add")) {
                         try {

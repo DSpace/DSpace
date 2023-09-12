@@ -116,7 +116,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      * object only to the {@link Group#ANONYMOUS} after the specified
      * embargoPeriod.  Any other READ permissions will be removed.
      *
-     * @param <B> type of this Builder.
+     * @param <B> type of {@code DSpaceObject} being built.
      * @param embargoPeriod
      *            the embargo period after which the READ permission will be
      *            active.
@@ -134,7 +134,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                     .toInstant();
             Date embargoDate = Date.from(embargoInstant);
 
-            return setOnlyReadPermission(dso, groupService.findByName(context, Group.ANONYMOUS), embargoDate);
+            Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
+            return setOnlyReadPermission(dso, anonymousGroup, embargoDate);
         } catch (Exception e) {
             return handleException(e);
         }

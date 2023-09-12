@@ -58,11 +58,13 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
     protected Context context;
 
 
+    @Override
     public HarvestScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager()
                            .getServiceByName("harvest", HarvestScriptConfiguration.class);
     }
 
+    @Override
     public void setup() throws ParseException {
         harvestedCollectionService =
                 HarvestServiceFactory.getInstance().getHarvestedCollectionService();
@@ -129,7 +131,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         UUID currentUserUuid = this.getEpersonIdentifier();
         try {
             this.context = new Context(Context.Mode.BATCH_EDIT);
-            EPerson eperson = ePersonService.find(context, currentUserUuid);
+            EPerson eperson = ePersonService.find(context.getSession(), currentUserUuid);
             if (eperson == null) {
                 super.handler.logError("EPerson not found: " + currentUserUuid);
                 throw new IllegalArgumentException("Unable to find a user with uuid: " + currentUserUuid);
@@ -140,6 +142,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         }
     }
 
+    @Override
     public void internalRun() throws Exception {
         if (help) {
             printHelp();
@@ -270,7 +273,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 } else {
                     // not a handle, try and treat it as an collection database UUID
                     handler.logInfo("Looking up by UUID: " + collectionID + ", " + "in context: " + context);
-                    targetCollection = collectionService.find(context, UUID.fromString(collectionID));
+                    targetCollection = collectionService.find(context.getSession(), UUID.fromString(collectionID));
                 }
             }
             // was the collection valid?
@@ -330,7 +333,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
             context.turnOffAuthorisationSystem();
 
             ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-            Iterator<Item> it = itemService.findByCollection(context, collection);
+            Iterator<Item> it = itemService.findByCollection(context.getSession(), collection);
             int i = 0;
             while (it.hasNext()) {
                 i++;

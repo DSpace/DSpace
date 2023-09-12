@@ -51,17 +51,18 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     private static final String ON_BEHALF_OF_REQUEST_PARAM = "X-On-Behalf-Of";
 
-    private RestAuthenticationService restAuthenticationService;
+    private final RestAuthenticationService restAuthenticationService;
 
-    private EPersonRestAuthenticationProvider authenticationProvider;
+    private final EPersonRestAuthenticationProvider authenticationProvider;
 
-    private RequestService requestService;
+    private final RequestService requestService;
 
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public StatelessAuthenticationFilter(AuthenticationManager authenticationManager,
                                          RestAuthenticationService restAuthenticationService,
@@ -165,7 +166,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             throw new IllegalArgumentException("The given UUID in the X-On-Behalf-Of header " +
                                                    "was not a proper UUID");
         }
-        EPerson onBehalfOfEPerson = ePersonService.find(context, epersonUuid);
+        EPerson onBehalfOfEPerson = ePersonService.find(context.getSession(), epersonUuid);
         if (onBehalfOfEPerson == null) {
             throw new IllegalArgumentException("The given UUID in the X-On-Behalf-Of header " +
                                                    "was not a proper EPerson UUID");

@@ -693,7 +693,7 @@ public class DOIOrganiser {
         // try to detect ItemID
         if (identifier
             .matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}")) {
-            DSpaceObject dso = itemService.find(context, UUID.fromString(identifier));
+            DSpaceObject dso = itemService.find(context.getSession(), UUID.fromString(identifier));
 
             if (null != dso) {
                 doiRow = doiService.findDOIByDSpaceObject(context, dso);

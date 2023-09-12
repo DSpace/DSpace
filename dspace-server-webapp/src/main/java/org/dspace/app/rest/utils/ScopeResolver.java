@@ -40,9 +40,9 @@ public class ScopeResolver {
         if (StringUtils.isNotBlank(scope)) {
             try {
                 UUID uuid = UUID.fromString(scope);
-                scopeObj = new IndexableCommunity(communityService.find(context, uuid));
+                scopeObj = new IndexableCommunity(communityService.find(context.getSession(), uuid));
                 if (scopeObj.getIndexedObject() == null) {
-                    scopeObj = new IndexableCollection(collectionService.find(context, uuid));
+                    scopeObj = new IndexableCollection(collectionService.find(context.getSession(), uuid));
                 }
             } catch (IllegalArgumentException ex) {
                 log.warn("The given scope string " + StringUtils.trimToEmpty(scope) + " is not a UUID", ex);

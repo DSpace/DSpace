@@ -89,7 +89,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
-        itemService.delete(context, itemService.find(context, importedItem.getID()));
+        itemService.delete(context, itemService.find(context.getSession(), importedItem.getID()));
         context.restoreAuthSystemState();
     }
 
@@ -107,7 +107,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
-        itemService.delete(context, itemService.find(context, importedItem.getID()));
+        itemService.delete(context, itemService.find(context.getSession(), importedItem.getID()));
         context.restoreAuthSystemState();
     }
 
@@ -125,7 +125,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
-        itemService.delete(context, itemService.find(context, importedItem.getID()));
+        itemService.delete(context, itemService.find(context.getSession(), importedItem.getID()));
         context.restoreAuthSystemState();
     }
 
@@ -167,9 +167,9 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         Item importedItem = findItemByName("Test Import 1");
 
 
-        assertEquals(1, relationshipService.findByItem(context, importedItem).size());
+        assertEquals(1, relationshipService.findByItem(context.getSession(), importedItem).size());
         context.turnOffAuthorisationSystem();
-        itemService.delete(context, itemService.find(context, importedItem.getID()));
+        itemService.delete(context, itemService.find(context.getSession(), importedItem.getID()));
         context.restoreAuthSystemState();
     }
 
@@ -178,7 +178,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
         Item personItem = ItemBuilder.createItem(context, personCollection)
                                      .withTitle("Person1").build();
-        List<Relationship> relationshipList = relationshipService.findByItem(context, personItem);
+        List<Relationship> relationshipList = relationshipService.findByItem(context.getSession(), personItem);
         assertEquals(0, relationshipList.size());
         Item publicationItem = ItemBuilder.createItem(context, publicationCollection)
                                           .withTitle("Publication1").build();
@@ -196,7 +196,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
         Item importedItem = findItemByName("Person1");
 
 
-        assertEquals(1, relationshipService.findByItem(context, importedItem).size());
+        assertEquals(1, relationshipService.findByItem(context.getSession(), importedItem).size());
 
     }
 
@@ -238,7 +238,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
 
     private Item findItemByName(String name) throws SQLException {
         Item importedItem = null;
-        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context));
+        List<Item> allItems = IteratorUtils.toList(itemService.findAll(context.getSession()));
         for (Item item : allItems) {
             if (item.getName().equals(name)) {
                 importedItem = item;

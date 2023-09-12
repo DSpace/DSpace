@@ -332,7 +332,7 @@ public class XSLTIngestionCrosswalk
                 String element = elt.getAttributeValue("element");
                 String qualifier = elt.getAttributeValue("qualifier");
                 MetadataSchema ms = ContentServiceFactory.getInstance().getMetadataSchemaService()
-                                                         .find(context, schema);
+                                                         .find(context.getSession(), schema);
                 if (ms == null) {
                     System.err.println("DIM Error, Cannot find metadata schema for: schema=\"" + schema +
                                            "\" (... element=\"" + element + "\", qualifier=\"" + qualifier + "\")");
@@ -344,7 +344,7 @@ public class XSLTIngestionCrosswalk
                         qualifier = null;
                     }
                     MetadataField mf = ContentServiceFactory.getInstance().getMetadataFieldService()
-                                                            .findByElement(context,
+                                                            .findByElement(context.getSession(),
                                                                            ms, element, qualifier);
                     if (mf == null) {
                         System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +

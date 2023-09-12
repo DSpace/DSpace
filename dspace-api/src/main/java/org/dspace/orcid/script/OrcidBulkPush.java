@@ -63,7 +63,7 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     /**
      * Cache that stores the synchronization mode set for a specific profile item.
      */
-    private Map<Item, OrcidSynchronizationMode> synchronizationModeByProfileItem = new HashMap<>();
+    private final Map<Item, OrcidSynchronizationMode> synchronizationModeByProfileItem = new HashMap<>();
 
     private boolean ignoreMaxAttempts = false;
 
@@ -283,7 +283,8 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     private void assignCurrentUserInContext() throws SQLException {
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
-            EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+            EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService()
+                    .find(context.getSession(), uuid);
             context.setCurrentUser(ePerson);
         }
     }

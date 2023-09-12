@@ -337,7 +337,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
         ;
 
-        targetBundle = bundleService.find(context, targetBundle.getID());
+        targetBundle = bundleService.find(context.getSession(), targetBundle.getID());
         String name = targetBundle.getName();
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
@@ -512,7 +512,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
         ;
 
-        targetBundle = bundleService.find(context, targetBundle.getID());
+        targetBundle = bundleService.find(context.getSession(), targetBundle.getID());
         String name = targetBundle.getName();
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
@@ -632,7 +632,7 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         // at this moment the bitstream should NOT be marked as deleted, because it has been attached to target bundle
         assertFalse(context.reloadEntity(bitstream).isDeleted());
 
-        targetBundle = bundleService.find(context, targetBundle.getID());
+        targetBundle = bundleService.find(context.getSession(), targetBundle.getID());
         String name = targetBundle.getName();
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();

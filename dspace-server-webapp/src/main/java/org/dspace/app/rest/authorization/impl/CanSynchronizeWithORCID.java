@@ -61,7 +61,7 @@ public class CanSynchronizeWithORCID implements AuthorizationFeature {
         }
 
         String id = ((ItemRest) object).getId();
-        Item item = itemService.find(context, UUID.fromString(id));
+        Item item = itemService.find(context.getSession(), UUID.fromString(id));
 
         return isOrcidSynchronizationEnabled() && isDspaceObjectOwner(ePerson, item);
     }

@@ -84,7 +84,7 @@ public class EditItemFeatureIT extends AbstractControllerIntegrationTest {
         });
         editItemFeature = authorizationFeatureService.find(EditItemFeature.NAME);
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
     }

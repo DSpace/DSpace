@@ -300,7 +300,7 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
      * @throws Exception
      */
     private void checkCollection() throws Exception {
-        assertNotNull(collectionService.find(context, collection.getID()));
+        assertNotNull(collectionService.find(context.getSession(), collection.getID()));
     }
 
     /**
@@ -309,7 +309,7 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
      * @throws Exception
      */
     private void checkItem(Item item) throws Exception {
-        assertNotNull(itemService.find(context, item.getID()));
+        assertNotNull(itemService.find(context.getSession(), item.getID()));
     }
 
     private void perfomExportScript(LinkedList<DSpaceCommandLineParameter> parameters)

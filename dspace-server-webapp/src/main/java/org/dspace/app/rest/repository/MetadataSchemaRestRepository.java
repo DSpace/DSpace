@@ -49,7 +49,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     public MetadataSchemaRest findOne(Context context, Integer id) {
         MetadataSchema metadataSchema = null;
         try {
-            metadataSchema = metadataSchemaService.find(context, id);
+            metadataSchema = metadataSchemaService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -123,7 +123,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     protected void delete(Context context, Integer id) throws AuthorizeException {
 
         try {
-            MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
+            MetadataSchema metadataSchema = metadataSchemaService.find(context.getSession(), id);
 
             if (metadataSchema == null) {
                 throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
@@ -149,7 +149,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 
-        MetadataSchema metadataSchema = metadataSchemaService.find(context, id);
+        MetadataSchema metadataSchema = metadataSchemaService.find(context.getSession(), id);
         if (metadataSchema == null) {
             throw new ResourceNotFoundException("metadata schema with id: " + id + " not found");
         }
