@@ -17,7 +17,6 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,7 +27,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -73,11 +71,11 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
-    @Resource(name = "requestItemAuthorExtractor")
-    protected RequestItemAuthorExtractor requestItemAuthorExtractor;
-
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected RequestItemEmailNotifier requestItemEmailNotifier;
 
     /*
      * DSpaceRestRepository
@@ -203,12 +201,12 @@ public class RequestItemRepository
 
         // Send the request email
         try {
-            RequestItemEmailNotifier.sendRequest(ctx, ri, responseLink);
+            requestItemEmailNotifier.sendRequest(ctx, ri, responseLink);
         } catch (IOException | SQLException ex) {
             throw new RuntimeException("Request not sent.", ex);
         }
-
-        return requestItemConverter.convert(ri, Projection.DEFAULT);
+        // #8636 - Security issue: Should not return RequestItemRest to avoid token exposure
+        return null;
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?
@@ -253,7 +251,7 @@ public class RequestItemRepository
         // Send the response email
         String subject = requestBody.findValue("subject").asText();
         try {
-            RequestItemEmailNotifier.sendResponse(context, ri, subject, message);
+            requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
             LOG.warn("Response not sent:  {}", ex::getMessage);
             throw new RuntimeException("Response not sent", ex);
@@ -262,7 +260,7 @@ public class RequestItemRepository
         // Perhaps send Open Access request to admin.s.
         if (requestBody.findValue("suggestOpenAccess").asBoolean(false)) {
             try {
-                RequestItemEmailNotifier.requestOpenAccess(context, ri);
+                requestItemEmailNotifier.requestOpenAccess(context, ri);
             } catch (IOException ex) {
                 LOG.warn("Open access request not sent:  {}", ex::getMessage);
                 throw new RuntimeException("Open access request not sent", ex);

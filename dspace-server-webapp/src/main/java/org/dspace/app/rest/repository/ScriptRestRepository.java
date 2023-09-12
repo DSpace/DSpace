@@ -37,6 +37,7 @@ import org.dspace.scripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -56,29 +57,24 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
-    // TODO: findOne() currently requires site ADMIN permissions as all scripts are admin-only at this time.
-    // If scripts ever need to be accessible to Comm/Coll Admins, we would likely need to create a new GrantedAuthority
-    // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    // authorization is verified inside the method
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ScriptRest findOne(Context context, String name) {
-
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
         if (scriptConfiguration != null) {
-            if (scriptConfiguration.isAllowedToExecute(context)) {
+            if (scriptConfiguration.isAllowedToExecute(context, null)) {
                 return converter.toRest(scriptConfiguration, utils.obtainProjection());
             } else {
                 throw new AccessDeniedException("The current user was not authorized to access this script");
             }
         }
-        throw new DSpaceBadRequestException("The script with name: " + name + " could not be found");
+        return null;
     }
 
-    // TODO: findAll() currently requires site ADMIN permissions as all scripts are admin-only at this time.
-    // If scripts ever need to be accessible to Comm/Coll Admins, we would likely need to create a new GrantedAuthority
-    // for Comm/Coll Admins in EPersonRestAuthenticationProvider to use on this endpoint
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    // authorization check is performed inside the script service
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
         List<ScriptConfiguration> scriptConfigurations =
             scriptService.getScriptConfigurations(context);
@@ -104,11 +100,17 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
         ScriptConfiguration scriptToExecute = scriptService.getScriptConfiguration(scriptName);
+
         if (scriptToExecute == null) {
-            throw new DSpaceBadRequestException("The script for name: " + scriptName + " wasn't found");
+            throw new ResourceNotFoundException("The script for name: " + scriptName + " wasn't found");
         }
-        if (!scriptToExecute.isAllowedToExecute(context)) {
-            throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
+        try {
+            if (!scriptToExecute.isAllowedToExecute(context, dSpaceCommandLineParameters)) {
+                throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName
+                        + " and the specified parameters " + StringUtils.join(dSpaceCommandLineParameters, ", "));
+            }
+        } catch (IllegalArgumentException e) {
+            throw new DSpaceBadRequestException("Illegal argoument " + e.getMessage(), e);
         }
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptToExecute.getName(), dSpaceCommandLineParameters,

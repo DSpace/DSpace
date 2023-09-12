@@ -207,9 +207,10 @@ public class MetadataWebService extends AbstractCurationTask implements Namespac
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         try {
-            // disallow DTD parsing to ensure no XXE attacks can occur.
+            // disallow DTD parsing to ensure no XXE attacks can occur
             // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setXIncludeAware(false);
             docBuilder = factory.newDocumentBuilder();
         } catch (ParserConfigurationException pcE) {
             log.error("caught exception: " + pcE);

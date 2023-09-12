@@ -147,8 +147,11 @@ public class BitstreamRestController {
             }
 
             //Determine if we need to send the file as a download or if the browser can open it inline
+            //The file will be downloaded if its size is larger than the configured threshold,
+            //or if its mimetype/extension appears in the "webui.content_disposition_format" config
             long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");
-            if (dispositionThreshold >= 0 && filesize > dispositionThreshold) {
+            if ((dispositionThreshold >= 0 && filesize > dispositionThreshold)
+                    || checkFormatForContentDisposition(format)) {
                 httpHeadersInitializer.withDisposition(HttpHeadersInitializer.CONTENT_DISPOSITION_ATTACHMENT);
             }
 
@@ -192,6 +195,24 @@ public class BitstreamRestController {
         Response.Status.Family responseCode = Response.Status.Family.familyOf(response.getStatus());
         return responseCode.equals(Response.Status.Family.SUCCESSFUL)
             || responseCode.equals(Response.Status.Family.REDIRECTION);
+    }
+
+    private boolean checkFormatForContentDisposition(BitstreamFormat format) {
+        // never automatically download undefined formats
+        if (format == null) {
+            return false;
+        }
+        List<String> formats = List.of((configurationService.getArrayProperty("webui.content_disposition_format")));
+        boolean download = formats.contains(format.getMIMEType());
+        if (!download) {
+            for (String ext : format.getExtensions()) {
+                if (formats.contains(ext)) {
+                    download = true;
+                    break;
+                }
+            }
+        }
+        return download;
     }
 
     /**

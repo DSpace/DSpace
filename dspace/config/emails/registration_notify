@@ -8,10 +8,12 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = 'DSpace: Registration Notification')
+#set($subject = "${config.get('dspace.name')}: Registration Notification")
 
 A new user has registered on ${params[0]} at ${params[1]}:
 
 Name:                   ${params[2]}
 Email:                  ${params[3]}
 Date:                   ${params[4]}
+
+The ${config.get('dspace.name')} Team

@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.time.Period;
 import java.util.UUID;
 
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
@@ -2413,7 +2414,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
-                .withEmbargoPeriod("12 months")
+                .withEmbargoPeriod(Period.ofMonths(12))
                 .build();
 
         //Turn on the authorization again
@@ -2714,7 +2715,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     /**
      * This test verifies that
      * {@link org.dspace.discovery.indexobject.InprogressSubmissionIndexFactoryImpl#storeInprogressItemFields}
-     * indexes the owning collection of workspace items
+     * indexes the owning collection of workspace items.
+     *
+     * @throws java.lang.Exception passed through.
      */
     @Test
     public void discoverSearchObjectsTestForWorkspaceItemInCollectionScope() throws Exception {
@@ -2765,7 +2768,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     /**
      * This test verifies that
      * {@link org.dspace.discovery.indexobject.InprogressSubmissionIndexFactoryImpl#storeInprogressItemFields}
-     * indexes the owning collection of workflow items
+     * indexes the owning collection of workflow items.
+     * @throws java.lang.Exception passed through.
      */
     @Test
     public void discoverSearchObjectsTestForWorkflowItemInCollectionScope() throws Exception {
@@ -6473,7 +6477,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$.facetType", equalTo("authority")))
                    //There always needs to be a self link available
                    .andExpect(jsonPath("$._links.self.href",
-                       containsString("api/discover/facets/supervisedBy?prefix=group%2520B&configuration=supervision")))
+                       containsString("api/discover/facets/supervisedBy?prefix=group%20B&configuration=supervision")))
                    //This is how the page object must look like because it's the default with size 20
                    .andExpect(jsonPath("$.page",
                        is(PageMatcher.pageEntry(0, 20))))

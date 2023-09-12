@@ -116,9 +116,17 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         return f2;
     }
 
-    public File getImageFile(File f, int page, boolean verbose)
+    /**
+     * Return an image from a bitstream with specific processing options for
+     * PDFs. This is only used by ImageMagickPdfThumbnailFilter in order to
+     * generate an intermediate image file for use with getThumbnailFile.
+     */
+    public File getImageFile(File f, boolean verbose)
         throws IOException, InterruptedException, IM4JavaException {
-        File f2 = new File(f.getParentFile(), f.getName() + ".jpg");
+        // Writing an intermediate file to disk is inefficient, but since we're
+        // doing it anyway, we should use a lossless format. IM's internal MIFF
+        // is lossless like PNG and TIFF, but much faster.
+        File f2 = new File(f.getParentFile(), f.getName() + ".miff");
         f2.deleteOnExit();
         ConvertCmd cmd = new ConvertCmd();
         IMOperation op = new IMOperation();
@@ -155,7 +163,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.define("pdf:use-cropbox=true");
         }
 
-        String s = "[" + page + "]";
+        String s = "[0]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
@@ -208,20 +216,20 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                 if (description != null) {
                     if (replaceRegex.matcher(description).matches()) {
                         if (verbose) {
-                            System.out.format("%s %s matches pattern and is replacable.%n",
-                                    description, nsrc);
+                            System.out.format("%s %s matches pattern and is replaceable.%n",
+                                    description, n);
                         }
                         continue;
                     }
                     if (description.equals(getDescription())) {
                         if (verbose) {
                             System.out.format("%s %s is replaceable.%n",
-                                    getDescription(), nsrc);
+                                    getDescription(), n);
                         }
                         continue;
                     }
                 }
-                System.out.format("Custom Thumbnail exists for %s for item %s.  Thumbnail will not be generated.%n",
+                System.out.format("Custom thumbnail exists for %s for item %s. Thumbnail will not be generated.%n",
                         nsrc, item.getHandle());
                 return false;
             }

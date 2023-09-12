@@ -103,6 +103,11 @@ public class ItemUtils {
             bundle.getElement().add(bitstreams);
             List<Bitstream> bits = b.getBitstreams();
             for (Bitstream bit : bits) {
+                // Check if bitstream is null and log the error
+                if (bit == null) {
+                    log.error("Null bitstream found, check item uuid: " + item.getID());
+                    break;
+                }
                 Element bitstream = create("bitstream");
                 bitstreams.getElement().add(bitstream);
                 String url = "";

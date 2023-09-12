@@ -19,10 +19,9 @@ import org.flywaydb.core.api.migration.Context;
  * of the "community" table. This is necessary for the upgrade from 1.3 to 1.4
  * <P>
  * This class was created because the names of database constraints differs based
- * on the type of database (Postgres vs. Oracle vs. H2). As such, it becomes difficult
+ * on the type of database (Postgres vs. H2). As such, it becomes difficult
  * to write simple SQL which will work for multiple database types (especially
- * since unit tests require H2 and the syntax for H2 is different from either
- * Oracle or Postgres).
+ * since unit tests require H2 and the syntax for H2 is different from Postgres).
  * <P>
  * NOTE: This migration class is very simple because it is meant to be used
  * in conjuction with the corresponding SQL script:

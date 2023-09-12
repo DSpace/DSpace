@@ -147,6 +147,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 String response = liveImportClient.executeHttpGetRequest(timeout, url, params);
 
                 SAXBuilder saxBuilder = new SAXBuilder();
+                // disallow DTD parsing to ensure no XXE attacks can occur
+                saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
                 Document document = saxBuilder.build(new StringReader(response));
                 Element root = document.getRootElement();
                 XPathExpression<Element> xpath = XPathFactory.instance().compile("//*[@name=\"RecordsFound\"]",
@@ -285,6 +287,8 @@ public class WOSImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     private List<Element> splitToRecords(String recordsSrc) {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
+            // disallow DTD parsing to ensure no XXE attacks can occur
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
             String cData = XPathFactory.instance().compile("//*[@name=\"Records\"]",

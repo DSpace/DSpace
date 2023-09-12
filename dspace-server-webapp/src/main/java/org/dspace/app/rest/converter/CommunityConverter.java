@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Community;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,13 @@ import org.springframework.stereotype.Component;
 public class CommunityConverter
     extends DSpaceObjectConverter<Community, CommunityRest>
         implements IndexableObjectConverter<Community, CommunityRest> {
+
+    public CommunityRest convert(Community community, Projection projection) {
+        CommunityRest resource = super.convert(community, projection);
+        resource.setArchivedItemsCount(community.countArchivedItems());
+
+        return resource;
+    }
 
     @Override
     protected CommunityRest newInstance() {
