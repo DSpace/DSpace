@@ -10,7 +10,10 @@ package org.dspace.handle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.UUID;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -27,10 +30,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+/* Created for LINDAT/CLARIAH-CZ (UFAL) */
 /**
  * Tests for PID configuration.
  *
  * @author Michaela Paurikova (michaela.paurikova at dataquest.sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class PIDConfigurationTest extends AbstractUnitTest {
     private static final String AUTHOR = "Test author name";
@@ -75,10 +81,48 @@ public class PIDConfigurationTest extends AbstractUnitTest {
 
         assertEquals("123456789/1-" + customSuffix[1], handle);
     }
-
     @Test
     public void testCollectionHandle() {
         String handle = col.getHandle();
         assertEquals("123456789/" + (handle.split("/"))[1], handle);
+    }
+//
+//    /*
+//    This is the config from test local.cfg:
+//    lr.pid.community.configurations = community=47501cdc-e2eb-44e5-85e0-89a31dc8ceee, prefix=123456789, type=epic, canonical_prefix=http://hdl.handle.net/, subprefix=1
+//    lr.pid.community.configurations = community=09f09b11-cba1-4c43-9e01-29fe919991ab, prefix=123456789, type=epic, canonical_prefix=http://hdl.handle.net/, subprefix=2
+//    lr.pid.community.configurations = community=*, prefix=123456789, type=epic, canonical_prefix=http://hdl.handle.net/, subprefix=2
+//*/
+    @Test
+    public void testInitMultipleCommunityConfigs() {
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        // now check that we have 2 community configurations in the test local.cfg
+        assertEquals(2, pidConfiguration.getPIDCommunityConfigurations().size());
+    }
+//
+    @Test
+    public  void testInitCommunityConfigSubprefix() {
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        // get the first one and check the subprefix is 1
+        PIDCommunityConfiguration pidCommunityConfiguration = pidConfiguration.getPIDCommunityConfiguration(
+                UUID.fromString("47501cdc-e2eb-44e5-85e0-89a31dc8ceee"));
+        assertEquals("Subprefix should be 1", "1", pidCommunityConfiguration.getSubprefix());
+    }
+
+    @Test
+    public  void testInitCommunityConfigMapShouldNotBeShared() throws NoSuchFieldException, IllegalAccessException {
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        PIDCommunityConfiguration pidCommunityConfiguration1 =
+                pidConfiguration.getPIDCommunityConfiguration(
+                        UUID.fromString("47501cdc-e2eb-44e5-85e0-89a31dc8ceee"));
+        PIDCommunityConfiguration pidCommunityConfiguration2 =
+                pidConfiguration.getPIDCommunityConfiguration(null);
+        assertEquals("Com2 should have local type", "local", pidCommunityConfiguration2.getType());
+        // get the private PIDCommunityConfiguration.configMap via reflection
+        Field field = PIDCommunityConfiguration.class.getDeclaredField("configMap");
+        field.setAccessible(true);
+        Map<String, String> configMap = (Map<String, String>) field.get(pidCommunityConfiguration1);
+        configMap.put("type", "epic");
+        assertEquals("Com2 should still have local type", "local", pidCommunityConfiguration2.getType());
     }
 }

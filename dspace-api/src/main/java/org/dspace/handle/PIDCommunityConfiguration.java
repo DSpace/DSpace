@@ -7,6 +7,7 @@
  */
 package org.dspace.handle;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
  * Class encapsulating community based PIDs configuration.
  *
  * @author Michaela Paurikova (michaela.paurikova at dataquest.sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 public class PIDCommunityConfiguration {
 
@@ -118,5 +120,24 @@ public class PIDCommunityConfiguration {
             communityID = UUID.fromString(value);
         }
         return communityID;
+    }
+
+    /**
+     * Creates new AssignmentRules from given string
+     *
+     * @param s String with assignment rules
+     * @return New instance of this class
+     */
+    public static PIDCommunityConfiguration fromString(String s) {
+        Map<String, String> configMap = new HashMap<String, String>();
+        for (String part : s.split(",")) {
+            String[] keyValue = part.split("=", 2);
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+                configMap.put(key, value);
+            }
+        }
+        return new PIDCommunityConfiguration(configMap);
     }
 }

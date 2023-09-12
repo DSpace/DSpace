@@ -41,12 +41,15 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseLabel;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.clarin.ClarinLicenseLabelService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
+import org.dspace.handle.PIDConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -73,6 +76,8 @@ public class ClarinWorkspaceItemRestRepositoryIT extends AbstractControllerInteg
     private ClarinLicenseLabelService clarinLicenseLabelService;
     @Autowired
     private ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
+    @Autowired
+    private InstallItemService installItemService;
 
     @Test
     public void uploadFileBiggerThanUploadFileSizeLimit() throws Exception {
@@ -808,6 +813,80 @@ public class ClarinWorkspaceItemRestRepositoryIT extends AbstractControllerInteg
         getClient(tokenAdmin).perform(get("/api/core/clarinlicenses/" + updatedClarinLicense.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bitstreams", is(1)));
+    }
+
+    /**
+     * Create Item with standard handle. The handle definition for every community is configured
+     * by the `lr.pid.community.configurations` properties.
+     */
+    @Test
+    public void createItemWithConfiguredNormalHandle() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection").build();
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                .withTitle("Item with custom handle")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        Item installedItem = installItemService.installItem(context, wItem);
+        context.restoreAuthSystemState();
+
+        Assert.assertNotNull(installedItem);
+        Assert.assertTrue(installedItem.getHandle().startsWith("123456789/2"));
+    }
+
+    /**
+     * Create Item with specific handle. The handle definition for special community is configured
+     * by the `lr.pid.community.configurations` properties.
+     */
+    @Test
+    public void createItemWithConfiguredSpecificHandle() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        // Set property in the cfg
+        String specificCommunityHandleDef = "community=" + parentCommunity.getID() + ",prefix=LRT," +
+                "type=local,canonical_prefix=http://hdl.handle.net/,subprefix=100";
+        configurationService.setProperty("lr.pid.community.configurations", specificCommunityHandleDef);
+
+        // Reload the set property in the hash map.
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        pidConfiguration.reloadPidCommunityConfigurations();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection").build();
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                .withTitle("Item with custom handle")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        Item installedItem = installItemService.installItem(context, wItem);
+        context.restoreAuthSystemState();
+
+        Assert.assertNotNull(installedItem);
+        Assert.assertTrue(installedItem.getHandle().startsWith("LRT/100"));
+
+        // Restore community configuration
+        context.turnOffAuthorisationSystem();
+        // Set property in the cfg
+        String restoreAllCommunityHandleDef = "community=*, prefix=123456789, " +
+                "type=local, canonical_prefix=http://hdl.handle.net/, subprefix=2";
+        String restoreSpecificCommunityHandleDef = "community=09f09b11-cba1-4c43-9e01-29fe919991ab, " +
+                "prefix=123456789, " + "type=local, canonical_prefix=http://hdl.handle.net/, subprefix=2";
+        ArrayList<String> configArrayCommunityConfig = new ArrayList<>(2);
+        configArrayCommunityConfig.add(restoreAllCommunityHandleDef);
+        configArrayCommunityConfig.add(restoreSpecificCommunityHandleDef);
+        configurationService.setProperty("lr.pid.community.configurations", configArrayCommunityConfig);
+
+        // Reload the set property in the hash map.
+        pidConfiguration.reloadPidCommunityConfigurations();
+        context.restoreAuthSystemState();
     }
 
     /**

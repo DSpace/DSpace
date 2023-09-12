@@ -8,6 +8,8 @@
 package org.dspace.handle;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Component;
  * Class encapsulating PIDs configuration.
  *
  * @author Michaela Paurikova (michaela.paurikova at dataquest.sk)
+ * @author Milan Majchrak (milan.majchrak at dataquest.sk)
  */
 @Component
 public class PIDConfiguration {
@@ -58,8 +62,8 @@ public class PIDConfiguration {
      * Initializes the singleton
      */
     private void initialize() {
-        //All configurations are loaded into one array.
-        //New configuration starts after loaded part contains "community".
+        // All configurations are loaded into one array.
+        // New configuration starts after loaded part contains "community".
         String[] pidCommunityConfigurationsArray = configurationService.getArrayProperty
                 (CLARIN_PID_COMMUNITY_CONFIGURATIONS_KEYWORD);
 
@@ -67,42 +71,20 @@ public class PIDConfiguration {
             return;
         }
 
-        //hashmap for creating PIDCommunityConfiguration
-        Map<String, String> map = new HashMap<String, String>();
-        pidCommunityConfigurations = new HashMap<UUID, PIDCommunityConfiguration>();
-        //exists minimally one configuration, so first community is added to map not in cycle
-        String[] keyValue = pidCommunityConfigurationsArray[0].split("=");
+        String convertedProperties = convertPropertyToValidString(pidCommunityConfigurationsArray);
+        if (StringUtils.isEmpty(convertedProperties)) {
+            log.error("Cannot convert community array property into valid string.");
+            return;
+        }
 
-        if (keyValue.length < 2) {
-            throw new RuntimeException("Cannot initialize PIDConfiguration, because the configuration " +
-                    "property has wrong syntax. Property must be in the format: `key=value`");
+        pidCommunityConfigurations = new HashMap<UUID, PIDCommunityConfiguration>();
+        for (String pidCommunityConfigurationString : convertedProperties.split(";")) {
+            PIDCommunityConfiguration pidCommunityConfiguration = PIDCommunityConfiguration
+                    .fromString(pidCommunityConfigurationString);
+            pidCommunityConfigurations.put(
+                    pidCommunityConfiguration.getCommunityID(),
+                    pidCommunityConfiguration);
         }
-        String key = keyValue[0].trim();
-        String value = keyValue[1].trim();
-        map.put(key, value);
-        //another parts of configurations
-        //start from the first position because the zero position was already added
-        for (int i = 1; i < pidCommunityConfigurationsArray.length; i++) {
-            keyValue = pidCommunityConfigurationsArray[i].split("=");
-            key = keyValue[0].trim();
-            value = keyValue[1].trim();
-            //finding the end of the configuration
-            if (key.equals("community")) {
-                //creating PIDCOmmunityConfiguration
-                PIDCommunityConfiguration pidCommunityConfiguration = new PIDCommunityConfiguration (map);
-                pidCommunityConfigurations.put(
-                        pidCommunityConfiguration.getCommunityID(),
-                        pidCommunityConfiguration);
-                //cleaning map for other configuration
-                map.clear();
-            }
-            map.put(key, value);
-        }
-        //creating PIDCommunityConfiguration because the last configuration found has not been added
-        PIDCommunityConfiguration pidCommunityConfiguration = new PIDCommunityConfiguration (map);
-        pidCommunityConfigurations.put(
-                pidCommunityConfiguration.getCommunityID(),
-                pidCommunityConfiguration);
     }
 
     /**
@@ -231,5 +213,42 @@ public class PIDConfiguration {
             Collections.addAll(prefixes, pidCommunityConfiguration.getAlternativePrefixes());
         }
         return prefixes;
+    }
+
+    /**
+     * Convert array property into single string property divided by `;` and not by `,`.
+     * @param pidCommunityConfigurationsArray
+     * @return
+     */
+    public String convertPropertyToValidString(String[] pidCommunityConfigurationsArray) {
+        String wholePccString = String.join(",", pidCommunityConfigurationsArray);
+        String[] splittedByCommunity = wholePccString.split("community=");
+        Collection<String> pccWithoutCommunity = Arrays.asList(splittedByCommunity);
+
+        // pcc = pidCommunityConfigurations
+        StringBuilder convertedPccString = new StringBuilder();
+        // Add `community=` string into start of the property
+        for (String pcc : pccWithoutCommunity) {
+            if (StringUtils.isEmpty(pcc)) {
+                continue;
+            }
+            pcc = "community=" + pcc;
+            // If last character is `,` replace it with `;`
+            if (pcc.endsWith(",")) {
+                int indexToReplace = pcc.lastIndexOf(",");
+                pcc = pcc.substring(0, indexToReplace) + ";";
+            }
+            convertedPccString.append(pcc);
+        }
+        return convertedPccString.toString();
+    }
+
+    /**
+     * Reload community configuration. It is for testing purposes.
+     */
+    public void reloadPidCommunityConfigurations() {
+        pidCommunityConfigurations.clear();
+        pidCommunityConfigurations = null;
+        initialize();
     }
 }

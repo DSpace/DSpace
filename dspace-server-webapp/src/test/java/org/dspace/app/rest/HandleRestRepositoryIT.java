@@ -45,8 +45,10 @@ import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.handle.Handle;
+import org.dspace.handle.PIDConfiguration;
 import org.dspace.handle.service.HandleClarinService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +82,9 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private HandleService handleService;
+
+    @Autowired
+    private ConfigurationService configurationService;
     @Before
     public void setup() {
         context.turnOffAuthorisationSystem();
@@ -492,6 +497,16 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection col2 =  CollectionBuilder.createCollection(context, community).build();
+
+        // Set property in the cfg
+        String specificCommunityHandleDef = "community=" + community.getID() + ",prefix=987654321," +
+                "type=local,canonical_prefix=http://hdl.handle.net/";
+        configurationService.setProperty("lr.pid.community.configurations", specificCommunityHandleDef);
+
+        // Reload the set property in the hash map.
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        pidConfiguration.reloadPidCommunityConfigurations();
+
         Item newItem = ItemBuilder.createItem(context, col2)
                 .withAuthor(AUTHOR)
                 .build();
@@ -500,6 +515,7 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertEquals(newItem.getHandle().split("/")[0], "987654321");
 
         this.cleanHandles();
+        this.restoreCommunityConfiguration();
     }
 
     @Test
@@ -558,6 +574,14 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
         Collection col2 =  CollectionBuilder.createCollection(context, community).build();
+        // Set property in the cfg
+        String specificCommunityHandleDef = "community=" + community.getID() + ",prefix=987654321," +
+                "type=local,canonical_prefix=http://hdl.handle.net/";
+        configurationService.setProperty("lr.pid.community.configurations", specificCommunityHandleDef);
+
+        // Reload the set property in the hash map.
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        pidConfiguration.reloadPidCommunityConfigurations();
         Item newItem = ItemBuilder.createItem(context, col2)
                 .withAuthor(AUTHOR)
                 .build();
@@ -582,6 +606,7 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertEquals(archivedExternalHandle2.getUrl(), externalHandle2.getUrl());
 
         this.cleanHandles();
+        this.restoreCommunityConfiguration();
     }
 
     // Clean handles of all created handles (items, cmmunity, collection, archived handles, external handles...)
@@ -616,5 +641,23 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
         //find created handle
         Handle handle = handleClarinService.findByID(context, handleId);
         return handle;
+    }
+
+    private void restoreCommunityConfiguration() {
+        context.turnOffAuthorisationSystem();
+        // Set property in the cfg
+        String allCommunityHandleDef = "community=*, prefix=123456789, " +
+                "type=local, canonical_prefix=http://hdl.handle.net/, subprefix=2";
+        String specificCommunityHandleDef = "community=09f09b11-cba1-4c43-9e01-29fe919991ab, prefix=123456789, " +
+                "type=local, canonical_prefix=http://hdl.handle.net/, subprefix=2";
+        ArrayList<String> configArrayCommunityConfig = new ArrayList<>(2);
+        configArrayCommunityConfig.add(allCommunityHandleDef);
+        configArrayCommunityConfig.add(specificCommunityHandleDef);
+        configurationService.setProperty("lr.pid.community.configurations", configArrayCommunityConfig);
+
+        // Reload the set property in the hash map.
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        pidConfiguration.reloadPidCommunityConfigurations();
+        context.restoreAuthSystemState();
     }
 }
