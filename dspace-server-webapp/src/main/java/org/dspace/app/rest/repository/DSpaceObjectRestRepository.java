@@ -57,7 +57,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
     protected void patchDSpaceObject(String apiCategory, String model, UUID id, Patch patch)
             throws AuthorizeException, ResourceNotFoundException, SQLException, UnprocessableEntityException {
         Context context = obtainContext();
-        M dso = dsoService.find(context, id);
+        M dso = dsoService.find(context.getSession(), id);
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
@@ -67,7 +67,7 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
 
     @Override
     public M findDomainObjectByPk(Context context, UUID uuid) throws SQLException {
-        return dsoService.find(context, uuid);
+        return dsoService.find(context.getSession(), uuid);
     }
 
     @Override

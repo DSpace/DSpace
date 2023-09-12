@@ -168,7 +168,7 @@ public class HarvestScheduler implements Runnable {
                         case HARVESTER_INTERRUPT_INSERT_THREAD:
                             interrupt = HARVESTER_INTERRUPT_NONE;
                             addThread(mainContext, harvestedCollectionService
-                                .find(mainContext, collectionService.find(mainContext, interruptValue)));
+                                .find(mainContext, collectionService.find(mainContext.getSession(), interruptValue)));
                             interruptValue = null;
                             break;
                         case HARVESTER_INTERRUPT_PAUSE:

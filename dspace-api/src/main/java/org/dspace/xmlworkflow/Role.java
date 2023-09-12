@@ -84,7 +84,7 @@ public class Role implements BeanNameAware {
 
     public RoleMembers getMembers(Context context, XmlWorkflowItem wfi) throws SQLException {
         if (scope == Scope.REPOSITORY) {
-            Group group = groupService.findByName(context, name);
+            Group group = groupService.findByName(context.getSession(), name);
             if (group == null) {
                 return new RoleMembers();
             } else {

@@ -36,16 +36,16 @@ import org.springframework.core.io.AbstractResource;
  */
 public class BitstreamResource extends AbstractResource {
 
-    private String name;
-    private UUID uuid;
-    private UUID currentUserUUID;
-    private boolean shouldGenerateCoverPage;
+    private final String name;
+    private final UUID uuid;
+    private final UUID currentUserUUID;
+    private final boolean shouldGenerateCoverPage;
     private byte[] file;
-    private Set<UUID> currentSpecialGroups;
+    private final Set<UUID> currentSpecialGroups;
 
-    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private CitationDocumentService citationDocumentService =
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private final CitationDocumentService citationDocumentService =
         new DSpace().getServiceManager()
                     .getServicesByType(CitationDocumentService.class).get(0);
 
@@ -89,7 +89,7 @@ public class BitstreamResource extends AbstractResource {
     public InputStream getInputStream() throws IOException {
         try (Context context = initializeContext()) {
 
-            Bitstream bitstream = bitstreamService.find(context, uuid);
+            Bitstream bitstream = bitstreamService.find(context.getSession(), uuid);
             InputStream out;
 
             if (shouldGenerateCoverPage) {
@@ -113,7 +113,7 @@ public class BitstreamResource extends AbstractResource {
     @Override
     public long contentLength() throws IOException {
         try (Context context = initializeContext()) {
-            Bitstream bitstream = bitstreamService.find(context, uuid);
+            Bitstream bitstream = bitstreamService.find(context.getSession(), uuid);
             if (shouldGenerateCoverPage) {
                 return getCoverpageByteArray(context, bitstream).length;
             } else {
@@ -126,7 +126,7 @@ public class BitstreamResource extends AbstractResource {
 
     private Context initializeContext() throws SQLException {
         Context context = new Context();
-        EPerson currentUser = ePersonService.find(context, currentUserUUID);
+        EPerson currentUser = ePersonService.find(context.getSession(), currentUserUUID);
         context.setCurrentUser(currentUser);
         currentSpecialGroups.forEach(context::setSpecialGroup);
         return context;

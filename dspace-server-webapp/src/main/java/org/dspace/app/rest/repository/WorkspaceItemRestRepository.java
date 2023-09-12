@@ -116,7 +116,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
-    private SubmissionConfigReader submissionConfigReader;
+    private final SubmissionConfigReader submissionConfigReader;
 
     public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -156,7 +156,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             Pageable pageable) {
         try {
             Context context = obtainContext();
-            EPerson ep = epersonService.find(context, submitterID);
+            EPerson ep = epersonService.find(context.getSession(), submitterID);
             long total = wis.countByEPerson(context, ep);
             List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
@@ -244,7 +244,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
         Collection collection = null;
         if (StringUtils.isNotBlank(uuid)) {
-            collection = collectionService.find(context, UUID.fromString(uuid));
+            collection = collectionService.find(context.getSession(), UUID.fromString(uuid));
         } else {
             collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
         }
@@ -345,7 +345,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                             Pageable pageable) {
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemUuid);
+            Item item = itemService.find(context.getSession(), itemUuid);
             WorkspaceItem workspaceItem = wis.findByItem(context, item);
             if (workspaceItem == null) {
                 return null;

@@ -75,7 +75,7 @@ public class CuratorTest extends AbstractUnitTest {
         instance.addParameters(parameters);
 
         // Curate the site.
-        DSpaceObject dso = SITE_SERVICE.findSite(context);
+        DSpaceObject dso = SITE_SERVICE.findSite(context.getSession());
         instance.curate(context, dso);
 
         // Check the result.

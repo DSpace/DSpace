@@ -22,6 +22,7 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -62,21 +63,21 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     }
 
     @Override
-    public MetadataValue find(Context context, int valueId) throws IOException, SQLException {
+    public MetadataValue find(Session session, int valueId) throws IOException, SQLException {
         // Grab row from DB
-        return metadataValueDAO.findByID(context.getSession(), MetadataValue.class, valueId);
+        return metadataValueDAO.findByID(session, MetadataValue.class, valueId);
     }
 
     @Override
-    public List<MetadataValue> findByField(Context context, MetadataField metadataField)
+    public List<MetadataValue> findByField(Session session, MetadataField metadataField)
         throws IOException, SQLException {
-        return metadataValueDAO.findByField(context.getSession(), metadataField);
+        return metadataValueDAO.findByField(session, metadataField);
     }
 
     @Override
-    public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
+    public Iterator<MetadataValue> findByFieldAndValue(Session session, MetadataField metadataField, String value)
             throws SQLException {
-        return metadataValueDAO.findItemValuesByFieldAndValue(context.getSession(), metadataField, value);
+        return metadataValueDAO.findItemValuesByFieldAndValue(session, metadataField, value);
     }
 
     @Override
@@ -95,7 +96,8 @@ public class MetadataValueServiceImpl implements MetadataValueService {
             DSpaceObjectService<DSpaceObject> dSpaceObjectService = contentServiceFactory
                 .getDSpaceObjectService(metadataValue.getDSpaceObject());
             // get the right class for our dspaceobject not the DSpaceObject lazy proxy
-            DSpaceObject dso = dSpaceObjectService.find(context, metadataValue.getDSpaceObject().getID());
+            DSpaceObject dso = dSpaceObjectService.find(context.getSession(),
+                    metadataValue.getDSpaceObject().getID());
             dSpaceObjectService.updateLastModified(context, dso);
         }
         update(context, metadataValue);
@@ -110,8 +112,8 @@ public class MetadataValueServiceImpl implements MetadataValueService {
     }
 
     @Override
-    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
-        return metadataValueDAO.findByValueLike(context.getSession(), value);
+    public Iterator<MetadataValue> findByValueLike(Session session, String value) throws SQLException {
+        return metadataValueDAO.findByValueLike(session, value);
     }
 
     @Override

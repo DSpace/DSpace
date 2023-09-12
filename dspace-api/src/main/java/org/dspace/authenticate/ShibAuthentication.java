@@ -293,7 +293,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                 return Collections.EMPTY_LIST;
             }
 
-            if (context.getSpecialGroups().size() > 0 ) {
+            if (!context.getSpecialGroups().isEmpty() ) {
                 log.debug("Returning cached special groups.");
                 return context.getSpecialGroups();
             }
@@ -369,7 +369,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                     // Add each group to the list.
                     for (int i = 0; i < groupNames.length; i++) {
                         try {
-                            Group group = groupService.findByName(context, groupNames[i].trim());
+                            Group group = groupService.findByName(context.getSession(), groupNames[i].trim());
                             if (group != null) {
                                 groups.add(group);
                             } else {
@@ -1030,7 +1030,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             return false;
         }
 
-        MetadataField metadataField = metadataFieldService.findByElement(context,
+        MetadataField metadataField = metadataFieldService.findByElement(context.getSession(),
                 MetadataSchemaEnum.EPERSON.getName(), metadataName, null);
         return metadataField != null;
     }
@@ -1064,7 +1064,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             return false;
         }
 
-        MetadataSchema epersonSchema = metadataSchemaService.find(context, "eperson");
+        MetadataSchema epersonSchema = metadataSchemaService.find(context.getSession(), "eperson");
         MetadataField metadataField = null;
         try {
             context.turnOffAuthorisationSystem();

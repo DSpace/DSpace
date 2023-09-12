@@ -207,20 +207,18 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Item find(Context context, UUID id) throws SQLException {
-        Item item = itemDAO.findByID(context.getSession(), Item.class, id);
+    public Item find(Session session, UUID id) throws SQLException {
+        Item item = itemDAO.findByID(session.getSession(), Item.class, id);
         if (item == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_item",
-                                               "not_found,item_id=" + id));
+                log.debug("find_item not_found, item_id={}", id);
             }
             return null;
         }
 
         // not null, return item
         if (log.isDebugEnabled()) {
-            log.debug(LogHelper.getHeader(context, "find_item", "item_id="
-                + id));
+            log.debug("find_item item_id={}", id);
         }
 
         return item;
@@ -278,80 +276,70 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAll(Context context) throws SQLException {
-        return itemDAO.findAll(context.getSession(), true);
-    }
-
-    @Override
     public Iterator<Item> findAll(Session session) throws SQLException {
         return itemDAO.findAll(session, true);
     }
 
     @Override
-    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return itemDAO.findAll(context.getSession(), true, limit, offset);
+    public Iterator<Item> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        return itemDAO.findAll(session, true, limit, offset);
     }
 
     @Override
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
-        return itemDAO.findAll(context.getSession(), true, true);
+    public Iterator<Item> findAllUnfiltered(Session session) throws SQLException {
+        return itemDAO.findAll(session, true, true);
     }
 
     @Override
-    public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
-        return itemDAO.findAllRegularItems(context.getSession());
+    public Iterator<Item> findAllRegularItems(Session session) throws SQLException {
+        return itemDAO.findAllRegularItems(session);
     }
 
     @Override
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
-        return itemDAO.findBySubmitter(context.getSession(), eperson);
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson) throws SQLException {
+        return itemDAO.findBySubmitter(session, eperson);
     }
 
     @Override
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson, boolean retrieveAllItems)
         throws SQLException {
-        return itemDAO.findBySubmitter(context.getSession(), eperson, retrieveAllItems);
+        return itemDAO.findBySubmitter(session, eperson, retrieveAllItems);
     }
 
     @Override
-    public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit)
+    public Iterator<Item> findBySubmitterDateSorted(Session session, EPerson eperson, Integer limit)
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
+            .findByElement(session, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
-        return itemDAO.findBySubmitter(context.getSession(), eperson, metadataField, limit);
+        return itemDAO.findBySubmitter(session, eperson, metadataField, limit);
     }
 
     @Override
-    public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException {
-        return findByCollection(context, collection, null, null);
+    public Iterator<Item> findByCollection(Session session, Collection collection) throws SQLException {
+        return findByCollection(session, collection, null, null);
     }
 
     @Override
-    public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findByCollection(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findArchivedByCollection(context.getSession(), collection, limit, offset);
+        return itemDAO.findArchivedByCollection(session, collection, limit, offset);
     }
 
     @Override
-    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findByCollectionMapping(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findArchivedByCollectionExcludingOwning(context.getSession(), collection, limit, offset);
+        return itemDAO.findArchivedByCollectionExcludingOwning(session, collection, limit, offset);
     }
 
     @Override
     public int countByCollectionMapping(Context context, Collection collection) throws SQLException {
         return itemDAO.countArchivedByCollectionExcludingOwning(context.getSession(), collection);
-    }
-
-    @Override
-    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
-        return itemDAO.findAllByCollection(context.getSession(), collection);
     }
 
     @Override
@@ -361,21 +349,21 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findAllByCollection(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findAllByCollection(context.getSession(), collection, limit, offset);
+        return itemDAO.findAllByCollection(session, collection, limit, offset);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Session session, Date since)
         throws SQLException {
-        return itemDAO.findAll(context.getSession(), true, true, true, since);
+        return itemDAO.findAll(session, true, true, true, since);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Session session, Date since)
         throws SQLException {
-        return itemDAO.findAll(context.getSession(), true, true, false, since);
+        return itemDAO.findAll(session, true, true, false, since);
     }
 
     @Override
@@ -792,7 +780,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         //remove subscription related with it
         subscribeService.deleteByDspaceObject(context, item);
         // Remove relationships
-        for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
+        for (Relationship relationship : relationshipService.findByItem(context.getSession(),
+                item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
         }
 
@@ -1109,7 +1098,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public List<Collection> getCollectionsNotLinked(Context context, Item item) throws SQLException {
-        List<Collection> allCollections = collectionService.findAll(context);
+        List<Collection> allCollections = collectionService.findAll(context.getSession());
         List<Collection> linkedCollections = item.getCollections();
         List<Collection> notLinkedCollections = new ArrayList<>(allCollections.size() - linkedCollections.size());
 
@@ -1307,96 +1296,62 @@ prevent the generation of resource policy entry values with null dspace_object a
         return !(hasCustomPolicy && isAnonimousGroup && datesAreNull);
     }
 
-    /**
-     * Returns an iterator of Items possessing the passed metadata field, or only
-     * those matching the passed value, if value is not Item.ANY
-     *
-     * @param context   DSpace context object
-     * @param schema    metadata field schema
-     * @param element   metadata field element
-     * @param qualifier metadata field qualifier
-     * @param value     field value or Item.ANY to match any value
-     * @return an iterator over the items matching that authority value
-     * @throws SQLException       if database error
-     *                            An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException if authorization error
-     *                            Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
     @Override
-    public Iterator<Item> findArchivedByMetadataField(Context context,
+    public Iterator<Item> findArchivedByMetadataField(Session session,
                                                       String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context.getSession(), mdf, null, true);
+            return itemDAO.findByMetadataField(session.getSession(), mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(context.getSession(), mdf, value, true);
+            return itemDAO.findByMetadataField(session.getSession(), mdf, value, true);
         }
     }
 
     @Override
-    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+    public Iterator<Item> findArchivedByMetadataField(Session session, String metadataField, String value)
             throws SQLException, AuthorizeException {
         String[] mdValueByField = getMDValueByField(metadataField);
-        return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
+        return findArchivedByMetadataField(session, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
     }
 
-    /**
-     * Returns an iterator of Items possessing the passed metadata field, or only
-     * those matching the passed value, if value is not Item.ANY
-     *
-     * @param context   DSpace context object
-     * @param schema    metadata field schema
-     * @param element   metadata field element
-     * @param qualifier metadata field qualifier
-     * @param value     field value or Item.ANY to match any value
-     * @return an iterator over the items matching that authority value
-     * @throws SQLException       if database error
-     *                            An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException if authorization error
-     *                            Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     * @throws IOException        if IO error
-     *                            A general class of exceptions produced by failed or interrupted I/O operations.
-     */
     @Override
-    public Iterator<Item> findByMetadataField(Context context,
+    public Iterator<Item> findByMetadataField(Session session,
                                               String schema, String element, String qualifier, String value)
         throws SQLException, AuthorizeException, IOException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context.getSession(), mdf, null, true);
+            return itemDAO.findByMetadataField(session, mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(context.getSession(), mdf, value, true);
+            return itemDAO.findByMetadataField(session, mdf, value, true);
         }
     }
 
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
+    public Iterator<Item> findByMetadataQuery(Session session, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit)
         throws SQLException, AuthorizeException, IOException {
         return itemDAO
-            .findByMetadataQuery(context.getSession(), listFieldList, query_op,
+            .findByMetadataQuery(session, listFieldList, query_op,
                     query_val, collectionUuids, regexClause, offset, limit);
     }
 
@@ -1480,38 +1435,38 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByAuthorityValue(Context context, String schema, String element, String qualifier,
+    public Iterator<Item> findByAuthorityValue(Session session, String schema, String element, String qualifier,
                                                String value) throws SQLException, AuthorizeException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
-        return itemDAO.findByAuthorityValue(context.getSession(), mdf, value, true);
+        return itemDAO.findByAuthorityValue(session, mdf, value, true);
     }
 
     @Override
-    public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)
+    public Iterator<Item> findByMetadataFieldAuthority(Session session, String mdString, String authority)
         throws SQLException, AuthorizeException {
         String[] elements = getElementsFilled(mdString);
         String schema = elements[0];
         String element = elements[1];
         String qualifier = elements[2];
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
-        return findByAuthorityValue(context, mds.getName(), mdf.getElement(), mdf.getQualifier(), authority);
+        return findByAuthorityValue(session, mds.getName(), mdf.getElement(), mdf.getQualifier(), authority);
     }
 
     @Override
@@ -1572,23 +1527,23 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Item findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public Item findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUID.fromString(id));
+            return find(session, UUID.fromString(id));
         }
     }
 
     @Override
-    public Item findByLegacyId(Context context, int id) throws SQLException {
-        return itemDAO.findByLegacyId(context.getSession(), id, Item.class);
+    public Item findByLegacyId(Session session, int id) throws SQLException {
+        return itemDAO.findByLegacyId(session, id, Item.class);
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public Iterator<Item> findByLastModifiedSince(Session session, Date last)
         throws SQLException {
-        return itemDAO.findByLastModifiedSince(context.getSession(), last);
+        return itemDAO.findByLastModifiedSince(session, last);
     }
 
     @Override
@@ -1719,7 +1674,8 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         // We will not verify that they are valid entries in the registry
         // until update() is called.
-        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        MetadataField metadataField = metadataFieldService.findByElement(context.getSession(),
+                schema, element, qualifier);
         if (metadataField == null) {
             throw new SQLException(
                 "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +

@@ -272,7 +272,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             List<Community> parentCommunities = community.getParentCommunities();
             String ownerHdl = null;
             if (CollectionUtils.isEmpty(parentCommunities)) {
-                ownerHdl = siteService.findSite(context).getHandle();
+                ownerHdl = siteService.findSite(context.getSession()).getHandle();
             } else {
                 ownerHdl = parentCommunities.get(0).getHandle();
             }
@@ -381,7 +381,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                                 bsfSupport = sl;
                             }
                         } else if (dcField.equals("format.internal")) {
-                            bsfInternal = (Boolean.valueOf(value)).booleanValue();
+                            bsfInternal = (Boolean.parseBoolean(value));
                         } else {
                             log.warn("Got unrecognized DC field for Bitstream: " + dcField);
                         }

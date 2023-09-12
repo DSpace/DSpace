@@ -374,7 +374,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         UUID itemid = wi.getItem().getID();
         int id = wi.getID();
         workspaceItemService.deleteWrapper(context, wi);
-        Item found = itemService.find(context, itemid);
+        Item found = itemService.find(context.getSession(), itemid);
         assertThat("testDeleteWrapperAuth 0", found, notNullValue());
         WorkspaceItem wfound = workspaceItemService.find(context, id);
         assertThat("testDeleteWrapperAuth 1", wfound, nullValue());

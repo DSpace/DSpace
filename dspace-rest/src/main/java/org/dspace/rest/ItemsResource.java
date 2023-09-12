@@ -181,8 +181,8 @@ public class ItemsResource extends Resource {
         try {
             context = createContext();
 
-            Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context);
-            items = new ArrayList<Item>();
+            Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context.getSession());
+            items = new ArrayList<>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
                 log.warn("Paging was badly set, using default values.");
@@ -469,7 +469,7 @@ public class ItemsResource extends Resource {
             org.dspace.content.Bitstream dspaceBitstream = null;
             List<Bundle> bundles = itemService.getBundles(dspaceItem, org.dspace.core.Constants.CONTENT_BUNDLE_NAME);
 
-            if (bundles != null && bundles.size() != 0) {
+            if (bundles != null && !bundles.isEmpty()) {
                 bundle = bundles.get(0); // There should be only one bundle ORIGINAL.
             }
             if (bundle == null) {
@@ -505,8 +505,7 @@ public class ItemsResource extends Resource {
                         .getBitstreamPolicies(context, dspaceBundle);
 
                     // Remove default bitstream policies
-                    List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<org.dspace.authorize
-                        .ResourcePolicy>();
+                    List<org.dspace.authorize.ResourcePolicy> policiesToRemove = new ArrayList<>();
                     for (org.dspace.authorize.ResourcePolicy policy : bitstreamsPolicies) {
                         if (policy.getdSpaceObject().getID().equals(dspaceBitstream.getID())) {
                             policiesToRemove.add(policy);
@@ -518,7 +517,7 @@ public class ItemsResource extends Resource {
 
                     org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
                     dspacePolicy.setAction(org.dspace.core.Constants.READ);
-                    dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context, groupId));
+                    dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context.getSession(), groupId));
                     dspacePolicy.setdSpaceObject(dspaceBitstream);
                     if ((year != null) || (month != null) || (day != null)) {
                         Date date = new Date();
@@ -543,7 +542,7 @@ public class ItemsResource extends Resource {
                 }
             }
 
-            dspaceBitstream = bitstreamService.find(context, dspaceBitstream.getID());
+            dspaceBitstream = bitstreamService.find(context.getSession(), dspaceBitstream.getID());
             bitstream = new Bitstream(dspaceBitstream, servletContext, "", context);
 
             context.complete();
@@ -834,7 +833,8 @@ public class ItemsResource extends Resource {
             context = createContext();
             org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
-            org.dspace.content.Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
+            org.dspace.content.Bitstream bitstream
+                    = bitstreamService.findByIdOrLegacyId(context.getSession(), bitstreamId);
             if (bitstream == null) {
                 context.abort();
                 log.warn("Bitstream(id=" + bitstreamId + ") was not found.");
@@ -915,7 +915,7 @@ public class ItemsResource extends Resource {
                      + ", language=" + metadataEntry.getLanguage() + ").");
         org.dspace.core.Context context = null;
 
-        List<Item> items = new ArrayList<Item>();
+        List<Item> items = new ArrayList<>();
         String[] metadata = mySplit(metadataEntry.getKey());
 
         // Must used own style.
@@ -928,7 +928,7 @@ public class ItemsResource extends Resource {
             context = createContext();
 
             Iterator<org.dspace.content.Item> itemIterator = itemService
-                .findByMetadataField(context, metadataEntry.getSchema(),
+                .findByMetadataField(context.getSession(), metadataEntry.getSchema(),
                                      metadataEntry.getElement(), metadataEntry.getQualifier(),
                                      metadataEntry.getValue());
 
@@ -956,7 +956,7 @@ public class ItemsResource extends Resource {
             processFinally(context);
         }
 
-        if (items.size() == 0) {
+        if (items.isEmpty()) {
             log.info("Items not found.");
         } else {
             log.info("Items were found.");
@@ -981,7 +981,7 @@ public class ItemsResource extends Resource {
         throws WebApplicationException {
         org.dspace.content.Item item = null;
         try {
-            item = itemService.findByIdOrLegacyId(context, id);
+            item = itemService.findByIdOrLegacyId(context.getSession(), id);
 
             if (item == null) {
                 context.abort();

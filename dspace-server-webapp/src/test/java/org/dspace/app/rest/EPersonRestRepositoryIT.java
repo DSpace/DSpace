@@ -119,8 +119,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         dataFull.setCanLogIn(true);
         dataFull.setMetadata(metadataRest);
 
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
-        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -944,7 +944,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -977,7 +977,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2319,7 +2319,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
@@ -2345,7 +2345,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
 
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
@@ -2385,7 +2385,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
         try {
@@ -2408,7 +2408,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
@@ -2449,7 +2449,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
         ePersonRest.setSelfRegistered(true);
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
@@ -2475,7 +2475,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
@@ -2914,7 +2914,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -2936,7 +2936,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
         } finally {
@@ -3289,7 +3289,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("Lowercasepassword");
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
@@ -3308,7 +3308,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       matchMetadata("eperson.lastname", "Boychuk"))))))
                  .andDo(result -> idRef.set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(String.valueOf(idRef.get())));
+            EPerson createdEPerson = ePersonService.find(context.getSession(),
+                    UUID.fromString(String.valueOf(idRef.get())));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "Lowercasepassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
         } finally {

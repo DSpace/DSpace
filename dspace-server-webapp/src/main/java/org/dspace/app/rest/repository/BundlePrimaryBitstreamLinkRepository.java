@@ -57,7 +57,7 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
                                              Projection projection) {
         try {
             Context context = obtainContext();
-            Bundle bundle = bundleService.find(context, bundleId);
+            Bundle bundle = bundleService.find(context.getSession(), bundleId);
             if (bundle == null) {
                 throw new ResourceNotFoundException("No such bundle: " + bundleId);
             }
@@ -142,7 +142,7 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
      */
     private Bundle setPrimaryBitstream(Context context, UUID bundleId, Bitstream bitstream, boolean shouldBeSet)
         throws SQLException {
-        Bundle bundle = bundleService.find(context, bundleId);
+        Bundle bundle = bundleService.find(context.getSession(), bundleId);
         if (bundle == null) {
             throw new ResourceNotFoundException("No such bundle: " + bundleId);
         }

@@ -156,7 +156,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         int total = 0;
         try {
             Context context = obtainContext();
-            EPerson eperson = epersonService.find(context, epersonUuid);
+            EPerson eperson = epersonService.find(context.getSession(), epersonUuid);
             if (eperson == null) {
                 return null;
             }
@@ -199,7 +199,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             if (context.getCurrentUser() == null) {
                 throw new RESTAuthorizationException("Only loggedin users can search resource policies by group");
             }
-            Group group = groupService.find(context, groupUuid);
+            Group group = groupService.find(context.getSession(), groupUuid);
             if (group == null) {
                 return null;
             }
@@ -266,7 +266,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         if (epersonUuidStr != null) {
             try {
                 UUID epersonUuid = UUID.fromString(epersonUuidStr);
-                EPerson ePerson = epersonService.find(context, epersonUuid);
+                EPerson ePerson = epersonService.find(context.getSession(), epersonUuid);
                 if (ePerson == null) {
                     throw new UnprocessableEntityException("EPerson with uuid: " + epersonUuid + " not found");
                 }
@@ -279,7 +279,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         } else {
             try {
                 UUID groupUuid = UUID.fromString(groupUuidStr);
-                Group group = groupService.find(context, groupUuid);
+                Group group = groupService.find(context.getSession(), groupUuid);
                 if (group == null) {
                     throw new UnprocessableEntityException("Group with uuid: " + groupUuid + " not found");
                 }

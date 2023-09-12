@@ -248,7 +248,7 @@ public class CommunityFiliator {
                 community = null;
             }
         } else {
-            community = communityService.find(c, UUID.fromString(communityID));
+            community = communityService.find(c.getSession(), UUID.fromString(communityID));
         }
 
         return community;

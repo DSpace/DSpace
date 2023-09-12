@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This class extends the {@link ExternalSourceEntryItemUriListHandler} abstract class and implements it specifically
- * for the List<Item> objects.
- * 
+ * This class extends the {@link ExternalSourceEntryItemUriListHandler} abstract
+ * class and implements it specifically for the {@code List<Item>} objects.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
@@ -69,7 +69,7 @@ public class ExternalSourceItemUriListHandler extends ExternalSourceEntryItemUri
         String id = matcher.group(1);
         UUID itemId = UUID.fromString(id);
         try {
-            item = itemService.find(context, itemId);
+            item = itemService.find(context.getReadOnlySession(), itemId);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -38,7 +38,8 @@ public class DSpaceFieldResolver implements FieldResolver {
                     qualifier = pieces[2];
                 }
 
-                MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+                MetadataField metadataField = metadataFieldService.findByElement(context.getSession(),
+                        schema, element, qualifier);
                 if (null != metadataField) {
                     metadataFieldCache.add(field, metadataField.getID());
                 } else {

@@ -148,7 +148,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     public Page<WorkflowItemRest> findBySubmitter(@Parameter(value = "uuid") UUID submitterID, Pageable pageable) {
         try {
             Context context = obtainContext();
-            EPerson ep = epersonService.find(context, submitterID);
+            EPerson ep = epersonService.find(context.getSession(), submitterID);
             long total = wis.countBySubmitter(context, ep);
             List<XmlWorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
                     pageable.getPageSize());
@@ -300,7 +300,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                                            Pageable pageable) {
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemUuid);
+            Item item = itemService.find(context.getSession(), itemUuid);
             XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context, item);
             if (xmlWorkflowItem == null) {
                 return null;

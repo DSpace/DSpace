@@ -90,7 +90,7 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
             throw new AuthorizeException("User unauthorized to create a new profile for user " + id);
         }
 
-        EPerson ePerson = ePersonService.find(context, id);
+        EPerson ePerson = ePersonService.find(context.getSession(), id);
         if (ePerson == null) {
             throw new UnprocessableEntityException("No EPerson exists with id: " + id);
         }
@@ -120,7 +120,7 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
             throw new AuthorizeException("User unauthorized to create a new profile for user " + id);
         }
 
-        EPerson ePerson = ePersonService.find(context, id);
+        EPerson ePerson = ePersonService.find(context.getSession(), id);
         if (ePerson == null) {
             throw new UnprocessableEntityException("No EPerson exists with id: " + id);
         }

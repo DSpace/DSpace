@@ -20,6 +20,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Community object.
@@ -74,33 +75,33 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
      * Get a list of all communities in the system. These are alphabetically
      * sorted by community name.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return the communities in the system
      * @throws SQLException if database error
      */
-    public List<Community> findAll(Context context) throws SQLException;
+    public List<Community> findAll(Session session) throws SQLException;
 
     /**
      * Get all communities in the system. Adds support for limit and offset.
      *
-     * @param context context
+     * @param session current request's database context.
      * @param limit   limit
      * @param offset  offset
      * @return list of communities
      * @throws SQLException if database error
      */
-    public List<Community> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    public List<Community> findAll(Session session, Integer limit, Integer offset) throws SQLException;
 
     /**
      * Get a list of all top-level communities in the system. These are
      * alphabetically sorted by community name. A top-level community is one
      * without a parent community.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return the top-level communities in the system
      * @throws SQLException if database error
      */
-    public List<Community> findAllTop(Context context) throws SQLException;
+    public List<Community> findAllTop(Session session) throws SQLException;
 
     /**
      * Give the community a logo. Passing in <code>null</code> removes any

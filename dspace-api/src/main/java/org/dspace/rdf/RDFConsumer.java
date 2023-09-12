@@ -109,7 +109,7 @@ public class RDFConsumer implements Consumer {
     public void consumeBitstream(Context ctx, Event event) throws SQLException {
         if (event.getEventType() == Event.MODIFY
             || event.getEventType() == Event.MODIFY_METADATA) {
-            Bitstream bitstream = bitstreamService.find(ctx, event.getSubjectID());
+            Bitstream bitstream = bitstreamService.find(ctx.getSession(), event.getSubjectID());
             if (bitstream == null) {
                 log.debug("Cannot find bitstream " + event.getSubjectID() + "! "
                               + "Ignoring, as it is likely it was deleted "
@@ -156,7 +156,7 @@ public class RDFConsumer implements Consumer {
             || event.getEventType() == Event.MODIFY_METADATA) {
             // either a Bitstream was added or removed or the Bundle was changed
             // update its item.
-            Bundle bundle = bundleService.find(ctx, event.getSubjectID());
+            Bundle bundle = bundleService.find(ctx.getSession(), event.getSubjectID());
             if (bundle == null) {
                 log.debug("Cannot find bundle " + event.getSubjectID() + "! "
                               + "Ignoring, as it is likely it was deleted "
@@ -269,7 +269,7 @@ public class RDFConsumer implements Consumer {
             || event.getEventType() == Event.REMOVE
             || event.getEventType() == Event.MODIFY
             || event.getEventType() == Event.MODIFY_METADATA) {
-            Site site = siteService.findSite(ctx);
+            Site site = siteService.findSite(ctx.getSession());
 
             DSOIdentifier id = new DSOIdentifier(Constants.SITE,
                                                  site.getID(), site.getHandle(), Arrays.asList(site.getHandle()));
@@ -341,11 +341,12 @@ public class RDFConsumer implements Consumer {
         Model m = null;
         try {
             if (id.type == Constants.SITE) {
-                m = RDFUtil.convertAndStore(ctx, siteService.findSite(ctx));
+                m = RDFUtil.convertAndStore(ctx, siteService.findSite(ctx.getSession()));
                 return;
             }
 
-            DSpaceObject dso = ContentServiceFactory.getInstance().getDSpaceObjectService(id.type).find(ctx, id.id);
+            DSpaceObject dso = ContentServiceFactory.getInstance().getDSpaceObjectService(id.type)
+                    .find(ctx.getSession(), id.id);
             if (dso == null) {
                 log.error("Cannot find " + Constants.typeText[id.type]
                               + " " + id.id + " unexpectedly! Will delete all "

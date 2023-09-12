@@ -37,7 +37,7 @@ public class UserCheck extends Check {
     public String run(ReportInfo ri) {
         Context context = new Context();
         String ret = "";
-        Map<String, Integer> info = new HashMap<String, Integer>();
+        Map<String, Integer> info = new HashMap<>();
         try {
             List<EPerson> epersons = ePersonService.findAll(context, EPerson.LASTNAME);
             info.put("Count", epersons.size());
@@ -106,7 +106,7 @@ public class UserCheck extends Check {
                 subscribers.size(), formatIds(subscribers));
 
             //subscribed collections
-            List<Collection> subscribedCols = collectionService.findCollectionsWithSubscribers(context);
+            List<Collection> subscribedCols = collectionService.findCollectionsWithSubscribers(context.getSession());
             ret += String.format(
                 "Subscribed cols.: #%d [%s]\n",
                 subscribedCols.size(), formatIds(subscribedCols));

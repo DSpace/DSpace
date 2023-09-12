@@ -647,9 +647,11 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         context.dispatchEvents();
 
         // verify person1 has a non-latest relationship, which should also be removed
-        List<Relationship> relationships1 = relationshipService.findByItem(context, person1, -1, -1, false, true);
+        List<Relationship> relationships1
+                = relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true);
         assertEquals(1, relationships1.size());
-        List<Relationship> relationships2 = relationshipService.findByItem(context, person1, -1, -1, false, false);
+        List<Relationship> relationships2
+                = relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false);
         assertEquals(2, relationships2.size());
 
         itemService.delete(context, person1);
@@ -750,7 +752,7 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         context.dispatchEvents();
         context.restoreAuthSystemState();
 
-        assertNull(itemService.find(context, item.getID()));
+        assertNull(itemService.find(context.getSession(), item.getID()));
     }
     private void assertMetadataValue(String authorQualifier, String contributorElement, String dcSchema, String value,
                                      String authority, int place, MetadataValue metadataValue) {

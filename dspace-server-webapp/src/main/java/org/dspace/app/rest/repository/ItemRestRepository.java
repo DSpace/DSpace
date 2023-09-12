@@ -104,7 +104,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
-            item = itemService.find(context, id);
+            item = itemService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -123,7 +123,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         try {
             // This endpoint only returns archived items
             long total = itemService.countArchivedItems(context);
-            Iterator<Item> it = itemService.findAll(context, pageable.getPageSize(),
+            Iterator<Item> it = itemService.findAll(context.getSession(), pageable.getPageSize(),
                 Math.toIntExact(pageable.getOffset()));
             List<Item> items = new ArrayList<>();
             while (it.hasNext()) {
@@ -156,7 +156,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         Item item = null;
         try {
-            item = itemService.find(context, id);
+            item = itemService.find(context.getSession(), id);
             if (item == null) {
                 throw new ResourceNotFoundException(ItemRest.CATEGORY + "." + ItemRest.NAME +
                     " with id: " + id + " not found");
@@ -200,14 +200,14 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_ALL)) {
             // Option 1: Copy all virtual metadata of this item to its related items. Iterate over all of the item's
             //           relationships and copy their data.
-            for (Relationship relationship : relationshipService.findByItem(context, item)) {
+            for (Relationship relationship : relationshipService.findByItem(context.getSession(), item)) {
                 deleteRelationshipCopyVirtualMetadata(item, relationship);
             }
         } else if (Objects.deepEquals(copyVirtual, COPYVIRTUAL_CONFIGURED)) {
             // Option 2: Use a configuration value to determine if virtual metadata needs to be copied. Iterate over all
             //           of the item's relationships and copy their data depending on the
             //           configuration.
-            for (Relationship relationship : relationshipService.findByItem(context, item)) {
+            for (Relationship relationship : relationshipService.findByItem(context.getSession(), item)) {
                 boolean copyToLeft = relationship.getRelationshipType().isCopyToLeft();
                 boolean copyToRight = relationship.getRelationshipType().isCopyToRight();
                 if (relationship.getLeftItem().getID().equals(item.getID())) {
@@ -226,7 +226,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             for (Integer relationshipId : relationshipIds) {
                 RelationshipType relationshipType = relationshipTypeService.find(context, relationshipId);
                 for (Relationship relationship : relationshipService
-                    .findByItemAndRelationshipType(context, item, relationshipType)) {
+                    .findByItemAndRelationshipType(context.getSession(), item, relationshipType)) {
 
                     deleteRelationshipCopyVirtualMetadata(item, relationship);
                 }
@@ -242,7 +242,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                     + " should only contain a single value '" + COPYVIRTUAL_ALL[0] + "', '" + COPYVIRTUAL_CONFIGURED[0]
                     + "' or a list of numbers.");
             }
-            types.add(Integer.parseInt(typeString));
+            types.add(Integer.valueOf(typeString));
         }
         return types;
     }
@@ -286,7 +286,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             throw new DSpaceBadRequestException("InArchive attribute should not be set to false for the create");
         }
         UUID owningCollectionUuid = UUIDUtils.fromString(owningCollectionUuidString);
-        Collection collection = collectionService.find(context, owningCollectionUuid);
+        Collection collection = collectionService.find(context.getSession(), owningCollectionUuid);
         if (collection == null) {
             throw new DSpaceBadRequestException("The given owningCollection parameter is invalid: "
                 + owningCollectionUuid);
@@ -318,7 +318,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
-        Item item = itemService.find(context, uuid);
+        Item item = itemService.find(context.getSession(), uuid);
         if (item == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
         }
@@ -340,10 +340,12 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      * @param item       The item to which the bundle has to be added
      * @param bundleRest The bundleRest that needs to be added to the item
      * @return The added bundle
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     public Bundle addBundleToItem(Context context, Item item, BundleRest bundleRest)
         throws SQLException, AuthorizeException {
-        if (item.getBundles(bundleRest.getName()).size() > 0) {
+        if (!item.getBundles(bundleRest.getName()).isEmpty()) {
             throw new DSpaceBadRequestException("The bundle name already exists in the item");
         }
 

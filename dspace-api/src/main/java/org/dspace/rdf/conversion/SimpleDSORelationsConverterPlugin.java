@@ -147,7 +147,7 @@ public class SimpleDSORelationsConverterPlugin
             return null;
         }
 
-        List<Community> topLevelCommies = communityService.findAllTop(context);
+        List<Community> topLevelCommies = communityService.findAllTop(context.getSession());
         for (Community community : topLevelCommies) {
             if (!RDFUtil.isPublicBoolean(context, community)) {
                 continue;
@@ -236,7 +236,7 @@ public class SimpleDSORelationsConverterPlugin
         DSpaceObject[] parents = communityParentList.toArray(new DSpaceObject[communityParentList.size()]);
         // check whether this is a top level community
         if (parents.length == 0) {
-            parents = new DSpaceObject[] {siteService.findSite(context)};
+            parents = new DSpaceObject[] {siteService.findSite(context.getSession())};
         }
         for (DSpaceObject parent : parents) {
             if (!RDFUtil.isPublicBoolean(context, parent)) {
@@ -352,7 +352,7 @@ public class SimpleDSORelationsConverterPlugin
         }
 
         // add all items
-        Iterator<Item> items = itemService.findAllByCollection(context, collection);
+        Iterator<Item> items = itemService.findAllByCollection(context.getSession(), collection);
         while (items.hasNext()) {
             String id = RDFUtil.generateIdentifier(context, items.next());
             if (id != null) {

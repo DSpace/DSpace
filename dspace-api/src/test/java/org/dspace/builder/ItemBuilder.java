@@ -425,7 +425,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public static void deleteItem(UUID uuid) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Item item = itemService.find(c, uuid);
+            Item item = itemService.find(c.getSession(), uuid);
             if (item != null) {
                 try {
                     itemService.delete(c, item);

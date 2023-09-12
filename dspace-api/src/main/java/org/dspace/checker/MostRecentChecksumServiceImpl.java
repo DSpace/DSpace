@@ -113,7 +113,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
 //                + "select 'x' from most_recent_checksum "
 //                + "where most_recent_checksum.bitstream_id = bitstream.bitstream_id )";
 
-        List<Bitstream> unknownBitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context);
+        List<Bitstream> unknownBitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context.getSession());
         for (Bitstream bitstream : unknownBitstreams) {
             log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstream.getName());
 

@@ -66,7 +66,7 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
         try {
             UUID dsoId = UUID.fromString(targetId.toString());
 
-            Group group = groupService.find(context, dsoId);
+            Group group = groupService.find(context.getSession(), dsoId);
 
             // if the group is one of the special groups of the context it is readable
             if (context.getSpecialGroups().contains(group)) {

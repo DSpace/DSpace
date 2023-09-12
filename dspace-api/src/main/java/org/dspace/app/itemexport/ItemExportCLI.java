@@ -53,7 +53,7 @@ public class ItemExportCLI extends ItemExport {
                 items = myItems.iterator();
             } else {
                 handler.logInfo("Exporting from collection: " + idString);
-                items = itemService.findByCollection(context, collection);
+                items = itemService.findByCollection(context.getSession(), collection);
             }
             itemExportService.exportAsZip(context, items, destDirName, zipFileName,
                     seqStart, migrate, excludeBitstreams);
@@ -67,7 +67,7 @@ public class ItemExportCLI extends ItemExport {
                 handler.logInfo("Exporting from collection: " + idString);
 
                 // it's a collection, so do a bunch of items
-                Iterator<Item> i = itemService.findByCollection(context, collection);
+                Iterator<Item> i = itemService.findByCollection(context.getSession(), collection);
                 itemExportService.exportItem(context, i, destDirName, seqStart, migrate, excludeBitstreams);
             }
         }

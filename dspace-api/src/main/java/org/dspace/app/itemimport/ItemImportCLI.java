@@ -173,7 +173,7 @@ public class ItemImportCLI extends ItemImport {
             // @ sign, must be an email
             myEPerson = epersonService.findByEmail(context, eperson);
         } else {
-            myEPerson = epersonService.find(context, UUID.fromString(eperson));
+            myEPerson = epersonService.find(context.getSession(), UUID.fromString(eperson));
         }
 
         // check eperson

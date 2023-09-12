@@ -298,7 +298,7 @@ public class EZIDIdentifierProvider
 
         Iterator<Item> found;
         try {
-            found = itemService.findByMetadataField(context,
+            found = itemService.findByMetadataField(context.getSession(),
                                                     MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
                                                     idToDOI(identifier));
         } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {

@@ -33,10 +33,10 @@ public class MetadataSchema {
     private String namespace;
 
     @XmlElement(required = true)
-    private ArrayList<String> expand = new ArrayList<String>();
+    private ArrayList<String> expand = new ArrayList<>();
 
     @XmlElement(name = "fields", required = true)
-    private List<MetadataField> fields = new ArrayList<MetadataField>();
+    private final List<MetadataField> fields = new ArrayList<MetadataField>();
 
     public MetadataSchema() {
     }
@@ -47,7 +47,7 @@ public class MetadataSchema {
     }
 
     private void setup(org.dspace.content.MetadataSchema schema, String expand, Context context) throws SQLException {
-        List<String> expandFields = new ArrayList<String>();
+        List<String> expandFields = new ArrayList<>();
         if (expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -55,7 +55,8 @@ public class MetadataSchema {
         this.setPrefix(schema.getName());
         this.setNamespace(schema.getNamespace());
         if (expandFields.contains("fields") || expandFields.contains("all")) {
-            List<org.dspace.content.MetadataField> fields = metadataFieldService.findAllInSchema(context, schema);
+            List<org.dspace.content.MetadataField> fields
+                    = metadataFieldService.findAllInSchema(context.getSession(), schema);
             this.addExpand("fields");
             for (org.dspace.content.MetadataField field : fields) {
                 this.fields.add(new MetadataField(schema, field, "", context));

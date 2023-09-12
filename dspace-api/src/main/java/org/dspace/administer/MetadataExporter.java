@@ -133,16 +133,16 @@ public class MetadataExporter {
         // If a single schema has been specified
         if (schema != null && !"".equals(schema)) {
             // Get the id of that schema
-            MetadataSchema mdSchema = metadataSchemaService.find(context, schema);
+            MetadataSchema mdSchema = metadataSchemaService.find(context.getSession(), schema);
             if (mdSchema == null) {
                 throw new RegistryExportException("no schema to export");
             }
 
             // Get the metadata fields only for the specified schema
-            mdFields = metadataFieldService.findAllInSchema(context, mdSchema);
+            mdFields = metadataFieldService.findAllInSchema(context.getSession(), mdSchema);
         } else {
             // Get the metadata fields for all the schemas
-            mdFields = metadataFieldService.findAll(context);
+            mdFields = metadataFieldService.findAll(context.getSession());
         }
 
         // Compose the metadata fields
@@ -181,7 +181,7 @@ public class MetadataExporter {
         throws SQLException, RegistryExportException {
         if (schema != null && !"".equals(schema)) {
             // Find a single named schema
-            MetadataSchema mdSchema = metadataSchemaService.find(context, schema);
+            MetadataSchema mdSchema = metadataSchemaService.find(context.getSession(), schema);
 
             saveSchema(document, mdSchema);
         } else {
@@ -300,7 +300,7 @@ public class MetadataExporter {
         }
     }
 
-    static Map<Integer, String> schemaMap = new HashMap<Integer, String>();
+    static Map<Integer, String> schemaMap = new HashMap<>();
 
     /**
      * Helper method to retrieve a schema name for the field.
@@ -319,7 +319,8 @@ public class MetadataExporter {
 
         if (name == null) {
             // Name not retrieved before, so get the schema now
-            MetadataSchema mdSchema = metadataSchemaService.find(context, mdField.getMetadataSchema().getID());
+            MetadataSchema mdSchema = metadataSchemaService.find(context.getSession(),
+                    mdField.getMetadataSchema().getID());
             if (mdSchema != null) {
                 name = mdSchema.getName();
                 schemaMap.put(mdSchema.getID(), name);

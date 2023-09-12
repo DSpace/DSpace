@@ -32,14 +32,17 @@ public class EPersonClaimProvider implements JWTClaimProvider {
     @Autowired
     private EPersonService ePersonService;
 
+    @Override
     public String getKey() {
         return EPERSON_ID;
     }
 
+    @Override
     public Object getValue(Context context, HttpServletRequest request) {
         return context.getCurrentUser().getID().toString();
     }
 
+    @Override
     public void parseClaim(Context context, HttpServletRequest request, JWTClaimsSet jwtClaimsSet) throws SQLException {
         EPerson ePerson = getEPerson(context, jwtClaimsSet);
 
@@ -47,7 +50,7 @@ public class EPersonClaimProvider implements JWTClaimProvider {
     }
 
     public EPerson getEPerson(Context context, JWTClaimsSet jwtClaimsSet) throws SQLException {
-        return ePersonService.find(context, getEPersonId(jwtClaimsSet));
+        return ePersonService.find(context.getSession(), getEPersonId(jwtClaimsSet));
     }
 
     private UUID getEPersonId(JWTClaimsSet jwtClaimsSet) {

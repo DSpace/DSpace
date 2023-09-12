@@ -219,7 +219,7 @@ public abstract class AbstractBuilder<T, S> {
 
         // Bitstreams still leave a trace when deleted, so we need to fully "expunge" them
         try (Context c = new Context()) {
-            List<Bitstream> bitstreams = bitstreamService.findAll(c);
+            List<Bitstream> bitstreams = bitstreamService.findAll(c.getSession());
             for (Bitstream bitstream : CollectionUtils.emptyIfNull(bitstreams)) {
 
                 // We expect tests to clean up all the objects they create. This means, all bitstreams we find here

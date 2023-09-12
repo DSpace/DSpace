@@ -139,7 +139,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @Test
     public void testCommunityFind() throws Exception {
         UUID id = c.getID();
-        Community found = communityService.find(context, id);
+        Community found = communityService.find(context.getSession(), id);
         assertThat("testCommunityFind 0", found, notNullValue());
         assertThat("testCommunityFind 1", found.getID(), equalTo(id));
         //the community created by default has no name
@@ -258,7 +258,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        List<Community> all = communityService.findAll(context);
+        List<Community> all = communityService.findAll(context.getSession());
         assertThat("testFindAll 0", all, notNullValue());
         assertTrue("testFindAll 1", all.size() >= 1);
 
@@ -276,7 +276,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindAllTop() throws Exception {
-        List<Community> all = communityService.findAllTop(context);
+        List<Community> all = communityService.findAllTop(context.getSession());
         assertThat("testFindAllTop 0", all, notNullValue());
         assertTrue("testFindAllTop 1", all.size() >= 1);
         for (Community cm : all) {
@@ -824,7 +824,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Now, test deletion
         UUID id = todelete.getID();
         communityService.delete(context, todelete);
-        Community found = communityService.find(context, id);
+        Community found = communityService.find(context.getSession(), id);
         assertThat("testDeleteAuth 0", found, nullValue());
     }
 
@@ -848,7 +848,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Now, test deletion
         UUID id = todelete.getID();
         communityService.delete(context, todelete);
-        Community found = communityService.find(context, id);
+        Community found = communityService.find(context.getSession(), id);
         assertThat("testDeleteAuth2 0", found, nullValue());
     }
 
@@ -912,19 +912,19 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         // Test that everything created here is deleted.
         assertThat("top-level Community not deleted",
-                   communityService.find(context, parentId), nullValue());
+                   communityService.find(context.getSession(), parentId), nullValue());
         assertThat("child Community not deleted",
-                   communityService.find(context, childId), nullValue());
+                   communityService.find(context.getSession(), childId), nullValue());
         assertThat("grandchild Community not deleted",
-                   communityService.find(context, grandchildId), nullValue());
+                   communityService.find(context.getSession(), grandchildId), nullValue());
         assertThat("Collection of child Community not deleted",
-                   collectionService.find(context, childColId), nullValue());
+                   collectionService.find(context.getSession(), childColId), nullValue());
         assertThat("Collection of grandchild Community not deleted",
-                   collectionService.find(context, grandchildColId), nullValue());
+                   collectionService.find(context.getSession(), grandchildColId), nullValue());
         assertThat("Item not deleted",
-                   itemService.find(context, itemId), nullValue());
+                   itemService.find(context.getSession(), itemId), nullValue());
         assertThat("Item not deleted",
-                   itemService.find(context, item2Id), nullValue());
+                   itemService.find(context.getSession(), item2Id), nullValue());
     }
 
     /**

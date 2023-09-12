@@ -93,7 +93,7 @@ public class ItemAddBundleController {
             throws SQLException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
-        Item item = itemService.find(context, uuid);
+        Item item = itemService.find(context.getSession(), uuid);
 
         if (item == null) {
             throw new ResourceNotFoundException("Could not find item with id " + uuid);

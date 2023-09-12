@@ -147,7 +147,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, admin);
                 GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-                Group adminGroup = groupService.findByName(context, Group.ADMIN);
+                Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
                 groupService.addMember(context, adminGroup, admin);
             }
 

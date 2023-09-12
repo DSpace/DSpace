@@ -67,6 +67,7 @@ import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -156,7 +157,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // create the default authorization policy for collections
         // of 'anonymous' READ
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
 
         authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.READ, null);
@@ -192,27 +193,27 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findAll(Context context) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+    public List<Collection> findAll(Session session) throws SQLException {
+        MetadataField nameField = metadataFieldService.findByElement(session, MetadataSchemaEnum.DC.getName(),
                                                                      "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return collectionDAO.findAll(context.getSession(), nameField);
+        return collectionDAO.findAll(session.getSession(), nameField);
     }
 
     @Override
-    public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
+    public List<Collection> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        MetadataField nameField = metadataFieldService.findByElement(session, MetadataSchemaEnum.DC.getName(),
                                                                      "title", null);
         if (nameField == null) {
             throw new IllegalArgumentException(
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return collectionDAO.findAll(context.getSession(), nameField, limit, offset);
+        return collectionDAO.findAll(session.getSession(), nameField, limit, offset);
     }
 
     @Override
@@ -226,7 +227,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         List<Collection> myResults = new ArrayList<>();
 
         if (authorizeService.isAdmin(context)) {
-            return findAll(context);
+            return findAll(context.getSession());
         }
 
         //Check eperson->policy
@@ -314,8 +315,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public Collection find(Context context, UUID id) throws SQLException {
-        return collectionDAO.findByID(context.getSession(), Collection.class, id);
+    public Collection find(Session session, UUID id) throws SQLException {
+        return collectionDAO.findByID(session, Collection.class, id);
     }
 
     @Override
@@ -747,7 +748,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         // Remove items
         // Remove items
-        Iterator<Item> items = itemService.findAllByCollection(context, collection);
+        Iterator<Item> items = itemService.findAllByCollection(context.getSession(), collection);
         while (items.hasNext()) {
             Item item = items.next();
 //            items.remove();
@@ -825,7 +826,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         if (community != null) {
             myCollections = community.getCollections();
         } else {
-            myCollections = findAll(context);
+            myCollections = findAll(context.getSession());
         }
 
         // now build a list of collections you have authorization for
@@ -844,8 +845,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
-        return collectionDAO.findCollectionsWithSubscribers(context.getSession());
+    public List<Collection> findCollectionsWithSubscribers(Session session) throws SQLException {
+        return collectionDAO.findCollectionsWithSubscribers(session);
     }
 
     @Override
@@ -896,17 +897,17 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public Collection findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public Collection findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUID.fromString(id));
+            return find(session, UUID.fromString(id));
         }
     }
 
     @Override
-    public Collection findByLegacyId(Context context, int id) throws SQLException {
-        return collectionDAO.findByLegacyId(context.getSession(), id, Collection.class);
+    public Collection findByLegacyId(Session session, int id) throws SQLException {
+        return collectionDAO.findByLegacyId(session.getSession(), id, Collection.class);
     }
 
     @Override

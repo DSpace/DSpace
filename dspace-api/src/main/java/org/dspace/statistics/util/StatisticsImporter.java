@@ -150,7 +150,7 @@ public class StatisticsImporter {
                 System.out.print("Loading local communities... ");
 
                 Context c = new Context();
-                List<Community> communities = communityService.findAll(c);
+                List<Community> communities = communityService.findAll(c.getSession());
                 localCommunities = new ArrayList<>();
                 for (Community community : communities) {
                     localCommunities.add(community.getID());
@@ -158,7 +158,7 @@ public class StatisticsImporter {
                 System.out.println("Found " + localCommunities.size());
 
                 System.out.print("Loading local collections... ");
-                List<Collection> collections = collectionService.findAll(c);
+                List<Collection> collections = collectionService.findAll(c.getSession());
                 localCollections = new ArrayList<>();
                 for (Collection collection : collections) {
                     localCollections.add(collection.getID());
@@ -166,7 +166,7 @@ public class StatisticsImporter {
                 System.out.println("Found " + localCollections.size());
 
                 System.out.print("Loading local items... ");
-                Iterator<Item> items = itemService.findAll(c);
+                Iterator<Item> items = itemService.findAll(c.getSession());
                 localItems = new ArrayList<>();
                 Item i;
                 while (items.hasNext()) {
@@ -176,7 +176,7 @@ public class StatisticsImporter {
                 System.out.println("Found " + localItems.size());
 
                 System.out.print("Loading local bitstreams... ");
-                List<Bitstream> bitstreams = bitstreamService.findAll(c);
+                List<Bitstream> bitstreams = bitstreamService.findAll(c.getSession());
                 localBitstreams = new ArrayList<>();
                 for (Bitstream bitstream : bitstreams) {
                     if (bitstream.getName() != null) {
@@ -338,7 +338,7 @@ public class StatisticsImporter {
                     continue;
                 }
 
-                DSpaceObject dso = legacySupportService.findByIdOrLegacyId(context, id);
+                DSpaceObject dso = legacySupportService.findByIdOrLegacyId(context.getSession(), id);
                 if (dso == null) {
                     if (verbose) {
                         System.err.println(" - DSO with ID '" + id + "' is no longer in the system");

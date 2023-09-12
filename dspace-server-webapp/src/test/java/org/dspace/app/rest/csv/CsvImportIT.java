@@ -115,7 +115,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                                                            author2, author1);
 
         // Verify that the new Publication is related to both author2 and author1 (in that exact order)
-        List<Relationship> relationships = relationshipService.findByItem(context, article2);
+        List<Relationship> relationships = relationshipService.findByItem(context.getSession(), article2);
         assertEquals(2, relationships.size());
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
                    .andExpect(status().isOk())
@@ -137,7 +137,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                                                    "Relationship list size is 1", 1, 2, 0);
 
         // Verify the new Publication now has 3 relationships (3 authors)
-        relationships = relationshipService.findByItem(context, article2);
+        relationships = relationshipService.findByItem(context.getSession(), article2);
         assertEquals(3,relationships.size());
 
         // Now, *remove* the first listed author (author2) from this new Publication
@@ -159,7 +159,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     }
 
     private void assertArticle2Relationships(Item article2, Item author1, Item author3) throws SQLException {
-        List<Relationship> relationshipsForArticle2 = relationshipService.findByItem(context, article2);
+        List<Relationship> relationshipsForArticle2
+                = relationshipService.findByItem(context.getSession(), article2);
         assertEquals(2, relationshipsForArticle2.size());
         assertEquals(author3, relationshipsForArticle2.get(0).getRightItem());
         assertEquals(author1, relationshipsForArticle2.get(1).getRightItem());
@@ -168,7 +169,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     private void assertArticleRelationships(Item article, Item author1, Item author2, Item author3)
         throws SQLException {
         List<Relationship> relationshipsForArticle = relationshipService
-            .findByItemAndRelationshipType(context, article, relationshipTypeService
+            .findByItemAndRelationshipType(context.getSession(), article, relationshipTypeService
                 .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
                                         entityTypeService.findByEntityType(context, "Person"),
                                         "isAuthorOfPublication", "isPublicationOfAuthor"));
@@ -221,10 +222,11 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
 
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
+        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, itemTitle);
         Item item = itemIteratorItem.next();
 
-        List<Relationship> relationships = relationshipService.findByItem(context, item);
+        List<Relationship> relationships = relationshipService.findByItem(context.getSession(), item);
         assertEquals(reasonAssertCheck, sizeToCheck, relationships.size());
         getClient().perform(get("/api/core/items/" + item.getID())).andExpect(status().isOk());
         getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
@@ -253,7 +255,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getHandle() + "," + itemTitle + "," + entityType + "," + idStringRelatedItems;
         String[] csv = {"id,collection,dc.title,dspace.entity.type,relation." + relationshipTypeLabel, csvLineString};
         performImportScript(csv);
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, itemTitle);
+        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, itemTitle);
         Item item = itemIteratorItem.next();
 
 
@@ -356,7 +359,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
 
-        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, "TestItemB");
+        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, "TestItemB");
         assertFalse(itemIteratorItem.hasNext());
     }
 }

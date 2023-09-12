@@ -304,7 +304,7 @@ public class WorkflowUtils extends Util {
 
     public static Group getRoleGroup(Context context, Collection collection, Role role) throws SQLException {
         if (role.getScope() == Role.Scope.REPOSITORY) {
-            return groupService.findByName(context, role.getName());
+            return groupService.findByName(context.getSession(), role.getName());
         } else if (role.getScope() == Role.Scope.COLLECTION) {
             CollectionRole collectionRole = collectionRoleService.find(context, collection, role.getId());
             if (collectionRole == null) {

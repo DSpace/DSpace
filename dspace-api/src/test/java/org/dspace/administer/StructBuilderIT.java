@@ -82,7 +82,7 @@ public class StructBuilderIT
     public void setUp() throws SQLException, AuthorizeException, IOException {
         // Clear out all communities and collections.
         context.turnOffAuthorisationSystem();
-        for (Community community : communityService.findAllTop(context)) {
+        for (Community community : communityService.findAllTop(context.getSession())) {
             deleteSubCommunities(community);
             communityService.delete(context, community);
         }
@@ -226,7 +226,7 @@ public class StructBuilderIT
 
         // Check a chosen Community for the right Handle.
         found = false;
-        for (Community community : communityService.findAllTop(context)) {
+        for (Community community : communityService.findAllTop(context.getSession())) {
             for (Handle handle : community.getHandles()) {
                 if (handle.getHandle().equals(COMMUNITY_0_HANDLE)) {
                     found = true;
@@ -238,7 +238,7 @@ public class StructBuilderIT
 
         // Check a chosen Collection for the right Handle.
         found = false;
-        for (Collection collection : collectionService.findAll(context)) {
+        for (Collection collection : collectionService.findAll(context.getSession())) {
             for (Handle handle : collection.getHandles()) {
                 if (handle.getHandle().equals(COLLECTION_0_1_HANDLE)) {
                     found = true;

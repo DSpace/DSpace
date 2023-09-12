@@ -1912,7 +1912,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream2 = null;

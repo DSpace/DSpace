@@ -301,7 +301,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     private void addLogBitstreamToProcess(Context context) throws SQLException, IOException, AuthorizeException {
         try {
-            EPerson ePerson = ePersonService.find(context, ePersonId);
+            EPerson ePerson = ePersonService.find(context.getSession(), ePersonId);
             Process process = processService.find(context, processId);
 
             context.setCurrentUser(ePerson);

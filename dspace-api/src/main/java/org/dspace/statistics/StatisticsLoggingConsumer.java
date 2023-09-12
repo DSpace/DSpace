@@ -56,7 +56,7 @@ public class StatisticsLoggingConsumer implements Consumer {
     @Override
     public void consume(Context ctx, Event event) throws Exception {
         if (toRemoveQueries == null) {
-            toRemoveQueries = new HashSet<String>();
+            toRemoveQueries = new HashSet<>();
         }
 
         UUID dsoId = event.getSubjectID();
@@ -72,7 +72,7 @@ public class StatisticsLoggingConsumer implements Consumer {
             // We have a modified item check for a withdraw/reinstate
         } else if (eventType == Event.MODIFY_METADATA
             && event.getSubjectType() == Constants.ITEM) {
-            Item item = itemService.find(ctx, event.getSubjectID());
+            Item item = itemService.find(ctx.getSession(), event.getSubjectID());
 
             String updateQuery = "id:" + item.getID() + " AND type:"
                 + item.getType();
@@ -80,8 +80,8 @@ public class StatisticsLoggingConsumer implements Consumer {
                 updateQuery, null, null);
 
             // Get all the metadata
-            List<String> storageFieldList = new ArrayList<String>();
-            List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
+            List<String> storageFieldList = new ArrayList<>();
+            List<List<Object>> storageValuesList = new ArrayList<>();
 
             solrLoggerService.update(updateQuery, "replace", storageFieldList,
                                      storageValuesList);
@@ -96,16 +96,16 @@ public class StatisticsLoggingConsumer implements Consumer {
             String updateQuery = "id: " + newItem.getID() + " AND type:"
                 + newItem.getType();
 
-            List<String> fieldNames = new ArrayList<String>();
-            List<List<Object>> valuesList = new ArrayList<List<Object>>();
+            List<String> fieldNames = new ArrayList<>();
+            List<List<Object>> valuesList = new ArrayList<>();
             fieldNames.add("owningColl");
             fieldNames.add("owningComm");
 
-            List<Object> valsList = new ArrayList<Object>();
+            List<Object> valsList = new ArrayList<>();
             valsList.add(dsoId);
             valuesList.add(valsList);
 
-            valsList = new ArrayList<Object>();
+            valsList = new ArrayList<>();
             valsList.addAll(findOwningCommunities(ctx, dsoId));
             valuesList.add(valsList);
 
@@ -119,16 +119,16 @@ public class StatisticsLoggingConsumer implements Consumer {
             String updateQuery = "id: " + newItem.getID() + " AND type:"
                 + newItem.getType();
 
-            List<String> fieldNames = new ArrayList<String>();
-            List<List<Object>> valuesList = new ArrayList<List<Object>>();
+            List<String> fieldNames = new ArrayList<>();
+            List<List<Object>> valuesList = new ArrayList<>();
             fieldNames.add("owningColl");
             fieldNames.add("owningComm");
 
-            List<Object> valsList = new ArrayList<Object>();
+            List<Object> valsList = new ArrayList<>();
             valsList.add(dsoId);
             valuesList.add(valsList);
 
-            valsList = new ArrayList<Object>();
+            valsList = new ArrayList<>();
             valsList.addAll(findOwningCommunities(ctx, dsoId));
             valuesList.add(valsList);
 
@@ -138,9 +138,9 @@ public class StatisticsLoggingConsumer implements Consumer {
 
     private List<Object> findOwningCommunities(Context context, UUID collId)
         throws SQLException {
-        Collection coll = collectionService.find(context, collId);
+        Collection coll = collectionService.find(context.getSession(), collId);
 
-        List<Object> owningComms = new ArrayList<Object>();
+        List<Object> owningComms = new ArrayList<>();
         for (int i = 0; i < coll.getCommunities().size(); i++) {
             Community community = coll.getCommunities().get(i);
             findComms(community, owningComms);
@@ -158,7 +158,7 @@ public class StatisticsLoggingConsumer implements Consumer {
             parentComms.add(comm.getID());
         }
         List<Community> parentCommunities = comm.getParentCommunities();
-        Community parent = parentCommunities.size() == 0 ? null : parentCommunities.get(0);
+        Community parent = parentCommunities.isEmpty() ? null : parentCommunities.get(0);
         findComms(parent, parentComms);
     }
 

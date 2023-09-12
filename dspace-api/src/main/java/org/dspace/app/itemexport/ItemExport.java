@@ -139,7 +139,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
                     item = null;
                 }
             } else {
-                item = itemService.find(context, UUID.fromString(idString));
+                item = itemService.find(context.getSession(), UUID.fromString(idString));
             }
 
             if (item == null) {
@@ -158,7 +158,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
                     collection = null;
                 }
             } else {
-                collection = collectionService.find(context, UUID.fromString(idString));
+                collection = collectionService.find(context.getSession(), UUID.fromString(idString));
             }
 
             if (collection == null) {
@@ -211,7 +211,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
             items = myItems.iterator();
         } else {
             handler.logInfo("Exporting from collection: " + idString);
-            items = itemService.findByCollection(context, collection);
+            items = itemService.findByCollection(context.getSession(), collection);
         }
         itemExportService.exportAsZip(context, items, destDirName, zipFileName,
                 seqStart, migrate, excludeBitstreams);
@@ -251,7 +251,7 @@ public class ItemExport extends DSpaceRunnable<ItemExportScriptConfiguration> {
     }
 
     private void setEPerson(Context context) throws SQLException {
-        EPerson myEPerson = epersonService.find(context, this.getEpersonIdentifier());
+        EPerson myEPerson = epersonService.find(context.getSession(), this.getEpersonIdentifier());
 
         // check eperson
         if (myEPerson == null) {

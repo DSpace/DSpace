@@ -70,7 +70,7 @@ public class AuthorityIndexClient {
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
-            Iterator<Item> allItems = itemService.findAll(context);
+            Iterator<Item> allItems = itemService.findAll(context.getSession());
             Map<String, AuthorityValue> authorityCache = new HashMap<>();
             while (allItems.hasNext()) {
                 Item item = allItems.next();

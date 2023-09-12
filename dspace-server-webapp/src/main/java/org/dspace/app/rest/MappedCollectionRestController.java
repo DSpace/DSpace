@@ -96,7 +96,7 @@ public class MappedCollectionRestController {
 
         for (DSpaceObject dso : listDsoFoundInRequest) {
 
-            Item item = itemService.find(context, uuid);
+            Item item = itemService.find(context.getSession(), uuid);
             if (dso != null && dso.getType() == COLLECTION && item != null) {
                 this.checkIfItemIsTemplate(item);
                 Collection collectionToMapTo = (Collection) dso;
@@ -141,8 +141,8 @@ public class MappedCollectionRestController {
             throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, collectionUuid);
-        Item item = itemService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), collectionUuid);
+        Item item = itemService.find(context.getSession(), uuid);
         if (collection != null && item != null) {
             this.checkIfItemIsTemplate(item);
             UUID owningCollectionUuid = item.getOwningCollection().getID();

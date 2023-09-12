@@ -434,7 +434,7 @@ public class StructBuilder {
 
         List<Community> communities = null;
         try {
-            communities = communityService.findAllTop(context);
+            communities = communityService.findAllTop(context.getSession());
         } catch (SQLException ex) {
             System.out.printf("Unable to get the list of top-level communities:  %s%n",
                     ex.getMessage());

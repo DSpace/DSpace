@@ -94,7 +94,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     public Page<RelationshipRest> findAll(Context context, Pageable pageable) {
         try {
             long total = relationshipService.countTotal(context);
-            List<Relationship> relationships = relationshipService.findAll(context,
+            List<Relationship> relationships = relationshipService.findAll(context.getSession(),
                     pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -347,7 +347,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         int total = 0;
         if (dsoId != null) {
 
-            Item item = itemService.find(context, dsoId);
+            Item item = itemService.find(context.getSession(), dsoId);
 
             if (item == null) {
                 throw new ResourceNotFoundException("The request DSO with id: " + dsoId + " was not found");
@@ -358,14 +358,16 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                     isLeft = true;
                 }
                 total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
-                relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
-                        isLeft, pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
+                relationships.addAll(relationshipService.findByItemAndRelationshipType(context.getSession(),
+                        item, relationshipType, isLeft, pageable.getPageSize(),
+                        Math.toIntExact(pageable.getOffset())));
             }
         } else {
             for (RelationshipType relationshipType : relationshipTypeList) {
                 total += relationshipService.countByRelationshipType(context, relationshipType);
-                relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType,
-                        pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
+                relationships.addAll(relationshipService.findByRelationshipType(context.getSession(),
+                        relationshipType, pageable.getPageSize(),
+                        Math.toIntExact(pageable.getOffset())));
             }
         }
 
@@ -377,7 +379,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
      * of potentially related items we need to know which of these other items
      * are already in a specific relationship with the focus item and,
      * by exclusion which ones are not yet related.
-     * 
+     *
      * @param typeId          The relationship type id to apply as a filter to the returned relationships
      * @param label           The name of the relation as defined from the side of the 'focusItem'
      * @param focusUUID       The uuid of the item to be checked on the side defined by 'relationshipLabel'
@@ -403,13 +405,14 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 throw new UnprocessableEntityException("The provided label: " + label +
                                                        " , does not match any relation!");
             }
-            relationships = relationshipService.findByItemRelationshipTypeAndRelatedList(context, focusUUID,
-                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label),
-                       Math.toIntExact(pageable.getOffset()),
-                       Math.toIntExact(pageable.getPageSize()));
+            relationships = relationshipService.findByItemRelationshipTypeAndRelatedList(context.getSession(),
+                    focusUUID, relationshipType, new ArrayList<UUID>(items),
+                    relationshipType.getLeftwardType().equals(label),
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getPageSize()));
 
             total = relationshipService.countByItemRelationshipTypeAndRelatedList(context, focusUUID,
-                       relationshipType, new ArrayList<UUID>(items), relationshipType.getLeftwardType().equals(label));
+                       relationshipType, new ArrayList<>(items), relationshipType.getLeftwardType().equals(label));
         }
         return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }

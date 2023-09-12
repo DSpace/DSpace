@@ -158,7 +158,7 @@ public class Harvest {
 
                 if (items) {
                     // Add the item reference
-                    itemInfo.item = itemService.find(context, itemInfo.itemID);
+                    itemInfo.item = itemService.find(context.getSession(), itemInfo.itemID);
                 }
 
                 if (nonAnon || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn)) {

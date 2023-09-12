@@ -82,7 +82,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Autowired
     AuthorizeService authorizeService;
 
-    private CommunityService cs;
+    private final CommunityService cs;
 
     public CommunityRestRepository(CommunityService dsoService) {
         super(dsoService);
@@ -110,7 +110,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
         Community parent;
         try {
-            parent = cs.find(context, id);
+            parent = cs.find(context.getSession(), id);
             if (parent == null) {
                 throw new UnprocessableEntityException("Parent community for id: "
                         + id + " not found");
@@ -153,7 +153,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public CommunityRest findOne(Context context, UUID id) {
         Community community = null;
         try {
-            community = cs.find(context, id);
+            community = cs.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -168,11 +168,11 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         try {
             if (authorizeService.isAdmin(context)) {
                 long total = cs.countTotal(context);
-                List<Community> communities = cs.findAll(context, pageable.getPageSize(),
+                List<Community> communities = cs.findAll(context.getSession(), pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
                 return converter.toRestPage(communities, pageable, total, utils.obtainProjection());
             } else {
-                List<Community> communities = new LinkedList<Community>();
+                List<Community> communities = new LinkedList<>();
                 // search for all the communities and let the SOLR security plugins to limit
                 // what is returned to what the user can see
                 DiscoverQuery discoverQuery = new DiscoverQuery();
@@ -196,7 +196,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
             Context context = obtainContext();
-            List<Community> topLevelCommunities = new LinkedList<Community>();
+            List<Community> topLevelCommunities = new LinkedList<>();
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.setQuery("*:*");
             discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
@@ -255,7 +255,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing community json: " + e.getMessage());
         }
-        Community community = cs.find(context, id);
+        Community community = cs.find(context.getSession(), id);
         if (community == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
@@ -273,7 +273,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Community community = null;
         try {
-            community = cs.find(context, id);
+            community = cs.find(context.getSession(), id);
             if (community == null) {
                 throw new ResourceNotFoundException(
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + id + " not found");

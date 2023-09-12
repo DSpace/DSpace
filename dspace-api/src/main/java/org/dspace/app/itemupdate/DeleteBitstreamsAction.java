@@ -55,7 +55,7 @@ public class DeleteBitstreamsAction extends UpdateBitstreamsAction {
             } else {
                 for (String id : list) {
                     try {
-                        Bitstream bs = bitstreamService.findByIdOrLegacyId(context, id);
+                        Bitstream bs = bitstreamService.findByIdOrLegacyId(context.getSession(), id);
                         if (bs == null) {
                             ItemUpdate.pr("Bitstream not found by id: " + id);
                         } else {

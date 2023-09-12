@@ -640,8 +640,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
-            assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                          metadataFieldRest.getQualifier()), nullValue());
+            assertThat(metadataFieldService.findByElement(context.getSession(),
+                    metadataSchema, metadataFieldRest.getElement(),
+                    metadataFieldRest.getQualifier()), nullValue());
 
             getClient(authToken)
                 .perform(post("/api/core/metadatafields")
@@ -672,8 +673,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         Integer id = null;
         try {
-            assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                          null), nullValue());
+            assertThat(metadataFieldService.findByElement(context.getSession(),
+                    metadataSchema, metadataFieldRest.getElement(), null),
+                    nullValue());
 
             id = read(
                     getClient(authToken)
@@ -708,8 +710,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
-            assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                          metadataFieldRest.getQualifier()), nullValue());
+            assertThat(metadataFieldService.findByElement(context.getSession(),
+                    metadataSchema, metadataFieldRest.getElement(),
+                    metadataFieldRest.getQualifier()), nullValue());
 
             getClient(authToken)
                 .perform(post("/api/core/metadatafields")
@@ -765,8 +768,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         metadataFieldRest.setScopeNote(SCOPE_NOTE);
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                      metadataFieldRest.getQualifier()), nullValue());
+        assertThat(metadataFieldService.findByElement(context.getSession(),
+                metadataSchema, metadataFieldRest.getElement(),
+                metadataFieldRest.getQualifier()), nullValue());
 
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
@@ -777,8 +781,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isUnprocessableEntity());
 
         metadataFieldRest.setElement("testElement,ForCreate");
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                      metadataFieldRest.getQualifier()), nullValue());
+        assertThat(metadataFieldService.findByElement(context.getSession(),
+                metadataSchema, metadataFieldRest.getElement(),
+                metadataFieldRest.getQualifier()), nullValue());
 
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
@@ -789,8 +794,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isUnprocessableEntity());
 
         metadataFieldRest.setElement("testElement ForCreate");
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                      metadataFieldRest.getQualifier()), nullValue());
+        assertThat(metadataFieldService.findByElement(context.getSession(),
+                metadataSchema, metadataFieldRest.getElement(),
+                metadataFieldRest.getQualifier()), nullValue());
 
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
@@ -809,8 +815,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         metadataFieldRest.setScopeNote(SCOPE_NOTE);
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                      metadataFieldRest.getQualifier()), nullValue());
+        assertThat(metadataFieldService.findByElement(context.getSession(),
+                metadataSchema, metadataFieldRest.getElement(),
+                metadataFieldRest.getQualifier()), nullValue());
 
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
@@ -821,8 +828,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isUnprocessableEntity());
 
         metadataFieldRest.setQualifier("testQualifier,ForCreate");
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                      metadataFieldRest.getQualifier()), nullValue());
+        assertThat(metadataFieldService.findByElement(context.getSession(),
+                metadataSchema, metadataFieldRest.getElement(),
+                metadataFieldRest.getQualifier()), nullValue());
 
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
@@ -833,8 +841,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isUnprocessableEntity());
 
         metadataFieldRest.setQualifier("testQualifier ForCreate");
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, metadataFieldRest.getElement(),
-                                                      metadataFieldRest.getQualifier()), nullValue());
+        assertThat(metadataFieldService.findByElement(context.getSession(),
+                metadataSchema, metadataFieldRest.getElement(),
+                metadataFieldRest.getQualifier()), nullValue());
 
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
@@ -938,7 +947,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(delete("/api/core/metadatafields/" + id))
             .andExpect(status().isNoContent());
 
-        assertThat(metadataFieldService.find(context, id), nullValue());
+        assertThat(metadataFieldService.find(context.getSession(), id), nullValue());
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(delete("/api/core/metadatafields/" + id))
@@ -972,7 +981,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .perform(delete("/api/core/metadatafields/" + id))
             .andExpect(status().isNoContent());
 
-        assertThat(metadataFieldService.find(context, id), nullValue());
+        assertThat(metadataFieldService.find(context.getSession(), id), nullValue());
 
         // deleted metadata field not found in index
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
@@ -1179,7 +1188,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         List<MetadataField> alphabeticMdFields =
             ContentServiceFactory.getInstance()
                                  .getMetadataFieldService()
-                                 .findAll(context).stream()
+                                 .findAll(context.getSession()).stream()
                                  .sorted(Comparator.comparing(mdf -> mdf.toString('.')))
                                  .collect(Collectors.toList());
         int numberOfMdFields = alphabeticMdFields.size();

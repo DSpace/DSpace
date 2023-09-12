@@ -54,7 +54,7 @@ public class FixDefaultPolicies {
         // carnage begins here
         //////////////////////
         ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
-        List<Collection> collections = contentServiceFactory.getCollectionService().findAll(c);
+        List<Collection> collections = contentServiceFactory.getCollectionService().findAll(c.getSession());
 
         for (Collection t : collections) {
             System.out.println("Collection " + t + " " + t.getName());
@@ -85,7 +85,7 @@ public class FixDefaultPolicies {
         }
 
         // now ensure communities have READ policies
-        List<Community> communities = contentServiceFactory.getCommunityService().findAll(c);
+        List<Community> communities = contentServiceFactory.getCommunityService().findAll(c.getSession());
 
         for (Community t : communities) {
             System.out.println("Community " + t + " " + t.getName());
@@ -112,7 +112,7 @@ public class FixDefaultPolicies {
         List<ResourcePolicy> policies = AuthorizeServiceFactory.getInstance().getAuthorizeService()
                                                                .getPoliciesActionFilter(c, t, myaction);
 
-        return policies.size() > 0;
+        return !policies.isEmpty();
     }
 
     /**
@@ -122,7 +122,8 @@ public class FixDefaultPolicies {
     private static void addAnonymousPolicy(Context c, DSpaceObject t,
                                            int myaction) throws SQLException, AuthorizeException {
         // group 0 is the anonymous group!
-        Group anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(c, Group.ANONYMOUS);
+        Group anonymousGroup = EPersonServiceFactory.getInstance().getGroupService()
+                .findByName(c.getSession(), Group.ANONYMOUS);
 
         // now create the default policies for submitted items
         ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();

@@ -50,13 +50,18 @@ import org.junit.Test;
  */
 public class PackagerIT extends AbstractIntegrationTestWithDatabase {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected static final InstallItemService installItemService = ContentServiceFactory.getInstance()
-            .getInstallItemService();
-    protected ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    private final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    private final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    private final WorkspaceItemService workspaceItemService
+            = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected static final InstallItemService installItemService
+            = ContentServiceFactory.getInstance().getInstallItemService();
+    protected ConfigurationService configService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected Community child1;
     protected Collection col1;
     protected Item article;
@@ -110,7 +115,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         String idStr = getID();
         itemService.delete(context, article);
         performImportScript(tempFile);
-        Item item = itemService.find(context, UUID.fromString(idStr));
+        Item item = itemService.find(context.getSession(), UUID.fromString(idStr));
         assertNotNull(item);
     }
 
@@ -123,7 +128,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         String idStr = getID();
         collectionService.delete(context, col1);
         performImportScript(tempFile);
-        Collection collection = collectionService.find(context, UUID.fromString(idStr));
+        Collection collection = collectionService.find(context.getSession(), UUID.fromString(idStr));
         assertNotNull(collection);
     }
 
@@ -137,7 +142,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         String idStr = getID();
         communityService.delete(context, child1);
         performImportScript(tempFile);
-        Community community = communityService.find(context, UUID.fromString(idStr));
+        Community community = communityService.find(context.getSession(), UUID.fromString(idStr));
         assertNotNull(community);
     }
 
@@ -148,7 +153,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         //Item should be overwritten if UUID already Exists
         performExportScript(article.getHandle(), tempFile);
         performImportScript(tempFile);
-        Iterator<Item> items = itemService.findByCollection(context, col1);
+        Iterator<Item> items = itemService.findByCollection(context.getSession(), col1);
         assertEquals(1, Iterators.size(items));
     }
 
@@ -162,7 +167,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
         installItemService.installItem(context, workspaceItem, "123456789/0100");
         performImportNoForceScript(tempFile);
-        Iterator<Item> items = itemService.findByCollection(context, col1);
+        Iterator<Item> items = itemService.findByCollection(context.getSession(), col1);
         Item testItem = items.next();
         assertFalse(items.hasNext()); //check to make sure there is only 1 item
         assertEquals("123456789/0100", testItem.getHandle()); //check to make sure the item wasn't overwritten as

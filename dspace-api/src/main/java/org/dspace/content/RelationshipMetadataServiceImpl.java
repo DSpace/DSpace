@@ -73,7 +73,8 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                 //       These fields contain the UUIDs of the items that have a relationship with current item,
                 //       from the perspective of this item. In other words, given a relationship with this item,
                 //       the other item should have "latest status" in order to appear in relation.* fields.
-                List<Relationship> relationships = relationshipService.findByItem(context, item, -1, -1, true);
+                List<Relationship> relationships
+                        = relationshipService.findByItem(context.getSession(), item, -1, -1, true);
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
                         .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType.getLabel(),
@@ -88,11 +89,13 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     }
 
     /**
-     * Create the list of relation.*.latestForDiscovery virtual metadata values for the given item.
+     * Create the list of relation.*.latestForDiscovery virtual metadata values
+     * for the given item.
      * @param context the DSpace context.
      * @param item the item.
      * @param itemEntityType the entity type of the item.
      * @return a list (may be empty) of metadata values of type relation.*.latestForDiscovery.
+     * @throws java.sql.SQLException passed through.
      */
     protected List<RelationshipMetadataValue> findLatestForDiscoveryMetadataValues(
         Context context, Item item, EntityType itemEntityType
@@ -114,7 +117,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                     && Objects.equals(relationshipType.getLeftType(), itemEntityType)) {
                 String element = relationshipType.getLeftwardType();
                 List<ItemUuidAndRelationshipId> data = relationshipService
-                    .findByLatestItemAndRelationshipType(context, item, relationshipType, true);
+                    .findByLatestItemAndRelationshipType(context.getSession(), item, relationshipType, true);
                 mdvs.addAll(constructLatestForDiscoveryMetadataValues(context, schema, element, qualifier, data));
             }
 
@@ -127,7 +130,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
             if (relationshipType.getTilted() != LEFT && relationshipType.getRightType().equals(itemEntityType)) {
                 String element = relationshipType.getRightwardType();
                 List<ItemUuidAndRelationshipId> data = relationshipService
-                    .findByLatestItemAndRelationshipType(context, item, relationshipType, false);
+                    .findByLatestItemAndRelationshipType(context.getSession(), item, relationshipType, false);
                 mdvs.addAll(constructLatestForDiscoveryMetadataValues(context, schema, element, qualifier, data));
             }
         }
@@ -329,7 +332,7 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
         MetadataField metadataField = null;
         try {
             metadataField = metadataFieldService
-                .findByElement(context, metadataSchema, metadataElement, metadataQualifier);
+                .findByElement(context.getSession(), metadataSchema, metadataElement, metadataQualifier);
         } catch (SQLException e) {
             log.error("Could not find element with MetadataSchema: " + metadataSchema +
                 ", MetadataElement: " + metadataElement + " and MetadataQualifier: " + metadataQualifier, e);

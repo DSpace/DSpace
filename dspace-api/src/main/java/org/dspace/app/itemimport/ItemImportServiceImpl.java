@@ -332,7 +332,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
      /**
       * Add relationships from a 'relationships' manifest file.
-      * 
+      *
       * @param c Context
       * @param sourceDir The parent import source directory
       * @throws Exception
@@ -436,7 +436,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Get the item's entity type from meta.
-     * 
+     *
      * @param item
      * @return
      */
@@ -446,7 +446,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Read the relationship manifest file.
-     * 
+     *
      * Each line in the file contains a relationship type id and an item
      * identifier in the following format:
      *
@@ -532,7 +532,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
       * The import item map will be checked first to see if the identifier refers to an item folder
       * that was just imported. Next it will try to find the item by handle or UUID, or by a unique
       * meta value.
-      * 
+      *
       * @param c Context
       * @param itemIdentifier The identifier string found in the import manifest (handle, uuid, or import subfolder)
       * @return Item if found, or null.
@@ -569,7 +569,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Resolve an item identifier.
-     * 
+     *
      * @param c Context
      * @param itemIdentifier The identifier string found in the import file (handle or UUID)
      * @return Item if found, or null.
@@ -585,12 +585,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         }
 
         // resolve by UUID
-        return itemService.findByIdOrLegacyId(c, itemIdentifier);
+        return itemService.findByIdOrLegacyId(c.getSession(), itemIdentifier);
     }
 
     /**
      * Lookup an item by a (unique) meta value.
-     * 
+     *
      * @param c current DSpace session.
      * @param metaKey name of the metadata field to match.
      * @param metaValue value to be matched.
@@ -610,15 +610,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         String element = mf[1];
         String qualifier = mf.length == 2 ? null : mf[2];
         try {
-            MetadataField mfo = metadataFieldService.findByElement(c, schema, element, qualifier);
-            Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(c, mfo, metaValue);
+            MetadataField mfo = metadataFieldService.findByElement(c.getSession(), schema, element, qualifier);
+            Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(c.getSession(), mfo, metaValue);
             if (mdv.hasNext()) {
                 MetadataValue mdvVal = mdv.next();
                 UUID uuid = mdvVal.getDSpaceObject().getID();
                 if (mdv.hasNext()) {
                     throw new Exception("Ambiguous reference; multiple matches in db: " + metaKey);
                 }
-                item = itemService.find(c, uuid);
+                item = itemService.find(c.getSession(), uuid);
             }
         } catch (SQLException e) {
             throw new Exception("Error looking up item by metadata reference: " + metaKey, e);
@@ -661,7 +661,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 // add new item, locate old one
                 oldItem = (Item) handleService.resolveToObject(c, oldHandle);
             } else {
-                oldItem = itemService.findByIdOrLegacyId(c, oldHandle);
+                oldItem = itemService.findByIdOrLegacyId(c.getSession(), oldHandle);
             }
 
             /* Rather than exposing public item methods to change handles --
@@ -706,7 +706,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 deleteItem(c, myhandle);
             } else {
                 // it's an ID
-                Item myitem = itemService.findByIdOrLegacyId(c, itemID);
+                Item myitem = itemService.findByIdOrLegacyId(c.getSession(), itemID);
                 logInfo("Deleting item " + itemID);
                 deleteItem(c, myitem);
                 c.uncacheEntity(myitem);
@@ -979,14 +979,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             }
         } else {
             // If we're just test the import, let's check that the actual metadata field exists.
-            MetadataSchema foundSchema = metadataSchemaService.find(c, schema);
+            MetadataSchema foundSchema = metadataSchemaService.find(c.getSession(), schema);
 
             if (foundSchema == null) {
                 logError("ERROR: schema '" + schema + "' was not found in the registry.");
                 return;
             }
 
-            MetadataField foundField = metadataFieldService.findByElement(c, foundSchema, element, qualifier);
+            MetadataField foundField = metadataFieldService.findByElement(c.getSession(),
+                    foundSchema, element, qualifier);
 
             if (foundField == null) {
                 logError(
@@ -1031,7 +1032,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             obj = null;
                         }
                     } else {
-                        obj = collectionService.find(c, UUID.fromString(line));
+                        obj = collectionService.find(c.getSession(), UUID.fromString(line));
                     }
 
                     if (obj == null) {
@@ -1667,7 +1668,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
 
                 try {
-                    myGroup = groupService.findByName(c, groupName);
+                    myGroup = groupService.findByName(c.getSession(), groupName);
                 } catch (SQLException sqle) {
                     logError("SQL Exception finding group name: "
                         + groupName);
@@ -1752,7 +1753,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                 if (labelExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_LABEL_ELEMENT, null);
+                        .findByElement(c.getSession(), METADATA_IIIF_SCHEMA, METADATA_IIIF_LABEL_ELEMENT, null);
                     logInfo("\tSetting label to " + thisLabel + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisLabel);
@@ -1761,7 +1762,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
                 if (heightExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                        .findByElement(c.getSession(), METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
                             METADATA_IIIF_HEIGHT_QUALIFIER);
                     logInfo("\tSetting height to " + thisHeight + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
@@ -1770,7 +1771,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
                 if (widthExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
+                        .findByElement(c.getSession(), METADATA_IIIF_SCHEMA, METADATA_IIIF_IMAGE_ELEMENT,
                             METADATA_IIIF_WIDTH_QUALIFIER);
                     logInfo("\tSetting width to " + thisWidth + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
@@ -1779,7 +1780,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
                 if (tocExists) {
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(c, METADATA_IIIF_SCHEMA, METADATA_IIIF_TOC_ELEMENT, null);
+                        .findByElement(c.getSession(), METADATA_IIIF_SCHEMA, METADATA_IIIF_TOC_ELEMENT, null);
                     logInfo("\tSetting toc to " + thisToc + " in element "
                         + metadataField.getElement() + " on " + bitstreamName);
                     bitstreamService.addMetadata(c, bs, metadataField, null, thisToc);
@@ -2073,7 +2074,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 EPerson eperson = null;
 
                 try {
-                    eperson = ePersonService.find(context, oldEPerson.getID());
+                    eperson = ePersonService.find(context.getSession(), oldEPerson.getID());
                     context.setCurrentUser(eperson);
                     context.turnOffAuthorisationSystem();
 
@@ -2085,7 +2086,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                             UUID colId = UUID.fromString(colID);
                             if (theOwningCollection != null
                                     && !theOwningCollection.getID().equals(colId)) {
-                                Collection col = collectionService.find(context, colId);
+                                Collection col = collectionService.find(context.getSession(), colId);
                                 if (col != null) {
                                     collectionList.add(col);
                                 }

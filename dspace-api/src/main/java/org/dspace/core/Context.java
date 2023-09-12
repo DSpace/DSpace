@@ -714,7 +714,9 @@ public class Context implements AutoCloseable {
     public List<Group> getSpecialGroups() throws SQLException {
         List<Group> myGroups = new ArrayList<>();
         for (UUID groupId : specialGroups) {
-            myGroups.add(EPersonServiceFactory.getInstance().getGroupService().find(this, groupId));
+            myGroups.add(EPersonServiceFactory.getInstance()
+                    .getGroupService()
+                    .find(this.getSession(), groupId));
         }
 
         return myGroups;

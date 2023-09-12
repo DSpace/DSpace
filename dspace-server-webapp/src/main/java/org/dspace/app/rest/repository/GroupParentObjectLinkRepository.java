@@ -53,7 +53,7 @@ public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepositor
     ) {
         Context context = obtainContext();
         try {
-            Group group = groupService.find(context, groupId);
+            Group group = groupService.find(context.getSession(), groupId);
             if (group == null) {
                 throw new ResourceNotFoundException(
                         GroupRest.CATEGORY + "." + GroupRest.NAME

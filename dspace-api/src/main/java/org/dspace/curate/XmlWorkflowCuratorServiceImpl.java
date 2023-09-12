@@ -223,7 +223,7 @@ public class XmlWorkflowCuratorServiceImpl
             String status, String action, String message)
             throws AuthorizeException, IOException, SQLException {
         List<EPerson> epa = resolveContacts(c, task.getContacts(status), wfi);
-        if (epa.size() > 0) {
+        if (!epa.isEmpty()) {
             workflowService.notifyOfCuration(c, wfi, epa, task.name, action, message);
         }
     }
@@ -284,7 +284,7 @@ public class XmlWorkflowCuratorServiceImpl
                 }
             } else {
                 // assume it is an arbitrary group name
-                Group group = groupService.findByName(c, contact);
+                Group group = groupService.findByName(c.getSession(), contact);
                 if (group != null) {
                     epList.addAll(groupService.allMembers(c, group));
                 }

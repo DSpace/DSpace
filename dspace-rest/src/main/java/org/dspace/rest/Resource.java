@@ -29,7 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Superclass of all resource classes in REST API. It has methods for creating
- * context, write statistics, processsing exceptions, splitting a key of
+ * context, write statistics, processing exceptions, splitting a key of
  * metadata, string representation of action and method for getting the logged
  * in user from the token in request header.
  *
@@ -40,7 +40,7 @@ public class Resource {
     @javax.ws.rs.core.Context
     public ServletContext servletContext;
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Resource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     private static final boolean writeStatistics;
 
@@ -75,7 +75,8 @@ public class Resource {
                 .getAuthorities();
             for (SimpleGrantedAuthority grantedAuthority : specialGroups) {
                 context.setSpecialGroup(EPersonServiceFactory.getInstance().getGroupService()
-                                                             .findByName(context, grantedAuthority.getAuthority())
+                                                             .findByName(context.getSession(),
+                                                                     grantedAuthority.getAuthority())
                                                              .getID());
             }
             context.setCurrentUser(
@@ -155,11 +156,11 @@ public class Resource {
     /**
      * Split string with regex ".".
      *
-     * @param key String which will be splitted.
+     * @param key String which will be split.
      * @return String array filed with separated string.
      */
     protected String[] mySplit(String key) {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         int prev = 0;
         for (int i = 0; i < key.length(); i++) {
             if (key.charAt(i) == '.') {

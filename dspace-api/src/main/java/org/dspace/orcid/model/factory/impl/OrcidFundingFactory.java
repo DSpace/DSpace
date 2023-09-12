@@ -172,7 +172,8 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
     private Stream<Relationship> getRelationships(Context context, Item item, RelationshipType relationshipType) {
         try {
-            return relationshipService.findByItemAndRelationshipType(context, item, relationshipType).stream();
+            return relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    item, relationshipType).stream();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

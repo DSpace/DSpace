@@ -100,7 +100,7 @@ public class SubmissionService {
     private ConverterService converter;
     @Autowired
     private org.dspace.app.rest.utils.Utils utils;
-    private SubmissionConfigReader submissionConfigReader;
+    private final SubmissionConfigReader submissionConfigReader;
 
     public SubmissionService() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -128,11 +128,11 @@ public class SubmissionService {
 
         try {
             if (StringUtils.isNotBlank(collectionUUID)) {
-                collection = collectionService.find(context, UUID.fromString(collectionUUID));
+                collection = collectionService.find(context.getSession(), UUID.fromString(collectionUUID));
             } else {
                 final List<Collection> findAuthorizedOptimized = collectionService.findAuthorizedOptimized(context,
                         Constants.ADD);
-                if (findAuthorizedOptimized != null && findAuthorizedOptimized.size() > 0) {
+                if (findAuthorizedOptimized != null && !findAuthorizedOptimized.isEmpty()) {
                     collection = findAuthorizedOptimized.get(0);
                 } else {
                     throw new RESTAuthorizationException("No collection suitable for submission for the current user");
@@ -317,7 +317,7 @@ public class SubmissionService {
      * Utility method used by the {@link WorkspaceItemRestRepository} and
      * {@link WorkflowItemRestRepository} to deal with the upload in an inprogress
      * submission
-     * 
+     *
      * @param context DSpace Context Object
      * @param request the http request containing the upload request
      * @param wsi     the inprogress submission current rest representation
@@ -327,10 +327,10 @@ public class SubmissionService {
      */
     public List<ErrorRest> uploadFileToInprogressSubmission(Context context, HttpServletRequest request,
             AInprogressSubmissionRest wsi, InProgressSubmission source, MultipartFile file) {
-        List<ErrorRest> errors = new ArrayList<ErrorRest>();
+        List<ErrorRest> errors = new ArrayList<>();
         SubmissionConfig submissionConfig =
             submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
+        List<Object[]> stepInstancesAndConfigs = new ArrayList<>();
         // we need to run the preProcess of all the appropriate steps and move on to the
         // upload and postProcess step
         // We will initialize the step class just one time so that it will be the same
@@ -385,7 +385,7 @@ public class SubmissionService {
      * Utility method used by the {@link WorkspaceItemRestRepository} and
      * {@link WorkflowItemRestRepository} to deal with the patch of an inprogress
      * submission
-     * 
+     *
      * @param context DSpace Context Object
      * @param request the http request
      * @param source  the current inprogress submission
@@ -398,7 +398,7 @@ public class SubmissionService {
         boolean sectionExist = false;
         SubmissionConfig submissionConfig = submissionConfigReader
                 .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
-        List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
+        List<Object[]> stepInstancesAndConfigs = new ArrayList<>();
         // we need to run the preProcess of all the appropriate steps and move on to the
         // doPatchProcessing and postProcess step
         // We will initialize the step classes just one time so that it will be the same

@@ -185,7 +185,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             }
 
             if ((ce.permissionsActionId != -1) && (ce.permissionsGroupName != null)) {
-                Group group = groupService.findByName(context, ce.permissionsGroupName);
+                Group group = groupService.findByName(context.getSession(), ce.permissionsGroupName);
 
                 if (group != null) {
                     authorizeService.removeAllPolicies(context, bs);  // remove the default policy

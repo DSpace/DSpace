@@ -100,7 +100,7 @@ public class CollectionLogoController {
         }
         Context context = ContextUtil.obtainContext(request);
 
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException(
                     "The given uuid did not resolve to a collection on the server: " + uuid);

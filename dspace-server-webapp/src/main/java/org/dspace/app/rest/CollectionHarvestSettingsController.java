@@ -77,7 +77,7 @@ public class CollectionHarvestSettingsController {
                                            HttpServletResponse response) throws SQLException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, collectionUuid);
+        Collection collection = collectionService.find(context.getSession(), collectionUuid);
 
         if (collection == null) {
             throw new ResourceNotFoundException("Collection with uuid: " + collectionUuid + " not found");
@@ -104,7 +104,7 @@ public class CollectionHarvestSettingsController {
                                               HttpServletRequest request) throws SQLException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, collectionUuid);
+        Collection collection = collectionService.find(context.getSession(), collectionUuid);
         HarvestedCollectionResource harvestedCollectionResource = null;
 
         if (collection == null) {

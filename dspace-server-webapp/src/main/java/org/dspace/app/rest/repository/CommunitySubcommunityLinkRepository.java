@@ -55,12 +55,12 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
                                                  Projection projection) {
         try {
             Context context = obtainContext();
-            Community community = communityService.find(context, communityId);
+            Community community = communityService.find(context.getSession(), communityId);
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
             Pageable pageable = utils.getPageable(optionalPageable);
-            List<Community> publicSubcommunities = new LinkedList<Community>();
+            List<Community> publicSubcommunities = new LinkedList<>();
             IndexObjectFactoryFactory indexObjectFactory = IndexObjectFactoryFactory.getInstance();
             IndexableObject scopeObject = indexObjectFactory.getIndexableObjects(context, community).get(0);
             DiscoverQuery discoverQuery = new DiscoverQuery();

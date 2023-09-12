@@ -67,7 +67,7 @@ public class EntityServiceImplTest  {
 
         // The returned Entity's item should match the mocked item's name
         assertEquals("TestFindByItem 0", "ItemName",
-                entityService.findByItemId(context, item.getID()).getItem().getName());
+                entityService.findByItemId(context.getSession(), item.getID()).getItem().getName());
     }
 
     @Test
@@ -133,7 +133,8 @@ public class EntityServiceImplTest  {
         relationshipList.add(relationship);
 
         // Mock the state of objects utilized in getRelationsByType() to meet the success criteria of an invocation
-        when(relationshipService.findByTypeName(context, "leftwardType", -1, -1)).thenReturn(relationshipList);
+        when(relationshipService.findByTypeName(context.getSession(), "leftwardType", -1, -1))
+                .thenReturn(relationshipList);
 
         // The relation(s) reported from our defined type should match our relationshipList
         assertEquals("TestGetRelationsByLabel 0", relationshipList,

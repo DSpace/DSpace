@@ -1481,11 +1481,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     String bundleName = bitBundleCache.get(bitstreamId);
                     if (bundleName == null) {
                         //Nothing found retrieve the bitstream
-                        Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
+                        Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context.getSession(), bitstreamId);
                         //Attempt to retrieve our bitstream !
                         if (bitstream != null) {
                             List<Bundle> bundles = bitstream.getBundles();
-                            if (bundles != null && 0 < bundles.size()) {
+                            if (bundles != null && !bundles.isEmpty()) {
                                 Bundle bundle = bundles.get(0);
                                 bundleName = bundle.getName();
                             } else {
@@ -1605,7 +1605,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             //20140527162409835,view_bitstream,1292,2014-05-27T16:24:09,anonymous,127.0.0.1
             DSpaceObjectLegacySupportService dsoService = contentServiceFactory
                 .getDSpaceLegacyObjectService(Integer.parseInt(type));
-            DSpaceObject dso = dsoService.findByIdOrLegacyId(context, id);
+            DSpaceObject dso = dsoService.findByIdOrLegacyId(context.getSession(), id);
             if (dso == null) {
                 log.debug("Document no longer exists in DB. type:" + type + " id:" + id);
                 continue;
@@ -1645,7 +1645,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected void addAdditionalSolrYearCores(SolrQuery solrQuery) {
         //Only add if needed
         initSolrYearCores();
-        if (0 < statisticYearCores.size()) {
+        if (!statisticYearCores.isEmpty()) {
             //The shards are a comma separated list of the urls to the cores
             solrQuery.add(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ","));
         }
@@ -1705,6 +1705,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         statisticYearCoresInit = true;
     }
 
+    @Override
     public Object anonymizeIp(String ip) throws UnknownHostException {
         InetAddress address = InetAddress.getByName(ip);
         if (address instanceof Inet4Address) {

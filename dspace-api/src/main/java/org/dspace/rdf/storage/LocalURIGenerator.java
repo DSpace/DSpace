@@ -40,7 +40,7 @@ public class LocalURIGenerator implements URIGenerator {
                                                 .getProperty(RDFUtil.CONTEXT_PATH_KEY) + "/resource/";
 
         if (type == Constants.SITE) {
-            return urlPrefix + siteService.findSite(context).getHandle();
+            return urlPrefix + siteService.findSite(context.getSession()).getHandle();
         }
 
         if (type == Constants.COMMUNITY

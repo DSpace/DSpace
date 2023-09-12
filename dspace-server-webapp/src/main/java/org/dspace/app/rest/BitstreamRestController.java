@@ -106,7 +106,7 @@ public class BitstreamRestController {
 
         Context context = ContextUtil.obtainContext(request);
 
-        Bitstream bit = bitstreamService.find(context, uuid);
+        Bitstream bit = bitstreamService.find(context.getSession(), uuid);
         EPerson currentUser = context.getCurrentUser();
 
         if (bit == null) {
@@ -184,7 +184,7 @@ public class BitstreamRestController {
         if (name == null) {
             // give a default name to the file based on the UUID and the primary extension of the format
             name = bit.getID().toString();
-            if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
+            if (format != null && format.getExtensions() != null && !format.getExtensions().isEmpty()) {
                 name += "." + format.getExtensions().get(0);
             }
         }
@@ -240,7 +240,7 @@ public class BitstreamRestController {
         BitstreamFormat bitstreamFormat = bitstreamFormats.stream().findFirst()
                 .orElseThrow(() -> new DSpaceBadRequestException("No valid bitstream format was provided"));
 
-        Bitstream bitstream = bitstreamService.find(context, uuid);
+        Bitstream bitstream = bitstreamService.find(context.getSession(), uuid);
 
         if (bitstream == null) {
             throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");

@@ -125,7 +125,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                     + " own claimed tasks or the admins");
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
-                EPerson ep = epersonService.find(context, userID);
+                EPerson ep = epersonService.find(context.getSession(), userID);
                 List<ClaimedTask> tasks = claimedTaskService.findByEperson(context, ep);
                 return converter.toRestPage(tasks, pageable, utils.obtainProjection());
             } else {
@@ -143,7 +143,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         List<ClaimedTask> tasks = null;
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemUUID);
+            Item item = itemService.find(context.getSession(), itemUUID);
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
@@ -165,7 +165,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         ClaimedTask claimedTask = null;
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemUUID);
+            Item item = itemService.find(context.getSession(), itemUUID);
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }

@@ -114,7 +114,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         List<Subscription> subscriptions = null;
         try {
             Context context = obtainContext();
-            EPerson ePerson = ePersonService.find(context, epersonId);
+            EPerson ePerson = ePersonService.find(context.getSession(), epersonId);
             subscriptions = subscribeService.findSubscriptionsByEPerson(context, ePerson,
                                                  Math.toIntExact(pageable.getPageSize()),
                                                  Math.toIntExact(pageable.getOffset()));
@@ -135,7 +135,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         try {
             Context context = obtainContext();
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, dsoId);
-            EPerson ePerson = ePersonService.find(context, epersonId);
+            EPerson ePerson = ePersonService.find(context.getSession(), epersonId);
             subscriptions = subscribeService.findSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject,
                                                                     Math.toIntExact(pageable.getPageSize()),
                                                                     Math.toIntExact(pageable.getOffset()));
@@ -159,7 +159,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
 
         try {
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, UUID.fromString(dsoId));
-            EPerson ePerson = ePersonService.findByIdOrLegacyId(context, epersonId);
+            EPerson ePerson = ePersonService.findByIdOrLegacyId(context.getSession(), epersonId);
             if (Objects.isNull(ePerson) || Objects.isNull(dSpaceObject)) {
                 throw new DSpaceBadRequestException("Id of person or dspace object must represents reals ids");
             }

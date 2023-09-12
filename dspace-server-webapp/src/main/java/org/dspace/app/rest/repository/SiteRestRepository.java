@@ -47,7 +47,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     public SiteRest findOne(Context context, UUID id) {
         Site site = null;
         try {
-            site = sitesv.find(context, id);
+            site = sitesv.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -60,7 +60,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     @Override
     public Page<SiteRest> findAll(Context context, Pageable pageable) {
         try {
-            List<Site> sites = Arrays.asList(sitesv.findSite(context));
+            List<Site> sites = Arrays.asList(sitesv.findSite(context.getSession()));
             return converter.toRestPage(sites, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

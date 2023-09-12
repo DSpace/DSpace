@@ -146,12 +146,13 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         handleDAO.updateHandlesWithNewPrefix(context.getSession(), newPrefix, HANDLE_PREFIX);
         context.commit();
 
-        assertEquals(newPrefix + "/" + SUFFIX_1, itemService.find(context, item1.getID()).getHandle());
-        assertEquals(newPrefix + "/" + SUFFIX_2, itemService.find(context, item2.getID()).getHandle());
-        assertEquals(newPrefix + "/" + SUFFIX_3, itemService.find(context, item3.getID()).getHandle());
+        assertEquals(newPrefix + "/" + SUFFIX_1, itemService.find(context.getSession(), item1.getID()).getHandle());
+        assertEquals(newPrefix + "/" + SUFFIX_2, itemService.find(context.getSession(), item2.getID()).getHandle());
+        assertEquals(newPrefix + "/" + SUFFIX_3, itemService.find(context.getSession(), item3.getID()).getHandle());
 
         //Ensure that records not matching the old prefix are not touched
-        assertEquals("hdl:custom-prefix/" + SUFFIX_4, itemService.find(context, item4.getID()).getHandle());
+        assertEquals("hdl:custom-prefix/" + SUFFIX_4,
+                itemService.find(context.getSession(), item4.getID()).getHandle());
 
         context.restoreAuthSystemState();
     }

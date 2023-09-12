@@ -484,7 +484,7 @@ public class RoleDisseminator implements PackageDisseminator {
         if (object.getType() == Constants.SITE) {
             // TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
-            return groupService.findAll(context, null);
+            return groupService.findAll(context.getSession(), null);
         } else if (object.getType() == Constants.COMMUNITY) {
             Community community = (Community) object;
 

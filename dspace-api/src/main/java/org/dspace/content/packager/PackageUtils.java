@@ -85,8 +85,8 @@ public class PackageUtils {
 
     // HashMaps to convert Community/Collection metadata to/from Dublin Core
     // (useful when crosswalking Communities/Collections)
-    protected static final Map<String, String> ccMetadataToDC = new HashMap<String, String>();
-    protected static final Map<String, String> ccDCToMetadata = new HashMap<String, String>();
+    protected static final Map<String, String> ccMetadataToDC = new HashMap<>();
+    protected static final Map<String, String> ccDCToMetadata = new HashMap<>();
 
     protected static final BitstreamService bitstreamService = ContentServiceFactory.getInstance()
                                                                                     .getBitstreamService();
@@ -424,7 +424,7 @@ public class PackageUtils {
             // If we couldn't find a bitstream with format = "License",
             // we will just assume the first bitstream is the deposit license
             // (usually a safe assumption as it is in the LICENSE bundle)
-            if (bitstreams.size() > 0) {
+            if (!bitstreams.isEmpty()) {
                 return bitstreams.get(0);
             }
         }
@@ -462,7 +462,7 @@ public class PackageUtils {
 
         switch (type) {
             case Constants.COLLECTION:
-                Collection collection = collectionService.find(context, uuid);
+                Collection collection = collectionService.find(context.getSession(), uuid);
                 if (collection != null) {
                     dso = collectionService.create(context, (Community) parent, handle);
                 } else {
@@ -474,14 +474,14 @@ public class PackageUtils {
             case Constants.COMMUNITY:
                 // top-level community?
                 if (parent == null || parent.getType() == Constants.SITE) {
-                    Community community = communityService.find(context, uuid);
+                    Community community = communityService.find(context.getSession(), uuid);
                     if (community != null) {
                         dso = communityService.create(null, context, handle);
                     } else {
                         dso = communityService.create(null, context, handle, uuid);
                     }
                 } else {
-                    Community community = communityService.find(context, uuid);
+                    Community community = communityService.find(context.getSession(), uuid);
                     if (community != null) {
                         dso = communityService.createSubcommunity(context, ((Community) parent), handle);
                     } else {
@@ -493,7 +493,7 @@ public class PackageUtils {
             case Constants.ITEM:
                 //Initialize a WorkspaceItem
                 //(Note: Handle is not set until item is finished)
-                Item item = itemService.find(context, uuid);
+                Item item = itemService.find(context.getSession(), uuid);
                 if (item != null) {
                     return item;
                 }
@@ -512,7 +512,7 @@ public class PackageUtils {
                 return wsi.getItem();
 
             case Constants.SITE:
-                return siteService.findSite(context);
+                return siteService.findSite(context.getSession());
             default:
                 return null;
         }
@@ -765,7 +765,7 @@ public class PackageUtils {
      * Lookaside list for translations we've already done, so we don't generate
      * multiple names for the same group
      */
-    protected static final Map<String, String> orphanGroups = new HashMap<String, String>();
+    protected static final Map<String, String> orphanGroups = new HashMap<>();
 
     /**
      * When DSpace creates Default Group Names they are of a very specific format,
@@ -831,7 +831,7 @@ public class PackageUtils {
 
             //First, get the object via the Internal ID
             DSpaceObject dso = ContentServiceFactory.getInstance().getDSpaceLegacyObjectService(objType)
-                                                    .findByIdOrLegacyId(context, objID);
+                                                    .findByIdOrLegacyId(context.getSession(), objID);
 
             if (dso == null) {
                 // No such object.  Change the name to something harmless, but predictable.

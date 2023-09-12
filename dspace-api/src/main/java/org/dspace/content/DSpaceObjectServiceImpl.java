@@ -202,7 +202,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
                             String lang, List<String> values) throws SQLException {
-        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        MetadataField metadataField = metadataFieldService.findByElement(context.getSession(),
+                schema, element, qualifier);
         if (metadataField == null) {
             throw new SQLException(
                 "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
@@ -218,7 +219,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         throws SQLException {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
-        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        MetadataField metadataField = metadataFieldService.findByElement(context.getSession(),
+                schema, element, qualifier);
         if (metadataField == null) {
             throw new SQLException(
                 "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +

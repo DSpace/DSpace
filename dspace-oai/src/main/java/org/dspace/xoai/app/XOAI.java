@@ -104,7 +104,7 @@ public class XOAI {
     private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
             .getConfigurationService();
 
-    private List<XOAIExtensionItemCompilePlugin> extensionPlugins;
+    private final List<XOAIExtensionItemCompilePlugin> extensionPlugins;
 
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
@@ -195,9 +195,9 @@ public class XOAI {
          */
         try {
             Iterator<Item> discoverableChangedItems = itemService
-                    .findInArchiveOrWithdrawnDiscoverableModifiedSince(context, last);
+                    .findInArchiveOrWithdrawnDiscoverableModifiedSince(context.getSession(), last);
             Iterator<Item> nonDiscoverableChangedItems = itemService
-                    .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, last);
+                    .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context.getSession(), last);
             Iterator<Item> possiblyChangedItems = getItemsWithPossibleChangesBefore(last);
             return this.index(discoverableChangedItems) + this.index(nonDiscoverableChangedItems)
                     + this.index(possiblyChangedItems);
@@ -237,7 +237,8 @@ public class XOAI {
                 nextCursorMark = response.getNextCursorMark();
 
                 for (SolrDocument document : response.getResults()) {
-                    Item item = itemService.find(context, UUID.fromString((String) document.getFieldValue("item.id")));
+                    Item item = itemService.find(context.getSession(),
+                            UUID.fromString((String) document.getFieldValue("item.id")));
                     if (nonNull(item)) {
                         if (nonNull(item.getLastModified())) {
                             if (item.getLastModified().before(last)) {
@@ -266,10 +267,10 @@ public class XOAI {
             // Index both in_archive items AND withdrawn items. Withdrawn items
             // will be flagged withdrawn
             // (in order to notify external OAI harvesters of their new status)
-            Iterator<Item> discoverableItems = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
-                    null);
+            Iterator<Item> discoverableItems
+                    = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context.getSession(), null);
             Iterator<Item> nonDiscoverableItems = itemService
-                    .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context, null);
+                    .findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context.getSession(), null);
             return this.index(discoverableItems) + this.index(nonDiscoverableItems);
         } catch (SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
@@ -674,10 +675,10 @@ public class XOAI {
 
             if (last == null) {
                 System.out.println("Retrieving all items to be compiled");
-                iterator = itemService.findAll(context);
+                iterator = itemService.findAll(context.getSession());
             } else {
                 System.out.println("Retrieving items modified after " + last + " to be compiled");
-                iterator = itemService.findByLastModifiedSince(context, last);
+                iterator = itemService.findByLastModifiedSince(context.getSession(), last);
             }
 
             while (iterator.hasNext()) {

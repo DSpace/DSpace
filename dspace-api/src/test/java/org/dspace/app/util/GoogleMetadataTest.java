@@ -365,7 +365,7 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         // Set 3 month embargo on pdf
         MutablePeriod period = PeriodFormat.getDefault().parseMutablePeriod("3 months");
         Date embargoDate = DateTime.now(DateTimeZone.UTC).plus(period).toDate();
-        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         authorizeService.removeAllPolicies(context, b);
         resourcePolicyService.removeAllPolicies(context, b);
         ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, anonGroup,

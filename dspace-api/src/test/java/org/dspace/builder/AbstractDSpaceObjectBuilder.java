@@ -115,6 +115,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      * Support method to grant the {@link Constants#READ} permission over an object only to the {@link Group#ANONYMOUS}
      * after the specified embargoPeriod. Any other READ permissions will be removed
      *
+     * @param <B> type of {@code DSpaceObject} being built.
      * @param embargoPeriod
      *            the embargo period after which the READ permission will be active. It is parsed using the
      *            {@link PeriodFormatter#parseMutablePeriod(String)} method of the joda library
@@ -128,7 +129,8 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
             MutablePeriod period = PeriodFormat.getDefault().parseMutablePeriod(embargoPeriod);
             Date embargoDate = DateTime.now(DateTimeZone.UTC).plus(period).toDate();
 
-            return setOnlyReadPermission(dso, groupService.findByName(context, Group.ANONYMOUS), embargoDate);
+            Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
+            return setOnlyReadPermission(dso, anonymousGroup, embargoDate);
         } catch (Exception e) {
             return handleException(e);
         }

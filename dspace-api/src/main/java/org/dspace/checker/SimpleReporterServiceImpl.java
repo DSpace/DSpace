@@ -227,7 +227,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
     public int getUncheckedBitstreamsReport(Context context, OutputStreamWriter osw)
         throws IOException, SQLException {
         // get all the bitstreams marked deleted for today
-        List<Bitstream> bitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context);
+        List<Bitstream> bitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context.getSession());
 
         osw.write("\n");
         osw.write(msg("unchecked-bitstream-report"));

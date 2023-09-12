@@ -120,7 +120,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
      */
     private void assertRelationship(Item leftItem, Item rightItem, int expectedCount,
                                     String placeDirection, int placeCount) throws SQLException {
-        List<Relationship> rels = relationshipService.findByItem(context, rightItem);
+        List<Relationship> rels = relationshipService.findByItem(context.getSession(), rightItem);
         Relationship relationship = null;
         int foundCount = 0;
         for (Relationship rel : rels) {
@@ -177,7 +177,8 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
         performImportScript(csvLines, false);
         Item[] items = new Item[csvLines.length - 1];
         for (int i = 0; i < items.length; i++) {
-            items[i] = itemService.findByIdOrLegacyId(context, getUUIDByIdentifierOther("" + i).toString());
+            items[i] = itemService.findByIdOrLegacyId(context.getSession(),
+                    getUUIDByIdentifierOther("" + i).toString());
         }
         return items;
     }
@@ -719,15 +720,15 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
      *
      * @param value the value of the dc.identifier.other to query for
      *
-     * @return first retrived UUID
+     * @return first retrieved UUID
      */
     private UUID getUUIDByIdentifierOther(String value) throws Exception {
         ArrayList<UUID> uuidList = new ArrayList<>();
         MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
         MetadataFieldService metadataFieldService =
             ContentServiceFactory.getInstance().getMetadataFieldService();
-        MetadataField mfo = metadataFieldService.findByElement(context, "dc", "identifier", "other");
-        Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(context, mfo, value);
+        MetadataField mfo = metadataFieldService.findByElement(context.getSession(), "dc", "identifier", "other");
+        Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(context.getSession(), mfo, value);
         while (mdv.hasNext()) {
             MetadataValue mdvVal = mdv.next();
             uuidList.add(mdvVal.getDSpaceObject().getID());

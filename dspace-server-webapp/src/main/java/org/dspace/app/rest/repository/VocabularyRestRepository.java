@@ -26,6 +26,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,8 +86,9 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
         String[] tokens = org.dspace.core.Utils.tokenize(metadataField);
 
         try {
-            collection = collectionService.find(obtainContext(), collectionUuid);
-            metadata = metadataFieldService.findByElement(obtainContext(), tokens[0], tokens[1], tokens[2]);
+            Session session = obtainContext().getSession();
+            collection = collectionService.find(session, collectionUuid);
+            metadata = metadataFieldService.findByElement(session, tokens[0], tokens[1], tokens[2]);
         } catch (SQLException e) {
             throw new RuntimeException(
                     "A database error occurs retrieving the metadata and/or the collection information", e);

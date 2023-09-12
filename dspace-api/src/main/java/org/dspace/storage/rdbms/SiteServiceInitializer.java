@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SiteServiceInitializer implements Callback {
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteServiceInitializer.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected SiteService siteService;
@@ -45,7 +45,7 @@ public class SiteServiceInitializer implements Callback {
             context = new Context();
             context.turnOffAuthorisationSystem();
             // Create Site object if it doesn't exist in database
-            Site site = siteService.findSite(context);
+            Site site = siteService.findSite(context.getSession());
             if (site == null) {
                 site = siteService.createSite(context);
             }
@@ -53,7 +53,7 @@ public class SiteServiceInitializer implements Callback {
             // Give Anonymous users READ permissions on the Site Object (if doesn't exist)
             if (!authorizeService.authorizeActionBoolean(context, site, Constants.READ)) {
                 context.turnOffAuthorisationSystem();
-                Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+                Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
                 if (anonGroup != null) {
                     authorizeService.addPolicy(context, site, Constants.READ, anonGroup);
                 }

@@ -134,7 +134,7 @@ public class RequestItemRepository
             if (isBlank(bitstreamId)) {
                 throw new IncompleteItemRequestException("A bitstream ID is required");
             }
-            bitstream = bitstreamService.find(ctx, UUID.fromString(bitstreamId));
+            bitstream = bitstreamService.find(ctx.getSession(), UUID.fromString(bitstreamId));
             if (null == bitstream) {
                 throw new IncompleteItemRequestException("That bitstream does not exist");
             }
@@ -147,7 +147,7 @@ public class RequestItemRepository
         if (isBlank(itemId)) {
             throw new IncompleteItemRequestException("An item ID is required");
         }
-        Item item = itemService.find(ctx, UUID.fromString(itemId));
+        Item item = itemService.find(ctx.getSession(), UUID.fromString(itemId));
         if (null == item) {
             throw new IncompleteItemRequestException("That item does not exist");
         }

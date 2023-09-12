@@ -28,6 +28,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.indexobject.IndexableMetadataField;
 import org.dspace.event.Event;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -91,24 +92,24 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     }
 
     @Override
-    public MetadataField find(Context context, int id) throws SQLException {
-        return metadataFieldDAO.findByID(context.getSession(), MetadataField.class, id);
+    public MetadataField find(Session session, int id) throws SQLException {
+        return metadataFieldDAO.findByID(session, MetadataField.class, id);
     }
 
     @Override
-    public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
+    public MetadataField findByElement(Session session, MetadataSchema metadataSchema, String element, String qualifier)
         throws SQLException {
-        return metadataFieldDAO.findByElement(context.getSession(), metadataSchema, element, qualifier);
+        return metadataFieldDAO.findByElement(session, metadataSchema, element, qualifier);
     }
 
     @Override
-    public MetadataField findByElement(Context context, String metadataSchemaName, String element, String qualifier)
+    public MetadataField findByElement(Session session, String metadataSchemaName, String element, String qualifier)
         throws SQLException {
-        return metadataFieldDAO.findByElement(context.getSession(), metadataSchemaName, element, qualifier);
+        return metadataFieldDAO.findByElement(session, metadataSchemaName, element, qualifier);
     }
 
     @Override
-    public MetadataField findByString(Context context, String mdString, char separator) throws SQLException {
+    public MetadataField findByString(Session session, String mdString, char separator) throws SQLException {
         String[] seq = StringUtils.split(mdString, separator);
         String schema = seq.length > 1 ? seq[0] : null;
         String element = seq.length > 1 ? seq[1] : null;
@@ -116,24 +117,24 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         if (schema == null || element == null) {
             return null;
         } else {
-            return this.findByElement(context, schema, element, qualifier);
+            return this.findByElement(session, schema, element, qualifier);
         }
     }
 
     @Override
-    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchemaName,
+    public List<MetadataField> findFieldsByElementNameUnqualified(Session session, String metadataSchemaName,
                                                                   String element) throws SQLException {
-        return metadataFieldDAO.findFieldsByElementNameUnqualified(context.getSession(), metadataSchemaName, element);
+        return metadataFieldDAO.findFieldsByElementNameUnqualified(session, metadataSchemaName, element);
     }
 
     @Override
-    public List<MetadataField> findAll(Context context) throws SQLException {
-        return metadataFieldDAO.findAll(context.getSession(), MetadataField.class);
+    public List<MetadataField> findAll(Session session) throws SQLException {
+        return metadataFieldDAO.findAll(session, MetadataField.class);
     }
 
     @Override
-    public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema) throws SQLException {
-        return metadataFieldDAO.findAllInSchema(context.getSession(), metadataSchema);
+    public List<MetadataField> findAllInSchema(Session session, MetadataSchema metadataSchema) throws SQLException {
+        return metadataFieldDAO.findAllInSchema(session, metadataSchema);
     }
 
     @Override
@@ -174,7 +175,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
         // Check for existing usages of this field
         List<MetadataValue> values = null;
         try {
-            values = metadataValueService.findByField(context, metadataField);
+            values = metadataValueService.findByField(context.getSession(), metadataField);
         } catch (IOException io) {
             // ignore
         }

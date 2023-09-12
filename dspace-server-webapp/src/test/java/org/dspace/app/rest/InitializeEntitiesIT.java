@@ -73,7 +73,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
         List<EntityType> entityTypeList = entityTypeService.findAll(context);
-        List<Relationship> relationships = relationshipService.findAll(context);
+        List<Relationship> relationships = relationshipService.findAll(context.getSession());
 
         for (Relationship relationship : relationships) {
             relationshipService.delete(context, relationship);

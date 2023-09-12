@@ -58,7 +58,7 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
                                           @Nullable Pageable optionalPageable,
                                           Projection projection) throws SQLException {
         Context context = ContextUtil.obtainCurrentRequestContext();
-        Item item = itemService.find(context, itemId);
+        Item item = itemService.find(context.getSession(), itemId);
         if (item == null) {
             throw new ResourceNotFoundException("Could not find item with id " + itemId);
         }

@@ -112,7 +112,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
     @Override
     public Iterator<IndexableItem> findAll(Context context) throws SQLException {
-        Iterator<Item> items = itemService.findAllRegularItems(context);
+        Iterator<Item> items = itemService.findAllRegularItems(context.getSession());
         return new Iterator<IndexableItem>() {
             @Override
             public boolean hasNext() {
@@ -572,7 +572,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 }
                 if (toProjectionFields.contains(field) || toProjectionFields
                         .contains(unqualifiedField + "." + Item.ANY)) {
-                    StringBuffer variantsToStore = new StringBuffer();
+                    StringBuilder variantsToStore = new StringBuilder();
                     if (variants != null) {
                         for (String var : variants) {
                             variantsToStore.append(VARIANTS_STORE_SEPARATOR);
@@ -609,7 +609,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
             List<MetadataValue> values = itemService.getMetadataByMetadataString(item, "dc.relation.ispartof");
 
-            if (values != null && values.size() > 0 && values.get(0) != null && values.get(0).getValue() != null) {
+            if (values != null && !values.isEmpty() && values.get(0) != null && values.get(0).getValue() != null) {
                 // group on parent
                 String handlePrefix = handleService.getCanonicalPrefix();
 
@@ -715,7 +715,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
     @Override
     public Optional<IndexableItem> findIndexableObject(Context context, String id) throws SQLException {
-        final Item item = itemService.find(context, UUID.fromString(id));
+        final Item item = itemService.find(context.getSession(), UUID.fromString(id));
         return item == null ? Optional.empty() : Optional.of(new IndexableItem(item));
     }
 

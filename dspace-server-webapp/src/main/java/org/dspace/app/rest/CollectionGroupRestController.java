@@ -88,7 +88,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
 
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
@@ -123,7 +123,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
@@ -156,7 +156,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
 
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
@@ -191,7 +191,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
@@ -223,7 +223,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
 
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
@@ -265,7 +265,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
@@ -305,7 +305,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
 
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
@@ -348,7 +348,7 @@ public class CollectionGroupRestController {
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
@@ -389,7 +389,7 @@ public class CollectionGroupRestController {
                                                                           @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
@@ -419,7 +419,7 @@ public class CollectionGroupRestController {
                                                                            @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
@@ -458,7 +458,7 @@ public class CollectionGroupRestController {
                                                                              @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
-        Collection collection = collectionService.find(context, uuid);
+        Collection collection = collectionService.find(context.getSession(), uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }

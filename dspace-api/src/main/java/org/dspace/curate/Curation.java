@@ -129,7 +129,9 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         if ("all".equals(this.id)) {
             // run on whole Site
             curator.curate(context,
-                ContentServiceFactory.getInstance().getSiteService().findSite(context).getHandle());
+                ContentServiceFactory.getInstance().getSiteService()
+                        .findSite(context.getSession())
+                        .getHandle());
         } else {
             curator.curate(context, this.id);
         }
@@ -254,7 +256,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         UUID currentUserUuid = this.getEpersonIdentifier();
         try {
             this.context = new Context(Context.Mode.BATCH_EDIT);
-            EPerson eperson = ePersonService.find(context, currentUserUuid);
+            EPerson eperson = ePersonService.find(context.getSession(), currentUserUuid);
             if (eperson == null) {
                 super.handler.logError("EPerson not found: " + currentUserUuid);
                 throw new IllegalArgumentException("Unable to find a user with uuid: " + currentUserUuid);

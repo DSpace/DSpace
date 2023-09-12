@@ -204,7 +204,7 @@ public class DSpaceCSV implements Serializable {
 
                     // Check that the scheme exists
                     if (!StringUtils.equals(metadataSchema, MetadataSchemaEnum.RELATION.getName())) {
-                        MetadataSchema foundSchema = metadataSchemaService.find(c, metadataSchema);
+                        MetadataSchema foundSchema = metadataSchemaService.find(c.getSession(), metadataSchema);
                         if (foundSchema == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
                                                                             MetadataImportInvalidHeadingException
@@ -214,7 +214,7 @@ public class DSpaceCSV implements Serializable {
 
                         // Check that the metadata element exists in the schema
                         MetadataField foundField = metadataFieldService
-                            .findByElement(c, foundSchema, metadataElement, metadataQualifier);
+                            .findByElement(c.getSession(), foundSchema, metadataElement, metadataQualifier);
                         if (foundField == null) {
                             throw new MetadataImportInvalidHeadingException(clean[0],
                                                                             MetadataImportInvalidHeadingException

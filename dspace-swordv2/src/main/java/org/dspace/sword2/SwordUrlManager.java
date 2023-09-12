@@ -46,10 +46,10 @@ public class SwordUrlManager {
     protected ConfigurationService configurationService =
             DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private String swordPath = configurationService.getProperty(
+    private final String swordPath = configurationService.getProperty(
             "swordv2-server.path", "swordv2");
 
-    private String dspaceUrl = configurationService.getProperty(
+    private final String dspaceUrl = configurationService.getProperty(
             "dspace.server.url");
 
     /**
@@ -140,7 +140,7 @@ public class SwordUrlManager {
                 iid = iid.substring(0, iid.length() - ".rdf".length());
             }
 
-            Item item = itemService.findByIdOrLegacyId(context, iid);
+            Item item = itemService.findByIdOrLegacyId(context.getSession(), iid);
             return item;
         } catch (SQLException e) {
             // log.error("Caught exception:", e);
@@ -424,7 +424,7 @@ public class SwordUrlManager {
             int firstSlash = bitstreamParts.indexOf("/");
             String bid = bitstreamParts.substring(0, firstSlash);
             Bitstream bitstream =
-                bitstreamService.findByIdOrLegacyId(context, bid);
+                bitstreamService.findByIdOrLegacyId(context.getSession(), bid);
             return bitstream;
         } catch (SQLException e) {
             // log.error("Caught exception:", e);

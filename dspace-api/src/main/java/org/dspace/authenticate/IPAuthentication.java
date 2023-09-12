@@ -17,6 +17,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -50,7 +51,7 @@ public class IPAuthentication implements AuthenticationMethod {
     /**
      * Our logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IPAuthentication.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * All the IP matchers
@@ -83,8 +84,8 @@ public class IPAuthentication implements AuthenticationMethod {
      * will never fail if the configuration is bad -- a warning will be logged.
      */
     public IPAuthentication() {
-        ipMatchers = new ArrayList<IPMatcher>();
-        ipNegativeMatchers = new ArrayList<IPMatcher>();
+        ipMatchers = new ArrayList<>();
+        ipNegativeMatchers = new ArrayList<>();
         ipMatcherGroupIDs = new HashMap<>();
         ipMatcherGroupNames = new HashMap<>();
         groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -164,7 +165,7 @@ public class IPAuthentication implements AuthenticationMethod {
         if (request == null) {
             return Collections.EMPTY_LIST;
         }
-        List<Group> groups = new ArrayList<Group>();
+        List<Group> groups = new ArrayList<>();
 
         // Get the user's IP address
         String addr = clientInfoService.getClientIp(request);
@@ -175,13 +176,13 @@ public class IPAuthentication implements AuthenticationMethod {
                     // Do we know group ID?
                     UUID g = ipMatcherGroupIDs.get(ipm);
                     if (g != null) {
-                        groups.add(groupService.find(context, g));
+                        groups.add(groupService.find(context.getSession(), g));
                     } else {
                         // See if we have a group name
                         String groupName = ipMatcherGroupNames.get(ipm);
 
                         if (groupName != null) {
-                            Group group = groupService.findByName(context, groupName);
+                            Group group = groupService.findByName(context.getSession(), groupName);
                             if (group != null) {
                                 // Add ID so we won't have to do lookup again
                                 ipMatcherGroupIDs.put(ipm, (group.getID()));
@@ -209,13 +210,13 @@ public class IPAuthentication implements AuthenticationMethod {
                     // Do we know group ID?
                     UUID g = ipMatcherGroupIDs.get(ipm);
                     if (g != null) {
-                        groups.remove(groupService.find(context, g));
+                        groups.remove(groupService.find(context.getSession(), g));
                     } else {
                         // See if we have a group name
                         String groupName = ipMatcherGroupNames.get(ipm);
 
                         if (groupName != null) {
-                            Group group = groupService.findByName(context, groupName);
+                            Group group = groupService.findByName(context.getSession(), groupName);
                             if (group != null) {
                                 // Add ID so we won't have to do lookup again
                                 ipMatcherGroupIDs.put(ipm, group.getID());

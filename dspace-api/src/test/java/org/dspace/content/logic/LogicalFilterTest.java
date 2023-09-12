@@ -70,17 +70,28 @@ import org.junit.Test;
  */
 public class LogicalFilterTest extends AbstractUnitTest {
     // Required services
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    protected ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    protected BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
+    protected BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
+    protected CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected WorkspaceItemService workspaceItemService
+            = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected InstallItemService installItemService
+            = ContentServiceFactory.getInstance().getInstallItemService();
+    private final MetadataFieldService metadataFieldService
+            = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private final MetadataValueService metadataValueService
+            = ContentServiceFactory.getInstance().getMetadataValueService();
+    private final AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final GroupService groupService
+            = EPersonServiceFactory.getInstance().getGroupService();
 
     // Logger
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LogicalFilterTest.class);
@@ -158,7 +169,7 @@ public class LogicalFilterTest extends AbstractUnitTest {
             // Withdraw the second item for later testing
             itemService.withdraw(context, itemTwo);
             // Initialise metadata field for later testing with both items
-            this.metadataField = metadataFieldService.findByElement(context,
+            this.metadataField = metadataFieldService.findByElement(context.getSession(),
                 MetadataSchemaEnum.DC.getName(), element, qualifier);
             context.restoreAuthSystemState();
         } catch (AuthorizeException | SQLException | IOException e) {

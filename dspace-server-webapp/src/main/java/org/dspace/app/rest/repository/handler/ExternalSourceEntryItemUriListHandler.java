@@ -38,7 +38,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriListHandler<T> {
 
-    private List<RequestMethod> allowedRequestMethods = new LinkedList<>(Arrays.asList(RequestMethod.POST));
+    private final List<RequestMethod> allowedRequestMethods
+            = new LinkedList<>(Arrays.asList(RequestMethod.POST));
 
     @Autowired
     private ExternalDataService externalDataService;
@@ -74,7 +75,8 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
             return false;
         }
         try {
-            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionString));
+            Collection collection = collectionService.find(context.getSession(),
+                    UUID.fromString(owningCollectionString));
             if (collection == null) {
                 return false;
             }
@@ -103,7 +105,8 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
 
         String owningCollectionUuid = request.getParameter("owningCollection");
         try {
-            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+            Collection collection = collectionService.find(context.getSession(),
+                    UUID.fromString(owningCollectionUuid));
             return externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
             log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,

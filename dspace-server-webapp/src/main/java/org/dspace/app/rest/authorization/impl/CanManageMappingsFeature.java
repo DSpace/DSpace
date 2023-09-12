@@ -63,7 +63,8 @@ public class CanManageMappingsFeature implements AuthorizationFeature {
             }
         }
         if (object instanceof ItemRest) {
-            Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
+            Item item = itemService.find(context.getSession(),
+                    UUID.fromString(((ItemRest) object).getUuid()));
             if (!authorizeService.authorizeActionBoolean(context, item, Constants.WRITE)) {
                 return false;
             }

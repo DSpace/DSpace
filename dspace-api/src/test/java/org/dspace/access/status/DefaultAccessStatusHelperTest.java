@@ -263,7 +263,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         List<ResourcePolicy> policies = new ArrayList<>();
         ResourcePolicy policy = resourcePolicyService.create(context);
         policy.setRpName("Embargo");
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         policy.setGroup(group);
         policy.setAction(Constants.READ);
         policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
@@ -290,7 +290,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         List<ResourcePolicy> policies = new ArrayList<>();
         ResourcePolicy policy = resourcePolicyService.create(context);
         policy.setRpName("Restriction");
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         policy.setGroup(group);
         policy.setAction(Constants.READ);
         policy.setStartDate(new LocalDate(10000, 1, 1).toDate());
@@ -317,7 +317,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         List<ResourcePolicy> policies = new ArrayList<>();
         ResourcePolicy policy = resourcePolicyService.create(context);
         policy.setRpName("Restriction");
-        Group group = groupService.findByName(context, Group.ADMIN);
+        Group group = groupService.findByName(context.getSession(), Group.ADMIN);
         policy.setGroup(group);
         policy.setAction(Constants.READ);
         policies.add(policy);
@@ -380,7 +380,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         List<ResourcePolicy> policies = new ArrayList<>();
         ResourcePolicy policy = resourcePolicyService.create(context);
         policy.setRpName("Embargo");
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         policy.setGroup(group);
         policy.setAction(Constants.READ);
         policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
@@ -409,7 +409,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         List<ResourcePolicy> policies = new ArrayList<>();
         ResourcePolicy policy = resourcePolicyService.create(context);
         policy.setRpName("Embargo");
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         policy.setGroup(group);
         policy.setAction(Constants.READ);
         policy.setStartDate(new LocalDate(9999, 12, 31).toDate());

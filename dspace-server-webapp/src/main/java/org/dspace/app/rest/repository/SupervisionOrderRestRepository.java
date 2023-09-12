@@ -111,7 +111,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
 
         validateParameters(itemId, groupId, type);
 
-        Item item = itemService.find(context, UUID.fromString(itemId));
+        Item item = itemService.find(context.getSession(), UUID.fromString(itemId));
         if (item == null) {
             throw new UnprocessableEntityException("Item with uuid: " + itemId + " not found");
         }
@@ -120,7 +120,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             throw new UnprocessableEntityException("An archived Item with uuid: " + itemId + " can't be supervised");
         }
 
-        Group group = groupService.find(context, UUID.fromString(groupId));
+        Group group = groupService.find(context.getSession(), UUID.fromString(groupId));
         if (group == null) {
             throw new UnprocessableEntityException("Group with uuid: " + groupId + " not found");
         }
@@ -162,7 +162,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
                                                  Pageable pageable) {
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, UUID.fromString(itemId));
+            Item item = itemService.find(context.getSession(), UUID.fromString(itemId));
             if (Objects.isNull(item)) {
                 throw new ResourceNotFoundException("no item is found for the uuid < " + itemId + " >");
             }

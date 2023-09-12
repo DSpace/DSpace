@@ -21,6 +21,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the DSpaceObject.
@@ -54,14 +55,14 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
             = new MetadataFieldName(DC, "source");
 
     /**
-     * Generic find for when the precise type of an Entity is not known
+     * Generic find for when the precise type of an Entity is not known.
      *
-     * @param context - the context
-     * @param uuid      - uuid within table of typed dspace objects
-     * @return the dspace object found, or null if it does not exist.
+     * @param session - current request's database context.
+     * @param uuid      - uuid within table of typed DSpace objects
+     * @return the DSpace object found, or null if it does not exist.
      * @throws SQLException only upon failure accessing the database.
      */
-    public T find(Context context, UUID uuid) throws SQLException;
+    public T find(Session session, UUID uuid) throws SQLException;
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.

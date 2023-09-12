@@ -168,7 +168,7 @@ public class ItemTemplateRestController {
     }
 
     private TemplateItem getTemplateItem(Context context, UUID uuid) throws SQLException {
-        Item item = itemService.find(context, uuid);
+        Item item = itemService.find(context.getSession(), uuid);
         if (item == null) {
             throw new ResourceNotFoundException(
                 "The given uuid did not resolve to an item on the server: " + uuid);

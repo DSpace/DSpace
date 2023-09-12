@@ -69,19 +69,21 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             }
 
             if (uuid != null) {
-                final Item item = ContentServiceFactory.getInstance().getItemService().find(context, uuid);
+                final Item item = ContentServiceFactory.getInstance()
+                        .getItemService()
+                        .find(context.getSession(), uuid);
                 if (item != null) {
                     indexableObject = Optional.of(new IndexableItem(item));
                 } else {
                     // it could be a community
                     final Community community = ContentServiceFactory.getInstance().
-                            getCommunityService().find(context, uuid);
+                            getCommunityService().find(context.getSession(), uuid);
                     if (community != null) {
                         indexableObject = Optional.of(new IndexableCommunity(community));
                     } else {
                         // it could be a collection
                         final Collection collection = ContentServiceFactory.getInstance().
-                                getCollectionService().find(context, uuid);
+                                getCollectionService().find(context.getSession(), uuid);
                         if (collection != null) {
                             indexableObject = Optional.of(new IndexableCollection(collection));
                         }
@@ -155,6 +157,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                                                                  IndexDiscoveryScriptConfiguration.class);
     }
 
+    @Override
     public void setup() throws ParseException {
         try {
             context = new Context(Context.Mode.READ_ONLY);
@@ -227,7 +230,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         throws IOException, SearchServiceException, SQLException {
         long count = 0;
 
-        final Iterator<Item> itemIterator = itemService.findByCollection(context, collection);
+        final Iterator<Item> itemIterator = itemService.findByCollection(context.getSession(), collection);
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
             indexingService.indexContent(context, new IndexableItem(item), true, false);

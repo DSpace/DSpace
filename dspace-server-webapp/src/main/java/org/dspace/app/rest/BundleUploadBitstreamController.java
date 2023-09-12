@@ -95,7 +95,7 @@ public class BundleUploadBitstreamController {
         Context context = ContextUtil.obtainContext(request);
         Bundle bundle = null;
         try {
-            bundle = bundleService.find(context, uuid);
+            bundle = bundleService.find(context.getSession(), uuid);
         } catch (SQLException e) {
             log.error("Something went wrong trying to find the Bundle with uuid: " + uuid, e);
         }
