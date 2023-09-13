@@ -88,8 +88,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try {
             handleService.createHandle(context, dso, identifier);
             if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
-                Item item = (Item) dso;
-                populateHandleMetadata(context, item, identifier);
+                populateHandleMetadata(context, dso, identifier);
             }
         } catch (IOException | IllegalStateException | SQLException | AuthorizeException e) {
             log.error(LogHelper.getHeader(context,
