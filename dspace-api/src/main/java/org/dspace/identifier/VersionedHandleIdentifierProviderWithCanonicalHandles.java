@@ -182,10 +182,10 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         try {
             if (dso instanceof Item) {
                 Item item = (Item) dso;
-                // if for this identifier is already present a record in the Handle table and the corresponding item
-                // has an history someone is trying to restore the latest version for the item. When
-                // trying to restore the latest version the identifier in input doesn't have the for 1234/123.latestVersion
-                // it is the canonical 1234/123
+                // if this identifier is already present in the Handle table and the corresponding item
+                // has a history, then someone is trying to restore the latest version for the item. When
+                // trying to restore the latest version, the identifier in input doesn't have the
+                // 1234/123.latestVersion. Instead, it is the canonical 1234/123
                 VersionHistory itemHistory = getHistory(context, identifier);
                 if (!identifier.matches(".*/.*\\.\\d+") && itemHistory != null) {
 
