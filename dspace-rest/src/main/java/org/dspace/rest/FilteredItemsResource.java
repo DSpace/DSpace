@@ -142,11 +142,13 @@ public class FilteredItemsResource extends Resource {
             List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);
 
             Iterator<org.dspace.content.Item> childItems = itemService
-                .findByMetadataQuery(context.getSession(), listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
+                .findByMetadataQuery(context.getSession(), listFieldList,
+                        query_op, query_val, uuids, regexClause, offset, limit);
 
             int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
-            writeStats(siteService.findSite(context.getSession()), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
-                       headers, request, context);
+            writeStats(siteService.findSite(context.getSession()),
+                    UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
             result.annotateQuery(query_field, query_op, query_val);
             result.setUnfilteredItemCount(count);
             context.complete();
