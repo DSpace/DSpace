@@ -75,7 +75,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     @Override
     public LDNMessageEntity create(Context context, Notification notification) throws SQLException {
         LDNMessageEntity ldnMessage = create(context, notification.getId());
-        ldnMessage.setObject(findDspaceObjectByUrl(context, notification.getId()));
+        ldnMessage.setObject(findDspaceObjectByUrl(context, notification.getObject().getId()));
         if (null != notification.getContext()) {
             ldnMessage.setContext(findDspaceObjectByUrl(context, notification.getContext().getId()));
         }
@@ -94,7 +94,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         ldnMessage.setType(StringUtils.joinWith(",", notification.getType()));
         Set<String> notificationType = notification.getType();
         if (notificationType != null) {
-            String[] notificationTypeArray = (String[]) notificationType.toArray();
+            String[] notificationTypeArray = notificationType.stream().toArray(String[]::new);
             if (notificationTypeArray.length >= 2) {
                 ldnMessage.setActivityStreamType(notificationTypeArray[0]);
                 ldnMessage.setCoarNotifyType(notificationTypeArray[1]);
