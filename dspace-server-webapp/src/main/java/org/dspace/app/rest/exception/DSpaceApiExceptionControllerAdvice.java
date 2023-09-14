@@ -132,7 +132,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
         //Using the value from HttpStatus.
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                 "Unprocessable or invalid entity",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
@@ -140,7 +140,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler( {InvalidSearchRequestException.class})
     protected void handleInvalidSearchRequestException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                 "Invalid search request",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
@@ -180,7 +180,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                             TranslatableException ex) throws IOException {
         Context context = ContextUtil.obtainContext(request);
         sendErrorResponse(
-            request, response, null, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
+            request, response, (Exception) ex, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
         );
     }
 
@@ -188,7 +188,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                           "A required parameter is invalid",
                           HttpStatus.BAD_REQUEST.value());
     }
@@ -197,7 +197,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                           "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
     }
