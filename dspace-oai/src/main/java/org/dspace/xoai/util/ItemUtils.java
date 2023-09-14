@@ -11,8 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
@@ -23,9 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -39,9 +34,6 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.data.DSpaceItem;
@@ -64,9 +56,6 @@ public class ItemUtils {
 
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
-
-    private static final AuthorizeService authorizeService =
-            AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -152,9 +141,6 @@ public class ItemUtils {
                 if (description != null) {
                     bitstream.getField().add(createValue("description", description));
                 }
-                // Add bitstream embargo information (READ policy present, for Anonymous group with a start date)
-                addEmbargoField(context, bit, bitstream);
-
                 bitstream.getField().add(createValue("format", bit.getFormat(context).getMIMEType()));
                 bitstream.getField().add(createValue("size", "" + bit.getSizeBytes()));
                 bitstream.getField().add(createValue("url", url));
@@ -165,46 +151,6 @@ public class ItemUtils {
         }
 
         return bundles;
-    }
-
-    /**
-     * This method will add embargo metadata for a give bitstream with an active embargo.
-     * It will parse of relevant policies and select the longest active embargo
-     * @param context
-     * @param bitstream the bitstream object
-     * @param bitstreamEl the bitstream metadata object to add embargo value to
-     * @throws SQLException
-     */
-    private static void addEmbargoField(Context context, Bitstream bitstream, Element bitstreamEl) throws SQLException {
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-        List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context,
-                bitstream,
-                ResourcePolicy.TYPE_CUSTOM);
-
-        Date embargoDate = null;
-
-        // Account for cases where there could be more than one embargo policy
-        for (ResourcePolicy policy : policies) {
-            if (policy.getGroup() == anonymousGroup && policy.getAction() == Constants.READ) {
-                Date startDate = policy.getStartDate();
-                if (startDate != null && startDate.after(new Date())) {
-                    // There is an active embargo: aim to take the longest embargo
-                    if (embargoDate == null) {
-                        embargoDate = startDate;
-                    } else {
-                        embargoDate = startDate.after(embargoDate) ? startDate : embargoDate;
-                    }
-                }
-            }
-        }
-
-        if (embargoDate != null) {
-            // Sort array of dates to extract the longest embargo
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            bitstreamEl.getField().add(
-                    createValue("embargo", formatter.format(embargoDate)));
-        }
     }
 
     private static Element createLicenseElement(Context context, Item item)
