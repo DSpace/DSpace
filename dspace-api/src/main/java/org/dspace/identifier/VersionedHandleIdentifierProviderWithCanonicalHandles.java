@@ -180,45 +180,46 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     @Override
     public void register(Context context, DSpaceObject dso, String identifier) {
         try {
+            if (dso instanceof Item) {
+                Item item = (Item) dso;
+                // if this identifier is already present in the Handle table and the corresponding item
+                // has a history, then someone is trying to restore the latest version for the item. When
+                // trying to restore the latest version, the identifier in input doesn't have the
+                // 1234/123.latestVersion. Instead, it is the canonical 1234/123
+                VersionHistory itemHistory = getHistory(context, identifier);
+                if (!identifier.matches(".*/.*\\.\\d+") && itemHistory != null) {
 
-            Item item = (Item) dso;
+                    int newVersionNumber = versionHistoryService.getLatestVersion(context, itemHistory)
+                                                                .getVersionNumber() + 1;
+                    String canonical = identifier;
+                    identifier = identifier.concat(".").concat("" + newVersionNumber);
+                    restoreItAsVersion(context, dso, identifier, item, canonical, itemHistory);
+                } else if (identifier.matches(".*/.*\\.\\d+")) {
+                    // if identifier == 1234.5/100.4 reinstate the version 4 in the version table if absent
 
-            // if for this identifier is already present a record in the Handle table and the corresponding item
-            // has an history someone is trying to restore the latest version for the item. When
-            // trying to restore the latest version the identifier in input doesn't have the for 1234/123.latestVersion
-            // it is the canonical 1234/123
-            VersionHistory itemHistory = getHistory(context, identifier);
-            if (!identifier.matches(".*/.*\\.\\d+") && itemHistory != null) {
-
-                int newVersionNumber = versionHistoryService.getLatestVersion(context, itemHistory)
-                                                            .getVersionNumber() + 1;
-                String canonical = identifier;
-                identifier = identifier.concat(".").concat("" + newVersionNumber);
-                restoreItAsVersion(context, dso, identifier, item, canonical, itemHistory);
-            } else if (identifier.matches(".*/.*\\.\\d+")) {
-                // if identifier == 1234.5/100.4 reinstate the version 4 in the version table if absent
-
-                // if it is a version of an item is needed to put back the record
-                // in the versionitem table
-                String canonical = getCanonical(identifier);
-                DSpaceObject canonicalItem = this.resolve(context, canonical);
-                if (canonicalItem == null) {
-                    restoreItAsCanonical(context, dso, identifier, item, canonical);
-                } else {
-                    VersionHistory history = versionHistoryService.findByItem(context, (Item) canonicalItem);
-                    if (history == null) {
+                    // if it is a version of an item is needed to put back the record
+                    // in the versionitem table
+                    String canonical = getCanonical(identifier);
+                    DSpaceObject canonicalItem = this.resolve(context, canonical);
+                    if (canonicalItem == null) {
                         restoreItAsCanonical(context, dso, identifier, item, canonical);
                     } else {
-                        restoreItAsVersion(context, dso, identifier, item, canonical, history);
+                        VersionHistory history = versionHistoryService.findByItem(context, (Item) canonicalItem);
+                        if (history == null) {
+                            restoreItAsCanonical(context, dso, identifier, item, canonical);
+                        } else {
+                            restoreItAsVersion(context, dso, identifier, item, canonical, history);
 
+                        }
                     }
-                }
-            } else {
-                //A regular handle
-                createNewIdentifier(context, dso, identifier);
-                if (dso instanceof Item) {
+                } else {
+                    // A regular handle to create for an Item
+                    createNewIdentifier(context, dso, identifier);
                     modifyHandleMetadata(context, item, getCanonical(identifier));
                 }
+            } else {
+                // Handle being registered for a different type of object (e.g. Collection or Community)
+                createNewIdentifier(context, dso, identifier);
             }
         } catch (IOException | SQLException | AuthorizeException e) {
             log.error(LogHelper.getHeader(context,
