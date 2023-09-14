@@ -175,7 +175,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     @Override
     public String getEmbargoFromItem(Context context, Item item)
             throws SQLException {
-        Date embargoDate;
+        Date embargoedDate;
 
         if (item == null) {
             return null;
@@ -202,15 +202,15 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
             return null;
         }
 
-        embargoDate = this.retrieveLongestEmbargo(context, bitstream);
+        embargoedDate = this.retrieveShortestEmbargo(context, bitstream);
 
-        return embargoDate != null ? embargoDate.toString() : null;
+        return embargoedDate != null ? embargoedDate.toString() : null;
     }
 
     /**
      *
      */
-    private Date retrieveLongestEmbargo(Context context, Bitstream bitstream) throws SQLException {
+    private Date retrieveShortestEmbargo(Context context, Bitstream bitstream) throws SQLException {
         Date embargoDate = null;
         // Only consider read policies.
         List<ResourcePolicy> policies = authorizeService
@@ -228,11 +228,12 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                     Date startDate = policy.getStartDate();
 
                     if (startDate != null && !startDate.before(LocalDate.now().toDate())) {
-                        // There is an active embargo: aim to take the longest embargo
+                        // There is an active embargo: aim to take the shortest embargo (account for rare cases where
+                        // more than one resource policy exists)
                         if (embargoDate == null) {
                             embargoDate = startDate;
                         } else {
-                            embargoDate = startDate.after(embargoDate) ? startDate : embargoDate;
+                            embargoDate = startDate.before(embargoDate) ? startDate : embargoDate;
                         }
                     }
                 }
