@@ -3091,6 +3091,84 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
+    // Test of /groups/[uuid]/epersons pagination
+    @Test
+    public void epersonMemberPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test1@example.com")
+                                         .withNameInMetadata("Test1", "User")
+                                         .build();
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test2@example.com")
+                                         .withNameInMetadata("Test2", "User")
+                                         .build();
+        EPerson eperson3 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test3@example.com")
+                                         .withNameInMetadata("Test3", "User")
+                                         .build();
+        EPerson eperson4 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test4@example.com")
+                                         .withNameInMetadata("Test4", "User")
+                                         .build();
+        EPerson eperson5 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test5@example.com")
+                                         .withNameInMetadata("Test5", "User")
+                                         .build();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group")
+                                  .addMember(eperson1)
+                                  .addMember(eperson2)
+                                  .addMember(eperson3)
+                                  .addMember(eperson4)
+                                  .addMember(eperson5)
+                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/epersons")
+                                              .param("page", "0")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(0)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/epersons")
+                                              .param("page", "1")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(1)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/epersons")
+                                              .param("page", "2")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(1)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(2)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
     @Test
     public void commAdminAndColAdminCannotExploitItemReadGroupTest() throws Exception {
 
