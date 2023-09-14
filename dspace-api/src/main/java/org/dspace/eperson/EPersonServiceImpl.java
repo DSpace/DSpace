@@ -567,11 +567,26 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
+        return findByGroups(c, groups, -1, -1);
+    }
+
+    @Override
+    public List<EPerson> findByGroups(Context c, Set<Group> groups, int pageSize, int offset) throws SQLException {
         //Make sure we at least have one group, if not don't even bother searching.
         if (CollectionUtils.isNotEmpty(groups)) {
-            return ePersonDAO.findByGroups(c, groups);
+            return ePersonDAO.findByGroups(c, groups, pageSize, offset);
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public int countByGroups(Context c, Set<Group> groups) throws SQLException {
+        //Make sure we at least have one group, if not don't even bother counting.
+        if (CollectionUtils.isNotEmpty(groups)) {
+            return ePersonDAO.countByGroups(c, groups);
+        } else {
+            return 0;
         }
     }
 
