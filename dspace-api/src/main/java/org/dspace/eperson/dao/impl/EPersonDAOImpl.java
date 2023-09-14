@@ -112,7 +112,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-    public List<EPerson> findByGroups(Context context, Set<Group> groups, int pageSize, int offset) throws SQLException {
+    public List<EPerson> findByGroups(Context context, Set<Group> groups, int pageSize, int offset)
+        throws SQLException {
         Query query = createQuery(context,
                                   "SELECT DISTINCT e FROM EPerson e " +
                                       "JOIN e.groups g " +
@@ -122,10 +123,16 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         for (Group group : groups) {
             idList.add(group.getID());
         }
-
         query.setParameter("idList", idList);
 
-        return list(query, pageSize, offset);
+        if (pageSize > 0) {
+            query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+            query.setFirstResult(offset);
+        }
+
+        return list(query);
     }
 
     @Override
