@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -313,7 +314,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(jsonPath("$.page.totalElements", is(3)));
-        ;
 
         getClient(token).perform(get("/api/core/items")
                    .param("size", "2")
@@ -596,7 +596,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -651,7 +651,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .build();
 
         context.restoreAuthSystemState();
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -700,7 +700,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // try to use an unauthorized user
         String token = getAuthToken(eperson.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -760,7 +760,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", null);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -822,7 +822,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -882,7 +882,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -932,7 +932,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -977,7 +977,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1031,7 +1031,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1076,7 +1076,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1119,7 +1119,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1165,7 +1165,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         // String value should work.
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", "false");
         ops.add(replaceOperation);
@@ -1212,7 +1212,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1257,7 +1257,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", false);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1311,7 +1311,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", null);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1638,7 +1638,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withIssueDate("2017-12-18")
                                          .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                          .withSubject("ExtraEntry")
-                                         .withEmbargoPeriod("6 months")
+                                         .withEmbargoPeriod(Period.ofMonths(6))
                                          .build();
 
         //3. a public item
@@ -1729,7 +1729,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2015-10-21")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
-                .withEmbargoPeriod("1 week")
+                .withEmbargoPeriod(Period.ofWeeks(1))
                 .build();
 
         context.restoreAuthSystemState();
@@ -1778,7 +1778,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("embargoed item 1")
                 .withIssueDate("2017-11-18")
                 .withAuthor("Smith, Donald")
-                .withEmbargoPeriod("-2 week")
+                .withEmbargoPeriod(Period.ofWeeks(-2))
                 .build();
 
         context.restoreAuthSystemState();
@@ -2069,7 +2069,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         UUID idRef = null;
-        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         try {
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
@@ -3895,7 +3895,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         createOrcidQueue(context, firstProfile, publication).build();
         createOrcidQueue(context, secondProfile, publication).build();
 
-        List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
+        List<OrcidHistory> historyRecords = new ArrayList<>();
         historyRecords.add(createOrcidHistory(context, firstProfile, publication).build());
         historyRecords.add(createOrcidHistory(context, firstProfile, publication).withPutCode("12345").build());
         historyRecords.add(createOrcidHistory(context, secondProfile, publication).build());
@@ -3982,7 +3982,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         createOrcidQueue(context, firstProfile, funding).build();
         createOrcidQueue(context, secondProfile, funding).build();
 
-        List<OrcidHistory> historyRecords = new ArrayList<OrcidHistory>();
+        List<OrcidHistory> historyRecords = new ArrayList<>();
         historyRecords.add(createOrcidHistory(context, firstProfile, funding).build());
         historyRecords.add(createOrcidHistory(context, firstProfile, funding).withPutCode("12345").build());
         historyRecords.add(createOrcidHistory(context, secondProfile, funding).build());
@@ -4081,7 +4081,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -4131,7 +4131,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .param("projection", "full"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
-                                        col1.getName(), col1.getID(), col1.getHandle())));;
+                                        col1.getName(), col1.getID(), col1.getHandle())));
 
         // try to spoof information as a logged in eperson using embedding, verify that no embedds are included
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())

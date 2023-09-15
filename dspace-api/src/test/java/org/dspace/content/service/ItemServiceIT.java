@@ -54,8 +54,8 @@ import org.dspace.versioning.service.VersioningService;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemServiceTest.class);
+public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemServiceIT.class);
 
     protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     protected RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()

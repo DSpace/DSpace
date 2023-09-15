@@ -90,13 +90,11 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
     @Override
     public long countHandlesByPrefix(Session session, String prefix) throws SQLException {
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
-        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Handle.class);
 
         Root<Handle> handleRoot = criteriaQuery.from(Handle.class);
-        criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Handle.class)));
+        criteriaQuery.select(handleRoot);
         criteriaQuery.where(criteriaBuilder.like(handleRoot.get(Handle_.handle), prefix + "%"));
         return countLong(session, criteriaQuery, criteriaBuilder, handleRoot);
     }
