@@ -3169,6 +3169,79 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                  .andExpect(jsonPath("$.page.totalElements", is(5)));
     }
 
+    // Test of /groups/[uuid]/subgroups pagination
+    @Test
+    public void subgroupPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group")
+                                  .build();
+
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 1")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 2")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 3")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 4")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 5")
+                    .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/subgroups")
+                                              .param("page", "0")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.subgroups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.subgroups").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(0)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/subgroups")
+                                              .param("page", "1")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.subgroups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.subgroups").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(1)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/subgroups")
+                                              .param("page", "2")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.subgroups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.subgroups").value(Matchers.hasSize(1)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(2)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
     @Test
     public void commAdminAndColAdminCannotExploitItemReadGroupTest() throws Exception {
 

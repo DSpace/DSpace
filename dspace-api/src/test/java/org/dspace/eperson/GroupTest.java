@@ -10,6 +10,7 @@ package org.dspace.eperson;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -24,6 +25,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
@@ -618,6 +620,31 @@ public class GroupTest extends AbstractUnitTest {
         ePersonService.delete(context, person);
         context.restoreAuthSystemState();
         assertTrue(groupService.isEmpty(level2Group));
+    }
+
+    @Test
+    public void findAndCountByParent() throws SQLException, AuthorizeException, IOException {
+        // Create a parent group with 3 child groups
+        Group parentGroup = createGroup("parentGroup");
+        Group childGroup = createGroup("childGroup");
+        Group child2Group = createGroup("child2Group");
+        Group child3Group = createGroup("child3Group");
+        groupService.addMember(context, parentGroup, childGroup);
+        groupService.addMember(context, parentGroup, child2Group);
+        groupService.addMember(context, parentGroup, child3Group);
+        groupService.update(context, parentGroup);
+
+        // Assert that findByParent is the same list of groups as getMemberGroups() when pagination is ignored
+        // (NOTE: Pagination is tested in GroupRestRepositoryIT)
+        assertEquals(parentGroup.getMemberGroups(), groupService.findByParent(context, parentGroup, -1, -1));
+        // Assert countBy parent is the same as the size of group members
+        assertEquals(parentGroup.getMemberGroups().size(), groupService.countByParent(context, parentGroup));
+
+        // Clean up our data
+        groupService.delete(context, parentGroup);
+        groupService.delete(context, childGroup);
+        groupService.delete(context, child2Group);
+        groupService.delete(context, child3Group);
     }
 
 
