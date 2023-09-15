@@ -254,9 +254,8 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     /**
      * Retrieve all EPerson accounts which belong to at least one of the specified groups.
      * <P>
-     * WARNING: This method should be used sparingly, as it could have performance issues for Groups with very large
-     * lists of members. In that situation, a very large number of EPerson objects will be loaded into memory.
-     * See https://github.com/DSpace/DSpace/issues/9052
+     * WARNING: This method may have bad performance issues for Groups with a very large number of members,
+     * as it will load all member EPerson objects into memory.
      * <P>
      * For better performance, use the paginated version of this method.
      *

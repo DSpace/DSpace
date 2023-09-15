@@ -829,4 +829,20 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public String getName(Group dso) {
         return dso.getName();
     }
+
+    @Override
+    public List<Group> findByParent(Context context, Group parent, int pageSize, int offset) throws SQLException {
+        if (parent == null) {
+            return null;
+        }
+        return groupDAO.findByParent(context, parent, pageSize, offset);
+    }
+
+    @Override
+    public int countByParent(Context context, Group parent) throws SQLException {
+        if (parent == null) {
+            return 0;
+        }
+        return groupDAO.countByParent(context, parent);
+    }
 }

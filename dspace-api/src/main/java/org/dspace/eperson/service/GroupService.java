@@ -327,4 +327,29 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      */
     List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField)
         throws SQLException;
+
+    /**
+     * Find all groups which are a member of the given Parent group
+     *
+     * @param context The relevant DSpace Context.
+     * @param parent The parent Group to search on
+     * @param pageSize           how many results return
+     * @param offset             the position of the first result to return
+     * @return List of all groups which are members of the parent group
+     * @throws SQLException database exception if error
+     */
+    List<Group> findByParent(Context context, Group parent, int pageSize, int offset)
+        throws SQLException;
+
+    /**
+     * Return number of groups which are a member of the given Parent group.
+     * Can be used with findByParent() for pagination of all groups within a given Parent group.
+     *
+     * @param context The relevant DSpace Context.
+     * @param parent The parent Group to search on
+     * @return number of groups which are members of the parent group
+     * @throws SQLException database exception if error
+     */
+    int countByParent(Context context, Group parent)
+        throws SQLException;
 }
