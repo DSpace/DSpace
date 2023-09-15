@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.mail.MessagingException;
 
 import org.apache.commons.codec.DecoderException;
@@ -1029,6 +1030,42 @@ public class EPersonTest extends AbstractUnitTest {
                 wfi.getSubmitter());
     }
 
+    @Test
+    public void findAndCountByGroups() throws SQLException, AuthorizeException, IOException {
+        // Create a group with 3 EPerson members
+        Group group = createGroup("parentGroup");
+        EPerson eperson1 = createEPersonAndAddToGroup("test1@example.com", group);
+        EPerson eperson2 = createEPersonAndAddToGroup("test2@example.com", group);
+        EPerson eperson3 = createEPersonAndAddToGroup("test3@example.com", group);
+        groupService.update(context, group);
+
+        // Assert that findByGroup is the same list of EPersons as getMembers() when pagination is ignored
+        // (NOTE: Pagination is tested in GroupRestRepositoryIT)
+        assertEquals(group.getMembers(), ePersonService.findByGroups(context, Set.of(group), -1, -1));
+        // Assert countByGroups is the same as the size of members
+        assertEquals(group.getMembers().size(), ePersonService.countByGroups(context, Set.of(group)));
+
+        // Add another group with duplicate EPerson
+        Group group2 = createGroup("anotherGroup");
+        groupService.addMember(context, group2, eperson1);
+        groupService.update(context, group2);
+
+        // Verify countByGroups is still 3 (existing person should not be counted twice)
+        assertEquals(3, ePersonService.countByGroups(context, Set.of(group, group2)));
+
+        // Add a new EPerson to new group, verify count goes up by one
+        EPerson eperson4 = createEPersonAndAddToGroup("test4@example.com", group2);
+        assertEquals(4, ePersonService.countByGroups(context, Set.of(group, group2)));
+
+        // Clean up our data
+        groupService.delete(context, group);
+        groupService.delete(context, group2);
+        ePersonService.delete(context, eperson1);
+        ePersonService.delete(context, eperson2);
+        ePersonService.delete(context, eperson3);
+        ePersonService.delete(context, eperson4);
+    }
+
     /**
      * Creates an item, sets the specified submitter.
      *
@@ -1074,5 +1111,33 @@ public class EPersonTest extends AbstractUnitTest {
         workspaceItemService.update(context, wsi);
         context.restoreAuthSystemState();
         return wsi;
+    }
+
+    protected Group createGroup(String name) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        Group group = groupService.create(context);
+        group.setName(name);
+        groupService.update(context, group);
+        context.restoreAuthSystemState();
+        return group;
+    }
+
+    protected EPerson createEPersonAndAddToGroup(String email, Group group) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = createEPerson(email);
+        groupService.addMember(context, group, ePerson);
+        groupService.update(context, group);
+        ePersonService.update(context, ePerson);
+        context.restoreAuthSystemState();
+        return ePerson;
+    }
+
+    protected EPerson createEPerson(String email) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = ePersonService.create(context);
+        ePerson.setEmail(email);
+        ePersonService.update(context, ePerson);
+        context.restoreAuthSystemState();
+        return ePerson;
     }
 }
