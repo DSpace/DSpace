@@ -640,7 +640,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject dso, Group group, int action, int policyID)
         throws SQLException {
-        return !resourcePolicyService.findByTypeGroupActionExceptId(c.getSession(), dso, group, action, policyID).isEmpty();
+        return !resourcePolicyService.findByTypeGroupActionExceptId(c.getSession(),
+                dso, group, action, policyID).isEmpty();
     }
 
     @Override

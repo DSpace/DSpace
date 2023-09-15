@@ -241,9 +241,10 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void cardinalityOnIssueJournalJournalVolumeRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context.getSession(), entityTypeService.findByEntityType(context.getSession(), "JournalVolume"),
-                                  entityTypeService.findByEntityType(context.getSession(), "JournalIssue"),
-                                  "isIssueOfJournalVolume", "isJournalVolumeOfIssue");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "JournalVolume"),
+                    entityTypeService.findByEntityType(context.getSession(), "JournalIssue"),
+                    "isIssueOfJournalVolume", "isJournalVolumeOfIssue");
         assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
         assertEquals(((Integer) 1), relationshipType.getRightMinCardinality());
         assertNull(relationshipType.getLeftMaxCardinality());
